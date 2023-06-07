@@ -145,5 +145,9 @@
     "account-settings": "帳號設定",
     "logout": "登出",
 
-    "more-items": "更多項目"
+    "more-items": "更多項目",
+
+    "template":"模板类",
+    "create-center":"创作中心",
+    "templateMarket":"模板市场"
 }

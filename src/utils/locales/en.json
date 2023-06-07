@@ -147,5 +147,9 @@
     "account-settings": "Account settings",
     "logout": "Logout",
 
-    "more-items": "More Items"
+    "more-items": "More Items",
+
+    "template":"Template Class",
+    "create-center":"createCenter",
+    "templateMarket":"templateMarket"
 }

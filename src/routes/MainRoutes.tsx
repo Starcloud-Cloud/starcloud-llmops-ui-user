@@ -5,6 +5,10 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 
+// template routing
+const Market = Loadable(lazy(() => import('views/template/market')));
+const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const DashboardAnalytics = Loadable(lazy(() => import('views/dashboard/Analytics')));
@@ -511,6 +515,14 @@ const MainRoutes = {
         {
             path: '/dashboard/analytics',
             element: <DashboardAnalytics />
+        },
+        {
+            path: '/template/templateMarket',
+            element: <Market />
+        },
+        {
+            path: '/template/createCenter',
+            element: <CreateCenter />
         }
     ]
 };

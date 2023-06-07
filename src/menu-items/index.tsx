@@ -7,11 +7,12 @@ import utilities from './utilities';
 import support from './support';
 import other from './other';
 import { NavItemType } from 'types';
+import template from './template';
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-    items: [dashboard, application, forms, elements, pages, utilities, support, other]
+    items: [template, dashboard, application, forms, elements, pages, utilities, support, other]
 };
 
 export default menuItems;

@@ -1,12 +1,10 @@
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // project import
 import { useSelector } from 'store';
 
 // assets
 import { IconChartArcs, IconClipboardList, IconChartInfographic } from '@tabler/icons';
 import { NavItemType } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 const icons = {
     widget: IconChartArcs,
@@ -24,7 +22,7 @@ export const Menu = () => {
         return subChildrenLis?.map((subList: NavItemType) => {
             return {
                 ...subList,
-                title: <FormattedMessage id={`${subList.title}`} />,
+                title: subList.title ? t(subList.title as string) : '默认值',
                 // @ts-ignore
                 icon: icons[subList.icon]
             };
@@ -34,7 +32,7 @@ export const Menu = () => {
     const menuItem = (subList: NavItemType) => {
         let list: NavItemType = {
             ...subList,
-            title: <FormattedMessage id={`${subList.title}`} />,
+            title: subList.title ? t(subList.title as string) : '默认值',
             // @ts-ignore
             icon: icons[subList.icon]
         };
@@ -51,7 +49,7 @@ export const Menu = () => {
 
     const menuList: NavItemType = {
         ...menu,
-        title: <FormattedMessage id={`${menu.title}`} />,
+        title: menu.title ? t(menu.title as string) : '默认值',
         // @ts-ignore
         icon: icons[menu.icon],
         children: ChildrenList

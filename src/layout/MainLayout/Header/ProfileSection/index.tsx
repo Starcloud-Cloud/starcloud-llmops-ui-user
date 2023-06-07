@@ -26,7 +26,6 @@ import {
 } from '@mui/material';
 
 // third-party
-import { FormattedMessage } from 'react-intl';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // project imports
@@ -35,6 +34,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import UpgradePlanCard from './UpgradePlanCard';
 import useAuth from 'hooks/useAuth';
 import User1 from 'assets/images/users/user-round.svg';
+import { t } from 'hooks/web/useI18n';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
@@ -265,11 +265,7 @@ const ProfileSection = () => {
                                                             <IconSettings stroke={1.5} size="20px" />
                                                         </ListItemIcon>
                                                         <ListItemText
-                                                            primary={
-                                                                <Typography variant="body2">
-                                                                    <FormattedMessage id="account-settings" />
-                                                                </Typography>
-                                                            }
+                                                            primary={<Typography variant="body2">{t('account-settings')}</Typography>}
                                                         />
                                                     </ListItemButton>
                                                     <ListItemButton
@@ -286,9 +282,7 @@ const ProfileSection = () => {
                                                             primary={
                                                                 <Grid container spacing={1} justifyContent="space-between">
                                                                     <Grid item>
-                                                                        <Typography variant="body2">
-                                                                            <FormattedMessage id="social-profile" />
-                                                                        </Typography>
+                                                                        <Typography variant="body2">{t('social-profile')}</Typography>
                                                                     </Grid>
                                                                     <Grid item>
                                                                         <Chip
@@ -315,13 +309,7 @@ const ProfileSection = () => {
                                                         <ListItemIcon>
                                                             <IconLogout stroke={1.5} size="20px" />
                                                         </ListItemIcon>
-                                                        <ListItemText
-                                                            primary={
-                                                                <Typography variant="body2">
-                                                                    <FormattedMessage id="logout" />
-                                                                </Typography>
-                                                            }
-                                                        />
+                                                        <ListItemText primary={<Typography variant="body2">{t('logout')}</Typography>} />
                                                     </ListItemButton>
                                                 </List>
                                             </Box>

@@ -17,9 +17,6 @@ import {
     useMediaQuery
 } from '@mui/material';
 
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // project imports
 import LAYOUT_CONST from 'constant';
 import NavCollapse from '../NavCollapse';
@@ -27,6 +24,7 @@ import NavItem from '../NavItem';
 import useConfig from 'hooks/useConfig';
 import Transitions from 'ui-component/extended/Transitions';
 import { dispatch, useSelector } from 'store';
+import { t } from 'hooks/web/useI18n';
 
 // assets
 import { IconChevronDown, IconChevronRight, IconMinusVertical } from '@tabler/icons';
@@ -237,7 +235,7 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                             sx={{ mr: 1 }}
                             primary={
                                 <Typography variant={selectedID === currentItem.id ? 'h5' : 'body1'} color="inherit">
-                                    {currentItem.id === lastItemId ? <FormattedMessage id="more-items" /> : currentItem.title}
+                                    {currentItem.id === lastItemId ? t('more-items') : currentItem.title}
                                 </Typography>
                             }
                         />

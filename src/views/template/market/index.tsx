@@ -5,10 +5,11 @@ import Link from '@mui/material/Link';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 
-import Template from 'views/template/myTemplate/components/template';
+// import Template from 'views/template/myTemplate/components/template';
 import CarryOut from 'views/template/carryOut';
 
 import { useState } from 'react';
@@ -34,8 +35,8 @@ function TemplateMarket() {
                 </Grid>
             </Grid>
             {/* <Template /> */}
-            <Box>
-                <Breadcrumbs aria-label="breadcrumb">
+            <Card sx={{ padding: 2 }}>
+                <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
                     <Link underline="hover" color="inherit" href="#">
                         MUI
                     </Link>
@@ -66,7 +67,7 @@ function TemplateMarket() {
                     </Button>
                 </Box>
                 <CarryOut />
-            </Box>
+            </Card>
         </Box>
     );
 }

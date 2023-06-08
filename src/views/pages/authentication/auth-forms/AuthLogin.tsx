@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // material-ui
@@ -31,6 +31,10 @@ import useScriptRef from 'hooks/useScriptRef';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+//Ruoyi API
+import * as LoginApi from 'api/login';
+import * as authUtil from 'utils/auth';
+
 // ===============================|| JWT LOGIN ||=============================== //
 
 const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
@@ -40,7 +44,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const scriptedRef = useScriptRef();
 
     const [checked, setChecked] = React.useState(true);
+    const [loginData, setLoginData] = useState({
+        isShowPassword: false,
+        captchaEnable: process.env.REACT_APP_CAPTCHA_ENABLE,
+        tenantEnable: process.env.REACT_APP_TENANT_ENABLE,
+        loginForm: {
+            tenantName: '芋道源码',
+            username: 'admin',
+            password: 'admin123',
+            captchaVerification: '',
+            rememberMe: false
+        }
+    });
 
+    console.log('process.env.REACT_APP_TENANT_ENABLE', process.env.REACT_APP_TENANT_ENABLE);
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -50,21 +67,46 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         event.preventDefault()!;
     };
 
+    const getTenantId = async () => {
+        if (loginData.tenantEnable === 'true') {
+            const res = await LoginApi.getTenantIdByName(loginData.loginForm.tenantName);
+            authUtil.setTenantId(res);
+            console.log('getTenantId', authUtil.getTenantId());
+        }
+    };
     return (
         <Formik
             initialValues={{
                 email: 'info@codedthemes.com',
                 password: '123456',
+                captchaVerification: '', // Add this line
                 submit: null
             }}
             validationSchema={Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                password: Yup.string().max(255).required('Password is required')
+                // email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                password: Yup.string().max(255).required('Password is required'),
+                captchaVerification: Yup.string() // And this line (optional, if you want validation for captchaVerification)
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    await login(values.email, values.password);
+                    await getTenantId();
+                    const updatedLoginForm = {
+                        ...loginData.loginForm,
+                        username: values.email,
+                        password: values.password,
+                        captchaVerification: values?.captchaVerification
+                    };
+                    const res = await LoginApi.login(updatedLoginForm);
+                    // await login(values.email, values.password);
 
+                    if (!res) {
+                        return;
+                    }
+                    setLoginData((prevState) => ({
+                        ...prevState,
+                        loginForm: updatedLoginForm
+                    }));
+                    authUtil.setToken(res);
                     if (scriptedRef.current) {
                         setStatus({ success: true });
                         setSubmitting(false);

@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
 // project imports
 import MainLayout from 'layout/MainLayout';
@@ -7,6 +8,8 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
+const MarketList = Loadable(lazy(() => import('views/template/market/components/list')));
+const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 
 // dashboard routing
@@ -518,8 +521,19 @@ const MainRoutes = {
         },
         {
             path: '/template/templateMarket',
-            element: <Market />
+            element: <Market />,
+            children: [
+                {
+                    path: 'list',
+                    element: <MarketList />
+                },
+                {
+                    path: 'detail',
+                    element: <MarketDetail />
+                }
+            ]
         },
+
         {
             path: '/template/createCenter',
             element: <CreateCenter />

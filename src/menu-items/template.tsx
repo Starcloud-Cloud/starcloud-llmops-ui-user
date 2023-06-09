@@ -23,7 +23,7 @@ const template: NavItemType = {
             id: 'templateMarket',
             title: t('templateMarket'),
             type: 'item',
-            url: '/template/templateMarket',
+            url: '/template/templateMarket/list',
             icon: icons.IconDashboard,
             breadcrumbs: false
         },

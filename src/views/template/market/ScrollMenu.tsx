@@ -12,21 +12,28 @@ import { useContext } from 'react';
 
 function ScrollMenus() {
     const items = [
-        'Apple',
-        'Banana',
-        'Cherry',
-        'Durian',
-        'Elderberry',
-        'Apple',
-        'Banana',
-        'Cherry',
-        'Durian',
-        'Elderberry',
-        'Apple',
-        'Banana',
-        'Cherry',
-        'Durian',
-        'Elderberry'
+        'Listing创建和优化',
+        '产品分析和推广',
+        '店铺管理和售后',
+        '中文写作',
+        '有趣好玩',
+        '邮件营销',
+        '社媒文案',
+        'Image',
+        'Amazon',
+        'Email',
+        'Social Media',
+        'Blog',
+        'Writing',
+        'Custom',
+        'Other',
+        'Ads',
+        'Website',
+        'Marketing',
+        'Business',
+        'Resume',
+        'Role Play',
+        'Fun'
     ];
     const LeftArrow = () => {
         const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -64,7 +71,7 @@ function ScrollMenus() {
             {items.map((id, index) => (
                 <Box sx={{ mx: 2, textAlign: 'center' }} key={index}>
                     <BorderAllIcon />
-                    <Box>{id}</Box>
+                    <Box sx={{ whiteSpace: 'nowrap' }}>{id}</Box>
                 </Box>
             ))}
         </ScrollMenu>

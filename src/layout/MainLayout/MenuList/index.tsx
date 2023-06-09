@@ -9,6 +9,7 @@ import menuItem from 'menu-items';
 import NavGroup from './NavGroup';
 import useConfig from 'hooks/useConfig';
 import { Menu } from 'menu-items/widget';
+import { RuoyiMenu } from 'menu-items/ruoyi';
 
 import LAYOUT_CONST from 'constant';
 import { HORIZONTAL_MAX_ITEM } from 'config';
@@ -30,16 +31,18 @@ const MenuList = () => {
     }, []);
 
     let getMenu = Menu();
+    let getRuoyiMenu = RuoyiMenu();
     const handlerMenuItem = () => {
-        const isFound = menuItem.items.some((element) => {
-            if (element.id === 'widget') {
-                return true;
-            }
-            return false;
-        });
+        // const isMenuFound = menuItem.items.some((element) => element.id === 'widget');
+        const isRuoyiMenuFound = menuItem.items.some((element) => element.id === 'ruoyi'); // 假设 RuoyiMenu 的 id 为 'ruoyi'
 
-        if (getMenu?.id !== undefined && !isFound) {
-            menuItem.items.splice(1, 0, getMenu);
+        // if (getMenu?.id !== undefined && !isMenuFound) {
+        //     menuItem.items.splice(1, 0, getMenu);
+        // }
+
+        if (getRuoyiMenu?.id !== undefined && !isRuoyiMenuFound) {
+            // 添加这段代码，判断并添加 RuoyiMenu
+            menuItem.items.splice(2, 0, getRuoyiMenu); // 假设你想要将它添加到第三个位置
         }
     };
 

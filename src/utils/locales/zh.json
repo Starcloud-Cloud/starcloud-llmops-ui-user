@@ -102,7 +102,7 @@
         "large": "大",
         "small": "小"
     },
-    "login": {
+    "2login": {
         "requiredField": "该字段不能为空",
         "invalidEmail": "无效的邮箱地址",
         "invalidPhone": "无效的手机号码",
@@ -266,7 +266,7 @@
     "watermark": {
         "watermark": "水印"
     },
-    "table": {
+    "2table": {
         "table": "表格",
         "index": "序号",
         "title": "标题",
@@ -304,7 +304,7 @@
         "dataCreate": "字典数据新增",
         "dataUpdate": "字典数据编辑"
     },
-    "dialog": {
+    "2dialog": {
         "dialog": "弹窗",
         "open": "打开",
         "close": "关闭"
@@ -355,6 +355,36 @@
             "placeholder": "请输入锁屏密码或者用户密码"
         },
         "login": {
+            "requiredField": "该字段不能为空",
+            "invalidEmail": "无效的邮箱地址",
+            "invalidPhone": "无效的手机号码",
+            "invalidURL": "无效的URL地址",
+            "invalidColor": "无效的颜色格式",
+            "welcome": "欢迎使用本系统",
+            "message": "开箱即用的中后台管理系统",
+            "tenantname": "租户名称",
+            "username": "用户名",
+            "code": "验证码",
+            "login": "登录",
+            "relogin": "重新登录",
+            "otherLogin": "其他登录方式",
+            "register": "注册",
+            "checkPassword": "确认密码",
+            "remember": "记住我",
+            "hasUser": "已有账号？去登录",
+            "tenantNamePlaceholder": "请输入租户名称",
+            "usernamePlaceholder": "请输入用户名",
+            "codePlaceholder": "请输入验证码",
+            "mobileTitle": "手机登录",
+            "mobileNumber": "手机号码",
+            "mobileNumberPlaceholder": "请输入手机号码",
+            "backLogin": "返回",
+            "getSmsCode": "获取验证码",
+            "btnMobile": "手机登录",
+            "btnQRCode": "二维码登录",
+            "qrcode": "扫描二维码登录",
+            "btnRegister": "注册",
+            "SmsSendMsg": "验证码已发送",
             "backSignIn": "返回",
             "signInFormTitle": "登录",
             "ssoFormTitle": "三方授权",
@@ -387,7 +417,7 @@
             "mobile": "手机号码"
         }
     },
-    "profile": {
+    "2profile": {
         "user": {
             "title": "个人信息",
             "username": "用户名称",

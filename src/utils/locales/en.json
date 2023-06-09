@@ -102,41 +102,6 @@
         "large": "Large",
         "small": "Small"
     },
-    "login": {
-        "requiredField": "This field is required",
-        "invalidEmail": "Invalid email address",
-        "invalidPhone": "Invalid phone number",
-        "invalidURL": "Invalid URL",
-        "invalidColor": "Invalid color format",
-        "welcome": "Welcome to the system",
-        "message": "Backstage management system",
-        "tenantname": "TenantName",
-        "username": "Username",
-        "password": "Password",
-        "code": "verification code",
-        "login": "Sign in",
-        "relogin": "Sign in again",
-        "otherLogin": "Sign in with",
-        "register": "Register",
-        "checkPassword": "Confirm password",
-        "remember": "Remember me",
-        "hasUser": "Existing account? Go to login",
-        "forgetPassword": "Forget password?",
-        "tenantNamePlaceholder": "Please Enter Tenant Name",
-        "usernamePlaceholder": "Please Enter Username",
-        "passwordPlaceholder": "Please Enter Password",
-        "codePlaceholder": "Please Enter Verification Code",
-        "mobileTitle": "Mobile sign in",
-        "mobileNumber": "Mobile Number",
-        "mobileNumberPlaceholder": "Plaease Enter Mobile Number",
-        "backLogin": "back",
-        "getSmsCode": "Get SMS Code",
-        "btnMobile": "Mobile sign in",
-        "btnQRCode": "QR code sign in",
-        "qrcode": "Scan the QR code to log in",
-        "btnRegister": "Sign up",
-        "SmsSendMsg": "code has been sent"
-    },
     "captcha": {
         "verification": "Please complete security verification",
         "slide": "Swipe right to complete verification",
@@ -266,22 +231,7 @@
     "watermark": {
         "watermark": "Watermark"
     },
-    "table": {
-        "table": "Table",
-        "index": "Index",
-        "title": "Title",
-        "author": "Author",
-        "createTime": "Create time",
-        "action": "Action",
-        "pagination": "pagination",
-        "reserveIndex": "Reserve index",
-        "restoreIndex": "Restore index",
-        "showSelections": "Show selections",
-        "hiddenSelections": "Restore selections",
-        "showExpandedRows": "Show expanded rows",
-        "hiddenExpandedRows": "Hidden expanded rows",
-        "header": "Header"
-    },
+    "table": "Table",
     "action": {
         "create": "Create",
         "add": "Add",
@@ -305,11 +255,7 @@
         "dataUpdate": "Dict Data Eidt",
         "fileUpload": "File Upload"
     },
-    "dialog": {
-        "dialog": "Dialog",
-        "open": "Open",
-        "close": "Close"
-    },
+    "dialog": "Dialog",
     "sys": {
         "api": {
             "operationFailed": "Operation failed",
@@ -320,7 +266,6 @@
             "apiRequestFailed": "The interface request failed, please try again later!",
             "networkException": "network anomaly",
             "networkExceptionMsg": "Please check if your network connection is normal! The network is abnormal",
-
             "errMsg401": "The user does not have permission (token, user name, password error)!",
             "errMsg403": "The user is authorized, but access is forbidden!",
             "errMsg404": "Network request error, the resource was not found!",
@@ -363,28 +308,23 @@
             "signInFormTitle": "Sign in",
             "signUpFormTitle": "Sign up",
             "forgetFormTitle": "Reset password",
-
             "signInTitle": "Backstage management system",
             "signInDesc": "Enter your personal details and get started!",
             "policy": "I agree to the xxx Privacy Policy",
             "scanSign": "scanning the code to complete the login",
-
             "loginButton": "Sign in",
             "registerButton": "Sign up",
-            "rememberMe": "Remember me",
+            "rememberMe": "Keep me logged in",
             "forgetPassword": "Forget Password?",
             "otherSignIn": "Sign in with",
-
             "loginSuccessTitle": "Login successful",
             "loginSuccessDesc": "Welcome back",
-
             "accountPlaceholder": "Please input username",
             "passwordPlaceholder": "Please input password",
             "smsPlaceholder": "Please input sms code",
             "mobilePlaceholder": "Please input mobile",
             "policyPlaceholder": "Register after checking",
             "diffPwd": "The two passwords are inconsistent",
-
             "userName": "Username",
             "password": "Password",
             "confirmPassword": "Confirm Password",
@@ -393,44 +333,7 @@
             "mobile": "Mobile"
         }
     },
-    "profile": {
-        "user": {
-            "title": "Personal Information",
-            "username": "User Name",
-            "nickname": "Nick Name",
-            "mobile": "Phone Number",
-            "email": "User Mail",
-            "dept": "Department",
-            "posts": "Position",
-            "roles": "Own Role",
-            "sex": "Sex",
-            "man": "Man",
-            "woman": "Woman",
-            "createTime": "Created Date"
-        },
-        "info": {
-            "title": "Basic Information",
-            "basicInfo": "Basic Information",
-            "resetPwd": "Reset Password",
-            "userSocial": "Social Information"
-        },
-        "rules": {
-            "nickname": "Please Enter User Nickname",
-            "mail": "Please Input The Email Address",
-            "truemail": "Please Input The Correct Email Address",
-            "phone": "Please Enter The Phone Number",
-            "truephone": "Please Enter The Correct Phone Number"
-        },
-        "password": {
-            "oldPassword": "Old PassWord",
-            "newPassword": "New Password",
-            "confirmPassword": "Confirm Password",
-            "oldPwdMsg": "Please Enter Old Password",
-            "newPwdMsg": "Please Enter New Password",
-            "cfPwdMsg": "Please Enter Confirm Password",
-            "diffPwd": "The Passwords Entered Twice No Match"
-        }
-    },
+    "profile": "Profile",
     "cropper": {
         "selectImage": "Select Image",
         "uploadSuccess": "Uploaded success!",
@@ -448,17 +351,14 @@
     "dashboard": "Dashboard",
     "default": "Default",
     "analytics": "Analytics",
-
     "widget": "Widget",
     "statistics": "Statistics",
     "data": "Data",
     "chart": "Chart",
-
     "application": "Application",
     "users": "Users",
     "social-profile": "Social Profile",
     "account-profile": "Account Profile",
-    "profile": "Profile",
     "cards": "Cards",
     "list": "List",
     "style": "Style",
@@ -478,7 +378,6 @@
     "product-details": "Product Details",
     "product-list": "Product List",
     "checkout": "Checkout",
-
     "forms": "Forms",
     "components": "Components",
     "autocomplete": "Autocomplete",
@@ -496,7 +395,6 @@
     "wysiwug-editor": "Wysiwug Editor",
     "modal": "Modal",
     "tooltip": "Tooltip",
-    "table": "Table",
     "table-basic": "Basic Table",
     "table-dense": "Dense Table",
     "table-enhanced": "Enhanced Tables",
@@ -513,7 +411,6 @@
     "multi-column-forms": "Multi Column Forms",
     "action-bar": "Action Bar",
     "sticky-action-bar": "Sticky Action Bar",
-
     "ui-element": "UI Element",
     "basic": "Basic",
     "basic-caption": "8+ Basic Components",
@@ -523,10 +420,8 @@
     "breadcrumb": "Breadcrumb",
     "chip": "Chip",
     "tabs": "Tabs",
-
     "advance": "Advance",
     "alert": "Alert",
-    "dialog": "Dialog",
     "pagination": "Pagination",
     "progress": "Progress",
     "rating": "Rating",
@@ -536,11 +431,9 @@
     "timeline": "Timeline",
     "toggle-button": "Toggle Button",
     "treeview": "Treeview",
-
     "pages": "Pages",
     "pages-caption": "Prebuild Pages",
     "authentication": "Authentication",
-    "login": "Login",
     "register": "Register",
     "forgot-password": "Forgot Password",
     "check-mail": "Check Mail",
@@ -556,7 +449,6 @@
     "contact-us": "Contact US",
     "faqs": "FAQs",
     "privacy-policy": "Privacy Policy",
-
     "utilities": "Utilities",
     "typography": "Typography",
     "color": "Color",
@@ -566,7 +458,6 @@
     "material-icons": "Material Icons",
     "animation": "Animation",
     "grid": "Grid",
-
     "others": "Others",
     "menu-level": "Menu Levels",
     "level": "Level",
@@ -580,18 +471,17 @@
     "coded": "Coded",
     "c": "C",
     "outlined": "Outlined",
-
     "sample-page": "Sample Page",
     "documentation": "Documentation",
     "roadmap": "Roadmap",
-
     "title": "Multi Language",
     "home": "Home",
     "change": "Change Language",
     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiatnulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollitanim id est laborum.",
-
     "account-settings": "Account settings",
     "logout": "Logout",
-
-    "more-items": "More Items"
+    "more-items": "More Items",
+    "2login": {
+        "remember": "Remember Me"
+    }
 }

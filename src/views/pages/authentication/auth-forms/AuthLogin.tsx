@@ -34,6 +34,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 //Ruoyi API
 import * as LoginApi from 'api/login';
 import * as authUtil from 'utils/auth';
+import { t } from 'hooks/web/useI18n';
 
 // ===============================|| JWT LOGIN ||=============================== //
 
@@ -42,8 +43,6 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
     const { login } = useAuth();
     const scriptedRef = useScriptRef();
-
-    const [checked, setChecked] = React.useState(true);
     const [loginData, setLoginData] = useState({
         isShowPassword: false,
         captchaEnable: process.env.REACT_APP_CAPTCHA_ENABLE,
@@ -77,8 +76,8 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     return (
         <Formik
             initialValues={{
-                email: 'info@codedthemes.com',
-                password: '123456',
+                email: 'admin',
+                password: 'admin123',
                 captchaVerification: '', // Add this line
                 submit: null
             }}
@@ -97,8 +96,6 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         captchaVerification: values?.captchaVerification
                     };
                     const res = await LoginApi.login(updatedLoginForm);
-                    // await login(values.email, values.password);
-
                     if (!res) {
                         return;
                     }
@@ -106,7 +103,13 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         ...prevState,
                         loginForm: updatedLoginForm
                     }));
+                    if (loginData.loginForm.rememberMe) {
+                        authUtil.setLoginForm(updatedLoginForm);
+                    } else {
+                        authUtil.removeLoginForm();
+                    }
                     authUtil.setToken(res);
+                    await login();
                     if (scriptedRef.current) {
                         setStatus({ success: true });
                         setSubmitting(false);
@@ -178,13 +181,21 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={checked}
-                                        onChange={(event) => setChecked(event.target.checked)}
-                                        name="checked"
+                                        checked={loginData.loginForm.rememberMe}
+                                        onChange={(event) =>
+                                            setLoginData({
+                                                ...loginData,
+                                                loginForm: {
+                                                    ...loginData.loginForm,
+                                                    rememberMe: event.target.checked
+                                                }
+                                            })
+                                        }
+                                        name="rememberMe"
                                         color="primary"
                                     />
                                 }
-                                label="Keep me logged in"
+                                label={t('sys.login.rememberMe')}
                             />
                         </Grid>
                         <Grid item>

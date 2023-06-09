@@ -1,11 +1,10 @@
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // assets
 import { IconDashboard, IconDeviceAnalytics } from '@tabler/icons';
 
 // type
 import { NavItemType } from 'types';
+
+import { t } from 'hooks/web/useI18n';
 
 const icons = {
     IconDashboard: IconDashboard,
@@ -16,13 +15,13 @@ const icons = {
 
 const template: NavItemType = {
     id: 'template',
-    title: <FormattedMessage id="template" />,
+    title: t('template'),
     icon: icons.IconDashboard,
     type: 'group',
     children: [
         {
             id: 'templateMarket',
-            title: <FormattedMessage id="templateMarket" />,
+            title: t('templateMarket'),
             type: 'item',
             url: '/template/templateMarket',
             icon: icons.IconDashboard,
@@ -30,7 +29,7 @@ const template: NavItemType = {
         },
         {
             id: 'createCenter',
-            title: <FormattedMessage id="create-center" />,
+            title: t('create-center'),
             type: 'item',
             url: '/template/createCenter',
             icon: icons.IconDeviceAnalytics,

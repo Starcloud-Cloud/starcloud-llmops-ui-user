@@ -1,4 +1,4 @@
-import request from 'config/axios';
+import request from 'utils/axios';
 
 // 获得授权信息
 export const getAuthorize = (clientId: string) => {

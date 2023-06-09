@@ -1,14 +1,14 @@
 import i18n, { Resource } from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import enTranslation from 'locales/en.json';
-import cnTranslation from 'locales/zh.json';
+import enTranslation from 'utils/locales/en.json';
+import zhTranslation from 'utils/locales/zh.json';
 
 const resources: Resource = {
     en: {
         translation: enTranslation
     },
     cn: {
-        translation: cnTranslation
+        translation: zhTranslation
     }
 };
 

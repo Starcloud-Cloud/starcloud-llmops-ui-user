@@ -14,7 +14,13 @@ import axios from 'utils/axios';
 
 // types
 import { KeyedObject } from 'types';
-import { InitialLoginContextProps, JWTContextType } from 'types/auth';
+import { InitialLoginContextProps, JWTContextType, loginForm } from 'types/auth';
+
+import { getAccessToken } from 'utils/auth';
+import useUserStore from 'store/user';
+import useRouteStore from 'store/router';
+
+import * as LoginApi from 'api/login';
 
 const chance = new Chance();
 
@@ -25,16 +31,16 @@ const initialState: InitialLoginContextProps = {
     user: null
 };
 
-const verifyToken: (st: string) => boolean = (serviceToken) => {
-    if (!serviceToken) {
-        return false;
-    }
-    const decoded: KeyedObject = jwtDecode(serviceToken);
-    /**
-     * Property 'exp' does not exist on type '<T = unknown>(token: string, options?: JwtDecodeOptions | undefined) => T'.
-     */
-    return decoded.exp > Date.now() / 1000;
-};
+// const verifyToken: (st: string) => boolean = (serviceToken) => {
+//     if (!serviceToken) {
+//         return false;
+//     }
+//     const decoded: KeyedObject = jwtDecode(serviceToken);
+//     /**
+//      * Property 'exp' does not exist on type '<T = unknown>(token: string, options?: JwtDecodeOptions | undefined) => T'.
+//      */
+//     return decoded.exp > Date.now() / 1000;
+// };
 
 const setSession = (serviceToken?: string | null) => {
     if (serviceToken) {
@@ -51,20 +57,30 @@ const JWTContext = createContext<JWTContextType | null>(null);
 
 export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     const [state, dispatch] = useReducer(accountReducer, initialState);
+    const isSetUser = useUserStore((states) => states.isSetUser);
+    const setUserInfoAction = useUserStore((states) => states.setUserInfoAction);
+    const generateRoutes = useRouteStore((states) => states.generateRoutes);
+    const loginOut = useUserStore((states) => states.loginOut);
+    // const hasCheckedAuth = useRouteStore((states) => states.hasCheckedAuth);
+    // const setHasCheckedAuth = useRouteStore((states) => states.setHasCheckedAuth);
 
     useEffect(() => {
         const init = async () => {
             try {
-                const serviceToken = window.localStorage.getItem('serviceToken');
-                if (serviceToken && verifyToken(serviceToken)) {
-                    setSession(serviceToken);
-                    const response = await axios.get('/api/account/me');
-                    const { user } = response.data;
+                const serviceToken = await getAccessToken();
+                if (serviceToken) {
+                    if (!isSetUser) {
+                        await setUserInfoAction();
+                        await generateRoutes();
+                    }
+                    // setSession(serviceToken);
+                    // const response = await axios.get('/api/account/me');
+                    // const { user } = response.data;
                     dispatch({
                         type: LOGIN,
                         payload: {
                             isLoggedIn: true,
-                            user
+                            user: null
                         }
                     });
                 } else {
@@ -83,17 +99,29 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         init();
     }, []);
 
-    const login = async (email: string, password: string) => {
-        const response = await axios.post('/api/account/login', { email, password });
-        const { serviceToken, user } = response.data;
-        setSession(serviceToken);
-        dispatch({
-            type: LOGIN,
-            payload: {
-                isLoggedIn: true,
-                user
+    const login = async () => {
+        // const response = await axios.post('/api/account/login', { email, password });
+        // const { serviceToken, user } = response.data;
+        // setSession(serviceToken);
+
+        const serviceToken = await getAccessToken();
+        if (serviceToken) {
+            if (!isSetUser) {
+                await setUserInfoAction();
+                await generateRoutes();
             }
-        });
+            dispatch({
+                type: LOGIN,
+                payload: {
+                    isLoggedIn: true,
+                    user: null
+                }
+            });
+        } else {
+            dispatch({
+                type: LOGOUT
+            });
+        }
     };
 
     const register = async (email: string, password: string, firstName: string, lastName: string) => {
@@ -124,8 +152,8 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         window.localStorage.setItem('users', JSON.stringify(users));
     };
 
-    const logout = () => {
-        setSession(null);
+    const logout = async () => {
+        await loginOut();
         dispatch({ type: LOGOUT });
     };
 

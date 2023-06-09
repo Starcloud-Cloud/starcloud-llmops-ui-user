@@ -65,12 +65,12 @@ interface RouteInfo {
 
 interface RouteStore {
     routes: AppCustomRouteRecordRaw[];
-    menuTabRouters: MUIRoutes[];
+    menuTabRouters: AppCustomRouteRecordRaw[];
     hasCheckedAuth: boolean;
     accessToken: string | null;
     setAccessToken: (token: string | null) => void;
     setHasCheckedAuth: (value: boolean) => void;
-    setRoutes: (newRoutes: MUIRoutes[]) => void;
+    setRoutes: (newRoutes: AppCustomRouteRecordRaw[]) => void;
     generateRoutes: () => Promise<void>;
-    setMenuTabRouters: (routers: MUIRoutes[]) => void;
+    setMenuTabRouters: (routers: AppCustomRouteRecordRaw[]) => void;
 }

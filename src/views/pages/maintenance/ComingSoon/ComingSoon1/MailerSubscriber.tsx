@@ -5,7 +5,7 @@ import { Box, Button, FormControl, FormHelperText, Grid, InputLabel, OutlinedInp
 import { useDispatch } from 'store';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
+import axios from 'utils/axios';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -30,12 +30,11 @@ const MailerSubscriber = ({ className, ...others }: { className?: string }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    const options = {
-                        headers: {
-                            'content-type': 'application/json'
-                        }
-                    };
-                    await axios.post('https://yourapicall', { email: values.email }, options);
+                    await axios.post({
+                        url: 'https://yourapicall',
+                        data: { email: values.email },
+                        headersType: 'application/json'
+                    });
                     dispatch(
                         openSnackbar({
                             open: true,

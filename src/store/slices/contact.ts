@@ -56,7 +56,7 @@ export function getContacts() {
 export function modifyContact(contact: UserProfile) {
     return async () => {
         try {
-            const response = await axios.post('/api/contact/modify', contact);
+            const response = await axios.post({ url: '/api/contact/modify', data: contact });
             dispatch(slice.actions.modifyContactSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));

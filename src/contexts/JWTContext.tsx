@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useReducer } from 'react';
 
 // third-party
 import { Chance } from 'chance';
-import jwtDecode from 'jwt-decode';
+// import jwtDecode from 'jwt-decode';
 
 // reducer - state management
 import { LOGIN, LOGOUT } from 'store/actions';
@@ -13,14 +13,14 @@ import Loader from 'ui-component/Loader';
 import axios from 'utils/axios';
 
 // types
-import { KeyedObject } from 'types';
-import { InitialLoginContextProps, JWTContextType, loginForm } from 'types/auth';
+// import { KeyedObject } from 'types';
+import { InitialLoginContextProps, JWTContextType } from 'types/auth';
 
 import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import useRouteStore from 'store/router';
 
-import * as LoginApi from 'api/login';
+// import * as LoginApi from 'api/login';
 
 const chance = new Chance();
 
@@ -29,27 +29,6 @@ const initialState: InitialLoginContextProps = {
     isLoggedIn: false,
     isInitialized: false,
     user: null
-};
-
-// const verifyToken: (st: string) => boolean = (serviceToken) => {
-//     if (!serviceToken) {
-//         return false;
-//     }
-//     const decoded: KeyedObject = jwtDecode(serviceToken);
-//     /**
-//      * Property 'exp' does not exist on type '<T = unknown>(token: string, options?: JwtDecodeOptions | undefined) => T'.
-//      */
-//     return decoded.exp > Date.now() / 1000;
-// };
-
-const setSession = (serviceToken?: string | null) => {
-    if (serviceToken) {
-        localStorage.setItem('serviceToken', serviceToken);
-        axios.defaults.headers.common.Authorization = `Bearer ${serviceToken}`;
-    } else {
-        localStorage.removeItem('serviceToken');
-        delete axios.defaults.headers.common.Authorization;
-    }
 };
 
 // ==============================|| JWT CONTEXT & PROVIDER ||============================== //
@@ -97,10 +76,11 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         };
 
         init();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const login = async () => {
-        // const response = await axios.post('/api/account/login', { email, password });
+        // const response = await axios.post({url: '/api/account/login', { email, password }});
         // const { serviceToken, user } = response.data;
         // setSession(serviceToken);
 
@@ -127,12 +107,15 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     const register = async (email: string, password: string, firstName: string, lastName: string) => {
         // todo: this flow need to be recode as it not verified
         const id = chance.bb_pin();
-        const response = await axios.post('/api/account/register', {
-            id,
-            email,
-            password,
-            firstName,
-            lastName
+        const response = await axios.post({
+            url: '/api/account/register',
+            data: {
+                id,
+                email,
+                password,
+                firstName,
+                lastName
+            }
         });
         let users = response.data;
 

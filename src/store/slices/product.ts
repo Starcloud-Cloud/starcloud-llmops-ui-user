@@ -90,7 +90,7 @@ export function getProducts() {
 export function filterProducts(filter: ProductsFilter) {
     return async () => {
         try {
-            const response = await axios.post('/api/products/filter', { filter });
+            const response = await axios.post({ url: '/api/products/filter', data: { filter } });
             dispatch(slice.actions.filterProductsSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -101,7 +101,7 @@ export function filterProducts(filter: ProductsFilter) {
 export function getProduct(id: string | undefined) {
     return async () => {
         try {
-            const response = await axios.post('/api/product/details', { id });
+            const response = await axios.post({ url: '/api/product/details', data: { id } });
             dispatch(slice.actions.getProductSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -112,7 +112,7 @@ export function getProduct(id: string | undefined) {
 export function getRelatedProducts(id: string | undefined) {
     return async () => {
         try {
-            const response = await axios.post('/api/product/related', { id });
+            const response = await axios.post({ url: '/api/product/related', data: { id } });
             dispatch(slice.actions.getRelatedProductsSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -145,7 +145,7 @@ export function getAddresses() {
 export function addAddress(address: Address) {
     return async () => {
         try {
-            const response = await axios.post('/api/address/new', address);
+            const response = await axios.post({ url: '/api/address/new', data: address });
             dispatch(slice.actions.addAddressSuccess(response.data.address));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -156,7 +156,7 @@ export function addAddress(address: Address) {
 export function editAddress(address: Address) {
     return async () => {
         try {
-            const response = await axios.post('/api/address/edit', address);
+            const response = await axios.post({ url: '/api/address/edit', data: address });
             dispatch(slice.actions.editAddressSuccess(response.data.address));
         } catch (error) {
             dispatch(slice.actions.hasError(error));

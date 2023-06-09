@@ -57,7 +57,7 @@ export function getMails() {
 export function filterMails(filter: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/mails/filter', { filter });
+            const response = await axios.post({ url: '/api/mails/filter', data: { filter } });
             dispatch(slice.actions.filterMailsSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -68,7 +68,7 @@ export function filterMails(filter: string) {
 export function setImportant(id: string) {
     return async () => {
         try {
-            await axios.post('/api/mails/setImportant', { id });
+            await axios.post({ url: '/api/mails/setImportant', data: { id } });
         } catch (error) {
             dispatch(slice.actions.hasError(error));
         }
@@ -78,7 +78,7 @@ export function setImportant(id: string) {
 export function setStarred(id: string) {
     return async () => {
         try {
-            await axios.post('/api/mails/setStarred', { id });
+            await axios.post({ url: '/api/mails/setStarred', data: { id } });
         } catch (error) {
             dispatch(slice.actions.hasError(error));
         }
@@ -88,7 +88,7 @@ export function setStarred(id: string) {
 export function setRead(id: string) {
     return async () => {
         try {
-            await axios.post('/api/mails/setRead', { id });
+            await axios.post({ url: '/api/mails/setRead', data: { id } });
         } catch (error) {
             dispatch(slice.actions.hasError(error));
         }

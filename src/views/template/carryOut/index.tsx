@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 
 import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -168,22 +169,47 @@ function CarryOut() {
                             ))}
                         </Grid>
                     </form>
-                    <Box my={2} display="flex" justifyContent="space-between">
-                        <Box>
-                            <Typography variant="h2">执行标题</Typography>
-                            <Typography variant="body2" mt={1}>
-                                我是每个步骤的描述
-                            </Typography>
+                    <Box>
+                        <Box my={2} display="flex" justifyContent="space-between">
+                            <Box>
+                                <Typography variant="h2">执行标题</Typography>
+                                <Typography variant="body2" mt={1}>
+                                    我是每个步骤的描述
+                                </Typography>
+                            </Box>
+                            <Box>
+                                <Tooltip title="点击执行当前步骤">
+                                    <IconButton size="small">
+                                        <ErrorOutlineIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Button size="small" startIcon={<NotStartedIcon />} variant="contained">
+                                    执行
+                                </Button>
+                            </Box>
                         </Box>
-                        <Box>
-                            <Tooltip title="点击执行当前步骤">
-                                <IconButton size="small">
-                                    <ErrorOutlineIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Button size="small" startIcon={<NotStartedIcon />} variant="contained">
-                                执行
-                            </Button>
+                        <form onSubmit={formik.handleSubmit}>
+                            <Grid container spacing={2}>
+                                {variables.map((item, index) => (
+                                    <Grid
+                                        item
+                                        lg={item.field === 'prompt' ? 12 : item.style === 'text' ? 6 : 4}
+                                        md={item.field === 'prompt' ? 12 : item.style === 'text' ? 6 : 4}
+                                        sm={12}
+                                        key={index}
+                                    >
+                                        <FormExecute key={index} formik={formik} item={item} />
+                                    </Grid>
+                                ))}
+                                {variables.map((item, index) => (
+                                    <Grid item lg={item.style === 'text' ? 6 : 4} sm={12}>
+                                        <FormExecute key={index} formik={formik} item={item} />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </form>
+                        <Box my={2}>
+                            <TextField multiline rows={8} fullWidth />
                         </Box>
                     </Box>
                 </Grid>

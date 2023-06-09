@@ -1,11 +1,12 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestHeaders, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import qs from 'qs';
-import { config } from 'config/axios/config';
+import { config } from 'utils/axios/config';
 import { setNotification, setMessageBox } from 'utils/notification';
 import { getAccessToken, getRefreshToken, getTenantId, setToken } from 'utils/auth';
 // import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from "utils/auth";
 import errorCode from './errorCode';
 import { t } from 'hooks/web/useI18n';
+
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
 
@@ -43,11 +44,13 @@ service.interceptors.request.use(
         // eslint-disable-next-line array-callback-return
         whiteList.some((v) => {
             if (config.url) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                config.url.indexOf(v) > -1;
-                return (isToken = false);
+                if (config.url.indexOf(v) > -1) {
+                    isToken = false;
+                    return true; // 结束 .some 的遍历
+                }
             }
         });
+
         if (getAccessToken() && !isToken) {
             (config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken(); // 让每个请求携带自定义token
         }
@@ -72,9 +75,8 @@ service.interceptors.request.use(
                 if (value !== void 0 && value !== null && typeof value !== 'undefined') {
                     if (typeof value === 'object') {
                         for (const val of Object.keys(value)) {
-                            // eslint-disable-next-line @typescript-eslint/no-shadow
-                            const params = propName + '[' + val + ']';
-                            const subPart = encodeURIComponent(params) + '=';
+                            const myparams = propName + '[' + val + ']';
+                            const subPart = encodeURIComponent(myparams) + '=';
                             url += subPart + encodeURIComponent(value[val]) + '&';
                         }
                     } else {
@@ -109,14 +111,14 @@ service.interceptors.response.use(
             throw new Error();
         }
         // 未设置状态码则默认成功状态
-        const code = data.code || result_code;
+        let code = data.code || result_code;
+        code = code as keyof typeof errorCode;
         // 二进制数据则直接返回
         if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
             return response.data;
         }
-        // 获取错误信息+
-        const msg = data.msg || errorCode.default;
-        // const msg = data.msg || errorCode[code] || errorCode.default;
+        // 获取错误信息
+        const msg = data.msg || errorCode[code] || errorCode.default;
         if (ignoreMsgs.indexOf(msg) !== -1) {
             // 如果是忽略的错误码，直接返回 msg 异常
             return Promise.reject(msg);
@@ -205,7 +207,7 @@ const handleAuthorized = () => {
         //   showCancelButton: false,
         //   closeOnClickModal: false,
         //   showClose: false,
-        //   confirmButtonText: t("login.relogin"),
+        //   confirmButtonText: t("login"),
         //   type: "warning",
         // }).then(() => {
         //   const { wsCache } = useCache();

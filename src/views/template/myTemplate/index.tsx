@@ -9,7 +9,6 @@ import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
@@ -96,6 +95,7 @@ function MyTemplate() {
                         </Button>
                     </Toolbar>
                 </AppBar>
+                <Box></Box>
             </Dialog>
         </Grid>
     );

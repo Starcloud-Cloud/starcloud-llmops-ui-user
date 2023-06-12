@@ -10,9 +10,10 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import Template from './components/template';
+import Basis from './components/createTemplate/basis';
 import MyselfTemplate from './components/mySelfTemplate';
 
 import { useState, useEffect } from 'react';
@@ -39,7 +40,7 @@ function MyTemplate() {
         setOpen(true);
     };
     return (
-        <Grid>
+        <Box>
             <Grid container spacing={2}>
                 <Grid item lg={3}>
                     <TextField v-model="queryParams.name" label="模板名称" InputLabelProps={{ shrink: true }} fullWidth />
@@ -82,22 +83,24 @@ function MyTemplate() {
                 <Pagination page={pageQuery.page} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
             </Box>
             <Dialog fullScreen open={open} onClose={() => setOpen(false)}>
-                <AppBar sx={{ position: 'relative', padding: '0' }}>
-                    <Toolbar>
-                        <Button color="inherit" onClick={() => setOpen(false)}>
-                            <KeyboardBackspaceIcon />
-                        </Button>
-                        <Typography sx={{ ml: 2, flex: 1, margin: 0 }} color="inherit" variant="h3" component="div">
+                <AppBar sx={{ position: 'relative' }}>
+                    <Toolbar sx={{ justifyContent: 'space-between' }}>
+                        <Button startIcon={<ArrowBackIcon />} color="inherit" onClick={() => setOpen(false)}>
                             Back
-                        </Typography>
+                        </Button>
                         <Button autoFocus color="inherit" onClick={() => setOpen(false)}>
                             save
                         </Button>
                     </Toolbar>
                 </AppBar>
-                <Box></Box>
+                <Grid container spacing={2}>
+                    <Grid item lg={4}>
+                        <Basis />
+                    </Grid>
+                    <Grid item lg={8}></Grid>
+                </Grid>
             </Dialog>
-        </Grid>
+        </Box>
     );
 }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Card, Tab, Tabs, TextField, MenuItem } from '@mui/material';
+import { Box, Card, Tab, Tabs, TextField, MenuItem, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -12,6 +12,7 @@ function Basis() {
     const formik = useFormik({
         initialValues: {
             name: '',
+            desc: '',
             topics: ''
         },
         validationSchema,
@@ -70,6 +71,8 @@ function Basis() {
                         fullWidth
                         InputLabelProps={{ shrink: true }}
                         label="Template Description"
+                        value={formik.values.desc}
+                        onChange={formik.handleChange}
                         placeholder="Please enter template description"
                         helperText={' '}
                         variant="outlined"
@@ -101,10 +104,23 @@ function Basis() {
                 </form>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                Item Two
+                <List>
+                    <ListItem>
+                        <ListItemText>模板版本号</ListItemText>
+                        <ListItemSecondaryAction>1</ListItemSecondaryAction>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText>模板key</ListItemText>
+                        <ListItemSecondaryAction>2</ListItemSecondaryAction>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText>模板Id</ListItemText>
+                        <ListItemSecondaryAction>mubanId</ListItemSecondaryAction>
+                    </ListItem>
+                </List>
             </TabPanel>
             <TabPanel value={tabValue} index={2}>
-                Item Three
+                three
             </TabPanel>
         </Card>
     );

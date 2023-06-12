@@ -1,6 +1,6 @@
 import dashboard from './dashboard';
 // import application from './application';
-// import forms from './forms';
+import forms from './forms';
 // import elements from './elements';
 // import pages from './pages';
 // import utilities from './utilities';
@@ -15,7 +15,7 @@ import template from './template';
 //     items: [template, dashboard, application, forms, elements, pages, utilities, support, other]
 // };
 const menuItems: { items: NavItemType[] } = {
-    items: [dashboard, template]
+    items: [dashboard, template, forms]
 };
 
 export default menuItems;

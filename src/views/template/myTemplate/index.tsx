@@ -5,6 +5,13 @@ import ChevronRight from '@mui/icons-material/ChevronRight';
 import Pagination from '@mui/material/Pagination';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 import Template from './components/template';
 import MyselfTemplate from './components/mySelfTemplate';
@@ -28,6 +35,10 @@ function MyTemplate() {
             page: value
         });
     };
+    const [open, setOpen] = useState(false);
+    const handleDetail = () => {
+        setOpen(true);
+    };
     return (
         <Grid>
             <Grid container spacing={2}>
@@ -48,8 +59,8 @@ function MyTemplate() {
                 </Link>
             </Box>
             <Box display="flex">
-                <Template />
-                <Template />
+                <Template handleDetail={handleDetail} />
+                <Template handleDetail={handleDetail} />
             </Box>
             <Box display="flex" justifyContent="space-between" alignItems="end" my={2}>
                 <Typography variant="h5">收藏模板</Typography>
@@ -61,8 +72,8 @@ function MyTemplate() {
                 </Box>
             </Box>
             <Box display="flex">
-                <Template />
-                <Template />
+                <Template handleDetail={handleDetail} />
+                <Template handleDetail={handleDetail} />
             </Box>
             <Typography variant="h5" my={2}>
                 我的模板
@@ -71,6 +82,21 @@ function MyTemplate() {
             <Box my={2}>
                 <Pagination page={pageQuery.page} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
             </Box>
+            <Dialog fullScreen open={open} onClose={() => setOpen(false)}>
+                <AppBar sx={{ position: 'relative', padding: '0' }}>
+                    <Toolbar>
+                        <Button color="inherit" onClick={() => setOpen(false)}>
+                            <KeyboardBackspaceIcon />
+                        </Button>
+                        <Typography sx={{ ml: 2, flex: 1, margin: 0 }} color="inherit" variant="h3" component="div">
+                            Back
+                        </Typography>
+                        <Button autoFocus color="inherit" onClick={() => setOpen(false)}>
+                            save
+                        </Button>
+                    </Toolbar>
+                </AppBar>
+            </Dialog>
         </Grid>
     );
 }

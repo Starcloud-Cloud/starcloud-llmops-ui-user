@@ -10,7 +10,7 @@ import './textnoWarp.css';
 function MyselfTemplate() {
     return (
         <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={6}>
+            <Grid item xs={12} md={6} lg={6} xl={4}>
                 <Card sx={{ height: 150 }}>
                     <Box display="flex" alignItems="center" p={2}>
                         <ChevronRight sx={{ fontSize: '80px' }} />

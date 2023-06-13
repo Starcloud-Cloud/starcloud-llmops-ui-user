@@ -9,7 +9,7 @@ function Template({ handleDetail }: any) {
         handleDetail();
     };
     return (
-        <Card sx={{ width: 260, height: 350, overflow: 'hidden', position: 'relative', marginRight: '20px' }}>
+        <Card sx={{ width: 260, height: 350, overflow: 'hidden', position: 'relative' }}>
             <img
                 onClick={goDetail}
                 alt="图片"

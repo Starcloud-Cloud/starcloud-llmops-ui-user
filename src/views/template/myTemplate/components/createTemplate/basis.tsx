@@ -1,5 +1,20 @@
 import { useState } from 'react';
-import { Box, Card, Tab, Tabs, TextField, MenuItem, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import {
+    Box,
+    Card,
+    TextField,
+    MenuItem,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
+    FormControl,
+    InputLabel,
+    Select,
+    Chip,
+    OutlinedInput,
+    Typography
+} from '@mui/material';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -20,39 +35,39 @@ function Basis() {
             console.log(111);
         }
     });
-    const [tabValue, setTabValue] = useState(0);
-    const changeTab = (event: React.SyntheticEvent, newValue: number) => {
-        setTabValue(newValue);
-    };
-    interface TabPanelProps {
-        children?: React.ReactNode;
-        dir?: string;
-        index: number;
-        value: number;
-    }
-    function TabPanel(props: TabPanelProps) {
-        const { children, value, index, ...other } = props;
+    const [tabValue] = useState(0);
+    // const changeTab = (event: React.SyntheticEvent, newValue: number) => {
+    //     setTabValue(newValue);
+    // };
 
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`full-width-tabpanel-${index}`}
-                aria-labelledby={`full-width-tab-${index}`}
-                {...other}
-            >
-                {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-            </div>
-        );
-    }
+    //场景
+    const [personName, setPersonName] = useState([]);
+    const names = [
+        'Oliver Hansen',
+        'Van Henry',
+        'April Tucker',
+        'Ralph Hubbard',
+        'Omar Alexander',
+        'Carlos Abbott',
+        'Miriam Wagner',
+        'Bradley Wilkerson',
+        'Virginia Andrews',
+        'Kelly Snyder'
+    ];
+    const handleChange = (event: any) => {
+        const {
+            target: { value }
+        } = event;
+        setPersonName(typeof value === 'string' ? value.split(',') : value);
+    };
     return (
-        <Card sx={{ color: '$store.state.card_color', elevation: 5, padding: '10px', margin: '10px' }}>
-            <Tabs value={tabValue} onChange={changeTab} aria-label="basic tabs example">
+        <Card sx={{ padding: '16px 0' }}>
+            {/* <Tabs sx={{ marginBottom: 2 }} value={tabValue} onChange={changeTab} aria-label="basic tabs example">
                 <Tab label="Foundation" />
                 <Tab label="Model" />
                 <Tab label="Scene" />
-            </Tabs>
-            <TabPanel value={tabValue} index={0}>
+            </Tabs> */}
+            {tabValue === 0 && (
                 <form onSubmit={formik.handleSubmit}>
                     <TextField
                         fullWidth
@@ -71,6 +86,7 @@ function Basis() {
                         fullWidth
                         InputLabelProps={{ shrink: true }}
                         label="Template Description"
+                        id="desc"
                         value={formik.values.desc}
                         onChange={formik.handleChange}
                         placeholder="Please enter template description"
@@ -102,8 +118,8 @@ function Basis() {
                         1111
                     </button>
                 </form>
-            </TabPanel>
-            <TabPanel value={tabValue} index={1}>
+            )}
+            {tabValue === 1 && (
                 <List>
                     <ListItem>
                         <ListItemText>模板版本号</ListItemText>
@@ -118,10 +134,34 @@ function Basis() {
                         <ListItemSecondaryAction>mubanId</ListItemSecondaryAction>
                     </ListItem>
                 </List>
-            </TabPanel>
-            <TabPanel value={tabValue} index={2}>
-                three
-            </TabPanel>
+            )}
+            {tabValue === 2 && (
+                <FormControl fullWidth>
+                    <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+                    <Select
+                        labelId="demo-multiple-chip-label"
+                        id="demo-multiple-chip"
+                        multiple
+                        value={personName}
+                        onChange={handleChange}
+                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                    <Chip key={value} label={value} />
+                                ))}
+                            </Box>
+                        )}
+                    >
+                        {names.map((item) => (
+                            <MenuItem key={item} value={item} sx={{ display: 'block' }}>
+                                <Typography variant="h4">{item}</Typography>
+                                <Typography variant="body1">{item}111</Typography>
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
         </Card>
     );
 }

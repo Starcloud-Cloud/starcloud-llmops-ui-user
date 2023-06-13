@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid';
 
-import Template from 'views/template/myTemplate/components/template';
+import Template from 'views/template/myTemplate/components/content/template';
 
 function List() {
     return (

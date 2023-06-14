@@ -1,8 +1,10 @@
-import { Tooltip, IconButton, Button, Typography, TextField, Grid, Box } from '@mui/material';
+import { Tooltip, IconButton, Button, Typography, TextField, Grid, Box, Card } from '@mui/material';
 
 import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NotStartedIcon from '@mui/icons-material/NotStarted';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+
 import FormExecute from 'views/template/components/validaForm';
 
 import { useFormik } from 'formik';
@@ -136,7 +138,7 @@ function Perform() {
             <Typography variant="h5" my={2}>
                 我是产品描述
             </Typography>
-            <Button startIcon={<AlbumIcon />} variant="contained">
+            <Button onClick={() => formik.handleSubmit()} startIcon={<AlbumIcon />} variant="contained">
                 全部执行
             </Button>
             <Tooltip title="点击全部执行">
@@ -153,11 +155,11 @@ function Perform() {
                     ))}
                 </Grid>
             </form>
-            <Box>
+            <Card elevation={2} sx={{ padding: 2 }}>
                 <Box my={2} display="flex" justifyContent="space-between">
                     <Box>
                         <Typography variant="h2">执行标题</Typography>
-                        <Typography variant="body2" mt={1}>
+                        <Typography variant="overline" display="block" mt={1}>
                             我是每个步骤的描述
                         </Typography>
                     </Box>
@@ -192,10 +194,19 @@ function Perform() {
                         ))}
                     </Grid>
                 </form>
-                <Box my={2}>
-                    <TextField multiline rows={8} fullWidth />
+                <Box my={2} display="flex">
+                    {/* <TextField fullWidth /> */}
+                    {/* <TextField multiline rows={8} fullWidth /> */}
+                    {Array.from({ length: 3 }, (_, index) => (
+                        <Card
+                            elevation={3}
+                            sx={{ width: '200px', height: '200px', marginRight: '16px', lineHeight: '200px', textAlign: 'center' }}
+                        >
+                            <InsertPhotoIcon fontSize="large" />
+                        </Card>
+                    ))}
                 </Box>
-            </Box>
+            </Card>
         </Box>
     );
 }

@@ -101,6 +101,7 @@
     "scripts": {
         "start": "react-app-rewired start",
         "build": "react-app-rewired build",
+        "build:cn-test": " dotenv -e .env.cn-test react-app-rewired build",
         "lint": "eslint --ext .ts,.tsx ./src",
         "test": "react-scripts test",
         "eject": "react-scripts eject"

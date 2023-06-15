@@ -44,19 +44,19 @@ const application: NavItemType = {
                     children: [
                         {
                             id: 'profile1',
-                            title: <>t('profile') 01</>,
+                            title: <>{t('profile')} 01</>,
                             type: 'item',
                             url: '/user/account-profile/profile1'
                         },
                         {
                             id: 'profile2',
-                            title: <>t('profile') 02</>,
+                            title: <>{t('profile')} 02</>,
                             type: 'item',
                             url: '/user/account-profile/profile2'
                         },
                         {
                             id: 'profile3',
-                            title: <>t('profile') 03</>,
+                            title: <>{t('profile')} 03</>,
                             type: 'item',
                             url: '/user/account-profile/profile3'
                         }
@@ -69,19 +69,19 @@ const application: NavItemType = {
                     children: [
                         {
                             id: 'card1',
-                            title: <>t('style') 01</>,
+                            title: <>{t('style')} 01</>,
                             type: 'item',
                             url: '/user/card/card1'
                         },
                         {
                             id: 'card2',
-                            title: <>t('style') 02</>,
+                            title: <>{t('style')} 02</>,
                             type: 'item',
                             url: '/user/card/card2'
                         },
                         {
                             id: 'card3',
-                            title: <>t('style') 03</>,
+                            title: <>{t('style')} 03</>,
                             type: 'item',
                             url: '/user/card/card3'
                         }
@@ -94,13 +94,13 @@ const application: NavItemType = {
                     children: [
                         {
                             id: 'list1',
-                            title: <>t('style') 01</>,
+                            title: <>{t('style')} 01</>,
                             type: 'item',
                             url: '/user/list/list1'
                         },
                         {
                             id: 'list2',
-                            title: <>t('style') 02</>,
+                            title: <>{t('style')} 02</>,
                             type: 'item',
                             url: '/user/list/list2'
                         }

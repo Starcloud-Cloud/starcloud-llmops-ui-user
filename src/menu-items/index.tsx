@@ -15,7 +15,7 @@ const menuItems: { items: NavItemType[] } = {
     items: [template, dashboard, application, forms, elements, pages, utilities, support, other]
 };
 // const menuItems: { items: NavItemType[] } = {
-// items: [dashboard, template, forms]
+//     items: [template, dashboard, application, forms, elements, pages, utilities, support, other]
 // };
 
 export default menuItems;

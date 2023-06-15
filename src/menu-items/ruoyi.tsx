@@ -18,14 +18,15 @@ export const RuoyiMenu = () => {
     const routes = useRouteStore((store) => store.routes);
 
     const ruoyiMenu = useMemo(() => {
-        const convertToNavItemType = (routeObj: AppCustomRouteRecordRaw): NavItemType => {
+        const convertToNavItemType = (routeObj: AppCustomRouteRecordRaw, isTopLevel: boolean = false): NavItemType => {
             let navItem: NavItemType = {
-                id: 'ruoyi',
+                id: routeObj?.id.toString(),
                 //@ts-ignore
                 icon: icons[routeObj?.icon],
                 url: routeObj?.path,
                 title: routeObj?.name,
-                type: routeObj?.children ? 'collapse' : 'item'
+                type: routeObj?.children ? 'collapse' : 'item',
+                ...(isTopLevel && { color: 'primary', type: 'group' }) // Only add color if it's a top-level item
             };
 
             if (routeObj.children) {
@@ -35,18 +36,11 @@ export const RuoyiMenu = () => {
             return navItem;
         };
         const convertRouteList = (routeList: AppCustomRouteRecordRaw[]) => {
-            return routeList.map((routeObj) => convertToNavItemType(routeObj));
+            return routeList.map((routeObj) => convertToNavItemType(routeObj, true)); // setting isTopLevel as true for all items in routeList
         };
         if (routes) {
             const convertedMenuList = convertRouteList(routes);
-            const newRuoyiMenu: NavItemType = {
-                id: 'ruoyi',
-                type: 'group',
-                title: 'Ruoyi',
-                color: 'primary',
-                children: convertedMenuList
-            };
-            return newRuoyiMenu;
+            return convertedMenuList; // 返回数组而非对象
         }
     }, [routes]); // 仅当 routes 变化时重新计算 getMenu 的值
 

@@ -20,7 +20,7 @@
         "noImplicitThis": true,
         "strictNullChecks": true,
         "types": ["node", "webpack-env"],
-        "typeRoots": ["./types"],
+        "typeRoots": ["node_modules/@types"],
         "baseUrl": "src"
     },
     "include": ["src"]

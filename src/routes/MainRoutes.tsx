@@ -24,6 +24,7 @@ const WidgetChart = Loadable(lazy(() => import('views/widget/Chart')));
 
 // application - user social & account profile routing
 const AppUserSocialProfile = Loadable(lazy(() => import('views/application/users/social-profile')));
+const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 const AppUserAccountProfile1 = Loadable(lazy(() => import('views/application/users/account-profile/Profile1')));
 const AppUserAccountProfile2 = Loadable(lazy(() => import('views/application/users/account-profile/Profile2')));
 const AppUserAccountProfile3 = Loadable(lazy(() => import('views/application/users/account-profile/Profile3')));
@@ -164,6 +165,10 @@ const MainRoutes = {
         {
             path: '/user/social-profile/:tab',
             element: <AppUserSocialProfile />
+        },
+        {
+            path: '/user/account-profile/profile',
+            element: <AppUserAccountProfile />
         },
         {
             path: '/user/account-profile/profile1',

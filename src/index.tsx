@@ -17,6 +17,11 @@ import { ConfigProvider } from 'contexts/ConfigContext';
 import 'assets/scss/style.scss';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
+import dotenv from 'dotenv';
+
+dotenv.config({
+    path: '.env.development'
+});
 
 const container = document.getElementById('root');
 const root = createRoot(container!);

@@ -37,13 +37,11 @@ function ScrollMenus() {
     ];
     const LeftArrow = () => {
         const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
-
         return (
             <Box sx={{ width: '40px' }}>
                 {!isFirstItemVisible ? (
                     <IconButton onClick={() => scrollPrev()}>
-                        {' '}
-                        <KeyboardArrowLeftIcon />{' '}
+                        <KeyboardArrowLeftIcon />
                     </IconButton>
                 ) : (
                     ''
@@ -57,7 +55,6 @@ function ScrollMenus() {
             <Box sx={{ width: '40px' }}>
                 {!isLastItemVisible ? (
                     <IconButton onClick={() => scrollNext()}>
-                        {' '}
                         <KeyboardArrowRightIcon />
                     </IconButton>
                 ) : (

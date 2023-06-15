@@ -22,7 +22,7 @@ const AuthForgotPassword = ({ ...others }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { resetPassword } = useAuth();
+    const { forgotPassword } = useAuth();
 
     return (
         <Formik
@@ -36,7 +36,7 @@ const AuthForgotPassword = ({ ...others }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    await resetPassword(values.email);
+                    await forgotPassword(values.email);
 
                     if (scriptedRef.current) {
                         setStatus({ success: true });

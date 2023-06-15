@@ -3,6 +3,8 @@ import { lazy } from 'react';
 // project imports
 import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
+import AuthForgotPassword from 'views/pages/authentication/authentication/ForgotPassword';
+const AuthResetPassword = Loadable(lazy(() => import('views/pages/authentication/authentication/ResetPassword')));
 
 // login option 1 routing
 const AuthLogin1 = Loadable(lazy(() => import('views/pages/authentication/authentication1/Login1')));
@@ -47,6 +49,14 @@ const AuthenticationRoutes = {
     element: <MinimalLayout />,
     children: [
         {
+            path: '/pages/forgot-password/forgot-password',
+            element: <AuthForgotPassword />
+        },
+        {
+            path: '/pages/reset-password/reset-password',
+            element: <AuthResetPassword />
+        },
+        {
             path: '/pages/login/login1',
             element: <AuthLogin1 />
         },
@@ -54,6 +64,7 @@ const AuthenticationRoutes = {
             path: '/pages/register/register1',
             element: <AuthRegister1 />
         },
+
         {
             path: '/pages/forgot-password/forgot-password1',
             element: <AuthForgotPassword1 />

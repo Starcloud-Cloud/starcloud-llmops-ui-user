@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 
 // third-party
-import { Chance } from 'chance';
+// import { Chance } from 'chance';
 // import jwtDecode from 'jwt-decode';
 
 // reducer - state management
@@ -22,7 +22,7 @@ import useRouteStore from 'store/router';
 
 // import * as LoginApi from 'api/login';
 
-const chance = new Chance();
+// const chance = new Chance();
 
 // constant
 const initialState: InitialLoginContextProps = {
@@ -104,35 +104,38 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         }
     };
 
-    const register = async (email: string, password: string, firstName: string, lastName: string) => {
-        // todo: this flow need to be recode as it not verified
-        const id = chance.bb_pin();
+    const register = async (email: string, password: string, username: string) => {
         const response = await axios.post({
-            url: '/api/account/register',
+            url: '/llm/auth/register',
             data: {
-                id,
                 email,
                 password,
-                firstName,
-                lastName
+                username
             }
         });
-        let users = response.data;
-
-        if (window.localStorage.getItem('users') !== undefined && window.localStorage.getItem('users') !== null) {
-            const localUsers = window.localStorage.getItem('users');
-            users = [
-                ...JSON.parse(localUsers!),
+        if (response?.data) {
+            let users = [
                 {
-                    id,
                     email,
                     password,
-                    name: `${firstName} ${lastName}`
+                    username
                 }
             ];
-        }
 
-        window.localStorage.setItem('users', JSON.stringify(users));
+            if (window.localStorage.getItem('users') !== undefined && window.localStorage.getItem('users') !== null) {
+                const localUsers = window.localStorage.getItem('users');
+                users = [
+                    ...JSON.parse(localUsers!),
+                    {
+                        email,
+                        password,
+                        username
+                    }
+                ];
+            }
+
+            window.localStorage.setItem('users', JSON.stringify(users));
+        }
     };
 
     const logout = async () => {
@@ -140,7 +143,25 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         dispatch({ type: LOGOUT });
     };
 
-    const resetPassword = (email: string) => console.log(email);
+    const forgotPassword = async (email: string) => {
+        const response = await axios.post({
+            url: 'llm/auth/recover/password',
+            data: {
+                email
+            }
+        });
+        console.log('response', response);
+    };
+
+    const resetPassword = (verificationCode: string, newPassword: string): Promise<{ code: number; data: boolean | null; msg: string }> => {
+        return axios.post({
+            url: 'llm/auth/change/password',
+            data: {
+                verificationCode,
+                newPassword
+            }
+        });
+    };
 
     const updateProfile = () => {};
 
@@ -149,7 +170,9 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     }
 
     return (
-        <JWTContext.Provider value={{ ...state, login, logout, register, resetPassword, updateProfile }}>{children}</JWTContext.Provider>
+        <JWTContext.Provider value={{ ...state, login, logout, register, forgotPassword, resetPassword, updateProfile }}>
+            {children}
+        </JWTContext.Provider>
     );
 };
 

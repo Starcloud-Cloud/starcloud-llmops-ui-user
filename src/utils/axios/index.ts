@@ -20,8 +20,9 @@ import { config } from './config';
 const { default_headers } = config;
 
 const request = (option: any) => {
-    const { url, method, params, data, headersType, responseType } = option;
+    const { baseUrl, url, method, params, data, headersType, responseType } = option;
     return service({
+        baseURL: baseUrl,
         url: url,
         method,
         params,

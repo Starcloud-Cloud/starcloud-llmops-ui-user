@@ -1,14 +1,26 @@
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
+import { Typography, Breadcrumbs, Link, Button, Box, Card, Chip } from '@mui/material';
 
+import AccessAlarm from '@mui/icons-material/AccessAlarm';
+
+import { marketDeatail } from 'api/template';
 import CarryOut from 'views/template/carryOut';
+
+import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
 function Deatail() {
+    const location = useLocation();
+    const [detailData, setDetailData] = useState<any>({});
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const queryParams: any = {
+            version: searchParams.get('version'),
+            uid: searchParams.get('uid')
+        };
+        marketDeatail(queryParams).then((res: any) => {
+            setDetailData(res);
+        });
+    }, [location.search]);
     return (
         <Card sx={{ padding: 2 }}>
             <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
@@ -25,11 +37,15 @@ function Deatail() {
                     <AccessAlarm sx={{ fontSize: '80px' }} />
                     <Box>
                         <Box>
-                            <Typography variant="h2">生成亚马逊Listing</Typography>
+                            <Typography variant="h2">{detailData.name}</Typography>
                         </Box>
                         <Box my={1}>
-                            <span>#sbc</span>
-                            <Chip sx={{ marginRight: 1 }} size="small" label="Chip Outlined" variant="outlined" />
+                            {detailData.categories && detailData.categories.map((item: any) => <span key={item}>#{item}</span>)}
+
+                            {detailData.scenes &&
+                                detailData.scenes.map((el: any) => (
+                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                ))}
                         </Box>
                         <Box sx={{ verticalAlign: 'middle' }}>
                             <AccessAlarm />

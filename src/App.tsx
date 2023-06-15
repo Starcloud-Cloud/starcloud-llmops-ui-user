@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Routes from 'routes';
 
 // project imports
-import Locales from 'ui-component/Locales';
+
 import NavigationScroll from 'layout/NavigationScroll';
 import RTLLayout from 'ui-component/RTLLayout';
 import Snackbar from 'ui-component/extended/Snackbar';
@@ -36,16 +36,14 @@ const App = () => {
     return (
         <ThemeCustomization>
             <RTLLayout>
-                <Locales>
-                    <NavigationScroll>
-                        <AuthProvider>
-                            <>
-                                <Routes />
-                                <Snackbar />
-                            </>
-                        </AuthProvider>
-                    </NavigationScroll>
-                </Locales>
+                <NavigationScroll>
+                    <AuthProvider>
+                        <>
+                            <Routes />
+                            <Snackbar />
+                        </>
+                    </AuthProvider>
+                </NavigationScroll>
             </RTLLayout>
         </ThemeCustomization>
     );

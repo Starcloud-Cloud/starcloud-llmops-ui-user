@@ -8,7 +8,8 @@ import { Typography, useMediaQuery } from '@mui/material';
 import menuItem from 'menu-items';
 import NavGroup from './NavGroup';
 import useConfig from 'hooks/useConfig';
-import { Menu } from 'menu-items/widget';
+// import { Menu } from 'menu-items/widget';
+import { RuoyiMenu } from 'menu-items/ruoyi';
 
 import LAYOUT_CONST from 'constant';
 import { HORIZONTAL_MAX_ITEM } from 'config';
@@ -29,18 +30,17 @@ const MenuList = () => {
         // eslint-disable-next-line
     }, []);
 
-    let getMenu = Menu();
+    // let getMenu = Menu();
+    let getRuoyiMenu = RuoyiMenu();
     const handlerMenuItem = () => {
-        const isFound = menuItem.items.some((element) => {
-            if (element.id === 'widget') {
-                return true;
+        const idsToInsert = ['2163']; // IDs of the items to be inserted
+        idsToInsert.forEach((id, index) => {
+            const ruoyiMenuItem = getRuoyiMenu?.find((item) => item.id === id); // Find the item with the corresponding id in getRuoyiMenu
+            const isRuoyiMenuFound = menuItem.items.some((element) => element.id === id);
+            if (ruoyiMenuItem && !isRuoyiMenuFound) {
+                menuItem.items.splice(index, 0, ruoyiMenuItem); // Insert the found item at the corresponding position
             }
-            return false;
         });
-
-        if (getMenu?.id !== undefined && !isFound) {
-            menuItem.items.splice(1, 0, getMenu);
-        }
     };
 
     // last menu-item to show in horizontal menu bar

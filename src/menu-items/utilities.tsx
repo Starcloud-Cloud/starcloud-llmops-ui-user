@@ -1,9 +1,7 @@
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // assets
 import { IconBrandFramer, IconTypography, IconPalette, IconShadow, IconWindmill, IconLayoutGridAdd } from '@tabler/icons';
 import { NavItemType } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 // constant
 const icons = {
@@ -14,18 +12,17 @@ const icons = {
     IconBrandFramer,
     IconLayoutGridAdd
 };
-
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
 
 const utilities: NavItemType = {
     id: 'utilities',
-    title: <FormattedMessage id="utilities" />,
+    title: t('utilities'),
     icon: icons.IconTypography,
     type: 'group',
     children: [
         {
             id: 'util-typography',
-            title: <FormattedMessage id="typography" />,
+            title: t('typography'),
             type: 'item',
             url: '/utils/util-typography',
             icon: icons.IconTypography,
@@ -33,7 +30,7 @@ const utilities: NavItemType = {
         },
         {
             id: 'util-color',
-            title: <FormattedMessage id="color" />,
+            title: t('color'),
             type: 'item',
             url: '/utils/util-color',
             icon: icons.IconPalette,
@@ -41,7 +38,7 @@ const utilities: NavItemType = {
         },
         {
             id: 'util-shadow',
-            title: <FormattedMessage id="shadow" />,
+            title: t('shadow'),
             type: 'item',
             url: '/utils/util-shadow',
             icon: icons.IconShadow,
@@ -49,13 +46,13 @@ const utilities: NavItemType = {
         },
         {
             id: 'icons',
-            title: <FormattedMessage id="icons" />,
+            title: t('icons'),
             type: 'collapse',
             icon: icons.IconWindmill,
             children: [
                 {
                     id: 'tabler-icons',
-                    title: <FormattedMessage id="tabler-icons" />,
+                    title: t('tabler-icons'),
                     type: 'item',
                     url: 'https://tabler-icons.io/',
                     external: true,
@@ -64,7 +61,7 @@ const utilities: NavItemType = {
                 },
                 {
                     id: 'material-icons',
-                    title: <FormattedMessage id="material-icons" />,
+                    title: t('material-icons'),
                     type: 'item',
                     url: 'https://mui.com/material-ui/material-icons/#main-content',
                     external: true,
@@ -75,7 +72,7 @@ const utilities: NavItemType = {
         },
         {
             id: 'util-animation',
-            title: <FormattedMessage id="animation" />,
+            title: t('animation'),
             type: 'item',
             url: '/utils/util-animation',
             icon: icons.IconBrandFramer,
@@ -83,7 +80,7 @@ const utilities: NavItemType = {
         },
         {
             id: 'util-grid',
-            title: <FormattedMessage id="grid" />,
+            title: t('grid'),
             type: 'item',
             url: '/utils/util-grid',
             icon: icons.IconLayoutGridAdd,

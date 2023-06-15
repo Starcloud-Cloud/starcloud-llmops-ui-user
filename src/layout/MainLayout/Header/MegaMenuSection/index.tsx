@@ -151,7 +151,7 @@ const MegaMenuSection = () => {
                                                                 </ListItemIcon>
                                                                 <ListItemText primary="Social Profile" />
                                                             </ListItemButton>
-                                                            <ListItemButton component={Link} to="/user/account-profile/profile1">
+                                                            <ListItemButton component={Link} to="/user/account-profile/profile">
                                                                 <ListItemIcon>
                                                                     <FiberManualRecordIcon sx={{ fontSize: '0.5rem' }} />
                                                                 </ListItemIcon>

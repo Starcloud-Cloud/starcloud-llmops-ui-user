@@ -86,7 +86,13 @@ const LoginForms = () => {
                     <Grid item xs={12}>
                         <Stack direction="row" justifyContent="flex-end">
                             <AnimateButton>
-                                <Button variant="contained" type="submit">
+                                <Button
+                                    variant="contained"
+                                    type="submit"
+                                    onClick={() => {
+                                        console.log(formik);
+                                    }}
+                                >
                                     Verify & Submit
                                 </Button>
                             </AnimateButton>

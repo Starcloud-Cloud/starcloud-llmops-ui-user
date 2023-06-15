@@ -187,7 +187,7 @@ export function getFollowers() {
 export function filterFollowers(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/followers/filter', { key });
+            const response = await axios.post({ url: '/api/followers/filter', data: { key } });
             dispatch(slice.actions.filterFollowersSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -209,7 +209,7 @@ export function getFriendRequests() {
 export function filterFriendRequests(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/friend-request/filter', { key });
+            const response = await axios.post({ url: '/api/friend-request/filter', data: { key } });
             dispatch(slice.actions.filterFriendRequestsSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -231,7 +231,7 @@ export function getFriends() {
 export function filterFriends(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/friends/filter', { key });
+            const response = await axios.post({ url: '/api/friends/filter', data: { key } });
             dispatch(slice.actions.filterFriendsSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -264,7 +264,7 @@ export function getPosts() {
 export function editComment(key: string, id: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/posts/editComment', { key, id });
+            const response = await axios.post({ url: '/api/posts/editComment', data: { key, id } });
             dispatch(slice.actions.editCommentSuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -275,7 +275,7 @@ export function editComment(key: string, id: string) {
 export function addComment(postId: string, comment: Reply) {
     return async () => {
         try {
-            const response = await axios.post('/api/comments/add', { postId, comment });
+            const response = await axios.post({ url: '/api/comments/add', data: { postId, comment } });
             dispatch(slice.actions.addCommentSuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -286,7 +286,7 @@ export function addComment(postId: string, comment: Reply) {
 export function addReply(postId: string, commentId: string, reply: Reply) {
     return async () => {
         try {
-            const response = await axios.post('/api/replies/add', { postId, commentId, reply });
+            const response = await axios.post({ url: '/api/replies/add', data: { postId, commentId, reply } });
             dispatch(slice.actions.addReplySuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -297,7 +297,7 @@ export function addReply(postId: string, commentId: string, reply: Reply) {
 export function likePost(postId: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/posts/list/like', { postId });
+            const response = await axios.post({ url: '/api/posts/list/like', data: { postId } });
             dispatch(slice.actions.likePostSuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -308,7 +308,7 @@ export function likePost(postId: string) {
 export function likeComment(postId: string, commentId: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/comments/list/like', { postId, commentId });
+            const response = await axios.post({ url: '/api/comments/list/like', data: { postId, commentId } });
             dispatch(slice.actions.likeCommentSuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -319,7 +319,7 @@ export function likeComment(postId: string, commentId: string) {
 export function likeReply(postId: string, commentId: string, replayId: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/replies/list/like', { postId, commentId, replayId });
+            const response = await axios.post({ url: '/api/replies/list/like', data: { postId, commentId, replayId } });
             dispatch(slice.actions.likeReplySuccess(response.data.posts));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -341,7 +341,7 @@ export function getDetailCards() {
 export function filterDetailCards(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/details-card/filter', { key });
+            const response = await axios.post({ url: '/api/details-card/filter', data: { key } });
             dispatch(slice.actions.filterDetailCardsSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -363,7 +363,7 @@ export function getSimpleCards() {
 export function filterSimpleCards(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/simple-card/filter', { key });
+            const response = await axios.post({ url: '/api/simple-card/filter', data: { key } });
             dispatch(slice.actions.filterSimpleCardsSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -385,7 +385,7 @@ export function getProfileCards() {
 export function filterProfileCards(key: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/profile-card/filter', { key });
+            const response = await axios.post({ url: '/api/profile-card/filter', data: { key } });
             dispatch(slice.actions.filterProfileCardsSuccess(response.data.results));
         } catch (error) {
             dispatch(slice.actions.hasError(error));

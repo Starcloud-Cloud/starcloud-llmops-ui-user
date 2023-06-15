@@ -1,0 +1,28 @@
+.textnoWarp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* 指定行数 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.headImg {
+    transition: all 0.2s ease-in-out;
+}
+
+.headImg:hover {
+    transform: scale(1.1);
+}
+
+.active:hover {
+    color: #7367f0;
+}
+
+.underline {
+    text-decoration: underline !important;
+}

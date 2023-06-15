@@ -52,7 +52,7 @@ export default slice.reducer;
 export function getUser(id: number) {
     return async () => {
         try {
-            const response = await axios.post('/api/chat/users/id', { id });
+            const response = await axios.post({ url: '/api/chat/users/id', data: { id } });
             dispatch(slice.actions.getUserSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -63,7 +63,7 @@ export function getUser(id: number) {
 export function getUserChats(user: string | undefined) {
     return async () => {
         try {
-            const response = await axios.post('/api/chat/filter', { user });
+            const response = await axios.post({ url: '/api/chat/filter', data: { user } });
             dispatch(slice.actions.getUserChatsSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -74,7 +74,7 @@ export function getUserChats(user: string | undefined) {
 export function insertChat(chat: ChatHistory) {
     return async () => {
         try {
-            await axios.post('/api/chat/insert', chat);
+            await axios.post({ url: '/api/chat/insert', data: chat });
         } catch (error) {
             dispatch(slice.actions.hasError(error));
         }

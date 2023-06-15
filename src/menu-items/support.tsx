@@ -1,9 +1,7 @@
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // assets
 import { IconMenu, IconBoxMultiple, IconCircleOff, IconCircle, IconBrandGravatar, IconShape } from '@tabler/icons';
 import { NavItemType } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 // constant
 const icons = {
@@ -14,76 +12,51 @@ const icons = {
     IconBrandGravatar,
     IconShape
 };
-
 // ==============================|| SUPPORT MENU ITEMS ||============================== //
 
 const support: NavItemType = {
     id: 'support',
-    title: <FormattedMessage id="others" />,
+    title: t('others'),
     icon: icons.IconMenu,
     type: 'group',
     children: [
         {
             id: 'menu-level',
-            title: <FormattedMessage id="menu-level" />,
+            title: t('menu-level'),
             type: 'collapse',
             icon: icons.IconMenu,
             children: [
                 {
                     id: 'menu-level-1.1',
-                    title: (
-                        <>
-                            <FormattedMessage id="level" /> 1
-                        </>
-                    ),
+                    title: <>t('level') 1</>,
                     type: 'item',
                     url: '#'
                 },
                 {
                     id: 'menu-level-1.2',
-                    title: (
-                        <>
-                            <FormattedMessage id="level" /> 1
-                        </>
-                    ),
+                    title: <>t('level') 1</>,
                     type: 'collapse',
                     children: [
                         {
                             id: 'menu-level-2.1',
-                            title: (
-                                <>
-                                    <FormattedMessage id="level" /> 2
-                                </>
-                            ),
+                            title: <>t('level') 2</>,
                             type: 'item',
                             url: '#'
                         },
                         {
                             id: 'menu-level-2.2',
-                            title: (
-                                <>
-                                    <FormattedMessage id="level" /> 2
-                                </>
-                            ),
+                            title: <>t('level') 2</>,
                             type: 'collapse',
                             children: [
                                 {
                                     id: 'menu-level-3.1',
-                                    title: (
-                                        <>
-                                            <FormattedMessage id="level" /> 3
-                                        </>
-                                    ),
+                                    title: <>t('level') 3</>,
                                     type: 'item',
                                     url: '#'
                                 },
                                 {
                                     id: 'menu-level-3.2',
-                                    title: (
-                                        <>
-                                            <FormattedMessage id="level" /> 3
-                                        </>
-                                    ),
+                                    title: <>t('level') 3</>,
                                     type: 'item',
                                     url: '#'
                                 }
@@ -95,40 +68,28 @@ const support: NavItemType = {
         },
         {
             id: 'menu-level-subtitle',
-            title: <FormattedMessage id="menu-level-subtitle" />,
-            caption: <FormattedMessage id="menu-level-subtitle-caption" />,
+            title: t('menu-level-subtitle'),
+            caption: t('menu-level-subtitle-caption'),
             type: 'collapse',
             icon: icons.IconBoxMultiple,
             children: [
                 {
                     id: 'sub-menu-level-1.1',
-                    title: (
-                        <>
-                            <FormattedMessage id="level" /> 1
-                        </>
-                    ),
-                    caption: <FormattedMessage id="menu-level-subtitle-item" />,
+                    title: <>t('level') 1</>,
+                    caption: t('menu-level-subtitle-item'),
                     type: 'item',
                     url: '#'
                 },
                 {
                     id: 'sub-menu-level-1.2',
-                    title: (
-                        <>
-                            <FormattedMessage id="level" /> 1
-                        </>
-                    ),
-                    caption: <FormattedMessage id="menu-level-subtitle-collapse" />,
+                    title: <>t('level') 1</>,
+                    caption: t('menu-level-subtitle-collapse'),
                     type: 'collapse',
                     children: [
                         {
                             id: 'sub-menu-level-2.1',
-                            title: (
-                                <>
-                                    <FormattedMessage id="level" /> 2
-                                </>
-                            ),
-                            caption: <FormattedMessage id="menu-level-subtitle-sub-item" />,
+                            title: <>t('level') 2</>,
+                            caption: t('menu-level-subtitle-sub-item'),
                             type: 'item',
                             url: '#'
                         }
@@ -138,7 +99,7 @@ const support: NavItemType = {
         },
         {
             id: 'disabled-menu',
-            title: <FormattedMessage id="disabled-menu" />,
+            title: t('disabled-menu'),
             type: 'item',
             url: '#',
             icon: icons.IconCircleOff,
@@ -146,7 +107,7 @@ const support: NavItemType = {
         },
         {
             id: 'oval-chip-menu',
-            title: <FormattedMessage id="oval-chip-menu" />,
+            title: t('oval-chip-menu'),
             type: 'item',
             url: '#',
             icon: icons.IconCircle,
@@ -157,25 +118,25 @@ const support: NavItemType = {
         },
         {
             id: 'user-chip-menu',
-            title: <FormattedMessage id="avatar" />,
+            title: t('avatar'),
             type: 'item',
             url: '#',
             icon: icons.IconBrandGravatar,
             chip: {
-                label: <FormattedMessage id="coded" />,
+                label: t('coded'),
                 color: 'primary',
-                avatar: <FormattedMessage id="c" />,
+                // avatar: t('c'),
                 size: 'small'
             }
         },
         {
             id: 'outline-chip-menu',
-            title: <FormattedMessage id="outlined" />,
+            title: t('outlined'),
             type: 'item',
             url: '#',
             icon: icons.IconShape,
             chip: {
-                label: <FormattedMessage id="outlined" />,
+                label: t('outlined'),
                 variant: 'outlined',
                 color: 'primary'
             }

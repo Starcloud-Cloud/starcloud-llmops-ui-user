@@ -66,7 +66,7 @@ export function getEvents() {
 export function addEvent(event: FormikValues) {
     return async () => {
         try {
-            const response = await axios.post('/api/calendar/events/add', event);
+            const response = await axios.post({ url: '/api/calendar/events/add', data: event });
             dispatch(slice.actions.addEventSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -77,7 +77,7 @@ export function addEvent(event: FormikValues) {
 export function updateEvent(event: FormikValues) {
     return async () => {
         try {
-            const response = await axios.post('/api/calendar/events/update', event);
+            const response = await axios.post({ url: '/api/calendar/events/update', data: event });
             dispatch(slice.actions.updateEventSuccess(response.data.events));
         } catch (error) {
             dispatch(slice.actions.hasError(error));
@@ -88,7 +88,7 @@ export function updateEvent(event: FormikValues) {
 export function removeEvent(eventId: string) {
     return async () => {
         try {
-            const response = await axios.post('/api/calendar/events/delete', { eventId });
+            const response = await axios.post({ url: '/api/calendar/events/delete', data: { eventId } });
             dispatch(slice.actions.removeEventSuccess(response.data));
         } catch (error) {
             dispatch(slice.actions.hasError(error));

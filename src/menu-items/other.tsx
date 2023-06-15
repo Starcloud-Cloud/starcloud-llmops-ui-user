@@ -1,9 +1,7 @@
-// third-party
-import { FormattedMessage } from 'react-intl';
-
 // assets
 import { IconBrandChrome, IconHelp, IconSitemap } from '@tabler/icons';
 import { NavItemType } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 // constant
 const icons = {
@@ -11,7 +9,6 @@ const icons = {
     IconHelp,
     IconSitemap
 };
-
 // ==============================|| SAMPLE PAGE & DOCUMENTATION MENU ITEMS ||============================== //
 
 const other: NavItemType = {
@@ -21,7 +18,7 @@ const other: NavItemType = {
     children: [
         {
             id: 'sample-page',
-            title: <FormattedMessage id="sample-page" />,
+            title: t('sample-page'),
             type: 'item',
             url: '/sample-page',
             icon: icons.IconBrandChrome,
@@ -29,7 +26,7 @@ const other: NavItemType = {
         },
         {
             id: 'documentation',
-            title: <FormattedMessage id="documentation" />,
+            title: t('documentation'),
             type: 'item',
             url: 'https://codedthemes.gitbook.io/berry/',
             icon: icons.IconHelp,
@@ -38,7 +35,7 @@ const other: NavItemType = {
         },
         {
             id: 'roadmap',
-            title: <FormattedMessage id="roadmap" />,
+            title: t('roadmap'),
             type: 'item',
             url: 'https://codedthemes.gitbook.io/berry/roadmap',
             icon: icons.IconSitemap,

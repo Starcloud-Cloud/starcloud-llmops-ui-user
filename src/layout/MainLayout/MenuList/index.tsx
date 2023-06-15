@@ -8,7 +8,7 @@ import { Typography, useMediaQuery } from '@mui/material';
 import menuItem from 'menu-items';
 import NavGroup from './NavGroup';
 import useConfig from 'hooks/useConfig';
-import { Menu } from 'menu-items/widget';
+// import { Menu } from 'menu-items/widget';
 import { RuoyiMenu } from 'menu-items/ruoyi';
 
 import LAYOUT_CONST from 'constant';
@@ -30,20 +30,17 @@ const MenuList = () => {
         // eslint-disable-next-line
     }, []);
 
-    let getMenu = Menu();
+    // let getMenu = Menu();
     let getRuoyiMenu = RuoyiMenu();
     const handlerMenuItem = () => {
-        // const isMenuFound = menuItem.items.some((element) => element.id === 'widget');
-        const isRuoyiMenuFound = menuItem.items.some((element) => element.id === 'ruoyi'); // 假设 RuoyiMenu 的 id 为 'ruoyi'
-
-        // if (getMenu?.id !== undefined && !isMenuFound) {
-        //     menuItem.items.splice(1, 0, getMenu);
-        // }
-
-        if (getRuoyiMenu?.id !== undefined && !isRuoyiMenuFound) {
-            // 添加这段代码，判断并添加 RuoyiMenu
-            menuItem.items.splice(2, 0, getRuoyiMenu); // 假设你想要将它添加到第三个位置
-        }
+        const idsToInsert = ['2163']; // IDs of the items to be inserted
+        idsToInsert.forEach((id, index) => {
+            const ruoyiMenuItem = getRuoyiMenu?.find((item) => item.id === id); // Find the item with the corresponding id in getRuoyiMenu
+            const isRuoyiMenuFound = menuItem.items.some((element) => element.id === id);
+            if (ruoyiMenuItem && !isRuoyiMenuFound) {
+                menuItem.items.splice(index, 0, ruoyiMenuItem); // Insert the found item at the corresponding position
+            }
+        });
     };
 
     // last menu-item to show in horizontal menu bar

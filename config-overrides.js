@@ -7,7 +7,9 @@ module.exports = function override(config) {
         stream: require.resolve('stream-browserify'),
         crypto: require.resolve('crypto-browserify'),
         util: require.resolve('util'),
-        buffer: require.resolve('buffer')
+        buffer: require.resolve('buffer'),
+        path: require.resolve('path-browserify'), // 添加这行
+        os: require.resolve('os-browserify/browser') // 添加这行
     };
 
     // https://stackoverflow.com/questions/69135310/workaround-for-cache-size-limit-in-create-react-app-pwa-service-worker

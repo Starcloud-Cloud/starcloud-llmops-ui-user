@@ -1,43 +1,34 @@
-import Grid from '@mui/material/Grid';
-
+import { Grid } from '@mui/material';
+import { marketPage } from 'api/template';
+import { useNavigate } from 'react-router-dom';
 import Template from 'views/template/myTemplate/components/content/template';
 
+import { useEffect, useState } from 'react';
+
 function List() {
+    //路由跳转
+    const navigate = useNavigate();
+
+    const [total, setTotal] = useState(0);
+    console.log(total);
+
+    const [listData, setListData] = useState<Array<{ uid: string }>>([]);
+    const handleDetail = (data: { version: number | string; uid: string }) => {
+        navigate(`/template/templateMarket/detail?version=${data.version}&uid=${data.uid}`);
+    };
+    useEffect(() => {
+        marketPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
+            setListData(res.list);
+            setTotal(res.page.total);
+        });
+    }, []);
     return (
         <Grid container spacing={2} my={2}>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
-            <Grid item xs={12} md={4} lg={3}>
-                <Template />
-            </Grid>
+            {listData.map((item) => (
+                <Grid key={item.uid} item>
+                    <Template handleDetail={handleDetail} data={item} />
+                </Grid>
+            ))}
         </Grid>
     );
 }

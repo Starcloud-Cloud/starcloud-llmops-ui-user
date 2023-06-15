@@ -205,7 +205,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 to={
                                     loginProp
                                         ? `/pages/forgot-password/forgot-password${loginProp}`
-                                        : '/pages/forgot-password/forgot-password3'
+                                        : '/pages/forgot-password/forgot-password'
                                 }
                                 color="secondary"
                                 sx={{ textDecoration: 'none' }}

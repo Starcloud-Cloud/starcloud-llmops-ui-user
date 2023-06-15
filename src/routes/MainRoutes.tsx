@@ -11,6 +11,7 @@ const MarketList = Loadable(lazy(() => import('views/template/market/components/
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));
+const Application_nalysis = Loadable(lazy(() => import('views/template/applicationAnalysis')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -23,6 +24,7 @@ const WidgetChart = Loadable(lazy(() => import('views/widget/Chart')));
 
 // application - user social & account profile routing
 const AppUserSocialProfile = Loadable(lazy(() => import('views/application/users/social-profile')));
+const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 const AppUserAccountProfile1 = Loadable(lazy(() => import('views/application/users/account-profile/Profile1')));
 const AppUserAccountProfile2 = Loadable(lazy(() => import('views/application/users/account-profile/Profile2')));
 const AppUserAccountProfile3 = Loadable(lazy(() => import('views/application/users/account-profile/Profile3')));
@@ -163,6 +165,10 @@ const MainRoutes = {
         {
             path: '/user/social-profile/:tab',
             element: <AppUserSocialProfile />
+        },
+        {
+            path: '/user/account-profile/profile',
+            element: <AppUserAccountProfile />
         },
         {
             path: '/user/account-profile/profile1',
@@ -537,6 +543,10 @@ const MainRoutes = {
         {
             path: '/template/createCenter',
             element: <CreateCenter />
+        },
+        {
+            path: '/template/applicationAnalysis',
+            element: <Application_nalysis />
         },
         {
             path: '/template/createDetail',

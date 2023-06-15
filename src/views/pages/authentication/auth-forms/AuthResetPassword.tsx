@@ -29,17 +29,23 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { StringColorProps } from 'types';
+import { dispatch } from 'store';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { openSnackbar } from 'store/slices/snackbar';
+import useAuth from 'hooks/useAuth';
 
 // ========================|| FIREBASE - RESET PASSWORD ||======================== //
 
 const AuthResetPassword = ({ ...others }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const verificationCode = new URLSearchParams(location.search).get('verificationCode');
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const [showPassword, setShowPassword] = React.useState(false);
     const [strength, setStrength] = React.useState(0);
     const [level, setLevel] = React.useState<StringColorProps>();
-
-    // const { firebaseEmailPasswordSignIn } = useAuth();
+    const { resetPassword } = useAuth();
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -62,7 +68,7 @@ const AuthResetPassword = ({ ...others }) => {
     return (
         <Formik
             initialValues={{
-                email: 'info@codedthemes.com',
+                verificationCode: verificationCode || '',
                 password: '123456',
                 confirmPassword: '123456',
                 submit: null
@@ -76,10 +82,38 @@ const AuthResetPassword = ({ ...others }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    // await firebaseEmailPasswordSignIn(values.email, values.password);
-                    if (scriptedRef.current) {
+                    const res = await resetPassword(values.verificationCode, values.confirmPassword);
+                    console.log(res);
+                    if (res && res.code === 0 && scriptedRef.current) {
                         setStatus({ success: true });
                         setSubmitting(false);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: 'Your registration has been successfully completed.',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+
+                        setTimeout(() => {
+                            navigate('/login', { replace: true });
+                        }, 1500);
+                    } else {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: 'Your registration has been successfully completed.',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
                     }
                 } catch (err: any) {
                     console.error(err);
@@ -91,7 +125,7 @@ const AuthResetPassword = ({ ...others }) => {
                 }
             }}
         >
-            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, status }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
                         <InputLabel htmlFor="outlined-adornment-password-reset">Password</InputLabel>

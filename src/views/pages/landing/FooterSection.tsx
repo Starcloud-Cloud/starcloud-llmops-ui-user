@@ -178,9 +178,16 @@ const FooterSection = () => {
                         spacing={{ xs: 1.5, sm: 1, md: 3 }}
                     >
                         <Typography color="text.secondary">
-                            © Berry is managed by{' '}
-                            <Link href="https://codedthemes.com/" target="_blank" underline="hover">
-                                CodedThemes
+                            版权所有 © 星河云海(杭州)网络技术有限公司{' '}
+                            <Link href="https://beian.miit.gov.cn" target="_blank" underline="hover">
+                                浙ICP备 2022002996号
+                            </Link>{' '}
+                            <Link
+                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33011002017175"
+                                target="_blank"
+                                underline="hover"
+                            >
+                                浙公网安备 33011002017175号
                             </Link>
                         </Typography>
                         <Stack direction="row" alignItems="center" spacing={{ xs: 3, sm: 1.5, md: 2 }}>

@@ -8,7 +8,7 @@ function Form({ item, onChange }: any) {
     };
     return (
         <Box>
-            {item.style === 'input' ? (
+            {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
                     label={item.label}
@@ -18,7 +18,7 @@ function Form({ item, onChange }: any) {
                     onChange={(e) => onChange(e.target)}
                     fullWidth
                 />
-            ) : item.style === 'text' ? (
+            ) : item.style === 'TEXT' ? (
                 <TextField
                     sx={mt}
                     label={item.label}
@@ -30,7 +30,7 @@ function Form({ item, onChange }: any) {
                     onChange={(e) => onChange(e.target)}
                     fullWidth
                 />
-            ) : item.style === 'select' ? (
+            ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
                     value={item.value || ''}

@@ -11,7 +11,7 @@ const MarketList = Loadable(lazy(() => import('views/template/market/components/
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));
-const Application_nalysis = Loadable(lazy(() => import('views/template/applicationAnalysis')));
+const ApplicationAnalysis = Loadable(lazy(() => import('views/template/applicationAnalysis')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -546,7 +546,7 @@ const MainRoutes = {
         },
         {
             path: '/template/applicationAnalysis',
-            element: <Application_nalysis />
+            element: <ApplicationAnalysis />
         },
         {
             path: '/template/createDetail',

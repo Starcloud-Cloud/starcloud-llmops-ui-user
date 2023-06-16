@@ -1,4 +1,4 @@
-import { Tooltip, IconButton, Button, Typography, TextField, Grid, Box, Card } from '@mui/material';
+import { Tooltip, IconButton, Button, Typography, Grid, Box, Card } from '@mui/material';
 
 import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -110,7 +110,7 @@ function Perform() {
             type: 'text',
             options: [],
             default: 'Hi.',
-            value: 'Write an article title for \'alternative\' type blog  about "{GLOBAL.TOPIC}" in {GLOBAL.LANGUAGE}. Style: {GLOBAL.WRITING_STYLE}. Tone: {GLOBAL.WRITING_TONE}. \nThe title of your alternative article contains a number, the word “alternative” or “alternatives to,” followed by the product or service and the product/service category.The number should no more than 8.Must be between 40 and 60 characters.\nUse natural language to describe the title of the article and to use the top level keyword to help search engines better understand the topic and content of the webpage.\nDo not use very common words that AI often uses.Utilize uncommon terminology to enhance the originality of the piece.Must be 100% unique and remove plagiarism.Make it look more like it was written by a human and have a high level of professionalism.',
+            value: 'Write an article title for \'alternative\' type blog  about "{GLOBAL.TOPIC}" in {GLOBAL.LANGUAGE}. Style: {GLOBAL.WRITING_STYLE}. Tone: {GLOBAL.WRITING_TONE}. \nThe title of your alternative article contains a number, the word "alternative" or "alternatives to," followed by the product or service and the product/service category.The number should no more than 8.Must be between 40 and 60 characters.\nUse natural language to describe the title of the article and to use the top level keyword to help search engines better understand the topic and content of the webpage.\nDo not use very common words that AI often uses.Utilize uncommon terminology to enhance the originality of the piece.Must be 100% unique and remove plagiarism.Make it look more like it was written by a human and have a high level of professionalism.',
             order: 4,
             group: 'model',
             is_point: true,

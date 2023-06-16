@@ -30,151 +30,262 @@ function CreateDetail() {
     //路由跳转
     const navigate = useNavigate();
     //改变label desc 和variable的值
-    const [edit, setEdit] = useState<any[]>([
-        {
-            field: '生成文本',
-            label: '生成文本',
-            desc: '您可以要求 AI 为您执行各种任务。您可以要求它写、重写或翻译文章，将单词或元素分类到组中，写电子邮件等。',
-            buttonLabel: '生成文本',
-            stepModule: {
-                version: 1,
-                key: 'OpenApiStepModule',
-                name: 'Open API',
-                desc: 'Open API 聊天',
-                source: 'native',
-                sourceUrl: 'https://platform.openai.com/docs/api-reference/completions/create',
-                tags: ['OpenAI', 'Completions'],
-                isAuto: true,
-                type: null,
-                icon: 'http://127.0.0.1:8084/wp-content/plugins/moredeal-ai-writer/res/images/openai.svg',
-                scenes: [],
-                variables: [
+    const [edit, setEdit] = useState<any>({
+        variables: [
+            {
+                key: 'TextVariableModule',
+                field: 'max_tokens',
+                label: '最大令牌',
+                desc: '输入令牌和生成令牌的总长度受模型上下文长度的限制。',
+                type: 'text',
+                options: [],
+                default: 1000,
+                value: 3,
+                order: 2,
+                group: 'model',
+                is_point: true,
+                is_show: false,
+                style: 'input',
+                moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+            },
+            {
+                key: 'TextVariableModule',
+                field: 'temperature',
+                label: '温度',
+                desc: '使用什么采样温度，介于0和2之间。较高的值（如0.8）会使输出更随机，而较低的值（如0.2）会使输出更集中和确定性。',
+                type: 'text',
+                options: [],
+                default: 0.7,
+                value: null,
+                order: 1,
+                group: 'model',
+                is_point: true,
+                is_show: false,
+                style: 'input',
+                moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+            },
+            {
+                key: 'TextVariableModule',
+                field: 'n',
+                label: '数量',
+                desc: '为每个输入消息生成多少个聊天完成选项。https://platform.openai.com/docs/api-reference/chat',
+                type: 'text',
+                options: [
                     {
-                        key: 'TextVariableModule',
-                        field: 'max_tokens',
-                        label: '最大令牌',
-                        desc: '输入令牌和生成令牌的总长度受模型上下文长度的限制。',
-                        type: 'text',
-                        options: [],
-                        default: 1000,
-                        value: 3,
-                        order: 2,
-                        group: 'model',
-                        is_point: true,
-                        is_show: false,
-                        style: 'input',
-                        moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        label: '1',
+                        value: 1
                     },
                     {
-                        key: 'TextVariableModule',
-                        field: 'temperature',
-                        label: '温度',
-                        desc: '使用什么采样温度，介于0和2之间。较高的值（如0.8）会使输出更随机，而较低的值（如0.2）会使输出更集中和确定性。',
-                        type: 'text',
-                        options: [],
-                        default: 0.7,
-                        value: null,
-                        order: 1,
-                        group: 'model',
-                        is_point: true,
-                        is_show: false,
-                        style: 'input',
-                        moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        label: '2',
+                        value: 2
                     },
                     {
-                        key: 'TextVariableModule',
-                        field: 'n',
-                        label: '数量',
-                        desc: '为每个输入消息生成多少个聊天完成选项。https://platform.openai.com/docs/api-reference/chat',
-                        type: 'text',
-                        options: [
-                            {
-                                label: '1',
-                                value: 1
-                            },
-                            {
-                                label: '2',
-                                value: 2
-                            },
-                            {
-                                label: '3',
-                                value: 3
-                            },
-                            {
-                                label: '4',
-                                value: 4
-                            },
-                            {
-                                label: '5',
-                                value: 5
-                            },
-                            {
-                                label: '6',
-                                value: 6
-                            },
-                            {
-                                label: '7',
-                                value: 7
-                            },
-                            {
-                                label: '8',
-                                value: 8
-                            },
-                            {
-                                label: '9',
-                                value: 9
-                            },
-                            {
-                                label: '10',
-                                value: 10
-                            }
-                        ],
-                        default: 1,
-                        value: null,
-                        order: 2,
-                        group: 'model',
-                        is_point: true,
-                        is_show: false,
-                        style: 'select',
-                        moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        label: '3',
+                        value: 3
                     },
                     {
-                        key: 'TextVariableModule',
-                        field: 'prompt',
-                        label: '提示',
-                        desc: '所需图像的文本描述。最大长度为1000个字符。',
-                        type: 'text',
-                        options: [],
-                        default: 'Hi.',
-                        value: 'aaa',
-                        order: 4,
-                        group: 'model',
-                        is_point: true,
-                        is_show: true,
-                        style: 'text',
-                        moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        label: '4',
+                        value: 4
+                    },
+                    {
+                        label: '5',
+                        value: 5
+                    },
+                    {
+                        label: '6',
+                        value: 6
+                    },
+                    {
+                        label: '7',
+                        value: 7
+                    },
+                    {
+                        label: '8',
+                        value: 8
+                    },
+                    {
+                        label: '9',
+                        value: 9
+                    },
+                    {
+                        label: '10',
+                        value: 10
                     }
                 ],
-                response: {
-                    key: 'TextResponseModule',
-                    type: 'text',
-                    style: 'text',
-                    stepField: null,
-                    processParams: null,
-                    isShow: true,
-                    value: null,
-                    errorCode: null,
-                    status: false,
-                    message: null,
-                    moduleCode: 'MoredealAiWritercodemodulesstep\responseTextResponseModule'
-                },
-                isCanAddStep: true,
-                moduleCode: 'MoredealAiWritercodemodulesstepOpenApiStepModule'
+                default: 1,
+                value: null,
+                order: 2,
+                group: 'model',
+                is_point: true,
+                is_show: false,
+                style: 'select',
+                moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
             },
-            variables: [{ desc: '', field: 'Variable_0', is_show: true, label: 'Variable 0', options: [], style: 'input', value: '12' }],
-            moduleCode: 'MoredealAiWritercodemodulesstepStepWrapper'
-        }
-    ]);
+            {
+                key: 'TextVariableModule',
+                field: 'prompt',
+                label: '提示',
+                desc: '所需图像的文本描述。最大长度为1000个字符。',
+                type: 'text',
+                options: [],
+                default: 'Hi.',
+                value: 'aaa',
+                order: 4,
+                group: 'model',
+                is_point: true,
+                is_show: true,
+                style: 'text',
+                moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+            }
+        ],
+        config: [
+            {
+                field: '生成文本',
+                label: '生成文本',
+                desc: '您可以要求 AI 为您执行各种任务。您可以要求它写、重写或翻译文章，将单词或元素分类到组中，写电子邮件等。',
+                buttonLabel: '生成文本',
+                stepModule: {
+                    version: 1,
+                    key: 'OpenApiStepModule',
+                    name: 'Open API',
+                    desc: 'Open API 聊天',
+                    source: 'native',
+                    sourceUrl: 'https://platform.openai.com/docs/api-reference/completions/create',
+                    tags: ['OpenAI', 'Completions'],
+                    isAuto: true,
+                    type: null,
+                    icon: 'http://127.0.0.1:8084/wp-content/plugins/moredeal-ai-writer/res/images/openai.svg',
+                    scenes: [],
+                    variables: [
+                        {
+                            key: 'TextVariableModule',
+                            field: 'max_tokens',
+                            label: '最大令牌',
+                            desc: '输入令牌和生成令牌的总长度受模型上下文长度的限制。',
+                            type: 'text',
+                            options: [],
+                            default: 1000,
+                            value: 3,
+                            order: 2,
+                            group: 'model',
+                            is_point: true,
+                            is_show: false,
+                            style: 'input',
+                            moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        },
+                        {
+                            key: 'TextVariableModule',
+                            field: 'temperature',
+                            label: '温度',
+                            desc: '使用什么采样温度，介于0和2之间。较高的值（如0.8）会使输出更随机，而较低的值（如0.2）会使输出更集中和确定性。',
+                            type: 'text',
+                            options: [],
+                            default: 0.7,
+                            value: null,
+                            order: 1,
+                            group: 'model',
+                            is_point: true,
+                            is_show: false,
+                            style: 'input',
+                            moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        },
+                        {
+                            key: 'TextVariableModule',
+                            field: 'n',
+                            label: '数量',
+                            desc: '为每个输入消息生成多少个聊天完成选项。https://platform.openai.com/docs/api-reference/chat',
+                            type: 'text',
+                            options: [
+                                {
+                                    label: '1',
+                                    value: 1
+                                },
+                                {
+                                    label: '2',
+                                    value: 2
+                                },
+                                {
+                                    label: '3',
+                                    value: 3
+                                },
+                                {
+                                    label: '4',
+                                    value: 4
+                                },
+                                {
+                                    label: '5',
+                                    value: 5
+                                },
+                                {
+                                    label: '6',
+                                    value: 6
+                                },
+                                {
+                                    label: '7',
+                                    value: 7
+                                },
+                                {
+                                    label: '8',
+                                    value: 8
+                                },
+                                {
+                                    label: '9',
+                                    value: 9
+                                },
+                                {
+                                    label: '10',
+                                    value: 10
+                                }
+                            ],
+                            default: 1,
+                            value: null,
+                            order: 2,
+                            group: 'model',
+                            is_point: true,
+                            is_show: false,
+                            style: 'select',
+                            moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        },
+                        {
+                            key: 'TextVariableModule',
+                            field: 'prompt',
+                            label: '提示',
+                            desc: '所需图像的文本描述。最大长度为1000个字符。',
+                            type: 'text',
+                            options: [],
+                            default: 'Hi.',
+                            value: 'aaa',
+                            order: 4,
+                            group: 'model',
+                            is_point: true,
+                            is_show: true,
+                            style: 'text',
+                            moduleCode: 'MoredealAiWritercodemodules\variableTextVariableModule'
+                        }
+                    ],
+                    response: {
+                        key: 'TextResponseModule',
+                        type: 'text',
+                        style: 'text',
+                        stepField: null,
+                        processParams: null,
+                        isShow: true,
+                        value: null,
+                        errorCode: null,
+                        status: false,
+                        message: null,
+                        moduleCode: 'MoredealAiWritercodemodulesstep\responseTextResponseModule'
+                    },
+                    isCanAddStep: true,
+                    moduleCode: 'MoredealAiWritercodemodulesstepOpenApiStepModule'
+                },
+                variables: [
+                    { desc: '', field: 'Variable_0', is_show: true, label: 'Variable 0', options: [], style: 'input', value: '12' }
+                ],
+                moduleCode: 'MoredealAiWritercodemodulesstepStepWrapper'
+            }
+        ]
+    });
     const editChange = (data: any) => {
         const { index } = data;
         const { name, value } = data.e.target;
@@ -255,7 +366,7 @@ function CreateDetail() {
                         <Basis />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform />
+                        <Perform config={edit} />
                     </Grid>
                 </Grid>
             </TabPanel>
@@ -265,7 +376,7 @@ function CreateDetail() {
                         <Arrange edit={edit} editChange={editChange} variableChange={variableChange} basisChange={basisChange} />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform />
+                        <Perform config={edit} />
                     </Grid>
                 </Grid>
             </TabPanel>

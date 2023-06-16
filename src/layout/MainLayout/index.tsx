@@ -12,7 +12,7 @@ import HorizontalBar from './HorizontalBar';
 import Customization from '../Customization';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 
-import navigation from 'menu-items';
+import getMenuItems from 'menu-items';
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
@@ -83,6 +83,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const MainLayout = () => {
+    const navigation = getMenuItems();
     const theme = useTheme();
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));

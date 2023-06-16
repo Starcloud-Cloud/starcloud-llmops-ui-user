@@ -7,10 +7,15 @@ import CarryOut from 'views/template/carryOut';
 
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-
 function Deatail() {
     const location = useLocation();
-    const [detailData, setDetailData] = useState<any>({});
+    const [detailData, setDetailData] = useState({
+        name: '',
+        categories: [],
+        scenes: [],
+        config: [],
+        example: ''
+    });
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
         const queryParams: any = {
@@ -57,7 +62,7 @@ function Deatail() {
                     收藏模板
                 </Button>
             </Box>
-            <CarryOut />
+            <CarryOut config={detailData.config} example={detailData.example} />
         </Card>
     );
 }

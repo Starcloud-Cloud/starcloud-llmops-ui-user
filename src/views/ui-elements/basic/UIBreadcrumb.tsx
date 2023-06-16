@@ -7,15 +7,17 @@ import Breadcrumb from 'ui-component/extended/Breadcrumbs';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
-import navigation from 'menu-items';
+
 import { gridSpacing } from 'store/constant';
 
 // assets
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import getMenuItems from 'menu-items';
 
 // =============================|| UI BREADCRUMB ||============================= //
 
 const UIBreadcrumb = () => {
+    const navigation = getMenuItems();
     const theme = useTheme();
 
     return (

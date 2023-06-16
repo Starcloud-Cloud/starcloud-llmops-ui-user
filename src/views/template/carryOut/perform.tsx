@@ -11,7 +11,7 @@ import { useFormik } from 'formik';
 
 import generateValidationSchema from 'hooks/usevalid';
 
-function Perform() {
+function Perform({ config }: { config: any }) {
     const variables = [
         {
             key: 'TextVariableModule',
@@ -120,7 +120,7 @@ function Perform() {
         }
     ];
     const initialValues: Record<string, any> = {};
-    variables.forEach((variable) => {
+    variables.forEach((variable: any) => {
         const { field } = variable;
         initialValues[field] = '';
         // 添加其他类型的校验规则，根据需要进行扩展
@@ -129,15 +129,12 @@ function Perform() {
     const formik = useFormik({
         initialValues,
         validationSchema,
-        onSubmit: (values) => {
-            console.log(values);
-        }
+        onSubmit: () => {}
     });
+    console.log(config);
+
     return (
         <Box>
-            <Typography variant="h5" my={2}>
-                我是产品描述
-            </Typography>
             <Button onClick={() => formik.handleSubmit()} startIcon={<AlbumIcon />} variant="contained">
                 全部执行
             </Button>
@@ -146,67 +143,71 @@ function Perform() {
                     <ErrorOutlineIcon />
                 </IconButton>
             </Tooltip>
-            <form onSubmit={formik.handleSubmit}>
+            <form>
                 <Grid container spacing={2}>
-                    {variables.map((item, index) => (
-                        <Grid item lg={4} md={6} sm={12} key={index}>
-                            <FormExecute formik={formik} item={item} />
-                        </Grid>
-                    ))}
+                    {config.variables &&
+                        config.variables.map((item: any, index: number) => (
+                            <Grid item lg={4} md={6} sm={12} key={index}>
+                                <FormExecute formik={formik} item={item} />
+                            </Grid>
+                        ))}
                 </Grid>
             </form>
-            <Card elevation={2} sx={{ padding: 2 }}>
-                <Box my={2} display="flex" justifyContent="space-between">
-                    <Box>
-                        <Typography variant="h2">执行标题</Typography>
-                        <Typography variant="overline" display="block" mt={1}>
-                            我是每个步骤的描述
-                        </Typography>
-                    </Box>
-                    <Box>
-                        <Tooltip title="点击执行当前步骤">
-                            <IconButton size="small">
-                                <ErrorOutlineIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Button size="small" startIcon={<NotStartedIcon />} variant="contained">
-                            执行
-                        </Button>
-                    </Box>
-                </Box>
-                <form onSubmit={formik.handleSubmit}>
-                    <Grid container spacing={2}>
-                        {variables.map((item, index) => (
-                            <Grid
-                                item
-                                lg={item.field === 'prompt' ? 12 : item.style === 'text' ? 6 : 4}
-                                md={item.field === 'prompt' ? 12 : item.style === 'text' ? 6 : 4}
-                                sm={12}
-                                key={index}
-                            >
-                                <FormExecute formik={formik} item={item} />
+            {config.steps &&
+                config.steps.map((item: any) => (
+                    <Card elevation={2} sx={{ padding: 2 }} key={item.field}>
+                        <Box my={2} display="flex" justifyContent="space-between">
+                            <Box>
+                                <Typography variant="h2">{item.name}</Typography>
+                                <Typography variant="overline" display="block" mt={1}>
+                                    {item.description}
+                                </Typography>
+                            </Box>
+                            <Box>
+                                <Tooltip title="点击执行当前步骤">
+                                    <IconButton size="small">
+                                        <ErrorOutlineIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Button size="small" startIcon={<NotStartedIcon />} variant="contained">
+                                    {item.buttonLabel}
+                                </Button>
+                            </Box>
+                        </Box>
+                        <form>
+                            <Grid container spacing={2}>
+                                {item.step.variables.map((el: any, index: number) => (
+                                    <Grid
+                                        item
+                                        lg={el.field === 'prompt' ? 12 : el.style === 'TEXT' ? 6 : 4}
+                                        md={el.field === 'prompt' ? 12 : el.style === 'TEXT' ? 6 : 4}
+                                        sm={12}
+                                        key={index}
+                                    >
+                                        <FormExecute formik={formik} item={el} />
+                                    </Grid>
+                                ))}
+                                {item.variables.map((el: any, index: number) => (
+                                    <Grid item key={index} lg={item.style === 'TEXT' ? 6 : 4} sm={12}>
+                                        <FormExecute formik={formik} item={el} />
+                                    </Grid>
+                                ))}
                             </Grid>
-                        ))}
-                        {variables.map((item, index) => (
-                            <Grid item key={index} lg={item.style === 'text' ? 6 : 4} sm={12}>
-                                <FormExecute formik={formik} item={item} />
-                            </Grid>
-                        ))}
-                    </Grid>
-                </form>
-                <Box my={2} display="flex">
-                    {/* <TextField fullWidth /> */}
-                    {/* <TextField multiline rows={8} fullWidth /> */}
-                    {Array.from({ length: 3 }, (_, index) => (
-                        <Card
-                            elevation={3}
-                            sx={{ width: '200px', height: '200px', marginRight: '16px', lineHeight: '200px', textAlign: 'center' }}
-                        >
-                            <InsertPhotoIcon fontSize="large" />
-                        </Card>
-                    ))}
-                </Box>
-            </Card>
+                        </form>
+                        <Box my={2} display="flex">
+                            {/* <TextField fullWidth /> */}
+                            {/* <TextField multiline rows={8} fullWidth /> */}
+                            {Array.from({ length: 3 }, (_, index) => (
+                                <Card
+                                    elevation={3}
+                                    sx={{ width: '200px', height: '200px', marginRight: '16px', lineHeight: '200px', textAlign: 'center' }}
+                                >
+                                    <InsertPhotoIcon fontSize="large" />
+                                </Card>
+                            ))}
+                        </Box>
+                    </Card>
+                ))}
         </Box>
     );
 }

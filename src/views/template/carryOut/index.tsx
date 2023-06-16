@@ -1,24 +1,23 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import { Box, Grid, Typography } from '@mui/material';
 
 import './index.css';
 import Perform from './perform';
 
-function CarryOut() {
-    const markdown =
-        "### Generol Input:\n\nTopic: Shopify Alternative\n\nLanguage: English\n\nWriting style: Creative\n\nWriting tone: Cheerful\n\n### Title\n\n\n\n##### Output:\n\n```\n\n5 Unconventional E-commerce Platforms: Alternatives to Shopify\n\n```\n\n### Sections\n\n##### Input:\n\nSections: 5\n\n\n\n\n\n##### Output:\n\n```\n\n## Unleashing the Power of Unconventional E-commerce Platforms\n## Empower Your Online Business with These 5 Game-Changing Platforms\n## Elevate Your E-commerce Game with These Unique Alternatives to Shopify\n## Ditch the Ordinary: 5 Unconventional E-commerce Platforms to Consider\n## Unconventional E-commerce Platforms: The Future of Online Selling\n\n```\n\n### Content\n\n##### Input:\n\nParagraphs: 2\n\n\n\n\n\n##### Output:\n\n```\n\n<!--- ===INTRO: --->\nAre you tired of using the same old e-commerce platform? Are you looking for something unique and unconventional? Look no further as we have listed down five alternative e-commerce platforms that will elevate your online business game. We will be discussing the features, benefits, and pricing of each platform to help you make an informed decision. So, say goodbye to the ordinary and hello to something new and exciting! \n\n## Unleashing the Power of Unconventional E-commerce Platforms\n\nE-commerce platforms have revolutionized the way we do business. They offer a range of features and functionalities that make online selling easier and more efficient. However, most businesses rely on the same old platforms, such as Shopify. But, what if we told you that there are other options out there that are just as good, if not better? These unconventional e-commerce platforms offer unique features and benefits that can take your business to the next level.\n\n## Empower Your Online Business with These 5 Game-Changing Platforms\n\n1. Big Cartel: Big Cartel is a platform that caters to artists and creatives. It offers a range of customizable templates and features that allow for a personalized online store. Unlike Shopify, Big Cartel offers a free plan that allows for up to five products. Its paid plans start at $9.99 per month.\n\n2. WooCommerce: WooCommerce is a plugin for WordPress that turns your website into an e-commerce store. It offers a range of features and integrations, making it a versatile platform for businesses of all sizes. Unlike Shopify, WooCommerce is free to use, but you will need to pay for hosting and a domain name.\n\n3. Squarespace: Squarespace is a website builder that also offers e-commerce functionality. It offers a range of customizable templates and features, making it a great option for businesses that want a professional-looking website. Its e-commerce plans start at $18 per month.\n\n4. Ecwid: Ecwid is a platform that allows you to sell on multiple channels, such as Facebook, Instagram, and Amazon. It offers a range of features, including inventory management and shipping options. Its plans start at $15 per month.\n\n5. Magento: Magento is an open-source e-commerce platform that offers a range of features and integrations. It is a great option for businesses that want complete control over their online store. Unlike Shopify, Magento is free to use, but you will need to pay for hosting and development.\n\n## Elevate Your E-commerce Game with These Unique Alternatives to Shopify\n\nWhile Shopify is a popular e-commerce platform, it may not be the best option for every business. These alternative platforms offer unique features and benefits that can help take your online business to the next level. Whether you're an artist, a blogger, or a large corporation, there's an e-commerce platform out there that's perfect for you.\n\n## Ditch the Ordinary: 5 Unconventional E-commerce Platforms to Consider\n\nIf you're tired of using the same old e-commerce platform, it's time to consider something new and exciting. These unconventional e-commerce platforms offer unique features and benefits that can help you stand out from the crowd. So, ditch the ordinary and try something new today!\n\n## Unconventional E-commerce Platforms: The Future of Online Selling\n\nAs e-commerce continues to grow, so does the demand for unique and unconventional platforms. These platforms offer a range of features and benefits that can help businesses of all sizes succeed online. So, whether you're a small business owner or a large corporation, consider using one of these unconventional e-commerce platforms to elevate your online business game.\n\n```\n\n### Excerpt\n\n\n\n##### Output:\n\n```\n\n\"Are you tired of the same old e-commerce options? Look no further! Check out these 5 unconventional platforms that will take your online store to the next level. Say goodbye to Shopify and hello to something new and exciting!\"\n\n```";
-
+function CarryOut({ config, example }: { config: any; example: string }) {
     return (
         <Box>
             <Grid container spacing={4}>
                 <Grid item lg={7} md={7} sm={7}>
-                    <Perform />
+                    <Typography variant="h5" my={2}>
+                        {config.description}
+                    </Typography>
+                    <Perform config={config} />
                 </Grid>
                 <Grid item lg={5} md={5} sm={5}>
-                    <ReactMarkdown children={markdown} remarkPlugins={[remarkGfm]} />
+                    <ReactMarkdown children={example} remarkPlugins={[remarkGfm]} />
                 </Grid>
             </Grid>
         </Box>

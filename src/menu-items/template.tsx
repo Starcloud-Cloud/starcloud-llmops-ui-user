@@ -34,6 +34,14 @@ const template: NavItemType = {
             url: '/template/createCenter',
             icon: icons.IconDeviceAnalytics,
             breadcrumbs: false
+        },
+        {
+            id: 'applicationAnalysis',
+            title: t('application-analysis'),
+            type: 'item',
+            url: '/template/applicationAnalysis',
+            icon: icons.IconDeviceAnalytics,
+            breadcrumbs: false
         }
     ]
 };

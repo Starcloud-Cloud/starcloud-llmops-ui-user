@@ -40,8 +40,7 @@ export const RuoyiMenu = () => {
         };
         if (routes) {
             const targetRoute = routes.find((route) => route.name === 'mofaai');
-            const convertedMenuList = convertRouteList(targetRoute?.children!);
-            return convertedMenuList; // 返回数组而非对象
+            return targetRoute && targetRoute?.children && convertRouteList(targetRoute?.children);
         }
     }, [routes]); // 仅当 routes 变化时重新计算 getMenu 的值
 

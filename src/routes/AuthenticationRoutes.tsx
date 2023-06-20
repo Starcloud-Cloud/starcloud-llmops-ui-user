@@ -1,4 +1,7 @@
 import { lazy } from 'react';
+// import { useMemo } from 'react';
+// import { AppCustomRouteRecordRaw } from 'types/router';
+// import useRouteStore from 'store/router';
 
 // project imports
 import Loadable from 'ui-component/Loadable';
@@ -41,13 +44,44 @@ const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
 const PagesContactUS = Loadable(lazy(() => import('views/pages/contact-us')));
 const PagesFaqs = Loadable(lazy(() => import('views/pages/saas-pages/Faqs')));
 const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
-
+// interface NavItemType {
+//     id: string;
+//     path: string;
+//     element: any;
+//     children: any;
+// }
+// const PathList = () => {
+//     const route = useRouteStore((store) => store.routes);
+//     const routes: any[] = useMemo(() => {
+//         console.log(1);
+//         const convertToNavItemType = (routeObj: AppCustomRouteRecordRaw): NavItemType => {
+//             let navItem: NavItemType = {
+//                 id: routeObj?.id.toString(),
+//                 path: routeObj?.path,
+//                 element: `views/${routeObj?.component}`,
+//                 children: routeObj.children && routeObj.children.map((childRouteObj) => convertToNavItemType(childRouteObj))
+//             };
+//             return navItem;
+//         };
+//         console.log(2);
+//         const convertRouteList = (routeList: AppCustomRouteRecordRaw[]) => {
+//             return routeList.map((routeObj) => convertToNavItemType(routeObj)); // setting isTopLevel as true for all items in routeList
+//         };
+//         console.log(3);
+//         if (route) {
+//             const targetRoute = routes.find((data) => data.name === 'mofaai');
+//             return targetRoute && targetRoute?.children && convertRouteList(targetRoute?.children);
+//         }
+//     }, [route]);
+//     return routes;
+// };
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 
 const AuthenticationRoutes = {
     path: '/',
     element: <MinimalLayout />,
     children: [
+        // ...PathList(),
         {
             path: '/pages/forgot-password/forgot-password',
             element: <AuthForgotPassword />

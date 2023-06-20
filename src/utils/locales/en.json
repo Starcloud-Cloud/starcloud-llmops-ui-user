@@ -484,5 +484,8 @@
     "template": "Template Class",
     "create-center": "createCenter",
     "application-analysis": "application Analysis",
-    "templateMarket": "templateMarket"
+    "templateMarket": "templateMarket",
+    "EntitlementCard": {
+        "ppgrades": "Go Premium"
+    }
 }

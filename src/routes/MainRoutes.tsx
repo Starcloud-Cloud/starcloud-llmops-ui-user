@@ -139,6 +139,9 @@ const UtilsGrid = Loadable(lazy(() => import('views/utilities/Grid')));
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
+// Rewards
+const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -539,7 +542,6 @@ const MainRoutes = {
                 }
             ]
         },
-
         {
             path: '/template/createCenter',
             element: <CreateCenter />
@@ -551,6 +553,10 @@ const MainRoutes = {
         {
             path: '/template/createDetail',
             element: <CreateDetail />
+        },
+        {
+            path: '/exchange',
+            element: <Redemption />
         }
     ]
 };

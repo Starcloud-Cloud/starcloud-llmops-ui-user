@@ -26,11 +26,12 @@ function Template({ data, handleDetail }: any) {
                 </Typography>
             </CardContent>
             <Box position="absolute" left="8px" bottom="8px">
-                {data.categories.map((item: string) => (
-                    <Link href="#" key={item} mr={1} className="active cursor underline" fontSize={14}>
-                        #{item}
-                    </Link>
-                ))}
+                {data.categories &&
+                    data.categories.map((item: string) => (
+                        <Link href="#" key={item} mr={1} className="active cursor underline" fontSize={14}>
+                            #{item}
+                        </Link>
+                    ))}
             </Box>
         </Card>
     );

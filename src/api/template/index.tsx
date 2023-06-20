@@ -5,3 +5,6 @@ export const marketPage = (params: PageParam) => {
 export const marketDeatail = (params: PageParam) => {
     return request.get({ url: 'llm/app/market/get', params });
 };
+export const userBenefits = () => {
+    return request.post({ url: 'llm/user-benefits/info' });
+};

@@ -16,7 +16,6 @@ const icons = {
 
 export const RuoyiMenu = () => {
     const routes = useRouteStore((store) => store.routes);
-
     const ruoyiMenu = useMemo(() => {
         const convertToNavItemType = (routeObj: AppCustomRouteRecordRaw, isTopLevel: boolean = false): NavItemType => {
             let navItem: NavItemType = {

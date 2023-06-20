@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -7,23 +9,26 @@ import {
     Avatar,
     Box,
     Card,
-    CardContent,
+    Link,
+    // CardContent,
     Chip,
     ClickAwayListener,
     Divider,
     Grid,
-    InputAdornment,
+    // InputAdornment,
     List,
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    OutlinedInput,
+    // OutlinedInput,
     Paper,
     Popper,
     Stack,
-    Switch,
+    // Switch,
+    IconButton,
     Typography
 } from '@mui/material';
+import useUserStore from 'store/user';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -37,21 +42,27 @@ import User1 from 'assets/images/users/user-round.svg';
 import { t } from 'hooks/web/useI18n';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
+import {
+    IconLogout,
+    //  IconSearch,
+    IconSettings
+    // IconUser
+} from '@tabler/icons';
 import useConfig from 'hooks/useConfig';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
+    const data = useUserStore();
     const theme = useTheme();
     const { borderRadius } = useConfig();
     const navigate = useNavigate();
 
-    const [sdm, setSdm] = useState(true);
-    const [value, setValue] = useState('');
-    const [notification, setNotification] = useState(false);
+    // const [sdm, setSdm] = useState(true);
+    // const [value, setValue] = useState('');
+    // const [notification, setNotification] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
-    const { logout, user } = useAuth();
+    const { logout } = useAuth();
     const [open, setOpen] = useState(false);
     /**
      * anchorRef is used on different components and specifying one type leads to other components throwing an error
@@ -160,17 +171,17 @@ const ProfileSection = () => {
                             <Paper>
                                 {open && (
                                     <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                                        <Box sx={{ p: 2, pb: 0 }}>
+                                        <Box sx={{ p: 2 }}>
                                             <Stack>
                                                 <Stack direction="row" spacing={0.5} alignItems="center">
                                                     <Typography variant="h4">Good Morning,</Typography>
                                                     <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                        {user?.name}
+                                                        {data.user.nickname}
                                                     </Typography>
                                                 </Stack>
-                                                <Typography variant="subtitle2">Project Admin</Typography>
+                                                {/* <Typography variant="subtitle2">{data.user.nickname}</Typography> */}
                                             </Stack>
-                                            <OutlinedInput
+                                            {/* <OutlinedInput
                                                 sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
                                                 id="input-search-profile"
                                                 value={value}
@@ -185,14 +196,38 @@ const ProfileSection = () => {
                                                 inputProps={{
                                                     'aria-label': 'weight'
                                                 }}
-                                            />
-                                            <Divider />
+                                            /> */}
+                                            {/* <Divider /> */}
                                         </Box>
                                         <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                                             <Box sx={{ p: 2, pt: 0 }}>
                                                 <UpgradePlanCard />
                                                 <Divider />
-                                                <Card
+                                                <Card sx={{ padding: 2 }}>
+                                                    <Grid container justifyContent="space-between">
+                                                        <Grid item md={6}>
+                                                            专属邀请链接
+                                                            <IconButton size="small">
+                                                                <ErrorOutlineIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Grid>
+                                                        <Grid item md={6}>
+                                                            <IconButton size="small">
+                                                                <ContentCopyIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Link href="#">https://www.mofaai.com.cn</Link>
+                                                    <Box>
+                                                        <img
+                                                            alt="邀请码"
+                                                            style={{ width: '200px', height: '200px', textAlign: 'center' }}
+                                                            src="https://www.mdc.ai/wp-content/plugins/moredeal-tools/res/market/img/qun.png"
+                                                        />
+                                                    </Box>
+                                                </Card>
+                                                <Divider />
+                                                {/* <Card
                                                     sx={{
                                                         bgcolor:
                                                             theme.palette.mode === 'dark'
@@ -237,7 +272,7 @@ const ProfileSection = () => {
                                                         </Grid>
                                                     </CardContent>
                                                 </Card>
-                                                <Divider />
+                                                <Divider /> */}
                                                 <List
                                                     component="nav"
                                                     sx={{
@@ -268,7 +303,7 @@ const ProfileSection = () => {
                                                             primary={<Typography variant="body2">{t('account-settings')}</Typography>}
                                                         />
                                                     </ListItemButton>
-                                                    <ListItemButton
+                                                    {/* <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
                                                         selected={selectedIndex === 1}
                                                         onClick={(event: React.MouseEvent<HTMLDivElement>) =>
@@ -300,7 +335,7 @@ const ProfileSection = () => {
                                                                 </Grid>
                                                             }
                                                         />
-                                                    </ListItemButton>
+                                                    </ListItemButton> */}
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
                                                         selected={selectedIndex === 4}

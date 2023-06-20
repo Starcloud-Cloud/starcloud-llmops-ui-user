@@ -99,7 +99,7 @@ function MyTemplate() {
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                     {items.map((id, index) => (
                         <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
-                            <Template handleDetail={handleDetail} />
+                            <Template data="{}" handleDetail={handleDetail} />
                         </Box>
                     ))}
                 </ScrollMenu>
@@ -117,7 +117,7 @@ function MyTemplate() {
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                     {items.map((id, index) => (
                         <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
-                            <Template handleDetail={handleDetail} />
+                            <Template data="{}" handleDetail={handleDetail} />
                         </Box>
                     ))}
                 </ScrollMenu>

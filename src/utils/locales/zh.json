@@ -609,5 +609,8 @@
     "template": "模板类",
     "create-center": "创作中心",
     "application-analysis": "应用分析",
-    "templateMarket": "模板市场"
+    "templateMarket": "模板市场",
+    "EntitlementCard": {
+        "ppgrades": "选择高级"
+    }
 }

@@ -33,6 +33,13 @@ const request = (option: any) => {
         }
     });
 };
+interface MyResponseData {
+    code: number;
+    data: any;
+    msg: string;
+    // 其他可能的字段...
+}
+
 const axiosServices = {
     get: async <T = any>(option: any) => {
         const res = await request({ method: 'GET', ...option });
@@ -42,9 +49,9 @@ const axiosServices = {
         const res = await request({ method: 'POST', ...option });
         return res.data as unknown as T;
     },
-    postOriginal: async (option: any) => {
+    postOriginal: async <T = MyResponseData>(option: any) => {
         const res = await request({ method: 'POST', ...option });
-        return res;
+        return res as unknown as T;
     },
     delete: async <T = any>(option: any) => {
         const res = await request({ method: 'DELETE', ...option });

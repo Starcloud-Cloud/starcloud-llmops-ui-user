@@ -10,20 +10,27 @@ interface UserVO {
     avatar: string;
     nickname: string;
 }
-interface UserInfoVO {
+// interface UserInfoVO {
+//     permissions: string[];
+//     roles: string[];
+//     isSetUser: boolean;
+//     user: UserVO;
+//     signInStatus: boolean | null;
+//     setSignInStatus: (status: boolean) => void;
+// }
+type UserStore = {
     permissions: string[];
     roles: string[];
     isSetUser: boolean;
     user: UserVO;
-}
+    signInStatus: boolean | null;
+    setSignInStatus: (status: boolean) => void;
+    setUserInfoAction: () => Promise<null | undefined>;
+    loginOut: () => Promise<void>;
+    resetState: () => void;
+};
 
-const useUserStore = create<
-    UserInfoVO & {
-        setUserInfoAction: () => Promise<null | undefined>;
-        loginOut: () => Promise<void>;
-        resetState: () => void;
-    }
->((set) => ({
+const useUserStore = create<UserStore>((set) => ({
     permissions: [],
     roles: [],
     isSetUser: false,
@@ -84,6 +91,10 @@ const useUserStore = create<
                 nickname: ''
             }
         });
+    },
+    signInStatus: null,
+    setSignInStatus: (status: boolean) => {
+        set({ signInStatus: status });
     }
 }));
 

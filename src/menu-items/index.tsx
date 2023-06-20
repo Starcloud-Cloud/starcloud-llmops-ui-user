@@ -23,6 +23,25 @@ const getMenuItems = () => {
         }
     }
 
+    // const arr: any[] = [
+    //     {
+    //         id: 2163,
+    //         parentId: 0,
+    //         title: 'mofaai',
+    //         type: 'group',
+    //         icon: '',
+    //         children: [
+    //             {
+    //                 id: 2164,
+    //                 breadcrumbs: false,
+    //                 title: '应用市场',
+    //                 type: 'item',
+    //                 url: 'template/templateMarket/list'
+    //             }
+    //         ]
+    //     }
+    // ];
+
     menuItems.items = [...ruoyiItemsToAdd, ...menuItems.items];
 
     return menuItems;

@@ -3,37 +3,37 @@ import { memo } from 'react';
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
 import {
-    Avatar,
+    Chip,
     Card,
     CardContent,
     Grid,
     LinearProgress,
     List,
     ListItem,
-    ListItemAvatar,
+    Button,
     ListItemText,
     Typography,
     linearProgressClasses
 } from '@mui/material';
+import { themesLight, themesTwo, themesEight } from 'hooks/useThemes';
 
 // assets
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 // styles
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     height: 10,
     borderRadius: 30,
     [`&.${linearProgressClasses.colorPrimary}`]: {
-        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.dark.light : '#fff'
+        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.secondary.light : '#fff'
     },
     [`& .${linearProgressClasses.bar}`]: {
         borderRadius: 5,
-        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main
+        backgroundColor: theme.palette.mode === 'dark' ? themesEight(leve, theme) : themesEight(leve, theme)
     }
 }));
-
-const CardStyle = styled(Card)(({ theme }) => ({
-    background: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.primary.light,
+const leve: string = 'Pro';
+const CardStyle = styled(Card)(({ theme }: any) => ({
+    background: theme.palette.mode === 'dark' ? theme.palette.dark.main : themesLight(leve, theme),
     marginBottom: '22px',
     overflow: 'hidden',
     position: 'relative',
@@ -42,7 +42,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
         position: 'absolute',
         width: '157px',
         height: '157px',
-        background: theme.palette.mode === 'dark' ? theme.palette.dark.dark : theme.palette.primary[200],
+        background: themesTwo(leve, theme),
         borderRadius: '50%',
         top: '-105px',
         right: '-96px'
@@ -52,7 +52,6 @@ const CardStyle = styled(Card)(({ theme }) => ({
 interface LinearProgressWithLabelProps {
     value: number;
 }
-
 // ==============================|| PROGRESS BAR WITH LABEL ||============================== //
 
 function LinearProgressWithLabel({ value, ...others }: LinearProgressWithLabelProps) {
@@ -65,7 +64,29 @@ function LinearProgressWithLabel({ value, ...others }: LinearProgressWithLabelPr
                     <Grid item>
                         <Typography
                             variant="h6"
-                            sx={{ color: theme.palette.mode === 'dark' ? theme.palette.dark.light : theme.palette.primary[800] }}
+                            sx={{
+                                color: theme.palette.mode === 'dark' ? theme.palette.dark.light : themesEight(leve, theme)
+                            }}
+                        >
+                            Token
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="h6" color="inherit">{`${Math.round(value)}%`}</Typography>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item>
+                <BorderLinearProgress aria-label="progress of theme" variant="determinate" value={value} {...others} />
+            </Grid>
+            <Grid item>
+                <Grid container justifyContent="space-between">
+                    <Grid item>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: theme.palette.mode === 'dark' ? theme.palette.dark.light : themesEight(leve, theme)
+                            }}
                         >
                             Progress
                         </Typography>
@@ -85,41 +106,25 @@ function LinearProgressWithLabel({ value, ...others }: LinearProgressWithLabelPr
 // ==============================|| SIDEBAR - MENU CARD ||============================== //
 
 const MenuCard = () => {
-    const theme = useTheme();
-
     return (
         <CardStyle>
             <CardContent sx={{ p: 2 }}>
                 <List sx={{ p: 0, m: 0 }}>
-                    <ListItem alignItems="flex-start" disableGutters sx={{ p: 0 }}>
-                        <ListItemAvatar sx={{ mt: 0 }}>
-                            <Avatar
-                                variant="rounded"
-                                sx={{
-                                    ...theme.typography.commonAvatar,
-                                    ...theme.typography.largeAvatar,
-                                    color: theme.palette.primary.main,
-                                    border: theme.palette.mode === 'dark' ? '1px solid' : 'none',
-                                    borderColor: theme.palette.primary.main,
-                                    background: theme.palette.mode === 'dark' ? theme.palette.dark.dark : '#fff',
-                                    marginRight: '12px'
-                                }}
+                    <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>
+                        <ListItemText sx={{ mt: 0 }}>
+                            <Chip size="small" variant="outlined" label="Pro"></Chip>
+                            {/* <Typography variant="subtitle2">升级享受更多权益</Typography> */}
+                        </ListItemText>
+                        <ListItemText sx={{ mt: 0 }}>
+                            <Button
+                                size="small"
+                                variant="contained"
+                                sx={{ boxShadow: 'none' }}
+                                color={leve === 'Free' ? 'primary' : leve === 'Plus' ? 'secondary' : 'warning'}
                             >
-                                <TableChartOutlinedIcon fontSize="inherit" />
-                            </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText
-                            sx={{ mt: 0 }}
-                            primary={
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{ color: theme.palette.mode === 'dark' ? theme.palette.dark.light : theme.palette.primary[800] }}
-                                >
-                                    Get Extra Space
-                                </Typography>
-                            }
-                            secondary={<Typography variant="caption"> 28/23 GB</Typography>}
-                        />
+                                Go Premium
+                            </Button>
+                        </ListItemText>
                     </ListItem>
                 </List>
                 <LinearProgressWithLabel value={80} />

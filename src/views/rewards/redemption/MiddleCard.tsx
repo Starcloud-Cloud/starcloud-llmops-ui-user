@@ -1,11 +1,11 @@
 import React from 'react';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import EventNoteIcon from '@mui/icons-material/EventNote';
+import SubCard from 'ui-component/cards/SubCard';
 
 // Define the shape of props that this component expects
 interface MiddleCardProps {
@@ -18,8 +18,16 @@ interface MiddleCardProps {
 }
 
 const MiddleCard: React.FC<MiddleCardProps> = ({ Icon, title, description, buttonText, isDisabled, onClick }) => (
-    <Card sx={{ background: '#E4F1FF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1 }}>
-        <CardContent>
+    <SubCard sx={{ p: 1, width: '100%' }}>
+        <CardContent
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                flexGrow: 1
+            }}
+        >
             <Box display="flex" alignItems="center">
                 <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', mr: 2 }}>
                     <Icon fontSize="large" />
@@ -29,11 +37,11 @@ const MiddleCard: React.FC<MiddleCardProps> = ({ Icon, title, description, butto
                     <Typography variant="body2">{description}</Typography>
                 </Box>
             </Box>
+            <Button variant="contained" disabled={isDisabled} sx={{ textTransform: 'none' }} onClick={onClick}>
+                {buttonText}
+            </Button>
         </CardContent>
-        <Button variant="contained" disabled={isDisabled} sx={{ textTransform: 'none' }} onClick={onClick}>
-            {buttonText}
-        </Button>
-    </Card>
+    </SubCard>
 );
 
 export default MiddleCard;

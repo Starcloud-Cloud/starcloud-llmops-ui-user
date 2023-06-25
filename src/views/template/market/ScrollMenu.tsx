@@ -1,40 +1,27 @@
-import IconButton from '@mui/material/IconButton';
-import Box from '@mui/material/Box';
+import { Box, IconButton } from '@mui/material';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import BorderAllIcon from '@mui/icons-material/BorderAll';
 
+import { categories } from 'api/template';
+
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 
-import { useContext } from 'react';
-
+import { useContext, useState, useEffect } from 'react';
+interface MenuList {
+    name: string;
+    icon: string;
+}
 function ScrollMenus() {
-    const items = [
-        'Listing创建和优化',
-        '产品分析和推广',
-        '店铺管理和售后',
-        '中文写作',
-        '有趣好玩',
-        '邮件营销',
-        '社媒文案',
-        'Image',
-        'Amazon',
-        'Email',
-        'Social Media',
-        'Blog',
-        'Writing',
-        'Custom',
-        'Other',
-        'Ads',
-        'Website',
-        'Marketing',
-        'Business',
-        'Resume',
-        'Role Play',
-        'Fun'
-    ];
+    const [menuList, setMenuList] = useState<MenuList[]>([]);
+    const [active, setActive] = useState(1);
+    useEffect(() => {
+        categories().then((res) => {
+            setMenuList(res);
+        });
+    }, []);
     const LeftArrow = () => {
         const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
         return (
@@ -63,12 +50,28 @@ function ScrollMenus() {
             </Box>
         );
     };
+    const focus = { textAlign: 'center', padding: '5px 20px', borderRadius: 15, cursor: 'pointer', fontSize: '12px' };
+    const focuos = {
+        textAlign: 'center',
+        padding: '5px 20px',
+        borderRadius: 15,
+        cursor: 'pointer',
+        background: '#673ab7',
+        color: '#fff',
+        fontSize: '12px'
+    };
     return (
         <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-            {items.map((id, index) => (
-                <Box sx={{ mx: 2, textAlign: 'center' }} key={index}>
-                    <BorderAllIcon />
-                    <Box sx={{ whiteSpace: 'nowrap' }}>{id}</Box>
+            {menuList.map((item, index) => (
+                <Box
+                    onClick={() => {
+                        setActive(index);
+                    }}
+                    sx={active === index ? focuos : focus}
+                    key={index}
+                >
+                    <BorderAllIcon fontSize="small" />
+                    <Box sx={{ whiteSpace: 'nowrap' }}>{item.name}</Box>
                 </Box>
             ))}
         </ScrollMenu>

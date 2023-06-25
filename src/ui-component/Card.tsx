@@ -127,7 +127,7 @@ const Cards = () => {
                     <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>
                         <ListItemText sx={{ mt: 0 }}>
                             <Box display="inline-block" padding="4px 10px" border="1px solid #bdbdbd" borderRadius="5px">
-                                {userInfo?.userLevel}
+                                {userInfo?.userLevel || 'Free'}
                             </Box>
                         </ListItemText>
                         <ListItemText sx={{ mt: 0 }}>
@@ -141,7 +141,9 @@ const Cards = () => {
                                             ? 'primary'
                                             : userInfo?.userLevel === 'plus'
                                             ? 'secondary'
-                                            : 'warning'
+                                            : userInfo?.userLevel === 'pro'
+                                            ? 'warning'
+                                            : 'primary'
                                     }
                                 >
                                     {t('EntitlementCard.ppgrades')}

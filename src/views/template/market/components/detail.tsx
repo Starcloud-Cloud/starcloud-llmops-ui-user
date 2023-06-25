@@ -13,7 +13,6 @@ function Deatail() {
         name: '',
         categories: [],
         scenes: [],
-        config: [],
         example: ''
     });
     useEffect(() => {
@@ -44,9 +43,8 @@ function Deatail() {
                         <Box>
                             <Typography variant="h2">{detailData.name}</Typography>
                         </Box>
-                        <Box my={1}>
+                        <Box my={0.5}>
                             {detailData.categories && detailData.categories.map((item: any) => <span key={item}>#{item}</span>)}
-
                             {detailData.scenes &&
                                 detailData.scenes.map((el: any) => (
                                     <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
@@ -62,7 +60,7 @@ function Deatail() {
                     收藏模板
                 </Button>
             </Box>
-            <CarryOut config={detailData.config} example={detailData.example} />
+            <CarryOut config={detailData} example={detailData.example} />
         </Card>
     );
 }

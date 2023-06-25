@@ -1,7 +1,6 @@
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
@@ -12,6 +11,11 @@ import ScrollMenus from './ScrollMenu';
 import { Outlet } from 'react-router-dom';
 
 import { useState } from 'react';
+
+import Paper from '@mui/material/Paper';
+import InputBase from '@mui/material/InputBase';
+import Button from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 
 function TemplateMarket() {
     const [queryParams, setQueryParams] = useState({
@@ -38,7 +42,24 @@ function TemplateMarket() {
             <Typography variant="h4" my={2} textAlign="center">
                 浏览 354+ 最佳AI工作流程
             </Typography>
-            <TextField fullWidth name="name" value={queryParams.name} onChange={handleChange} />
+            <Paper
+                sx={{
+                    p: '2px 4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: 600,
+                    margin: '0 auto',
+                    background: '#f8fafc',
+                    height: 50
+                }}
+            >
+                <SearchIcon />
+                <InputBase sx={{ ml: 1, flex: 1, p: 1 }} inputProps={{ 'aria-label': 'search google maps' }} value={queryParams.name} />
+                <Button size="small" color="primary" sx={{ borderRadius: '5px' }} onChange={handleChange}>
+                    Search
+                </Button>
+            </Paper>
+
             <Grid container spacing={2} my={2}>
                 <Grid item xs={12} md={10}>
                     <ScrollMenus />

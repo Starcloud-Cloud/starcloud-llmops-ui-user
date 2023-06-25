@@ -8,7 +8,7 @@ function FormExecute({ formik, item }: any) {
     };
     return (
         <Box>
-            {item.style === 'input' ? (
+            {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
                     label={item.label}
@@ -16,13 +16,15 @@ function FormExecute({ formik, item }: any) {
                     id={item.field}
                     required
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item.default !== undefined ? String(item.default) : ''}
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.desc}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
                     onChange={formik.handleChange}
                     fullWidth
                 />
-            ) : item.style === 'text' ? (
+            ) : item.style === '"TEXTAREA"' ? (
                 <TextField
                     sx={mt}
                     label={item.label}
@@ -33,11 +35,13 @@ function FormExecute({ formik, item }: any) {
                     maxRows={4}
                     InputLabelProps={{ shrink: true }}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.desc}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
                     onChange={formik.handleChange}
                     fullWidth
                 />
-            ) : item.style === 'select' ? (
+            ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
                     value={formik.values[item.field]}
@@ -48,8 +52,10 @@ function FormExecute({ formik, item }: any) {
                     name={item.field}
                     label={item.label}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.desc}
-                    placeholder={item.default !== undefined ? String(item.default) : ''}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     onChange={formik.handleChange}
                     fullWidth
                 >

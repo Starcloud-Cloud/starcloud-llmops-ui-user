@@ -19,6 +19,7 @@ interface UserVO {
 //     setSignInStatus: (status: boolean) => void;
 // }
 type UserStore = {
+    [x: string]: any;
     permissions: string[];
     roles: string[];
     isSetUser: boolean;

@@ -65,6 +65,7 @@ interface RouteInfo {
 
 interface RouteStore {
     routes: AppCustomRouteRecordRaw[];
+    addRouters: any;
     menuTabRouters: AppCustomRouteRecordRaw[];
     hasCheckedAuth: boolean;
     accessToken: string | null;

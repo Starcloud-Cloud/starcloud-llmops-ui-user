@@ -1,10 +1,12 @@
 import { isUrl } from 'utils/is';
 // import { componentModules } from 'router/routes';
 import { AppCustomRouteRecordRaw, AppRouteRecordRaw, MUIRoutes } from 'types/router';
-// import { RouteInfo, RouteMeta } from 'types/router';
+import Loadable from 'ui-component/Loadable';
+// import { RouteMeta } from 'types/router';
 // import { useLocation, useParams } from 'react-router-dom';
 import React from 'react';
 import { Icon } from '@mui/material';
+const modules: any = require.context('../views', true, /\.(tsx)$/);
 
 export const transformRoutes = (appRoutes: AppRouteRecordRaw[], parentPath = ''): MUIRoutes[] => {
     const transformRoute = (route: AppRouteRecordRaw) => {
@@ -78,6 +80,23 @@ export const transformRoutes = (appRoutes: AppRouteRecordRaw[], parentPath = '')
 // };
 
 // 按照路由中meta下的rank等级升序来排序路由
+export const getRedirect: any = (parentPath: string, children: AppCustomRouteRecordRaw[]) => {
+    if (!children || children.length === 0) {
+        return parentPath;
+    }
+    const path = generateRoutePath(parentPath, children[0].path);
+    // 递归子节点
+    if (children[0].children) return getRedirect(path, children[0].children);
+};
+const generateRoutePath = (parentPath: string, path: string) => {
+    if (parentPath.endsWith('/')) {
+        parentPath = parentPath.slice(0, -1); // 移除默认的 /
+    }
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    return parentPath + path;
+};
 export const ascending = (arr: any[]) => {
     arr.forEach((v) => {
         if (v?.meta?.rank === null) v.meta.rank = undefined;
@@ -105,74 +124,132 @@ export const ascending = (arr: any[]) => {
 //   // 其他路由组件...
 // };
 
-// 后端控制路由生成
-export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
+//若依
+export const Layout = () => import('views/pages/landing');
+export const generateRoute = (routesList: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
     const res: AppRouteRecordRaw[] = [];
-    // for (const route of routes) {
-    //   const meta = {
-    //     title: route.name,
-    //     icon: route.icon,
-    //     hidden: !route.visible,
-    //     noCache: !route.keepAlive,
-    //     alwaysShow:
-    //       route.children &&
-    //       route.children.length === 1 &&
-    //       (route.alwaysShow !== undefined ? route.alwaysShow : true),
-    //   } as RouteMeta;
-    //   // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
-    //   let data: AppRouteRecordRaw = {
-    //     path: route.path,
-    //     element:
-    //       route?.componentName && route?.componentName?.length > 0
-    //         ? React.createElement(componentModules[route.componentName])
-    //         : React.createElement(componentModules[toCamelCase(route.path, true)]),
-    //     meta: meta,
-    //   };
-
-    //   //处理顶级非目录路由
-    //   if (!route.children && route.parentId == 0 && route.component) {
-    //     data.element = React.createElement(componentModules["Layout"]);
-    //     data.meta = {};
-    //     data.path = "";
-    //     meta.alwaysShow = true;
-    //     const childrenData = {
-    //       path: route.path,
-    //       element: React.createElement(
-    //         componentModules[route?.component ?? toCamelCase(route.path, true)]
-    //       ),
-    //       meta: meta,
-    //     };
-    //     data.children = [childrenData];
-    //   } else {
-    //     // 目录
-    //     if (route.children) {
-    //       data.element = React.createElement(componentModules["Layout"]);
-    //       data.children = generateRoute(route.children);
-    //       // 外链
-    //     } else if (isUrl(route.path)) {
-    //       data = {
-    //         path: "/external-link",
-    //         element: React.createElement(componentModules["Layout"]),
-    //         meta: {
-    //           name: route.name,
-    //         },
-    //         children: [
-    //           {
-    //             ...data,
-    //             path: route.path,
-    //           },
-    //         ],
-    //       } as AppRouteRecordRaw;
-    //       // 菜单
-    //     } else {
-    //       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
-    //       data.element = React.createElement(componentModules[route.component || route.path]);
-    //     }
-    //   }
-    //   res.push(data);
-    // }
+    const modulesRoutesKeys: string[] = modules.keys();
+    function changeRoute(routes: AppCustomRouteRecordRaw[]) {
+        for (const route of routes) {
+            // const meta = {
+            //     title: route.name,
+            //     icon: route.icon,
+            //     hidden: !route.visible,
+            //     noCache: !route.keepAlive,
+            //     alwaysShow: route.children && route.children.length === 1 && (route.alwaysShow !== undefined ? route.alwaysShow : true)
+            // };
+            // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
+            let data: any = {
+                path: route.path
+                // redirect: route.redirect,
+                // meta: meta
+            };
+            //处理顶级非目录路由
+            if (!route.children && route.parentId === 0 && route.component) {
+                data.component = Layout;
+                // data.meta = {};
+                // data.name = toCamelCase(route.path, true) + 'Parent';
+                // data.redirect = '';
+                // meta.alwaysShow = true;
+                const childrenData: any = {
+                    path: ''
+                    // name: toCamelCase(route.path, true),
+                    // redirect: route.redirect,
+                    // meta: meta
+                };
+                // const index = route?.component
+                //     ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
+                //     : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
+                // childrenData.component = modules.keys()[modulesRoutesKeys[index]];
+                data.children = [childrenData];
+            } else {
+                const index = route?.component
+                    ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
+                    : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
+                // 目录
+                if (!route.children && route.component && route.component !== '') {
+                    const Element = Loadable(React.lazy(() => import(`views/${modulesRoutesKeys[index]?.split('./')[1]}`)));
+                    data.element = <Element />;
+                }
+                if (route.children) {
+                    changeRoute(route.children);
+                }
+            }
+            res.push(data as AppRouteRecordRaw);
+        }
+    }
+    changeRoute(routesList);
     return res;
 };
+
+// 后端控制路由生成
+// export const generateRoute = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
+//     const res: AppRouteRecordRaw[] = [];
+//     for (const route of routes) {
+//       const meta = {
+//         title: route.name,
+//         icon: route.icon,
+//         hidden: !route.visible,
+//         noCache: !route.keepAlive,
+//         alwaysShow:
+//           route.children &&
+//           route.children.length === 1 &&
+//           (route.alwaysShow !== undefined ? route.alwaysShow : true),
+//       } as RouteMeta;
+//       // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
+//       let data: AppRouteRecordRaw = {
+//         path: route.path,
+//         element:
+//           route?.componentName && route?.componentName?.length > 0
+//             ? React.createElement(componentModules[route.componentName])
+//             : React.createElement(componentModules[toCamelCase(route.path, true)]),
+//         meta: meta,
+//       };
+
+//       //处理顶级非目录路由
+//       if (!route.children && route.parentId == 0 && route.component) {
+//         data.element = React.createElement(componentModules["Layout"]);
+//         data.meta = {};
+//         data.path = "";
+//         meta.alwaysShow = true;
+//         const childrenData = {
+//           path: route.path,
+//           element: React.createElement(
+//             componentModules[route?.component ?? toCamelCase(route.path, true)]
+//           ),
+//           meta: meta,
+//         };
+//         data.children = [childrenData];
+//       } else {
+//         // 目录
+//         if (route.children) {
+//           data.element = React.createElement(componentModules["Layout"]);
+//           data.children = generateRoute(route.children);
+//           // 外链
+//         } else if (isUrl(route.path)) {
+//           data = {
+//             path: "/external-link",
+//             element: React.createElement(componentModules["Layout"]),
+//             meta: {
+//               name: route.name,
+//             },
+//             children: [
+//               {
+//                 ...data,
+//                 path: route.path,
+//               },
+//             ],
+//           } as AppRouteRecordRaw;
+//           // 菜单
+//         } else {
+//           // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会根path保持一致）
+//           data.element = React.createElement(componentModules[route.component || route.path]);
+//         }
+//       }
+//       res.push(data);
+//     }
+//     return res;
+// };
 
 // export const transformRoutes = (appRoutes: AppRouteRecordRaw[], parentPath = ""): MUIRoutes[] => {
 //   const transformRoute = (route: AppRouteRecordRaw) => {
@@ -230,6 +307,9 @@ export const pathResolve = (parentPath: string, path: string) => {
     return `${parentPath}${childPath}`.replace(/\/\//g, '/');
 };
 
+// function toCamelCase(path: string, arg1: boolean) {
+//     throw new Error('Function not implemented.');
+// }
 // // 路由降级
 // export const flatMultiLevelRoutes = (routes: AppRouteRecordRaw[]) => {
 //   const modules: AppRouteRecordRaw[] = cloneDeep(routes);

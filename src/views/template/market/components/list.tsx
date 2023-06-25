@@ -24,8 +24,8 @@ function List() {
     }, []);
     return (
         <Grid container spacing={2} my={2}>
-            {listData.map((item) => (
-                <Grid key={item.uid} item>
+            {listData.map((item, index) => (
+                <Grid key={item.uid + index} item>
                     <Template handleDetail={handleDetail} data={item} />
                 </Grid>
             ))}

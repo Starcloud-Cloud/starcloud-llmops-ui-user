@@ -11,6 +11,7 @@ interface UserVO {
     nickname: string;
 }
 type UserStore = {
+    [x: string]: any;
     permissions: string[];
     roles: string[];
     isSetUser: boolean;

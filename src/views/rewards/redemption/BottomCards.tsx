@@ -109,8 +109,8 @@ const BottomCards: React.FC = () => {
         <div>
             <Grid container spacing={2}>
                 {cardsData.map((card, index) => (
-                    <Grid item xs={12} md={6} lg={3} key={index}>
-                        <BottomCard {...card} height={{ xs: '220px', sm: '240px', md: '260px' }} onClick={card.onClick} />
+                    <Grid item xs={12} md={6} lg={4} xl={3} key={index}>
+                        <BottomCard {...card} height={{ xs: '220px', md: '260px', lg: '280px', xl: '300px' }} onClick={card.onClick} />
                     </Grid>
                 ))}
             </Grid>

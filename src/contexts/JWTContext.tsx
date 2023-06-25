@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from 'react';
+import React, { createContext, useEffect, useReducer, useState } from 'react';
 
 // third-party
 // import { Chance } from 'chance';
@@ -18,8 +18,17 @@ import { InitialLoginContextProps, JWTContextType } from 'types/auth';
 
 import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
+import useAuthorizedStore from 'store/authorize';
 import useRouteStore from 'store/router';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import { t } from 'hooks/web/useI18n';
+import { Typography, useTheme } from '@mui/material';
 // import * as LoginApi from 'api/login';
 
 // const chance = new Chance();
@@ -40,8 +49,11 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     const setUserInfoAction = useUserStore((states) => states.setUserInfoAction);
     const generateRoutes = useRouteStore((states) => states.generateRoutes);
     const loginOut = useUserStore((states) => states.loginOut);
-    // const hasCheckedAuth = useRouteStore((states) => states.hasCheckedAuth);
-    // const setHasCheckedAuth = useRouteStore((states) => states.setHasCheckedAuth);
+    const [open, setOpen] = useState(false);
+    // 获取 zustand 中的状态和函数
+    const isUnauthorized = useAuthorizedStore((states) => states.isUnauthorized);
+    const resetUnauthorized = useAuthorizedStore((states) => states.resetUnauthorized);
+    const theme = useTheme();
 
     useEffect(() => {
         const init = async () => {
@@ -78,6 +90,11 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         init();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    useEffect(() => {
+        if (isUnauthorized) {
+            setOpen(true);
+        }
+    }, [isUnauthorized]);
 
     const login = async () => {
         // const response = await axios.post({url: '/api/account/login', { email, password }});
@@ -169,9 +186,52 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         return <Loader />;
     }
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleConfirm = () => {
+        setOpen(false);
+        // 在这里处理确认事件
+        logout();
+        resetUnauthorized();
+    };
+
     return (
         <JWTContext.Provider value={{ ...state, login, logout, register, forgotPassword, resetPassword, updateProfile }}>
             {children}
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ p: 3 }}
+            >
+                {open && (
+                    <>
+                        <DialogTitle id="alert-dialog-title">{t('common.confirmTitle')}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Typography variant="body2" component="span">
+                                    {t('sys.api.timeoutMessage')}
+                                </Typography>
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions sx={{ pr: 2.5 }}>
+                            <Button
+                                sx={{ color: theme.palette.error.dark, borderColor: theme.palette.error.dark }}
+                                onClick={handleClose}
+                                color="secondary"
+                            >
+                                Disagree
+                            </Button>
+                            <Button variant="contained" size="small" onClick={handleConfirm} autoFocus>
+                                Agree
+                            </Button>
+                        </DialogActions>
+                    </>
+                )}
+            </Dialog>
         </JWTContext.Provider>
     );
 };

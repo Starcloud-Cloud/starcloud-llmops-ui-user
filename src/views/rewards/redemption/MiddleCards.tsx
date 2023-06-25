@@ -45,7 +45,7 @@ const MiddleCards = () => {
     return (
         <Grid container spacing={2}>
             {cardInfo.map((card, index) => (
-                <Grid key={index} item xs={12} sm={6} sx={{ pb: 2 }}>
+                <Grid key={index} item xs={12} md={6} sx={{ pb: 2, width: '100%' }}>
                     <MiddleCard
                         key={index}
                         Icon={card.Icon}

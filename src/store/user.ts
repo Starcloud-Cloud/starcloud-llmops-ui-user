@@ -10,14 +10,6 @@ interface UserVO {
     avatar: string;
     nickname: string;
 }
-// interface UserInfoVO {
-//     permissions: string[];
-//     roles: string[];
-//     isSetUser: boolean;
-//     user: UserVO;
-//     signInStatus: boolean | null;
-//     setSignInStatus: (status: boolean) => void;
-// }
 type UserStore = {
     [x: string]: any;
     permissions: string[];

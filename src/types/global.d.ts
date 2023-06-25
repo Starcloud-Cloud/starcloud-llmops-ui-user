@@ -44,4 +44,7 @@ declare global {
         name: string;
         children?: Tree[] | any[];
     }
+    interface Window {
+        handleUnauthorizedEvent: Event;
+    }
 }

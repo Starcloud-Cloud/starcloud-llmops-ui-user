@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 // routing
 import Routes from 'routes';
@@ -8,7 +8,7 @@ import Routes from 'routes';
 import NavigationScroll from 'layout/NavigationScroll';
 import RTLLayout from 'ui-component/RTLLayout';
 import Snackbar from 'ui-component/extended/Snackbar';
-import Loader from 'ui-component/Loader';
+// import Loader from 'ui-component/Loader';
 
 import ThemeCustomization from 'themes';
 // import { dispatch } from 'store';

@@ -21,7 +21,7 @@ function Template({ data, handleDetail }: any) {
                 <Typography onClick={() => handleDetail(data)} className="active cursor" gutterBottom variant="h3" component="div" my={1}>
                     {data.name}
                 </Typography>
-                <Typography onClick={() => handleDetail(data)} className="cursor" variant="body2" component="div" lineHeight={1.2}>
+                <Typography onClick={() => handleDetail(data)} className="cursor desc" variant="body2" component="div" lineHeight={1.2}>
                     {data.description}
                 </Typography>
             </CardContent>

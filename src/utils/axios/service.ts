@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestHeaders, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { config } from 'utils/axios/config';
-import { setNotification, setMessageBox } from 'utils/notification';
+import { setNotification } from 'utils/notification';
 import { getAccessToken, getRefreshToken, getTenantId, setToken } from 'utils/auth';
 // import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from "utils/auth";
 import errorCode from './errorCode';
@@ -162,13 +162,7 @@ service.interceptors.response.use(
                     });
                 });
             }
-        } else if (code === 500) {
-            setNotification(t('sys.api.errMsg500'), 'error');
-            return Promise.reject(new Error(msg));
-        } else if (code === 901) {
-            setMessageBox(`${t('sys.api.errMsg901')}\n\n参考 https://doc.iocoder.cn/ 教程\n\n5 分钟搭建本地环境`, 'Error 901', 'error');
-            return Promise.reject(new Error(msg));
-        } else if (code !== 200) {
+        } else if (result_code !== 200) {
             if (msg === '无效的刷新令牌') {
                 // hard coding：忽略这个提示，直接登出
                 console.log(msg);
@@ -201,23 +195,9 @@ const refreshToken = async () => {
 };
 const handleAuthorized = () => {
     if (!isRelogin.show) {
-        setMessageBox(t('sys.api.timeoutMessage'), t('common.confirmTitle'), 'warning');
-        // isRelogin.show = true;
-        // ElMessageBox.confirm(t("sys.api.timeoutMessage"), t("common.confirmTitle"), {
-        //   showCancelButton: false,
-        //   closeOnClickModal: false,
-        //   showClose: false,
-        //   confirmButtonText: t("login"),
-        //   type: "warning",
-        // }).then(() => {
-        //   const { wsCache } = useCache();
-        //   resetRouter(); // 重置静态路由表
-        //   wsCache.clear();
-        //   removeToken();
-        //   isRelogin.show = false;
-        //   // 干掉token后再走一次路由让它过router.beforeEach的校验
-        //   window.location.href = window.location.href;
-        // });
+        // 触发事件
+        window.dispatchEvent(window.handleUnauthorizedEvent);
+        // 其他你需要执行的代码
     }
     return Promise.reject(t('sys.api.timeoutMessage'));
 };

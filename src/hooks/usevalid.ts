@@ -5,6 +5,7 @@ interface Variable {
     field: string;
     label: string;
     type: string;
+    isShow: boolean;
     // 其他字段...
 }
 
@@ -13,8 +14,8 @@ const generateValidationSchema = (variables: Variable[]) => {
 
     variables &&
         variables.forEach((variable: any) => {
-            const { field, label } = variable;
-            validationSchemaFields[field] = Yup.string().required(`${label}不能为空`);
+            const { field, label, isShow } = variable;
+            if (isShow) validationSchemaFields[field] = Yup.string().required(`${label}不能为空`);
         });
 
     return Yup.object().shape(validationSchemaFields);

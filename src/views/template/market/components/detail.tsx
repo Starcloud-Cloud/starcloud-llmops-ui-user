@@ -1,20 +1,34 @@
-import { Typography, Breadcrumbs, Link, Button, Box, Card, Chip } from '@mui/material';
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
-
-import { marketDeatail } from 'api/template';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+// import StarIcon from '@mui/icons-material/Star';
+// import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { marketDeatail, installTemplate } from 'api/template';
 import CarryOut from 'views/template/carryOut';
 
-import { useLocation } from 'react-router-dom';
+import { t } from 'hooks/web/useI18n';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 function Deatail() {
     const location = useLocation();
+    const navigate = useNavigate();
     const [detailData, setDetailData] = useState({
         name: '',
         categories: [],
         scenes: [],
-        example: ''
+        example: '',
+        viewCount: '',
+        likeCount: '',
+        installCount: '',
+        uid: '',
+        version: '',
+        installStatus: { installStatus: '' }
     });
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
         const queryParams: any = {
@@ -25,14 +39,33 @@ function Deatail() {
             setDetailData(res);
         });
     }, [location.search]);
+    const iconStyle = {
+        fontSize: '16px',
+        display: 'inline-block',
+        margin: '0 8px 0 4px'
+    };
+    const install = ({ uid, version }: { uid: string; version: number | string }) => {
+        setLoading(true);
+        installTemplate({ uid, version }).then((res) => {
+            if (res.data) {
+                setLoading(false);
+                setDetailData({
+                    ...detailData,
+                    installStatus: { installStatus: 'INSTALLED' }
+                });
+            }
+        });
+    };
     return (
         <Card sx={{ padding: 2 }}>
             <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="#">
-                    MUI
-                </Link>
-                <Link underline="hover" color="inherit" href="##">
-                    Core
+                <Link
+                    sx={{ cursor: 'pointer' }}
+                    underline="hover"
+                    color="inherit"
+                    onClick={() => navigate('/template/templateMarket/list')}
+                >
+                    {t('market.all')}
                 </Link>
                 <Typography color="text.primary">Breadcrumbs</Typography>
             </Breadcrumbs>
@@ -50,16 +83,28 @@ function Deatail() {
                                     <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                                 ))}
                         </Box>
-                        <Box sx={{ verticalAlign: 'middle' }}>
-                            <AccessAlarm />
-                            <span>826</span>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <RemoveRedEyeIcon fontSize="small" />
+                            <span style={iconStyle}>{detailData.viewCount}</span>
+                            <VerticalAlignBottomIcon fontSize="small" />
+                            <span style={iconStyle}>{detailData.installCount}</span>
+                            <ThumbUpIcon fontSize="small" />
+                            <span style={iconStyle}>{detailData.likeCount}</span>
                         </Box>
                     </Box>
                 </Box>
-                <Button variant="contained" color="info">
-                    收藏模板
-                </Button>
+                <LoadingButton
+                    color="info"
+                    disabled={detailData.installStatus.installStatus === 'INSTALLED'}
+                    onClick={() => install(detailData)}
+                    loading={loading}
+                    loadingIndicator="downLoad..."
+                    variant="outlined"
+                >
+                    {detailData.installStatus.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
+                </LoadingButton>
             </Box>
+            <Divider sx={{ my: 1 }} />
             <CarryOut config={detailData} example={detailData.example} />
         </Card>
     );

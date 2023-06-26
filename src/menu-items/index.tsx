@@ -42,7 +42,10 @@ const getMenuItems = () => {
     //     }
     // ];
 
-    menuItems.items = [...ruoyiItemsToAdd, ...menuItems.items];
+    menuItems.items = [
+        ...ruoyiItemsToAdd
+        // ...menuItems.items
+    ];
 
     return menuItems;
 };

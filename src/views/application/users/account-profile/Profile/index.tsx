@@ -33,10 +33,11 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
-import { getUserProfile, ProfileVO } from 'api/system/user/profile';
+import { ProfileVO } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import EmojiEmotionsTwoToneIcon from '@mui/icons-material/EmojiEmotionsTwoTone';
 import LibraryBooksTwoToneIcon from '@mui/icons-material/LibraryBooksTwoTone';
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
@@ -47,6 +48,7 @@ import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
 // types
 import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
+import { getUserInfo } from 'api/login';
 
 // ==============================|| PROFILE 1 ||============================== //
 
@@ -89,7 +91,7 @@ const Profilnew = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await getUserProfile();
+            const result = await getUserInfo();
             setUserProfile(result);
         };
         fetchData();
@@ -140,6 +142,18 @@ const Profilnew = () => {
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
                                         {userProfile?.username || 'admin'}
+                                    </Typography>
+                                </ListItemSecondaryAction>
+                            </ListItemButton>
+                            <Divider />
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <EmojiEmotionsTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                </ListItemIcon>
+                                <ListItemText primary={<Typography variant="subtitle1">用户昵称</Typography>} />
+                                <ListItemSecondaryAction>
+                                    <Typography variant="subtitle2" align="right">
+                                        {userProfile?.nickname || 'admin'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>

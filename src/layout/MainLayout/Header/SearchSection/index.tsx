@@ -2,7 +2,21 @@ import { useState } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Avatar, Box, Card, Grid, InputAdornment, OutlinedInput, Popper } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+    Avatar,
+    Box,
+    Card,
+    Grid,
+    InputAdornment,
+    OutlinedInput,
+    Popper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    IconButton
+} from '@mui/material';
+import List from 'views/template/market/components/list';
 
 // third-party
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
@@ -113,6 +127,7 @@ const MobileSearch = ({ value, setValue, popupState }: Props) => {
 const SearchSection = () => {
     const theme = useTheme();
     const [value, setValue] = useState('');
+    const [open, setOpen] = useState(false);
 
     return (
         <>
@@ -154,7 +169,7 @@ const SearchSection = () => {
                     )}
                 </PopupState>
             </Box>
-            <Box sx={{ display: { xs: 'none', md: 'block', cursor: 'pointer' } }}>
+            <Box onClick={() => setOpen(true)}>
                 <OutlineInputStyle
                     id="input-search-header"
                     value={value}
@@ -170,6 +185,28 @@ const SearchSection = () => {
                     inputProps={{ 'aria-label': 'weight' }}
                 />
             </Box>
+            <Dialog fullWidth={true} maxWidth="lg" open={open} onClose={() => setOpen(false)}>
+                <DialogTitle sx={{ m: 0 }}>
+                    <OutlineInputStyle
+                        size="small"
+                        id="input-search-header"
+                        placeholder="Search"
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <IconSearch stroke={1.5} size="16px" color={theme.palette.grey[500]} />
+                            </InputAdornment>
+                        }
+                        aria-describedby="search-helper-text"
+                        inputProps={{ 'aria-label': 'weight' }}
+                    />
+                    <IconButton aria-label="close" onClick={() => setOpen(false)} sx={{ float: 'right' }}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ height: '500px', overflowY: 'auto' }}>
+                    <List />
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

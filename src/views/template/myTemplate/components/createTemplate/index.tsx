@@ -5,7 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Basis from './basis';
 import Arrange from './arrange';
 import Upload from './upLoad';
-import Perform from 'views/template/carryOut/perform';
+// import Perform from 'views/template/carryOut/perform';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TabsProps } from 'types';
@@ -366,7 +366,7 @@ function CreateDetail() {
                         <Basis />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform config={edit} />
+                        {/* <Perform config={edit} /> */}
                     </Grid>
                 </Grid>
             </TabPanel>
@@ -376,7 +376,7 @@ function CreateDetail() {
                         <Arrange edit={edit} editChange={editChange} variableChange={variableChange} basisChange={basisChange} />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform config={edit} />
+                        {/* <Perform config={edit} /> */}
                     </Grid>
                 </Grid>
             </TabPanel>

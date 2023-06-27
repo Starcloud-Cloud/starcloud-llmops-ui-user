@@ -46,6 +46,10 @@ const axiosServices = {
         const res = await request({ method: 'PUT', ...option });
         return res.data as unknown as T;
     },
+    putOriginal: async <T = MyResponseData>(option: any) => {
+        const res = await request({ method: 'PUT', ...option });
+        return res as unknown as T;
+    },
     download: async <T = any>(option: any) => {
         const res = await request({ method: 'GET', responseType: 'blob', ...option });
         return res as unknown as Promise<T>;

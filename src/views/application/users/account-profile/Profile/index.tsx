@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react';
+import { useState, useEffect, SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 // material-ui
@@ -26,13 +26,14 @@ import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 
 // project imports
-import Profile from './Profile';
+// import Profile from './Profile';
 import MyAccount from './MyAccount';
 import ChangePassword from './ChangePassword';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
+import { getUserProfile, ProfileVO } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
@@ -41,7 +42,7 @@ import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
 import Avatar3 from 'assets/images/users/avatar-3.png';
-import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
+// import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
 
 // types
 import { TabsProps } from 'types';
@@ -74,17 +75,26 @@ const tabsOption = [
     {
         label: '修改密码',
         icon: <LockTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-    },
-    {
-        label: '社交信息',
-        icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
     }
+    // {
+    //     label: '社交信息',
+    //     icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
+    // }
 ];
 
 const Profilnew = () => {
     const theme = useTheme();
-
     const [value, setValue] = useState<number>(0);
+    const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await getUserProfile();
+            setUserProfile(result);
+        };
+        fetchData();
+    }, []);
+
     const handleChange = (event: SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -105,9 +115,9 @@ const Profilnew = () => {
                     <SubCard
                         title={
                             <Grid container spacing={2} alignItems="center" justifyContent="center" onClick={handleClickOpen}>
-                                {Avatar3 ? (
+                                {userProfile?.avatar ? (
                                     <Grid item>
-                                        <Avatar alt="User 1" src={Avatar3} size="xl" />
+                                        <Avatar alt={userProfile.nickname} src={userProfile.avatar} size="xl" />
                                     </Grid>
                                 ) : (
                                     <Grid item>
@@ -129,7 +139,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">用户名称</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        admin
+                                        {userProfile?.username || 'admin'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -141,7 +151,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">手机号码</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        15612345678
+                                        {userProfile?.mobile || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -153,11 +163,11 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">用户邮箱</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        aoteman@126.com
+                                        {userProfile?.email || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
-                            <Divider />
+                            {/* <Divider />
                             <ListItemButton>
                                 <ListItemIcon>
                                     <AccountTreeTwoTone sx={{ fontSize: '1.3rem' }} />
@@ -165,7 +175,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属部门</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        研发部门
+                                        {userProfile?.dept?.name || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -177,7 +187,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属岗位</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        董事长
+                                        {userProfile?.posts?.map((post) => post.name).join(', ') || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -189,7 +199,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属角色</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        超级管理员，普通角色
+                                        {userProfile?.roles?.map((role) => role.name).join(', ') || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -201,16 +211,16 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">创建日期</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        2021-01-06 01:03:47
+                                        {userProfile?.createTime ? new Date(userProfile.createTime).toLocaleString() : '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
-                            </ListItemButton>
+                            </ListItemButton> */}
                         </List>
                     </SubCard>
                     <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
                         <DialogTitle id="form-dialog-title">Upload Avatar</DialogTitle>
                         <DialogContent>
-                            <AvatarUpload defaultImageSrc={Avatar3} />
+                            <AvatarUpload defaultImageSrc={userProfile?.avatar} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">
@@ -258,14 +268,14 @@ const Profilnew = () => {
                         ))}
                     </Tabs>
                     <TabPanel value={value} index={0}>
-                        <MyAccount />
+                        <MyAccount userProfile={userProfile} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ChangePassword />
                     </TabPanel>
-                    <TabPanel value={value} index={2}>
+                    {/* <TabPanel value={value} index={2}>
                         <Profile />
-                    </TabPanel>
+                    </TabPanel> */}
                 </Grid>
             </Grid>
         </MainCard>

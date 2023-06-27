@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
-import { Button, Grid, MenuItem, TextField } from '@mui/material';
+import { Button, Grid, MenuItem, TextField, useTheme } from '@mui/material';
 
 // project imports
 import SubCard from 'ui-component/cards/SubCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { gridSpacing } from 'store/constant';
+import { ProfileVO } from 'api/system/user/profile';
 
+interface MyAccountProps {
+    userProfile: ProfileVO | null;
+}
 // select options
 const currencies = [
     {
@@ -22,8 +26,26 @@ const currencies = [
 
 // ==============================|| PROFILE 1 - MY ACCOUNT ||============================== //
 
-const MyAccount = () => {
-    const [currency, setCurrency] = useState('man');
+const MyAccount = ({ userProfile }: MyAccountProps) => {
+    const initialCurrency = userProfile?.sex === 1 ? 'man' : 'woman';
+    const [currency, setCurrency] = useState(initialCurrency);
+    const [nickname, setNickname] = useState(userProfile?.nickname || '');
+    const [mobile, setMobile] = useState(userProfile?.mobile || '');
+    const [email, setEmail] = useState(userProfile?.email || '');
+    const theme = useTheme();
+
+    useEffect(() => {
+        handleReset();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userProfile]);
+
+    const handleReset = () => {
+        setCurrency(userProfile?.sex === 1 ? 'man' : 'woman');
+        setNickname(userProfile?.nickname || '');
+        setMobile(userProfile?.mobile || '');
+        setEmail(userProfile?.email || '');
+    };
+
     const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCurrency(event.target.value);
     };
@@ -38,15 +60,27 @@ const MyAccount = () => {
                                     id="outlined-basic5"
                                     fullWidth
                                     label="用户昵称"
-                                    // helperText="Your Profile URL: https://pc.com/Ashoka_Tano_16"
-                                    defaultValue="芋道源码"
+                                    value={nickname}
+                                    onChange={(e) => setNickname(e.target.value)}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField id="outlined-basic6" fullWidth label="手机号码" defaultValue="15612345678" />
+                                <TextField
+                                    id="outlined-basic6"
+                                    fullWidth
+                                    label="手机号码"
+                                    value={mobile}
+                                    onChange={(e) => setMobile(e.target.value)}
+                                />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField id="outlined-basic6" fullWidth label="用户邮箱" defaultValue="aoteman@126.com" />
+                                <TextField
+                                    id="outlined-basic7"
+                                    fullWidth
+                                    label="用户邮箱"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <TextField
@@ -65,22 +99,20 @@ const MyAccount = () => {
                                 </TextField>
                             </Grid>
                         </Grid>
+                        <Grid spacing={2} container justifyContent="flex-end" sx={{ mt: 3 }}>
+                            <Grid item>
+                                <AnimateButton>
+                                    <Button variant="contained">更新</Button>
+                                </AnimateButton>
+                            </Grid>
+                            <Grid item>
+                                <Button sx={{ color: theme.palette.error.main }} onClick={handleReset}>
+                                    Clear
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </form>
                 </SubCard>
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 3 }}>
-                <Grid spacing={2} container justifyContent="flex-end">
-                    <Grid item>
-                        <AnimateButton>
-                            <Button variant="contained">更新</Button>
-                        </AnimateButton>
-                    </Grid>
-                    <Grid item>
-                        <AnimateButton>
-                            <Button variant="contained">重置</Button>
-                        </AnimateButton>
-                    </Grid>
-                </Grid>
             </Grid>
         </Grid>
     );

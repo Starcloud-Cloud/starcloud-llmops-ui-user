@@ -38,8 +38,11 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { StringColorProps } from 'types';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
-
-const JWTRegister = ({ ...others }) => {
+interface JWTRegisterProps {
+    inviteCode?: string;
+    [key: string]: any;
+}
+const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const scriptedRef = useScriptRef();
@@ -86,6 +89,7 @@ const JWTRegister = ({ ...others }) => {
                     email: '',
                     password: '',
                     userName: '',
+                    inviteCode: inviteCode,
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -94,25 +98,39 @@ const JWTRegister = ({ ...others }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        await register(values.email, values.password, values.userName);
-                        if (scriptedRef.current) {
-                            setStatus({ success: true });
-                            setSubmitting(false);
+                        const res = await register(values.email, values.password, values.userName, values.inviteCode);
+                        if (res?.data) {
+                            if (scriptedRef.current) {
+                                setStatus({ success: true });
+                                setSubmitting(false);
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '已发送邮件,请前往邮箱激活',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        close: false
+                                    })
+                                );
+
+                                setTimeout(() => {
+                                    navigate('/login', { replace: true });
+                                }, 1500);
+                            }
+                        } else {
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: 'Your registration has been successfully completed.',
+                                    message: `${res?.msg}`,
                                     variant: 'alert',
                                     alert: {
-                                        color: 'success'
+                                        color: 'error'
                                     },
                                     close: false
                                 })
                             );
-
-                            setTimeout(() => {
-                                navigate('/login', { replace: true });
-                            }, 1500);
                         }
                     } catch (err: any) {
                         console.error(err);
@@ -217,6 +235,11 @@ const JWTRegister = ({ ...others }) => {
                                 </Box>
                             </FormControl>
                         )}
+
+                        <FormControl fullWidth sx={{ display: 'none' }}>
+                            <InputLabel htmlFor="inviteCode">Invite Code</InputLabel>
+                            <OutlinedInput id="inviteCode" type="text" value={values.inviteCode} name="inviteCode" />
+                        </FormControl>
 
                         <Grid container alignItems="center" justifyContent="space-between">
                             <Grid item>

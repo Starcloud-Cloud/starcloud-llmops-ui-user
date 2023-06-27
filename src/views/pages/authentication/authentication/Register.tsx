@@ -13,6 +13,7 @@ import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
 import { AuthSliderProps } from 'types';
+import { useLocation } from 'react-router-dom';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
@@ -37,6 +38,9 @@ const items: AuthSliderProps[] = [
 
 const Register = () => {
     const theme = useTheme();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const inviteCode = query.get('inviteCode') || '';
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -88,7 +92,7 @@ const Register = () => {
                                             </Stack>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <AuthRegister />
+                                            <AuthRegister inviteCode={inviteCode} />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <Divider />

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, { createContext, useEffect, useReducer } from 'react';
 
 // third-party
 // import { Chance } from 'chance';
@@ -21,14 +21,15 @@ import useUserStore from 'store/user';
 import useAuthorizedStore from 'store/authorize';
 import useRouteStore from 'store/router';
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import { t } from 'hooks/web/useI18n';
-import { Typography, useTheme } from '@mui/material';
+// import Dialog from '@mui/material/Dialog';
+// import DialogActions from '@mui/material/DialogActions';
+// import DialogContent from '@mui/material/DialogContent';
+// import DialogContentText from '@mui/material/DialogContentText';
+// import DialogTitle from '@mui/material/DialogTitle';
+// import Button from '@mui/material/Button';
+// import { t } from 'hooks/web/useI18n';
+// import { Typography, useTheme } from '@mui/material';
+import { oriregister } from 'api/login';
 // import * as LoginApi from 'api/login';
 
 // const chance = new Chance();
@@ -49,11 +50,11 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     const setUserInfoAction = useUserStore((states) => states.setUserInfoAction);
     const generateRoutes = useRouteStore((states) => states.generateRoutes);
     const loginOut = useUserStore((states) => states.loginOut);
-    const [open, setOpen] = useState(false);
+    // const [open, setOpen] = useState(false);
     // 获取 zustand 中的状态和函数
     const isUnauthorized = useAuthorizedStore((states) => states.isUnauthorized);
     const resetUnauthorized = useAuthorizedStore((states) => states.resetUnauthorized);
-    const theme = useTheme();
+    // const theme = useTheme();
 
     useEffect(() => {
         const init = async () => {
@@ -92,8 +93,10 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     }, []);
     useEffect(() => {
         if (isUnauthorized) {
-            setOpen(true);
+            logout();
+            resetUnauthorized();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUnauthorized]);
 
     const login = async () => {
@@ -121,21 +124,15 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         }
     };
 
-    const register = async (email: string, password: string, username: string) => {
-        const response = await axios.post({
-            url: '/llm/auth/register',
-            data: {
-                email,
-                password,
-                username
-            }
-        });
+    const register = async (email: string, password: string, username: string, inviteCode: string) => {
+        const response = await oriregister({ email, password, username, inviteCode });
         if (response?.data) {
             let users = [
                 {
                     email,
                     password,
-                    username
+                    username,
+                    inviteCode
                 }
             ];
 
@@ -146,13 +143,15 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                     {
                         email,
                         password,
-                        username
+                        username,
+                        inviteCode
                     }
                 ];
             }
 
             window.localStorage.setItem('users', JSON.stringify(users));
         }
+        return response;
     };
 
     const logout = async () => {
@@ -186,21 +185,21 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         return <Loader />;
     }
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    // const handleClose = () => {
+    //     setOpen(false);
+    // };
 
-    const handleConfirm = () => {
-        setOpen(false);
-        // 在这里处理确认事件
-        logout();
-        resetUnauthorized();
-    };
+    // const handleConfirm = () => {
+    //     setOpen(false);
+    //     // 在这里处理确认事件
+    //     logout();
+    //     resetUnauthorized();
+    // };
 
     return (
         <JWTContext.Provider value={{ ...state, login, logout, register, forgotPassword, resetPassword, updateProfile }}>
             {children}
-            <Dialog
+            {/* <Dialog
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
@@ -231,7 +230,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                         </DialogActions>
                     </>
                 )}
-            </Dialog>
+            </Dialog> */}
         </JWTContext.Provider>
     );
 };

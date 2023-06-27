@@ -68,3 +68,23 @@ export const getCode = (data: any) => {
 export const reqCheck = (data: any) => {
     return request.postOriginal({ url: 'system/captcha/check', data });
 };
+
+// 获取用户身份信息 | Get user identity information
+export const getUserInfo = () => {
+    return request.get({ url: '/llm/auth/user/detail' });
+};
+
+// 获取登陆二维码 | QRcode
+export const getQRcode = () => {
+    return request.get({ url: '/llm/wechat/qr' });
+};
+
+// 注册 | Register
+export const oriregister = (data: any) => {
+    return request.postOriginal({ url: '/llm/auth/register', data });
+};
+
+// 二维码登陆 | QRcodeLogin
+export const qRcodeLogin = (data: any) => {
+    return request.postOriginal({ url: 'llm/wechat/qr/login', data });
+};

@@ -7,7 +7,7 @@ import { Button, Grid, MenuItem, TextField, useTheme } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { gridSpacing } from 'store/constant';
-import { ProfileVO } from 'api/system/user/profile';
+import { ProfileVO, updateUserProfile } from 'api/system/user/profile';
 
 interface MyAccountProps {
     userProfile: ProfileVO | null;
@@ -27,8 +27,9 @@ const currencies = [
 // ==============================|| PROFILE 1 - MY ACCOUNT ||============================== //
 
 const MyAccount = ({ userProfile }: MyAccountProps) => {
-    const initialCurrency = userProfile?.sex === 1 ? 'man' : 'woman';
-    const [currency, setCurrency] = useState(initialCurrency);
+    const initialSex = userProfile?.sex === 1 ? 'man' : 'woman';
+    const [sex, setSex] = useState(initialSex);
+    const [username, setUsername] = useState(userProfile?.username || '');
     const [nickname, setNickname] = useState(userProfile?.nickname || '');
     const [mobile, setMobile] = useState(userProfile?.mobile || '');
     const [email, setEmail] = useState(userProfile?.email || '');
@@ -40,14 +41,24 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
     }, [userProfile]);
 
     const handleReset = () => {
-        setCurrency(userProfile?.sex === 1 ? 'man' : 'woman');
+        setSex(userProfile?.sex === 1 ? 'man' : 'woman');
         setNickname(userProfile?.nickname || '');
         setMobile(userProfile?.mobile || '');
         setEmail(userProfile?.email || '');
     };
 
+    const handleUpdate = () => {
+        updateUserProfile({
+            username,
+            nickname,
+            email,
+            mobile,
+            sex: sex === 'man' ? 1 : 0
+        });
+    };
+
     const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setCurrency(event.target.value);
+        setSex(event.target.value);
     };
     return (
         <Grid container spacing={gridSpacing}>
@@ -55,6 +66,15 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                 <SubCard title="General Settings">
                     <form noValidate autoComplete="off">
                         <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    id="outlined-basic5"
+                                    fullWidth
+                                    label="用户名称"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </Grid>
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     id="outlined-basic5"
@@ -83,14 +103,7 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField
-                                    id="outlined-select-gender"
-                                    select
-                                    fullWidth
-                                    label="性别"
-                                    value={currency}
-                                    onChange={handleChange1}
-                                >
+                                <TextField id="outlined-select-gender" select fullWidth label="性别" value={sex} onChange={handleChange1}>
                                     {currencies.map((option) => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.label}
@@ -102,7 +115,9 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                         <Grid spacing={2} container justifyContent="flex-end" sx={{ mt: 3 }}>
                             <Grid item>
                                 <AnimateButton>
-                                    <Button variant="contained">更新</Button>
+                                    <Button variant="contained" onClick={handleUpdate}>
+                                        更新
+                                    </Button>
                                 </AnimateButton>
                             </Grid>
                             <Grid item>

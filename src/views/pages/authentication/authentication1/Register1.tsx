@@ -8,7 +8,7 @@ import { Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 import AuthWrapper1 from '../AuthWrapper1';
 import AuthCardWrapper from '../AuthCardWrapper';
 import Logo from 'ui-component/Logo';
-import AuthRegister from '../auth-forms/AuthRegister';
+// import AuthRegister from '../auth-forms/AuthRegister';
 import BackgroundPattern1 from 'ui-component/cards/BackgroundPattern1';
 import AuthSlider from 'ui-component/cards/AuthSlider';
 import { AuthSliderProps } from 'types';

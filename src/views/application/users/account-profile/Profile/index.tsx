@@ -41,7 +41,7 @@ import LibraryBooksTwoToneIcon from '@mui/icons-material/LibraryBooksTwoTone';
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
-import Avatar3 from 'assets/images/users/avatar-3.png';
+// import Avatar3 from 'assets/images/users/avatar-3.png';
 // import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
 
 // types

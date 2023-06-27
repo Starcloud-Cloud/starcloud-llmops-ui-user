@@ -64,7 +64,7 @@ function TemplateMarket() {
         setNewTemplate(newList);
     };
     return (
-        <Box>
+        <Box maxWidth="1200px" margin="0 auto">
             <Typography variant="h1" mt={3} textAlign="center">
                 {t('market.title')}
             </Typography>

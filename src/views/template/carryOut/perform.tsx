@@ -9,7 +9,7 @@ import FormExecute from 'views/template/components/validaForm';
 import generateValidationSchema from 'hooks/usevalid';
 import { t } from 'hooks/web/useI18n';
 
-function Perform({ config }: { config: any }) {
+function Perform({ config, changeSon }: any) {
     if (!config) {
         return null;
     }
@@ -20,10 +20,10 @@ function Perform({ config }: { config: any }) {
     // });
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
-        data.forEach((variable: { isShow: boolean; field: string }) => {
-            const { field, isShow } = variable;
+        data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
+            const { field, isShow, value } = variable;
             if (isShow) {
-                Data[field] = '';
+                Data[field] = value;
             }
         });
         return Data;
@@ -35,11 +35,25 @@ function Perform({ config }: { config: any }) {
         onSubmit: () => {}
     });
     const arr: any[] = [];
+    const mapVariables = (variable: any, obj: any) => {
+        for (const item of variable) {
+            for (const key in obj) {
+                if (item.field === key) {
+                    item.value = obj[key];
+                }
+            }
+        }
+    };
     config.steps.forEach((item: any, index: number) => {
         arr[index] = Formik({
             initialValues: fn([...item.variable.variables, ...item.flowStep.variable.variables]),
             validationSchema: generateValidationSchema([...item.variable.variables, ...item.flowStep.variable.variables]),
-            onSubmit: () => {}
+            onSubmit: (value) => {
+                const steps = JSON.parse(JSON.stringify(config.steps[index]));
+                mapVariables(steps.variable.variables, value);
+                mapVariables(steps.flowStep.variable.variables, value);
+                changeSon({ stepId: config.steps[index].field, steps, index });
+            }
         });
     });
     return (
@@ -129,7 +143,7 @@ function Perform({ config }: { config: any }) {
                         {item.flowStep.response.style === 'TEXT' ? (
                             <TextField fullWidth />
                         ) : item.flowStep.response.style === 'TEXTAREA' ? (
-                            <TextField multiline rows={8} fullWidth />
+                            <TextField value={item.flowStep.response.value} multiline rows={8} fullWidth />
                         ) : (
                             <Card
                                 elevation={3}

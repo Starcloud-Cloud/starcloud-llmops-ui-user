@@ -488,6 +488,16 @@
     "EntitlementCard": {
         "ppgrades": "Go Premium"
     },
+    "apply": {
+        "name": "Application Name",
+        "category": "Category",
+        "tag": "Tag",
+        "recommend": "Get Started",
+        "instruction": "Trial Instruction",
+        "downLoad": "Collection Template",
+        "more": "More",
+        "self": "My App"
+    },
     "market": {
         "title": "Template Market",
         "subLeft": "Browse",

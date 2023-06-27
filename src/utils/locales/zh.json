@@ -613,6 +613,16 @@
     "EntitlementCard": {
         "ppgrades": "选择高级"
     },
+    "apply": {
+        "name": "应用名称",
+        "category": "分类",
+        "tag": "标签",
+        "recommend": "推荐应用",
+        "instruction": "使用说明",
+        "downLoad": "已下载应用",
+        "more": "More",
+        "self": "我的应用"
+    },
     "market": {
         "title": "模板市场",
         "subLeft": "浏览",

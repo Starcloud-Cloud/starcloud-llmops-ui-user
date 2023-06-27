@@ -6,7 +6,7 @@ import { t } from 'hooks/web/useI18n';
 import './index.css';
 import Perform from './perform';
 
-function CarryOut({ config, example }: { config: any; example: string }) {
+function CarryOut({ config, changeData }: any) {
     return (
         <Box>
             <Grid container spacing={4}>
@@ -15,7 +15,7 @@ function CarryOut({ config, example }: { config: any; example: string }) {
                     <Typography variant="h5" my={2}>
                         {config.description}
                     </Typography>
-                    <Perform config={config.workflowConfig} />
+                    <Perform config={config.workflowConfig} changeSon={changeData} />
                     <Box sx={{ px: 2 }}>
                         {/* <span style={{ marginRight: '20px' }}>{t('market.world')}:3333</span>
                         {t('market.step')}:111 */}
@@ -46,7 +46,7 @@ function CarryOut({ config, example }: { config: any; example: string }) {
                     </Box>
                 </Grid>
                 {/* <Grid item lg={5} md={5} sm={5}>
-                    <ReactMarkdown children={example} remarkPlugins={[remarkGfm]} />
+                    <ReactMarkdown children={example.example} remarkPlugins={[remarkGfm]} />
                 </Grid> */}
             </Grid>
         </Box>

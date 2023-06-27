@@ -612,5 +612,26 @@
     "templateMarket": "模板市场",
     "EntitlementCard": {
         "ppgrades": "选择高级"
+    },
+    "market": {
+        "title": "模板市场",
+        "subLeft": "浏览",
+        "subright": "最佳AI工作流程",
+        "search": "搜索",
+        "sortby": "排序",
+        "new": "最新的",
+        "popular": "受欢迎的",
+        "recommend": "推荐的",
+        "all": "全部",
+        "ins": "已安装",
+        "down": "下载模板",
+        "allExecute": "全部执行",
+        "allStepTips": "点击生成全部步骤的内容",
+        "stepTips": "点击生成当前步骤的内容",
+        "world": "词",
+        "step": "步骤",
+        "version": "版本",
+        "plugLevel": "插件等级",
+        "plugVersion": "插件版本"
     }
 }

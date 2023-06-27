@@ -154,22 +154,16 @@ const SearchSection = () => {
                     )}
                 </PopupState>
             </Box>
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Box sx={{ display: { xs: 'none', md: 'block', cursor: 'pointer' } }}>
                 <OutlineInputStyle
                     id="input-search-header"
                     value={value}
+                    disabled
                     onChange={(e) => setValue(e.target.value)}
                     placeholder="Search"
                     startAdornment={
                         <InputAdornment position="start">
                             <IconSearch stroke={1.5} size="16px" color={theme.palette.grey[500]} />
-                        </InputAdornment>
-                    }
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <HeaderAvatarStyle variant="rounded">
-                                <IconAdjustmentsHorizontal stroke={1.5} size="20px" />
-                            </HeaderAvatarStyle>
                         </InputAdornment>
                     }
                     aria-describedby="search-helper-text"

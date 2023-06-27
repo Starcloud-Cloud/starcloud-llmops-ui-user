@@ -24,7 +24,7 @@ function FormExecute({ formik, item }: any) {
                     onChange={formik.handleChange}
                     fullWidth
                 />
-            ) : item.style === '"TEXTAREA"' ? (
+            ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     sx={mt}
                     label={item.label}
@@ -32,7 +32,7 @@ function FormExecute({ formik, item }: any) {
                     id={item.field}
                     required
                     multiline
-                    maxRows={4}
+                    minRows={2}
                     InputLabelProps={{ shrink: true }}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
                     helperText={

@@ -20,7 +20,7 @@ import 'assets/scss/style.scss';
 import dotenv from 'dotenv';
 
 dotenv.config({
-    path: '.env.development'
+    path: '.env.production'
 });
 
 const container = document.getElementById('root');

@@ -92,7 +92,8 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                 <Typography
                                     variant="h6"
                                     sx={{
-                                        color: theme.palette.mode === 'dark' ? theme.palette.dark.light : themesEight(info.userLevel, theme)
+                                        color:
+                                            theme.palette.mode === 'dark' ? theme.palette.dark.light : themesEight(info?.userLevel, theme)
                                     }}
                                 >
                                     {item.name}
@@ -116,10 +117,13 @@ const Cards = () => {
     const theme = useTheme();
     const { userInfo, setUserInfo }: any = userInfoStore();
     useEffect(() => {
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
-    }, [setUserInfo]);
+        if (!userInfo) {
+            userBenefits().then((res) => {
+                setUserInfo(res);
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     return (
         <CardStyle level={userInfo?.userLevel} theme={theme}>
             <CardContent sx={{ p: 2 }}>

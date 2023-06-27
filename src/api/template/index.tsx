@@ -15,3 +15,7 @@ export const userBenefits = () => {
 export const categories = () => {
     return request.get({ url: '/llm/app/categories' });
 };
+//安装应用市场
+export const installTemplate = (data: { uid: string; version: number | string }) => {
+    return request.postOriginal({ url: '/llm/app/market/install', data });
+};

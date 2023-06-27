@@ -487,5 +487,26 @@
     "templateMarket": "templateMarket",
     "EntitlementCard": {
         "ppgrades": "Go Premium"
+    },
+    "market": {
+        "title": "Template Market",
+        "subLeft": "Browse",
+        "subright": "Best AI Workflow",
+        "search": "Search",
+        "sortby": "Sort By",
+        "new": "New",
+        "popular": "Popular",
+        "recommend": "Recommend",
+        "all": "All",
+        "ins": "Already Installed",
+        "down": "Download template",
+        "allExecute": "All Execution",
+        "allStepTips": "Click to Generate the Content for All Steps",
+        "stepTips": "Click to Generate the Content of the Current Step",
+        "world": "Word",
+        "step": "Step",
+        "version": "Version",
+        "plugLevel": "Plug-in Level",
+        "plugVersion": "Plug-in Version"
     }
 }

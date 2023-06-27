@@ -1,32 +1,36 @@
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-
-import ScrollMenus from './ScrollMenu';
+import { Typography, Grid, Box, FormControl, InputLabel, Select, MenuItem, Paper, InputBase, Button } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 import { Outlet } from 'react-router-dom';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import Button from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-
+import ScrollMenus from './ScrollMenu';
+import { t } from 'hooks/web/useI18n';
+import marketStore from 'store/market';
+interface MarketList {
+    name: string;
+    tags: string[];
+    createTime: number;
+    viewCount: number;
+}
 function TemplateMarket() {
+    const { total, templateList, setNewTemplate } = marketStore();
     const [queryParams, setQueryParams] = useState({
         name: '',
         sort: ''
     });
     const sortList = [
-        { text: '最新的', key: 'gmt_create' },
-        { text: '受欢迎的', key: 'like' },
-        { text: '推荐的', key: 'step' }
+        { text: t('market.new'), key: 'gmt_create' },
+        { text: t('market.popular'), key: 'like' },
+        { text: t('market.recommend'), key: 'step' }
     ];
+    useEffect(() => {
+        if (queryParams.sort) {
+            handleSearch();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [queryParams.sort]);
     const handleChange = (event: any) => {
         const { name, value } = event.target;
         setQueryParams({
@@ -34,13 +38,38 @@ function TemplateMarket() {
             [name]: value
         });
     };
+    const handleSearch = () => {
+        let newList = templateList.filter((item: MarketList) => {
+            let nameMatch = true;
+            if (queryParams.name) {
+                nameMatch = item.name.toLowerCase().includes(queryParams.name.toLowerCase());
+            }
+            return nameMatch;
+        });
+        if (queryParams.sort && queryParams.sort === 'like') {
+            newList.sort((a: MarketList, b: MarketList) => {
+                return b.viewCount - a.viewCount;
+            });
+        }
+        if (queryParams.sort && queryParams.sort === 'step') {
+            const fristList = newList.filter((item: MarketList) => item.tags.includes('recommend'));
+            const lastList = newList.filter((item: MarketList) => !item.tags.includes('recommend'));
+            newList = [...fristList, ...lastList];
+        }
+        if (queryParams.sort && queryParams.sort === 'gmt_create') {
+            newList.sort((a: MarketList, b: MarketList) => {
+                return (b.createTime = a.createTime);
+            });
+        }
+        setNewTemplate(newList);
+    };
     return (
         <Box>
             <Typography variant="h1" mt={3} textAlign="center">
-                模板市场
+                {t('market.title')}
             </Typography>
             <Typography variant="h4" my={2} textAlign="center">
-                浏览 354+ 最佳AI工作流程
+                {t('market.subLeft')} {total} + {t('market.subright')}
             </Typography>
             <Paper
                 sx={{
@@ -54,20 +83,25 @@ function TemplateMarket() {
                 }}
             >
                 <SearchIcon />
-                <InputBase sx={{ ml: 1, flex: 1, p: 1 }} inputProps={{ 'aria-label': 'search google maps' }} value={queryParams.name} />
-                <Button size="small" color="primary" sx={{ borderRadius: '5px' }} onChange={handleChange}>
-                    Search
+                <InputBase
+                    sx={{ ml: 1, flex: 1, p: 1 }}
+                    name="name"
+                    inputProps={{ 'aria-label': 'search google maps' }}
+                    value={queryParams.name}
+                    onChange={handleChange}
+                />
+                <Button size="small" color="primary" sx={{ borderRadius: '5px' }} onClick={handleSearch}>
+                    {t('market.search')}
                 </Button>
             </Paper>
-
             <Grid container spacing={2} my={2}>
                 <Grid item xs={12} md={10}>
                     <ScrollMenus />
                 </Grid>
                 <Grid item xs={12} md={2}>
                     <FormControl fullWidth>
-                        <InputLabel id="sort">Age</InputLabel>
-                        <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label="Sort">
+                        <InputLabel id="sort">{t('market.sortby')}</InputLabel>
+                        <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label={t('market.sortby')}>
                             {sortList.map((el: any) => (
                                 <MenuItem key={el.key} value={el.key}>
                                     {el.text}

@@ -6,6 +6,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    /* 指定行数 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .cursor {
     cursor: pointer;

@@ -10,8 +10,8 @@ import SearchSection from './SearchSection';
 import MobileSection from './MobileSection';
 import ProfileSection from './ProfileSection';
 import LocalizationSection from './LocalizationSection';
-import MegaMenuSection from './MegaMenuSection';
-import NotificationSection from './NotificationSection';
+// import MegaMenuSection from './MegaMenuSection';
+// import NotificationSection from './NotificationSection';
 
 import { useDispatch, useSelector } from 'store';
 import { openDrawer } from 'store/slices/menu';
@@ -74,9 +74,9 @@ const Header = () => {
             <Box sx={{ flexGrow: 1 }} />
 
             {/* mega-menu */}
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />
-            </Box>
+            </Box> */}
 
             {/* live customization & localization */}
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -84,7 +84,7 @@ const Header = () => {
             </Box>
 
             {/* notification & profile */}
-            <NotificationSection />
+            {/* <NotificationSection /> */}
             <ProfileSection />
 
             {/* mobile header */}

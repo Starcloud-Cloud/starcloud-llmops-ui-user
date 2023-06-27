@@ -84,7 +84,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
     return (
         <Box>
-            {info.benefits?.map((item: BenefitItem) => (
+            {info?.benefits?.map((item: BenefitItem) => (
                 <Grid key={item.type} container direction="column" spacing={1} sx={{ mt: 1.5 }}>
                     <Grid item>
                         <Grid container justifyContent="space-between">

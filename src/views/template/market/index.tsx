@@ -1,7 +1,7 @@
 import { Typography, Grid, Box, FormControl, InputLabel, Select, MenuItem, InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
 
@@ -13,8 +13,10 @@ interface MarketList {
     tags: string[];
     createTime: number;
     viewCount: number;
+    categories: any;
 }
 function TemplateMarket() {
+    const navigate = useNavigate();
     const { total, templateList, setNewTemplate } = marketStore();
     const [queryParams, setQueryParams] = useState({
         name: '',
@@ -31,6 +33,7 @@ function TemplateMarket() {
         { text: t('market.recommend'), key: 'step' }
     ];
     const handleChange = (event: any) => {
+        navigate('/template/templateMarket/list');
         const { name, value } = event.target;
         setQueryParams({
             ...queryParams,
@@ -43,8 +46,14 @@ function TemplateMarket() {
             if (queryParams.name) {
                 nameMatch = item.name?.toLowerCase().includes(queryParams.name.toLowerCase());
             }
-            return nameMatch;
+
+            let categoryMatch = true;
+            if (queryParams.category) {
+                categoryMatch = item.categories?.includes(queryParams.category);
+            }
+            return nameMatch && categoryMatch;
         });
+
         if (queryParams.sort && queryParams.sort === 'like') {
             newList.sort((a: MarketList, b: MarketList) => {
                 return b.viewCount - a.viewCount;
@@ -61,6 +70,12 @@ function TemplateMarket() {
             });
         }
         setNewTemplate(newList);
+    };
+    const changeCategory = (data: string) => {
+        setQueryParams({
+            ...queryParams,
+            category: data
+        });
     };
     return (
         <Box maxWidth="1200px" margin="0 auto">
@@ -88,7 +103,7 @@ function TemplateMarket() {
             </Box>
             <Grid container spacing={2} my={2}>
                 <Grid item xs={12} md={10}>
-                    <ScrollMenus />
+                    <ScrollMenus change={changeCategory} />
                 </Grid>
                 <Grid item xs={12} md={2}>
                     <FormControl fullWidth>

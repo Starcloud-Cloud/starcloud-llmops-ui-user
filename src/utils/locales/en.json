@@ -521,7 +521,9 @@
         "step": "Step",
         "version": "Version",
         "plugLevel": "Plug-in Level",
-        "plugVersion": "Plug-in Version"
+        "plugVersion": "Plug-in Version",
+        "invitation": "Exclusive invitation link",
+        "tips": "Recommend friends to register, increase the amount of rights and interests"
     },
     "redemption": {
         "title": "Get MoFaAI Redemption",
@@ -543,8 +545,6 @@
             "sex": "Gender"
         },
         "info": {
-            "invitation": "Exclusive invitation link",
-            "tips": "Recommend friends to register, increase the amount of rights and interests",
             "basicInfo": "Basic Info",
             "resetPwd": "Reset Password"
         },

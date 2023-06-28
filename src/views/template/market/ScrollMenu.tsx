@@ -9,11 +9,12 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 
 import { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 interface MenuList {
     name: string;
     icon: string;
 }
-function ScrollMenus() {
+function ScrollMenus({ change }: { change: any }) {
     const [menuList, setMenuList] = useState<MenuList[]>([]);
     const [active, setActive] = useState<number | string>('');
     useEffect(() => {
@@ -21,11 +22,15 @@ function ScrollMenus() {
             setMenuList(res);
         });
     }, []);
-    const changeCategory = (index: number) => {
+    const navigate = useNavigate();
+    const changeCategory = (item: any, index: number) => {
+        navigate('/template/templateMarket/list');
         if (active === index) {
             setActive('');
+            change('');
         } else {
             setActive(index);
+            change(item.code);
         }
     };
     const LeftArrow = () => {
@@ -77,7 +82,7 @@ function ScrollMenus() {
             {menuList?.map((item, index) => (
                 <Box
                     onClick={() => {
-                        changeCategory(index);
+                        changeCategory(item, index);
                     }}
                     sx={active === index ? focuos : focus}
                     key={index}

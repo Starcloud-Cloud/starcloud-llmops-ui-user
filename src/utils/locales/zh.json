@@ -445,14 +445,6 @@
             "resetPwd": "修改密码",
             "userSocial": "社交信息"
         },
-        "info": {
-            "invitation": "专属邀请链接",
-            "tips": "推荐好友注册，提升权益额度",
-            "title": "基本信息",
-            "basicInfo": "基本资料",
-            "resetPwd": "修改密码",
-            "userSocial": "社交信息"
-        },
         "rules": {
             "nickname": "请输入用户昵称",
             "mail": "请输入邮箱地址",
@@ -680,7 +672,9 @@
         "step": "步骤",
         "version": "版本",
         "plugLevel": "插件等级",
-        "plugVersion": "插件版本"
+        "plugVersion": "插件版本",
+        "invitation": "专属邀请链接",
+        "tips": "推荐好友注册，提升权益额度"
     },
     "rede": {
         "title": "免费兑换MoFaAI创作权益"

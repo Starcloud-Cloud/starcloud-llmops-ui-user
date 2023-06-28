@@ -9,16 +9,19 @@ function List() {
     //路由跳转
     const navigate = useNavigate();
     //状态管理
-    const { newtemplateList, setTotal, setTemplate, setNewTemplate }: any = marketStore();
+    const { newtemplateList, templateList, setTotal, setTemplate, setNewTemplate }: any = marketStore();
     const handleDetail = (data: { uid: string }) => {
         navigate(`/template/templateMarket/detail/${data.uid}`);
     };
     useEffect(() => {
-        marketPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
-            setTemplate(res.list);
-            setNewTemplate(res.list);
-            setTotal(res.page.total);
-        });
+        if (templateList.length === 0) {
+            marketPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
+                setTemplate(res.list);
+                setNewTemplate(res.list);
+                setTotal(res.page.total);
+            });
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (

@@ -227,8 +227,8 @@ const ProfileSection = () => {
                                                     <Grid container justifyContent="space-between" alignItems="center">
                                                         <Grid item md={10}>
                                                             <Box display="flex" alignItems="center">
-                                                                <Typography variant="body1">{t('info.invitation')}</Typography>
-                                                                <Tooltip title={t('info.tips')}>
+                                                                <Typography variant="body1">{t('market.invitation')}</Typography>
+                                                                <Tooltip title={t('market.tips')}>
                                                                     <ErrorOutlineIcon
                                                                         fontSize="small"
                                                                         sx={{ marginLeft: '10px', cursor: 'pointer' }}

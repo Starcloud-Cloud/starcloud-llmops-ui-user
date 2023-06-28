@@ -16,6 +16,7 @@ import { AuthSliderProps } from 'types';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-forgotpass.svg';
+import { t } from 'hooks/web/useI18n';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -76,10 +77,10 @@ const ForgotPassword = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Forgot password?
+                                                    {t('auth.login.forgotpassword')}
                                                 </Typography>
                                                 <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    Enter your email address below and we&apos;ll send you password reset OTP.
+                                                    {t('auth.login.requirepassword')}
                                                 </Typography>
                                             </Stack>
                                         </Grid>
@@ -97,7 +98,7 @@ const ForgotPassword = () => {
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >
-                                                    Already have an account?
+                                                    {t('auth.register.tologin')}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

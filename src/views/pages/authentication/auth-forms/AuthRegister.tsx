@@ -36,6 +36,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { StringColorProps } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 interface JWTRegisterProps {
@@ -79,7 +80,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
             <Grid container direction="column" justifyContent="center" spacing={2}>
                 <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1">Sign up with Email address</Typography>
+                        <Typography variant="subtitle1"> {t('auth.register.signupwithemail')}</Typography>
                     </Box>
                 </Grid>
             </Grid>
@@ -93,8 +94,8 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    email: Yup.string().email('Must be a valid email').max(255).required(t('auth.register.emailrequired')),
+                    password: Yup.string().max(255).required(t('auth.register.passwordrequired'))
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
@@ -106,7 +107,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                 dispatch(
                                     openSnackbar({
                                         open: true,
-                                        message: '已发送邮件,请前往邮箱激活',
+                                        message: t('auth.register.successful'),
                                         variant: 'alert',
                                         alert: {
                                             color: 'success'
@@ -148,7 +149,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
-                                    label="User Name"
+                                    label={t('user.username')}
                                     margin="normal"
                                     name="userName"
                                     type="text"
@@ -160,7 +161,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                             </Grid>
                         </Grid>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                            <InputLabel htmlFor="outlined-adornment-email-register">Email Address</InputLabel>
+                            <InputLabel htmlFor="outlined-adornment-email-register">{t('user.emailaddress')}</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email-register"
                                 type="email"
@@ -182,13 +183,13 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                             error={Boolean(touched.password && errors.password)}
                             sx={{ ...theme.typography.customInput }}
                         >
-                            <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                            <InputLabel htmlFor="outlined-adornment-password-register"> {t('user.password')}</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password-register"
                                 type={showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 name="password"
-                                label="Password"
+                                label={t('user.password')}
                                 onBlur={handleBlur}
                                 onChange={(e) => {
                                     handleChange(e);
@@ -254,9 +255,9 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                     }
                                     label={
                                         <Typography variant="subtitle1">
-                                            Agree with &nbsp;
+                                            {t('auth.require.agree')} &nbsp;
                                             <Typography variant="subtitle1" component={Link} to="#">
-                                                Terms & Condition.
+                                                {t('auth.require.terms')}
                                             </Typography>
                                         </Typography>
                                     }
@@ -280,7 +281,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Sign up
+                                    {t('auth.register.signup')}
                                 </Button>
                             </AnimateButton>
                         </Box>

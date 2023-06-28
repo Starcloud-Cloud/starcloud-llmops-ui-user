@@ -9,6 +9,7 @@ import { gridSpacing } from 'store/constant';
 import { updateUserPassword } from 'api/system/user/profile';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import { t } from 'hooks/web/useI18n';
 
 // ==============================|| PROFILE 1 - CHANGE PASSWORD ||============================== //
 
@@ -31,7 +32,7 @@ const ChangePassword = () => {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: 'New password and confirm password do not match!',
+                    message: t('2profile.password.diffPwd'),
                     variant: 'alert',
                     alert: {
                         color: 'warning'
@@ -42,44 +43,16 @@ const ChangePassword = () => {
             return;
         }
 
-        try {
-            const res = await updateUserPassword(oldPassword, newPassword);
-            if (res?.data) {
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        message: 'Password updated successfully!',
-                        variant: 'alert',
-                        alert: {
-                            color: 'success'
-                        },
-                        close: false
-                    })
-                );
-            } else {
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        message: res?.msg,
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                );
-            }
-        } catch (err) {
+        const res = await updateUserPassword(oldPassword, newPassword);
+        if (res) {
             dispatch(
                 openSnackbar({
                     open: true,
                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    message: 'Failed to update password!',
+                    message: t('sys.app.updatesuccess'),
                     variant: 'alert',
                     alert: {
-                        color: 'error'
+                        color: 'success'
                     },
                     close: false
                 })
@@ -90,7 +63,7 @@ const ChangePassword = () => {
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-                <SubCard title="Change Password">
+                <SubCard title={'Change Password'}>
                     <form noValidate autoComplete="off" onSubmit={handleSubmit}>
                         <Grid container spacing={gridSpacing} sx={{ mb: 1.75 }}>
                             <Grid item xs={12} md={6}>

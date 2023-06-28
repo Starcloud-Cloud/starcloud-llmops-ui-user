@@ -8,6 +8,9 @@ import SubCard from 'ui-component/cards/SubCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { gridSpacing } from 'store/constant';
 import { ProfileVO, updateUserProfile } from 'api/system/user/profile';
+import { openSnackbar } from 'store/slices/snackbar';
+import { t } from 'hooks/web/useI18n';
+import { dispatch } from 'store';
 
 interface MyAccountProps {
     userProfile: ProfileVO | null;
@@ -48,14 +51,27 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
         setEmail(userProfile?.email || '');
     };
 
-    const handleUpdate = () => {
-        updateUserProfile({
+    const handleUpdate = async () => {
+        const res = await updateUserProfile({
             username,
             nickname,
             email,
             mobile,
             sex: sex === 'man' ? 1 : 0
         });
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: t('sys.app.updatesuccess'),
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+        }
     };
 
     const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,14 +80,14 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-                <SubCard title="General Settings">
+                <SubCard title={t('2profile.user.general')}>
                     <form noValidate autoComplete="off">
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     id="outlined-basic5"
                                     fullWidth
-                                    label="用户名称"
+                                    label={t('2profile.user.username')}
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
@@ -80,7 +96,7 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                                 <TextField
                                     id="outlined-basic5"
                                     fullWidth
-                                    label="用户昵称"
+                                    label={t('2profile.user.nickname')}
                                     value={nickname}
                                     onChange={(e) => setNickname(e.target.value)}
                                 />
@@ -89,7 +105,7 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                                 <TextField
                                     id="outlined-basic6"
                                     fullWidth
-                                    label="手机号码"
+                                    label={t('2profile.user.mobile')}
                                     value={mobile}
                                     onChange={(e) => setMobile(e.target.value)}
                                 />
@@ -98,13 +114,20 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                                 <TextField
                                     id="outlined-basic7"
                                     fullWidth
-                                    label="用户邮箱"
+                                    label={t('2profile.user.email')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField id="outlined-select-gender" select fullWidth label="性别" value={sex} onChange={handleChange1}>
+                                <TextField
+                                    id="outlined-select-gender"
+                                    select
+                                    fullWidth
+                                    label={t('2profile.user.sex')}
+                                    value={sex}
+                                    onChange={handleChange1}
+                                >
                                     {currencies.map((option) => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.label}
@@ -117,13 +140,13 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
                             <Grid item>
                                 <AnimateButton>
                                     <Button variant="contained" onClick={handleUpdate}>
-                                        更新
+                                        {t('sys.app.update')}
                                     </Button>
                                 </AnimateButton>
                             </Grid>
                             <Grid item>
                                 <Button sx={{ color: theme.palette.error.main }} onClick={handleReset}>
-                                    Clear
+                                    {t('sys.app.reset')}
                                 </Button>
                             </Grid>
                         </Grid>

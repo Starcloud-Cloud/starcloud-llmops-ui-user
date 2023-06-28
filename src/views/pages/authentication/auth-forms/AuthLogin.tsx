@@ -269,7 +269,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         <Divider sx={{ flexGrow: 1 }} />
                     </Box>
                     <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                        <AiOutlineWechat size={30} onClick={handleWeChat} />
+                        <AiOutlineWechat size={30} onClick={handleWeChat} style={{ cursor: 'pointer' }} />
                     </Box>
 
                     <LoginModal open={open} qrUrl={qrUrl} handleClose={() => setOpen(false)} />

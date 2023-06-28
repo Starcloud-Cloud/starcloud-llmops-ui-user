@@ -16,7 +16,6 @@ function ElevationScroll({ children, window }: ElevationScrollProps) {
     return cloneElement(children, {
         elevation: trigger ? 1 : 0,
         style: {
-            backgroundColor: theme.palette.mode === 'dark' && trigger ? theme.palette.dark[800] : theme.palette.background.default,
             color: theme.palette.text.dark
         }
     });

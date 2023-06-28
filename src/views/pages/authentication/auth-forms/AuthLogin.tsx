@@ -7,6 +7,7 @@ import {
     Box,
     Button,
     Checkbox,
+    Divider,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -21,6 +22,7 @@ import {
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import { AiOutlineWechat } from 'react-icons/ai';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -100,7 +102,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
         if (ticket) {
             // 设置定时器
-            intervalId = setInterval(polling, 5000); // 例如，每5秒轮询一次
+            intervalId = setInterval(polling, 2000); // 例如，每5秒轮询一次
         }
 
         return () => {
@@ -261,9 +263,15 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                             </Button>
                         </AnimateButton>
                     </Box>
-                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                        <Button onClick={handleWeChat}>打开弹窗</Button>
+                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                        <Divider sx={{ flexGrow: 1 }} />
+                        <Box px={2}>其他登录方式</Box>
+                        <Divider sx={{ flexGrow: 1 }} />
                     </Box>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                        <AiOutlineWechat size={30} onClick={handleWeChat} />
+                    </Box>
+
                     <LoginModal open={open} qrUrl={qrUrl} handleClose={() => setOpen(false)} />
                 </form>
             )}

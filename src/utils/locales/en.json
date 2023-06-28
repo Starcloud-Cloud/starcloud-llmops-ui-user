@@ -488,6 +488,23 @@
     "EntitlementCard": {
         "ppgrades": "Go Premium"
     },
+    "info": {
+        "invitation": "Exclusive invitation link",
+        "tips": "Recommend friends to register, increase the amount of rights and interests"
+    },
+    "generate": {
+        "mode": "App Mode",
+        "anme": "App Name",
+        "fromScene": "From Scene",
+        "totalMessageTokens": "Total Message Tokens",
+        "totalAnswerTokens": "Total Answer Tokens",
+        "messageCount": "Message Count",
+        "feedbacksCount": "Feedbacks Count",
+        "totalElapsed": "Total Elapsed",
+        "totalPrice": "Total Price",
+        "status": "Status",
+        "createTime": "CreateTime"
+    },
     "apply": {
         "name": "Application Name",
         "category": "Category",

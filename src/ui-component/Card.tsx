@@ -17,11 +17,11 @@ import { t } from 'hooks/web/useI18n';
 import { userBenefits } from 'api/template';
 import { useEffect } from 'react';
 import userInfoStore from 'store/entitlementAction';
-import { themesLight, themesTwo, themesEight } from 'hooks/useThemes';
+import { themesLight, themesDarkAfter, themesDarkBefor } from 'hooks/useThemes';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.dark.main : themesLight(level, theme),
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.dark.main : themesLight(level, theme, 1),
     color: '#fff',
     overflow: 'hidden',
     position: 'relative',
@@ -30,7 +30,7 @@ const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) =>
         position: 'absolute',
         width: 210,
         height: 210,
-        background: theme.palette.mode === 'dark' ? themesEight(level, theme) : themesEight(level, theme),
+        background: theme.palette.mode === 'dark' ? themesDarkAfter(level, theme) : themesLight(level, theme, 3),
         borderRadius: '50%',
         top: -125,
         right: -155,
@@ -44,7 +44,7 @@ const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) =>
         position: 'absolute',
         width: 210,
         height: 210,
-        background: theme.palette.mode === 'dark' ? themesTwo(level, theme) : themesTwo(level, theme),
+        background: theme.palette.mode === 'dark' ? themesDarkBefor(level, theme) : themesLight(level, theme, 2),
         borderRadius: '50%',
         top: -145,
         right: -100,
@@ -65,7 +65,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme, level }: { theme: 
     },
     [`& .${linearProgressClasses.bar}`]: {
         borderRadius: 5,
-        backgroundColor: theme.palette.mode === 'dark' ? themesEight(level, theme) : themesEight(level, theme)
+        backgroundColor: theme.palette.mode === 'dark' ? themesLight(level, theme, 3) : themesLight(level, theme, 3)
     }
 }));
 
@@ -93,7 +93,9 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                     variant="h6"
                                     sx={{
                                         color:
-                                            theme.palette.mode === 'dark' ? theme.palette.dark.light : themesEight(info?.userLevel, theme)
+                                            theme.palette.mode === 'dark'
+                                                ? theme.palette.dark.light
+                                                : themesLight(info?.userLevel, theme, 3)
                                     }}
                                 >
                                     {item.name}

@@ -32,3 +32,12 @@ export const recommends = () => {
 export const appPage = (params: { pageNo: number; pageSize: number }) => {
     return request.get({ url: '/llm/app/page', params });
 };
+
+//执行记录图标
+export const logStatistics = () => {
+    return request.post({ url: '/llm/app/log/statistics' });
+};
+//执行记录列表
+export const infoPage = (data: any) => {
+    return request.post({ url: 'llm/app/log/infoPage', data });
+};

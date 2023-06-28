@@ -613,6 +613,23 @@
     "EntitlementCard": {
         "ppgrades": "选择高级"
     },
+    "info": {
+        "invitation": "专属邀请链接",
+        "tips": "推荐好友注册，提升权益额度"
+    },
+    "generate": {
+        "mode": "App模式",
+        "anme": "App名称",
+        "fromScene": "执行场景",
+        "totalMessageTokens": "请求消耗token数",
+        "totalAnswerTokens": "返回总消耗token数",
+        "messageCount": "消息总数",
+        "feedbacksCount": "反馈总数",
+        "totalElapsed": "执行总耗时",
+        "totalPrice": "执行总话费",
+        "status": "执行状态",
+        "createTime": "创建时间"
+    },
     "apply": {
         "name": "应用名称",
         "category": "分类",

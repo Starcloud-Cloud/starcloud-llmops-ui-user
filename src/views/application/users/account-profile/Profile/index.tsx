@@ -49,6 +49,7 @@ import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
 import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
 import { getUserInfo } from 'api/login';
+import { t } from 'hooks/web/useI18n';
 
 // ==============================|| PROFILE 1 ||============================== //
 
@@ -71,11 +72,11 @@ function a11yProps(index: number) {
 // tabs option
 const tabsOption = [
     {
-        label: '基本资料',
+        label: '2profile.info.basicInfo',
         icon: <LibraryBooksTwoToneIcon sx={{ fontSize: '1.3rem' }} />
     },
     {
-        label: '修改密码',
+        label: '2profile.info.resetPwd',
         icon: <LockTwoToneIcon sx={{ fontSize: '1.3rem' }} />
     }
     // {
@@ -124,7 +125,7 @@ const Profilnew = () => {
                                 ) : (
                                     <Grid item>
                                         <MuiTooltip title="Add" aria-label="add">
-                                            <Fab color="primary" sx={{ m: 2 }}>
+                                            <Fab color="secondary" sx={{ m: 2 }}>
                                                 {/* <AddIcon /> */}
                                             </Fab>
                                         </MuiTooltip>
@@ -138,10 +139,10 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <AccountCircleTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">用户名称</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.username')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.username || '未知'}
+                                        {userProfile?.username || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -150,10 +151,10 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <EmojiEmotionsTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">用户昵称</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.nickname')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.nickname || '未知'}
+                                        {userProfile?.nickname || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -162,10 +163,10 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <PhonelinkRingTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">手机号码</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.mobile')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.mobile || '未知'}
+                                        {userProfile?.mobile || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -174,10 +175,10 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <MailTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">用户邮箱</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.email')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.email || '未知'}
+                                        {userProfile?.email || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -189,7 +190,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属部门</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.dept?.name || '未知'}
+                                        {userProfile?.dept?.name || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -201,7 +202,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属岗位</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.posts?.map((post) => post.name).join(', ') || '未知'}
+                                        {userProfile?.posts?.map((post) => post.name).join(', ') || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -213,7 +214,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属角色</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.roles?.map((role) => role.name).join(', ') || '未知'}
+                                        {userProfile?.roles?.map((role) => role.name).join(', ') || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -225,20 +226,20 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">创建日期</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.createTime ? new Date(userProfile.createTime).toLocaleString() : '未知'}
+                                        {userProfile?.createTime ? new Date(userProfile.createTime).toLocaleString() : t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton> */}
                         </List>
                     </SubCard>
                     <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="form-dialog-title">Upload Avatar</DialogTitle>
+                        <DialogTitle id="form-dialog-title">{t('2profile.user.upload')}</DialogTitle>
                         <DialogContent>
                             <AvatarUpload defaultImageSrc={userProfile?.avatar} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">
-                                Confirm
+                                {t('2profile.user.confirm')}
                             </Button>
                         </DialogActions>
                     </Dialog>
@@ -278,7 +279,7 @@ const Profilnew = () => {
                         }}
                     >
                         {tabsOption.map((tab, index) => (
-                            <Tab key={index} component={Link} to="#" icon={tab.icon} label={tab.label} {...a11yProps(index)} />
+                            <Tab key={index} component={Link} to="#" icon={tab.icon} label={t(tab.label)} {...a11yProps(index)} />
                         ))}
                     </Tabs>
                     <TabPanel value={value} index={0}>

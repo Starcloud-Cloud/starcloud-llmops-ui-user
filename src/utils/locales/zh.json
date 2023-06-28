@@ -335,7 +335,11 @@
         "app": {
             "logoutTip": "温馨提醒",
             "logoutMessage": "是否确认退出系统?",
-            "menuLoading": "菜单加载中..."
+            "menuLoading": "菜单加载中...",
+            "unknown": "未知",
+            "update": "更新",
+            "reset": "重置",
+            "updatesuccess": "更新成功"
         },
         "exception": {
             "backLogin": "返回登录",
@@ -430,7 +434,10 @@
             "sex": "性别",
             "man": "男",
             "woman": "女",
-            "createTime": "创建日期"
+            "createTime": "创建日期",
+            "upload": "上传头像",
+            "confirm": "确认",
+            "general": "基础设置"
         },
         "info": {
             "title": "基本信息",
@@ -444,6 +451,29 @@
             "truemail": "请输入正确的邮箱地址",
             "phone": "请输入正确的手机号码",
             "truephone": "请输入正确的手机号码"
+        },
+        "generate": {
+            "mode": "App模式",
+            "anme": "App名称",
+            "fromScene": "执行场景",
+            "totalMessageTokens": "请求消耗token数",
+            "totalAnswerTokens": "返回总消耗token数",
+            "messageCount": "消息总数",
+            "feedbacksCount": "反馈总数",
+            "totalElapsed": "执行总耗时",
+            "totalPrice": "执行总话费",
+            "status": "执行状态",
+            "createTime": "创建时间"
+        },
+        "apply": {
+            "name": "应用名称",
+            "category": "分类",
+            "tag": "标签",
+            "recommend": "推荐应用",
+            "instruction": "使用说明",
+            "downLoad": "已下载应用",
+            "more": "More",
+            "self": "我的应用"
         },
         "password": {
             "oldPassword": "旧密码",
@@ -642,6 +672,19 @@
         "step": "步骤",
         "version": "版本",
         "plugLevel": "插件等级",
-        "plugVersion": "插件版本"
+        "plugVersion": "插件版本",
+        "invitation": "专属邀请链接",
+        "tips": "推荐好友注册，提升权益额度"
+    },
+    "rede": {
+        "title": "免费兑换MoFaAI创作权益"
+    },
+    "redemption": {
+        "title": "免费兑换mofaai创作权益",
+        "code": "请输入兑换码",
+        "successful": "兑换成功",
+        "redeem": "兑换权益",
+        "obtain": "获取权益",
+        "scancode": "扫码入群 获取权益"
     }
 }

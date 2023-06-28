@@ -12,7 +12,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { styled } from '@mui/system';
 import { redeemBenefits } from 'api/rewards';
 import { dispatch } from 'store';
-import { closeSnackbar, openSnackbar } from 'store/slices/snackbar';
+import { openSnackbar } from 'store/slices/snackbar';
+import { t } from 'hooks/web/useI18n';
 
 const CustomMainCard = styled(MainCard)({
     '& .MuiCardContent-root': {
@@ -27,13 +28,12 @@ const RedemptionHeader = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery('(max-width:680px)');
     const [code, setCode] = useState(''); // 创建一个状态变量来保存用户的输入
-    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const alertSuccess = () => {
         dispatch(
             openSnackbar({
                 open: true,
-                message: '兑换成功',
+                message: t('redemption.successful'),
                 variant: 'alert',
                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 alert: {
@@ -42,15 +42,12 @@ const RedemptionHeader = () => {
                 close: false
             })
         );
-        timerRef.current = setTimeout(() => {
-            dispatch(closeSnackbar());
-        }, 2000);
     };
     const alertFailed = (msg: string) => {
         dispatch(
             openSnackbar({
                 open: true,
-                message: msg, // 使用响应中的消息
+                message: msg,
                 variant: 'alert',
                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 alert: {
@@ -59,30 +56,15 @@ const RedemptionHeader = () => {
                 close: false
             })
         );
-        timerRef.current = setTimeout(() => {
-            dispatch(closeSnackbar());
-        }, 2000);
     };
     const handleRedeem = async () => {
-        try {
-            // 尝试发送请求
-            const res = await redeemBenefits(code);
-            if (res.data) {
-                alertSuccess();
-            } else {
-                alertFailed(res.msg);
-            }
-        } catch (error) {
-            alertFailed('请求失败');
+        const res: { data: any; msg: string } = await redeemBenefits(code);
+        if (res.data) {
+            alertSuccess();
+        } else {
+            alertFailed(res.msg);
         }
     };
-    React.useEffect(() => {
-        return () => {
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, []);
 
     return (
         <CustomMainCard title="注册即获取免费基础权益包 5000字文案权益/10张AI配图权益/5个AI视频权益">
@@ -93,7 +75,7 @@ const RedemptionHeader = () => {
                             <Grid item xs={isMobile ? 12 : 9}>
                                 <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
                                     <Grid item>
-                                        <Typography variant="h1">免费兑换mofaai创作权益</Typography>
+                                        <Typography variant="h1">{t('redemption.title')}</Typography>
                                     </Grid>
                                     <Grid
                                         item
@@ -108,7 +90,7 @@ const RedemptionHeader = () => {
                                             <TextField
                                                 id="outlined-basic"
                                                 fullWidth
-                                                placeholder="请输入兑换码"
+                                                placeholder={t('redemption.code')}
                                                 value={code}
                                                 onChange={(e) => setCode(e.target.value)}
                                                 sx={{ height: '100%', boxSizing: 'border-box' }}
@@ -129,7 +111,7 @@ const RedemptionHeader = () => {
                                                     boxSizing: 'border-box'
                                                 }}
                                             >
-                                                兑换权益
+                                                {t('redemption.redeem')}
                                             </Button>
                                         </Grid>
                                     </Grid>
@@ -153,7 +135,7 @@ const RedemptionHeader = () => {
                                 >
                                     <CardMedia component="img" image={Card3} title="QR Code" sx={{ width: '100px', height: '100px' }} />
                                     <Typography variant="body1" textAlign="center">
-                                        扫码入群 获取权益
+                                        {t('redemption.scancode')}
                                     </Typography>
                                 </div>
                             </Grid>

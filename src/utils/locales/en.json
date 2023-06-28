@@ -282,7 +282,11 @@
         "app": {
             "logoutTip": "Reminder",
             "logoutMessage": "Confirm to exit the system?",
-            "menuLoading": "Menu loading..."
+            "menuLoading": "Menu loading...",
+            "unknown": "unknown",
+            "update": "Update",
+            "reset": "Clear",
+            "updatesuccess": "Update successful"
         },
         "exception": {
             "backLogin": "Back Login",
@@ -517,6 +521,58 @@
         "step": "Step",
         "version": "Version",
         "plugLevel": "Plug-in Level",
-        "plugVersion": "Plug-in Version"
+        "plugVersion": "Plug-in Version",
+        "invitation": "Exclusive invitation link",
+        "tips": "Recommend friends to register, increase the amount of rights and interests"
+    },
+    "redemption": {
+        "title": "Get MoFaAI Redemption",
+        "code": "Please enter the redemption code.",
+        "successful": "Redemption successful",
+        "redeem": "Redeem",
+        "obtain": "Obtain Benefits",
+        "scancode": "Scan Code Gain Benefits"
+    },
+    "2profile": {
+        "user": {
+            "username": "Username",
+            "nickname": "Nickname",
+            "mobile": "Phone",
+            "email": "Email",
+            "upload": "Upload Avatar",
+            "confirm": "Confirm",
+            "general": "General Setting",
+            "sex": "Gender"
+        },
+        "info": {
+            "basicInfo": "Basic Info",
+            "resetPwd": "Reset Password"
+        },
+        "generate": {
+            "mode": "App Mode",
+            "anme": "App Name",
+            "fromScene": "From Scene",
+            "totalMessageTokens": "Total Message Tokens",
+            "totalAnswerTokens": "Total Answer Tokens",
+            "messageCount": "Message Count",
+            "feedbacksCount": "Feedbacks Count",
+            "totalElapsed": "Total Elapsed",
+            "totalPrice": "Total Price",
+            "status": "Status",
+            "createTime": "CreateTime"
+        },
+        "apply": {
+            "name": "Application Name",
+            "category": "Category",
+            "tag": "Tag",
+            "recommend": "Get Started",
+            "instruction": "Trial Instruction",
+            "downLoad": "Collection Template",
+            "more": "More",
+            "self": "My App"
+        },
+        "password": {
+            "diffPwd": "New password and confirm password do not match!"
+        }
     }
 }

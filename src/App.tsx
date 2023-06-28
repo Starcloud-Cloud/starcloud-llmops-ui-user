@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 // routing
 import Routes from 'routes';
 
@@ -17,15 +15,15 @@ import useAuthorizedStore from 'store/authorize';
 
 // auth provider
 import { JWTProvider as AuthProvider } from 'contexts/JWTContext';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
+import usePubSubEvent from 'hooks/usePubsub';
 // import { t } from 'hooks/web/useI18n';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 // import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
 // import { Auth0Provider as AuthProvider } from 'contexts/Auth0Context';
 
 // ==============================|| APP ||============================== //
-// 在全局的地方创建这个事件
-window.handleUnauthorizedEvent = new Event('handleUnauthorized');
-
 const App = () => {
     // const [loading, setLoading] = useState<boolean>(false);
     const setUnauthorized = useAuthorizedStore((state) => state.setUnauthorized);
@@ -36,17 +34,26 @@ const App = () => {
     //     });
     // }, []);
     // 当状态 isUnauthorized 改变时显示一个对话框
-    useEffect(() => {
-        const handleUnauthorizedListener = () => {
-            setUnauthorized();
-        };
-        window.addEventListener('handleUnauthorized', handleUnauthorizedListener);
-        return () => {
-            // 组件卸载时移除监听器
-            window.removeEventListener('handleUnauthorized', handleUnauthorizedListener);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // 当状态 isUnauthorized 改变时显示一个对话框
+    usePubSubEvent('unauthorized', (_: any, data: string) => {
+        setUnauthorized();
+    });
+
+    // 订阅全局错误事件
+    usePubSubEvent('global.error', (_, data) => {
+        // 显示错误提示
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: data.message,
+                variant: 'alert',
+                alert: {
+                    color: data.type
+                },
+                close: false
+            })
+        );
+    });
 
     // if (!loading) return <Loader />;
 

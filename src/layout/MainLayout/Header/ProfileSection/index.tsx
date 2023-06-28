@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-
+import copy from 'clipboard-copy';
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import QRCode from 'qrcode.react';
 import {
     Avatar,
     Box,
     Card,
-    Link,
     // CardContent,
     Chip,
     ClickAwayListener,
@@ -26,8 +26,11 @@ import {
     Stack,
     // Switch,
     IconButton,
-    Typography
+    Typography,
+    Tooltip
 } from '@mui/material';
+import { getUserInfo } from 'api/login';
+import infoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
 
 // third-party
@@ -48,6 +51,7 @@ import {
     IconSettings
     // IconUser
 } from '@tabler/icons';
+import DoneIcon from '@mui/icons-material/Done';
 import useConfig from 'hooks/useConfig';
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -94,12 +98,28 @@ const ProfileSection = () => {
         setOpen(false);
     };
     const prevOpen = useRef(open);
+    const { invitationCode, setInvitationCode } = infoStore();
+    const fetchData = async () => {
+        if (!invitationCode) {
+            const result = await getUserInfo();
+            setInvitationCode(result.inviteCode);
+        }
+    };
+    const [loading, setLoading] = useState(false);
+    const copyCode = () => {
+        copy(window.location.protocol + '//' + window.location.host + '/register?inviteCode=' + invitationCode);
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+    };
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
             anchorRef.current.focus();
         }
-
+        fetchData();
         prevOpen.current = open;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open]);
 
     return (
@@ -204,25 +224,44 @@ const ProfileSection = () => {
                                                 <UpgradePlanCard />
                                                 <Divider />
                                                 <Card sx={{ padding: 2 }}>
-                                                    <Grid container justifyContent="space-between">
-                                                        <Grid item md={6}>
-                                                            专属邀请链接
-                                                            <IconButton size="small">
-                                                                <ErrorOutlineIcon fontSize="small" />
-                                                            </IconButton>
+                                                    <Grid container justifyContent="space-between" alignItems="center">
+                                                        <Grid item md={10}>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Typography variant="body1">{t('market.invitation')}</Typography>
+                                                                <Tooltip title={t('market.tips')}>
+                                                                    <ErrorOutlineIcon
+                                                                        fontSize="small"
+                                                                        sx={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                                    />
+                                                                </Tooltip>
+                                                            </Box>
                                                         </Grid>
-                                                        <Grid item md={6}>
-                                                            <IconButton size="small">
-                                                                <ContentCopyIcon fontSize="small" />
-                                                            </IconButton>
+                                                        <Grid item md={2}>
+                                                            {loading ? (
+                                                                <IconButton size="small" disabled>
+                                                                    <DoneIcon fontSize="small" />
+                                                                </IconButton>
+                                                            ) : (
+                                                                <IconButton size="small" onClick={copyCode}>
+                                                                    <ContentCopyIcon fontSize="small" />
+                                                                </IconButton>
+                                                            )}
                                                         </Grid>
                                                     </Grid>
-                                                    <Link href="#">https://www.mofaai.com.cn</Link>
-                                                    <Box>
-                                                        <img
-                                                            alt="邀请码"
-                                                            style={{ width: '200px', height: '200px', textAlign: 'center' }}
-                                                            src="https://www.mdc.ai/wp-content/plugins/moredeal-tools/res/market/img/qun.png"
+                                                    <Typography variant="body1" sx={{ width: '300px', textDecoration: 'underline' }}>
+                                                        {window.location.protocol + '//' + window.location.host}/register?inviteCode=
+                                                        {invitationCode}
+                                                    </Typography>
+                                                    <Box marginTop={1}>
+                                                        <QRCode
+                                                            size={150}
+                                                            value={
+                                                                window.location.protocol +
+                                                                '//' +
+                                                                window.location.host +
+                                                                '/register?inviteCode=' +
+                                                                invitationCode
+                                                            }
                                                         />
                                                     </Box>
                                                 </Card>

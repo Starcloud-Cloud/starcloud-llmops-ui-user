@@ -44,6 +44,7 @@ export interface ProfileVO {
 }
 
 export interface UserProfileUpdateReqVO {
+    username: string;
     nickname: string;
     email: string;
     mobile: string;
@@ -57,12 +58,12 @@ export const getUserProfile = () => {
 
 // 修改用户个人信息
 export const updateUserProfile = (data: UserProfileUpdateReqVO) => {
-    return request.put({ url: '/system/user/profile/update', data });
+    return request.put({ url: '/llm/auth/user/update', data });
 };
 
 // 用户密码重置
 export const updateUserPassword = (oldPassword: string, newPassword: string) => {
-    return request.putOriginal({
+    return request.put({
         url: '/system/user/profile/update-password',
         data: {
             oldPassword: oldPassword,

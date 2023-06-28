@@ -6,7 +6,20 @@ export interface Item {
     tags: string[];
 }
 export interface Execute {
-    index: number | undefined;
+    index: number;
     stepId: string;
     steps: any;
+}
+export interface Details {
+    name: string;
+    categories: string[];
+    scenes: string[];
+    example: string;
+    viewCount: string;
+    likeCount: string;
+    installCount: string;
+    uid: string;
+    version: number;
+    installStatus: any;
+    workflowConfig: { steps: any[] };
 }

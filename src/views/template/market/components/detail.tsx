@@ -10,7 +10,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { marketDeatail, installTemplate } from 'api/template';
 import { executeMarket } from 'api/template/fetch';
 import CarryOut from 'views/template/carryOut';
-import { Execute } from 'types/template';
+import { Execute, Details } from 'types/template';
 
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -18,40 +18,65 @@ import { useEffect, useState } from 'react';
 function Deatail() {
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
-    const [detailData, setDetailData] = useState({
-        name: '',
-        categories: [],
-        scenes: [],
-        example: '',
-        viewCount: '',
-        likeCount: '',
-        installCount: '',
-        uid: '',
-        version: '',
-        installStatus: { installStatus: '' }
-    });
-    const changeData = async ({ stepId, steps, index }: Execute) => {
-        // return;
-        // setDetailData({
-        //     ...detailData.workflowConfig.,
-        //     detailData
-        // })
-        let resp: any = await executeMarket({
-            appUid: uid,
-            stepId,
-            appReqVO: detailData
-        });
-        const reader = resp.getReader();
-        const textDecoder = new TextDecoder();
-        while (1) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
+    const [detailData, setDetailData] = useState<Details>({} as Details);
+    const [stepID, setStepID] = useState('');
+    const [num, setNum] = useState(12);
+    const changeData = (data: Execute) => {
+        const { stepId, index }: { stepId: string; index: number } = data;
+        setStepID(stepId);
+        setNum(index);
+        setDetailData({
+            ...detailData,
+            workflowConfig: {
+                steps: [
+                    ...detailData.workflowConfig.steps.slice(0, index),
+                    data.steps,
+                    ...detailData.workflowConfig.steps.slice(index + 1, detailData.workflowConfig.steps.length)
+                ]
             }
-            const str = textDecoder.decode(value);
-            console.log(str);
-        }
+        });
     };
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!stepID) return;
+            let resp: any = await executeMarket({
+                appUid: uid,
+                stepId: stepID,
+                appReqVO: detailData
+            });
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            while (1) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                const str = textDecoder.decode(value);
+                console.log(num);
+
+                setDetailData({
+                    ...detailData,
+                    workflowConfig: {
+                        steps: [
+                            ...detailData.workflowConfig.steps.slice(0, num),
+                            {
+                                flowStep: {
+                                    response: {
+                                        ...detailData.workflowConfig.steps[num].flowStep.response,
+                                        answer: str
+                                    }
+                                }
+                            },
+                            ...detailData.workflowConfig.steps.slice(num + 1, detailData.workflowConfig.steps.length)
+                        ]
+                    }
+                });
+            }
+        };
+        fetchData();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [num, stepID, detailData.workflowConfig?.steps]);
     const [loading, setLoading] = useState(false);
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
@@ -115,13 +140,13 @@ function Deatail() {
                 </Box>
                 <LoadingButton
                     color="info"
-                    disabled={detailData.installStatus.installStatus === 'INSTALLED'}
+                    disabled={detailData.installStatus?.installStatus === 'INSTALLED'}
                     onClick={install}
                     loading={loading}
                     loadingIndicator="downLoad..."
                     variant="outlined"
                 >
-                    {detailData.installStatus.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
+                    {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton>
             </Box>
             <Divider sx={{ my: 1 }} />

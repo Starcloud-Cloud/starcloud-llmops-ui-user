@@ -6,6 +6,7 @@ import { getAccessToken, getRefreshToken, getTenantId, setToken } from 'utils/au
 // import { getAccessToken, getRefreshToken, getTenantId, removeToken, setToken } from "utils/auth";
 import errorCode from './errorCode';
 import { t } from 'hooks/web/useI18n';
+import PubSub from 'pubsub-js';
 
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
@@ -167,8 +168,11 @@ service.interceptors.response.use(
                 // hard coding：忽略这个提示，直接登出
                 console.log(msg);
             } else {
-                setNotification(msg, 'error');
+                PubSub.publish('global.error', { message: msg, type: 'error' });
             }
+            return Promise.reject('error');
+        } else if (code !== 200 && code !== 0) {
+            PubSub.publish('global.error', { message: msg, type: 'error' });
             return Promise.reject('error');
         } else {
             return data;
@@ -196,7 +200,7 @@ const refreshToken = async () => {
 const handleAuthorized = () => {
     if (!isRelogin.show) {
         // 触发事件
-        window.dispatchEvent(window.handleUnauthorizedEvent);
+        PubSub.publish('unauthorized', {});
         // 其他你需要执行的代码
     }
     return Promise.reject(t('sys.api.timeoutMessage'));

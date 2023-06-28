@@ -51,7 +51,7 @@ const Login = () => {
                         justifyContent={matchDownSM ? 'center' : 'space-between'}
                     >
                         <Grid item sx={{ display: { xs: 'none', md: 'block' }, m: 3 }}>
-                            <Link to="#" aria-label="theme logo">
+                            <Link to="#" aria-label="theme logo" style={{ textDecoration: 'none' }}>
                                 <Logo />
                             </Link>
                         </Grid>
@@ -64,7 +64,7 @@ const Login = () => {
                             sx={{ minHeight: { xs: 'calc(100vh - 68px)', md: 'calc(100vh - 152px)' } }}
                         >
                             <Stack justifyContent="center" alignItems="center" spacing={5} m={2}>
-                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' } }}>
+                                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                                     <Logo />
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>

@@ -42,6 +42,7 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
 
     const handleReset = () => {
         setSex(userProfile?.sex === 1 ? 'man' : 'woman');
+        setUsername(userProfile?.username || '');
         setNickname(userProfile?.nickname || '');
         setMobile(userProfile?.mobile || '');
         setEmail(userProfile?.email || '');

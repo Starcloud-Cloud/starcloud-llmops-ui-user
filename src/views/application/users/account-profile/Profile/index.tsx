@@ -23,7 +23,7 @@ import {
     Button
 } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
+// import AddIcon from '@mui/icons-material/Add';
 
 // project imports
 // import Profile from './Profile';
@@ -119,13 +119,13 @@ const Profilnew = () => {
                             <Grid container spacing={2} alignItems="center" justifyContent="center" onClick={handleClickOpen}>
                                 {userProfile?.avatar ? (
                                     <Grid item>
-                                        <Avatar alt={userProfile.nickname} src={userProfile.avatar} size="xl" />
+                                        <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
                                     </Grid>
                                 ) : (
                                     <Grid item>
                                         <MuiTooltip title="Add" aria-label="add">
                                             <Fab color="primary" sx={{ m: 2 }}>
-                                                <AddIcon />
+                                                {/* <AddIcon /> */}
                                             </Fab>
                                         </MuiTooltip>
                                     </Grid>
@@ -141,7 +141,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">用户名称</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.username || 'admin'}
+                                        {userProfile?.username || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -153,7 +153,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">用户昵称</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        {userProfile?.nickname || 'admin'}
+                                        {userProfile?.nickname || '未知'}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>

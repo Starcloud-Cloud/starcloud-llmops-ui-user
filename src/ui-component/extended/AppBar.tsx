@@ -68,50 +68,6 @@ const AppBar = ({ ...others }) => {
                 <Container>
                     <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
                         <Logo />
-                        {/* <Typography
-                            component="div"
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    width: 150,
-                                    height: 64,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        fontSize: '3em',
-                                        lineHeight: '1em',
-                                        textAlign: 'center',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    魔法AI
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        fontSize: '1em',
-                                        lineHeight: '1em',
-                                        textAlign: 'center',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    AI让企业更美好
-                                </Typography>
-                            </Box>
-                        </Typography> */}
                         <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button color="inherit" component={Link} href="#">
                                 Home

@@ -63,7 +63,7 @@ export const updateUserProfile = (data: UserProfileUpdateReqVO) => {
 
 // 用户密码重置
 export const updateUserPassword = (oldPassword: string, newPassword: string) => {
-    return request.putOriginal({
+    return request.put({
         url: '/system/user/profile/update-password',
         data: {
             oldPassword: oldPassword,

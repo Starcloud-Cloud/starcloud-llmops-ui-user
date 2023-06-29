@@ -41,3 +41,8 @@ export const logStatistics = () => {
 export const infoPage = (data: any) => {
     return request.post({ url: 'llm/app/log/infoPage', data });
 };
+
+//获取我的应用
+export const getApp = (data: { uid: string }) => {
+    return request.get({ url: `/llm/app/get/${data.uid}` });
+};

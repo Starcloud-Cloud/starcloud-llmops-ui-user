@@ -572,7 +572,86 @@
             "self": "My App"
         },
         "password": {
-            "diffPwd": "New password and confirm password do not match!"
+            "diffPwd": "New password and confirm password do not match!",
+            "changepassword": "Change Password",
+            "currentpassword": "Current Password",
+            "newpassword": "New Password",
+            "confirmpassword": "Confirm Password"
+        }
+    },
+    "auth": {
+        "login": {
+            "otherLogin": "Login with Social Media",
+            "welcome": "Hi, Welcome Back",
+            "credentials": " Enter your credentials to continue",
+            "account": "Don't have an account?",
+            "signin": "Sign In",
+            "forgotpassword": "Forgot Password ?",
+            "requirepassword": "Enter your email address below and we'll send you password reset OTP."
+        },
+        "register": {
+            "signup": "Sign Up",
+            "signupwithemail": "Sign up with Email address",
+            "emailrequired": "Email is required",
+            "passwordrequired": "Password is required",
+            "successful": "An activation link has been sent to your email. Please check your inbox to activate your account.",
+            "tologin": "Already have an account?"
+        },
+        "password": {
+            "poor": "Poor",
+            "weak": "Weak",
+            "normal": "Normal",
+            "good": "Good",
+            "strong": "Strong",
+            "sendmail": "Send Mail",
+            "confirmsend": "Check mail for reset password link"
+        },
+        "require": {
+            "emailvalide": "Must be a valid email",
+            "agree": "Agree with",
+            "terms": "Terms & Condition."
+        }
+    },
+    "user": {
+        "username": "Username",
+        "password": "Password",
+        "emailaddress": "Email Address"
+    },
+    "homepage": {
+        "title": {
+            "slogan": "AI跨境营销内容创作",
+            "spread": "用AI技术革新营销内容创作,提升创作效率和质量"
+        },
+        "cards": {
+            "templates": "Templates",
+            "experts": "Experts",
+            "savings": "Savings",
+            "creation": "Creaction"
+        },
+        "feature": {
+            "title": "个性场景营销",
+            "desc": "AIGC智能引擎,丰富的模板,专为跨境营销而生,有效提升亚马逊运营、独立站营销、海外营销等内容工作的效率",
+            "cardtitle1": "亚马逊营销",
+            "carddesc1": "用于亚马逊商品推广的各种营销场景,提高点击率和销售转化率。",
+            "cardtitle2": "独立站营销",
+            "carddesc2": "包含独立站所需各类文案,生成品牌口号,商品描述等,让你的站点更出色。",
+            "cardtitle3": "外贸邮件营销",
+            "carddesc3": "通过邮件进行客户开发等,传播产品和服务信息,促进国际贸易的营销策略。",
+            "cardtitle4": "社媒营销文案",
+            "carddesc4": "针对不同的社媒生成对应的推广文案,并能适应各个平台风格。",
+            "cardtitle5": "办公写作",
+            "carddesc5": "帮助办公室工作人员更轻松完成文案,包括生成PPT大纲,每周周报等。",
+            "cardtitle6": "好玩有趣",
+            "carddesc6": "工作之余,提供可以休闲一刻的文案,不仅有趣而且含有知识量。"
+        },
+        "startup": {
+            "pro": "一键生成专家级",
+            "pro1": "生成亚马逊listing",
+            "pro2": "生成亚马逊关键词",
+            "pro3": "亚马逊竞品优缺点分析",
+            "pro4": "开发信文案",
+            "pro5": "小红书文案",
+            "pro6": "商品洞察"
         }
     }
 }

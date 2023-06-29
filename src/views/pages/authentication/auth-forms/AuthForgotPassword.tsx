@@ -13,6 +13,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import useAuth from 'hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
 import { openSnackbar } from 'store/slices/snackbar';
+import { t } from 'hooks/web/useI18n';
 
 // ========================|| FIREBASE - FORGOT PASSWORD ||======================== //
 
@@ -32,7 +33,7 @@ const AuthForgotPassword = ({ ...others }) => {
                 submit: null
             }}
             validationSchema={Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required')
+                email: Yup.string().email(t('auth.require.emailvalide')).max(255).required(t('auth.register.emailrequired'))
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
@@ -44,7 +45,7 @@ const AuthForgotPassword = ({ ...others }) => {
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: 'Check mail for reset password link',
+                                message: t('auth.password.confirmsend'),
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'
@@ -69,7 +70,7 @@ const AuthForgotPassword = ({ ...others }) => {
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-email-forgot">Email Address / Username</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-email-forgot">{t('user.emailaddress')}</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-forgot"
                             type="email"
@@ -77,7 +78,7 @@ const AuthForgotPassword = ({ ...others }) => {
                             name="email"
                             onBlur={handleBlur}
                             onChange={handleChange}
-                            label="Email Address / Username"
+                            label={t('user.emailaddress')}
                             inputProps={{}}
                         />
                         {touched.email && errors.email && (
@@ -104,7 +105,7 @@ const AuthForgotPassword = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                Send Mail
+                                {t('auth.password.sendmail')}
                             </Button>
                         </AnimateButton>
                     </Box>

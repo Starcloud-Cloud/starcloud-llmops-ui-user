@@ -5,6 +5,8 @@ import ChevronRight from '@mui/icons-material/ChevronRight';
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 
+import { recommends, appPage } from 'api/template/index';
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +17,8 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 
 import { useContext } from 'react';
-
+import { Item } from 'types/template';
+import { t } from 'hooks/web/useI18n';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -53,81 +56,94 @@ const RightArrow = () => {
 function MyTemplate() {
     //路由跳转
     const navigate = useNavigate();
-    useEffect(() => {
-        getList();
-    }, []);
-    const getList = () => {
-        console.log('页面第一次进入');
-    };
-
+    const [recommendList, setRecommends] = useState([]);
+    const [appList, setAppList] = useState([]);
+    const [newAppList, setNewApp] = useState([]);
     const [pageQuery, setPageQuery] = useState({
-        page: 1,
-        pageSize: 40
+        pageNo: 1,
+        pageSize: 20
     });
-    let total = 10000;
+    const [total, setTotal] = useState(0);
+    useEffect(() => {
+        recommends().then((res) => {
+            setRecommends(res);
+        });
+        appPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
+            setAppList(res.list);
+            setNewApp(res.list.slice(0, pageQuery.pageSize));
+            setTotal(res.page.total);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const paginationChange = (event: any, value: number) => {
         setPageQuery({
             ...pageQuery,
-            page: value
+            pageNo: value
         });
+        setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     //弹窗
     const handleDetail = () => {
         navigate('/template/createDetail');
     };
-    const items = [1, 2, 3, 4, 5, 6, 7, 8];
     return (
         <Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.name" label="模板名称" InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField v-model="queryParams.name" label={t('apply.name')} InputLabelProps={{ shrink: true }} fullWidth />
                 </Grid>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.topics" label="模板名称" InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />
                 </Grid>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.tags" label="模板名称" InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />
                 </Grid>
             </Grid>
             <Box display="flex" alignItems="end" my={2}>
-                <Typography variant="h5">推荐模板</Typography>
+                <Typography variant="h5">{t('apply.tag')}</Typography>
                 <Link href="#" fontSize={14} color="#7367f0" ml={1}>
-                    使用说明
+                    {t('apply.instruction')}
                 </Link>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-                    {items.map((id, index) => (
+                    {recommendList.map((item, index) => (
                         <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
-                            <Template data="{}" handleDetail={handleDetail} />
+                            <Template data={item} handleDetail={handleDetail} />
                         </Box>
                     ))}
                 </ScrollMenu>
             </Box>
             <Box display="flex" justifyContent="space-between" alignItems="end" my={2}>
-                <Typography variant="h5">收藏模板</Typography>
+                <Typography variant="h5">{t('apply.downLoad')}</Typography>
                 <Box fontSize={25} color="#7367f0" display="flex" alignItems="center">
                     <Link href="#" fontSize={14}>
-                        More
+                        {t('apply.more')}
                     </Link>
                     <ChevronRight />
                 </Box>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-                    {items.map((id, index) => (
+                    {recommendList.map((item, index) => (
                         <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
-                            <Template data="{}" handleDetail={handleDetail} />
+                            <Template data={item} handleDetail={handleDetail} />
                         </Box>
                     ))}
                 </ScrollMenu>
             </Box>
             <Typography variant="h5" my={2}>
-                我的模板
+                {t('apply.self')}
             </Typography>
-            <MyselfTemplate />
+            <Grid container spacing={2}>
+                {newAppList?.map((item: Item) => (
+                    <Grid item xs={12} md={6} lg={4} key={item.uid}>
+                        <MyselfTemplate data={item} />
+                    </Grid>
+                ))}
+            </Grid>
             <Box my={2}>
-                <Pagination page={pageQuery.page} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
             </Box>
         </Box>
     );

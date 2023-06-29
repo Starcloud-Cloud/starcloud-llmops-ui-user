@@ -536,7 +536,7 @@ const MainRoutes = {
                     element: <MarketList />
                 },
                 {
-                    path: 'detail',
+                    path: 'detail/:uid',
                     element: <MarketDetail />
                 }
             ]

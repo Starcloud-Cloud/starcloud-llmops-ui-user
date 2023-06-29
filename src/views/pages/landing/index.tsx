@@ -7,13 +7,13 @@ import AppBar from 'ui-component/extended/AppBar';
 import HeaderSection from './HeaderSection';
 import CardSection from './CardSection';
 import FeatureSection from './FeatureSection';
-import PeopleSection from './PeopleSection';
-import FrameworkSection from './FrameworkSection';
+// import PeopleSection from './PeopleSection';
+// import FrameworkSection from './FrameworkSection';
 import FooterSection from './FooterSection';
-import CustomizeSection from './CustomizeSection';
+// import CustomizeSection from './CustomizeSection';
 import PreBuildDashBoard from './PreBuildDashBoard';
 import StartupProjectSection from './StartupProjectSection';
-//import IncludeSection from './IncludeSection';
+// import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
 // custom stlye
@@ -51,9 +51,9 @@ const Landing = () => {
             </SectionWrapper>
 
             {/* 4. Developer Experience section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
                 <CustomizeSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 3. about section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
@@ -66,9 +66,9 @@ const Landing = () => {
             </SectionWrapper>
 
             {/* 5. people section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <PeopleSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 6. startup section */}
             <SectionWrapper sx={{ py: 0 }}>
@@ -82,15 +82,15 @@ const Landing = () => {
             </SectionWrapper> */}
 
             {/* framework section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <FrameworkSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 7. inculde section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <IncludeSection />
-            </SectionWrapper>
-            */}
+            </SectionWrapper> */}
+
             {/* footer section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />

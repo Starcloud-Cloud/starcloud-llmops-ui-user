@@ -1,43 +1,36 @@
-import Grid from '@mui/material/Grid';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
-
+import { Item } from 'types/template';
 import './textnoWarp.css';
-function MyselfTemplate() {
+function MyselfTemplate({ data }: { data: Item }) {
     return (
-        <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={6} xl={4}>
-                <Card sx={{ height: 150 }}>
-                    <Box display="flex" alignItems="center" p={2}>
-                        <ChevronRight sx={{ fontSize: '80px' }} />
-                        <Box overflow="hidden">
-                            <Typography variant="h3" noWrap width="100%" mb={0.5}>
-                                我是标题我是标题我是标题我是标题我是标题我是标题
-                            </Typography>
-                            <div className="textnoWarp">
-                                我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述我是描述
-                            </div>
-                            <Box fontSize={12}>
-                                <Link href="#" fontSize={14} mr={0.5}>
-                                    #Blog
-                                </Link>
-                                <Link href="#" fontSize={14}>
-                                    #Blog
-                                </Link>
-                            </Box>
-                            <Box fontSize={14} mt={0.5}>
-                                <Chip label="Article" size="small" variant="outlined" />
-                                <Chip label="Blog" size="small" variant="outlined" />
-                            </Box>
-                        </Box>
+        <Card sx={{ height: 150 }}>
+            <Box display="flex" alignItems="center" p={2}>
+                <ChevronRight sx={{ fontSize: '80px' }} />
+                <Box overflow="hidden">
+                    <Typography variant="h3" noWrap width="100%" mb={0.5}>
+                        {data.name}
+                    </Typography>
+                    <div className="textnoWarp">{data.description} </div>
+                    <Box fontSize={12}>
+                        {data.categories.map((el) => (
+                            <Link href="#" fontSize={14} mr={0.5}>
+                                {el}
+                            </Link>
+                        ))}
                     </Box>
-                </Card>
-            </Grid>
-        </Grid>
+                    <Box fontSize={14} mt={0.5}>
+                        {data.tags.map((el) => (
+                            <Chip label={el} size="small" variant="outlined" />
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+        </Card>
     );
 }
 

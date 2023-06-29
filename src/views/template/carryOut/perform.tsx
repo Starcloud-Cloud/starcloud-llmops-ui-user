@@ -13,7 +13,6 @@ function Perform({ config, changeSon }: any) {
     if (!config) {
         return null;
     }
-    console.log(config);
 
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};

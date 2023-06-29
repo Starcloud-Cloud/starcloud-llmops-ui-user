@@ -36,10 +36,14 @@ import { openSnackbar } from 'store/slices/snackbar';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { StringColorProps } from 'types';
+import { t } from 'hooks/web/useI18n';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
-
-const JWTRegister = ({ ...others }) => {
+interface JWTRegisterProps {
+    inviteCode?: string;
+    [key: string]: any;
+}
+const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const scriptedRef = useScriptRef();
@@ -76,7 +80,7 @@ const JWTRegister = ({ ...others }) => {
             <Grid container direction="column" justifyContent="center" spacing={2}>
                 <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1">Sign up with Email address</Typography>
+                        <Typography variant="subtitle1"> {t('auth.register.signupwithemail')}</Typography>
                     </Box>
                 </Grid>
             </Grid>
@@ -86,33 +90,48 @@ const JWTRegister = ({ ...others }) => {
                     email: '',
                     password: '',
                     userName: '',
+                    inviteCode: inviteCode,
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    email: Yup.string().email('Must be a valid email').max(255).required(t('auth.register.emailrequired')),
+                    password: Yup.string().max(255).required(t('auth.register.passwordrequired'))
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        await register(values.email, values.password, values.userName);
-                        if (scriptedRef.current) {
-                            setStatus({ success: true });
-                            setSubmitting(false);
+                        const res = await register(values.email, values.password, values.userName, values.inviteCode);
+                        if (res?.data) {
+                            if (scriptedRef.current) {
+                                setStatus({ success: true });
+                                setSubmitting(false);
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: t('auth.register.successful'),
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        close: false
+                                    })
+                                );
+
+                                setTimeout(() => {
+                                    navigate('/login', { replace: true });
+                                }, 1500);
+                            }
+                        } else {
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: 'Your registration has been successfully completed.',
+                                    message: `${res?.msg}`,
                                     variant: 'alert',
                                     alert: {
-                                        color: 'success'
+                                        color: 'error'
                                     },
                                     close: false
                                 })
                             );
-
-                            setTimeout(() => {
-                                navigate('/login', { replace: true });
-                            }, 1500);
                         }
                     } catch (err: any) {
                         console.error(err);
@@ -130,7 +149,7 @@ const JWTRegister = ({ ...others }) => {
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
-                                    label="User Name"
+                                    label={t('user.username')}
                                     margin="normal"
                                     name="userName"
                                     type="text"
@@ -142,7 +161,7 @@ const JWTRegister = ({ ...others }) => {
                             </Grid>
                         </Grid>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                            <InputLabel htmlFor="outlined-adornment-email-register">Email Address</InputLabel>
+                            <InputLabel htmlFor="outlined-adornment-email-register">{t('user.emailaddress')}</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email-register"
                                 type="email"
@@ -164,13 +183,13 @@ const JWTRegister = ({ ...others }) => {
                             error={Boolean(touched.password && errors.password)}
                             sx={{ ...theme.typography.customInput }}
                         >
-                            <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+                            <InputLabel htmlFor="outlined-adornment-password-register"> {t('user.password')}</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password-register"
                                 type={showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 name="password"
-                                label="Password"
+                                label={t('user.password')}
                                 onBlur={handleBlur}
                                 onChange={(e) => {
                                     handleChange(e);
@@ -218,6 +237,11 @@ const JWTRegister = ({ ...others }) => {
                             </FormControl>
                         )}
 
+                        <FormControl fullWidth sx={{ display: 'none' }}>
+                            <InputLabel htmlFor="inviteCode">Invite Code</InputLabel>
+                            <OutlinedInput id="inviteCode" type="text" value={values.inviteCode} name="inviteCode" />
+                        </FormControl>
+
                         <Grid container alignItems="center" justifyContent="space-between">
                             <Grid item>
                                 <FormControlLabel
@@ -231,9 +255,9 @@ const JWTRegister = ({ ...others }) => {
                                     }
                                     label={
                                         <Typography variant="subtitle1">
-                                            Agree with &nbsp;
+                                            {t('auth.require.agree')} &nbsp;
                                             <Typography variant="subtitle1" component={Link} to="#">
-                                                Terms & Condition.
+                                                {t('auth.require.terms')}
                                             </Typography>
                                         </Typography>
                                     }
@@ -257,7 +281,7 @@ const JWTRegister = ({ ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Sign up
+                                    {t('auth.register.signup')}
                                 </Button>
                             </AnimateButton>
                         </Box>

@@ -1,17 +1,10 @@
 // project import
 
-import { IconChartArcs, IconClipboardList, IconChartInfographic } from '@tabler/icons';
 import { NavItemType } from 'types';
 import useRouteStore from 'store/router';
 import { AppCustomRouteRecordRaw } from 'types/router';
 import { useMemo } from 'react';
 
-const icons = {
-    widget: IconChartArcs,
-    statistics: IconChartArcs,
-    data: IconClipboardList,
-    chart: IconChartInfographic
-};
 // ==============================|| MENU ITEMS - API ||============================== //
 
 export const RuoyiMenu = () => {
@@ -21,7 +14,7 @@ export const RuoyiMenu = () => {
             let navItem: NavItemType = {
                 id: routeObj?.id.toString(),
                 //@ts-ignore
-                icon: icons[routeObj?.icon],
+                icon: routeObj?.icon,
                 url: routeObj?.path,
                 title: routeObj?.name,
                 type: routeObj?.children ? 'collapse' : 'item',

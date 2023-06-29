@@ -536,7 +536,7 @@ const MainRoutes = {
                     element: <MarketList />
                 },
                 {
-                    path: 'detail',
+                    path: 'detail/:uid',
                     element: <MarketDetail />
                 }
             ]
@@ -546,7 +546,7 @@ const MainRoutes = {
             element: <CreateCenter />
         },
         {
-            path: '/template/createDetail',
+            path: '/createApp',
             element: <CreateDetail />
         },
         {

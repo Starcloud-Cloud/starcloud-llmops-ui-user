@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // material-ui
@@ -7,6 +7,7 @@ import {
     Box,
     Button,
     Checkbox,
+    Divider,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -21,6 +22,7 @@ import {
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import { AiOutlineWechat } from 'react-icons/ai';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -35,29 +37,31 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import * as LoginApi from 'api/login';
 import * as authUtil from 'utils/auth';
 import { t } from 'hooks/web/useI18n';
+import LoginModal from './AuthLoginModal';
+// import { TrendingUp } from '@mui/icons-material';
 
 // ===============================|| JWT LOGIN ||=============================== //
 
 const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const theme = useTheme();
-
     const { login } = useAuth();
+    const [open, setOpen] = useState(false);
+    const [ticket, setTicket] = useState('');
     const scriptedRef = useScriptRef();
     const [loginData, setLoginData] = useState({
         isShowPassword: false,
         captchaEnable: process.env.REACT_APP_CAPTCHA_ENABLE,
-        tenantEnable: process.env.REACT_APP_TENANT_ENABLE,
+        // tenantEnable: process.env.REACT_APP_TENANT_ENABLE,
         loginForm: {
-            tenantName: '芋道源码',
+            // tenantName: '',
             username: 'admin',
             password: 'admin123',
             captchaVerification: '',
             rememberMe: false
         }
     });
-
-    console.log('process.env.REACT_APP_TENANT_ENABLE', process.env.REACT_APP_TENANT_ENABLE);
     const [showPassword, setShowPassword] = React.useState(false);
+    const [qrUrl, setQrurl] = React.useState(null);
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -66,18 +70,54 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         event.preventDefault()!;
     };
 
-    const getTenantId = async () => {
-        if (loginData.tenantEnable === 'true') {
-            const res = await LoginApi.getTenantIdByName(loginData.loginForm.tenantName);
-            authUtil.setTenantId(res);
-            console.log('getTenantId', authUtil.getTenantId());
+    // const getTenantId = async () => {
+    //     if (loginData.tenantEnable === 'true') {
+    //         const res = await LoginApi.getTenantIdByName(loginData.loginForm.tenantName);
+    //         authUtil.setTenantId(res);
+    //         console.log('getTenantId', authUtil.getTenantId());
+    //     }
+    // };
+    const handleWeChat = async () => {
+        const res = await LoginApi.getQRcode();
+        if (res) {
+            setQrurl(res?.url);
+            setOpen(true);
+            setTicket(res?.ticket);
         }
     };
+    useEffect(() => {
+        let intervalId: ReturnType<typeof setInterval>;
+
+        const polling = async () => {
+            const res = await LoginApi.qRcodeLogin({ ticket });
+            if (!res?.data) {
+                return;
+            }
+            authUtil.setToken(res?.data);
+            await login();
+
+            // 清除定时器
+            clearInterval(intervalId as unknown as number);
+        };
+
+        if (ticket) {
+            // 设置定时器
+            intervalId = setInterval(polling, 2000); // 例如，每5秒轮询一次
+        }
+
+        return () => {
+            // 在组件卸载或者重新渲染时清除定时器
+            clearInterval(intervalId as unknown as number);
+        };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ticket]);
+
     return (
         <Formik
             initialValues={{
-                email: 'admin',
-                password: 'admin123',
+                email: '',
+                password: '',
                 captchaVerification: '', // Add this line
                 submit: null
             }}
@@ -88,7 +128,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    await getTenantId();
+                    // await getTenantId();
                     const updatedLoginForm = {
                         ...loginData.loginForm,
                         username: values.email,
@@ -127,7 +167,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-email-login">{t('user.username')}</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-login"
                             type="email"
@@ -145,7 +185,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </FormControl>
 
                     <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password-login">{t('user.password')}</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password-login"
                             type={showPassword ? 'text' : 'password'}
@@ -206,7 +246,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 color="secondary"
                                 sx={{ textDecoration: 'none' }}
                             >
-                                Forgot Password?
+                                {t('auth.login.forgotpassword')}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -219,10 +259,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     <Box sx={{ mt: 2 }}>
                         <AnimateButton>
                             <Button color="secondary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
-                                Sign In
+                                {t('auth.login.signin')}
                             </Button>
                         </AnimateButton>
                     </Box>
+                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                        <Divider sx={{ flexGrow: 1 }} />
+                        <Box px={2}>{t('auth.login.otherLogin')}</Box>
+                        <Divider sx={{ flexGrow: 1 }} />
+                    </Box>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                        <AiOutlineWechat size={30} onClick={handleWeChat} style={{ cursor: 'pointer' }} />
+                    </Box>
+
+                    <LoginModal open={open} qrUrl={qrUrl} handleClose={() => setOpen(false)} />
                 </form>
             )}
         </Formik>

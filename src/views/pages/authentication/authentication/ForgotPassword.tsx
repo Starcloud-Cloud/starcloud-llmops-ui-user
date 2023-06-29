@@ -16,6 +16,7 @@ import { AuthSliderProps } from 'types';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-forgotpass.svg';
+import { t } from 'hooks/web/useI18n';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -51,7 +52,7 @@ const ForgotPassword = () => {
                         justifyContent={matchDownSM ? 'center' : 'space-between'}
                     >
                         <Grid item sx={{ display: { xs: 'none', md: 'block' }, m: 3 }}>
-                            <Link to="#" aria-label="theme logo">
+                            <Link to="#" aria-label="theme logo" style={{ textDecoration: 'none' }}>
                                 <Logo />
                             </Link>
                         </Grid>
@@ -64,7 +65,7 @@ const ForgotPassword = () => {
                             sx={{ minHeight: { xs: 'calc(100vh - 68px)', md: 'calc(100vh - 152px)' } }}
                         >
                             <Stack justifyContent="center" alignItems="center" spacing={5} m={2}>
-                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' } }}>
+                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' }, textDecoration: 'none' }}>
                                     <Logo />
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>
@@ -76,10 +77,10 @@ const ForgotPassword = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Forgot password?
+                                                    {t('auth.login.forgotpassword')}
                                                 </Typography>
                                                 <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    Enter your email address below and we&apos;ll send you password reset OTP.
+                                                    {t('auth.login.requirepassword')}
                                                 </Typography>
                                             </Stack>
                                         </Grid>
@@ -97,7 +98,7 @@ const ForgotPassword = () => {
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >
-                                                    Already have an account?
+                                                    {t('auth.register.tologin')}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

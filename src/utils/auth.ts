@@ -40,7 +40,6 @@ export const formatToken = (token: string): string => {
 const LoginFormKey = 'LOGINFORM';
 
 export type LoginFormType = {
-    tenantName: string;
     username: string;
     password: string;
     rememberMe: boolean;

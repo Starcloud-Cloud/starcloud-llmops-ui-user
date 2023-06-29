@@ -130,52 +130,54 @@ export const generateRoute = (routesList: AppCustomRouteRecordRaw[]): AppRouteRe
     const res: AppRouteRecordRaw[] = [];
     const modulesRoutesKeys: string[] = modules.keys();
     function changeRoute(routes: AppCustomRouteRecordRaw[]) {
-        for (const route of routes) {
-            // const meta = {
-            //     title: route.name,
-            //     icon: route.icon,
-            //     hidden: !route.visible,
-            //     noCache: !route.keepAlive,
-            //     alwaysShow: route.children && route.children.length === 1 && (route.alwaysShow !== undefined ? route.alwaysShow : true)
-            // };
-            // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
-            let data: any = {
-                path: route.path
-                // redirect: route.redirect,
-                // meta: meta
-            };
-            //处理顶级非目录路由
-            if (!route.children && route.parentId === 0 && route.component) {
-                data.component = Layout;
-                // data.meta = {};
-                // data.name = toCamelCase(route.path, true) + 'Parent';
-                // data.redirect = '';
-                // meta.alwaysShow = true;
-                const childrenData: any = {
-                    path: ''
-                    // name: toCamelCase(route.path, true),
+        if (routes?.length > 0) {
+            for (const route of routes) {
+                // const meta = {
+                //     title: route.name,
+                //     icon: route.icon,
+                //     hidden: !route.visible,
+                //     noCache: !route.keepAlive,
+                //     alwaysShow: route.children && route.children.length === 1 && (route.alwaysShow !== undefined ? route.alwaysShow : true)
+                // };
+                // 路由地址转首字母大写驼峰，作为路由名称，适配keepAlive
+                let data: any = {
+                    path: route.path
                     // redirect: route.redirect,
                     // meta: meta
                 };
-                // const index = route?.component
-                //     ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
-                //     : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
-                // childrenData.component = modules.keys()[modulesRoutesKeys[index]];
-                data.children = [childrenData];
-            } else {
-                const index = route?.component
-                    ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
-                    : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
-                // 目录
-                if (!route.children && route.component && route.component !== '') {
-                    const Element = Loadable(React.lazy(() => import(`views/${modulesRoutesKeys[index]?.split('./')[1]}`)));
-                    data.element = <Element />;
+                //处理顶级非目录路由
+                if (!route.children && route.parentId === 0 && route.component) {
+                    data.component = Layout;
+                    // data.meta = {};
+                    // data.name = toCamelCase(route.path, true) + 'Parent';
+                    // data.redirect = '';
+                    // meta.alwaysShow = true;
+                    const childrenData: any = {
+                        path: ''
+                        // name: toCamelCase(route.path, true),
+                        // redirect: route.redirect,
+                        // meta: meta
+                    };
+                    // const index = route?.component
+                    //     ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
+                    //     : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
+                    // childrenData.component = modules.keys()[modulesRoutesKeys[index]];
+                    data.children = [childrenData];
+                } else {
+                    const index = route?.component
+                        ? modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.component))
+                        : modulesRoutesKeys.findIndex((ev: any) => ev.includes(route.path));
+                    // 目录
+                    if (!route.children && route.component && route.component !== '') {
+                        const Element = Loadable(React.lazy(() => import(`views/${modulesRoutesKeys[index]?.split('./')[1]}`)));
+                        data.element = <Element />;
+                    }
+                    if (route.children) {
+                        changeRoute(route.children);
+                    }
                 }
-                if (route.children) {
-                    changeRoute(route.children);
-                }
+                res.push(data as AppRouteRecordRaw);
             }
-            res.push(data as AppRouteRecordRaw);
         }
     }
     changeRoute(routesList);

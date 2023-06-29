@@ -16,6 +16,7 @@ import { AuthSliderProps } from 'types';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-login.svg';
+import { t } from 'hooks/web/useI18n';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -51,7 +52,7 @@ const Login = () => {
                         justifyContent={matchDownSM ? 'center' : 'space-between'}
                     >
                         <Grid item sx={{ display: { xs: 'none', md: 'block' }, m: 3 }}>
-                            <Link to="#" aria-label="theme logo">
+                            <Link to="#" aria-label="theme logo" style={{ textDecoration: 'none' }}>
                                 <Logo />
                             </Link>
                         </Grid>
@@ -64,7 +65,7 @@ const Login = () => {
                             sx={{ minHeight: { xs: 'calc(100vh - 68px)', md: 'calc(100vh - 152px)' } }}
                         >
                             <Stack justifyContent="center" alignItems="center" spacing={5} m={2}>
-                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' } }}>
+                                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                                     <Logo />
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>
@@ -76,14 +77,14 @@ const Login = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Hi, Welcome Back
+                                                    {t('auth.login.welcome')}
                                                 </Typography>
                                                 <Typography
                                                     variant="caption"
                                                     fontSize="16px"
                                                     textAlign={matchDownSM ? 'center' : 'inherit'}
                                                 >
-                                                    Enter your credentials to continue
+                                                    {t('auth.login.credentials')}
                                                 </Typography>
                                             </Stack>
                                         </Grid>
@@ -101,7 +102,7 @@ const Login = () => {
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >
-                                                    Don&apos;t have an account?
+                                                    {t('auth.login.account')}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

@@ -13,9 +13,11 @@ import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
 import { AuthSliderProps } from 'types';
+import { useLocation } from 'react-router-dom';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
+import { t } from 'hooks/web/useI18n';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -37,6 +39,9 @@ const items: AuthSliderProps[] = [
 
 const Register = () => {
     const theme = useTheme();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const inviteCode = query.get('inviteCode') || '';
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -51,7 +56,7 @@ const Register = () => {
                         justifyContent={matchDownSM ? 'center' : 'space-between'}
                     >
                         <Grid item sx={{ display: { xs: 'none', md: 'block' }, m: 3 }}>
-                            <Link to="#" aria-label="theme logo">
+                            <Link to="#" aria-label="theme logo" style={{ textDecoration: 'none' }}>
                                 <Logo />
                             </Link>
                         </Grid>
@@ -64,7 +69,7 @@ const Register = () => {
                             sx={{ minHeight: { xs: 'calc(100vh - 68px)', md: 'calc(100vh - 152px)' } }}
                         >
                             <Stack justifyContent="center" alignItems="center" spacing={5} m={2}>
-                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' } }}>
+                                <Box component={Link} to="#" sx={{ display: { xs: 'block', md: 'none' }, textDecoration: 'none' }}>
                                     <Logo />
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>
@@ -76,19 +81,19 @@ const Register = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Sign up
+                                                    {t('auth.register.signup')}
                                                 </Typography>
                                                 <Typography
                                                     variant="caption"
                                                     fontSize="16px"
                                                     textAlign={matchDownSM ? 'center' : 'inherit'}
                                                 >
-                                                    Enter your credentials to continue
+                                                    {t('auth.login.credentials')}
                                                 </Typography>
                                             </Stack>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <AuthRegister />
+                                            <AuthRegister inviteCode={inviteCode} />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <Divider />
@@ -97,11 +102,11 @@ const Register = () => {
                                             <Grid item container direction="column" alignItems="center" xs={12}>
                                                 <Typography
                                                     component={Link}
-                                                    to="/pages/login/login2"
+                                                    to="/login"
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >
-                                                    Already have an account?
+                                                    {t('auth.register.tologin')}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

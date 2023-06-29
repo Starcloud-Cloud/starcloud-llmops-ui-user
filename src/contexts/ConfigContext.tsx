@@ -7,6 +7,7 @@ import useLocalStorage from 'hooks/useLocalStorage';
 // types
 import { PaletteMode } from '@mui/material';
 import { CustomizationProps } from 'types/config';
+import i18n from 'hooks/web/useI18n';
 
 // initial state
 const initialState: CustomizationProps = {
@@ -77,6 +78,7 @@ function ConfigProvider({ children }: ConfigProviderProps) {
             ...config,
             locale
         });
+        i18n.changeLanguage(locale);
     };
 
     const onChangeRTL = (rtlLayout: boolean) => {

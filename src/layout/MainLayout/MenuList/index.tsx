@@ -19,6 +19,7 @@ import { NavItemType } from 'types';
 
 const MenuList = () => {
     const menuItem = getMenuItems();
+
     const theme = useTheme();
     const { layout } = useConfig();
 

@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react';
+import { useState, useEffect, SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 // material-ui
@@ -23,29 +23,33 @@ import {
     Button
 } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
+// import AddIcon from '@mui/icons-material/Add';
 
 // project imports
-import Profile from './Profile';
+// import Profile from './Profile';
 import MyAccount from './MyAccount';
 import ChangePassword from './ChangePassword';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
+import { ProfileVO } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import EmojiEmotionsTwoToneIcon from '@mui/icons-material/EmojiEmotionsTwoTone';
 import LibraryBooksTwoToneIcon from '@mui/icons-material/LibraryBooksTwoTone';
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
-import Avatar3 from 'assets/images/users/avatar-3.png';
-import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
+// import Avatar3 from 'assets/images/users/avatar-3.png';
+// import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
 
 // types
 import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
+import { getUserInfo } from 'api/login';
+import { t } from 'hooks/web/useI18n';
 
 // ==============================|| PROFILE 1 ||============================== //
 
@@ -68,23 +72,32 @@ function a11yProps(index: number) {
 // tabs option
 const tabsOption = [
     {
-        label: '基本资料',
+        label: '2profile.info.basicInfo',
         icon: <LibraryBooksTwoToneIcon sx={{ fontSize: '1.3rem' }} />
     },
     {
-        label: '修改密码',
+        label: '2profile.info.resetPwd',
         icon: <LockTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-    },
-    {
-        label: '社交信息',
-        icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
     }
+    // {
+    //     label: '社交信息',
+    //     icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
+    // }
 ];
 
 const Profilnew = () => {
     const theme = useTheme();
-
     const [value, setValue] = useState<number>(0);
+    const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await getUserInfo();
+            setUserProfile(result);
+        };
+        fetchData();
+    }, []);
+
     const handleChange = (event: SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -105,15 +118,15 @@ const Profilnew = () => {
                     <SubCard
                         title={
                             <Grid container spacing={2} alignItems="center" justifyContent="center" onClick={handleClickOpen}>
-                                {Avatar3 ? (
+                                {userProfile?.avatar ? (
                                     <Grid item>
-                                        <Avatar alt="User 1" src={Avatar3} size="xl" />
+                                        <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
                                     </Grid>
                                 ) : (
                                     <Grid item>
                                         <MuiTooltip title="Add" aria-label="add">
-                                            <Fab color="primary" sx={{ m: 2 }}>
-                                                <AddIcon />
+                                            <Fab color="secondary" sx={{ m: 2 }}>
+                                                {/* <AddIcon /> */}
                                             </Fab>
                                         </MuiTooltip>
                                     </Grid>
@@ -126,10 +139,22 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <AccountCircleTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">用户名称</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.username')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        admin
+                                        {userProfile?.username || t('sys.app.unknown')}
+                                    </Typography>
+                                </ListItemSecondaryAction>
+                            </ListItemButton>
+                            <Divider />
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <EmojiEmotionsTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                </ListItemIcon>
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.nickname')}</Typography>} />
+                                <ListItemSecondaryAction>
+                                    <Typography variant="subtitle2" align="right">
+                                        {userProfile?.nickname || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -138,10 +163,10 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <PhonelinkRingTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">手机号码</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.mobile')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        15612345678
+                                        {userProfile?.mobile || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -150,14 +175,14 @@ const Profilnew = () => {
                                 <ListItemIcon>
                                     <MailTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                 </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">用户邮箱</Typography>} />
+                                <ListItemText primary={<Typography variant="subtitle1">{t('2profile.user.email')}</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        aoteman@126.com
+                                        {userProfile?.email || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
-                            <Divider />
+                            {/* <Divider />
                             <ListItemButton>
                                 <ListItemIcon>
                                     <AccountTreeTwoTone sx={{ fontSize: '1.3rem' }} />
@@ -165,7 +190,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属部门</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        研发部门
+                                        {userProfile?.dept?.name || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -177,7 +202,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属岗位</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        董事长
+                                        {userProfile?.posts?.map((post) => post.name).join(', ') || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -189,7 +214,7 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">所属角色</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        超级管理员，普通角色
+                                        {userProfile?.roles?.map((role) => role.name).join(', ') || t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
@@ -201,20 +226,20 @@ const Profilnew = () => {
                                 <ListItemText primary={<Typography variant="subtitle1">创建日期</Typography>} />
                                 <ListItemSecondaryAction>
                                     <Typography variant="subtitle2" align="right">
-                                        2021-01-06 01:03:47
+                                        {userProfile?.createTime ? new Date(userProfile.createTime).toLocaleString() : t('sys.app.unknown')}
                                     </Typography>
                                 </ListItemSecondaryAction>
-                            </ListItemButton>
+                            </ListItemButton> */}
                         </List>
                     </SubCard>
                     <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="form-dialog-title">Upload Avatar</DialogTitle>
+                        <DialogTitle id="form-dialog-title">{t('2profile.user.upload')}</DialogTitle>
                         <DialogContent>
-                            <AvatarUpload defaultImageSrc={Avatar3} />
+                            <AvatarUpload defaultImageSrc={userProfile?.avatar} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">
-                                Confirm
+                                {t('2profile.user.confirm')}
                             </Button>
                         </DialogActions>
                     </Dialog>
@@ -254,18 +279,18 @@ const Profilnew = () => {
                         }}
                     >
                         {tabsOption.map((tab, index) => (
-                            <Tab key={index} component={Link} to="#" icon={tab.icon} label={tab.label} {...a11yProps(index)} />
+                            <Tab key={index} component={Link} to="#" icon={tab.icon} label={t(tab.label)} {...a11yProps(index)} />
                         ))}
                     </Tabs>
                     <TabPanel value={value} index={0}>
-                        <MyAccount />
+                        <MyAccount userProfile={userProfile} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ChangePassword />
                     </TabPanel>
-                    <TabPanel value={value} index={2}>
+                    {/* <TabPanel value={value} index={2}>
                         <Profile />
-                    </TabPanel>
+                    </TabPanel> */}
                 </Grid>
             </Grid>
         </MainCard>

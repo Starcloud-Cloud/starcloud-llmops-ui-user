@@ -9,6 +9,7 @@ interface UserVO {
     id: number;
     avatar: string;
     nickname: string;
+    [key: string]: any;
 }
 type UserStore = {
     [x: string]: any;

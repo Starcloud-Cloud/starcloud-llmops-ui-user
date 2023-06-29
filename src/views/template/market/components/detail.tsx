@@ -8,45 +8,92 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 // import StarIcon from '@mui/icons-material/Star';
 // import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { marketDeatail, installTemplate } from 'api/template';
+import { executeMarket } from 'api/template/fetch';
 import CarryOut from 'views/template/carryOut';
+import { Execute, Details } from 'types/template';
 
 import { t } from 'hooks/web/useI18n';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 function Deatail() {
-    const location = useLocation();
+    const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
-    const [detailData, setDetailData] = useState({
-        name: '',
-        categories: [],
-        scenes: [],
-        example: '',
-        viewCount: '',
-        likeCount: '',
-        installCount: '',
-        uid: '',
-        version: '',
-        installStatus: { installStatus: '' }
-    });
+    const [detailData, setDetailData] = useState<Details>({} as Details);
+    const [stepID, setStepID] = useState('');
+    const [num, setNum] = useState<number | null>(null);
+    const changeData = (data: Execute) => {
+        const { stepId, index }: { stepId: string; index: number } = data;
+        setStepID(stepId);
+        setNum(index);
+        setDetailData({
+            ...detailData,
+            workflowConfig: {
+                steps: [
+                    ...detailData.workflowConfig.steps.slice(0, index),
+                    data.steps,
+                    ...detailData.workflowConfig.steps.slice(index + 1, detailData.workflowConfig.steps.length)
+                ]
+            }
+        });
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!stepID || (!num && num !== 0)) return;
+            let resp: any = await executeMarket({
+                appUid: uid,
+                stepId: stepID,
+                appReqVO: detailData
+            });
+            setStepID('');
+            setNum(null);
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            while (1) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                const str = textDecoder.decode(value);
+                setDetailData({
+                    ...detailData,
+                    workflowConfig: {
+                        steps: [
+                            ...detailData.workflowConfig.steps.slice(0, num),
+                            {
+                                ...detailData.workflowConfig.steps[num],
+                                flowStep: {
+                                    ...detailData.workflowConfig.steps[num].flowStep,
+                                    response: {
+                                        ...detailData.workflowConfig.steps[num].flowStep.response,
+                                        answer: str
+                                    }
+                                }
+                            },
+                            ...detailData.workflowConfig.steps.slice(num + 1, detailData.workflowConfig.steps.length)
+                        ]
+                    }
+                });
+            }
+        };
+        fetchData();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [num, stepID, detailData.workflowConfig?.steps]);
     const [loading, setLoading] = useState(false);
     useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const queryParams: any = {
-            version: searchParams.get('version'),
-            uid: searchParams.get('uid')
-        };
-        marketDeatail(queryParams).then((res: any) => {
+        marketDeatail({ uid }).then((res: any) => {
             setDetailData(res);
         });
-    }, [location.search]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const iconStyle = {
         fontSize: '16px',
         display: 'inline-block',
         margin: '0 8px 0 4px'
     };
-    const install = ({ uid, version }: { uid: string; version: number | string }) => {
+    const install = () => {
         setLoading(true);
-        installTemplate({ uid, version }).then((res) => {
+        installTemplate({ uid }).then((res) => {
             if (res.data) {
                 setLoading(false);
                 setDetailData({
@@ -95,17 +142,17 @@ function Deatail() {
                 </Box>
                 <LoadingButton
                     color="info"
-                    disabled={detailData.installStatus.installStatus === 'INSTALLED'}
-                    onClick={() => install(detailData)}
+                    disabled={detailData.installStatus?.installStatus === 'INSTALLED'}
+                    onClick={install}
                     loading={loading}
                     loadingIndicator="downLoad..."
                     variant="outlined"
                 >
-                    {detailData.installStatus.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
+                    {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton>
             </Box>
             <Divider sx={{ my: 1 }} />
-            <CarryOut config={detailData} example={detailData.example} />
+            <CarryOut config={detailData} changeData={changeData} />
         </Card>
     );
 }

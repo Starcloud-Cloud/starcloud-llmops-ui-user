@@ -12,8 +12,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
               with:
-                  token: ${{ secrets.COMPANYTOKEN }}
-
+                  token: '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'
             - name: Configure Git
               run: |
                   git config --global user.name 'GanXing'

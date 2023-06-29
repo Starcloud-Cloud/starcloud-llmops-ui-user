@@ -11,9 +11,9 @@ import FeatureSection from './FeatureSection';
 // import FrameworkSection from './FrameworkSection';
 import FooterSection from './FooterSection';
 // import CustomizeSection from './CustomizeSection';
-// import PreBuildDashBoard from './PreBuildDashBoard';
+import PreBuildDashBoard from './PreBuildDashBoard';
 import StartupProjectSection from './StartupProjectSection';
-//import IncludeSection from './IncludeSection';
+// import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
 // custom stlye
@@ -61,9 +61,9 @@ const Landing = () => {
             </SectionWrapper>
 
             {/* 4. Apps */}
-            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
                 <PreBuildDashBoard />
-            </SectionWrapper> */}
+            </SectionWrapper>
 
             {/* 5. people section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
@@ -89,8 +89,8 @@ const Landing = () => {
             {/* 7. inculde section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <IncludeSection />
-            </SectionWrapper>
-            */}
+            </SectionWrapper> */}
+
             {/* footer section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />

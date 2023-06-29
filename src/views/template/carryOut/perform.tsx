@@ -9,44 +9,48 @@ import FormExecute from 'views/template/components/validaForm';
 import generateValidationSchema from 'hooks/usevalid';
 import { t } from 'hooks/web/useI18n';
 
-function Perform({ config }: { config: any }) {
+function Perform({ config, changeSon }: any) {
     if (!config) {
         return null;
     }
-    // const initialValues: Record<string, any> = {};
-    // config.variable.variables.forEach((variable: { field: string }) => {
-    //     const { field } = variable;
-    //     initialValues[field] = '';
-    // });
+
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
-        data.forEach((variable: { isShow: boolean; field: string }) => {
-            const { field, isShow } = variable;
+        data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
+            const { field, isShow, value } = variable;
             if (isShow) {
-                Data[field] = '';
+                Data[field] = value;
             }
         });
         return Data;
     };
-    const validationSchema = generateValidationSchema(config.variable.variables);
-    const formik = Formik({
-        initialValues: fn(config.variable.variables),
-        validationSchema,
-        onSubmit: () => {}
-    });
     const arr: any[] = [];
+    const mapVariables = (variable: any, obj: any) => {
+        for (const item of variable) {
+            for (const key in obj) {
+                if (item.field === key) {
+                    item.value = obj[key];
+                }
+            }
+        }
+    };
     config.steps.forEach((item: any, index: number) => {
         arr[index] = Formik({
-            initialValues: fn([...item.variable.variables, ...item.flowStep.variable.variables]),
+            initialValues: fn([...item.variable?.variables, ...item.flowStep?.variable.variables]),
             validationSchema: generateValidationSchema([...item.variable.variables, ...item.flowStep.variable.variables]),
-            onSubmit: () => {}
+            onSubmit: (value) => {
+                const steps = JSON.parse(JSON.stringify(config.steps[index]));
+                mapVariables(steps.variable.variables, value);
+                mapVariables(steps.flowStep.variable.variables, value);
+                changeSon({ stepId: config.steps[index].field, steps, index });
+            }
         });
     });
     return (
         <Box>
             {config.steps > 1 ? (
                 <Box>
-                    <Button onClick={() => formik.handleSubmit()} startIcon={<AlbumIcon />} variant="contained">
+                    <Button startIcon={<AlbumIcon />} variant="contained">
                         {t('market.allExecute')}
                     </Button>
                     <Tooltip title={t('market.allStepTips')}>
@@ -56,18 +60,6 @@ function Perform({ config }: { config: any }) {
                     </Tooltip>
                 </Box>
             ) : null}
-            <form>
-                <Grid container spacing={2}>
-                    {config.variable.variables.length !== 0 &&
-                        config.variable.variables.map((item: any) =>
-                            item.isShow ? (
-                                <Grid item lg={4} md={6} sm={12} key={item.field}>
-                                    <FormExecute formik={formik} item={item} />
-                                </Grid>
-                            ) : null
-                        )}
-                </Grid>
-            </form>
             {config.steps.map((item: any, steps: number) => (
                 <Card sx={{ padding: 2 }} key={item.field + item.steps}>
                     <Box my={2} display="flex" justifyContent="space-between">
@@ -126,10 +118,10 @@ function Perform({ config }: { config: any }) {
                         </Grid>
                     </form>
                     <Box my={2} display="flex">
-                        {item.flowStep.response.style === 'TEXT' ? (
+                        {item.flowStep.response.style === 'INPUT' ? (
                             <TextField fullWidth />
                         ) : item.flowStep.response.style === 'TEXTAREA' ? (
-                            <TextField multiline rows={8} fullWidth />
+                            <TextField value={item.flowStep.response.answer} multiline rows={8} fullWidth />
                         ) : (
                             <Card
                                 elevation={3}

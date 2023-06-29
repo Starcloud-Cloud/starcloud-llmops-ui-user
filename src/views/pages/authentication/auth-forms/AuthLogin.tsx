@@ -167,7 +167,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-email-login">{t('user.username')}</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-login"
                             type="email"
@@ -185,7 +185,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </FormControl>
 
                     <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password-login">{t('user.password')}</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password-login"
                             type={showPassword ? 'text' : 'password'}
@@ -246,7 +246,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 color="secondary"
                                 sx={{ textDecoration: 'none' }}
                             >
-                                Forgot Password?
+                                {t('auth.login.forgotpassword')}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -259,13 +259,13 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     <Box sx={{ mt: 2 }}>
                         <AnimateButton>
                             <Button color="secondary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
-                                Sign In
+                                {t('auth.login.signin')}
                             </Button>
                         </AnimateButton>
                     </Box>
                     <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
                         <Divider sx={{ flexGrow: 1 }} />
-                        <Box px={2}>其他登录方式</Box>
+                        <Box px={2}>{t('auth.login.otherLogin')}</Box>
                         <Divider sx={{ flexGrow: 1 }} />
                     </Box>
                     <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>

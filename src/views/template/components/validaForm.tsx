@@ -33,7 +33,9 @@ function FormExecute({ formik, item }: any) {
                     required
                     multiline
                     minRows={2}
+                    maxRows={4}
                     InputLabelProps={{ shrink: true }}
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
                     helperText={
                         formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description

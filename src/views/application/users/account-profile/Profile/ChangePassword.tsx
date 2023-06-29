@@ -63,7 +63,7 @@ const ChangePassword = () => {
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
-                <SubCard title={'Change Password'}>
+                <SubCard title={t('2profile.password.changepassword')}>
                     <form noValidate autoComplete="off" onSubmit={handleSubmit}>
                         <Grid container spacing={gridSpacing} sx={{ mb: 1.75 }}>
                             <Grid item xs={12} md={6}>
@@ -71,7 +71,7 @@ const ChangePassword = () => {
                                     type="password"
                                     id="outlined-basic7"
                                     fullWidth
-                                    label="Current Password"
+                                    label={t('2profile.password.currentpassword')}
                                     value={oldPassword}
                                     onChange={(e) => setOldPassword(e.target.value)}
                                 />
@@ -83,7 +83,7 @@ const ChangePassword = () => {
                                     type="password"
                                     id="outlined-basic8"
                                     fullWidth
-                                    label="New Password"
+                                    label={t('2profile.password.newpassword')}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
@@ -93,7 +93,7 @@ const ChangePassword = () => {
                                     type="password"
                                     id="outlined-basic9"
                                     fullWidth
-                                    label="Confirm Password"
+                                    label={t('2profile.password.confirmpassword')}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
@@ -103,13 +103,13 @@ const ChangePassword = () => {
                             <Grid item>
                                 <AnimateButton>
                                     <Button variant="contained" type="submit">
-                                        Change Password
+                                        {t('2profile.password.changepassword')}
                                     </Button>
                                 </AnimateButton>
                             </Grid>
                             <Grid item>
                                 <Button sx={{ color: theme.palette.error.main }} onClick={clearFields}>
-                                    Clear
+                                    {t('sys.app.reset')}
                                 </Button>
                             </Grid>
                         </Grid>

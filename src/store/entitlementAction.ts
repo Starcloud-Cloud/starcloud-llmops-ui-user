@@ -1,10 +1,20 @@
 import { create } from 'zustand';
-
-const userInfoStore = create<any>((set: any) => ({
+type UserInfo = {
+    invitationCode: null | string;
+    userInfo: null | any;
+    setUserInfo: (data: string) => void;
+    setInvitationCode: (data: string) => void;
+};
+const userInfoStore = create<UserInfo>((set) => ({
     userInfo: null,
-    setUserInfo: (data: string) =>
+    invitationCode: null,
+    setUserInfo: (data) =>
         set(() => ({
             userInfo: data
+        })),
+    setInvitationCode: (data) =>
+        set(() => ({
+            invitationCode: data
         }))
 }));
 export default userInfoStore;

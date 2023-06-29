@@ -7,6 +7,7 @@ import Slider from 'react-slick';
 
 // assets
 import BackgroundImag from 'assets/images/landing/bg-heand.png';
+import { t } from 'hooks/web/useI18n';
 
 // styles
 const HeaderAnimationImage = styled('img')({
@@ -78,27 +79,27 @@ const RtlInfoSection = () => {
                                     fontSize: { xs: '1.563rem', md: '2.5rem', xl: '3.125rem' }
                                 }}
                             >
-                                Choose Berry for
+                                {t('homepage.startup.pro')}
                             </Typography>
                         </Box>
                         <Slider {...settings}>
                             <Typography color="text.hint" variant="h2">
-                                Easy Customizability
+                                {t('homepage.startup.pro1')}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                Highly Responsive
+                                {t('homepage.startup.pro2')}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                Design Consistency
+                                {t('homepage.startup.pro3')}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                Effective Support
+                                {t('homepage.startup.pro4')}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                Standardization
+                                {t('homepage.startup.pro5')}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                Compatibility
+                                {t('homepage.startup.pro6')}
                             </Typography>
                         </Slider>
                     </Stack>

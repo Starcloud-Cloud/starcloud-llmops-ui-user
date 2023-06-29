@@ -12,12 +12,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
               with:
-                  repository: '' # 如果需要，可在这里填写repository的名称，格式为'owner/repo'
-                  ref: '' # 如果需要，可在这里填写需要checkout的分支、tag或SHA
-                  token: '' # 如果需要，可在这里填写用于获取repository的Personal Access Token
-                  ssh-key: '' # 如果需要，可在这里填写用于获取repository的SSH key
-                  persist-credentials: true # 是否在本地git配置中保留token或SSH key，这样您的脚本就可以执行带身份验证的git命令
-                  clean: true # 是否在获取前执行`git clean -ffdx && git reset --hard HEAD`
+                  token: ${{ secrets.COMPANYTOKEN }}
 
             - name: Configure Git
               run: |

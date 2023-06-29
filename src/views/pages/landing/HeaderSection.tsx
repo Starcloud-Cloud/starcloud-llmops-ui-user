@@ -15,13 +15,23 @@ import useConfig from 'hooks/useConfig';
 // assets
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-import TechLight from 'assets/images/landing/tech-light.svg';
-import TechDark from 'assets/images/landing/tech-dark.svg';
+import img1 from 'assets/images/landing/1.png';
+import img2 from 'assets/images/landing/2.png';
+import img3 from 'assets/images/landing/3.png';
+import img4 from 'assets/images/landing/4.png';
+import img5 from 'assets/images/landing/5.png';
+import img6 from 'assets/images/landing/6.png';
+import img7 from 'assets/images/landing/7.png';
+import img8 from 'assets/images/landing/8.png';
+import img9 from 'assets/images/landing/9.png';
+// import TechLight from 'assets/images/landing/tech-light.svg';
+// import TechDark from 'assets/images/landing/tech-dark.svg';
 import dashboard from 'assets/images/landing/hero-dashboard.png';
 import widget1 from 'assets/images/landing/hero-widget-1.png';
 import widget2 from 'assets/images/landing/hero-widget-2.png';
 import BgDark from 'assets/images/landing/bg-hero-block-dark.png';
 import BgLight from 'assets/images/landing/bg-hero-block-light.png';
+import { t } from 'hooks/web/useI18n';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -88,7 +98,7 @@ const HeaderSection = () => {
                             >
                                 <Stack spacing={1}>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
-                                        Use Berry to Power Your Next
+                                        {t('homepage.title.slogan')}
                                     </Typography>
 
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" color="primary" sx={headerSX}>
@@ -109,7 +119,7 @@ const HeaderSection = () => {
                                     variant="body1"
                                     sx={{ fontSize: { xs: '1rem', md: '1.125rem' } }}
                                 >
-                                    Berry is React based Dashboard template which helps you to build faster and beautiful web applications.
+                                    {t('homepage.title.spread')}
                                 </Typography>
                             </motion.div>
                         </Grid>
@@ -150,12 +160,15 @@ const HeaderSection = () => {
                                 transition={{ type: 'spring', stiffness: 150, damping: 30, delay: 0.6 }}
                             >
                                 <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                                    <CardMedia
-                                        component="img"
-                                        image={theme.palette.mode === 'dark' ? TechDark : TechLight}
-                                        alt="Berry Tech"
-                                        sx={{ width: { xs: '75%', sm: '50%', md: '75%' } }}
-                                    />
+                                    <CardMedia component="img" image={img1} alt="img1" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img2} alt="img2" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img3} alt="img3" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img4} alt="img4" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img5} alt="img5" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img6} alt="img6" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img7} alt="img7" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img8} alt="img8" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img9} alt="img9" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                 </Stack>
                             </motion.div>
                         </Grid>

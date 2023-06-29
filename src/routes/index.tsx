@@ -4,7 +4,7 @@ import { useRoutes } from 'react-router-dom';
 // routes
 import MainRoutes from './MainRoutes';
 import LoginRoutes from './LoginRoutes';
-import AuthenticationRoutes from './AuthenticationRoutes';
+// import AuthenticationRoutes from './AuthenticationRoutes';
 import Loadable from 'ui-component/Loadable';
 import useRouteStore from 'store/router';
 
@@ -17,7 +17,7 @@ export default function ThemeRoutes() {
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
-        AuthenticationRoutes,
+        // AuthenticationRoutes,
         LoginRoutes,
         MainRoutes,
         { path: '*', element: <PageNotFound /> }

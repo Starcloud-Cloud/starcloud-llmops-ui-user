@@ -107,10 +107,10 @@ service.interceptors.response.use(
         const { data } = response;
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const config = response.config;
-        if (!data) {
-            // 返回“[HTTP]请求没有返回值”;
-            throw new Error();
-        }
+        // if (!data) {
+        //     // 返回“[HTTP]请求没有返回值”;
+        //     throw new Error();
+        // }
         // 未设置状态码则默认成功状态
         let code = data.code || result_code;
         code = code as keyof typeof errorCode;

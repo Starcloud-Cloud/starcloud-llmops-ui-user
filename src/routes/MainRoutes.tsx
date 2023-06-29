@@ -546,7 +546,7 @@ const MainRoutes = {
             element: <CreateCenter />
         },
         {
-            path: '/template/createDetail',
+            path: '/createApp',
             element: <CreateDetail />
         },
         {

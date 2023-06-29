@@ -9,12 +9,10 @@ import FormExecute from 'views/template/components/validaForm';
 import generateValidationSchema from 'hooks/usevalid';
 import { t } from 'hooks/web/useI18n';
 
-function Perform({ config, changeSon }: any) {
+function Perform({ config, changeSon, source }: any) {
     if (!config) {
         return null;
     }
-    console.log(config);
-
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
         data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
@@ -37,11 +35,14 @@ function Perform({ config, changeSon }: any) {
     };
     config.steps.forEach((item: any, index: number) => {
         arr[index] = Formik({
-            initialValues: fn([...item.variable?.variables, ...item.flowStep?.variable.variables]),
-            validationSchema: generateValidationSchema([...item.variable.variables, ...item.flowStep.variable.variables]),
+            initialValues: fn([...(item.variable ? item.variable.variables : []), ...item.flowStep?.variable.variables]),
+            validationSchema: generateValidationSchema([
+                ...(item.variable ? item.variable.variables : []),
+                ...item.flowStep.variable.variables
+            ]),
             onSubmit: (value) => {
                 const steps = JSON.parse(JSON.stringify(config.steps[index]));
-                mapVariables(steps.variable.variables, value);
+                if (steps.variable) mapVariables(steps.variable.variables, value);
                 mapVariables(steps.flowStep.variable.variables, value);
                 changeSon({ stepId: config.steps[index].field, steps, index });
             }
@@ -63,20 +64,18 @@ function Perform({ config, changeSon }: any) {
             ) : null}
             {config.steps.map((item: any, steps: number) => (
                 <Card sx={{ padding: 2 }} key={item.field + item.steps}>
-                    <Box my={2} display="flex" justifyContent="space-between">
+                    <Box my={2} display="flex" justifyContent="space-between" alignItems="top">
                         <Box>
-                            {config.steps > 1 ? (
+                            {config.steps > 1 || source === 'myApp' ? (
                                 <Box>
                                     <Typography variant="h3">{item.name}</Typography>
-                                    <Typography variant="body2">nxcvjkxclvjxljc{item.desc}</Typography>
+                                    <Typography variant="caption" display="block" mt={1}>
+                                        {item.description}
+                                    </Typography>
                                 </Box>
                             ) : null}
-                            <Box></Box>
-                            <Typography variant="overline" display="block" mt={1}>
-                                {item.description}
-                            </Typography>
                         </Box>
-                        <Box>
+                        <Box width="150px">
                             <Tooltip title={t('market.stepTips')}>
                                 <IconButton size="small">
                                     <ErrorOutlineIcon />
@@ -94,14 +93,13 @@ function Perform({ config, changeSon }: any) {
                     </Box>
                     <form>
                         <Grid container spacing={2}>
-                            {item.variable.variables.length !== 0 &&
-                                item.variable.variables.map((el: any) =>
-                                    el.isShow ? (
-                                        <Grid item key={el.field} lg={item.style === 'TEXT' ? 6 : 4} sm={12}>
-                                            <FormExecute formik={arr[steps]} item={el} />
-                                        </Grid>
-                                    ) : null
-                                )}
+                            {item.variable?.variables.map((el: any) =>
+                                el.isShow ? (
+                                    <Grid item key={el.field} lg={item.style === 'TEXT' ? 6 : 4} sm={12}>
+                                        <FormExecute formik={arr[steps]} item={el} />
+                                    </Grid>
+                                ) : null
+                            )}
                             {item.flowStep.variable.variables.length !== 0 &&
                                 item.flowStep.variable.variables.map((el: any) =>
                                     el.isShow ? (

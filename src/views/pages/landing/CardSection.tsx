@@ -11,6 +11,7 @@ import Avatar from 'ui-component/extended/Avatar';
 import GridViewIcon from '@mui/icons-material/GridView';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import WebOutlinedIcon from '@mui/icons-material/WebOutlined';
+import { t } from 'hooks/web/useI18n';
 
 // =============================|| LANDING - CARD SECTION ||============================= //
 
@@ -49,7 +50,7 @@ const CardSection = () => {
     return (
         <Container>
             <Grid container justifyContent="center" spacing={{ xs: 3, sm: 5 }} sx={{ textAlign: 'center' }}>
-                <Grid item md={4} sm={6} xs={12}>
+                <Grid item md={3} sm={6} xs={12}>
                     <FadeInWhenVisible>
                         <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -76,7 +77,7 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        150+
+                                        300+
                                     </Typography>
                                     <Typography
                                         variant="h5"
@@ -87,14 +88,14 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        Components
+                                        {t('homepage.cards.templates')}
                                     </Typography>
                                 </Stack>
                             </Stack>
                         </SubCard>
                     </FadeInWhenVisible>
                 </Grid>
-                <Grid item md={4} sm={6} xs={12}>
+                <Grid item md={3} sm={6} xs={12}>
                     <FadeInWhenVisible>
                         <SubCard sx={{ bgcolor: theme.palette.primary[200], ...cardSX }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -121,7 +122,7 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        8+
+                                        10+
                                     </Typography>
                                     <Typography
                                         variant="h5"
@@ -132,14 +133,14 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        Application
+                                        {t('homepage.cards.experts')}
                                     </Typography>
                                 </Stack>
                             </Stack>
                         </SubCard>
                     </FadeInWhenVisible>
                 </Grid>
-                <Grid item md={4} sm={6} xs={12}>
+                <Grid item md={3} sm={6} xs={12}>
                     <FadeInWhenVisible>
                         <SubCard sx={{ bgcolor: theme.palette.secondary[200], ...cardSX }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -165,7 +166,7 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        100+
+                                        99%
                                     </Typography>
                                     <Typography
                                         variant="h5"
@@ -175,7 +176,52 @@ const CardSection = () => {
                                             color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                         }}
                                     >
-                                        Pages
+                                        {t('homepage.cards.savings')}
+                                    </Typography>
+                                </Stack>
+                            </Stack>
+                        </SubCard>
+                    </FadeInWhenVisible>
+                </Grid>
+                <Grid item md={3} sm={6} xs={12}>
+                    <FadeInWhenVisible>
+                        <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Avatar
+                                    variant="rounded"
+                                    sx={{
+                                        background: theme.palette.background.paper,
+                                        opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
+                                        color: theme.palette.warning.main,
+                                        height: 60,
+                                        width: 60,
+                                        borderRadius: '12px'
+                                    }}
+                                >
+                                    <GridViewIcon sx={{ fontSize: '2.25rem', transform: 'rotate(45deg)' }} />
+                                </Avatar>
+                                <Stack alignItems="flex-end">
+                                    <Typography
+                                        variant="h1"
+                                        sx={{
+                                            fontWeight: 800,
+                                            fontSize: '2.5rem',
+                                            zIndex: '99',
+                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                        }}
+                                    >
+                                        10S
+                                    </Typography>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 500,
+                                            fontSize: '1.120rem',
+                                            textAlign: 'end',
+                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                        }}
+                                    >
+                                        {t('homepage.cards.creation')}
                                     </Typography>
                                 </Stack>
                             </Stack>

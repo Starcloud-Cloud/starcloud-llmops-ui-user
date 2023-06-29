@@ -17,6 +17,7 @@ import { useLocation } from 'react-router-dom';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
+import { t } from 'hooks/web/useI18n';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -80,14 +81,14 @@ const Register = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Sign up
+                                                    {t('auth.register.signup')}
                                                 </Typography>
                                                 <Typography
                                                     variant="caption"
                                                     fontSize="16px"
                                                     textAlign={matchDownSM ? 'center' : 'inherit'}
                                                 >
-                                                    Enter your credentials to continue
+                                                    {t('auth.login.credentials')}
                                                 </Typography>
                                             </Stack>
                                         </Grid>
@@ -101,11 +102,11 @@ const Register = () => {
                                             <Grid item container direction="column" alignItems="center" xs={12}>
                                                 <Typography
                                                     component={Link}
-                                                    to="/pages/login/login2"
+                                                    to="/login"
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >
-                                                    Already have an account?
+                                                    {t('auth.register.tologin')}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

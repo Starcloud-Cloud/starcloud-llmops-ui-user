@@ -20,7 +20,7 @@ function Deatail() {
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>({} as Details);
     const [stepID, setStepID] = useState('');
-    const [num, setNum] = useState(12);
+    const [num, setNum] = useState<number | null>(null);
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
         setStepID(stepId);
@@ -38,12 +38,14 @@ function Deatail() {
     };
     useEffect(() => {
         const fetchData = async () => {
-            if (!stepID) return;
+            if (!stepID || (!num && num !== 0)) return;
             let resp: any = await executeMarket({
                 appUid: uid,
                 stepId: stepID,
                 appReqVO: detailData
             });
+            setStepID('');
+            setNum(null);
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
             while (1) {
@@ -52,15 +54,15 @@ function Deatail() {
                     break;
                 }
                 const str = textDecoder.decode(value);
-                console.log(num);
-
                 setDetailData({
                     ...detailData,
                     workflowConfig: {
                         steps: [
                             ...detailData.workflowConfig.steps.slice(0, num),
                             {
+                                ...detailData.workflowConfig.steps[num],
                                 flowStep: {
+                                    ...detailData.workflowConfig.steps[num].flowStep,
                                     response: {
                                         ...detailData.workflowConfig.steps[num].flowStep.response,
                                         answer: str

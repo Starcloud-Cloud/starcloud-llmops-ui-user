@@ -15,25 +15,30 @@ import {
     OutlinedInput,
     Typography
 } from '@mui/material';
-
+import { Anyevent } from 'types/template';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 const validationSchema = yup.object({
-    name: yup.string().required('Name is required'),
-    topics: yup.string().required('Topics is required')
+    name: yup.string().required('Name is required')
 });
 
-function Basis() {
+function Basis({ name, desc }: Anyevent) {
+    // const [query, setQuery] = useState({} as { name: string; desc: string });
+    // useEffect(() => {
+    //     console.log(222);
+
+    //     setQuery({ name, desc });
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [nmae]);
+    // console.log(query);
+
     const formik = useFormik({
         initialValues: {
-            name: '',
-            desc: '',
-            topics: ''
+            name: name,
+            desc: desc
         },
         validationSchema,
-        onSubmit: () => {
-            console.log(111);
-        }
+        onSubmit: () => {}
     });
     const [tabValue] = useState(0);
     // const changeTab = (event: React.SyntheticEvent, newValue: number) => {
@@ -93,30 +98,6 @@ function Basis() {
                         helperText={' '}
                         variant="outlined"
                     />
-                    <TextField
-                        value={formik.values.topics}
-                        InputLabelProps={{ shrink: true }}
-                        select
-                        required
-                        name="topics"
-                        error={formik.touched.topics && Boolean(formik.errors.topics)}
-                        helperText={formik.touched.topics && formik.errors.topics ? formik.errors.topics : ' '}
-                        onChange={formik.handleChange}
-                        fullWidth
-                    >
-                        {/* {item.options.map((el: any) => ( */}
-                        <MenuItem value={1}>2</MenuItem>
-                        <MenuItem value={2}>3</MenuItem>
-                        {/* ))} */}
-                    </TextField>
-                    <button
-                        onClick={() => {
-                            formik.handleSubmit();
-                            console.log(formik);
-                        }}
-                    >
-                        1111
-                    </button>
                 </form>
             )}
             {tabValue === 1 && (

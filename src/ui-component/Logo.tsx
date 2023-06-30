@@ -43,17 +43,17 @@ const Logo = ({ ...others }) => {
                     xmlnsXlink="http://www.w3.org/1999/xlink"
                     x="0px"
                     y="0px"
-                    width="64px"
-                    height="64px"
-                    viewBox="0 0 64 64"
-                    enable-background="new 0 0 64 64"
+                    width="48px"
+                    height="48px"
+                    viewBox="0 0 48 48"
+                    enable-background="new 0 0 48 48"
                     xmlSpace="preserve"
                 >
                     {' '}
                     <image
                         id="image0"
-                        width="64"
-                        height="64"
+                        width="48"
+                        height="48"
                         x="0"
                         y="0"
                         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
@@ -215,8 +215,8 @@ const Logo = ({ ...others }) => {
                 </svg>
                 <Box
                     sx={{
-                        width: 150,
-                        height: 64,
+                        width: 100,
+                        height: 48,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center'
@@ -225,7 +225,7 @@ const Logo = ({ ...others }) => {
                     <Typography
                         variant="body1"
                         sx={{
-                            fontSize: '3em',
+                            fontSize: '2em',
                             lineHeight: '1em',
                             textAlign: 'center',
                             overflow: 'hidden',

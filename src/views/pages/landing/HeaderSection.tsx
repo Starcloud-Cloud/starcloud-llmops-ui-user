@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Button, CardMedia, Container, Grid, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, CardMedia, Container, Grid, Stack, Typography } from '@mui/material';
 
 // third party
 import { motion } from 'framer-motion';
@@ -32,6 +32,7 @@ import widget2 from 'assets/images/landing/hero-widget-2.png';
 import BgDark from 'assets/images/landing/bg-hero-block-dark.png';
 import BgLight from 'assets/images/landing/bg-hero-block-light.png';
 import { t } from 'hooks/web/useI18n';
+import Slider from 'react-slick';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -57,6 +58,20 @@ const HeaderAnimationImage = styled('img')({
 const HeaderSection = () => {
     const theme = useTheme();
     const { rtlLayout } = useConfig();
+    const settings = {
+        className: 'center',
+        dots: false,
+        arrows: false,
+        centerPadding: '0',
+        centerMode: true,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        vertical: true,
+        verticalSwiping: true,
+        focusOnSelect: true,
+        autoplay: true,
+        autoplaySpeed: 2000
+    };
 
     const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3.5rem', lg: '3.5rem' } };
 
@@ -102,7 +117,86 @@ const HeaderSection = () => {
                                     </Typography>
 
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" color="primary" sx={headerSX}>
-                                        React Project
+                                        <Container
+                                            sx={{
+                                                position: 'relative',
+                                                zIndex: 1
+                                            }}
+                                        >
+                                            <Box sx={{ mt: { xs: 0, md: 0, lg: 0, xl: 0 }, zIndex: 2 }}>
+                                                <Stack
+                                                    direction="row"
+                                                    alignItems="center"
+                                                    justifyContent="flex-start"
+                                                    spacing={4}
+                                                    sx={{
+                                                        '& .slick-current': {
+                                                            '.MuiTypography-root': { color: theme.palette.primary.main }
+                                                        },
+                                                        '& .slick-slider': {
+                                                            textAlign: 'left',
+                                                            '.MuiTypography-root': {
+                                                                fontSize: { xs: '1rem', md: '1.25rem', xl: '1.5rem' },
+                                                                cursor: 'pointer',
+                                                                height: { xs: '1.267rem', md: '1.5rem', xl: '2rem' },
+                                                                width: '10rem'
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            marginTop: { sm: '2%', lg: '1%' },
+                                                            width: { xs: '38%', md: '100%' },
+                                                            paddingLeft: { xs: 2, md: 0, xl: 0 }
+                                                        }}
+                                                    >
+                                                        <Typography
+                                                            variant="h3"
+                                                            sx={{
+                                                                color: '#fff',
+                                                                width: { xs: '150px', sm: 'max-content', xl: 'max-content' },
+                                                                fontSize: { xs: '1rem', md: '1.25rem', xl: '1.5rem' }
+                                                            }}
+                                                        >
+                                                            {t('homepage.title.pro')}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Slider {...settings}>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro1')}
+                                                            </Typography>
+                                                        </div>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro2')}
+                                                            </Typography>
+                                                        </div>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro3')}
+                                                            </Typography>
+                                                        </div>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro1')}
+                                                            </Typography>
+                                                        </div>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro2')}
+                                                            </Typography>
+                                                        </div>
+                                                        <div>
+                                                            <Typography color="text.hint" variant="h3">
+                                                                {t('homepage.title.pro3')}
+                                                            </Typography>
+                                                        </div>
+                                                    </Slider>
+                                                </Stack>
+                                            </Box>
+                                        </Container>
                                     </Typography>
                                 </Stack>
                             </motion.div>
@@ -144,11 +238,6 @@ const HeaderSection = () => {
                                                 Live Preview
                                             </Button>
                                         </AnimateButton>
-                                    </Grid>
-                                    <Grid item>
-                                        <Button component={Link} href="https://links.codedthemes.com/hsqll" target="_blank" size="large">
-                                            Purchase Now
-                                        </Button>
                                     </Grid>
                                 </Grid>
                             </motion.div>

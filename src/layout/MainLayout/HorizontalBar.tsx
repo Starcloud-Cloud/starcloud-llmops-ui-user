@@ -46,7 +46,7 @@ const CustomAppBar = () => {
                 sx={{
                     top: 71,
                     bgcolor: theme.palette.background.paper,
-                    width: '100%',
+                    width: '50%',
                     height: 62,
                     justifyContent: 'center',
                     borderTop: `1px solid ${theme.palette.divider}`,
@@ -54,7 +54,7 @@ const CustomAppBar = () => {
                 }}
             >
                 <Container maxWidth={container ? 'lg' : false}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '10rem' }}>
                         <MenuList />
                     </Box>
                 </Container>

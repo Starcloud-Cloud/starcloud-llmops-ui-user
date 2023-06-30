@@ -21,7 +21,6 @@ function List() {
                 setTotal(res.page.total);
             });
         }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (

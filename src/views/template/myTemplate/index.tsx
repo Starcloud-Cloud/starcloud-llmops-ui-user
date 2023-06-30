@@ -1,7 +1,5 @@
 import { Box, Grid, Link, Pagination, TextField, Typography, Button } from '@mui/material';
 
-import ChevronRight from '@mui/icons-material/ChevronRight';
-
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 
@@ -84,7 +82,7 @@ function MyTemplate() {
     };
     //弹窗
     const handleDetail = () => {
-        navigate('/template/createDetail');
+        navigate('/createApp');
     };
     return (
         <Box>
@@ -107,26 +105,8 @@ function MyTemplate() {
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-                    {recommendList.map((item, index) => (
-                        <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
-                            <Template data={item} handleDetail={handleDetail} />
-                        </Box>
-                    ))}
-                </ScrollMenu>
-            </Box>
-            <Box display="flex" justifyContent="space-between" alignItems="end" my={2}>
-                <Typography variant="h5">{t('apply.downLoad')}</Typography>
-                <Box fontSize={25} color="#7367f0" display="flex" alignItems="center">
-                    <Link href="#" fontSize={14}>
-                        {t('apply.more')}
-                    </Link>
-                    <ChevronRight />
-                </Box>
-            </Box>
-            <Box sx={{ position: 'relative' }}>
-                <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
-                    {recommendList.map((item, index) => (
-                        <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
+                    {recommendList.map((item: Item, index) => (
+                        <Box key={item.uid} style={{ marginLeft: index === 0 ? 0 : '16px' }}>
                             <Template data={item} handleDetail={handleDetail} />
                         </Box>
                     ))}
@@ -135,13 +115,7 @@ function MyTemplate() {
             <Typography variant="h5" my={2}>
                 {t('apply.self')}
             </Typography>
-            <Grid container spacing={2}>
-                {newAppList?.map((item: Item) => (
-                    <Grid item xs={12} md={6} lg={4} key={item.uid}>
-                        <MyselfTemplate data={item} />
-                    </Grid>
-                ))}
-            </Grid>
+            <MyselfTemplate appList={newAppList} />
             <Box my={2}>
                 <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
             </Box>

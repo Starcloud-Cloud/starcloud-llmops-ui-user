@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import StarsIcon from '@mui/icons-material/Stars';
+import VoicemailIcon from '@mui/icons-material/Voicemail';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 
 // project imports
@@ -13,12 +16,12 @@ import { activeID, activeItem, openDrawer } from 'store/slices/menu';
 
 // assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { LinkTarget, NavItemType } from 'types';
+import { LinkTarget } from 'types';
 
 // ==============================|| SIDEBAR MENU LIST ITEMS ||============================== //
 
 interface NavItemProps {
-    item: NavItemType;
+    item: any;
     level: number;
     parentId: string;
 }
@@ -27,15 +30,18 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
     const theme = useTheme();
     const matchesSM = useMediaQuery(theme.breakpoints.down('lg'));
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
-
     const dispatch = useDispatch();
     const { pathname } = useLocation();
     const { layout, borderRadius } = useConfig();
 
     const { selectedItem, drawerOpen } = useSelector((state) => state.menu);
     const isSelected = selectedItem.findIndex((id) => id === item.id) > -1;
-
-    const Icon = item?.icon!;
+    const obj: { [key: string]: React.ElementType } = {
+        StorefrontIcon,
+        StarsIcon,
+        VoicemailIcon
+    };
+    const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
     const itemIcon = item?.icon ? (
         <Icon
             stroke={1.5}

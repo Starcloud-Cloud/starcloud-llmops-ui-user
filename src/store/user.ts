@@ -60,7 +60,6 @@ const useUserStore = create<UserStore>((set) => ({
         wsCache.set(CACHE_KEY.USER, userInfo);
     },
     loginOut: async () => {
-        await loginOut();
         removeToken();
         wsCache.clear();
         set({
@@ -73,6 +72,7 @@ const useUserStore = create<UserStore>((set) => ({
                 nickname: ''
             }
         });
+        await loginOut();
     },
     resetState: () => {
         set({

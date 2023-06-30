@@ -100,39 +100,88 @@ function CreateDetail() {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    //设置name desc
+    const setData = (data: any) => {
+        setDetail({
+            ...detail,
+            [data.name]: data.value
+        });
+    };
 
-    const [edit, setEdit] = useState<any>({});
-    const editChange = (data: any) => {
-        const { index } = data;
-        const { name, value } = data.e.target;
-        setEdit(() => {
-            const update = [...edit];
-            update[index] = {
-                ...update[index],
-                [name]: value
-            };
-            return update;
+    //设置提示词编排步骤的name desc
+    const editChange = ({ index, label, value }: { index: number; label: string; value: string }) => {
+        setDetail({
+            ...detail,
+            workflowConfig: {
+                steps: [
+                    ...detail.workflowConfig.steps.slice(0, index),
+                    {
+                        ...detail.workflowConfig.steps[index],
+                        flowStep: {
+                            ...detail.workflowConfig.steps[index].flowStep,
+                            [label]: value
+                        }
+                    },
+                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
+                ]
+            }
         });
     };
-    const variableChange = (data: any) => {
-        const { value } = data.e;
-        const { index, i } = data;
-        setEdit(() => {
-            const update = [...edit];
-            update[index].stepModule.variables[i] = {
-                ...update[index].stepModule.variables[i],
-                value: value
-            };
-            return update;
+    const basisChange = ({ e, index, i }: any) => {
+        setDetail({
+            ...detail,
+            workflowConfig: {
+                steps: [
+                    ...detail.workflowConfig.steps.slice(0, index),
+                    {
+                        ...detail.workflowConfig.steps[index],
+                        flowStep: {
+                            ...detail.workflowConfig.steps[index].flowStep,
+                            variable: {
+                                variables: [
+                                    ...detail.workflowConfig.steps[index].flowStep.variable.variables.slice(0, i),
+                                    {
+                                        ...detail.workflowConfig.steps[index].flowStep.variable.variables[i],
+                                        value: e.value
+                                    },
+                                    ...detail.workflowConfig.steps[index].flowStep.variable.variables.slice(
+                                        i + 1,
+                                        detail.workflowConfig.steps[index].flowStep.variable.variables.length
+                                    )
+                                ]
+                            }
+                        }
+                    },
+                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
+                ]
+            }
         });
     };
-    const basisChange = (data: any) => {
-        const { value } = data.e as { value: string };
-        const { index, i } = data;
-        setEdit(() => {
-            const updatedEdit = [...edit];
-            updatedEdit[index].variables[i] = { ...updatedEdit[index].variables[i], value: value };
-            return updatedEdit;
+    const variableChange = ({ e, index, i }: any) => {
+        setDetail({
+            ...detail,
+            workflowConfig: {
+                steps: [
+                    ...detail.workflowConfig.steps.slice(0, index),
+                    {
+                        ...detail.workflowConfig.steps[index],
+                        variable: {
+                            variables: [
+                                ...detail.workflowConfig.steps[index].variable.variables.slice(0, i),
+                                {
+                                    ...detail.workflowConfig.steps[index].variable.variables[i],
+                                    value: e.value
+                                },
+                                ...detail.workflowConfig.steps[index].variable.variables.slice(
+                                    i + 1,
+                                    detail.workflowConfig.steps[index].variable.variables.length
+                                )
+                            ]
+                        }
+                    },
+                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
+                ]
+            }
         });
     };
     //tabs
@@ -179,7 +228,7 @@ function CreateDetail() {
             <TabPanel value={value} index={0}>
                 <Grid container spacing={5}>
                     <Grid item lg={5}>
-                        <Basis name={detail.name} desc={detail.description} />
+                        <Basis name={detail.name} desc={detail.description} setValues={setData} />
                     </Grid>
                     <Grid item lg={7}>
                         <Perform config={detail.workflowConfig} changeSon={changeData} source="myApp" />
@@ -189,10 +238,15 @@ function CreateDetail() {
             <TabPanel value={value} index={1}>
                 <Grid container spacing={5}>
                     <Grid item lg={5}>
-                        <Arrange edit={edit} editChange={editChange} variableChange={variableChange} basisChange={basisChange} />
+                        <Arrange
+                            config={detail.workflowConfig}
+                            editChange={editChange}
+                            variableChange={variableChange}
+                            basisChange={basisChange}
+                        />
                     </Grid>
                     <Grid item lg={7}>
-                        {/* <Perform config={edit} /> */}
+                        <Perform config={detail.workflowConfig} changeSon={changeData} source="myApp" />
                     </Grid>
                 </Grid>
             </TabPanel>

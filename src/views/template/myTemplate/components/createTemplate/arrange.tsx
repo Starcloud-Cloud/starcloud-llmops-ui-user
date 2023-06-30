@@ -61,7 +61,7 @@ const validationSchema = yup.object({
     label: yup.string().required('label is required')
 });
 
-function Arrange({ edit, editChange, variableChange, basisChange }: any) {
+function Arrange({ config, editChange, variableChange, basisChange }: any) {
     const formik = useFormik({
         initialValues: {
             variable: '',
@@ -72,27 +72,25 @@ function Arrange({ edit, editChange, variableChange, basisChange }: any) {
         validationSchema,
         onSubmit: (values) => {}
     });
-    console.log(edit);
     const rows = [{ name: 'Frozen yoghurt', calories: 159, fat: 12 }];
     //弹窗
     const [open, setOpen] = useState(false);
     const handleClose = () => {
         setOpen(false);
     };
-
     return (
         <Box>
             <Typography variant="h3">模板流程</Typography>
-            {edit.map((item: any, index: number) => (
+            {config?.steps.map((item: any, index: number) => (
                 <Card key={item.field} sx={{ padding: '16px 0' }}>
                     <Grid container spacing={2}>
                         <Grid item lg={4}>
                             <TextField
                                 label="标题"
-                                value={item.label}
+                                value={item.buttonLabel}
                                 name="label"
                                 InputLabelProps={{ shrink: true }}
-                                onChange={(e) => editChange({ e, index })}
+                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
                                 helperText={' '}
                                 fullWidth
                             />
@@ -100,10 +98,10 @@ function Arrange({ edit, editChange, variableChange, basisChange }: any) {
                         <Grid item lg={8}>
                             <TextField
                                 label="描述"
-                                value={item.desc}
+                                value={item.description}
                                 name="desc"
                                 InputLabelProps={{ shrink: true }}
-                                onChange={(e) => editChange({ e, index })}
+                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
                                 helperText={' '}
                                 fullWidth
                             />
@@ -111,13 +109,14 @@ function Arrange({ edit, editChange, variableChange, basisChange }: any) {
                     </Grid>
                     <Typography variant="h3">变量</Typography>
                     <Grid container spacing={2}>
-                        {item.stepModule.variables.map((el: any, i: number) => (
-                            <Grid item md={12} key={i + 'prompt'}>
-                                <Form item={el} onChange={(e: any) => variableChange({ e, index, i })} />
-                            </Grid>
-                        ))}
-                        {item.variables.map((el: any, i: number) => (
-                            <Grid item md={3} key={i + 'variables'}>
+                        {item.variable &&
+                            item.variable.variables.map((el: any, i: number) => (
+                                <Grid item md={3} key={i + 'prompt'}>
+                                    <Form item={el} onChange={(e: any) => variableChange({ e, index, i })} />
+                                </Grid>
+                            ))}
+                        {item.flowStep.variable?.variables.map((el: any, i: number) => (
+                            <Grid item md={12} key={i + 'variables'}>
                                 <Form item={el} onChange={(e: any) => basisChange({ e, index, i })} />
                             </Grid>
                         ))}

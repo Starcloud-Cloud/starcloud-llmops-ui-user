@@ -18,7 +18,7 @@ function Form({ item, onChange }: any) {
                     onChange={(e) => onChange(e.target)}
                     fullWidth
                 />
-            ) : item.style === 'TEXT' ? (
+            ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     sx={mt}
                     label={item.label}

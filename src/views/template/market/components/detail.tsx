@@ -104,7 +104,7 @@ function Deatail() {
         });
     };
     return (
-        <Card sx={{ padding: 2 }}>
+        <Card elevation={2} sx={{ padding: 2 }}>
             <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
                 <Link
                     sx={{ cursor: 'pointer' }}

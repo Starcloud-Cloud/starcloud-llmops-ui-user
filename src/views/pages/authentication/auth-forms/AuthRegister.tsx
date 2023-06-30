@@ -256,7 +256,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                     label={
                                         <Typography variant="subtitle1">
                                             {t('auth.require.agree')} &nbsp;
-                                            <Typography variant="subtitle1" component={Link} to="#">
+                                            <Typography variant="subtitle1" component={Link} to="/pages/privacy-policy">
                                                 {t('auth.require.terms')}
                                             </Typography>
                                         </Typography>

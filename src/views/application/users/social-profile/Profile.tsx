@@ -221,7 +221,7 @@ const Profile = () => {
                                 <Grid item xs={12}>
                                     <TextField
                                         id="outlined-textarea"
-                                        placeholder="What’s on your mind, Larry?"
+                                        placeholder="What's on your mind, Larry?"
                                         rows={4}
                                         fullWidth
                                         multiline

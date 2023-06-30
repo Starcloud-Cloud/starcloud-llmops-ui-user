@@ -131,10 +131,8 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
     const Icon = currentItem?.icon!;
     const itemIcon = currentItem?.icon ? <Icon stroke={1.5} size="20px" /> : null;
-
     // menu list collapse & items
     const items = currentItem.children?.map((menu) => {
         switch (menu.type) {
@@ -240,7 +238,6 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                             }
                         />
                         {openMini ? <IconChevronDown stroke={1.5} size="16px" /> : <IconChevronRight stroke={1.5} size="16px" />}
-
                         {anchorEl && (
                             <PopperStyled
                                 id={popperId}

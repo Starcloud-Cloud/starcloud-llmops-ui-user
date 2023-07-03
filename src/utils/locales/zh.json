@@ -694,7 +694,7 @@
     "auth": {
         "login": {
             "welcome": "嗨！欢迎回来～",
-            "credentials": "完成验证以继续",
+            "credentials": "AI让创作更简单",
             "account": "立即注册！",
             "signin": "登  录",
             "forgotpassword": "忘记密码？",

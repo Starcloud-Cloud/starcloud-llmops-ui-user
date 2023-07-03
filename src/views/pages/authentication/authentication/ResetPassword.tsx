@@ -51,7 +51,7 @@ const ResetPassword = () => {
                         justifyContent={matchDownSM ? 'center' : 'space-between'}
                     >
                         <Grid item sx={{ display: { xs: 'none', md: 'block' }, m: 3 }}>
-                            <Link to="#" aria-label="theme logo" style={{ textDecoration: 'none' }}>
+                            <Link to="/" aria-label="theme logo" style={{ textDecoration: 'none' }}>
                                 <Logo />
                             </Link>
                         </Grid>

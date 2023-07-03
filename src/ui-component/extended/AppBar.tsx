@@ -24,6 +24,7 @@ import {
 import Logo from 'ui-component/Logo';
 
 // assets
+import StarIcon from '@mui/icons-material/Star';
 import { IconDashboard, IconHome2 } from '@tabler/icons';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -69,11 +70,16 @@ const AppBar = ({ ...others }) => {
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
                         <Logo />
                         <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
-                            <Button color="inherit" component={Link} href="#">
-                                Home
-                            </Button>
-                            <Button color="inherit" component={RouterLink} to="/login" target="_blank">
-                                Dashboard
+                            <Button
+                                component={RouterLink}
+                                to="/login"
+                                target="_blank"
+                                disableElevation
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<StarIcon />}
+                            >
+                                创作平台
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>

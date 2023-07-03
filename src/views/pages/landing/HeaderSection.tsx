@@ -13,7 +13,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import useConfig from 'hooks/useConfig';
 
 // assets
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StarIcon from '@mui/icons-material/Star';
 
 import img1 from 'assets/images/landing/1.png';
 import img2 from 'assets/images/landing/2.png';
@@ -200,9 +200,9 @@ const HeaderSection = () => {
                                                 size="large"
                                                 variant="contained"
                                                 color="secondary"
-                                                startIcon={<PlayArrowIcon />}
+                                                startIcon={<StarIcon />}
                                             >
-                                                Live Preview
+                                                创作平台
                                             </Button>
                                         </AnimateButton>
                                     </Grid>

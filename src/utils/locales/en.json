@@ -622,7 +622,12 @@
   "user": {
     "username": "Username",
     "password": "Password",
-    "emailaddress": "Email Address"
+    "emailaddress": "Email Address",
+    "free": "Free",
+    "plus": "Plus",
+    "pro": "Pro",
+    "令牌": "Token",
+    "图片": "Images"
   },
   "homepage": {
     "title": {

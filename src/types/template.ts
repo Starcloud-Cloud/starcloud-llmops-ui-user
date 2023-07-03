@@ -16,6 +16,7 @@ export interface Details {
     description: string;
     categories: string[];
     scenes: string[];
+    tags: string[];
     example: string;
     viewCount: string;
     likeCount: string;

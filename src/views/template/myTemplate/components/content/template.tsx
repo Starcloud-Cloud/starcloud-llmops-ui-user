@@ -3,10 +3,12 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import marketStore from 'store/market';
 import Link from '@mui/material/Link';
 import './textnoWarp.css';
 
 function Template({ data, handleDetail }: any) {
+    const { categoryList } = marketStore();
     const theme = useTheme();
     return (
         <Card
@@ -60,7 +62,7 @@ function Template({ data, handleDetail }: any) {
                 {data.categories &&
                     data.categories.map((item: string) => (
                         <Link href="#" key={item} mr={1} className="active cursor underline" fontSize={14}>
-                            #{item}
+                            #{categoryList?.find((el: { code: string }) => el.code === item).name}
                         </Link>
                     ))}
             </Box>

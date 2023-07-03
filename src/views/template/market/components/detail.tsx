@@ -1,5 +1,5 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
+// import LoadingButton from '@mui/lab/LoadingButton';
 
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
@@ -7,79 +7,104 @@ import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 // import StarIcon from '@mui/icons-material/Star';
 // import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { marketDeatail, installTemplate } from 'api/template';
+import {
+    marketDeatail
+    // installTemplate
+} from 'api/template';
 import { executeMarket } from 'api/template/fetch';
 import CarryOut from 'views/template/carryOut';
 import { Execute, Details } from 'types/template';
-
+import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 function Deatail() {
+    const { categoryList } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>({} as Details);
-    const [stepID, setStepID] = useState('');
-    const [num, setNum] = useState<number | null>(null);
+    const [loadings, setLoadings] = useState<any[]>([]);
+    const [isAllExecute, setIsAllExecute] = useState<boolean>(false);
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
-        setStepID(stepId);
-        setNum(index);
-        setDetailData({
-            ...detailData,
-            workflowConfig: {
-                steps: [
-                    ...detailData.workflowConfig.steps.slice(0, index),
-                    data.steps,
-                    ...detailData.workflowConfig.steps.slice(index + 1, detailData.workflowConfig.steps.length)
-                ]
+        const newValue = [...loadings];
+        newValue[index] = true;
+        if (!isAllExecute) {
+            setLoadings(newValue);
+        } else {
+            const value: any[] = [];
+            for (let i = index; i < detailData.workflowConfig.steps.length; i++) {
+                value[i] = true;
             }
+            setLoadings(value);
+        }
+        setDetailData((oldValue) => {
+            const newData = {
+                ...oldValue,
+                workflowConfig: {
+                    steps: [
+                        ...oldValue.workflowConfig.steps.slice(0, index),
+                        data.steps,
+                        ...oldValue.workflowConfig.steps.slice(index + 1, oldValue.workflowConfig.steps.length)
+                    ]
+                }
+            };
+            const fetchData = async () => {
+                let resp: any = await executeMarket({
+                    appUid: uid,
+                    stepId: stepId,
+                    appReqVO: newData
+                });
+                const reader = resp.getReader();
+                const textDecoder = new TextDecoder();
+                while (1) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        if (isAllExecute && index < newData.workflowConfig.steps.length - 1) {
+                            changeData({
+                                index: index + 1,
+                                stepId: newData.workflowConfig.steps[index + 1].field,
+                                steps: newData.workflowConfig.steps[index + 1]
+                            });
+                        }
+                        break;
+                    }
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    let str = textDecoder.decode(value);
+                    // if (str.includes('&error&')) {
+                    //     str = '';
+                    // } else if (str.includes('&start&')) {
+                    //     str = str.split('&start&')[1];
+                    // } else if (str.includes('&end&')) {
+                    //     str = str.split('&start&')[1].split('&end&')[0];
+                    // }
+                    setDetailData({
+                        ...newData,
+                        workflowConfig: {
+                            steps: [
+                                ...newData.workflowConfig.steps.slice(0, index),
+                                {
+                                    ...newData.workflowConfig.steps[index],
+                                    flowStep: {
+                                        ...newData.workflowConfig.steps[index].flowStep,
+                                        response: {
+                                            ...newData.workflowConfig.steps[index].flowStep.response,
+                                            answer: str
+                                        }
+                                    }
+                                },
+                                ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
+                            ]
+                        }
+                    });
+                }
+            };
+            fetchData();
+            return newData;
         });
     };
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!stepID || (!num && num !== 0)) return;
-            let resp: any = await executeMarket({
-                appUid: uid,
-                stepId: stepID,
-                appReqVO: detailData
-            });
-            setStepID('');
-            setNum(null);
-            const reader = resp.getReader();
-            const textDecoder = new TextDecoder();
-            while (1) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    break;
-                }
-                const str = textDecoder.decode(value);
-                setDetailData({
-                    ...detailData,
-                    workflowConfig: {
-                        steps: [
-                            ...detailData.workflowConfig.steps.slice(0, num),
-                            {
-                                ...detailData.workflowConfig.steps[num],
-                                flowStep: {
-                                    ...detailData.workflowConfig.steps[num].flowStep,
-                                    response: {
-                                        ...detailData.workflowConfig.steps[num].flowStep.response,
-                                        answer: str
-                                    }
-                                }
-                            },
-                            ...detailData.workflowConfig.steps.slice(num + 1, detailData.workflowConfig.steps.length)
-                        ]
-                    }
-                });
-            }
-        };
-        fetchData();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [num, stepID, detailData.workflowConfig?.steps]);
-    const [loading, setLoading] = useState(false);
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
             setDetailData(res);
@@ -91,18 +116,20 @@ function Deatail() {
         display: 'inline-block',
         margin: '0 8px 0 4px'
     };
-    const install = () => {
-        setLoading(true);
-        installTemplate({ uid }).then((res) => {
-            if (res.data) {
-                setLoading(false);
-                setDetailData({
-                    ...detailData,
-                    installStatus: { installStatus: 'INSTALLED' }
-                });
-            }
-        });
-    };
+    //下载模板
+    // const [loading, setLoading] = useState(false);
+    // const install = () => {
+    //     setLoading(true);
+    //     installTemplate({ uid }).then((res) => {
+    //         if (res.data) {
+    //             setLoading(false);
+    //             setDetailData({
+    //                 ...detailData,
+    //                 installStatus: { installStatus: 'INSTALLED' }
+    //             });
+    //         }
+    //     });
+    // };
     return (
         <Card elevation={2} sx={{ padding: 2 }}>
             <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
@@ -124,9 +151,12 @@ function Deatail() {
                             <Typography variant="h2">{detailData.name}</Typography>
                         </Box>
                         <Box my={0.5}>
-                            {detailData.categories && detailData.categories.map((item: any) => <span key={item}>#{item}</span>)}
-                            {detailData.scenes &&
-                                detailData.scenes.map((el: any) => (
+                            {detailData.categories &&
+                                detailData.categories.map((item: any) => (
+                                    <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
+                                ))}
+                            {detailData.tags &&
+                                detailData.tags.map((el: any) => (
                                     <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                                 ))}
                         </Box>
@@ -140,7 +170,7 @@ function Deatail() {
                         </Box>
                     </Box>
                 </Box>
-                <LoadingButton
+                {/* <LoadingButton
                     color="info"
                     disabled={detailData.installStatus?.installStatus === 'INSTALLED'}
                     onClick={install}
@@ -149,10 +179,17 @@ function Deatail() {
                     variant="outlined"
                 >
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
-                </LoadingButton>
+                </LoadingButton> */}
             </Box>
             <Divider sx={{ my: 1 }} />
-            <CarryOut config={detailData} changeData={changeData} />
+            <CarryOut
+                config={detailData}
+                changeData={changeData}
+                loadings={loadings}
+                allExecute={(value: boolean) => {
+                    setIsAllExecute(value);
+                }}
+            />
         </Card>
     );
 }

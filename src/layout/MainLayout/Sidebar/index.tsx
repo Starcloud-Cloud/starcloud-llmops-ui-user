@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Drawer, Stack, useMediaQuery } from '@mui/material';
+import { Box, Drawer, useMediaQuery } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -12,7 +12,6 @@ import Cards from 'ui-component/Card';
 import MenuList from '../MenuList';
 import LogoSection from '../LogoSection';
 import MiniDrawerStyled from './MiniDrawerStyled';
-import Chip from 'ui-component/extended/Chip';
 
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
@@ -46,11 +45,6 @@ const Sidebar = () => {
         <>
             <MenuList />
             {layout === LAYOUT_CONST.VERTICAL_LAYOUT && drawerOpen && <Cards />}
-            {layout === LAYOUT_CONST.VERTICAL_LAYOUT && drawerOpen && (
-                <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
-                    <Chip label={process.env.REACT_APP_VERSION} disabled chipcolor="secondary" size="small" sx={{ cursor: 'pointer' }} />
-                </Stack>
-            )}
         </>
     );
 

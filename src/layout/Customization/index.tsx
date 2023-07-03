@@ -9,11 +9,7 @@ import { IconSettings } from '@tabler/icons';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // project imports
-import BorderRadius from './BorderRadius';
 import Layout from './Layout';
-import PresetColor from './PresetColor';
-import FontFamily from './FontFamily';
-import InputFilled from './InputFilled';
 import BoxContainer from './BoxContainer';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { gridSpacing } from 'store/constant';
@@ -76,22 +72,6 @@ const Customization = () => {
                             <Grid item xs={12}>
                                 {/* layout type */}
                                 <Layout />
-                            </Grid>
-                            <Grid item xs={12}>
-                                {/* Theme Preset Color */}
-                                <PresetColor />
-                            </Grid>
-                            <Grid item xs={12}>
-                                {/* font family */}
-                                <FontFamily />
-                            </Grid>
-                            <Grid item xs={12}>
-                                {/* border radius */}
-                                <BorderRadius />
-                            </Grid>
-                            <Grid item xs={12}>
-                                {/* filled with outline textfield */}
-                                <InputFilled />
                             </Grid>
                             <Grid item xs={12}>
                                 {/* box container */}

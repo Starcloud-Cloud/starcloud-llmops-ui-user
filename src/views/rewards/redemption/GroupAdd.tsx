@@ -44,7 +44,7 @@ const GroupAdd: React.FC<CustomModalProps> = ({ open, handleClose }) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: { xs: 280, lg: 450 }
+                        width: { lg: 450 }
                     }}
                     title="加入官方体验群"
                 >

@@ -49,7 +49,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: { xs: 450, lg: 700 }
+                        width: { xs: 500, lg: 700 }
                     }}
                     title="发布产品好评"
                 >
@@ -70,7 +70,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                         }}
                     >
                         <Typography id="modal-description" sx={{ mb: 2 }}>
-                            在社交媒体发布产品相关测评和好评推文，可获取基础免费权益（5000字，30张图，10个视频）
+                            在朋友圈/小红书/微博/知乎/抖音或其他社媒平台上发布产品相关文章和图片信息并符合要求，保留1天以上或10人点赞，即可免费获取权益。每条可兑换一次权益。
                         </Typography>
 
                         {socialRules.map((item, index) => (
@@ -84,7 +84,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
 
                         <img src="https://via.placeholder.com/150" alt="QR Code" />
 
-                        <Typography sx={{ mt: 2 }}>详情加入Copydone体验群咨询</Typography>
+                        <Typography sx={{ mt: 2 }}>详情加入魔法AI体验群咨询</Typography>
                     </CardContent>
                 </MainCard>
             </div>

@@ -28,7 +28,7 @@ const items: AuthSliderProps[] = [
         description: 'Powerful and easy to use multipurpose theme'
     },
     {
-        title: 'Power of React with Material UI',
+        title: 'React with Material UI',
         description: 'Powerful and easy to use multipurpose theme'
     }
 ];

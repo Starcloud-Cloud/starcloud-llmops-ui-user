@@ -21,6 +21,7 @@ const BottomCards: React.FC = () => {
     const handleCloseGroupAdd = () => setOpenGroupAdd(false);
     const handleOpenShare = () => setOpenShare(true); // 新增的打开函数
     const handleCloseShare = () => setOpenShare(false); // 新增的关闭函数
+
     const handleInvite = async () => {
         try {
             const response = await axios.get({
@@ -29,7 +30,7 @@ const BottomCards: React.FC = () => {
             });
             if (response?.inviteCode) {
                 const currentURL = window.location.protocol + '//' + window.location.host;
-                const inviteURL = `${currentURL}/register?inviteCode=${response.inviteCode}`; // 创建邀请链接
+                const inviteURL = `${currentURL}/register?q=${response.inviteCode}`; // 创建邀请链接
 
                 navigator.clipboard
                     .writeText(inviteURL)
@@ -71,38 +72,38 @@ const BottomCards: React.FC = () => {
         {
             title: '方法一',
             subtitle: '加入社群',
-            description: '加入copydnoe官方体验群即可获取相应免费权益包',
+            description: '加入魔法AI官方社群即可获得相应权益包',
             buttonText: '点击加入',
             Icon: GroupAddIcon,
-            endText: '字: 5000 / 图: 10 / 视频: 5',
+            endText: '送5000字/2张图片',
             onClick: handleOpenGroupAdd
         },
         {
             title: '方法二',
             subtitle: '邀请注册',
-            description: '邀请多少，送多少，无上限发送链接邀请注册后，即可获取相应免费权益包',
+            description: '注册一位送一次，无上限,发送链接邀请注册，每注册一位获取一个权益包',
             buttonText: '复制链接',
             Icon: PersonAddIcon,
-            endText: '字: 10000 / 图: 20 / 视频: 8',
+            endText: '送5000字/2张图片',
             onClick: handleInvite
         },
         {
             title: '方法三',
             subtitle: '社媒分享',
-            description: '多分享，多次送，无上限社交媒体发布测评，截图认证即可获取免费权益',
+            description: '分享一次送一次，无上限,社交媒体发布测评，截图认证可获取权益包',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '字: 5000 / 图: 30 / 视频: 10',
+            endText: '送5000字/2张图片',
             onClick: handleOpenShare
         },
         {
             title: '方法四',
             subtitle: '参与用户调研',
-            description: '模型不够满意？你的需求我们帮你实现',
+            description: '需要什么模板?哪些模板不满意？您的建议是我们改进的动力。',
             buttonText: '点击参加',
             Icon: PollIcon,
-            endText: '字: 5000 / 图: 10 / 视频: 5',
-            onClick: () => alert('点击参加')
+            endText: '送5000字/2张图片',
+            onClick: () => window.open('http://ov9t0w4iwaq9xq9l.mikecrm.com/OX02r3z', '_blank')
         }
     ];
     return (

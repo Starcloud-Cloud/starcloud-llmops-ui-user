@@ -32,25 +32,25 @@
 // }
 
 interface ProcessEnv {
-  readonly REACT_APP_TITLE: string;
-  readonly REACT_APP_PORT: number;
-  readonly REACT_APP_OPEN: string;
-  readonly REACT_APP_DEV: string;
-  readonly REACT_APP_CAPTCHA_ENABLE: string;
-  readonly REACT_APP_TENANT_ENABLE: string;
-  readonly REACT_APP_BASE_URL: string;
-  readonly REACT_APP_UPLOAD_URL: string;
-  readonly REACT_APP_API_BASEPATH: string;
-  readonly REACT_APP_API_URL: string;
-  readonly REACT_APP_BASE_PATH: string;
-  readonly REACT_APP_DROP_DEBUGGER: string;
-  readonly REACT_APP_DROP_CONSOLE: string;
-  readonly REACT_APP_SOURCEMAP: string;
-  readonly REACT_APP_OUT_DIR: string;
+    readonly REACT_APP_TITLE: string;
+    readonly REACT_APP_PORT: number;
+    readonly REACT_APP_OPEN: string;
+    readonly REACT_APP_DEV: string;
+    readonly REACT_APP_CAPTCHA_ENABLE: string;
+    readonly REACT_APP_TENANT_ENABLE: string;
+    readonly REACT_APP_BASE_URL: string;
+    readonly REACT_APP_UPLOAD_URL: string;
+    readonly REACT_APP_API_BASEPATH: string;
+    readonly REACT_APP_API_URL: string;
+    readonly REACT_APP_BASE_PATH: string;
+    readonly REACT_APP_DROP_DEBUGGER: string;
+    readonly REACT_APP_DROP_CONSOLE: string;
+    readonly REACT_APP_SOURCEMAP: string;
+    readonly REACT_APP_OUT_DIR: string;
 }
 
 declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends ProcessEnv {}
-  }
+    namespace NodeJS {
+        interface ProcessEnv extends ProcessEnv {}
+    }
 }

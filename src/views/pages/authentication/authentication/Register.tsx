@@ -18,20 +18,21 @@ import { useLocation } from 'react-router-dom';
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
 import { t } from 'hooks/web/useI18n';
+import { useEffect, useState } from 'react';
 
 // carousel items
 const items: AuthSliderProps[] = [
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '海量优质模板',
+        description: '300+模板免费使用'
     },
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: 'AI文案一键生成',
+        description: '10秒生成专业文案'
     },
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '自定义模板',
+        description: '可以创建自己的模板'
     }
 ];
 
@@ -41,7 +42,28 @@ const Register = () => {
     const theme = useTheme();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
-    const inviteCode = query.get('inviteCode') || '';
+    const urlInviteCode = query.get('q');
+
+    const [inviteCode, setInviteCode] = useState('');
+
+    // 获取存储在localStorage的inviteCode及其过期时间
+    useEffect(() => {
+        const storedInviteCode = localStorage.getItem('inviteCode');
+        const inviteCodeExpiry = localStorage.getItem('inviteCodeExpiry');
+
+        // 如果url中没有inviteCode，且localStorage中的inviteCode未过期，那么使用localStorage中的inviteCode
+        if (!urlInviteCode && storedInviteCode && inviteCodeExpiry && new Date().getTime() < Number(inviteCodeExpiry)) {
+            setInviteCode(storedInviteCode);
+        }
+        // 如果url中有inviteCode，那么使用url中的inviteCode，并更新localStorage
+        else if (urlInviteCode) {
+            const currentTime = new Date().getTime();
+            const expiryTime = currentTime + 24 * 60 * 60 * 1000; // 24 hours from now
+            localStorage.setItem('inviteCode', urlInviteCode);
+            localStorage.setItem('inviteCodeExpiry', expiryTime.toString());
+            setInviteCode(urlInviteCode);
+        }
+    }, [urlInviteCode]);
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 

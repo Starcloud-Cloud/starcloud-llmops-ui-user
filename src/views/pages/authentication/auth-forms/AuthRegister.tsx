@@ -72,7 +72,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
     };
 
     useEffect(() => {
-        changePassword('123456');
+        changePassword('');
     }, []);
 
     return (

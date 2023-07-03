@@ -21,16 +21,16 @@ import { t } from 'hooks/web/useI18n';
 // carousel items
 const items: AuthSliderProps[] = [
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '海量优质模板',
+        description: '300+模板免费使用'
     },
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: 'AI文案一键生成',
+        description: '10秒生成专业文案'
     },
     {
-        title: 'Power of React with Material UI',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '自定义模板',
+        description: '可以创建自己的模板'
     }
 ];
 

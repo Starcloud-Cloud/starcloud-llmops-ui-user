@@ -10,6 +10,7 @@ import Share from './Share';
 import axios from 'utils/axios';
 import { closeSnackbar, openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import Record from './Record';
 
 const BottomCards: React.FC = () => {
     const [openGroupAdd, setOpenGroupAdd] = useState(false);
@@ -117,6 +118,7 @@ const BottomCards: React.FC = () => {
             </Grid>
             <GroupAdd open={openGroupAdd} handleClose={handleCloseGroupAdd} />
             <Share open={openShare} handleClose={handleCloseShare} />
+            <Record open={openShare} handleClose={handleCloseShare} />
         </div>
     );
 };

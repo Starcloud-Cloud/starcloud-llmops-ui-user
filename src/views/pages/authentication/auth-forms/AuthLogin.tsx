@@ -89,8 +89,8 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         }
     };
     const getInviteCodeFromLocalStorage = () => {
-        const inviteCode2 = localStorage.getItem('inviteCode');
-        return inviteCode2 || '';
+        const localInviteCode = localStorage.getItem('inviteCode');
+        return localInviteCode || '';
     };
     useEffect(() => {
         // 获取URL中的邀请码

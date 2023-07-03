@@ -26,5 +26,5 @@ export interface Details {
     workflowConfig: { steps: any[] };
 }
 export interface Anyevent {
-    [key: string]: string;
+    [key: string]: string | any;
 }

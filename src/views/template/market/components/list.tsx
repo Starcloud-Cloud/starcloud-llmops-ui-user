@@ -24,9 +24,9 @@ function List() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
-        <Grid container spacing={2} sx={{ width: '100%' }}>
+        <Grid container spacing={2} justifyContent="flex-end">
             {newtemplateList.map((item: any, index: number) => (
-                <Grid lg={3} md={4} sm={6} xs={12} key={item.uid + index} item>
+                <Grid lg={2} md={3} sm={6} xs={6} key={item.uid + index} item>
                     <Template handleDetail={handleDetail} data={item} />
                 </Grid>
             ))}

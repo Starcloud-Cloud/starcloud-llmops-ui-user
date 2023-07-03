@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Box,
     Card,
@@ -22,24 +22,23 @@ const validationSchema = yup.object({
     name: yup.string().required('Name is required')
 });
 
-function Basis({ name, desc }: Anyevent) {
-    // const [query, setQuery] = useState({} as { name: string; desc: string });
-    // useEffect(() => {
-    //     console.log(222);
-
-    //     setQuery({ name, desc });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [nmae]);
-    // console.log(query);
-
+function Basis({ name, desc, setValues }: Anyevent) {
+    useEffect(() => {
+        formik.setFieldValue('name', name || '');
+        formik.setFieldValue('desc', desc || '');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [name]);
     const formik = useFormik({
         initialValues: {
-            name: name,
-            desc: desc
+            name: '',
+            desc: ''
         },
         validationSchema,
         onSubmit: () => {}
     });
+    const handleValue = (e: any) => {
+        setValues({ name: e.target.name, value: e.target.value });
+    };
     const [tabValue] = useState(0);
     // const changeTab = (event: React.SyntheticEvent, newValue: number) => {
     //     setTabValue(newValue);
@@ -72,18 +71,18 @@ function Basis({ name, desc }: Anyevent) {
                 <Tab label="Model" />
                 <Tab label="Scene" />
             </Tabs> */}
-            {tabValue === 0 && (
-                <form onSubmit={formik.handleSubmit}>
+            {tabValue === 0 && formik && (
+                <form>
                     <TextField
                         fullWidth
                         required
                         InputLabelProps={{ shrink: true }}
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        error={formik.touched.name && Boolean(formik.errors.name)}
-                        helperText={formik.touched.name && formik.errors.name ? formik.errors.name : ' '}
+                        value={formik?.values.name}
+                        onChange={handleValue}
+                        error={formik?.touched.name && Boolean(formik?.errors.name)}
+                        helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ' '}
                         label="Template Name"
-                        id="name"
+                        name="name"
                         placeholder="Please enter template name"
                         variant="outlined"
                     />
@@ -91,13 +90,20 @@ function Basis({ name, desc }: Anyevent) {
                         fullWidth
                         InputLabelProps={{ shrink: true }}
                         label="Template Description"
-                        id="desc"
+                        name="desc"
                         value={formik.values.desc}
-                        onChange={formik.handleChange}
+                        onChange={handleValue}
                         placeholder="Please enter template description"
                         helperText={' '}
                         variant="outlined"
                     />
+                    <button
+                        onClick={() => {
+                            formik.handleSubmit();
+                        }}
+                    >
+                        111
+                    </button>
                 </form>
             )}
             {tabValue === 1 && (

@@ -49,7 +49,11 @@ function TemplateMarket() {
 
             let categoryMatch = true;
             if (queryParams.category) {
-                categoryMatch = item.categories?.includes(queryParams.category);
+                if (queryParams.category === 'ALL') {
+                    categoryMatch = true;
+                } else {
+                    categoryMatch = item.categories?.includes(queryParams.category);
+                }
             }
             return nameMatch && categoryMatch;
         });
@@ -78,7 +82,7 @@ function TemplateMarket() {
         });
     };
     return (
-        <Box maxWidth="1200px" margin="0 auto">
+        <Box maxWidth="1300px" margin="0 auto">
             <Typography variant="h1" mt={3} textAlign="center">
                 {t('market.title')}
             </Typography>

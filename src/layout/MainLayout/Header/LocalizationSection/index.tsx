@@ -83,14 +83,14 @@ const LocalizationSection = () => {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.mediumAvatar,
                         border: '1px solid',
-                        borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.primary.light,
-                        background: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.primary.light,
-                        color: theme.palette.primary.dark,
+                        borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.secondary.light,
+                        background: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.secondary.light,
+                        color: theme.palette.secondary.dark,
                         transition: 'all .2s ease-in-out',
                         '&[aria-controls="menu-list-grow"],&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            background: theme.palette.primary.main,
-                            color: theme.palette.primary.light
+                            borderColor: theme.palette.secondary.main,
+                            background: theme.palette.secondary.main,
+                            color: theme.palette.secondary.light
                         }
                     }}
                     ref={anchorRef}
@@ -155,30 +155,6 @@ const LocalizationSection = () => {
                                                 }
                                             />
                                         </ListItemButton>
-                                        {/* <ListItemButton selected={language === 'fr'} onClick={(event) => handleListItemClick(event, 'fr')}>
-                                            <ListItemText
-                                                primary={
-                                                    <Grid container>
-                                                        <Typography color="textPrimary">français</Typography>
-                                                        <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
-                                                            (French)
-                                                        </Typography>
-                                                    </Grid>
-                                                }
-                                            />
-                                        </ListItemButton> */}
-                                        {/* <ListItemButton selected={language === 'ro'} onClick={(event) => handleListItemClick(event, 'ro')}>
-                                            <ListItemText
-                                                primary={
-                                                    <Grid container>
-                                                        <Typography color="textPrimary">Română</Typography>
-                                                        <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
-                                                            (Romanian)
-                                                        </Typography>
-                                                    </Grid>
-                                                }
-                                            />
-                                        </ListItemButton> */}
                                         <ListItemButton selected={language === 'zh'} onClick={(event) => handleListItemClick(event, 'zh')}>
                                             <ListItemText
                                                 primary={

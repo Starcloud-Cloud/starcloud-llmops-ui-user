@@ -5,6 +5,7 @@ import { Button, Card, CardContent, CardMedia, Grid, TextField, Typography } fro
 
 // assets
 import Card3 from 'assets/images/cards/card-3.jpg';
+import wechat1 from 'assets/images/landing/wechat.png';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import React, { useState } from 'react';
@@ -133,8 +134,8 @@ const RedemptionHeader = () => {
                                         gap: '5px'
                                     }}
                                 >
-                                    <CardMedia component="img" image={Card3} title="QR Code" sx={{ width: '100px', height: '100px' }} />
-                                    <Typography variant="body1" textAlign="center">
+                                    <CardMedia component="img" image={wechat1} title="QR Code" sx={{ width: '100px', height: '100px' }} />
+                                    <Typography variant="body1" textAlign="center" color="white">
                                         {t('redemption.scancode')}
                                     </Typography>
                                 </div>

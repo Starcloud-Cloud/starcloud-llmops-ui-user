@@ -4,7 +4,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import { CardContent } from '@mui/material';
+import wechat1 from 'assets/images/landing/wechat.png';
+import { CardContent, CardMedia } from '@mui/material';
 
 interface CustomModalProps {
     open: boolean;
@@ -56,12 +57,12 @@ const GroupAdd: React.FC<CustomModalProps> = ({ open, handleClose }) => {
                             justifyContent: 'center'
                         }}
                     >
-                        <img src="https://via.placeholder.com/150" alt="QR code" />
+                        <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }} />
                         <Typography id="modal-description" variant="body1" sx={{ mt: 2 }}>
                             扫码加入用户群，可获取基础免费权益包
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 2 }}>
-                            （5000字，10张图，5个视频）
+                            送5000字/2张图片
                         </Typography>
                     </CardContent>
                 </MainCard>

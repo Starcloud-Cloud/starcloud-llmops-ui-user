@@ -21,16 +21,16 @@ import { t } from 'hooks/web/useI18n';
 // carousel items
 const items: AuthSliderProps[] = [
     {
-        title: 'Components Based Design System',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '海量优质模板',
+        description: '300+模板免费使用'
     },
     {
-        title: 'Ready to use components',
-        description: 'Ready made component to apply directly'
+        title: 'AI文案一键生成',
+        description: '10秒生成专业文案'
     },
     {
-        title: 'Multiple dashboard and widgets',
-        description: '100+ widgets and customize controls'
+        title: '自定义模板',
+        description: '可以创建自己的模板'
     }
 ];
 

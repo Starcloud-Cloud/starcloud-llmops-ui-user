@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -60,8 +60,11 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             rememberMe: false
         }
     });
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [qrUrl, setQrurl] = React.useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [qrUrl, setQrurl] = useState(null);
+    const [inviteCode, setInviteCode] = useState('');
+
+    const location = useLocation();
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -85,11 +88,30 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             setTicket(res?.ticket);
         }
     };
+    const getInviteCodeFromLocalStorage = () => {
+        const localInviteCode = localStorage.getItem('inviteCode');
+        return localInviteCode || '';
+    };
+    useEffect(() => {
+        // 获取URL中的邀请码
+        const query = new URLSearchParams(location.search);
+        let inviteCodeFromUrl = query.get('q') || '';
+
+        if (!inviteCodeFromUrl) {
+            // 如果URL中没有邀请码，尝试从localStorage获取
+            inviteCodeFromUrl = getInviteCodeFromLocalStorage();
+        }
+
+        // 设置邀请码
+        setInviteCode(inviteCodeFromUrl);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     useEffect(() => {
         let intervalId: ReturnType<typeof setInterval>;
 
         const polling = async () => {
-            const res = await LoginApi.qRcodeLogin({ ticket });
+            const res = await LoginApi.qRcodeLogin({ ticket, inviteCode });
             if (!res?.data) {
                 return;
             }
@@ -102,7 +124,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
         if (ticket) {
             // 设置定时器
-            intervalId = setInterval(polling, 2000); // 例如，每5秒轮询一次
+            intervalId = setInterval(polling, 2000); // 例如，每2秒轮询一次
         }
 
         return () => {

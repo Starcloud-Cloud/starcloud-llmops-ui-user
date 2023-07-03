@@ -24,7 +24,9 @@ const AuthSlider = ({ items }: { items: AuthSliderProps[] }) => {
                         <Typography variant="h1">{item.title}</Typography>
                     </Grid>
                     <Grid item>
-                        <Typography variant="subtitle2">{item.description}</Typography>
+                        <Typography variant="subtitle2" sx={{ fontSize: '1.25rem' }}>
+                            {item.description}
+                        </Typography>
                     </Grid>
                 </Grid>
             ))}

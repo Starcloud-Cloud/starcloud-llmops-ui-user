@@ -9,7 +9,7 @@ interface ShareProps {
     handleClose: () => void;
 }
 
-const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
+const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     const socialRules = [
         {
             platform: '朋友圈',
@@ -96,4 +96,4 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
     );
 };
 
-export default Share;
+export default Record;

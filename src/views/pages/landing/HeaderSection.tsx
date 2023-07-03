@@ -13,7 +13,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import useConfig from 'hooks/useConfig';
 
 // assets
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StarIcon from '@mui/icons-material/Star';
 
 import img1 from 'assets/images/landing/1.png';
 import img2 from 'assets/images/landing/2.png';
@@ -73,7 +73,7 @@ const HeaderSection = () => {
         autoplaySpeed: 2000
     };
 
-    const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3.5rem', lg: '3.5rem' } };
+    const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3rem', lg: '3rem' } };
 
     const HeaderAnimationImagememo = useMemo(
         () => (
@@ -104,99 +104,66 @@ const HeaderSection = () => {
                 sx={{ mt: { xs: 10, sm: 6, md: 18.75 }, mb: { xs: 2.5, md: 10 } }}
             >
                 <Grid item xs={12} md={5}>
-                    <Grid container spacing={6}>
+                    <Grid container spacing={5}>
                         <Grid item xs={12}>
                             <motion.div
                                 initial={{ opacity: 0, translateY: 550 }}
                                 animate={{ opacity: 1, translateY: 0 }}
                                 transition={{ type: 'spring', stiffness: 150, damping: 30 }}
                             >
-                                <Stack spacing={1}>
+                                <Stack spacing={2}>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
                                         {t('homepage.title.slogan')}
                                     </Typography>
 
-                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" color="primary" sx={headerSX}>
-                                        <Container
-                                            sx={{
-                                                position: 'relative',
-                                                zIndex: 1
-                                            }}
-                                        >
-                                            <Box sx={{ mt: { xs: 0, md: 0, lg: 0, xl: 0 }, zIndex: 2 }}>
-                                                <Stack
-                                                    direction="row"
-                                                    alignItems="center"
-                                                    justifyContent="flex-start"
-                                                    spacing={4}
-                                                    sx={{
-                                                        '& .slick-current': {
-                                                            '.MuiTypography-root': { color: theme.palette.primary.main }
-                                                        },
-                                                        '& .slick-slider': {
-                                                            textAlign: 'left',
-                                                            '.MuiTypography-root': {
-                                                                fontSize: { xs: '1rem', md: '1.25rem', xl: '1.5rem' },
-                                                                cursor: 'pointer',
-                                                                height: { xs: '1.267rem', md: '1.5rem', xl: '2rem' },
-                                                                width: '10rem'
-                                                            }
-                                                        }
-                                                    }}
-                                                >
-                                                    <Box
-                                                        sx={{
-                                                            marginTop: { sm: '2%', lg: '1%' },
-                                                            width: { xs: '38%', md: '100%' },
-                                                            paddingLeft: { xs: 2, md: 0, xl: 0 }
-                                                        }}
-                                                    >
-                                                        <Typography
-                                                            variant="h3"
-                                                            sx={{
-                                                                color: '#fff',
-                                                                width: { xs: '150px', sm: 'max-content', xl: 'max-content' },
-                                                                fontSize: { xs: '1rem', md: '1.25rem', xl: '1.5rem' }
-                                                            }}
-                                                        >
-                                                            {t('homepage.title.pro')}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Slider {...settings}>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro1')}
-                                                            </Typography>
-                                                        </div>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro2')}
-                                                            </Typography>
-                                                        </div>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro3')}
-                                                            </Typography>
-                                                        </div>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro1')}
-                                                            </Typography>
-                                                        </div>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro2')}
-                                                            </Typography>
-                                                        </div>
-                                                        <div>
-                                                            <Typography color="text.hint" variant="h3">
-                                                                {t('homepage.title.pro3')}
-                                                            </Typography>
-                                                        </div>
-                                                    </Slider>
-                                                </Stack>
-                                            </Box>
-                                        </Container>
+                                    <Typography
+                                        textAlign={{ xs: 'center', md: 'left' }}
+                                        variant="h2"
+                                        color="primary"
+                                        sx={{
+                                            '& .slick-current': {
+                                                '.MuiTypography-root': { color: theme.palette.primary.main }
+                                            },
+                                            '& .slick-slider': {
+                                                '.MuiTypography-root': {
+                                                    fontSize: { xs: '1.5rem', sm: '1.5rem', md: '1.5rem', lg: '1.5rem' },
+                                                    cursor: 'pointer'
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Slider {...settings}>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro1')}
+                                                </Typography>
+                                            </div>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro2')}
+                                                </Typography>
+                                            </div>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro3')}
+                                                </Typography>
+                                            </div>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro1')}
+                                                </Typography>
+                                            </div>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro2')}
+                                                </Typography>
+                                            </div>
+                                            <div>
+                                                <Typography color="text.hint" variant="h2">
+                                                    {t('homepage.title.pro3')}
+                                                </Typography>
+                                            </div>
+                                        </Slider>
                                     </Typography>
                                 </Stack>
                             </motion.div>
@@ -233,9 +200,9 @@ const HeaderSection = () => {
                                                 size="large"
                                                 variant="contained"
                                                 color="secondary"
-                                                startIcon={<PlayArrowIcon />}
+                                                startIcon={<StarIcon />}
                                             >
-                                                Live Preview
+                                                创作平台
                                             </Button>
                                         </AnimateButton>
                                     </Grid>

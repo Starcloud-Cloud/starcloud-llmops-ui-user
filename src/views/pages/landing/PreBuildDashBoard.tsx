@@ -164,12 +164,12 @@ const PreBuildDashBoard = () => {
                     <Grid container spacing={1.5}>
                         <Grid item xs={12}>
                             <Typography variant="h2" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
-                                Explore Concenputal Apps
+                                AI个性模板
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="h4" sx={{ fontWeight: 400 }} align="center">
-                                Berry has conceptul working apps like Chat, Inbox, E-commerce, Invoice, Kanban, and Calendar
+                                丰富多样的AI模板，10秒生成专业内容，使得写作更加简单和高效。
                             </Typography>
                         </Grid>
                     </Grid>

@@ -583,7 +583,7 @@
     "login": {
       "otherLogin": "Login with Social Media",
       "welcome": "Hi, Welcome Back",
-      "credentials": " Enter your credentials to continue",
+      "credentials": " AI make creaction much easier",
       "account": "Don't have an account?",
       "signin": "Sign In",
       "forgotpassword": "Forgot Password ?",
@@ -622,21 +622,15 @@
   "user": {
     "username": "Username",
     "password": "Password",
-    "emailaddress": "Email Address",
-    "free": "Free",
-    "plus": "Plus",
-    "pro": "Pro",
-    "令牌": "Token",
-    "图片": "Images"
+    "emailaddress": "Email Address"
   },
   "homepage": {
     "title": {
       "slogan": "AI跨境营销内容创作",
       "spread": "用AI技术革新营销内容创作,提升创作效率和质量",
-      "pro": "10秒生成专家级",
-      "pro1": "亚马逊listing",
-      "pro2": "关键词分析",
-      "pro3": "竞品分析"
+      "pro1": "10秒生成专家级亚马逊listing",
+      "pro2": "10秒生成专家级关键词分析",
+      "pro3": "10秒生成专家级竞品分析"
     },
     "cards": {
       "templates": "Templates",

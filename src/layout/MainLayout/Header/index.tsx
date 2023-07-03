@@ -35,7 +35,7 @@ const Header = () => {
             {/* logo & toggler button */}
             <Box
                 sx={{
-                    width: 228,
+                    width: 208,
                     display: 'flex',
                     [theme.breakpoints.down('md')]: {
                         width: 'auto'

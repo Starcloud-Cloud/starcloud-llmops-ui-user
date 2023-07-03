@@ -26,16 +26,16 @@ const MiddleCards = () => {
     const cardInfo = [
         {
             Icon: AccountBoxIcon,
-            title: '注册 copydone账号',
-            description: '字: 5000 / 图: 10 / 视频: 5',
+            title: '注册魔法AI账号',
+            description: '送5000字/10张图片',
             buttonText: '已注册',
             isDisabled: true,
             onClick: undefined
         },
         {
             Icon: EventNoteIcon,
-            title: '每日签到即送',
-            description: '字: 3000 / 图: 2 / 视频: 1',
+            title: '每日签到',
+            description: '送2000字/2张图片',
             buttonText: signInStatus ? '已签到' : '立即签到',
             isDisabled: signInStatus ? true : false,
             onClick: !signInStatus ? handleSignIn : undefined

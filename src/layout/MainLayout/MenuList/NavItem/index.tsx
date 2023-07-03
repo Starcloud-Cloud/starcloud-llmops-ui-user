@@ -6,6 +6,9 @@ import { useTheme } from '@mui/material/styles';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import StarsIcon from '@mui/icons-material/Stars';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import UpgradeIcon from '@mui/icons-material/Upgrade';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 
 // project imports
@@ -39,7 +42,10 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
     const obj: { [key: string]: React.ElementType } = {
         StorefrontIcon,
         StarsIcon,
-        VoicemailIcon
+        VoicemailIcon,
+        SelfImprovementIcon,
+        CurrencyExchangeIcon,
+        UpgradeIcon
     };
     const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
     const itemIcon = item?.icon ? (

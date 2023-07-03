@@ -1,11 +1,11 @@
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Container, Grid, Link, Stack, Typography } from '@mui/material'; // Divider
+import { Box, CardMedia, Container, Grid, Link, Stack, Typography } from '@mui/material'; // Divider
 
 // assets
-// import Dribble from 'assets/images/landing/footer-dribble.png';
-// import Freepik from 'assets/images/landing/footer-freepik.png';
-// import Awards from 'assets/images/landing/footer-awards.png';
+import wechat1 from 'assets/images/landing/wechat.png';
+import wechat2 from 'assets/images/landing/wechattube.jpg';
+import wechat3 from 'assets/images/landing/wechatpublic.bmp';
 
 import { t } from 'hooks/web/useI18n';
 
@@ -82,15 +82,38 @@ const FooterSection = () => {
                                         </Stack>
                                     </Grid>
                                     <Grid item xs={4} sm={4}>
-                                        <Stack spacing={{ xs: 3, md: 5 }}>
-                                            <img src="https://via.placeholder.com/50" alt="Placeholder" />
-                                            <img src="https://via.placeholder.com/50" alt="Placeholder" />
+                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
+                                            <CardMedia
+                                                component="img"
+                                                image={wechat1}
+                                                alt="img1"
+                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                            />
+                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
+                                                企业微信群
+                                            </Typography>
+                                            <CardMedia
+                                                component="img"
+                                                image={wechat2}
+                                                alt="img2"
+                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                            />
+                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
+                                                视频号
+                                            </Typography>
                                         </Stack>
                                     </Grid>
                                     <Grid item xs={4} sm={4}>
-                                        <Stack spacing={{ xs: 3, md: 5 }}>
-                                            <img src="https://via.placeholder.com/50" alt="Placeholder" />
-                                            <img src="https://via.placeholder.com/50" alt="Placeholder" />
+                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
+                                            <CardMedia
+                                                component="img"
+                                                image={wechat3}
+                                                alt="img3"
+                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                            />
+                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
+                                                公众号
+                                            </Typography>
                                         </Stack>
                                     </Grid>
                                 </Grid>

@@ -1,7 +1,8 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { Modal, IconButton, Typography, CardContent } from '@mui/material';
+import { Modal, IconButton, Typography, CardContent, CardMedia } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
+import wechat1 from 'assets/images/landing/wechat.png';
 
 interface ShareProps {
     open: boolean;
@@ -44,11 +45,13 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
             >
                 <MainCard
                     sx={{
-                        p: 4,
+                        p: 2,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        maxHeight: '90vh', // 将高度稍微减小一些
+                        overflowY: 'auto',
                         width: { xs: 500, lg: 700 }
                     }}
                     title="发布产品好评"
@@ -63,18 +66,19 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
 
                     <CardContent
                         sx={{
+                            pt: 0, // 调整此值来减小标题和内容之间的间距
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}
                     >
-                        <Typography id="modal-description" sx={{ mb: 2 }}>
+                        <Typography id="modal-description" sx={{ mb: 1 }}>
                             在朋友圈/小红书/微博/知乎/抖音或其他社媒平台上发布产品相关文章和图片信息并符合要求，保留1天以上或10人点赞，即可免费获取权益。每条可兑换一次权益。
                         </Typography>
 
                         {socialRules.map((item, index) => (
-                            <div key={index} style={{ marginBottom: '20px' }}>
+                            <div key={index} style={{ marginBottom: '5px' }}>
                                 <Typography variant="h6" component="h3">
                                     {item.platform}
                                 </Typography>
@@ -82,9 +86,9 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                             </div>
                         ))}
 
-                        <img src="https://via.placeholder.com/150" alt="QR Code" />
+                        <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: { xs: '30%', sm: '30%', md: '30%' } }} />
 
-                        <Typography sx={{ mt: 2 }}>详情加入魔法AI体验群咨询</Typography>
+                        <Typography sx={{ mt: 1 }}>详情加入魔法AI体验群咨询</Typography>
                     </CardContent>
                 </MainCard>
             </div>

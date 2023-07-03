@@ -31,8 +31,8 @@ const items: AuthSliderProps[] = [
         description: '10秒生成专业文案'
     },
     {
-        title: '自定义模板',
-        description: '可以创建自己的模板'
+        title: '自定义AI模板',
+        description: '可以创建自己的AI模板,分享给好友使用'
     }
 ];
 

@@ -170,7 +170,7 @@ const SearchSection = () => {
                 </PopupState>
             </Box>
             <Box onClick={() => setOpen(true)}>
-                <OutlineInputStyle
+                {/* <OutlineInputStyle
                     id="input-search-header"
                     value={value}
                     disabled
@@ -183,7 +183,7 @@ const SearchSection = () => {
                     }
                     aria-describedby="search-helper-text"
                     inputProps={{ 'aria-label': 'weight' }}
-                />
+                /> */}
             </Box>
             <Dialog fullWidth={true} maxWidth="lg" open={open} onClose={() => setOpen(false)}>
                 <DialogTitle sx={{ m: 0 }}>

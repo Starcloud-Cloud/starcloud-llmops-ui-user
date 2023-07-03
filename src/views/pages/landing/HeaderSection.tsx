@@ -202,7 +202,7 @@ const HeaderSection = () => {
                                                 color="secondary"
                                                 startIcon={<StarIcon />}
                                             >
-                                                开始创作
+                                                创作平台
                                             </Button>
                                         </AnimateButton>
                                     </Grid>

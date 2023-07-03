@@ -30,7 +30,8 @@ const useRouteStore = create<RouteStore>((set) => ({
             res = await getAsyncRoutes();
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);
         }
-        const routerMap = generateRoute(res[1]?.children);
+        const targetRoute = res.find((route) => route.name === 'mofaai');
+        const routerMap = generateRoute(targetRoute?.children);
         // const routerMap = [];
         // ...use transformRoutes with your AppRouteRecordRaw routes array
         // const newRoutes = transformRoutes(routerMap);

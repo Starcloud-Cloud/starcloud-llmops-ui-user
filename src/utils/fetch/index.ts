@@ -9,7 +9,8 @@ export default function fetchRequest(url: string, method: string, body: any, hea
             headers: {
                 ...headers,
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + getAccessToken()
+                Authorization: 'Bearer ' + getAccessToken(),
+                'X-Accel-Buffering': 'no'
             },
             body: body ? JSON.stringify(body) : null
         };

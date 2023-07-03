@@ -4,6 +4,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import { categories } from 'api/template';
+import marketStore from 'store/market';
 
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
@@ -17,10 +18,14 @@ interface MenuList {
 function ScrollMenus({ change }: { change: any }) {
     const [menuList, setMenuList] = useState<MenuList[]>([]);
     const [active, setActive] = useState<number | string>('');
+    const { setCategoryList } = marketStore();
     useEffect(() => {
         categories().then((res) => {
             setMenuList(res);
+            console.log(res);
+            setCategoryList(res);
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const navigate = useNavigate();
     const changeCategory = (item: any, index: number) => {
@@ -34,30 +39,26 @@ function ScrollMenus({ change }: { change: any }) {
         }
     };
     const LeftArrow = () => {
-        const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
+        const { scrollPrev } = useContext(VisibilityContext);
         return (
             <Box sx={{ width: '40px' }}>
-                {!isFirstItemVisible ? (
+                {
                     <IconButton onClick={() => scrollPrev()}>
                         <KeyboardArrowLeftIcon />
                     </IconButton>
-                ) : (
-                    ''
-                )}
+                }
             </Box>
         );
     };
     const RightArrow = () => {
-        const { isLastItemVisible, scrollNext } = useContext(VisibilityContext);
+        const { scrollNext } = useContext(VisibilityContext);
         return (
             <Box sx={{ width: '40px' }}>
-                {!isLastItemVisible ? (
+                {
                     <IconButton onClick={() => scrollNext()}>
                         <KeyboardArrowRightIcon />
                     </IconButton>
-                ) : (
-                    ''
-                )}
+                }
             </Box>
         );
     };
@@ -67,7 +68,8 @@ function ScrollMenus({ change }: { change: any }) {
         borderRadius: 15,
         cursor: 'pointer',
         fontSize: '12px',
-        border: '1px solid transparent'
+        border: '1px solid transparent',
+        marginBottom: 1
     };
     const focuos = {
         textAlign: 'center',
@@ -75,7 +77,9 @@ function ScrollMenus({ change }: { change: any }) {
         borderRadius: 15,
         cursor: 'pointer',
         border: '1px solid #673ab7',
-        fontSize: '12px'
+        color: '#673ab7',
+        fontSize: '12px',
+        marginBottom: 1
     };
     return (
         <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>

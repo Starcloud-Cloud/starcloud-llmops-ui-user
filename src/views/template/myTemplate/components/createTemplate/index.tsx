@@ -34,66 +34,88 @@ function CreateDetail() {
     const searchParams = new URLSearchParams(location.search);
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
-        setStepID(stepId);
-        setNum(index);
-        setDetail({
-            ...detail,
-            workflowConfig: {
-                steps: [
-                    ...detail.workflowConfig.steps.slice(0, index),
-                    data.steps,
-                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
-                ]
+        const newValue = [...loadings];
+        newValue[index] = true;
+        if (!isAllExecute) {
+            setLoadings(newValue);
+        } else {
+            const value: any[] = [];
+            for (let i = index; i < detail.workflowConfig.steps.length; i++) {
+                console.log(i);
+                value[i] = true;
             }
+        }
+        setDetail((oldValue) => {
+            const newData = {
+                ...oldValue,
+                workflowConfig: {
+                    steps: [
+                        ...oldValue.workflowConfig.steps.slice(0, index),
+                        data.steps,
+                        ...oldValue.workflowConfig.steps.slice(index + 1, oldValue.workflowConfig.steps.length)
+                    ]
+                }
+            };
+            const fetchData = async () => {
+                let resp: any = await executeApp({
+                    appUid: searchParams.get('uid'),
+                    stepId: stepId,
+                    appReqVO: newData
+                });
+                const reader = resp.getReader();
+                const textDecoder = new TextDecoder();
+                while (1) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        if (isAllExecute && index < newData.workflowConfig.steps.length - 1) {
+                            changeData({
+                                index: index + 1,
+                                stepId: newData.workflowConfig.steps[index + 1].field,
+                                steps: newData.workflowConfig.steps[index + 1]
+                            });
+                        }
+                        break;
+                    }
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    let str = textDecoder.decode(value);
+                    // if (str.includes('&error&')) {
+                    //     str = '';
+                    // } else if (str.includes('&start&')) {
+                    //     str = str.split('&start&')[1];
+                    // } else if (str.includes('&end&')) {
+                    //     str = str.split('&start&')[1].split('&end&')[0];
+                    // }
+                    setDetail({
+                        ...newData,
+                        workflowConfig: {
+                            steps: [
+                                ...newData.workflowConfig.steps.slice(0, index),
+                                {
+                                    ...newData.workflowConfig.steps[index],
+                                    flowStep: {
+                                        ...newData.workflowConfig.steps[index].flowStep,
+                                        response: {
+                                            ...newData.workflowConfig.steps[index].flowStep.response,
+                                            answer: str
+                                        }
+                                    }
+                                },
+                                ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
+                            ]
+                        }
+                    });
+                }
+            };
+            fetchData();
+
+            return newData;
         });
     };
     const [detail, setDetail] = useState({} as Details);
-    const [stepID, setStepID] = useState('');
-    const [num, setNum] = useState<number | null>(null);
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!stepID || (!num && num !== 0)) return;
-            let resp: any = await executeApp({
-                appUid: searchParams.get('uid'),
-                stepId: stepID,
-                appReqVO: detail
-            });
-            setStepID('');
-            setNum(null);
-            const reader = resp.getReader();
-            const textDecoder = new TextDecoder();
-            while (1) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    break;
-                }
-                const str = textDecoder.decode(value);
-                console.log(str);
-
-                setDetail({
-                    ...detail,
-                    workflowConfig: {
-                        steps: [
-                            ...detail.workflowConfig.steps.slice(0, num),
-                            {
-                                ...detail.workflowConfig.steps[num],
-                                flowStep: {
-                                    ...detail.workflowConfig.steps[num].flowStep,
-                                    response: {
-                                        ...detail.workflowConfig.steps[num].flowStep.response,
-                                        answer: str
-                                    }
-                                }
-                            },
-                            ...detail.workflowConfig.steps.slice(num + 1, detail.workflowConfig.steps.length)
-                        ]
-                    }
-                });
-            }
-        };
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [num, stepID, detail.workflowConfig?.steps]);
+    const [loadings, setLoadings] = useState<any[]>([]);
+    const [isAllExecute, setIsAllExecute] = useState<boolean>(false);
     useEffect(() => {
         getApp({ uid: searchParams.get('uid') as string }).then((res) => {
             setDetail(res);
@@ -231,7 +253,15 @@ function CreateDetail() {
                         <Basis name={detail.name} desc={detail.description} setValues={setData} />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform config={detail.workflowConfig} changeSon={changeData} source="myApp" />
+                        <Perform
+                            config={detail.workflowConfig}
+                            changeSon={changeData}
+                            loadings={loadings}
+                            isallExecute={(flag: boolean) => {
+                                setIsAllExecute(flag);
+                            }}
+                            source="myApp"
+                        />
                     </Grid>
                 </Grid>
             </TabPanel>

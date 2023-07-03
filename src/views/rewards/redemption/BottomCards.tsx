@@ -11,10 +11,12 @@ import axios from 'utils/axios';
 import { closeSnackbar, openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import Record from './Record';
+import { Button } from '@mui/material';
 
 const BottomCards: React.FC = () => {
     const [openGroupAdd, setOpenGroupAdd] = useState(false);
     const [openShare, setOpenShare] = useState(false); // 新增的状态
+    const [openRecord, setOpenRecord] = useState(false); // 新增的状态
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Define handle functions
@@ -22,6 +24,8 @@ const BottomCards: React.FC = () => {
     const handleCloseGroupAdd = () => setOpenGroupAdd(false);
     const handleOpenShare = () => setOpenShare(true); // 新增的打开函数
     const handleCloseShare = () => setOpenShare(false); // 新增的关闭函数
+    const handleOpenRecord = () => setOpenRecord(true); // 新增的打开函数
+    const handleCloseRecord = () => setOpenRecord(false); // 新增的关闭函数
 
     const handleInvite = async () => {
         try {
@@ -116,9 +120,15 @@ const BottomCards: React.FC = () => {
                     </Grid>
                 ))}
             </Grid>
+
+            <Grid container justifyContent="center">
+                <Button variant="outlined" onClick={handleOpenRecord}>
+                    权益记录页面
+                </Button>
+            </Grid>
             <GroupAdd open={openGroupAdd} handleClose={handleCloseGroupAdd} />
             <Share open={openShare} handleClose={handleCloseShare} />
-            <Record open={openShare} handleClose={handleCloseShare} />
+            <Record open={openRecord} handleClose={handleCloseRecord} />
         </div>
     );
 };

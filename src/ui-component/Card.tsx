@@ -31,6 +31,7 @@ const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) =>
         width: 210,
         height: 210,
         background: theme.palette.mode === 'dark' ? themesDarkAfter(level, theme) : themesLight(level, theme, 3),
+        opacity: theme.palette.mode !== 'dark' ? 0.4 : 1,
         borderRadius: '50%',
         top: -125,
         right: -155,

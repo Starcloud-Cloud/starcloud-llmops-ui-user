@@ -201,32 +201,42 @@ const ProfileSection = () => {
                                                 </Stack>
                                             </Stack>
                                         </Box>
-                                        <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
+                                        <PerfectScrollbar style={{ height: '100%', overflowX: 'hidden', width: '260px' }}>
                                             <Box sx={{ p: 2, pt: 0 }}>
                                                 <UpgradePlanCard />
-                                                <Divider />
-                                                <Card sx={{ padding: 2 }}>
+                                                <Divider sx={{ mt: 1 }} />
+                                                <Card>
                                                     <Grid container justifyContent="space-between" alignItems="center">
-                                                        <Grid item md={10}>
+                                                        <Grid item md={9}>
                                                             <Box display="flex" alignItems="center">
                                                                 <Typography variant="body1">{t('market.invitation')}</Typography>
-                                                                <Tooltip title={t('market.tips')}>
+                                                                <Tooltip
+                                                                    arrow
+                                                                    placement="top"
+                                                                    title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{t('market.tips')}</Box>}
+                                                                >
                                                                     <ErrorOutlineIcon
                                                                         fontSize="small"
-                                                                        sx={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                                        sx={{ marginLeft: '5px', cursor: 'pointer' }}
                                                                     />
                                                                 </Tooltip>
                                                             </Box>
                                                         </Grid>
-                                                        <Grid item md={2}>
+                                                        <Grid item md={3}>
                                                             {loading ? (
                                                                 <IconButton size="small" disabled>
                                                                     <DoneIcon fontSize="small" />
                                                                 </IconButton>
                                                             ) : (
-                                                                <IconButton size="small" onClick={copyCode}>
-                                                                    <ContentCopyIcon fontSize="small" />
-                                                                </IconButton>
+                                                                <Tooltip
+                                                                    arrow
+                                                                    placement="top"
+                                                                    title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{t('market.copy')}</Box>}
+                                                                >
+                                                                    <IconButton size="small" onClick={copyCode}>
+                                                                        <ContentCopyIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
                                                             )}
                                                         </Grid>
                                                     </Grid>
@@ -234,9 +244,9 @@ const ProfileSection = () => {
                                                         {window.location.protocol + '//' + window.location.host}/register?q=
                                                         {invitationCode}
                                                     </Typography>
-                                                    <Box marginTop={1}>
+                                                    <Box marginTop={1} textAlign="center">
                                                         <QRCode
-                                                            size={150}
+                                                            size={100}
                                                             value={
                                                                 window.location.protocol +
                                                                 '//' +
@@ -245,6 +255,9 @@ const ProfileSection = () => {
                                                                 invitationCode
                                                             }
                                                         />
+                                                        <Typography variant="h4" mb={1}>
+                                                            专属邀请码
+                                                        </Typography>
                                                     </Box>
                                                 </Card>
                                                 <Divider />
@@ -252,8 +265,6 @@ const ProfileSection = () => {
                                                     component="nav"
                                                     sx={{
                                                         width: '100%',
-                                                        maxWidth: 350,
-                                                        minWidth: 300,
                                                         backgroundColor: theme.palette.background.paper,
                                                         borderRadius: '10px',
                                                         [theme.breakpoints.down('md')]: {

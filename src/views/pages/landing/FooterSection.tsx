@@ -73,10 +73,10 @@ const FooterSection = () => {
                                                 {t('homepage.foot.help')}
                                             </Typography>
                                             <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                                                <FooterLink href="https://links.codedthemes.com/HTIBc" target="_blank" underline="none">
+                                                <FooterLink href="/" target="_blank" underline="none">
                                                     {t('homepage.foot.documentation')}
                                                 </FooterLink>
-                                                <FooterLink href="https://codedthemes.gitbook.io/berry/" target="_blank" underline="none">
+                                                <FooterLink href="/" target="_blank" underline="none">
                                                     {t('homepage.foot.support')}
                                                 </FooterLink>
                                             </Stack>

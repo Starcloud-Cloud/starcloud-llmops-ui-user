@@ -524,7 +524,8 @@
     "plugVersion": "Plug-in Version",
     "invitation": "Exclusive invitation link",
     "tips": "Recommend friends to register, increase the amount of rights and interests",
-    "copy": "Click Copy Invitation code"
+    "copy": "Click Copy Invitation code",
+    "error": "The currently used tokens are insufficient"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",
@@ -681,6 +682,9 @@
     "messageTotal": "Message Total",
     "usertotal": "User Total",
     "TimeConsuming": "Time Consuming",
-    "tokenTotal": "tokens Total"
+    "tokenTotal": "tokens Total",
+    "name": "Name",
+    "date": "Time",
+    "search": "Search"
   }
 }

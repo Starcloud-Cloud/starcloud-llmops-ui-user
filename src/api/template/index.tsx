@@ -33,9 +33,13 @@ export const appPage = (params: { pageNo: number; pageSize: number }) => {
     return request.get({ url: '/llm/app/page', params });
 };
 
-//执行记录图标
-export const logStatistics = () => {
-    return request.post({ url: '/llm/app/log/statistics' });
+//执行记录echart
+export const logStatistics = (data: { name: string; timeType: string }) => {
+    return request.post({ url: '/llm/app/log/statistics', data });
+};
+//获取时间
+export const logTimeType = () => {
+    return request.get({ url: '/llm/app/log/timeType' });
 };
 //执行记录列表
 export const infoPage = (data: any) => {

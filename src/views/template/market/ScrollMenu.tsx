@@ -18,11 +18,10 @@ interface MenuList {
 function ScrollMenus({ change }: { change: any }) {
     const [menuList, setMenuList] = useState<MenuList[]>([]);
     const [active, setActive] = useState<number | string>('');
-    const { setCategoryList } = marketStore();
+    const setCategoryList = marketStore((state) => state.setCategoryList);
     useEffect(() => {
         categories().then((res) => {
             setMenuList(res);
-            console.log(res);
             setCategoryList(res);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps

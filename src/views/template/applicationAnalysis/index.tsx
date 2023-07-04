@@ -13,13 +13,16 @@ import {
     TableRow,
     TableContainer,
     Paper,
-    Pagination
+    Pagination,
+    TextField,
+    Button
 } from '@mui/material';
 import formatDate from 'hooks/useDate';
 import SubCard from 'ui-component/cards/SubCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
-import { logStatistics, infoPage } from 'api/template';
+import { logStatistics, infoPage, logTimeType } from 'api/template';
+import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
 interface LogStatistics {
     messageCount: string;
@@ -35,17 +38,18 @@ interface Charts {
 interface TableData {
     [key: string]: string;
 }
-interface Page {
-    pageNo: number;
-    pageSize: number;
+interface Date {
+    label: string;
+    value: string;
+}
+interface Query {
+    name: string;
+    timeType: string;
 }
 function ApplicationAnalysis() {
-    const [queryParams, setQuery] = useState({
-        date: '',
-        play: '',
-        scene: '',
-        type: '',
-        username: ''
+    const [queryParams, setQuery] = useState<Query>({
+        timeType: '',
+        name: ''
     });
     const [generate, setGenerate] = useState<Charts[]>([]);
     const [total, setTotal] = useState(0);
@@ -55,15 +59,15 @@ function ApplicationAnalysis() {
     });
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
-    const infoList = (params: Page) => {
-        infoPage(params).then((res) => {
+    const infoList = (params: any) => {
+        infoPage({ ...params, ...queryParams }).then((res) => {
             setTotalData(res.list);
             setTotal(res.total);
         });
     };
-    useEffect(() => {
-        //获取echarts
-        logStatistics().then((res) => {
+    //获取标数据
+    const getStatistic = () => {
+        logStatistics(queryParams).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
@@ -75,13 +79,23 @@ function ApplicationAnalysis() {
                 { title: t('generateLog.tokenTotal'), data: tokens }
             ]);
         });
+    };
+    const [dateList, setDateList] = useState([] as Date[]);
+    useEffect(() => {
+        //获取echarts
+        getStatistic();
         infoList(page);
+        logTimeType().then((res) => {
+            setDateList(res);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    //输入框输入
     const handleChange = (e: any) => {
         const { name, value } = e.target;
         setQuery({ ...queryParams, [name]: value });
     };
+    //切换分页
     const paginationChange = (event: any, value: number) => {
         setPage((oldValue) => {
             const newValue = {
@@ -92,6 +106,7 @@ function ApplicationAnalysis() {
             return newValue;
         });
     };
+    //封装的echarts
     const list = (item: Charts): Props => {
         return {
             height: 300,
@@ -148,72 +163,55 @@ function ApplicationAnalysis() {
             series: [{ name: '', data: item.data }]
         };
     };
+    //搜索
+    const querys = () => {
+        setPage((oldValue) => {
+            const newValue = {
+                ...oldValue,
+                pageNo: 1
+            };
+            getStatistic();
+            infoList(newValue);
+            return newValue;
+        });
+    };
     return (
         <Box>
-            <Grid sx={{ mb: 2 }} container spacing={2}>
+            <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
+                <Grid item md={3} lg={2} xs={12}>
+                    <TextField
+                        label={t('generateLog.name')}
+                        value={queryParams.name}
+                        name="name"
+                        InputLabelProps={{ shrink: true }}
+                        onChange={(e) => {
+                            setQuery({ ...queryParams, [e.target.name]: e.target.value });
+                        }}
+                        fullWidth
+                    />
+                </Grid>
                 <Grid item md={3} lg={2} xs={12}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">分析</InputLabel>
+                        <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
-                            name="date"
-                            label="分析"
-                            value={queryParams.date}
+                            name="timeType"
+                            label={t('generateLog.date')}
+                            value={queryParams.timeType}
                             onChange={handleChange}
                         >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
+                            {dateList?.map((item) => (
+                                <MenuItem key={item.value} value={item.value}>
+                                    {item.label}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item md={3} lg={2} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">应用</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            name="play"
-                            label="应用"
-                            value={queryParams.play}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item md={3} lg={2} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">场景</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            name="scene"
-                            label="场景"
-                            value={queryParams.scene}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item md={3} lg={2} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">用户类型</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            name="type"
-                            label="用户类型"
-                            value={queryParams.type}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <Button onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
+                        {t('generateLog.search')}
+                    </Button>
                 </Grid>
             </Grid>
             <Grid container spacing={2}>

@@ -666,7 +666,8 @@
     "plugVersion": "插件版本",
     "invitation": "专属邀请链接",
     "tips": "推荐好友注册，提升权益额度",
-    "copy": "点击复制邀请码"
+    "copy": "点击复制邀请码",
+    "error": "当前使用的token不足"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -794,6 +795,9 @@
     "messageTotal": "消息数总数",
     "usertotal": "用户总数",
     "TimeConsuming": "总耗时",
-    "tokenTotal": "Tokens总数"
+    "tokenTotal": "Tokens总数",
+    "name": "名称",
+    "date": "时间",
+    "search": "搜索"
   }
 }

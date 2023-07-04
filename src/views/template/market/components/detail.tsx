@@ -11,6 +11,8 @@ import {
     marketDeatail
     // installTemplate
 } from 'api/template';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import { executeMarket } from 'api/template/fetch';
 import CarryOut from 'views/template/carryOut';
 import { Execute, Details } from 'types/template';
@@ -55,12 +57,53 @@ function Deatail() {
                     stepId: stepId,
                     appReqVO: newData
                 });
+                setDetailData({
+                    ...newData,
+                    workflowConfig: {
+                        steps: [
+                            ...newData.workflowConfig.steps.slice(0, index),
+                            {
+                                ...newData.workflowConfig.steps[index],
+                                flowStep: {
+                                    ...newData.workflowConfig.steps[index].flowStep,
+                                    response: {
+                                        ...newData.workflowConfig.steps[index].flowStep.response,
+                                        answer: ''
+                                    }
+                                }
+                            },
+                            ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
+                        ]
+                    }
+                });
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
                 while (1) {
                     const { done, value } = await reader.read();
+                    if (textDecoder.decode(value).includes('2008002007')) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.error'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                close: false
+                            })
+                        );
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
+                        return;
+                    }
+
                     if (done) {
-                        if (isAllExecute && index < newData.workflowConfig.steps.length - 1) {
+                        if (
+                            isAllExecute &&
+                            index < newData.workflowConfig.steps.length - 1 &&
+                            newData.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
+                        ) {
                             changeData({
                                 index: index + 1,
                                 stepId: newData.workflowConfig.steps[index + 1].field,
@@ -73,13 +116,6 @@ function Deatail() {
                     newValue1[index] = false;
                     setLoadings(newValue1);
                     let str = textDecoder.decode(value);
-                    // if (str.includes('&error&')) {
-                    //     str = '';
-                    // } else if (str.includes('&start&')) {
-                    //     str = str.split('&start&')[1];
-                    // } else if (str.includes('&end&')) {
-                    //     str = str.split('&start&')[1].split('&end&')[0];
-                    // }
                     setDetailData({
                         ...newData,
                         workflowConfig: {
@@ -91,7 +127,7 @@ function Deatail() {
                                         ...newData.workflowConfig.steps[index].flowStep,
                                         response: {
                                             ...newData.workflowConfig.steps[index].flowStep.response,
-                                            answer: str
+                                            answer: newData.workflowConfig.steps[index].flowStep.response.answer + str
                                         }
                                     }
                                 },
@@ -99,6 +135,13 @@ function Deatail() {
                             ]
                         }
                     });
+                    // if (str.includes('&error&')) {
+                    //     str = '';
+                    // } else if (str.includes('&start&')) {
+                    //     str = str.split('&start&')[1];
+                    // } else if (str.includes('&end&')) {
+                    //     str = str.split('&start&')[1].split('&end&')[0];
+                    // }
                 }
             };
             fetchData();

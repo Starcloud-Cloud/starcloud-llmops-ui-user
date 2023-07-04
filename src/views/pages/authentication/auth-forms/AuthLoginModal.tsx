@@ -3,7 +3,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import { CardContent, CardMedia } from '@mui/material';
+import { CardMedia } from '@mui/material';
 
 interface CustomModalProps {
     open: boolean;

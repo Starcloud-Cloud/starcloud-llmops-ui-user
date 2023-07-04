@@ -3,7 +3,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import { CardContent } from '@mui/material';
+import { CardContent, CardMedia } from '@mui/material';
 
 interface CustomModalProps {
     open: boolean;
@@ -39,25 +39,19 @@ const LoginModal: React.FC<CustomModalProps> = ({ open, qrUrl, handleClose }) =>
                 </IconButton>
                 <MainCard
                     sx={{
-                        p: 4,
+                        p: 2,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: { lg: 450 }
+                        width: { lg: 300 },
+                        '.MuiCardContent-root': {
+                            paddingTop: '0 !important'
+                        }
                     }}
                     title="扫码登录"
                 >
-                    <CardContent
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <img src={qrUrl ? qrUrl : 'https://via.placeholder.com/150'} alt="QR code" />
-                    </CardContent>
+                    <CardMedia component="img" height="150" image={qrUrl ? qrUrl : 'https://via.placeholder.com/150'} alt="QR code" />
                 </MainCard>
             </div>
         </Modal>

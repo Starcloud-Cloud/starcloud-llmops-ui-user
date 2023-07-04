@@ -34,7 +34,7 @@ export const appPage = (params: { pageNo: number; pageSize: number }) => {
 };
 
 //执行记录echart
-export const logStatistics = (data: { name: string; timeType: string }) => {
+export const logStatistics = (data: { appName: string; timeType: string }) => {
     return request.post({ url: '/llm/app/log/statistics', data });
 };
 //获取时间

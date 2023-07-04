@@ -43,13 +43,13 @@ interface Date {
     value: string;
 }
 interface Query {
-    name: string;
+    appName: string;
     timeType: string;
 }
 function ApplicationAnalysis() {
     const [queryParams, setQuery] = useState<Query>({
         timeType: '',
-        name: ''
+        appName: ''
     });
     const [generate, setGenerate] = useState<Charts[]>([]);
     const [total, setTotal] = useState(0);
@@ -181,8 +181,8 @@ function ApplicationAnalysis() {
                 <Grid item md={3} lg={2} xs={12}>
                     <TextField
                         label={t('generateLog.name')}
-                        value={queryParams.name}
-                        name="name"
+                        value={queryParams.appName}
+                        name="appName"
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => {
                             setQuery({ ...queryParams, [e.target.name]: e.target.value });

@@ -14,3 +14,32 @@ export const signIn = () => {
 export const redeemBenefits = (data: string) => {
     return request.postOriginal({ url: `/llm/user-benefits/code?code=${data}` });
 };
+
+// 参数接口
+
+// 响应接口
+export interface GetUserBenefitsPageRes {
+    list: {
+        benefitsName: string;
+        benefitsList: {
+            name: string;
+            type: string;
+            amount: number;
+        }[];
+        effectiveTime: number;
+        expirationTime: number;
+        enabled: boolean;
+        validity: number;
+        validityUnit: string;
+    }[];
+    total: number;
+}
+
+/**
+ * 获得用户权益 - 分页
+ * @param {string} pageVO 管理后台 - 用户权益分页 Request VO
+ * @returns
+ */
+export const getUserBenefitsPage = (pageVO: string): Promise<GetUserBenefitsPageRes> => {
+    return request.get({ url: `llm/user-benefits/page?pageVO=${pageVO}` });
+};

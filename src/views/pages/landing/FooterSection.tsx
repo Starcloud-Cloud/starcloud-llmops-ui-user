@@ -6,6 +6,7 @@ import { Box, CardMedia, Container, Grid, Link, Stack, Typography } from '@mui/m
 import wechat1 from 'assets/images/landing/wechat.png';
 import wechat2 from 'assets/images/landing/wechattube.jpg';
 import wechat3 from 'assets/images/landing/wechatpublic.bmp';
+import tiktok from 'assets/images/landing/douyin.png';
 
 import { t } from 'hooks/web/useI18n';
 
@@ -67,49 +68,66 @@ const FooterSection = () => {
                             <Grid item xs={12} md={8}>
                                 <Grid container spacing={{ xs: 5, md: 2 }}>
                                     <Grid item xs={4} sm={4}>
-                                        <Stack spacing={{ xs: 3, md: 5 }}>
+                                        <Stack spacing={{ xs: 3, md: 5 }} textAlign="center">
                                             <Typography variant="h4" color={textColor} sx={{ fontWeight: 500 }}>
                                                 {t('homepage.foot.help')}
                                             </Typography>
                                             <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                                                <FooterLink href="https://links.codedthemes.com/HTIBc" target="_blank" underline="none">
+                                                <FooterLink href="/" target="_blank" underline="none">
                                                     {t('homepage.foot.documentation')}
                                                 </FooterLink>
-                                                <FooterLink href="https://codedthemes.gitbook.io/berry/" target="_blank" underline="none">
+                                                <FooterLink href="/" target="_blank" underline="none">
                                                     {t('homepage.foot.support')}
                                                 </FooterLink>
                                             </Stack>
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={4} sm={4}>
+                                    <Grid item xs={2} sm={2}>
                                         <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
                                             <CardMedia
                                                 component="img"
                                                 image={wechat1}
                                                 alt="img1"
-                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 企业微信群
                                             </Typography>
+                                        </Stack>
+                                    </Grid>
+                                    <Grid item xs={2} sm={2}>
+                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
                                             <CardMedia
                                                 component="img"
                                                 image={wechat2}
                                                 alt="img2"
-                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 视频号
                                             </Typography>
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={4} sm={4}>
+                                    <Grid item xs={2} sm={2}>
+                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
+                                            <CardMedia
+                                                component="img"
+                                                image={tiktok}
+                                                alt="img1"
+                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
+                                            />
+                                            <Typography variant="h4" color={textColor} align="center" sx={{ pt: 0, fontWeight: 500 }}>
+                                                抖音
+                                            </Typography>
+                                        </Stack>
+                                    </Grid>
+                                    <Grid item xs={2} sm={2}>
                                         <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
                                             <CardMedia
                                                 component="img"
                                                 image={wechat3}
                                                 alt="img3"
-                                                sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
+                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 公众号

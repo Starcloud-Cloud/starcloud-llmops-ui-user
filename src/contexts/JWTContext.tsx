@@ -155,8 +155,8 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     };
 
     const logout = async () => {
+        loginOut();
         dispatch({ type: LOGOUT });
-        await loginOut();
     };
 
     const forgotPassword = async (email: string) => {

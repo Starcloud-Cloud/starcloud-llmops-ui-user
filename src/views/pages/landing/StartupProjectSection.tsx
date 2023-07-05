@@ -58,7 +58,7 @@ const RtlInfoSection = () => {
                             '& .slick-slider': {
                                 textAlign: 'left',
                                 '.MuiTypography-root': {
-                                    fontSize: { xs: '1.563rem', md: '2.5rem', xl: '3.125rem' },
+                                    fontSize: { xs: '1.3rem', md: '2.5rem', xl: '3.125rem' },
                                     cursor: 'pointer'
                                 }
                             }
@@ -75,8 +75,9 @@ const RtlInfoSection = () => {
                                 variant="h2"
                                 sx={{
                                     color: '#fff',
-                                    width: { xs: '150px', sm: 'max-content', xl: 'max-content' },
-                                    fontSize: { xs: '1.563rem', md: '2.5rem', xl: '3.125rem' }
+                                    textAlign: 'center',
+                                    width: { xs: '90px', sm: 'max-content', xl: 'max-content' },
+                                    fontSize: { xs: '1.2rem', md: '2.5rem', xl: '3.125rem' }
                                 }}
                             >
                                 {t('homepage.startup.pro')}

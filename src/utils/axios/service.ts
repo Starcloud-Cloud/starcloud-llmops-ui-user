@@ -16,6 +16,7 @@ const { result_code, base_url, request_timeout } = config;
 
 // 需要忽略的提示。忽略后，自动 Promise.reject('error')
 const ignoreMsgs = [
+    '请扫描二维码授权',
     '无效的刷新令牌', // 刷新令牌被删除时，不用提示
     '刷新令牌已过期' // 使用刷新令牌，刷新获取新的访问令牌时，结果因为过期失败，此时需要忽略。否则，会导致继续 401，无法跳转到登出界面
 ];
@@ -107,10 +108,10 @@ service.interceptors.response.use(
         const { data } = response;
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const config = response.config;
-        // if (!data) {
-        //     // 返回“[HTTP]请求没有返回值”;
-        //     throw new Error();
-        // }
+        if (!data) {
+            // 返回“[HTTP]请求没有返回值”;
+            throw new Error();
+        }
         // 未设置状态码则默认成功状态
         let code = data.code || result_code;
         code = code as keyof typeof errorCode;

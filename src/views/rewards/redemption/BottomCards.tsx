@@ -10,10 +10,12 @@ import Share from './Share';
 import axios from 'utils/axios';
 import { closeSnackbar, openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import Follow from './Follow';
 
 const BottomCards: React.FC = () => {
     const [openGroupAdd, setOpenGroupAdd] = useState(false);
     const [openShare, setOpenShare] = useState(false); // 新增的状态
+    const [openFollow, setOpenFollow] = useState(false); // 新增的状态
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -23,6 +25,8 @@ const BottomCards: React.FC = () => {
     const handleOpenShare = () => setOpenShare(true); // 新增的打开函数
     const handleCloseShare = () => setOpenShare(false); // 新增的关闭函数
 
+    const handleOpenFollow = () => setOpenFollow(true); // 新增的打开函数
+    const handleCloseFollow = () => setOpenFollow(false); // 新增的关闭函数
     const handleInvite = async () => {
         try {
             const response = await axios.get({
@@ -105,6 +109,15 @@ const BottomCards: React.FC = () => {
             Icon: PollIcon,
             endText: '送5000字/2张图片',
             onClick: () => window.open('http://ov9t0w4iwaq9xq9l.mikecrm.com/OX02r3z', '_blank')
+        },
+        {
+            title: '方法五',
+            subtitle: '关注 魔法AI',
+            description: '一键关注，即可马上兑换',
+            buttonText: '点击参加',
+            Icon: ShareIcon,
+            endText: '送8000字/2张图片',
+            onClick: handleOpenFollow
         }
     ];
     return (
@@ -112,13 +125,14 @@ const BottomCards: React.FC = () => {
             <Grid container spacing={2}>
                 {cardsData.map((card, index) => (
                     <Grid item xs={12} md={6} lg={4} xl={3} key={index}>
-                        <BottomCard {...card} height={{ xs: '220px', md: '260px', lg: '280px', xl: '300px' }} onClick={card.onClick} />
+                        <BottomCard {...card} height={{ xs: '220px', md: '240px', lg: '240px', xl: '240px' }} onClick={card.onClick} />
                     </Grid>
                 ))}
             </Grid>
 
             <GroupAdd open={openGroupAdd} handleClose={handleCloseGroupAdd} />
             <Share open={openShare} handleClose={handleCloseShare} />
+            <Follow open={openFollow} handleClose={handleCloseFollow} />
         </div>
     );
 };

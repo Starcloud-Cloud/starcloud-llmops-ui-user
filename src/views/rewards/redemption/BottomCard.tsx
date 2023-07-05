@@ -22,7 +22,17 @@ interface BottomCardProps {
 }
 
 const BottomCard: React.FC<BottomCardProps> = ({ title, subtitle, description, buttonText, Icon, endText, height, onClick }) => (
-    <SubCard sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 0 }}>
+    <SubCard
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            p: 0,
+            '& > .MuiCardContent-root': {
+                paddingBottom: '0 !important'
+            }
+        }}
+    >
         <CardContent
             sx={{
                 height: height,
@@ -38,7 +48,7 @@ const BottomCard: React.FC<BottomCardProps> = ({ title, subtitle, description, b
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Box>
                         <Typography variant="h5">{title}</Typography>
-                        <Typography variant="h6" sx={{ color: '#693af4' }}>
+                        <Typography variant="h3" sx={{ fontSize: '1.4rem', color: '#693af4' }}>
                             {subtitle}
                         </Typography>
                     </Box>
@@ -47,7 +57,7 @@ const BottomCard: React.FC<BottomCardProps> = ({ title, subtitle, description, b
                     </Box>
                 </Box>
                 <Typography variant="body2">{description}</Typography>
-                <Typography variant="body2" mt={2}>
+                <Typography variant="body2" mt={0}>
                     {endText}
                 </Typography>
             </Box>

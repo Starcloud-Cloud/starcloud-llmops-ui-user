@@ -6,7 +6,6 @@ import { Button, Card, CardContent, CardMedia, Grid, TextField, Typography } fro
 // assets
 import Card3 from 'assets/images/cards/card-3.jpg';
 import wechat1 from 'assets/images/landing/wechat.png';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 import React, { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
@@ -27,7 +26,6 @@ const CustomMainCard = styled(MainCard)({
 });
 const RedemptionHeader = () => {
     const theme = useTheme();
-    const isMobile = useMediaQuery('(max-width:680px)');
     const [code, setCode] = useState(''); // 创建一个状态变量来保存用户的输入
 
     const alertSuccess = () => {
@@ -68,26 +66,37 @@ const RedemptionHeader = () => {
     };
 
     return (
-        <CustomMainCard title="注册即获取基础权益：5000字数 10张图片">
+        <CustomMainCard
+            sx={{
+                '.MuiCardHeader-title': { fontSize: { xs: '0.875rem !important', md: '1.5rem !important', xl: '1.5rem !important' } }
+            }}
+            title="注册即获取基础权益：5000字数 10张图片"
+        >
             <Card>
                 <CardMedia image={Card3} title="Card 3">
                     <CardContent sx={{ height: '300px', display: 'flex', alignItems: 'center' }}>
-                        <Grid container spacing={2} direction={isMobile ? 'column' : 'row'} justifyContent="center" alignItems="center">
-                            <Grid item xs={isMobile ? 12 : 9}>
+                        <Grid container spacing={2} direction={{ xs: 'column', sm: 'row' }} justifyContent="center" alignItems="center">
+                            <Grid item>
                                 <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
                                     <Grid item>
-                                        <Typography variant="h1">{t('redemption.title')}</Typography>
+                                        <Typography
+                                            variant="h1"
+                                            sx={{
+                                                fontSize: { xs: '1.2rem', md: '3.125rem', xl: '3.125rem' }
+                                            }}
+                                        >
+                                            {t('redemption.title')}
+                                        </Typography>
                                     </Grid>
                                     <Grid
                                         item
                                         container
-                                        direction="row"
-                                        alignItems="stretch"
+                                        direction={{ sm: 'row' }}
+                                        alignItems={{ xs: 'center', sm: 'stretch' }}
                                         justifyContent="center"
                                         spacing={2}
-                                        sx={{ width: '500px' }}
                                     >
-                                        <Grid item xs={8}>
+                                        <Grid item xs={7}>
                                             <TextField
                                                 id="outlined-basic"
                                                 fullWidth
@@ -97,7 +106,7 @@ const RedemptionHeader = () => {
                                                 sx={{ height: '100%', boxSizing: 'border-box' }}
                                             />
                                         </Grid>
-                                        <Grid item xs={4}>
+                                        <Grid item xs={5}>
                                             <Button
                                                 variant="contained"
                                                 size="large"
@@ -118,11 +127,7 @@ const RedemptionHeader = () => {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            <Grid
-                                item
-                                xs={isMobile ? 12 : 3}
-                                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-                            >
+                            <Grid item sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <div
                                     style={{
                                         display: 'flex',

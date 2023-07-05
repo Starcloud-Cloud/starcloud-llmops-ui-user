@@ -15,8 +15,13 @@ const Redemption = () => {
             <Typography variant="h3" textAlign="center" sx={{ my: 5 }}>
                 {t('redemption.obtain')}
             </Typography>
-            <Typography variant="h4" textAlign="right" sx={{ my: 5, mr: 2 }} onClick={handleOpenRecord}>
-                权益记录
+            <Typography
+                variant="h5"
+                textAlign="right"
+                sx={{ cursor: 'pointer', color: '#7e7e7e', my: 5, mr: 2 }}
+                onClick={handleOpenRecord}
+            >
+                {'查看权益记录 >'}
             </Typography>
             <Record open={openRecord} handleClose={handleCloseRecord} />
             <MiddleCards />

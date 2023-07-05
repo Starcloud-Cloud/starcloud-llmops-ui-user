@@ -503,9 +503,9 @@
     "self": "My App"
   },
   "market": {
-    "title": "Template Market",
+    "title": "Application Market",
     "subLeft": "Browse",
-    "subright": "Best AI Workflow",
+    "subright": "Best AI Application",
     "search": "Search",
     "sortby": "Sort By",
     "new": "New",
@@ -525,7 +525,9 @@
     "invitation": "Exclusive invitation link",
     "tips": "Recommend friends to register, increase the amount of rights and interests",
     "copy": "Click Copy Invitation code",
-    "error": "The currently used tokens are insufficient"
+    "error": "The currently used tokens are insufficient",
+    "welcome": "Welcome",
+    "place": "Search AI Applications"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",
@@ -616,7 +618,8 @@
     "plus": "Plus",
     "pro": "Pro",
     "令牌": "Token",
-    "图片": "Images"
+    "图片": "Images",
+    "remaining": "Remaining"
   },
   "homepage": {
     "title": {
@@ -669,7 +672,6 @@
     "mode": "App Mode",
     "name": "App Name",
     "fromScene": "From Scene",
-    "totalMessageTokens": "Total Message Tokens",
     "totalAnswerTokens": "Total Answer Tokens",
     "messageCount": "Message Count",
     "feedbacksCount": "Feedbacks Count",
@@ -681,7 +683,7 @@
   "generateLog": {
     "messageTotal": "Message Total",
     "usertotal": "User Total",
-    "TimeConsuming": "Time Consuming",
+    "TimeConsuming": "Average Time Consuming",
     "tokenTotal": "tokens Total",
     "name": "Name",
     "date": "Time",

@@ -194,7 +194,7 @@ const ProfileSection = () => {
                                         <Box sx={{ p: 2 }}>
                                             <Stack>
                                                 <Stack direction="row" spacing={0.5} alignItems="center">
-                                                    <Typography variant="h4">Good Morning,</Typography>
+                                                    <Typography variant="h4">{t('market.welcome')},</Typography>
                                                     <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
                                                         {data.user.nickname}
                                                     </Typography>
@@ -240,7 +240,7 @@ const ProfileSection = () => {
                                                             )}
                                                         </Grid>
                                                     </Grid>
-                                                    <Typography variant="body1" sx={{ width: '300px', textDecoration: 'underline' }}>
+                                                    <Typography variant="body1" sx={{ width: '220px', textDecoration: 'underline' }}>
                                                         {window.location.protocol + '//' + window.location.host}/register?q=
                                                         {invitationCode}
                                                     </Typography>
@@ -255,7 +255,7 @@ const ProfileSection = () => {
                                                                 invitationCode
                                                             }
                                                         />
-                                                        <Typography variant="h4" mb={1}>
+                                                        <Typography variant="h5" mb={1}>
                                                             专属邀请码
                                                         </Typography>
                                                     </Box>

@@ -50,10 +50,10 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
             marginTop: 88
         },
         [theme.breakpoints.down('sm')]: {
-            marginLeft: '10px',
+            marginLeft: '0',
             width: `calc(100% - ${drawerWidth}px)`,
             padding: '16px',
-            marginRight: '10px',
+            marginRight: '0',
             marginTop: 88
         }
     }),

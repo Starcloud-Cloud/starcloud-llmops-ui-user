@@ -9,6 +9,7 @@
 .desc {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    height: 30px;
     /* 指定行数 */
     -webkit-box-orient: vertical;
     overflow: hidden;

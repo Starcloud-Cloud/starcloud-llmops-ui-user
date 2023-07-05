@@ -528,7 +528,7 @@ const MainRoutes = {
             element: <DashboardAnalytics />
         },
         {
-            path: '/template/templateMarket',
+            path: '/appMarket',
             element: <Market />,
             children: [
                 {

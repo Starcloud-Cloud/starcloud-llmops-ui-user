@@ -5,6 +5,7 @@ import { Box, Grid, Typography, Divider } from '@mui/material';
 import { t } from 'hooks/web/useI18n';
 import './index.css';
 import Perform from './perform';
+import formatDate from 'hooks/useDate';
 
 function CarryOut({ config, changeData, loadings, allExecute }: any) {
     return (
@@ -12,7 +13,7 @@ function CarryOut({ config, changeData, loadings, allExecute }: any) {
             <Grid container spacing={4}>
                 {/* <Grid item lg={7} md={7} sm={7}> */}
                 <Grid item lg={12} md={12} sm={12}>
-                    <Typography variant="h5" my={2}>
+                    <Typography variant="h5" sx={{ fontSize: '1.3rem' }} my={2}>
                         {config.description}
                     </Typography>
                     <Perform
@@ -25,7 +26,7 @@ function CarryOut({ config, changeData, loadings, allExecute }: any) {
                     <Box sx={{ px: 2 }}>
                         {/* <span style={{ marginRight: '20px' }}>{t('market.world')}:3333</span>
                         {t('market.step')}:111 */}
-                        <Divider sx={{ my: 2 }} />
+                        <Divider sx={{ mb: 2 }} />
                         <Box
                             sx={{
                                 display: 'flex',
@@ -46,8 +47,8 @@ function CarryOut({ config, changeData, loadings, allExecute }: any) {
                             {/* {t('market.plugLevel')}:2 */}
                             {/* <Divider orientation="vertical" flexItem /> */}
                             {/* {t('market.plugVersion')}:3 */}
-                            {/* <Divider orientation="vertical" flexItem /> */}
-                            {/* {t('market.createTime')}:4 */}
+                            <Divider orientation="vertical" flexItem />
+                            {t('generate.createTime')}:{formatDate(config.createTime)}
                         </Box>
                     </Box>
                 </Grid>

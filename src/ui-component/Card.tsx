@@ -104,12 +104,30 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                 </Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h6">{item?.usedNum + '/' + item?.totalNum}</Typography>
+                                <Typography variant="h6">
+                                    {t('user.remaining')}
+                                    {item?.totalNum - item?.usedNum}
+                                </Typography>
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item>
+                    <Grid item sx={{ position: 'relative' }}>
                         <BorderLinearProgress level={info?.userLevel} variant="determinate" value={item?.percentage} theme={theme} />
+                        <span
+                            style={{
+                                position: 'absolute',
+                                textAlign: 'center',
+                                left: 0,
+                                right: 0,
+                                bottom: -4,
+                                margin: 'auto',
+                                zIndex: 100,
+                                color: '#000',
+                                fontSize: '8px'
+                            }}
+                        >
+                            {item?.usedNum + '/' + item?.totalNum}
+                        </span>
                     </Grid>
                 </Grid>
             ))}

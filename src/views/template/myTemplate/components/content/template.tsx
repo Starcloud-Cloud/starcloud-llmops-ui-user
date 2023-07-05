@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 import marketStore from 'store/market';
 import Link from '@mui/material/Link';
 import './textnoWarp.css';
@@ -19,8 +20,7 @@ function Template({ data, handleDetail }: any) {
                 border: '1px solid',
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
-                    boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)',
-                    borderColor: '#5e35b1'
+                    boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
                 }
             }}
         >
@@ -44,19 +44,31 @@ function Template({ data, handleDetail }: any) {
                     overflow: 'hidden'
                 }}
             >
-                <Typography
-                    onClick={() => handleDetail(data)}
-                    className="textnoWarp active cursor"
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    my={1}
-                >
-                    {data.name}
-                </Typography>
-                <Typography onClick={() => handleDetail(data)} className="cursor desc" variant="body2" component="div" lineHeight={1.2}>
-                    {data.description}
-                </Typography>
+                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.name}</Box>}>
+                    <Typography
+                        onClick={() => handleDetail(data)}
+                        className="textnoWarp active cursor"
+                        gutterBottom
+                        variant="h3"
+                        sx={{ fontSize: '1rem' }}
+                        component="div"
+                        my={1}
+                    >
+                        {data.name}
+                    </Typography>
+                </Tooltip>
+                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '12px' }}>{data.description}</Box>}>
+                    <Typography
+                        sx={{ fontSize: '.75rem', color: 'rgba(21,39,55,.6)' }}
+                        onClick={() => handleDetail(data)}
+                        className="cursor desc"
+                        variant="body2"
+                        component="div"
+                        lineHeight={1.2}
+                    >
+                        {data.description}
+                    </Typography>
+                </Tooltip>
             </CardContent>
             <Box position="absolute" left="8px" bottom="8px">
                 {data.categories &&

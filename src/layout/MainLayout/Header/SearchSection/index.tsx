@@ -135,11 +135,11 @@ const SearchSection = () => {
                 <PopupState variant="popper" popupId="demo-popup-popper">
                     {(popupState) => (
                         <>
-                            <Box sx={{ ml: 2 }}>
+                            {/* <Box sx={{ ml: 2 }}>
                                 <HeaderAvatarStyle variant="rounded" {...bindToggle(popupState)}>
                                     <IconSearch stroke={1.5} size="19.2px" />
                                 </HeaderAvatarStyle>
-                            </Box>
+                            </Box> */}
                             <PopperStyle {...bindPopper(popupState)} transition>
                                 {({ TransitionProps }) => (
                                     <>

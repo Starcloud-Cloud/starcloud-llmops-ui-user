@@ -69,7 +69,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
     return (
         <Box>
             {config?.steps.length > 1 ? (
-                <Box>
+                <Box mb={1}>
                     <Button startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
                         {t('market.allExecute')}
                     </Button>
@@ -102,18 +102,16 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                     <CircularProgress />
                                 </div>
                             )}
-                            <CardContent>
+                            <CardContent sx={{ p: 0 }}>
                                 <Box display="flex" justifyContent="space-between" alignItems="top">
-                                    <Box>
-                                        {config?.steps > 1 || source === 'myApp' ? (
-                                            <Box>
-                                                <Typography variant="h3">{item.name}</Typography>
-                                                <Typography variant="caption" display="block" mt={1}>
-                                                    {item.description}
-                                                </Typography>
-                                            </Box>
-                                        ) : null}
-                                    </Box>
+                                    {config?.steps.length > 1 || source === 'myApp' ? (
+                                        <Box>
+                                            <Typography variant="h3">{item.name}</Typography>
+                                            <Typography variant="caption" display="block">
+                                                {item.description}
+                                            </Typography>
+                                        </Box>
+                                    ) : null}
                                     <Box whiteSpace="nowrap">
                                         <Tooltip title={t('market.stepTips')}>
                                             <IconButton size="small">
@@ -137,7 +135,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                     <Grid container spacing={1}>
                                         {item.variable?.variables.map((el: any) =>
                                             el.isShow ? (
-                                                <Grid item key={el.field} md={el.style === 'TEXTAREA' ? 6 : 4} sm={12}>
+                                                <Grid item key={el.field} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
                                                     <FormExecute formik={arr[steps]} item={el} />
                                                 </Grid>
                                             ) : null
@@ -149,7 +147,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                                         item
                                                         lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
                                                         md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
-                                                        sm={12}
+                                                        xs={12}
                                                         key={el.field}
                                                     >
                                                         <FormExecute formik={arr[steps]} item={el} />

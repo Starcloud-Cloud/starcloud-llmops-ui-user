@@ -19,7 +19,7 @@ interface MenuList {
 function ScrollMenus({ change }: { change: any }) {
     const theme = useTheme();
     const [menuList, setMenuList] = useState<MenuList[]>([]);
-    const [active, setActive] = useState<number | string>('');
+    const [active, setActive] = useState<number | string>(0);
     const setCategoryList = marketStore((state) => state.setCategoryList);
     useEffect(() => {
         categories().then((res) => {
@@ -31,10 +31,10 @@ function ScrollMenus({ change }: { change: any }) {
 
     const navigate = useNavigate();
     const changeCategory = (item: any, index: number) => {
-        navigate('/template/templateMarket/list');
+        navigate('/appMarket/list');
         if (active === index) {
-            setActive('');
-            change('');
+            setActive(0);
+            change('ALL');
         } else {
             setActive(index);
             change(item.code);
@@ -66,24 +66,24 @@ function ScrollMenus({ change }: { change: any }) {
     };
     const focus = {
         textAlign: 'center',
-        padding: '0px 30px',
+        padding: '0px 15px',
         borderRadius: 15,
         cursor: 'pointer',
         fontSize: '12px',
         border: '1px solid transparent',
         paddingTop: '5px',
-        marginBottom: 1
+        marginBottom: 2
     };
     const focuos = {
         textAlign: 'center',
-        padding: '0px 30px',
+        padding: '0px 15px',
         borderRadius: 15,
         cursor: 'pointer',
-        background: theme?.palette.secondary.light,
         paddingTop: '5px',
         color: theme.palette.secondary[800],
+        fontWeight: 600,
         fontSize: '12px',
-        marginBottom: 1
+        marginBottom: 2
     };
     return (
         <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
@@ -96,7 +96,7 @@ function ScrollMenus({ change }: { change: any }) {
                     key={index}
                 >
                     <img style={{ width: '25px' }} src={require('../../../assets/images/category/' + item.icon + '.svg')} alt="Icon" />
-                    <Box sx={{ whiteSpace: 'nowrap' }}>{item.name}</Box>
+                    <Box sx={{ whiteSpace: 'nowrap', fontSize: '14px' }}>{item.name}</Box>
                 </Box>
             ))}
         </ScrollMenu>

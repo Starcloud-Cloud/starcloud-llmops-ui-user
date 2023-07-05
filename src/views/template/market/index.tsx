@@ -33,7 +33,7 @@ function TemplateMarket() {
         { text: t('market.recommend'), key: 'step' }
     ];
     const handleChange = (event: any) => {
-        navigate('/template/templateMarket/list');
+        navigate('/appMarket/list');
         const { name, value } = event.target;
         setQueryParams({
             ...queryParams,
@@ -94,6 +94,7 @@ function TemplateMarket() {
                 <TextField
                     id="filled-start-adornment"
                     sx={{ width: '600px' }}
+                    placeholder={t('market.place')}
                     name="name"
                     value={queryParams.name}
                     onChange={handleChange}

@@ -632,7 +632,7 @@
   "application-analysis": "应用分析",
   "templateMarket": "模板市场",
   "EntitlementCard": {
-    "ppgrades": "选择高级"
+    "ppgrades": "权益升级"
   },
   "apply": {
     "name": "应用名称",
@@ -645,9 +645,9 @@
     "self": "我的应用"
   },
   "market": {
-    "title": "模板市场",
+    "title": "应用市场",
     "subLeft": "浏览",
-    "subright": "最佳AI工作流程",
+    "subright": "最佳AI工作应用",
     "search": "搜索",
     "sortby": "排序",
     "new": "最新的",
@@ -667,7 +667,9 @@
     "invitation": "专属邀请链接",
     "tips": "推荐好友注册，提升权益额度",
     "copy": "点击复制邀请码",
-    "error": "当前使用的token不足"
+    "error": "当前使用的token不足",
+    "welcome": "欢迎您",
+    "place": "搜索AI应用"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -728,7 +730,8 @@
     "plus": "普通",
     "pro": "专业",
     "令牌": "令牌",
-    "图片": "图片"
+    "图片": "图片",
+    "remaining": "剩余"
   },
   "homepage": {
     "title": {
@@ -782,8 +785,7 @@
     "mode": "App模式",
     "name": "App名称",
     "fromScene": "执行场景",
-    "totalMessageTokens": "请求消耗token数",
-    "totalAnswerTokens": "返回总消耗token数",
+    "totalAnswerTokens": "总消耗令牌数",
     "messageCount": "消息总数",
     "feedbacksCount": "反馈总数",
     "totalElapsed": "执行总耗时",
@@ -794,7 +796,7 @@
   "generateLog": {
     "messageTotal": "消息数总数",
     "usertotal": "用户总数",
-    "TimeConsuming": "总耗时",
+    "TimeConsuming": "平均耗时",
     "tokenTotal": "Tokens总数",
     "name": "名称",
     "date": "时间",

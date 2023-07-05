@@ -27,7 +27,7 @@ import { t } from 'hooks/web/useI18n';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
-    elapsedTotal: string;
+    elapsedAvg: string;
     userCount: string;
     tokens: string;
 }
@@ -71,11 +71,11 @@ function ApplicationAnalysis() {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            const elapsedTotal = res?.map((item: LogStatistics) => ({ y: item.elapsedTotal, x: item.createDate }));
+            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg, x: item.createDate }));
             setGenerate([
                 { title: t('generateLog.messageTotal'), data: message },
                 { title: t('generateLog.usertotal'), data: userCount },
-                { title: t('generateLog.TimeConsuming'), data: elapsedTotal },
+                { title: t('generateLog.TimeConsuming'), data: elapsedAvg },
                 { title: t('generateLog.tokenTotal'), data: tokens }
             ]);
         });
@@ -232,10 +232,8 @@ function ApplicationAnalysis() {
                         <TableRow>
                             <TableCell>{t('generate.name')}</TableCell>
                             <TableCell>{t('generate.mode')}</TableCell>
-                            <TableCell>{t('generate.totalMessageTokens')}</TableCell>
                             <TableCell>{t('generate.totalAnswerTokens')}</TableCell>
-                            <TableCell>{t('generate.totalElapsed')}</TableCell>
-                            <TableCell>{t('generate.totalPrice')}</TableCell>
+                            <TableCell>{t('generate.totalElapsed')} (s)</TableCell>
                             <TableCell>{t('generate.status')}</TableCell>
                             <TableCell>{t('generate.createTime')}</TableCell>
                         </TableRow>
@@ -245,10 +243,8 @@ function ApplicationAnalysis() {
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell>{row.appMode}</TableCell>
                                 <TableCell>{row.appName}</TableCell>
-                                <TableCell>{row.totalMessageTokens}</TableCell>
                                 <TableCell>{row.totalAnswerTokens}</TableCell>
                                 <TableCell>{row.totalElapsed}</TableCell>
-                                <TableCell>{row.totalPrice}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell>{formatDate(row.createTime)}</TableCell>
                             </TableRow>

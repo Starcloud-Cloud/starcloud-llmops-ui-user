@@ -1,4 +1,4 @@
-import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider } from '@mui/material';
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
 // import LoadingButton from '@mui/lab/LoadingButton';
 
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
@@ -22,12 +22,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
+import { useTheme } from '@mui/material/styles';
 function Deatail() {
     const { setUserInfo }: any = userInfoStore();
-    const { categoryList } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>({} as Details);
+    //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     const [isAllExecute, setIsAllExecute] = useState<boolean>(false);
     const changeData = (data: Execute) => {
@@ -155,6 +156,7 @@ function Deatail() {
     };
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
+            setAllLoading(false);
             setDetailData(res);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -178,25 +180,48 @@ function Deatail() {
     //         }
     //     });
     // };
+    //页面进入loading
+    const theme = useTheme();
+    const isDarkMode = theme.palette.mode === 'dark';
+    const [allLoading, setAllLoading] = useState(true);
+    //过滤出category
+    const categoryList = marketStore((state) => state.categoryList);
     return (
-        <Card elevation={2} sx={{ padding: 2 }}>
-            <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
-                <Link
-                    sx={{ cursor: 'pointer' }}
-                    underline="hover"
-                    color="inherit"
-                    onClick={() => navigate('/template/templateMarket/list')}
+        <Card elevation={2} sx={{ padding: 2, position: 'relative' }}>
+            {allLoading && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: !isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.4)',
+                        zIndex: 100
+                    }}
                 >
+                    <CircularProgress />
+                </div>
+            )}
+            <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
+                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket/list')}>
                     {t('market.all')}
                 </Link>
-                <Typography color="text.primary">Breadcrumbs</Typography>
+                <Typography color="text.primary">
+                    {categoryList?.find((el: { code: string }) => el.code === (detailData.categories && detailData.categories[0]))?.name}
+                </Typography>
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <AccessAlarm sx={{ fontSize: '80px' }} />
                     <Box>
                         <Box>
-                            <Typography variant="h2">{detailData.name}</Typography>
+                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                {detailData.name}
+                            </Typography>
                         </Box>
                         <Box my={0.5}>
                             {detailData.categories &&

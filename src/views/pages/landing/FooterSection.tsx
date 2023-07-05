@@ -88,7 +88,7 @@ const FooterSection = () => {
                                                 component="img"
                                                 image={wechat1}
                                                 alt="img1"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
+                                                sx={{ width: { xs: '200%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 企业微信群
@@ -101,7 +101,7 @@ const FooterSection = () => {
                                                 component="img"
                                                 image={wechat2}
                                                 alt="img2"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
+                                                sx={{ width: { xs: '200%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 视频号
@@ -114,7 +114,7 @@ const FooterSection = () => {
                                                 component="img"
                                                 image={tiktok}
                                                 alt="img1"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
+                                                sx={{ width: { xs: '200%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ pt: 0, fontWeight: 500 }}>
                                                 抖音
@@ -127,7 +127,7 @@ const FooterSection = () => {
                                                 component="img"
                                                 image={wechat3}
                                                 alt="img3"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
+                                                sx={{ width: { xs: '200%', sm: '100%', md: '100%' } }}
                                             />
                                             <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
                                                 公众号

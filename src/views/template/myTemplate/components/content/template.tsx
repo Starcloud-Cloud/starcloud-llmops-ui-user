@@ -62,7 +62,7 @@ function Template({ data, handleDetail }: any) {
                 {data.categories &&
                     data.categories.map((item: string) => (
                         <Link href="#" key={item} mr={1} className="active cursor underline" fontSize={14}>
-                            #{categoryList?.find((el: { code: string }) => el.code === item).name}
+                            #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
                         </Link>
                     ))}
             </Box>

@@ -11,22 +11,24 @@ import 'react-horizontal-scrolling-menu/dist/styles.css';
 
 import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 interface MenuList {
     name: string;
     icon: string;
 }
 function ScrollMenus({ change }: { change: any }) {
+    const theme = useTheme();
     const [menuList, setMenuList] = useState<MenuList[]>([]);
     const [active, setActive] = useState<number | string>('');
-    const { setCategoryList } = marketStore();
+    const setCategoryList = marketStore((state) => state.setCategoryList);
     useEffect(() => {
         categories().then((res) => {
             setMenuList(res);
-            console.log(res);
             setCategoryList(res);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     const navigate = useNavigate();
     const changeCategory = (item: any, index: number) => {
         navigate('/template/templateMarket/list');
@@ -69,6 +71,7 @@ function ScrollMenus({ change }: { change: any }) {
         cursor: 'pointer',
         fontSize: '12px',
         border: '1px solid transparent',
+        paddingTop: '5px',
         marginBottom: 1
     };
     const focuos = {
@@ -76,8 +79,9 @@ function ScrollMenus({ change }: { change: any }) {
         padding: '0px 30px',
         borderRadius: 15,
         cursor: 'pointer',
-        border: '1px solid #673ab7',
-        color: '#673ab7',
+        background: theme?.palette.secondary.light,
+        paddingTop: '5px',
+        color: theme.palette.secondary[800],
         fontSize: '12px',
         marginBottom: 1
     };

@@ -1,13 +1,22 @@
 import { create } from 'zustand';
-
-const marketStore = create<any>((set: any) => ({
+interface MarketStore {
+    total: string | number | null;
+    templateList: any[];
+    newtemplateList: any[];
+    categoryList: any[];
+    setTotal: (data: number) => void;
+    setTemplate: (data: any[]) => void;
+    setNewTemplate: (data: any[]) => void;
+    setCategoryList: (data: any[]) => void;
+}
+const marketStore = create<MarketStore>((set) => ({
     total: null,
     templateList: [],
     newtemplateList: [],
     categoryList: [],
-    setTotal: (data: string | number) => set(() => ({ total: data })),
-    setTemplate: (data: any[]) => set(() => ({ templateList: data })),
-    setNewTemplate: (data: any[]) => set(() => ({ newtemplateList: data })),
-    setCategoryList: (data: any[]) => set(() => ({ categoryList: data }))
+    setTotal: (data) => set(() => ({ total: data })),
+    setTemplate: (data) => set(() => ({ templateList: data })),
+    setNewTemplate: (data) => set(() => ({ newtemplateList: data })),
+    setCategoryList: (data) => set(() => ({ categoryList: data }))
 }));
 export default marketStore;

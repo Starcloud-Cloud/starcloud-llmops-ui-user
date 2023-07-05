@@ -52,7 +52,7 @@ const LoginModal: React.FC<CustomModalProps> = ({ open, qrUrl, handleClose }) =>
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: { lg: 270 },
+                        width: { xs: 300, md: 300, lg: 300, xl: 300 },
                         '.MuiCardContent-root': {
                             paddingTop: '0 !important'
                         },

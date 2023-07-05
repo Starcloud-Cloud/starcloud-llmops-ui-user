@@ -18,6 +18,7 @@ import { userBenefits } from 'api/template';
 import { useEffect } from 'react';
 import userInfoStore from 'store/entitlementAction';
 import { themesLight, themesDarkAfter, themesDarkBefor } from 'hooks/useThemes';
+import { useNavigate } from 'react-router-dom';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -31,6 +32,7 @@ const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) =>
         width: 210,
         height: 210,
         background: theme.palette.mode === 'dark' ? themesDarkAfter(level, theme) : themesLight(level, theme, 3),
+        opacity: theme.palette.mode !== 'dark' ? 0.4 : 1,
         borderRadius: '50%',
         top: -125,
         right: -155,
@@ -117,6 +119,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
 
 const Cards = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { userInfo, setUserInfo }: any = userInfoStore();
     useEffect(() => {
         if (!userInfo) {
@@ -139,6 +142,9 @@ const Cards = () => {
                         <ListItemText sx={{ mt: 0 }}>
                             {userInfo?.userLevel !== 'pro' && (
                                 <Button
+                                    onClick={() => {
+                                        navigate('/subscribe');
+                                    }}
                                     size="small"
                                     variant="contained"
                                     sx={{ boxShadow: 'none' }}

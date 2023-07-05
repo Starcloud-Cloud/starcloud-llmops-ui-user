@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 // material-ui
@@ -48,6 +48,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const [open, setOpen] = useState(false);
     const [ticket, setTicket] = useState('');
     const scriptedRef = useScriptRef();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginData, setLoginData] = useState({
         isShowPassword: false,
         captchaEnable: process.env.REACT_APP_CAPTCHA_ENABLE,
@@ -86,6 +87,9 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             setQrurl(res?.url);
             setOpen(true);
             setTicket(res?.ticket);
+            if (intervalIdRef.current) {
+                clearInterval(intervalIdRef.current as unknown as number);
+            }
         }
     };
     const getInviteCodeFromLocalStorage = () => {
@@ -107,9 +111,12 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        let intervalId: ReturnType<typeof setInterval>;
+    // 增加一个登录状态的state
 
+    const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // 使用ref存储定时器id
+    const isClearedRef = useRef(false); // 用来跟踪是否已经清除了定时器
+
+    useEffect(() => {
         const polling = async () => {
             const res = await LoginApi.qRcodeLogin({ ticket, inviteCode });
             if (!res?.data) {
@@ -117,23 +124,28 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             }
             authUtil.setToken(res?.data);
             await login();
+            setIsLoggedIn(true);
 
-            // 清除定时器
-            clearInterval(intervalId as unknown as number);
+            // 登录成功后立即清除定时器
+            clearInterval(intervalIdRef.current as unknown as number);
+            isClearedRef.current = true; // 更新已清除定时器的状态
         };
 
-        if (ticket) {
-            // 设置定时器
-            intervalId = setInterval(polling, 2000); // 例如，每2秒轮询一次
+        if (ticket && !isLoggedIn && !isClearedRef.current) {
+            if (intervalIdRef.current) {
+                clearInterval(intervalIdRef.current as unknown as number);
+            }
+
+            const id = setInterval(polling, 2000);
+            intervalIdRef.current = id; // 更新定时器id
         }
 
         return () => {
-            // 在组件卸载或者重新渲染时清除定时器
-            clearInterval(intervalId as unknown as number);
+            if (intervalIdRef.current && !isClearedRef.current) {
+                clearInterval(intervalIdRef.current as unknown as number);
+            }
         };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ticket]);
+    }, [ticket, isLoggedIn, login, inviteCode]);
 
     return (
         <Formik
@@ -294,7 +306,17 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         <AiOutlineWechat size={30} onClick={handleWeChat} style={{ cursor: 'pointer' }} />
                     </Box>
 
-                    <LoginModal open={open} qrUrl={qrUrl} handleClose={() => setOpen(false)} />
+                    <LoginModal
+                        open={open}
+                        qrUrl={qrUrl}
+                        handleClose={() => {
+                            setOpen(false);
+                            if (intervalIdRef.current) {
+                                clearInterval(intervalIdRef.current as unknown as number);
+                            }
+                            isClearedRef.current = true; // 更新已清除定时器的状态
+                        }}
+                    />
                 </form>
             )}
         </Formik>

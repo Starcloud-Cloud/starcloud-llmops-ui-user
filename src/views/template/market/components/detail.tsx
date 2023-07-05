@@ -20,7 +20,10 @@ import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { userBenefits } from 'api/template';
+import userInfoStore from 'store/entitlementAction';
 function Deatail() {
+    const { setUserInfo }: any = userInfoStore();
     const { categoryList } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
@@ -97,8 +100,10 @@ function Deatail() {
                         setLoadings(newValue1);
                         return;
                     }
-
                     if (done) {
+                        userBenefits().then((res) => {
+                            setUserInfo(res);
+                        });
                         if (
                             isAllExecute &&
                             index < newData.workflowConfig.steps.length - 1 &&

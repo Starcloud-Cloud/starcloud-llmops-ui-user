@@ -119,7 +119,7 @@ const RedemptionHeader = () => {
                                     spacing={2}
                                     sx={{ paddingLeft: { xs: '0', sm: '100px !important' } }}
                                 >
-                                    <Grid item xs={8} sm={8} md={9} lg={10}>
+                                    <Grid item xs={7} sm={8} md={9} lg={10}>
                                         <TextField
                                             id="outlined-basic"
                                             fullWidth
@@ -129,7 +129,7 @@ const RedemptionHeader = () => {
                                             sx={{ height: '100%', boxSizing: 'border-box' }}
                                         />
                                     </Grid>
-                                    <Grid item xs={4} sm={4} md={3} lg={2}>
+                                    <Grid item xs={5} sm={4} md={3} lg={2}>
                                         <Button
                                             variant="contained"
                                             size="large"

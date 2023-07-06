@@ -23,7 +23,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // assets
 import { KeyedObject, ArrangementOrder, EnhancedTableHeadProps } from 'types';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { getUserBenefitsPage } from 'api/rewards';
 
 type TableEnhancedCreateDataType = {
@@ -116,7 +116,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
+                        align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
@@ -254,15 +254,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                     justifyContent: 'center'
                 }}
             >
-                <MainCard
-                    content={false}
-                    title="权益记录"
-                    // secondary={
-                    //     <Stack direction="row" spacing={2} alignItems="center" style={{ marginRight: '2rem' }}>
-                    //         <CSVExport data={rows} filename={'enhanced-table.csv'} header={headCells.map((cell) => cell.label)} />
-                    //     </Stack>
-                    // }
-                >
+                <MainCard content={false} title="权益记录" style={{ width: '1200px' }}>
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
@@ -308,7 +300,14 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                                     {row.benefitsName}
                                                 </TableCell>
                                                 <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
-                                                <TableCell align="left">{row.benefitsList.join(' ')}</TableCell>
+                                                <TableCell align="center">
+                                                    {row.benefitsList.map((benefit, id) => (
+                                                        <Fragment key={id}>
+                                                            {benefit}
+                                                            <br />
+                                                        </Fragment>
+                                                    ))}
+                                                </TableCell>
                                                 <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
                                                 <TableCell align="right">
                                                     {row.validity} {row.validityUnit}
@@ -342,6 +341,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
+                        labelRowsPerPage="每页行数"
                     />
                 </MainCard>
             </div>

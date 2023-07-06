@@ -11,7 +11,7 @@ function List() {
     //状态管理
     const { newtemplateList, templateList, setTotal, setTemplate, setNewTemplate }: any = marketStore();
     const handleDetail = (data: { uid: string }) => {
-        navigate(`/appMarket/list/detail/${data.uid}`);
+        navigate(`/appMarket/detail/${data.uid}`);
     };
     useEffect(() => {
         if (templateList.length === 0) {

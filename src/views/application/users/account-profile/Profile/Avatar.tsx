@@ -1,22 +1,33 @@
-import React, { useRef, useState } from 'react';
-import AvatarEditor from 'react-avatar-editor';
-import { Button, Slider, Grid } from '@mui/material';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
+import { Button, Grid } from '@mui/material';
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import RestoreIcon from '@mui/icons-material/Restore';
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone';
+import FlipCameraAndroidIcon from '@mui/icons-material/FlipCameraAndroid';
+import FlipCameraIosIcon from '@mui/icons-material/FlipCameraIos';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/system';
-// import axios from 'axios';
+import AnimateButton from 'ui-component/extended/AnimateButton';
+import { useTheme } from '@mui/material/styles';
 
 interface AvatarUploadProps {
     defaultImageSrc?: string;
+    onUpload?: (image: string) => void;
 }
 
-const AvatarUpload: React.FC<AvatarUploadProps> = ({ defaultImageSrc }) => {
+interface AvatarUploadHandles {
+    upload: () => void;
+}
+
+const AvatarUpload: React.ForwardRefRenderFunction<AvatarUploadHandles, AvatarUploadProps> = ({ defaultImageSrc, onUpload }, ref) => {
     const [image, setImage] = useState<string | undefined>(defaultImageSrc);
-    const [scale, setScale] = useState<number>(1);
-    const [rotate, setRotate] = useState<number>(0);
-    const editorRef = useRef<AvatarEditor | null>(null);
+    const theme = useTheme();
+    const cropperRef = useRef<HTMLImageElement>(null);
+
     const StyledUploadTwoToneIcon = styled(UploadTwoToneIcon)`
         margin: 0;
     `;
@@ -27,117 +38,277 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ defaultImageSrc }) => {
         }
     };
 
-    const handleScaleChange = (_event: any, newValue: number | number[]) => {
-        setScale(newValue as number);
-    };
-
     const handleRotateRight = () => {
-        setRotate(rotate + 90);
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.rotate(90);
     };
 
     const handleRotateLeft = () => {
-        setRotate(rotate - 90);
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.rotate(-90);
     };
 
     const handleReset = () => {
-        setScale(1);
-        setRotate(0);
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.reset();
     };
 
-    // const handleUpload = async () => {
-    //     if (editorRef.current) {
-    //         const canvas = editorRef.current.getImageScaledToCanvas();
-    //         canvas.toBlob(async (blob) => {
-    //             const formData = new FormData();
-    //             formData.append('file', blob!, 'newFile.jpeg');
-    //             // Replace url with your own backend url
-    //             const url = 'https://your-backend-url/upload';
-    //             await axios.post(url, formData, {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data'
-    //                 }
-    //             });
-    //         }, 'image/jpeg');
-    //     }
-    // };
+    const handleFlipHorizontal = () => {
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.scaleX(-1);
+    };
+
+    const handleFlipVertical = () => {
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.scaleY(-1);
+    };
+
+    const handleZoomIn = () => {
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.zoom(0.1);
+    };
+
+    const handleZoomOut = () => {
+        const currentCropper: any = cropperRef?.current;
+        currentCropper.cropper.zoom(-0.1);
+    };
+    const handleUpload = () => {
+        const currentCropper: any = cropperRef?.current;
+        if (currentCropper) {
+            const croppedCanvas = currentCropper.cropper.getCroppedCanvas();
+            const dataUrl = croppedCanvas.toDataURL();
+            onUpload && onUpload(dataUrl);
+        }
+    };
+    useImperativeHandle(ref, () => ({
+        upload: handleUpload
+    }));
 
     return (
         <div>
             {image && (
                 <div>
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <div
-                            style={{
-                                borderRadius: '50%',
-                                overflow: 'hidden',
-                                width: '250px',
-                                height: '250px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <AvatarEditor
-                                ref={editorRef}
-                                image={image}
-                                width={250}
-                                height={250}
-                                border={50}
-                                color={[0, 0, 0, 0]}
-                                scale={scale}
-                                rotate={rotate}
-                            />
-                        </div>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        <Cropper ref={cropperRef} src={image} style={{ height: 400, width: '100%' }} aspectRatio={1} guides={false} />
                     </div>
                     <br />
-                    <Slider value={scale} min={1} max={3} step={0.01} onChange={handleScaleChange} />
-                    <Grid container spacing={2} alignItems="center">
+                    <Grid container spacing={1} alignItems="center" direction="row" wrap="nowrap">
                         <Grid item>
                             <label htmlFor="containedButtonFile">
-                                <Button
-                                    variant="outlined"
-                                    size="medium"
-                                    startIcon={<StyledUploadTwoToneIcon />}
-                                    title="上传图片"
-                                    sx={{
-                                        '& .MuiButton-startIcon': {
-                                            margin: 0
-                                        }
+                                <AnimateButton
+                                    scale={{
+                                        hover: 1.1,
+                                        tap: 0.9
                                     }}
                                 >
-                                    {' '}
-                                    <input
-                                        accept="image/*"
-                                        style={{
-                                            opacity: 0,
-                                            position: 'absolute',
-                                            zIndex: 1,
-                                            padding: 0.5,
-                                            cursor: 'pointer',
-                                            width: '100%'
+                                    <Button
+                                        variant="outlined"
+                                        size="medium"
+                                        startIcon={<StyledUploadTwoToneIcon />}
+                                        title="上传图片"
+                                        sx={{
+                                            '& .MuiButton-startIcon': {
+                                                margin: 0
+                                            },
+                                            boxShadow: theme.customShadows.secondary,
+                                            ':hover': {
+                                                boxShadow: 'none'
+                                            }
                                         }}
-                                        id="containedButtonFile"
-                                        multiple
-                                        type="file"
-                                        onChange={handleImageUpload}
-                                    />
-                                </Button>
+                                    >
+                                        <input
+                                            accept="image/*"
+                                            style={{
+                                                opacity: 0,
+                                                position: 'absolute',
+                                                zIndex: 1,
+                                                padding: 0.5,
+                                                cursor: 'pointer',
+                                                width: '100%'
+                                            }}
+                                            id="containedButtonFile"
+                                            multiple
+                                            type="file"
+                                            onChange={handleImageUpload}
+                                        />
+                                    </Button>
+                                </AnimateButton>
                             </label>
                         </Grid>
                         <Grid item>
-                            <Button onClick={handleReset} size="large" startIcon={<RestoreIcon />} title="重置" />
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleReset}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<RestoreIcon />}
+                                    title="重置"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
                         </Grid>
                         <Grid item>
-                            <Button onClick={handleRotateLeft} size="large" startIcon={<RotateLeftIcon />} title="向左旋转" />
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleRotateLeft}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<RotateLeftIcon />}
+                                    title="向左旋转"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
                         </Grid>
                         <Grid item>
-                            <Button onClick={handleRotateRight} size="large" startIcon={<RotateRightIcon />} title="向右旋转" />
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleRotateRight}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<RotateRightIcon />}
+                                    title="向右旋转"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
+                        </Grid>
+                        <Grid item>
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleFlipHorizontal}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<FlipCameraAndroidIcon />}
+                                    title="水平翻转"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
+                        </Grid>
+                        <Grid item>
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleFlipVertical}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<FlipCameraIosIcon />}
+                                    title="垂直翻转"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
+                        </Grid>
+                        <Grid item>
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleZoomIn}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<ZoomInIcon />}
+                                    title="放大"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
+                        </Grid>
+                        <Grid item>
+                            <AnimateButton
+                                scale={{
+                                    hover: 1.1,
+                                    tap: 0.9
+                                }}
+                            >
+                                <Button
+                                    onClick={handleZoomOut}
+                                    variant="outlined"
+                                    size="medium"
+                                    startIcon={<ZoomOutIcon />}
+                                    title="缩小"
+                                    sx={{
+                                        '& .MuiButton-startIcon': {
+                                            margin: 0
+                                        },
+                                        boxShadow: theme.customShadows.secondary,
+                                        ':hover': {
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                />
+                            </AnimateButton>
                         </Grid>
                     </Grid>
                 </div>
@@ -146,4 +317,4 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ defaultImageSrc }) => {
     );
 };
 
-export default AvatarUpload;
+export default forwardRef(AvatarUpload);

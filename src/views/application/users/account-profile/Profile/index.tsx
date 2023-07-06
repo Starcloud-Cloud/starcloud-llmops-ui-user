@@ -1,4 +1,4 @@
-import { useState, useEffect, SyntheticEvent } from 'react';
+import { useState, useEffect, SyntheticEvent, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 // material-ui
@@ -23,7 +23,7 @@ import {
     Button
 } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
-// import AddIcon from '@mui/icons-material/Add';
+import AddIcon from '@mui/icons-material/Add';
 
 // project imports
 // import Profile from './Profile';
@@ -43,8 +43,6 @@ import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 import MailTwoToneIcon from '@mui/icons-material/MailTwoTone';
 import PhonelinkRingTwoToneIcon from '@mui/icons-material/PhonelinkRingTwoTone';
 // import Avatar3 from 'assets/images/users/avatar-3.png';
-// import { AccountTreeTwoTone, CalendarMonthTwoTone, Diversity3TwoTone, GroupTwoTone, WorkTwoTone } from '@mui/icons-material';
-
 // types
 import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
@@ -105,12 +103,40 @@ const Profilnew = () => {
 
     // 点击事件处理器
     const handleClickOpen = () => {
-        // setDialogOpen(true);
+        setDialogOpen(true);
     };
 
     const handleClose = () => {
         setDialogOpen(false);
     };
+
+    const handleUpload = (dataUrl: string) => {
+        // 在这里处理裁剪后的图像数据，例如上传到服务器
+        async function uploadImage(imageData: string) {
+            const response = await fetch('/your-upload-url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: imageData })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        }
+        uploadImage(dataUrl);
+    };
+    interface AvatarUploadHandles {
+        upload: () => void;
+    }
+    const avatarUploadRef = useRef<AvatarUploadHandles | null>(null);
+
+    const handleConfirm = () => {
+        avatarUploadRef.current?.upload();
+        handleClose();
+    };
+
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -120,15 +146,15 @@ const Profilnew = () => {
                             <Grid container spacing={2} alignItems="center" justifyContent="center" onClick={handleClickOpen}>
                                 {userProfile?.avatar ? (
                                     <Grid item>
-                                        <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
+                                        <MuiTooltip title="Add" aria-label="add">
+                                            <Fab color="secondary" sx={{ m: 2 }}>
+                                                <AddIcon />
+                                            </Fab>
+                                        </MuiTooltip>
                                     </Grid>
                                 ) : (
                                     <Grid item>
-                                        <MuiTooltip title="Add" aria-label="add">
-                                            <Fab color="secondary" sx={{ m: 2 }}>
-                                                {/* <AddIcon /> */}
-                                            </Fab>
-                                        </MuiTooltip>
+                                        <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
                                     </Grid>
                                 )}
                             </Grid>
@@ -182,63 +208,15 @@ const Profilnew = () => {
                                     </Typography>
                                 </ListItemSecondaryAction>
                             </ListItemButton>
-                            {/* <Divider />
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <AccountTreeTwoTone sx={{ fontSize: '1.3rem' }} />
-                                </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">所属部门</Typography>} />
-                                <ListItemSecondaryAction>
-                                    <Typography variant="subtitle2" align="right">
-                                        {userProfile?.dept?.name || t('sys.app.unknown')}
-                                    </Typography>
-                                </ListItemSecondaryAction>
-                            </ListItemButton>
-                            <Divider />
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <WorkTwoTone sx={{ fontSize: '1.3rem' }} />
-                                </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">所属岗位</Typography>} />
-                                <ListItemSecondaryAction>
-                                    <Typography variant="subtitle2" align="right">
-                                        {userProfile?.posts?.map((post) => post.name).join(', ') || t('sys.app.unknown')}
-                                    </Typography>
-                                </ListItemSecondaryAction>
-                            </ListItemButton>
-                            <Divider />
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <GroupTwoTone sx={{ fontSize: '1.3rem' }} />
-                                </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">所属角色</Typography>} />
-                                <ListItemSecondaryAction>
-                                    <Typography variant="subtitle2" align="right">
-                                        {userProfile?.roles?.map((role) => role.name).join(', ') || t('sys.app.unknown')}
-                                    </Typography>
-                                </ListItemSecondaryAction>
-                            </ListItemButton>
-                            <Divider />
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <CalendarMonthTwoTone sx={{ fontSize: '1.3rem' }} />
-                                </ListItemIcon>
-                                <ListItemText primary={<Typography variant="subtitle1">创建日期</Typography>} />
-                                <ListItemSecondaryAction>
-                                    <Typography variant="subtitle2" align="right">
-                                        {userProfile?.createTime ? new Date(userProfile.createTime).toLocaleString() : t('sys.app.unknown')}
-                                    </Typography>
-                                </ListItemSecondaryAction>
-                            </ListItemButton> */}
                         </List>
                     </SubCard>
                     <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
                         <DialogTitle id="form-dialog-title">{t('2profile.user.upload')}</DialogTitle>
                         <DialogContent>
-                            <AvatarUpload defaultImageSrc={userProfile?.avatar} />
+                            <AvatarUpload ref={avatarUploadRef} defaultImageSrc={userProfile?.avatar} onUpload={handleUpload} />
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={handleClose} color="primary">
+                            <Button onClick={handleConfirm} color="primary">
                                 {t('2profile.user.confirm')}
                             </Button>
                         </DialogActions>

@@ -37,7 +37,12 @@ const MiddleCard: React.FC<MiddleCardProps> = ({ Icon, title, description, butto
                     <Typography variant="body2">{description}</Typography>
                 </Box>
             </Box>
-            <Button variant="contained" disabled={isDisabled} sx={{ textTransform: 'none' }} onClick={onClick}>
+            <Button
+                variant="contained"
+                disabled={isDisabled}
+                sx={{ textTransform: 'none', transform: 'scale(0.8)', width: '7rem' }}
+                onClick={onClick}
+            >
                 {buttonText}
             </Button>
         </CardContent>

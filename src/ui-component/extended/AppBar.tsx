@@ -77,7 +77,7 @@ const AppBar = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                创作平台
+                                登录/注册
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'none', sm: 'none' } }}>

@@ -11,7 +11,8 @@ import {
     ListItemText,
     Typography,
     linearProgressClasses,
-    Box
+    Box,
+    Tooltip
 } from '@mui/material';
 import { t } from 'hooks/web/useI18n';
 import { userBenefits } from 'api/template';
@@ -105,29 +106,15 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                             </Grid>
                             <Grid item>
                                 <Typography variant="h6">
-                                    {t('user.remaining')}
-                                    {item?.totalNum - item?.usedNum}
+                                    {t('user.remaining')}&nbsp;&nbsp;{item?.totalNum - item?.usedNum}
                                 </Typography>
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item sx={{ position: 'relative' }}>
-                        <BorderLinearProgress level={info?.userLevel} variant="determinate" value={item?.percentage} theme={theme} />
-                        <span
-                            style={{
-                                position: 'absolute',
-                                textAlign: 'center',
-                                left: 0,
-                                right: 0,
-                                bottom: -4,
-                                margin: 'auto',
-                                zIndex: 100,
-                                color: '#000',
-                                fontSize: '8px'
-                            }}
-                        >
-                            {item?.usedNum + '/' + item?.totalNum}
-                        </span>
+                    <Grid item>
+                        <Tooltip title={item?.usedNum + '/' + item?.totalNum} placement="top">
+                            <BorderLinearProgress level={info?.userLevel} variant="determinate" value={item?.percentage} theme={theme} />
+                        </Tooltip>
                     </Grid>
                 </Grid>
             ))}

@@ -15,9 +15,14 @@ interface MarketList {
     viewCount: number;
     categories: any;
 }
+interface Page {
+    pageNo: number;
+    pageSize: number;
+}
 function TemplateMarket() {
     const navigate = useNavigate();
-    const { total, templateList, setNewTemplate } = marketStore();
+    const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList } = marketStore();
+    const [page, setPage] = useState<Page>({ pageNo: 1, pageSize: 30 });
     const [queryParams, setQueryParams] = useState({
         name: '',
         sort: '',
@@ -32,6 +37,7 @@ function TemplateMarket() {
         { text: t('market.popular'), key: 'like' },
         { text: t('market.recommend'), key: 'step' }
     ];
+    //更改筛选
     const handleChange = (event: any) => {
         navigate('/appMarket/list');
         const { name, value } = event.target;
@@ -40,6 +46,7 @@ function TemplateMarket() {
             [name]: value
         });
     };
+    //当用户更改了筛选触发的逻辑
     const handleSearch = () => {
         let newList = templateList.filter((item: MarketList) => {
             let nameMatch = true;
@@ -58,7 +65,6 @@ function TemplateMarket() {
             }
             return nameMatch && categoryMatch;
         });
-
         if (queryParams.sort && queryParams.sort === 'like') {
             newList.sort((a: MarketList, b: MarketList) => {
                 return b.viewCount - a.viewCount;
@@ -74,8 +80,37 @@ function TemplateMarket() {
                 return (b.createTime = a.createTime);
             });
         }
+        setPage({
+            ...page,
+            pageNo: 1
+        });
         setNewTemplate(newList);
+        setSorllList(newList.slice(0, page.pageSize));
     };
+    //页面滚动
+    const goodsScroll = (event: any) => {
+        const container = event.target;
+        const scrollTop = container.scrollTop;
+        const clientHeight = container.clientHeight;
+        const scrollHeight = container.scrollHeight;
+        if (scrollTop + clientHeight >= scrollHeight - 20) {
+            if (Math.ceil(newtemplateList.length / page.pageSize) > page.pageNo) {
+                setPage((oldValue: Page) => {
+                    let newValue = { ...oldValue };
+                    newValue.pageNo = newValue.pageNo + 1;
+                    setSorllList([
+                        ...sorllList,
+                        ...newtemplateList.slice(
+                            (newValue.pageNo - 1) * newValue.pageSize,
+                            (newValue.pageNo - 1) * newValue.pageSize + newValue.pageSize
+                        )
+                    ]);
+                    return newValue;
+                });
+            }
+        }
+    };
+    //切换category
     const changeCategory = (data: string) => {
         setQueryParams({
             ...queryParams,
@@ -83,7 +118,7 @@ function TemplateMarket() {
         });
     };
     return (
-        <Box maxWidth="1300px" margin="0 auto">
+        <Box maxWidth="1300px" margin="0 auto" height="calc(100vh - 128px)" overflow="auto" onScroll={goodsScroll}>
             <Typography variant="h1" mt={3} textAlign="center">
                 {t('market.title')}
             </Typography>

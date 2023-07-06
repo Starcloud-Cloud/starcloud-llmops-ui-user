@@ -527,7 +527,13 @@
     "copy": "Click Copy Invitation code",
     "error": "The currently used tokens are insufficient",
     "welcome": "Welcome",
-    "place": "Search AI Applications"
+    "place": "Search AI Applications",
+    "ai": "AI Result",
+    "like": "Like",
+    "Step": "Dont Like",
+    "copys": "Copy",
+    "share": "Share",
+    "words": "Words"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",
@@ -678,7 +684,9 @@
     "totalElapsed": "Total Elapsed",
     "totalPrice": "Total Price",
     "status": "Status",
-    "createTime": "CreateTime"
+    "createTime": "CreateTime",
+    "CHAT": "Chat",
+    "COMPLETION": "Completion"
   },
   "generateLog": {
     "messageTotal": "Message Total",

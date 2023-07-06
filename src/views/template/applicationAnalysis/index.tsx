@@ -27,7 +27,7 @@ import { t } from 'hooks/web/useI18n';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
-    elapsedAvg: string;
+    elapsedAvg: number;
     userCount: string;
     tokens: string;
 }
@@ -55,7 +55,7 @@ function ApplicationAnalysis() {
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState({
         pageNo: 1,
-        pageSize: 10
+        pageSize: 15
     });
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
@@ -71,11 +71,11 @@ function ApplicationAnalysis() {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg, x: item.createDate }));
+            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
             setGenerate([
                 { title: t('generateLog.messageTotal'), data: message },
                 { title: t('generateLog.usertotal'), data: userCount },
-                { title: t('generateLog.TimeConsuming'), data: elapsedAvg },
+                { title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg },
                 { title: t('generateLog.tokenTotal'), data: tokens }
             ]);
         });
@@ -109,7 +109,7 @@ function ApplicationAnalysis() {
     //封装的echarts
     const list = (item: Charts): Props => {
         return {
-            height: 300,
+            height: 200,
             type: 'area',
             options: {
                 chart: {
@@ -217,7 +217,7 @@ function ApplicationAnalysis() {
             <Grid container spacing={2}>
                 {generate.map((item) => (
                     <Grid item md={6} xs={12} key={item.title}>
-                        <SubCard sx={{ height: '400px' }}>
+                        <SubCard sx={{ pb: 0 }}>
                             <Typography variant="h4" gutterBottom>
                                 {item.title}
                             </Typography>
@@ -230,8 +230,8 @@ function ApplicationAnalysis() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>{t('generate.name')}</TableCell>
                             <TableCell>{t('generate.mode')}</TableCell>
+                            <TableCell>{t('generate.name')}</TableCell>
                             <TableCell>{t('generate.totalAnswerTokens')}</TableCell>
                             <TableCell>{t('generate.totalElapsed')} (s)</TableCell>
                             <TableCell>{t('generate.status')}</TableCell>
@@ -241,7 +241,7 @@ function ApplicationAnalysis() {
                     <TableBody>
                         {totalData?.map((row) => (
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell>{row.appMode}</TableCell>
+                                <TableCell>{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell>{row.appName}</TableCell>
                                 <TableCell>{row.totalAnswerTokens}</TableCell>
                                 <TableCell>{row.totalElapsed}</TableCell>

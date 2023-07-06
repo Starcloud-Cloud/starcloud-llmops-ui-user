@@ -2,11 +2,16 @@ import { Tooltip, TextField, IconButton, Button, Typography, Grid, Box, Card, Ca
 
 import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import NotStartedIcon from '@mui/icons-material/NotStarted';
+import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
+import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
+import ReplyIcon from '@mui/icons-material/Reply';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import { useFormik as Formik } from 'formik';
 import FormExecute from 'views/template/components/validaForm';
 import generateValidationSchema from 'hooks/usevalid';
+import copy from 'clipboard-copy';
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
@@ -70,7 +75,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
         <Box>
             {config?.steps.length > 1 ? (
                 <Box mb={1}>
-                    <Button startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
+                    <Button color="secondary" startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
                         {t('market.allExecute')}
                     </Button>
                     <Tooltip title={t('market.allStepTips')}>
@@ -112,6 +117,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                             </Typography>
                                         </Box>
                                     ) : null}
+                                    <Box sx={{ display: { xs: 'none', md: 'block' } }}></Box>
                                     <Box whiteSpace="nowrap">
                                         <Tooltip title={t('market.stepTips')}>
                                             <IconButton size="small">
@@ -123,6 +129,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                                 isallExecute(false);
                                                 arr[steps].handleSubmit();
                                             }}
+                                            color="secondary"
                                             size="small"
                                             startIcon={<NotStartedIcon />}
                                             variant="contained"
@@ -158,9 +165,73 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                 </form>
                                 <Box my={2} display="flex">
                                     {item.flowStep.response.style === 'INPUT' ? (
-                                        <TextField fullWidth />
+                                        <TextField
+                                            label={t('market.ai')}
+                                            InputLabelProps={{ shrink: true }}
+                                            value={item.flowStep.response.answer}
+                                            fullWidth
+                                        />
                                     ) : item.flowStep.response.style === 'TEXTAREA' ? (
-                                        <TextField value={item.flowStep.response.answer} multiline rows={8} fullWidth />
+                                        <Box width="100%">
+                                            <TextField
+                                                label={t('market.ai')}
+                                                InputLabelProps={{ shrink: true }}
+                                                value={item.flowStep.response.answer}
+                                                multiline
+                                                rows={8}
+                                                fullWidth
+                                            />
+                                            {item.flowStep.response.answer && (
+                                                <Box display="flex" justifyContent="space-between">
+                                                    <Box>
+                                                        <Button
+                                                            sx={{ mt: 1, mr: 1 }}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                            startIcon={<ContentPasteIcon />}
+                                                            onClick={() => {
+                                                                copy(item.flowStep.response.answer);
+                                                            }}
+                                                        >
+                                                            {t('market.copys')}
+                                                        </Button>
+                                                        <Button
+                                                            sx={{ mt: 1, mr: 1 }}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                            startIcon={<ThumbUpAltOutlinedIcon />}
+                                                        >
+                                                            {t('market.like')}
+                                                        </Button>
+                                                        <Button
+                                                            sx={{ mt: 1, mr: 1 }}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                            startIcon={<ThumbDownOutlinedIcon />}
+                                                        >
+                                                            {t('market.Step')}
+                                                        </Button>
+                                                        <Button
+                                                            sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                            startIcon={<ReplyIcon />}
+                                                        >
+                                                            {t('market.share')}
+                                                        </Button>
+                                                    </Box>
+                                                    {item.flowStep.response.answer && (
+                                                        <Typography sx={{ mt: 1, fontSize: '.75rem' }}>
+                                                            {item.flowStep.response.answer?.length} {t('market.words')}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            )}
+                                        </Box>
                                     ) : (
                                         <Card
                                             elevation={3}

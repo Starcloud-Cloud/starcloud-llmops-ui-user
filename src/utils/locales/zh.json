@@ -669,7 +669,13 @@
     "copy": "点击复制邀请码",
     "error": "当前使用的token不足",
     "welcome": "欢迎您",
-    "place": "搜索AI应用"
+    "place": "搜索AI应用",
+    "ai": "AI 结果",
+    "like": "点赞",
+    "Step": "踩",
+    "copys": "复制",
+    "share": "分享",
+    "words": "个字符"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -731,7 +737,7 @@
     "pro": "专业",
     "令牌": "令牌",
     "图片": "图片",
-    "remaining": "剩余"
+    "remaining": "余"
   },
   "homepage": {
     "title": {
@@ -791,7 +797,9 @@
     "totalElapsed": "执行总耗时",
     "totalPrice": "执行总话费",
     "status": "执行状态",
-    "createTime": "创建时间"
+    "createTime": "创建时间",
+    "CHAT": "聊天",
+    "COMPLETION": "生成"
   },
   "generateLog": {
     "messageTotal": "消息数总数",

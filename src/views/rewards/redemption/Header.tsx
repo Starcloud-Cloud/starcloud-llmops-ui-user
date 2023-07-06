@@ -75,75 +75,102 @@ const RedemptionHeader = () => {
             <Card>
                 <CardMedia image={Card3} title="Card 3">
                     <CardContent sx={{ height: '300px', display: 'flex', alignItems: 'center' }}>
-                        <Grid container spacing={2} direction={{ xs: 'column', sm: 'row' }} justifyContent="center" alignItems="center">
+                        <Grid
+                            container
+                            spacing={2}
+                            direction={{ xs: 'column' }}
+                            justifyContent="center"
+                            alignItems="center"
+                            textAlign="center"
+                            sx={{
+                                '> .MuiGrid-root': {
+                                    width: '100%'
+                                }
+                            }}
+                        >
                             <Grid item>
-                                <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
-                                    <Grid item>
-                                        <Typography
-                                            variant="h1"
-                                            sx={{
-                                                fontSize: { xs: '1.2rem', md: '3.125rem', xl: '3.125rem' }
-                                            }}
-                                        >
-                                            {t('redemption.title')}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid
-                                        item
-                                        container
-                                        direction={{ sm: 'row' }}
-                                        alignItems={{ xs: 'center', sm: 'stretch' }}
-                                        justifyContent="center"
-                                        spacing={2}
-                                    >
-                                        <Grid item xs={7}>
-                                            <TextField
-                                                id="outlined-basic"
-                                                fullWidth
-                                                placeholder={t('redemption.code')}
-                                                value={code}
-                                                onChange={(e) => setCode(e.target.value)}
-                                                sx={{ height: '100%', boxSizing: 'border-box' }}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={5}>
-                                            <Button
-                                                variant="contained"
-                                                size="large"
-                                                fullWidth
-                                                onClick={handleRedeem}
-                                                sx={{
-                                                    height: '100%',
-                                                    boxShadow: theme.customShadows.primary,
-                                                    ':hover': {
-                                                        boxShadow: 'none'
-                                                    },
-                                                    boxSizing: 'border-box'
-                                                }}
-                                            >
-                                                {t('redemption.redeem')}
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                            <Grid item sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        padding: '10px 5px',
-                                        background: 'linear-gradient(180deg, rgba(74,237,255,.44), rgba(122,120,255,.22))',
-                                        gap: '5px'
+                                <Typography
+                                    variant="h1"
+                                    sx={{
+                                        fontSize: { xs: '1.2rem', md: '3.125rem', xl: '3.125rem' }
                                     }}
                                 >
-                                    <CardMedia component="img" image={wechat1} title="QR Code" sx={{ width: '100px', height: '100px' }} />
-                                    <Typography variant="body1" textAlign="center" color="white">
-                                        {t('redemption.scancode')}
-                                    </Typography>
-                                </div>
+                                    {t('redemption.title')}
+                                </Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                container
+                                spacing={2}
+                                direction={{ xs: 'column', sm: 'row' }}
+                                justifyContent="center" // Change this line
+                                alignItems="center"
+                                sx={{ width: '90%' }} // Add this line
+                            >
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={9}
+                                    container
+                                    direction="row"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    spacing={2}
+                                    sx={{ paddingLeft: { xs: '0', sm: '100px !important' } }}
+                                >
+                                    <Grid item xs={8} sm={8} md={9} lg={10}>
+                                        <TextField
+                                            id="outlined-basic"
+                                            fullWidth
+                                            placeholder={t('redemption.code')}
+                                            value={code}
+                                            onChange={(e) => setCode(e.target.value)}
+                                            sx={{ height: '100%', boxSizing: 'border-box' }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4} sm={4} md={3} lg={2}>
+                                        <Button
+                                            variant="contained"
+                                            size="large"
+                                            fullWidth
+                                            onClick={handleRedeem}
+                                            sx={{
+                                                height: '100%',
+                                                boxShadow: theme.customShadows.primary,
+                                                ':hover': {
+                                                    boxShadow: 'none'
+                                                },
+                                                boxSizing: 'border-box'
+                                            }}
+                                        >
+                                            {t('redemption.redeem')}
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12} sm={3} container direction="row" alignItems="center" justifyContent="center">
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '10px 5px',
+                                            background: 'linear-gradient(180deg, rgba(74,237,255,.44), rgba(122,120,255,.22))',
+                                            gap: '5px'
+                                        }}
+                                    >
+                                        <CardMedia
+                                            component="img"
+                                            image={wechat1}
+                                            title="QR Code"
+                                            sx={{ width: '100px', height: '100px' }}
+                                        />
+                                        <Typography variant="body1" textAlign="center" color="white">
+                                            {t('redemption.scancode')}
+                                        </Typography>
+                                    </div>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </CardContent>

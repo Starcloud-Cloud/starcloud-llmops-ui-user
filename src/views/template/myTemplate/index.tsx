@@ -106,7 +106,7 @@ function MyTemplate() {
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                     {recommendList.map((item: Item, index) => (
-                        <Box key={item.uid} style={{ marginLeft: index === 0 ? 0 : '16px', width: '219px', height: '319px' }}>
+                        <Box key={item.uid} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
                             <Template data={item} handleDetail={handleDetail} />
                         </Box>
                     ))}

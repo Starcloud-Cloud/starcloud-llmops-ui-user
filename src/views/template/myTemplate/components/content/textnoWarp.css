@@ -8,8 +8,9 @@
 }
 .desc {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    height: 30px;
+    -webkit-line-clamp: 5;
+    height: 80px;
+    line-height: 1rem;
     /* 指定行数 */
     -webkit-box-orient: vertical;
     overflow: hidden;

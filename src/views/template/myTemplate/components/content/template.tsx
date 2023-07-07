@@ -14,7 +14,7 @@ function Template({ data, handleDetail }: any) {
     return (
         <Card
             sx={{
-                aspectRatio: 16 / 9,
+                aspectRatio: '186 / 220',
                 overflow: 'hidden',
                 position: 'relative',
                 border: '1px solid',
@@ -24,7 +24,7 @@ function Template({ data, handleDetail }: any) {
                 }
             }}
         >
-            <Box height="120px" overflow="hidden">
+            <Box sx={{ aspectRatio: '186 / 80', overflow: 'hidden' }}>
                 <img
                     onClick={() => handleDetail(data)}
                     alt="图片"
@@ -40,7 +40,6 @@ function Template({ data, handleDetail }: any) {
                     px: 2,
                     py: 1,
                     position: 'relative',
-                    paddingBottom: '50%', // 16:9 aspect ratio (9 / 16 = 0.5625)
                     overflow: 'hidden'
                 }}
             >
@@ -57,18 +56,16 @@ function Template({ data, handleDetail }: any) {
                         {data.name}
                     </Typography>
                 </Tooltip>
-                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '12px' }}>{data.description}</Box>}>
-                    <Typography
-                        sx={{ fontSize: '.75rem', color: 'rgba(21,39,55,.6)' }}
-                        onClick={() => handleDetail(data)}
-                        className="cursor desc"
-                        variant="body2"
-                        component="div"
-                        lineHeight={1.2}
-                    >
-                        {data.description}
-                    </Typography>
-                </Tooltip>
+                <Typography
+                    sx={{ fontSize: '.75rem', color: 'rgba(21,39,55,.6)' }}
+                    onClick={() => handleDetail(data)}
+                    className="cursor desc"
+                    variant="body2"
+                    component="div"
+                    lineHeight={1.2}
+                >
+                    {data.description}
+                </Typography>
             </CardContent>
             <Box position="absolute" left="8px" bottom="8px">
                 {data.categories &&

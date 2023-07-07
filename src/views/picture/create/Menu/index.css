@@ -1,0 +1,55 @@
+.pcm_menu {
+    width: 360px;
+    border-right: 0.5px solid #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pcm_tab_span_wrapper {
+    flex: 1;
+}
+
+.pcm_tab_span {
+    width: 96%;
+    height: 32px;
+    background-color: rgb(244, 246, 248);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.pcm_tab_span:hover {
+    width: 96%;
+    height: 32px;
+    background-color: rgb(244, 246, 248);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #673ab7;
+    cursor: pointer;
+}
+
+.pcm_tab_span_active {
+    width: 96%;
+    height: 32px;
+    background-color: rgba(129, 84, 235, 0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #673ab7;
+    cursor: pointer;
+    border: 0.5px solid #673ab7;
+}
+
+.pcm_collapse_child_wrapper {
+    display: flex;
+}
+
+.pcm_collapse_child_item {
+    display: flex;
+}

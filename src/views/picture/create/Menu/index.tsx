@@ -1,7 +1,8 @@
 import { Button, Col, Collapse, Input, Row, Space, Tag, Typography } from 'antd';
 
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import './index.css';
+import './index.scss';
 
 const { TextArea } = Input;
 const { CheckableTag } = Tag;
@@ -33,11 +34,16 @@ const CollapseChildren = () => {
     );
 };
 
-export const PictureCreateMenu = () => {
+type IPictureCreateMenuProps = {
+    menuVisible: boolean;
+    setMenuVisible: (menuVisible: boolean) => void;
+};
+
+export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreateMenuProps) => {
     const [select, setSelect] = useState<undefined | number>(undefined);
 
     return (
-        <Col className={'pcm_menu'}>
+        <Col className={menuVisible ? 'pcm_menu' : 'pcm_menu_hidden'}>
             <Row style={{ width: '90%', marginTop: '15px' }}>
                 <Typography.Text aria-level={1} style={{ fontSize: '16px' }}>
                     图片描述
@@ -93,10 +99,28 @@ export const PictureCreateMenu = () => {
                 justify={'center'}
                 align={'middle'}
             >
-                <Button type={'primary'} block style={{ width: '94%' }}>
+                <Button type={'primary'} block style={{ width: '94%', background: '#673ab7' }}>
                     生成
                 </Button>
             </Row>
+            <div
+                className="flex cursor-pointer h-24 w-5 items-center justify-end bg-white outline-none rotate-180 absolute z-10 top-1/2 -translate-y-1/2 transform -right-5"
+                onClick={() => setMenuVisible(!menuVisible)}
+            ></div>
+            <span className="panel-collapse-border-handle z-10 h-24 w-[21px] bg-neutral-200 absolute top-1/2 -translate-y-1/2 transform -right-5 rotate-180"></span>
+            {menuVisible ? (
+                <LeftOutlined
+                    rev={undefined}
+                    className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"
+                    onClick={() => setMenuVisible(!menuVisible)}
+                />
+            ) : (
+                <RightOutlined
+                    rev={undefined}
+                    className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"
+                    onClick={() => setMenuVisible(!menuVisible)}
+                />
+            )}
         </Col>
     );
 };

@@ -1,0 +1,19 @@
+.pcm_container {
+  width: calc(100vw - 390px);
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+
+  .pcm_container_wrapper {
+    width: 620px;
+   display: flex; 
+   flex-wrap: wrap;
+   align-items: center; 
+    justify-content: center; 
+
+    .pcm_container_item {
+     padding: 5px; 
+    }
+  }
+
+}

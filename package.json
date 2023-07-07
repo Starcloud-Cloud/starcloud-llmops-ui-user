@@ -180,6 +180,7 @@
         "os-browserify": "^0.3.0",
         "path-browserify": "^1.0.1",
         "prettier": "^2.8.1",
-        "sass": "^1.57.1"
+        "sass": "^1.57.1",
+        "tailwindcss": "^3.3.2"
     }
 }

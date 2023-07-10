@@ -43,3 +43,13 @@ export interface GetUserBenefitsPageRes {
 export const getUserBenefitsPage = (pageVO: string): Promise<GetUserBenefitsPageRes> => {
     return request.get({ url: `llm/user-benefits/page?pageVO=${pageVO}` });
 };
+
+// 响应接口
+export interface SubmitPayOrder {
+    displayMode: string;
+    displayContent: string;
+}
+
+export function submitPayOrder(data: any): Promise<SubmitPayOrder> {
+    return request.post({ url: `/llm/pay/order/submit`, data });
+}

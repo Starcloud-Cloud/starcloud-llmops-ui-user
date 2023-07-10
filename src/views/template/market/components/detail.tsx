@@ -114,7 +114,7 @@ function Deatail() {
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: t('market.marning'),
+                                    message: t('market.warning'),
                                     variant: 'alert',
                                     alert: {
                                         color: 'error'

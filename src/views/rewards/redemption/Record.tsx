@@ -242,7 +242,15 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     return (
-        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+        <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+            sx={{
+                '& > div:focus-visible': { outline: 'none' }
+            }}
+        >
             <div
                 style={{
                     position: 'absolute',

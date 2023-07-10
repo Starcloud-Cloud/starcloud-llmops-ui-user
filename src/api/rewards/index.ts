@@ -53,3 +53,7 @@ export interface SubmitPayOrder {
 export function submitPayOrder(data: any): Promise<SubmitPayOrder> {
     return request.post({ url: `/llm/pay/order/submit`, data });
 }
+
+export function getProductList() {
+    return request.post({ url: `/llm/pay/order/product/list` });
+}

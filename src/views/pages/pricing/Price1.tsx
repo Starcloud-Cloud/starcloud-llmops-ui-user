@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 
 import { useTheme, AppBar, Tabs, Tab, Box } from '@mui/material';
 import { Button, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ import TwoWheelerTwoToneIcon from '@mui/icons-material/TwoWheelerTwoTone';
 import AirportShuttleTwoToneIcon from '@mui/icons-material/AirportShuttleTwoTone';
 import DirectionsBoatTwoToneIcon from '@mui/icons-material/DirectionsBoatTwoTone';
 import { FaArrowRight, FaMinus } from 'react-icons/fa';
-import { submitPayOrder } from 'api/rewards';
+import { getProductList, submitPayOrder } from 'api/rewards';
 
 const basePlans = [
     {
@@ -62,6 +62,11 @@ const Price1 = () => {
     const handleChange = (event: ChangeEvent<{}>, newValue: number) => {
         setValue(newValue);
     };
+    useEffect(() => {
+        getProductList().then((res) => {
+            console.log(res);
+        });
+    }, []);
     const handlepay = async () => {
         const res = await submitPayOrder({ code: '000001' });
         window.location.href = res.displayContent;

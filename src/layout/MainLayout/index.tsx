@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 
 // material-ui
@@ -16,7 +16,8 @@ import getMenuItems from 'menu-items';
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
-import { useSelector } from 'store';
+import { openDrawer } from 'store/slices/menu';
+import { useDispatch, useSelector } from 'store';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
@@ -86,9 +87,32 @@ const MainLayout = () => {
     const theme = useTheme();
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
-
+    const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
-    const { container, layout } = useConfig();
+    const { drawerType, container, layout } = useConfig();
+
+    // useEffect(() => {
+    //     if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER) {
+    //         dispatch(openDrawer(true));
+    //     } else {
+    //         dispatch(openDrawer(false));
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [drawerType]);
+
+    useEffect(() => {
+        if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER && !matchDownMd) {
+            dispatch(openDrawer(true));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // useEffect(() => {
+    //     if (matchDownMd) {
+    //         dispatch(openDrawer(true));
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [matchDownMd]);
 
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 

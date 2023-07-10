@@ -14,6 +14,8 @@ import generateValidationSchema from 'hooks/usevalid';
 import copy from 'clipboard-copy';
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
@@ -172,17 +174,12 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                             fullWidth
                                         />
                                     ) : item.flowStep.response.style === 'TEXTAREA' ? (
-                                        <Box width="100%">
-                                            <TextField
-                                                label={t('market.ai')}
-                                                InputLabelProps={{ shrink: true }}
-                                                value={item.flowStep.response.answer}
-                                                multiline
-                                                rows={8}
-                                                fullWidth
-                                            />
+                                        <Box width="100%" sx={{ background: '#f8fafc' }}>
+                                            <Box sx={{ p: 2, height: '300px', overflow: 'auto' }}>
+                                                <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
+                                            </Box>
                                             {item.flowStep.response.answer && (
-                                                <Box display="flex" justifyContent="space-between">
+                                                <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
                                                     <Box>
                                                         <Button
                                                             sx={{ mt: 1, mr: 1 }}
@@ -225,7 +222,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute }: any) {
                                                         </Button>
                                                     </Box>
                                                     {item.flowStep.response.answer && (
-                                                        <Typography sx={{ mt: 1, fontSize: '.75rem' }}>
+                                                        <Typography sx={{ mt: 1, fontSize: '.75rem', mr: '24px' }}>
                                                             {item.flowStep.response.answer?.length} {t('market.words')}
                                                         </Typography>
                                                     )}

@@ -45,45 +45,21 @@ function Deatail() {
             setLoadings(value);
         }
         setDetailData((oldValue) => {
-            const newData = {
-                ...oldValue,
-                workflowConfig: {
-                    steps: [
-                        ...oldValue.workflowConfig.steps.slice(0, index),
-                        data.steps,
-                        ...oldValue.workflowConfig.steps.slice(index + 1, oldValue.workflowConfig.steps.length)
-                    ]
-                }
-            };
+            const newData = { ...oldValue };
+            newData.workflowConfig.steps[index] = data.steps;
             const fetchData = async () => {
                 let resp: any = await executeMarket({
                     appUid: uid,
                     stepId: stepId,
                     appReqVO: newData
                 });
-                setDetailData({
-                    ...newData,
-                    workflowConfig: {
-                        steps: [
-                            ...newData.workflowConfig.steps.slice(0, index),
-                            {
-                                ...newData.workflowConfig.steps[index],
-                                flowStep: {
-                                    ...newData.workflowConfig.steps[index].flowStep,
-                                    response: {
-                                        ...newData.workflowConfig.steps[index].flowStep.response,
-                                        answer: ''
-                                    }
-                                }
-                            },
-                            ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
-                        ]
-                    }
-                });
+                const contentData = { ...newData };
+                contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+                setDetailData(contentData);
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
                 while (1) {
-                    const { done, value } = await reader.();
+                    const { done, value } = await reader.read();
                     if (textDecoder.decode(value).includes('2008002007')) {
                         dispatch(
                             openSnackbar({
@@ -118,38 +94,36 @@ function Deatail() {
                         }
                         break;
                     }
-                    console.log(new TextDecoder().decode(value));
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
                     let str = textDecoder.decode(value);
-                    // console.log(newData.workflowConfig.steps[index].flowStep.response.answer);
-                    setDetailData({
-                        ...newData,
-                        workflowConfig: {
-                            steps: [
-                                ...newData.workflowConfig.steps.slice(0, index),
-                                {
-                                    ...newData.workflowConfig.steps[index],
-                                    flowStep: {
-                                        ...newData.workflowConfig.steps[index].flowStep,
-                                        response: {
-                                            ...newData.workflowConfig.steps[index].flowStep.response,
-                                            answer: newData.workflowConfig.steps[index].flowStep.response.answer + str
-                                        }
-                                    }
-                                },
-                                ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
-                            ]
+                    const lines = str.split('\n');
+                    lines.forEach((message) => {
+                        let bufferObj;
+                        if (message.startsWith('data:')) {
+                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                        } else if (message && !message.startsWith('data:')) {
+                            bufferObj = JSON.parse(message);
+                        }
+                        if (bufferObj?.code === 200) {
+                            contentData.workflowConfig.steps[index].flowStep.response.answer =
+                                contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            setDetailData(contentData);
+                        } else {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: t('market.marning'),
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                })
+                            );
                         }
                     });
-                    // if (str.includes('&error&')) {
-                    //     str = '';
-                    // } else if (str.includes('&start&')) {
-                    //     str = str.split('&start&')[1];
-                    // } else if (str.includes('&end&')) {
-                    //     str = str.split('&start&')[1].split('&end&')[0];
-                    // }
                 }
             };
             fetchData();

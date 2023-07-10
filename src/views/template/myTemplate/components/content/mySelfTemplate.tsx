@@ -1,15 +1,17 @@
-import { Typography, Link, Chip, Box, Grid } from '@mui/material';
+import { Typography, Link, Chip, Box, Grid, Tooltip } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 import { Item } from 'types/template';
 import { useNavigate } from 'react-router-dom';
+import marketStore from 'store/market';
 import './textnoWarp.css';
 function MyselfTemplate({ appList }: { appList: Item[] }) {
     const navigate = useNavigate();
+    const { categoryList } = marketStore();
     return (
         <Grid container spacing={2}>
             {appList?.map((data) => (
-                <Grid item xs={12} md={6} lg={4}>
-                    <SubCard key={data.uid} sx={{ height: 150, cursor: 'pointer' }}>
+                <Grid key={data.uid} item xs={12} md={6} lg={4}>
+                    <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                         <Box
                             onClick={() => {
                                 navigate('/createApp?uid=' + data?.uid);
@@ -25,14 +27,19 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                 />
                             )}
                             <Box overflow="hidden" marginLeft="20px">
-                                <Typography variant="h3" noWrap width="100%" mb={0.5}>
-                                    {data?.name}
-                                </Typography>
-                                <div className="textnoWarp">{data?.description} </div>
+                                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.name}</Box>}>
+                                    <Typography variant="h3" sx={{ display: 'inline-block' }} noWrap mb={0.5}>
+                                        {data?.name}
+                                    </Typography>
+                                </Tooltip>
+                                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.description}</Box>}>
+                                    <div className="textnoWarp">{data?.description} </div>
+                                </Tooltip>
+
                                 <Box fontSize={12}>
                                     {data?.categories.map((el) => (
                                         <Link key={el} href="#" fontSize={14} mr={0.5}>
-                                            {el}
+                                            #{categoryList?.find((i: { code: string }) => i.code === el)?.name}
                                         </Link>
                                     ))}
                                 </Box>

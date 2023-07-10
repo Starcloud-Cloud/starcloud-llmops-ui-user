@@ -149,6 +149,7 @@ function CreateDetail() {
             }
         });
     };
+    //提示词更改
     const basisChange = ({ e, index, i }: any) => {
         setDetail({
             ...detail,
@@ -179,6 +180,7 @@ function CreateDetail() {
             }
         });
     };
+    //步骤更改
     const variableChange = ({ e, index, i }: any) => {
         setDetail({
             ...detail,

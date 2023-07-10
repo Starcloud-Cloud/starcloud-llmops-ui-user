@@ -106,19 +106,24 @@ function MyTemplate() {
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                     {recommendList.map((item: Item, index) => (
-                        <Box key={item.uid} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
+                        <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
                             <Template data={item} handleDetail={handleDetail} />
                         </Box>
                     ))}
                 </ScrollMenu>
             </Box>
-            <Typography variant="h5" my={2}>
-                {t('apply.self')}
-            </Typography>
-            <MyselfTemplate appList={newAppList} />
-            <Box my={2}>
-                <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
-            </Box>
+            {total > 0 && (
+                <Box>
+                    <Typography variant="h5" my={2}>
+                        {t('apply.self')}
+                    </Typography>
+                    <MyselfTemplate appList={newAppList} />
+                    <Box my={2}>
+                        (
+                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />)
+                    </Box>
+                </Box>
+            )}
         </Box>
     );
 }

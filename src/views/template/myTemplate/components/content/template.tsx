@@ -1,11 +1,6 @@
-import Card from '@mui/material/Card';
-import Box from '@mui/material/Box';
+import { Card, CardContent, Box, Typography, Tooltip, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
 import marketStore from 'store/market';
-import Link from '@mui/material/Link';
 import './textnoWarp.css';
 
 function Template({ data, handleDetail }: any) {

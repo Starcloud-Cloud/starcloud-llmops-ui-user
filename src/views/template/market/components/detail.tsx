@@ -83,7 +83,7 @@ function Deatail() {
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
                 while (1) {
-                    const { done, value } = await reader.read();
+                    const { done, value } = await reader.();
                     if (textDecoder.decode(value).includes('2008002007')) {
                         dispatch(
                             openSnackbar({
@@ -118,10 +118,12 @@ function Deatail() {
                         }
                         break;
                     }
+                    console.log(new TextDecoder().decode(value));
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
                     let str = textDecoder.decode(value);
+                    // console.log(newData.workflowConfig.steps[index].flowStep.response.answer);
                     setDetailData({
                         ...newData,
                         workflowConfig: {

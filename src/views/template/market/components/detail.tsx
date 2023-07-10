@@ -58,8 +58,11 @@ function Deatail() {
                 setDetailData(contentData);
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
+                let outerJoins: any;
                 while (1) {
+                    let joins = outerJoins;
                     const { done, value } = await reader.read();
+
                     if (textDecoder.decode(value).includes('2008002007')) {
                         dispatch(
                             openSnackbar({
@@ -98,23 +101,32 @@ function Deatail() {
                     newValue1[index] = false;
                     setLoadings(newValue1);
                     let str = textDecoder.decode(value);
+
                     const lines = str.split('\n');
-                    lines.forEach((message) => {
+                    lines.forEach((message, i: number) => {
+                        if (i === 0 && joins) {
+                            message = joins + message;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (message && message.indexOf('}') === -1) {
+                                joins = message;
+                                return;
+                            }
+                        }
                         let bufferObj;
-                        if (message.startsWith('data:')) {
+                        if (message?.startsWith('data:')) {
                             bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                        } else if (message && !message.startsWith('data:')) {
-                            bufferObj = JSON.parse(message);
                         }
                         if (bufferObj?.code === 200) {
                             contentData.workflowConfig.steps[index].flowStep.response.answer =
                                 contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                             setDetailData(contentData);
-                        } else {
+                        } else if (bufferObj && bufferObj.code !== 200) {
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: t('market.marning'),
+                                    message: t('market.warning'),
                                     variant: 'alert',
                                     alert: {
                                         color: 'error'
@@ -124,6 +136,7 @@ function Deatail() {
                             );
                         }
                     });
+                    outerJoins = joins;
                 }
             };
             fetchData();

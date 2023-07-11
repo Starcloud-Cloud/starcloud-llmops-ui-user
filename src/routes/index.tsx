@@ -7,6 +7,7 @@ import LoginRoutes from './LoginRoutes';
 // import AuthenticationRoutes from './AuthenticationRoutes';
 import Loadable from 'ui-component/Loadable';
 import useRouteStore from 'store/router';
+import AuthSingleRouter from './AuthSingleRouter';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
@@ -20,6 +21,7 @@ export default function ThemeRoutes() {
         // AuthenticationRoutes,
         LoginRoutes,
         MainRoutes,
+        AuthSingleRouter,
         { path: '*', element: <PageNotFound /> }
     ]);
 }

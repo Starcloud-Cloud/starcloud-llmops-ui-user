@@ -1,12 +1,12 @@
 // material-ui
-import { useTheme, styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 // project imports
 import Customization from 'layout/Customization';
 import AppBar from 'ui-component/extended/AppBar';
-import HeaderSection from './HeaderSection';
 import CardSection from './CardSection';
 import FeatureSection from './FeatureSection';
+import HeaderSection from './HeaderSection';
 // import PeopleSection from './PeopleSection';
 // import FrameworkSection from './FrameworkSection';
 import FooterSection from './FooterSection';
@@ -17,7 +17,7 @@ import StartupProjectSection from './StartupProjectSection';
 //import RtlInfoSection from './RtlInfoSection';
 
 // custom stlye
-const HeaderWrapper = styled('div')(({ theme }) => ({
+export const HeaderWrapper = styled('div')(({ theme }) => ({
     overflowX: 'hidden',
     overflowY: 'clip',
     background:
@@ -27,7 +27,7 @@ const HeaderWrapper = styled('div')(({ theme }) => ({
     [theme.breakpoints.down('md')]: {}
 }));
 
-const SectionWrapper = styled('div')({
+export const SectionWrapper = styled('div')({
     paddingTop: 100,
     paddingBottom: 100
 });

@@ -1,46 +1,59 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React from 'react';
 
-import { useTheme, AppBar, Tabs, Tab, Box } from '@mui/material';
-import { Button, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+// material-ui
+import { Box, Button, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
+import MainCard from 'ui-component/cards/MainCard';
 
 // assets
-import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
-import TwoWheelerTwoToneIcon from '@mui/icons-material/TwoWheelerTwoTone';
 import AirportShuttleTwoToneIcon from '@mui/icons-material/AirportShuttleTwoTone';
+import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
 import DirectionsBoatTwoToneIcon from '@mui/icons-material/DirectionsBoatTwoTone';
-import { FaArrowRight, FaMinus } from 'react-icons/fa';
-import { getProductList, submitPayOrder } from 'api/rewards';
+import TwoWheelerTwoToneIcon from '@mui/icons-material/TwoWheelerTwoTone';
+import { HeaderWrapper } from '../landing';
+import { VipBar } from './VipBar';
+// import PeopleSection from './PeopleSection'
+import FooterSection from '../landing/FooterSection';
+import { SectionWrapper } from '../landing/index';
 
-const basePlans = [
+const plans = [
     {
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
-        title: 'STARTER',
-        pay: 'JOIN',
-        price: 59,
-        annualPrice: 119,
+        title: 'Standard',
+        description:
+            'Create one end product for a client, transfer that end product to your client, charge them for your services. The license is then transferred to the client.',
+        price: 69,
+        permission: [0, 1]
+    },
+    {
+        active: false,
+        icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
+        title: 'Standard',
+        description:
+            'Create one end product for a client, transfer that end product to your client, charge them for your services. The license is then transferred to the client.',
+        price: 69,
         permission: [0, 1]
     },
     {
         active: true,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
-        title: 'PREMIUM',
-        pay: 'TRY PREMIUM',
-        price: 89,
-        annualPrice: 159,
+        title: 'Standard Plus',
+        description:
+            'Create one end product for a client, transfer that end product to your client, charge them for your services. The license is then transferred to the client.',
+        price: 129,
         permission: [0, 1, 2, 3]
     },
     {
         active: false,
         icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
-        title: 'ENTERPRISE',
-        pay: 'JOIN',
-        price: 99,
-        annualPrice: 359,
+        title: 'Extended',
+        description:
+            'You are licensed to use the CONTENT to create one end product for yourself or for one client (a “single application”), and the end product may be sold or distributed for free.',
+        price: 599,
         permission: [0, 1, 2, 3, 5]
     }
 ];
@@ -56,220 +69,146 @@ const planList = [
     'Separate sale of our UI Elements?' // 7
 ];
 
+// ===============================|| PRICING - PRICE 1 ||=============================== //
+
 const Price1 = () => {
     const theme = useTheme();
-    const [value, setValue] = useState(0);
-    const handleChange = (event: ChangeEvent<{}>, newValue: number) => {
-        setValue(newValue);
+    const priceListDisable = {
+        opacity: '0.4',
+        '& >div> svg': {
+            fill: theme.palette.secondary.light
+        }
     };
-    useEffect(() => {
-        getProductList().then((res) => {
-            console.log(res);
-        });
-    }, []);
-    const handlepay = async () => {
-        const res = await submitPayOrder({ code: '000001' });
-        window.location.href = res.displayContent;
-    };
-    const plans = basePlans.map((plan) => {
-        return {
-            ...plan,
-            price: value === 0 ? plan.price : plan.annualPrice
-        };
-    });
     return (
-        <Grid container spacing={gridSpacing}>
-            <Grid item xs={12} sm={12} md={12}>
-                <Box width={{ xs: '22rem', md: '25rem', justifyContent: 'center' }} mx="auto" mt={4} mb={4}>
-                    <AppBar position="static" sx={{ backgroundColor: 'white' }}>
-                        <Tabs value={value} onChange={handleChange}>
-                            <Tab
-                                sx={{ width: '50%' }}
-                                id="monthly"
-                                label={
-                                    <Box py={0.5} px={2} color="black">
-                                        Monthly
-                                    </Box>
-                                }
-                            />
-                            <Tab
-                                sx={{ width: '50%' }}
-                                id="annual"
-                                label={
-                                    <Box
-                                        py={0.5}
-                                        px={2}
-                                        color="black
-                                    "
-                                    >
-                                        Annual
-                                    </Box>
-                                }
-                            />
-                        </Tabs>
-                    </AppBar>
-                </Box>
-            </Grid>
-
-            {plans.map((plan, index) => {
-                // const darkBorder = theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
-                return (
-                    <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        md={4}
-                        key={index}
-                        sx={{
-                            '.MuiCardContent-root': {
-                                pt: 0
-                            }
-                        }}
-                    >
-                        <MainCard
-                            boxShadow
-                            sx={{
-                                pt: 1.75,
-                                overflow: 'visible',
-                                backgroundColor: index % 2 === 0 ? '#fff' : '#000',
-                                color: index % 2 === 0 ? '#000' : '#fff'
-                            }}
-                        >
-                            <Grid
-                                container
-                                textAlign="center"
-                                spacing={gridSpacing}
-                                sx={{
-                                    width: '100%',
-
-                                    margin: 0,
-                                    '.MuiCardContent-root': { pt: 0 },
-                                    '> .MuiGrid-item:last-child': {
-                                        p: '1rem 0'
-                                    }
-                                }}
-                            >
-                                <Grid
-                                    item
-                                    xs={12}
+        <div>
+            <HeaderWrapper id="vip">
+                <VipBar />
+            </HeaderWrapper>
+            <div style={{ width: '80%', margin: '0 auto' }}>
+                <Grid container spacing={gridSpacing} style={{ margin: '100px 0' }}>
+                    {plans.map((plan, index) => {
+                        const darkBorder =
+                            theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
+                        return (
+                            <Grid item xs={12} sm={6} md={3} key={index}>
+                                <MainCard
+                                    boxShadow
                                     sx={{
-                                        position: 'relative',
-                                        '.MuiGrid-item': {
-                                            width: '100%'
-                                        },
-                                        '.MuiCardContent-root': { pt: 0 }
+                                        pt: 1.75,
+                                        border: plan.active ? '2px solid' : '1px solid',
+                                        borderColor: plan.active ? 'secondary.main' : darkBorder
                                     }}
                                 >
-                                    <Typography
-                                        variant="h6"
-                                        sx={{
-                                            fontSize: '1.5625rem',
-                                            fontWeight: 500,
-                                            p: '1rem 5rem',
-                                            position: 'absolute',
-                                            color: index % 2 === 0 ? '#000' : '#fff',
-                                            background: index % 2 === 0 ? '#f0f2f5' : '#1A73E8',
-                                            borderRadius: '10rem',
-                                            top: '-50%', // 将 Typography 组件向上移动一半的高度
-                                            left: '50%', // 将 Typography 组件向右移动一半的宽度
-                                            transformOrigin: 'center', // 以中心为原点缩放
-                                            transform: 'translate(-50%, -50%) scale(0.4)' // 将 Typography 组件的中心放置在父元素的中心，并缩小到0.3倍大小
-                                        }}
-                                    >
-                                        {plan.title}
-                                    </Typography>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <Typography
-                                        component="div"
-                                        variant="body2"
-                                        sx={{
-                                            color: index % 2 === 0 ? '#000' : '#fff',
-                                            fontSize: '2.1875rem',
-                                            fontWeight: 700,
-                                            '& > span': {
-                                                fontSize: '1.25rem',
-                                                fontWeight: 500,
-                                                color: index % 2 === 0 ? '#000' : '#fff'
-                                            }
-                                        }}
-                                    >
-                                        <sup style={{ fontSize: '1rem', color: index % 2 === 0 ? '#000' : '#fff' }}>$</sup>
-                                        {plan.price}
-                                        <span>/mo</span>
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <List
-                                        sx={{
-                                            m: 0,
-                                            p: 0,
-                                            '&> li': {
-                                                px: 0,
-                                                py: 0.625,
-                                                '& svg': {
-                                                    fill: theme.palette.success.dark
-                                                }
-                                            }
-                                        }}
-                                        component="ul"
-                                    >
-                                        {planList.map((list, i) => (
-                                            <React.Fragment key={i}>
-                                                <ListItem>
-                                                    <ListItemIcon>
-                                                        {plan.permission.includes(i) ? (
-                                                            <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                                        ) : (
-                                                            <FaMinus />
-                                                        )}
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={list}
-                                                        sx={{
-                                                            '> span': { color: index % 2 === 0 ? '#000 !important' : '#fff !important' }
-                                                        }}
-                                                    />
-                                                </ListItem>
-                                            </React.Fragment>
-                                        ))}
-                                    </List>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sx={{
-                                        position: 'relative',
-                                        pb: '2rem',
-                                        '.MuiGrid-item': {
-                                            p: '2rem 0'
-                                        }
-                                    }}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: index % 2 === 0 ? '#000' : '#1A73E8',
-                                            width: '100%',
-                                            p: '0.5rem 2rem',
-                                            boxShadow: 'none',
-                                            ':hover': {
-                                                backgroundColor: index % 2 === 0 ? '#000' : '#1A73E8',
-                                                boxShadow: index % 2 === 0 ? '#000' : '#1A73E8'
-                                            }
-                                        }}
-                                        onClick={handlepay}
-                                    >
-                                        {plan.pay} <FaArrowRight style={{ paddingLeft: '0.5rem' }} size="1.2rem" />
-                                    </Button>
-                                </Grid>
+                                    <Grid container textAlign="center" spacing={gridSpacing}>
+                                        <Grid item xs={12}>
+                                            <Box
+                                                sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    borderRadius: '50%',
+                                                    width: 80,
+                                                    height: 80,
+                                                    background:
+                                                        theme.palette.mode === 'dark'
+                                                            ? theme.palette.dark[800]
+                                                            : theme.palette.primary.light,
+                                                    color: theme.palette.primary.main,
+                                                    '& > svg': {
+                                                        width: 35,
+                                                        height: 35
+                                                    }
+                                                }}
+                                            >
+                                                {plan.icon}
+                                            </Box>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography
+                                                variant="h6"
+                                                sx={{
+                                                    fontSize: '1.5625rem',
+                                                    fontWeight: 500,
+                                                    position: 'relative',
+                                                    mb: 1.875,
+                                                    '&:after': {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        bottom: -15,
+                                                        left: 'calc(50% - 25px)',
+                                                        width: 50,
+                                                        height: 4,
+                                                        background: theme.palette.primary.main,
+                                                        borderRadius: '3px'
+                                                    }
+                                                }}
+                                            >
+                                                {plan.title}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography variant="body2">{plan.description}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography
+                                                component="div"
+                                                variant="body2"
+                                                sx={{
+                                                    fontSize: '2.1875rem',
+                                                    fontWeight: 700,
+                                                    '& > span': {
+                                                        fontSize: '1.25rem',
+                                                        fontWeight: 500
+                                                    }
+                                                }}
+                                            >
+                                                <sup>$</sup>
+                                                {plan.price}
+                                                <span>/Lifetime</span>
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <List
+                                                sx={{
+                                                    m: 0,
+                                                    p: 0,
+                                                    '&> li': {
+                                                        px: 0,
+                                                        py: 0.625,
+                                                        '& svg': {
+                                                            fill: theme.palette.success.dark
+                                                        }
+                                                    }
+                                                }}
+                                                component="ul"
+                                            >
+                                                {planList.map((list, i) => (
+                                                    <React.Fragment key={i}>
+                                                        <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
+                                                            <ListItemIcon>
+                                                                <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                                            </ListItemIcon>
+                                                            <ListItemText primary={list} />
+                                                        </ListItem>
+                                                        <Divider />
+                                                    </React.Fragment>
+                                                ))}
+                                            </List>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Button variant="outlined">Order Now</Button>
+                                        </Grid>
+                                    </Grid>
+                                </MainCard>
                             </Grid>
-                        </MainCard>
-                    </Grid>
-                );
-            })}
-        </Grid>
+                        );
+                    })}
+                </Grid>
+            </div>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
+                <FooterSection />
+            </SectionWrapper>
+        </div>
     );
 };
 

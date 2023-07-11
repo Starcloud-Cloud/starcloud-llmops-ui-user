@@ -130,6 +130,8 @@ const Price1 = () => {
 
     const [open, setOpen] = React.useState(false);
 
+    const [payUrl, setPayUrl] = useState('');
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -144,7 +146,9 @@ const Price1 = () => {
 
     const handleCreateOrder = async (code?: string) => {
         const res = await createOrder({ productCode: code });
-        const resOrder = await submitOrder({ id: res, channelCode: 'alipay_pc', displayMode: 'qr_code_url' });
+        const resOrder = await submitOrder({ id: res, channelCode: 'alipay_pc', displayMode: 'iframe' });
+        setPayUrl(resOrder.displayContent);
+        handleOpen();
     };
 
     const handleClick = (index: number, code?: string) => {
@@ -328,7 +332,7 @@ const Price1 = () => {
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />
             </SectionWrapper>
-            <PayModal open={open} handleClose={() => handleClose()} />
+            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
         </div>
     );
 };

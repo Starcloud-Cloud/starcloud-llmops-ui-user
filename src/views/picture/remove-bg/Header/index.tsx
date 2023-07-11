@@ -1,6 +1,5 @@
 import { HomeFilled } from '@ant-design/icons';
-import { Button } from '@mui/material';
-import { Col, Divider, Row } from 'antd';
+import { Button, Col, Divider, Row, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 export const PictureCreateHeader = () => {
@@ -17,12 +16,13 @@ export const PictureCreateHeader = () => {
                     }}
                 />
                 <Divider type={'vertical'} />
-                <span className="text-base font-medium">智能设计</span>
+                <span className="text-base font-medium">批量商品抠图</span>
             </Col>
             <Col className="flex items-center">
-                <Button variant="outlined" color="secondary">
-                    下载
-                </Button>
+                <Space>
+                    <Button>批量保存</Button>
+                    <Button>打包下载</Button>
+                </Space>
             </Col>
         </Row>
     );

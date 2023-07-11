@@ -5,7 +5,7 @@ import { PictureCreateContainer } from './Container/index';
 import { PictureCreateHeader } from './Header';
 import { PictureCreateMenu } from './Menu';
 
-const PictureCreate = () => {
+const PictureRemoveBg = () => {
     const [menuVisible, setMenuVisible] = useState<boolean>(true);
     const size = useWindowSize();
 
@@ -13,7 +13,7 @@ const PictureCreate = () => {
         return (
             <div>
                 <PictureCreateHeader />
-                <Row style={{ height: 'calc(100vh - 60px)' }} className={menuVisible ? '' : 'justify-between'}>
+                <Row style={{ height: 'calc(100vh - 60px)' }} className={menuVisible ? '' : 'align-middle justify-center'}>
                     <PictureCreateMenu menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
                     {!menuVisible && <PictureCreateContainer />}
                 </Row>
@@ -24,12 +24,12 @@ const PictureCreate = () => {
     return (
         <div>
             <PictureCreateHeader />
-            <Row style={{ height: 'calc(100vh - 60px)' }} className="justify-between">
+            <Row style={{ height: 'calc(100vh - 60px)' }} className="align-middle justify-center">
                 <PictureCreateMenu menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
-                <PictureCreateContainer menuVisible={menuVisible} />
+                <PictureCreateContainer />
             </Row>
         </div>
     );
 };
 
-export default PictureCreate;
+export default PictureRemoveBg;

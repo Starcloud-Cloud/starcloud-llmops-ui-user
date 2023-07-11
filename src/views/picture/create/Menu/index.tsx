@@ -1,6 +1,8 @@
-import { Button, Col, Collapse, Input, Row, Space, Tag, Typography } from 'antd';
+import { Button } from '@mui/material';
+import { Col, Collapse, Input, Row, Space, Tag, Typography } from 'antd';
 
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { Slider } from '@mui/material';
 import { useState } from 'react';
 import './index.scss';
 
@@ -41,6 +43,7 @@ type IPictureCreateMenuProps = {
 
 export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreateMenuProps) => {
     const [select, setSelect] = useState<undefined | number>(undefined);
+    const [inputValue, setInputValue] = useState('');
 
     return (
         <Col className={menuVisible ? 'pcm_menu' : 'pcm_menu_hidden'}>
@@ -50,7 +53,8 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                 </Typography.Text>
                 <TextArea
                     rows={6}
-                    style={{ width: '100%', marginTop: '5px' }}
+                    style={{ width: '100%', marginTop: '5px', resize: 'none' }}
+                    onChange={(e) => setInputValue(e.target.value)}
                     placeholder={
                         '在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素'
                     }
@@ -77,6 +81,23 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                 </div>
             </Row>
             <Row style={{ width: '90%', marginTop: '30px' }}>
+                <span style={{ fontSize: '16px' }}>生成张数</span>
+                <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
+                    <Slider
+                        color="secondary"
+                        defaultValue={4}
+                        // size="small"
+                        // getAriaValueText={valueText}
+                        valueLabelDisplay="on"
+                        aria-labelledby="discrete-slider-small-steps"
+                        marks
+                        step={1}
+                        min={1}
+                        max={10}
+                    />
+                </div>
+            </Row>
+            <Row style={{ width: '90%', marginTop: '30px' }}>
                 <Collapse
                     style={{ width: '100%' }}
                     items={[
@@ -87,6 +108,12 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                         }
                     ]}
                 />
+            </Row>
+            <Row style={{ width: '90%', marginTop: '30px' }} className="flex">
+                <span style={{ fontSize: '16px' }}>最终描述</span>
+                <div style={{ width: '100%', display: 'flex', marginTop: '5px' }} className="font-medium">
+                    {inputValue}
+                </div>
             </Row>
             <Row
                 style={{
@@ -99,7 +126,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                 justify={'center'}
                 align={'middle'}
             >
-                <Button type={'primary'} block style={{ width: '94%', background: '#673ab7' }}>
+                <Button variant="contained" color="secondary" style={{ width: '94%' }}>
                     生成
                 </Button>
             </Row>

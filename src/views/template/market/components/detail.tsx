@@ -1,12 +1,9 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-// import LoadingButton from '@mui/lab/LoadingButton';
 
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-// import StarIcon from '@mui/icons-material/Star';
-// import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {
     marketDeatail
     // installTemplate
@@ -30,7 +27,8 @@ function Deatail() {
     const [detailData, setDetailData] = useState<Details>({} as Details);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
-    const [isAllExecute, setIsAllExecute] = useState<boolean>(false);
+    let isAllExecute = false;
+    //执行
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
         const newValue = [...loadings];
@@ -44,30 +42,84 @@ function Deatail() {
             }
             setLoadings(value);
         }
-        setDetailData((oldValue) => {
-            const newData = { ...oldValue };
-            newData.workflowConfig.steps[index] = data.steps;
-            const fetchData = async () => {
-                let resp: any = await executeMarket({
-                    appUid: uid,
-                    stepId: stepId,
-                    appReqVO: newData
-                });
-                const contentData = { ...newData };
-                contentData.workflowConfig.steps[index].flowStep.response.answer = '';
-                setDetailData(contentData);
-                const reader = resp.getReader();
-                const textDecoder = new TextDecoder();
-                let outerJoins: any;
-                while (1) {
-                    let joins = outerJoins;
-                    const { done, value } = await reader.read();
-
-                    if (textDecoder.decode(value).includes('2008002007')) {
+        const fetchData = async () => {
+            let resp: any = await executeMarket({
+                appUid: uid,
+                stepId: stepId,
+                appReqVO: detailData
+            });
+            const contentData = { ...detailData };
+            contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+            setDetailData(contentData);
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            let outerJoins: any;
+            while (1) {
+                let joins = outerJoins;
+                const { done, value } = await reader.read();
+                if (textDecoder.decode(value).includes('2008002007')) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: t('market.error'),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    return;
+                }
+                if (done) {
+                    userBenefits().then((res) => {
+                        setUserInfo(res);
+                    });
+                    if (
+                        isAllExecute &&
+                        index < detailData.workflowConfig.steps.length - 1 &&
+                        detailData.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
+                    ) {
+                        changeData({
+                            index: index + 1,
+                            stepId: detailData.workflowConfig.steps[index + 1].field,
+                            steps: detailData.workflowConfig.steps[index + 1]
+                        });
+                    }
+                    break;
+                }
+                const newValue1 = [...loadings];
+                newValue1[index] = false;
+                setLoadings(newValue1);
+                let str = textDecoder.decode(value);
+                const lines = str.split('\n');
+                lines.forEach((message, i: number) => {
+                    if (i === 0 && joins) {
+                        message = joins + message;
+                        joins = undefined;
+                    }
+                    if (i === lines.length - 1) {
+                        if (message && message.indexOf('}') === -1) {
+                            joins = message;
+                            return;
+                        }
+                    }
+                    let bufferObj;
+                    if (message?.startsWith('data:')) {
+                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                    }
+                    if (bufferObj?.code === 200) {
+                        contentData.workflowConfig.steps[index].flowStep.response.answer =
+                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        setDetailData(contentData);
+                    } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: t('market.error'),
+                                message: t('market.warning'),
                                 variant: 'alert',
                                 alert: {
                                     color: 'error'
@@ -75,73 +127,20 @@ function Deatail() {
                                 close: false
                             })
                         );
-                        const newValue1 = [...loadings];
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
-                        return;
                     }
-                    if (done) {
-                        userBenefits().then((res) => {
-                            setUserInfo(res);
-                        });
-                        if (
-                            isAllExecute &&
-                            index < newData.workflowConfig.steps.length - 1 &&
-                            newData.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
-                        ) {
-                            changeData({
-                                index: index + 1,
-                                stepId: newData.workflowConfig.steps[index + 1].field,
-                                steps: newData.workflowConfig.steps[index + 1]
-                            });
-                        }
-                        break;
-                    }
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    let str = textDecoder.decode(value);
-
-                    const lines = str.split('\n');
-                    lines.forEach((message, i: number) => {
-                        if (i === 0 && joins) {
-                            message = joins + message;
-                            joins = undefined;
-                        }
-                        if (i === lines.length - 1) {
-                            if (message && message.indexOf('}') === -1) {
-                                joins = message;
-                                return;
-                            }
-                        }
-                        let bufferObj;
-                        if (message?.startsWith('data:')) {
-                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                        }
-                        if (bufferObj?.code === 200) {
-                            contentData.workflowConfig.steps[index].flowStep.response.answer =
-                                contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                            setDetailData(contentData);
-                        } else if (bufferObj && bufferObj.code !== 200) {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: t('market.warning'),
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    close: false
-                                })
-                            );
-                        }
-                    });
-                    outerJoins = joins;
-                }
-            };
-            fetchData();
-            return newData;
-        });
+                });
+                outerJoins = joins;
+            }
+        };
+        fetchData();
+    };
+    //全部执行
+    const changeAllSon = (newValue: any) => {
+        isAllExecute = true;
+        const oldV = { ...detailData };
+        oldV.workflowConfig = newValue;
+        changeData({ stepId: oldV.workflowConfig.steps[0].field, index: 0, steps: oldV.workflowConfig.steps[0] });
+        return oldV;
     };
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
@@ -247,9 +246,10 @@ function Deatail() {
             <CarryOut
                 config={detailData}
                 changeData={changeData}
+                changeAllSon={changeAllSon}
                 loadings={loadings}
                 allExecute={(value: boolean) => {
-                    setIsAllExecute(value);
+                    isAllExecute = value;
                 }}
             />
         </Card>

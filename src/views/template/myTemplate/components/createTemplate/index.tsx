@@ -1,5 +1,6 @@
 import { Card, Box, Grid, Link, AppBar, Toolbar, Button, Tab, Tabs } from '@mui/material';
 import { getApp } from 'api/template/index';
+import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { executeApp } from 'api/template/fetch';
 import Basis from './basis';
@@ -10,6 +11,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { t } from 'hooks/web/useI18n';
+import userInfoStore from 'store/entitlementAction';
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -32,6 +37,11 @@ function CreateDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+    const { setUserInfo }: any = userInfoStore();
+    //是否全部执行
+    let isAllExecute = false;
+    const [detail, setDetail] = useState({} as Details);
+    const [loadings, setLoadings] = useState<any[]>([]);
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
         const newValue = [...loadings];
@@ -45,77 +55,106 @@ function CreateDetail() {
                 value[i] = true;
             }
         }
-        setDetail((oldValue) => {
-            const newData = {
-                ...oldValue,
-                workflowConfig: {
-                    steps: [
-                        ...oldValue.workflowConfig.steps.slice(0, index),
-                        data.steps,
-                        ...oldValue.workflowConfig.steps.slice(index + 1, oldValue.workflowConfig.steps.length)
-                    ]
-                }
-            };
-            const fetchData = async () => {
-                let resp: any = await executeApp({
-                    appUid: searchParams.get('uid'),
-                    stepId: stepId,
-                    appReqVO: newData
-                });
-                const reader = resp.getReader();
-                const textDecoder = new TextDecoder();
-                while (1) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        if (isAllExecute && index < newData.workflowConfig.steps.length - 1) {
-                            changeData({
-                                index: index + 1,
-                                stepId: newData.workflowConfig.steps[index + 1].field,
-                                steps: newData.workflowConfig.steps[index + 1]
-                            });
-                        }
-                        break;
-                    }
+        const fetchData = async () => {
+            let resp: any = await executeApp({
+                appUid: searchParams.get('uid'),
+                stepId: stepId,
+                appReqVO: detail
+            });
+            const contentData = { ...detail };
+            contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+            setDetail(contentData);
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            let outerJoins: any;
+            while (1) {
+                let joins = outerJoins;
+                const { done, value } = await reader.read();
+                if (textDecoder.decode(value).includes('2008002007')) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: t('market.error'),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
-                    let str = textDecoder.decode(value);
-                    // if (str.includes('&error&')) {
-                    //     str = '';
-                    // } else if (str.includes('&start&')) {
-                    //     str = str.split('&start&')[1];
-                    // } else if (str.includes('&end&')) {
-                    //     str = str.split('&start&')[1].split('&end&')[0];
-                    // }
-                    setDetail({
-                        ...newData,
-                        workflowConfig: {
-                            steps: [
-                                ...newData.workflowConfig.steps.slice(0, index),
-                                {
-                                    ...newData.workflowConfig.steps[index],
-                                    flowStep: {
-                                        ...newData.workflowConfig.steps[index].flowStep,
-                                        response: {
-                                            ...newData.workflowConfig.steps[index].flowStep.response,
-                                            answer: str
-                                        }
-                                    }
-                                },
-                                ...newData.workflowConfig.steps.slice(index + 1, newData.workflowConfig.steps.length)
-                            ]
-                        }
-                    });
+                    return;
                 }
-            };
-            fetchData();
-
-            return newData;
-        });
+                if (done) {
+                    userBenefits().then((res) => {
+                        setUserInfo(res);
+                    });
+                    if (
+                        isAllExecute &&
+                        index < detail.workflowConfig.steps.length - 1 &&
+                        detail.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
+                    ) {
+                        changeData({
+                            index: index + 1,
+                            stepId: detail.workflowConfig.steps[index + 1].field,
+                            steps: detail.workflowConfig.steps[index + 1]
+                        });
+                    }
+                    break;
+                }
+                const newValue1 = [...loadings];
+                newValue1[index] = false;
+                setLoadings(newValue1);
+                let str = textDecoder.decode(value);
+                const lines = str.split('\n');
+                lines.forEach((message, i: number) => {
+                    if (i === 0 && joins) {
+                        message = joins + message;
+                        joins = undefined;
+                    }
+                    if (i === lines.length - 1) {
+                        if (message && message.indexOf('}') === -1) {
+                            joins = message;
+                            return;
+                        }
+                    }
+                    let bufferObj;
+                    if (message?.startsWith('data:')) {
+                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                    }
+                    if (bufferObj?.code === 200) {
+                        contentData.workflowConfig.steps[index].flowStep.response.answer =
+                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        setDetail(contentData);
+                    } else if (bufferObj && bufferObj.code !== 200) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.warning'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                close: false
+                            })
+                        );
+                    }
+                });
+                outerJoins = joins;
+            }
+        };
+        fetchData();
     };
-    const [detail, setDetail] = useState({} as Details);
-    const [loadings, setLoadings] = useState<any[]>([]);
-    const [isAllExecute, setIsAllExecute] = useState<boolean>(false);
+    //全部执行
+    const changeAllSon = (newValue: any) => {
+        isAllExecute = true;
+        const oldV = { ...detail };
+        oldV.workflowConfig = newValue;
+        changeData({ stepId: oldV.workflowConfig.steps[0].field, index: 0, steps: oldV.workflowConfig.steps[0] });
+        return oldV;
+    };
     useEffect(() => {
         getApp({ uid: searchParams.get('uid') as string }).then((res) => {
             setDetail(res);
@@ -258,9 +297,10 @@ function CreateDetail() {
                         <Perform
                             config={detail.workflowConfig}
                             changeSon={changeData}
+                            changeAllSon={changeAllSon}
                             loadings={loadings}
                             isallExecute={(flag: boolean) => {
-                                setIsAllExecute(flag);
+                                isAllExecute = flag;
                             }}
                             source="myApp"
                         />

@@ -119,8 +119,7 @@ function MyTemplate() {
                     </Typography>
                     <MyselfTemplate appList={newAppList} />
                     <Box my={2}>
-                        (
-                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />)
+                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
                     </Box>
                 </Box>
             )}

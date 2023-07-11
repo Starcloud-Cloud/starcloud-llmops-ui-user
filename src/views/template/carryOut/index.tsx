@@ -7,7 +7,7 @@ import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
-function CarryOut({ config, changeData, loadings, allExecute }: any) {
+function CarryOut({ config, changeData, changeAllSon, loadings, allExecute }: any) {
     return (
         <Box>
             <Grid container spacing={4}>
@@ -19,6 +19,7 @@ function CarryOut({ config, changeData, loadings, allExecute }: any) {
                     <Perform
                         config={config.workflowConfig}
                         changeSon={changeData}
+                        changeAllSon={changeAllSon}
                         loadings={loadings}
                         isallExecute={allExecute}
                         source="market"

@@ -1,13 +1,13 @@
 import { ReactElement, cloneElement } from 'react';
 
 // material-ui
-import { Container, AppBar as MuiAppBar, Stack, Toolbar, useScrollTrigger, useTheme } from '@mui/material';
+import { Button, Container, AppBar as MuiAppBar, Stack, Toolbar, useScrollTrigger, useTheme } from '@mui/material';
 
 // project imports
 import Logo from 'ui-component/Logo';
 
 // assets
-import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // elevation scroll
 interface ElevationScrollProps {
@@ -35,14 +35,26 @@ function ElevationScroll({ children, window }: ElevationScrollProps) {
 // ==============================|| MINIMAL LAYOUT APP BAR ||============================== //
 
 export const VipBar = ({ ...others }) => {
+    const navigate = useNavigate();
     return (
         <ElevationScroll {...others}>
             <MuiAppBar>
                 <Container>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
-                        <Logo />
+                        <div className="cursor-pointer" onClick={() => navigate('/dashboard/default')}>
+                            <Logo />
+                        </div>
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
-                            <ProfileSection />
+                            <Button
+                                component={RouterLink}
+                                to="/login"
+                                target="_blank"
+                                disableElevation
+                                variant="contained"
+                                color="secondary"
+                            >
+                                登录/注册
+                            </Button>
                         </Stack>
                     </Toolbar>
                 </Container>

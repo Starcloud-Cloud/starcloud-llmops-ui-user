@@ -1,7 +1,7 @@
 import React from 'react';
 
 // material-ui
-import { Button, CardContent, CardActions, Divider, Grid, IconButton, Modal, Typography, CardProps } from '@mui/material';
+import { Button, CardActions, CardContent, CardProps, Divider, Grid, IconButton, Modal, Typography } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';

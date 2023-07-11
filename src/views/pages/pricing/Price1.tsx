@@ -1,275 +1,339 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import { useTheme, AppBar, Tabs, Tab, Box } from '@mui/material';
-import { Button, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+// material-ui
+import { Button, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { Popover, Tag } from 'antd';
 
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
+import MainCard from 'ui-component/cards/MainCard';
 
 // assets
-import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
-import TwoWheelerTwoToneIcon from '@mui/icons-material/TwoWheelerTwoTone';
 import AirportShuttleTwoToneIcon from '@mui/icons-material/AirportShuttleTwoTone';
+import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
 import DirectionsBoatTwoToneIcon from '@mui/icons-material/DirectionsBoatTwoTone';
-import { FaArrowRight, FaMinus } from 'react-icons/fa';
-import { getProductList, submitPayOrder } from 'api/rewards';
+import TwoWheelerTwoToneIcon from '@mui/icons-material/TwoWheelerTwoTone';
+import { HeaderWrapper } from '../landing';
+import { VipBar } from './VipBar';
+// import PeopleSection from './PeopleSection'
+import type { RadioChangeEvent } from 'antd';
+import { Radio } from 'antd';
+import { createOrder } from 'api/vip';
+import { useNavigate } from 'react-router-dom';
+import { submitOrder } from '../../../api/vip/index';
+import FooterSection from '../landing/FooterSection';
+import { SectionWrapper } from '../landing/index';
+import { PayModal } from './PayModal';
 
-const basePlans = [
+const plans = [
     {
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
-        title: 'STARTER',
-        pay: 'JOIN',
-        price: 59,
-        annualPrice: 119,
-        permission: [0, 1]
+        title: '免费版',
+        description: '无需信用卡，每天签到获取字数/图片使用数',
+        price: '免费',
+        permission: [0, 1, 2, 4],
+        btnText: '免费使用'
     },
     {
         active: true,
+        icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
+        title: '高级版',
+        description: '200000字数创作，400张图片',
+        price: 69,
+        permission: [0, 1, 2, 3, 4, 5, 6],
+        btnText: '立即购买',
+        monthCode: 'plus_month',
+        yearCode: 'plus_year'
+    },
+    {
+        active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
-        title: 'PREMIUM',
-        pay: 'TRY PREMIUM',
-        price: 89,
-        annualPrice: 159,
-        permission: [0, 1, 2, 3]
+        title: '团队版',
+        description: '6个账号，无限字数创作，1000张图片',
+        price: 129,
+        permission: [0, 1, 2, 3, 4, 5, 6],
+        btnText: '立即购买',
+        monthCode: 'pro_month',
+        yearCode: 'pro_year'
     },
     {
         active: false,
         icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
-        title: 'ENTERPRISE',
-        pay: 'JOIN',
-        price: 99,
-        annualPrice: 359,
-        permission: [0, 1, 2, 3, 5]
+        title: '企业版',
+        description: '拥有企业个性化的AI模型和系统',
+        price: '专属顾问',
+        permission: [0, 1, 2, 3, 4, 5],
+        btnText: '扫码咨询'
     }
 ];
 
 const planList = [
-    'One End Product', // 0
-    'No attribution required', // 1
-    'TypeScript', // 2
-    'Figma Design Resources', // 3
-    'Create Multiple Products', // 4
-    'Create a SaaS Project', // 5
-    'Resale Product', // 6
-    'Separate sale of our UI Elements?' // 7
+    [
+        '签到/活动可免费获取3000字数', // 0
+        '签到可免费获取图片2张', // 1
+        'GPT-3.5', // 2
+        'GPT-4', // 3
+        '4个自定义应用', // 4
+        'Baidu/Google/Amazon联网查询', // 5
+        '上传信息库/文档问答' // 6
+    ],
+    [
+        '200000字数生成', // 0
+        '生成图片400张', // 1
+        'GPT-3.5', // 2
+        'GPT-4', // 3
+        '无限自定义应用数量', // 4
+        'Baidu/Google/Amazon联网查询', // 5
+        '上传信息库/文档问答' // 6
+    ],
+    [
+        '无限字数生成', // 0
+        '生成图片1000张', // 1
+        'GPT-3.5', // 2
+        'GPT-4', // 3
+        '无限自定义应用数量', // 4
+        'Baidu/Google/Amazon联网查询', // 5
+        '上传信息库/文档问答' // 6
+    ],
+    [
+        '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
+        '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
+        '私有的企业知识库存储空间', // 2
+        '按需提供企业所需的数据接入和发布方式', // 3
+        '定制化的联网查询/企业数据查询', // 4
+        '个性化域名' // 6
+    ]
 ];
 
+// ===============================|| PRICING - PRICE 1 ||=============================== //
 const Price1 = () => {
+    const navigate = useNavigate();
     const theme = useTheme();
-    const [value, setValue] = useState(0);
-    const handleChange = (event: ChangeEvent<{}>, newValue: number) => {
-        setValue(newValue);
+    const priceListDisable = {
+        opacity: '0.4',
+        '& >div> svg': {
+            fill: theme.palette.secondary.light
+        }
     };
-    useEffect(() => {
-        getProductList().then((res) => {
-            console.log(res);
-        });
-    }, []);
-    const handlepay = async () => {
-        const res = await submitPayOrder({ code: '000001' });
-        window.location.href = res.displayContent;
+
+    // 从服务端请求vip数据
+    // useEffect(() => {
+    //     getVipList().then((res) => {
+    //         if (res.code === 0) {
+    //         }
+    //     });
+    // }, []);
+
+    const [value, setValue] = useState('1');
+
+    const [open, setOpen] = React.useState(false);
+
+    const [payUrl, setPayUrl] = useState('');
+
+    const handleOpen = () => {
+        setOpen(true);
     };
-    const plans = basePlans.map((plan) => {
-        return {
-            ...plan,
-            price: value === 0 ? plan.price : plan.annualPrice
-        };
-    });
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const onChange = (e: RadioChangeEvent) => {
+        setValue(e.target.value);
+    };
+
+    const handleCreateOrder = async (code?: string) => {
+        const res = await createOrder({ productCode: code });
+        const resOrder = await submitOrder({ id: res, channelCode: 'alipay_pc', displayMode: 'iframe' });
+        setPayUrl(resOrder.displayContent);
+        handleOpen();
+    };
+
+    const handleClick = (index: number, code?: string) => {
+        switch (index) {
+            case 0:
+                return navigate('/dashboard/default');
+            case 1:
+                return handleCreateOrder(code);
+            case 2:
+                return handleCreateOrder(code);
+            case 3:
+                return;
+        }
+    };
+
     return (
-        <Grid container spacing={gridSpacing}>
-            <Grid item xs={12} sm={12} md={12}>
-                <Box width={{ xs: '22rem', md: '25rem', justifyContent: 'center' }} mx="auto" mt={4} mb={4}>
-                    <AppBar position="static" sx={{ backgroundColor: 'white' }}>
-                        <Tabs value={value} onChange={handleChange}>
-                            <Tab
-                                sx={{ width: '50%' }}
-                                id="monthly"
-                                label={
-                                    <Box py={0.5} px={2} color="black">
-                                        Monthly
-                                    </Box>
-                                }
-                            />
-                            <Tab
-                                sx={{ width: '50%' }}
-                                id="annual"
-                                label={
-                                    <Box
-                                        py={0.5}
-                                        px={2}
-                                        color="black
-                                    "
-                                    >
-                                        Annual
-                                    </Box>
-                                }
-                            />
-                        </Tabs>
-                    </AppBar>
-                </Box>
-            </Grid>
-
-            {plans.map((plan, index) => {
-                // const darkBorder = theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
-                return (
-                    <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        md={4}
-                        key={index}
-                        sx={{
-                            '.MuiCardContent-root': {
-                                pt: 0
-                            }
-                        }}
-                    >
-                        <MainCard
-                            boxShadow
-                            sx={{
-                                pt: 1.75,
-                                overflow: 'visible',
-                                backgroundColor: index % 2 === 0 ? '#fff' : '#000',
-                                color: index % 2 === 0 ? '#000' : '#fff'
-                            }}
-                        >
-                            <Grid
-                                container
-                                textAlign="center"
-                                spacing={gridSpacing}
-                                sx={{
-                                    width: '100%',
-
-                                    margin: 0,
-                                    '.MuiCardContent-root': { pt: 0 },
-                                    '> .MuiGrid-item:last-child': {
-                                        p: '1rem 0'
-                                    }
-                                }}
-                            >
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sx={{
-                                        position: 'relative',
-                                        '.MuiGrid-item': {
-                                            width: '100%'
-                                        },
-                                        '.MuiCardContent-root': { pt: 0 }
-                                    }}
-                                >
-                                    <Typography
-                                        variant="h6"
+        <div>
+            <HeaderWrapper id="vip">
+                <VipBar />
+            </HeaderWrapper>
+            <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
+                <div className="w-4/5">
+                    <div className="flex justify-center mb-10 text-5xl">立即订阅，创作无限可能！</div>
+                    <div className="flex justify-center mb-10">
+                        <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
+                            <Radio.Button value="1" style={{ width: '150px', textAlign: 'center' }}>
+                                月付
+                            </Radio.Button>
+                            <Radio.Button value="2" style={{ width: '150px', textAlign: 'center' }}>
+                                年付 <Tag color="#f50">8折</Tag>
+                            </Radio.Button>
+                        </Radio.Group>
+                    </div>
+                    <Grid container spacing={gridSpacing}>
+                        {plans.map((plan, index) => {
+                            const darkBorder =
+                                theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
+                            return (
+                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                    <MainCard
+                                        boxShadow
                                         sx={{
-                                            fontSize: '1.5625rem',
-                                            fontWeight: 500,
-                                            p: '1rem 5rem',
-                                            position: 'absolute',
-                                            color: index % 2 === 0 ? '#000' : '#fff',
-                                            background: index % 2 === 0 ? '#f0f2f5' : '#1A73E8',
-                                            borderRadius: '10rem',
-                                            top: '-50%', // 将 Typography 组件向上移动一半的高度
-                                            left: '50%', // 将 Typography 组件向右移动一半的宽度
-                                            transformOrigin: 'center', // 以中心为原点缩放
-                                            transform: 'translate(-50%, -50%) scale(0.4)' // 将 Typography 组件的中心放置在父元素的中心，并缩小到0.3倍大小
+                                            pt: 1.75,
+                                            border: plan.active ? '2px solid' : '1px solid',
+                                            borderColor: plan.active ? 'secondary.main' : darkBorder
                                         }}
                                     >
-                                        {plan.title}
-                                    </Typography>
+                                        <Grid container textAlign="center" spacing={gridSpacing}>
+                                            {/* <Grid item xs={12}>
+                                                <Box
+                                                    sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        borderRadius: '50%',
+                                                        width: 80,
+                                                        height: 80,
+                                                        background:
+                                                            theme.palette.mode === 'dark'
+                                                                ? theme.palette.dark[800]
+                                                                : theme.palette.primary.light,
+                                                        color: theme.palette.primary.main,
+                                                        '& > svg': {
+                                                            width: 35,
+                                                            height: 35
+                                                        }
+                                                    }}
+                                                >
+                                                    {plan.icon}
+                                                </Box>
+                                            </Grid> */}
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
+                                                        fontSize: '1.5625rem',
+                                                        fontWeight: 500,
+                                                        position: 'relative',
+                                                        mb: 1.875,
+                                                        '&:after': {
+                                                            content: '""',
+                                                            position: 'absolute',
+                                                            bottom: -15,
+                                                            left: 'calc(50% - 25px)',
+                                                            width: 50,
+                                                            height: 4,
+                                                            background: theme.palette.primary.main,
+                                                            borderRadius: '3px'
+                                                        }
+                                                    }}
+                                                >
+                                                    {plan.title}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Typography variant="body2">{plan.description}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    component="div"
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: '2.1875rem',
+                                                        fontWeight: 700,
+                                                        '& > span': {
+                                                            fontSize: '1.25rem',
+                                                            fontWeight: 500
+                                                        }
+                                                    }}
+                                                >
+                                                    {(index === 1 || index === 2) && <span>￥</span>}
+                                                    {plan.price}
+                                                    {(index === 1 || index === 2) && <span>/{value === '1' ? '月' : '年'}</span>}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                {index === 3 ? (
+                                                    <Popover
+                                                        content={
+                                                            <div className="flex justify-start items-center flex-col">
+                                                                <img
+                                                                    className="w-40"
+                                                                    src={'/static/media/wechat.707dac08a28c8844005e.png'}
+                                                                    alt=""
+                                                                />
+                                                                <div className="text-sm">微信扫码咨询</div>
+                                                            </div>
+                                                        }
+                                                        trigger="hover"
+                                                    >
+                                                        <Button variant="outlined" onClick={() => handleClick(index)} color="secondary">
+                                                            {plan.btnText}
+                                                        </Button>
+                                                    </Popover>
+                                                ) : (
+                                                    <Button
+                                                        variant="outlined"
+                                                        onClick={() => handleClick(index, value === '1' ? plan.monthCode : plan.yearCode)}
+                                                        color="secondary"
+                                                    >
+                                                        {plan.btnText}
+                                                    </Button>
+                                                )}
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <List
+                                                    sx={{
+                                                        m: 0,
+                                                        p: 0,
+                                                        '&> li': {
+                                                            px: 0,
+                                                            py: 0.625,
+                                                            '& svg': {
+                                                                fill: theme.palette.success.dark
+                                                            }
+                                                        }
+                                                    }}
+                                                    component="ul"
+                                                >
+                                                    {planList[index].map((list, i) => (
+                                                        <React.Fragment key={i}>
+                                                            <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
+                                                                <ListItemIcon>
+                                                                    <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                                                </ListItemIcon>
+                                                                <ListItemText primary={list} />
+                                                            </ListItem>
+                                                            <Divider />
+                                                        </React.Fragment>
+                                                    ))}
+                                                </List>
+                                            </Grid>
+                                        </Grid>
+                                    </MainCard>
                                 </Grid>
-
-                                <Grid item xs={12}>
-                                    <Typography
-                                        component="div"
-                                        variant="body2"
-                                        sx={{
-                                            color: index % 2 === 0 ? '#000' : '#fff',
-                                            fontSize: '2.1875rem',
-                                            fontWeight: 700,
-                                            '& > span': {
-                                                fontSize: '1.25rem',
-                                                fontWeight: 500,
-                                                color: index % 2 === 0 ? '#000' : '#fff'
-                                            }
-                                        }}
-                                    >
-                                        <sup style={{ fontSize: '1rem', color: index % 2 === 0 ? '#000' : '#fff' }}>$</sup>
-                                        {plan.price}
-                                        <span>/mo</span>
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <List
-                                        sx={{
-                                            m: 0,
-                                            p: 0,
-                                            '&> li': {
-                                                px: 0,
-                                                py: 0.625,
-                                                '& svg': {
-                                                    fill: theme.palette.success.dark
-                                                }
-                                            }
-                                        }}
-                                        component="ul"
-                                    >
-                                        {planList.map((list, i) => (
-                                            <React.Fragment key={i}>
-                                                <ListItem>
-                                                    <ListItemIcon>
-                                                        {plan.permission.includes(i) ? (
-                                                            <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                                        ) : (
-                                                            <FaMinus />
-                                                        )}
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={list}
-                                                        sx={{
-                                                            '> span': { color: index % 2 === 0 ? '#000 !important' : '#fff !important' }
-                                                        }}
-                                                    />
-                                                </ListItem>
-                                            </React.Fragment>
-                                        ))}
-                                    </List>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sx={{
-                                        position: 'relative',
-                                        pb: '2rem',
-                                        '.MuiGrid-item': {
-                                            p: '2rem 0'
-                                        }
-                                    }}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: index % 2 === 0 ? '#000' : '#1A73E8',
-                                            width: '100%',
-                                            p: '0.5rem 2rem',
-                                            boxShadow: 'none',
-                                            ':hover': {
-                                                backgroundColor: index % 2 === 0 ? '#000' : '#1A73E8',
-                                                boxShadow: index % 2 === 0 ? '#000' : '#1A73E8'
-                                            }
-                                        }}
-                                        onClick={handlepay}
-                                    >
-                                        {plan.pay} <FaArrowRight style={{ paddingLeft: '0.5rem' }} size="1.2rem" />
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </MainCard>
+                            );
+                        })}
                     </Grid>
-                );
-            })}
-        </Grid>
+                </div>
+            </div>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
+                <FooterSection />
+            </SectionWrapper>
+            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
+        </div>
     );
 };
 

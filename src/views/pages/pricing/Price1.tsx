@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // material-ui
 import { Button, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Popover, Tag } from 'antd';
+import { Popover, Radio, Tag } from 'antd';
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -18,7 +18,6 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { Radio } from 'antd';
 import { createOrder } from 'api/vip';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -146,7 +145,12 @@ const Price1 = () => {
 
     const handleCreateOrder = async (code?: string) => {
         const res = await createOrder({ productCode: code });
-        const resOrder = await submitOrder({ id: res, channelCode: 'alipay_pc', displayMode: 'iframe' });
+        const resOrder = await submitOrder({
+            id: res,
+            channelCode: 'alipay_pc',
+            channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
+            displayMode: 'qr_code'
+        });
         setPayUrl(resOrder.displayContent);
         handleOpen();
     };

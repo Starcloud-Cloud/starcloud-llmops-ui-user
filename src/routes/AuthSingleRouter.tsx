@@ -14,7 +14,7 @@ const AuthSingleRouter = {
     ),
     children: [
         {
-            path: '/pages/vip',
+            path: '/member',
             element: <PagesPrice1 />
         }
     ]

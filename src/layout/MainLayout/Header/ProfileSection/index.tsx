@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import copy from 'clipboard-copy';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // material-ui
-import { useTheme } from '@mui/material/styles';
-import QRCode from 'qrcode.react';
 import {
     Avatar,
     Box,
@@ -15,6 +13,8 @@ import {
     ClickAwayListener,
     Divider,
     Grid,
+    // Switch,
+    IconButton,
     // InputAdornment,
     List,
     ListItemButton,
@@ -24,12 +24,12 @@ import {
     Paper,
     Popper,
     Stack,
-    // Switch,
-    IconButton,
-    Typography,
-    Tooltip
+    Tooltip,
+    Typography
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { getUserInfo } from 'api/login';
+import QRCode from 'qrcode.react';
 import infoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
 
@@ -37,21 +37,22 @@ import useUserStore from 'store/user';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // project imports
+import User1 from 'assets/images/users/user-round.svg';
+import useAuth from 'hooks/useAuth';
+import { t } from 'hooks/web/useI18n';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import UpgradePlanCard from './UpgradePlanCard';
-import useAuth from 'hooks/useAuth';
-import User1 from 'assets/images/users/user-round.svg';
-import { t } from 'hooks/web/useI18n';
 
 // assets
+import DoneIcon from '@mui/icons-material/Done';
 import {
     IconLogout,
     //  IconSearch,
-    IconSettings
+    IconSettings,
+    IconShoppingBag
     // IconUser
 } from '@tabler/icons';
-import DoneIcon from '@mui/icons-material/Done';
 import useConfig from 'hooks/useConfig';
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -287,6 +288,20 @@ const ProfileSection = () => {
                                                         </ListItemIcon>
                                                         <ListItemText
                                                             primary={<Typography variant="body2">{t('account-settings')}</Typography>}
+                                                        />
+                                                    </ListItemButton>
+                                                    <ListItemButton
+                                                        sx={{ borderRadius: `${borderRadius}px` }}
+                                                        selected={selectedIndex === 0}
+                                                        onClick={(event: React.MouseEvent<HTMLDivElement>) =>
+                                                            handleListItemClick(event, 0, '/user/account-profile/profile')
+                                                        }
+                                                    >
+                                                        <ListItemIcon>
+                                                            <IconShoppingBag stroke={1.5} size="20px" />
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary={<Typography variant="body2">{t('order-record')}</Typography>}
                                                         />
                                                     </ListItemButton>
                                                     <ListItemButton

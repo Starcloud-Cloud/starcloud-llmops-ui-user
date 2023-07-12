@@ -2,14 +2,14 @@ import { ForwardRefExoticComponent, RefAttributes, forwardRef, useEffect } from 
 import { Link, useLocation } from 'react-router-dom';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import StarsIcon from '@mui/icons-material/Stars';
-import VoicemailIcon from '@mui/icons-material/Voicemail';
-import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import StarsIcon from '@mui/icons-material/Stars';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
+import VoicemailIcon from '@mui/icons-material/Voicemail';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
 import LAYOUT_CONST from 'constant';
@@ -30,6 +30,12 @@ interface NavItemProps {
 }
 
 const NavItem = ({ item, level, parentId }: NavItemProps) => {
+    // 针对会员跳转特殊处理
+    if (item.url === 'member') {
+        item.external = true;
+        item.url = '/member/subscribe';
+    }
+
     const theme = useTheme();
     const matchesSM = useMediaQuery(theme.breakpoints.down('lg'));
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));

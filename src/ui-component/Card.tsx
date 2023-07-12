@@ -1,25 +1,25 @@
 // material-ui
-import { styled, useTheme } from '@mui/material/styles';
 import {
+    Box,
+    Button,
     Card,
     CardContent,
     Grid,
     LinearProgress,
     List,
     ListItem,
-    Button,
     ListItemText,
+    Tooltip,
     Typography,
-    linearProgressClasses,
-    Box,
-    Tooltip
+    linearProgressClasses
 } from '@mui/material';
-import { t } from 'hooks/web/useI18n';
+import { styled, useTheme } from '@mui/material/styles';
 import { userBenefits } from 'api/template';
+import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
+import { t } from 'hooks/web/useI18n';
 import { useEffect } from 'react';
-import userInfoStore from 'store/entitlementAction';
-import { themesLight, themesDarkAfter, themesDarkBefor } from 'hooks/useThemes';
 import { useNavigate } from 'react-router-dom';
+import userInfoStore from 'store/entitlementAction';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({

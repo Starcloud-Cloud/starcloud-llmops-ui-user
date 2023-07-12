@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, Modal } from '@mui/material';
+import { Button } from '@mui/material';
 
 // material-ui
 import {
@@ -184,108 +184,82 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     const transformValue = (v: number) => {
         switch (v) {
             case 10:
-                return '已支付';
-            case 2:
-                return '已取消';
+                return '支付成功';
+            case 20:
+                return '支付关闭';
             case 0:
                 return '未支付';
         }
     };
 
     return (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-title"
-            aria-describedby="modal-description"
-            sx={{
-                '& > div:focus-visible': { outline: 'none' }
-            }}
-        >
-            <div
-                style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <MainCard content={false} title="订单记录" style={{ width: '1200px' }}>
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{ position: 'absolute', right: 15, top: 15, bgcolor: '#ffffff' }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                    <TableContainer>
-                        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-                            <EnhancedTableHead
-                                numSelected={selected.length}
-                                order={order}
-                                orderBy={orderBy}
-                                onSelectAllClick={handleSelectAllClick}
-                                onRequestSort={handleRequestSort}
-                                rowCount={rows.length}
-                            />
-                            <TableBody>
-                                {stableSort(
-                                    rows.filter((row) => typeof row !== 'number'),
-                                    getComparator(order, orderBy)
-                                )
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row, index) => {
-                                        if (typeof row === 'number') {
-                                            return null; // 忽略数字类型的行
-                                        }
-
-                                        return (
-                                            <TableRow hover key={row.id}>
-                                                {/* <TableCell align="center">{row.id}</TableCell> */}
-                                                <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                                <TableCell align="center">{row.subject}</TableCell>
-                                                <TableCell align="center">{row.body}</TableCell>
-                                                <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
-                                                <TableCell align="center">{transformValue(row.status)}</TableCell>
-                                                <TableCell align="center">
-                                                    <Button variant="text" color="secondary" disabled={row.status === 10}>
-                                                        支付
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-
-                                {emptyRows > 0 && (
-                                    <TableRow
-                                        style={{
-                                            height: (dense ? 33 : 53) * emptyRows
-                                        }}
-                                    >
-                                        <TableCell colSpan={7} />
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-
-                    {/* table pagination */}
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10]}
-                        component="div"
-                        count={total}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage="每页行数"
+        <MainCard content={false} title="订单记录">
+            <IconButton aria-label="close" onClick={handleClose} sx={{ position: 'absolute', right: 15, top: 15, bgcolor: '#ffffff' }}>
+                <CloseIcon />
+            </IconButton>
+            <TableContainer>
+                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                    <EnhancedTableHead
+                        numSelected={selected.length}
+                        order={order}
+                        orderBy={orderBy}
+                        onSelectAllClick={handleSelectAllClick}
+                        onRequestSort={handleRequestSort}
+                        rowCount={rows.length}
                     />
-                </MainCard>
-            </div>
-        </Modal>
+                    <TableBody>
+                        {stableSort(
+                            rows.filter((row) => typeof row !== 'number'),
+                            getComparator(order, orderBy)
+                        )
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row, index) => {
+                                if (typeof row === 'number') {
+                                    return null; // 忽略数字类型的行
+                                }
+
+                                return (
+                                    <TableRow hover key={row.id}>
+                                        {/* <TableCell align="center">{row.id}</TableCell> */}
+                                        <TableCell align="center">{row.merchantOrderId}</TableCell>
+                                        <TableCell align="center">{row.subject}</TableCell>
+                                        <TableCell align="center">{row.body}</TableCell>
+                                        <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
+                                        <TableCell align="center">{transformValue(row.status)}</TableCell>
+                                        <TableCell align="center">
+                                            <Button variant="text" color="secondary" disabled={row.status === 10}>
+                                                支付
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+
+                        {emptyRows > 0 && (
+                            <TableRow
+                                style={{
+                                    height: (dense ? 33 : 53) * emptyRows
+                                }}
+                            >
+                                <TableCell colSpan={7} />
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* table pagination */}
+            <TablePagination
+                rowsPerPageOptions={[5, 10]}
+                component="div"
+                count={total}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="每页行数"
+            />
+        </MainCard>
     );
 };
 

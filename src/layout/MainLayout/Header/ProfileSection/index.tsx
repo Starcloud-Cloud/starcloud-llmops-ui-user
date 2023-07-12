@@ -292,9 +292,9 @@ const ProfileSection = () => {
                                                     </ListItemButton>
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
-                                                        selected={selectedIndex === 0}
+                                                        selected={selectedIndex === 1}
                                                         onClick={(event: React.MouseEvent<HTMLDivElement>) =>
-                                                            handleListItemClick(event, 0, '/user/account-profile/profile')
+                                                            handleListItemClick(event, 1, '/orderRecord')
                                                         }
                                                     >
                                                         <ListItemIcon>

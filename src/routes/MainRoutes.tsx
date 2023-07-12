@@ -125,7 +125,7 @@ const AdvanceUIToggleButton = Loadable(lazy(() => import('views/ui-elements/adva
 const AdvanceUITreeview = Loadable(lazy(() => import('views/ui-elements/advance/UITreeview')));
 
 // pricing page routing
-const PagesPrice1 = Loadable(lazy(() => import('views/pages/pricing/Price1')));
+// const PagesPrice1 = Loadable(lazy(() => import('views/pages/pricing/member')));
 const PagesPrice2 = Loadable(lazy(() => import('views/pages/pricing/Price2')));
 
 // utilities routing
@@ -486,10 +486,10 @@ const MainRoutes = {
             element: <AdvanceUITreeview />
         },
 
-        {
-            path: '/pages/price/price1',
-            element: <PagesPrice1 />
-        },
+        // {
+        //     path: '/pages/price/price1',
+        //     element: <PagesPrice1 />
+        // },
         {
             path: '/pages/price/price2',
             element: <PagesPrice2 />

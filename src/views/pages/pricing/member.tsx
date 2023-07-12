@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
 
 // material-ui
-import { Button, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import {
+    Button,
+    Dialog,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Divider,
+    Grid,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Typography
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Popover, Radio, Tag } from 'antd';
 
@@ -19,6 +32,7 @@ import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
 import { createOrder } from 'api/vip';
+import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
 import FooterSection from '../landing/FooterSection';
@@ -31,7 +45,8 @@ const plans = [
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
         description: '无需信用卡，每天签到获取字数/图片使用数',
-        price: '免费',
+        monthPrice: '免费',
+        yearPrice: '免费',
         permission: [0, 1, 2, 4],
         btnText: '免费使用'
     },
@@ -40,7 +55,8 @@ const plans = [
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
         description: '200000字数创作，400张图片',
-        price: 69,
+        monthPrice: 99,
+        yearPrice: 999,
         permission: [0, 1, 2, 3, 4, 5, 6],
         btnText: '立即购买',
         monthCode: 'plus_month',
@@ -51,7 +67,8 @@ const plans = [
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
         description: '6个账号，无限字数创作，1000张图片',
-        price: 129,
+        monthPrice: 499,
+        yearPrice: 4999,
         permission: [0, 1, 2, 3, 4, 5, 6],
         btnText: '立即购买',
         monthCode: 'pro_month',
@@ -63,6 +80,8 @@ const plans = [
         title: '企业版',
         description: '拥有企业个性化的AI模型和系统',
         price: '专属顾问',
+        monthPrice: '专属顾问',
+        yearPrice: '专属顾问',
         permission: [0, 1, 2, 3, 4, 5],
         btnText: '扫码咨询'
     }
@@ -70,7 +89,7 @@ const plans = [
 
 const planList = [
     [
-        '签到/活动可免费获取3000字数', // 0
+        '签到每天可免费', // 0
         '签到可免费获取图片2张', // 1
         'GPT-3.5', // 2
         'GPT-4', // 3
@@ -109,7 +128,11 @@ const planList = [
 // ===============================|| PRICING - PRICE 1 ||=============================== //
 const Price1 = () => {
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
     const theme = useTheme();
+
+    const [openDialog, setOpenDialog] = useState(false);
+
     const priceListDisable = {
         opacity: '0.4',
         '& >div> svg': {
@@ -144,15 +167,36 @@ const Price1 = () => {
     };
 
     const handleCreateOrder = async (code?: string) => {
-        const res = await createOrder({ productCode: code });
-        const resOrder = await submitOrder({
-            id: res,
-            channelCode: 'alipay_pc',
-            channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
-            displayMode: 'qr_code'
-        });
-        setPayUrl(resOrder.displayContent);
-        handleOpen();
+        if (!isLoggedIn) {
+            setOpenDialog(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
+        } else {
+            try {
+                const options = Intl.DateTimeFormat().resolvedOptions();
+                const timeZone = options.timeZone;
+                const res = await createOrder({ productCode: code, timestamp: new Date().getTime(), timeZone });
+                const resOrder = await submitOrder({
+                    id: res,
+                    channelCode: 'alipay_pc',
+                    channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
+                    displayMode: 'qr_code'
+                });
+                setPayUrl(resOrder.displayContent);
+                handleOpen();
+            } catch (e) {
+                const TEXT_MESSAGE = '登录超时,请重新登录!';
+                if (e === TEXT_MESSAGE) {
+                    setOpenDialog(true);
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 3000);
+                } else {
+                    PubSub.publish('global.error', { message: e as string, type: 'error' });
+                }
+            }
+        }
     };
 
     const handleClick = (index: number, code?: string) => {
@@ -264,7 +308,7 @@ const Price1 = () => {
                                                     }}
                                                 >
                                                     {(index === 1 || index === 2) && <span>￥</span>}
-                                                    {plan.price}
+                                                    {value === '1' ? plan.monthPrice : plan.yearPrice}
                                                     {(index === 1 || index === 2) && <span>/{value === '1' ? '月' : '年'}</span>}
                                                 </Typography>
                                             </Grid>
@@ -283,13 +327,19 @@ const Price1 = () => {
                                                         }
                                                         trigger="hover"
                                                     >
-                                                        <Button variant="outlined" onClick={() => handleClick(index)} color="secondary">
+                                                        <Button
+                                                            className={'w-4/5'}
+                                                            variant="outlined"
+                                                            onClick={() => handleClick(index)}
+                                                            color="secondary"
+                                                        >
                                                             {plan.btnText}
                                                         </Button>
                                                     </Popover>
                                                 ) : (
                                                     <Button
-                                                        variant="outlined"
+                                                        className={'w-4/5'}
+                                                        variant={plan.active ? 'contained' : 'outlined'}
                                                         onClick={() => handleClick(index, value === '1' ? plan.monthCode : plan.yearCode)}
                                                         color="secondary"
                                                     >
@@ -331,12 +381,34 @@ const Price1 = () => {
                             );
                         })}
                     </Grid>
+                    <div className="flex justify-center text-xs mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
                 </div>
             </div>
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />
             </SectionWrapper>
             <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
+            {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}
+            <Dialog
+                open={openDialog}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ p: 2 }}
+            >
+                {openDialog && (
+                    <>
+                        <DialogTitle id="alert-dialog-title">提示</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Typography variant="h5" component="span">
+                                    当前用户未登录，3S后跳转至登录页...
+                                </Typography>
+                            </DialogContentText>
+                        </DialogContent>
+                    </>
+                )}
+            </Dialog>
         </div>
     );
 };

@@ -35,15 +35,10 @@ interface BodyProps extends CardProps {
 
 const Body = React.forwardRef(({ modalStyle, handleClose, url }: BodyProps, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} tabIndex={-1}>
-        {/**
-         * style={modalStyle}
-         * Property 'style' does not exist on type 'IntrinsicAttributes & MainCardProps & RefAttributes<HTMLDivElement>
-         */}
         <MainCard
-            style={modalStyle}
-            sx={{
+            style={{
                 position: 'absolute',
-                width: { xs: 350, lg: 600 },
+                width: '350px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)'
@@ -60,9 +55,9 @@ const Body = React.forwardRef(({ modalStyle, handleClose, url }: BodyProps, ref:
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12} sm={12} md={12}>
                         <div className="flex justify-center flex-col items-center">
-                            <div className="text-base">请扫描下方二维码完成支付</div>
+                            <div className="text-base mb-2">请扫描下方二维码完成支付</div>
                             <img className="w-[250px] h-[250px]" src={url} alt="" />
-                            <div className="text-sm">二维码将在 10 分钟内失效</div>
+                            <div className="text-sm mt-2">二维码将在 10 分钟内失效</div>
                         </div>
                     </Grid>
                 </Grid>
@@ -80,7 +75,7 @@ export function PayModal({ open, handleClose, url }: { open: boolean; handleClos
 
     return (
         <Grid container justifyContent="flex-end">
-            <Modal open={open} onClose={handleClose} aria-labelledby="simple-modal-title" aria-describedby="simple-modal-description">
+            <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <Body modalStyle={modalStyle} handleClose={handleClose} url={url} />
             </Modal>
         </Grid>

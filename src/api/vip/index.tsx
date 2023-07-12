@@ -23,3 +23,12 @@ export const createOrder = (data: any) => {
 export const submitOrder = (data: any) => {
     return request.post({ url: '/llm/pay/order/submit', data });
 };
+
+/**
+ * 获取支付记录
+ * @param data
+ * @returns
+ */
+export const getOrderRecord = (data: any) => {
+    return request.post({ url: '/llm/pay/order/user/page', data });
+};

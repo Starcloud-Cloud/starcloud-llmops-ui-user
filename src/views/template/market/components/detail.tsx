@@ -24,7 +24,7 @@ function Deatail() {
     const { setUserInfo }: any = userInfoStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
-    const [detailData, setDetailData] = useState<Details>({} as Details);
+    const [detailData, setDetailData] = useState<Details>(null as unknown as Details);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     let isAllExecute = false;
@@ -134,13 +134,17 @@ function Deatail() {
         };
         fetchData();
     };
-    //全部执行
-    const changeAllSon = (newValue: any) => {
-        isAllExecute = true;
-        const oldV = { ...detailData };
-        oldV.workflowConfig = newValue;
-        changeData({ stepId: oldV.workflowConfig.steps[0].field, index: 0, steps: oldV.workflowConfig.steps[0] });
-        return oldV;
+    //更改prompt的值
+    const promptChange = ({ e, steps, el }: any) => {
+        const newValue = { ...detailData };
+        newValue.workflowConfig.steps[steps].flowStep.variable.variables[el].value = e.value;
+        setDetailData(newValue);
+    };
+    //更改变量的值
+    const variableChange = ({ e, steps, i }: any) => {
+        const newValue = { ...detailData };
+        newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        setDetailData(newValue);
     };
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
@@ -199,7 +203,7 @@ function Deatail() {
                     {t('market.all')}
                 </Link>
                 <Typography color="text.primary">
-                    {categoryList?.find((el: { code: string }) => el.code === (detailData.categories && detailData.categories[0]))?.name}
+                    {categoryList?.find((el: { code: string }) => el.code === (detailData?.categories && detailData?.categories[0]))?.name}
                 </Typography>
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
@@ -208,26 +212,24 @@ function Deatail() {
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                {detailData.name}
+                                {detailData?.name}
                             </Typography>
                         </Box>
                         <Box my={0.5}>
-                            {detailData.categories &&
-                                detailData.categories.map((item: any) => (
-                                    <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
-                                ))}
-                            {detailData.tags &&
-                                detailData.tags.map((el: any) => (
-                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                ))}
+                            {detailData?.categories.map((item: any) => (
+                                <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
+                            ))}
+                            {detailData?.tags.map((el: any) => (
+                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                            ))}
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <RemoveRedEyeIcon fontSize="small" />
-                            <span style={iconStyle}>{detailData.viewCount}</span>
+                            <span style={iconStyle}>{detailData?.viewCount}</span>
                             <VerticalAlignBottomIcon fontSize="small" />
-                            <span style={iconStyle}>{detailData.installCount}</span>
+                            <span style={iconStyle}>{detailData?.installCount}</span>
                             <ThumbUpIcon fontSize="small" />
-                            <span style={iconStyle}>{detailData.likeCount}</span>
+                            <span style={iconStyle}>{detailData?.likeCount}</span>
                         </Box>
                     </Box>
                 </Box>
@@ -246,7 +248,8 @@ function Deatail() {
             <CarryOut
                 config={detailData}
                 changeData={changeData}
-                changeAllSon={changeAllSon}
+                variableChange={variableChange}
+                promptChange={promptChange}
                 loadings={loadings}
                 allExecute={(value: boolean) => {
                     isAllExecute = value;

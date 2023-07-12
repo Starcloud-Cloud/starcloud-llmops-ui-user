@@ -1,247 +1,17 @@
-import { Tooltip, TextField, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress } from '@mui/material';
-
+import { Tooltip, IconButton, Button, Box } from '@mui/material';
 import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import NotStartedIcon from '@mui/icons-material/NotStarted';
 // import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 // import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
-import ReplyIcon from '@mui/icons-material/Reply';
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import { useFormik as Formik } from 'formik';
-import FormExecute from 'views/template/components/validaForm';
-import generateValidationSchema from 'hooks/usevalid';
-import copy from 'clipboard-copy';
-import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
-function Perform({ config, changeSon, changeAllSon, source, loadings, isallExecute }: any) {
-    const CarrOut = forwardRef(({ item, steps, callBack }: { item: any; steps: number; callBack: (data: any) => void }, ref) => {
-        useImperativeHandle(ref, () => ({
-            submit: () => {
-                if (!formik.isValid) {
-                    formik.handleSubmit();
-                    return false;
-                } else {
-                    return formik.values;
-                }
-            }
-        }));
-        const fn = (data: any[]) => {
-            const Data: Record<string, any> = {};
-            data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
-                const { field, isShow, value } = variable;
-                if (isShow) {
-                    Data[field] = value;
-                }
-            });
-            return Data;
-        };
-        const mapVariables = (variable: any, obj: any) => {
-            for (const i of variable) {
-                for (const key in obj) {
-                    if (i.field === key) {
-                        i.value = obj[key];
-                    }
-                }
-            }
-        };
-        const formik = Formik({
-            initialValues: fn([...(item.variable ? item.variable.variables : []), ...item.flowStep?.variable.variables]),
-            validationSchema: generateValidationSchema([
-                ...(item.variable ? item.variable.variables : []),
-                ...item.flowStep.variable.variables
-            ]),
-            onSubmit: (value) => {
-                const data = { ...item };
-                if (data.variable) mapVariables(data.variable.variables, value);
-                mapVariables(data.flowStep.variable.variables, value);
-                callBack({ data, index: steps });
-            }
-        });
-        const mdRef = useRef<any>(null);
-        useEffect(() => {
-            if (mdRef.current) {
-                mdRef.current.scrollTop = mdRef.current.scrollHeight;
-            }
-        }, [item?.flowStep.response.answer]);
-        return (
-            <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
-                {loadings[steps] && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: !isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.3)',
-                            zIndex: 100
-                        }}
-                    >
-                        <CircularProgress />
-                    </div>
-                )}
-                <CardContent sx={{ p: 0 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="top">
-                        {config?.steps.length > 1 || source === 'myApp' ? (
-                            <Box>
-                                <Typography variant="h3">{item.name}</Typography>
-                                <Typography variant="caption" display="block">
-                                    {item.description}
-                                </Typography>
-                            </Box>
-                        ) : null}
-                        <Box sx={{ display: { xs: 'none', md: 'block' } }}></Box>
-                        <Box whiteSpace="nowrap">
-                            <Tooltip title={t('market.stepTips')}>
-                                <IconButton size="small">
-                                    <ErrorOutlineIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Button
-                                onClick={() => {
-                                    formik.handleSubmit();
-                                }}
-                                color="secondary"
-                                size="small"
-                                startIcon={<NotStartedIcon />}
-                                variant="contained"
-                            >
-                                {item.buttonLabel}
-                            </Button>
-                        </Box>
-                    </Box>
-                    <form>
-                        <Grid container spacing={1}>
-                            {item.variable?.variables.map((el: any) =>
-                                el.isShow ? (
-                                    <Grid item key={el.field} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
-                                        <FormExecute formik={formik} item={el} />
-                                    </Grid>
-                                ) : null
-                            )}
-                            {item.flowStep.variable.variables.length !== 0 &&
-                                item.flowStep.variable.variables.map((el: any) =>
-                                    el.isShow ? (
-                                        <Grid
-                                            item
-                                            lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
-                                            md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
-                                            xs={12}
-                                            key={el.field}
-                                        >
-                                            <FormExecute formik={arr[steps]} item={el} />
-                                        </Grid>
-                                    ) : null
-                                )}
-                        </Grid>
-                    </form>
-                    <Box my={2} display="flex">
-                        {item.flowStep.response.style === 'INPUT' ? (
-                            <TextField
-                                label={t('market.ai')}
-                                InputLabelProps={{ shrink: true }}
-                                value={item.flowStep.response.answer}
-                                fullWidth
-                            />
-                        ) : item.flowStep.response.style === 'TEXTAREA' ? (
-                            <Box width="100%" sx={{ background: '#f8fafc' }}>
-                                <Box sx={{ p: 2, height: '300px', overflow: 'auto' }} ref={mdRef}>
-                                    <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
-                                </Box>
-                                {item.flowStep.response.answer && (
-                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
-                                        <Box>
-                                            <Button
-                                                sx={{ mt: 1, mr: 1 }}
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                startIcon={<ContentPasteIcon />}
-                                                onClick={() => {
-                                                    copy(item.flowStep.response.answer);
-                                                }}
-                                            >
-                                                {t('market.copys')}
-                                            </Button>
-                                            {/* <Button
-                                        sx={{ mt: 1, mr: 1 }}
-                                        size="small"
-                                        variant="outlined"
-                                        color="secondary"
-                                        startIcon={<ThumbUpAltOutlinedIcon />}
-                                    >
-                                        {t('market.like')}
-                                    </Button>
-                                    <Button
-                                        sx={{ mt: 1, mr: 1 }}
-                                        size="small"
-                                        variant="outlined"
-                                        color="secondary"
-                                        startIcon={<ThumbDownOutlinedIcon />}
-                                    >
-                                        {t('market.Step')}
-                                    </Button> */}
-                                            <Button
-                                                sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                startIcon={<ReplyIcon />}
-                                            >
-                                                {t('market.share')}
-                                            </Button>
-                                        </Box>
-                                        {item.flowStep.response.answer && (
-                                            <Typography sx={{ mt: 1, fontSize: '.75rem', mr: '24px' }}>
-                                                {item.flowStep.response.answer?.length} {t('market.words')}
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                )}
-                            </Box>
-                        ) : (
-                            <Card
-                                elevation={3}
-                                sx={{
-                                    width: '200px',
-                                    height: '200px',
-                                    marginRight: '16px',
-                                    lineHeight: '200px',
-                                    textAlign: 'center'
-                                }}
-                            >
-                                <InsertPhotoIcon fontSize="large" />
-                            </Card>
-                        )}
-                    </Box>
-                </CardContent>
-            </Card>
-        );
-    });
+import { useRef } from 'react';
+import CarrOut from './carrOut';
+function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange }: any) {
     const refs = useRef<any>([]);
-    const theme = useTheme();
-    const isDarkMode = theme.palette.mode === 'dark';
-    const arr: any[] = [];
     //子组件返回的值
-    const callBack = ({ data, index }: { data: any; index: number }) => {
+    const callBack = (data: any) => {
         isallExecute(false);
-        changeSon({ stepId: data.field, steps: data, index });
-    };
-    const mapVariables = (variable: any, obj: any) => {
-        for (const item of variable) {
-            for (const key in obj) {
-                if (item.field === key) {
-                    item.value = obj[key];
-                }
-            }
-        }
+        changeSon({ stepId: data.item, index: data.steps });
     };
     //点击全部执行
     const allExecute = async () => {
@@ -249,12 +19,8 @@ function Perform({ config, changeSon, changeAllSon, source, loadings, isallExecu
             return item.submit();
         });
         if (status.every((item: boolean) => item !== false)) {
-            const newConFig = { ...config };
-            newConFig.steps.forEach((item: any, index: number) => {
-                if (item.variable) mapVariables(item.variable.variables, status[index]);
-                mapVariables(item.flowStep.variable.variables, status[index]);
-            });
-            changeAllSon(newConFig);
+            isallExecute(true);
+            changeSon({ stepId: config.steps[0].field, index: 0 });
         }
     };
     return (
@@ -274,7 +40,18 @@ function Perform({ config, changeSon, changeAllSon, source, loadings, isallExecu
             {config?.steps.map(
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (
-                        <CarrOut ref={(el) => (refs.current[steps] = el)} key={steps} item={item} steps={steps} callBack={callBack} />
+                        <CarrOut
+                            source={source}
+                            loadings={loadings}
+                            variableChange={variableChange}
+                            promptChange={promptChange}
+                            config={config}
+                            ref={(el) => (refs.current[steps] = el)}
+                            key={steps}
+                            items={item}
+                            steps={steps}
+                            callBack={callBack}
+                        />
                     )
             )}
         </Box>

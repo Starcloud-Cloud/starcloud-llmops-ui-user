@@ -27,5 +27,9 @@ export interface Details {
     workflowConfig: { steps: any[] };
 }
 export interface Anyevent {
-    [key: string]: string | any;
+    initialValues: {
+        name: string;
+        desc: string;
+    };
+    setValues: (data: { name: string; value: string }) => void;
 }

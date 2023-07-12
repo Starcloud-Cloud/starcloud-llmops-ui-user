@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Card,
@@ -21,24 +21,12 @@ import * as yup from 'yup';
 const validationSchema = yup.object({
     name: yup.string().required('Name is required')
 });
-
-function Basis({ name, desc, setValues }: Anyevent) {
-    useEffect(() => {
-        formik.setFieldValue('name', name || '');
-        formik.setFieldValue('desc', desc || '');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name]);
+function Basis({ initialValues, setValues }: Anyevent) {
     const formik = useFormik({
-        initialValues: {
-            name: '',
-            desc: ''
-        },
+        initialValues,
         validationSchema,
         onSubmit: () => {}
     });
-    const handleValue = (e: any) => {
-        setValues({ name: e.target.name, value: e.target.value });
-    };
     const [tabValue] = useState(0);
     // const changeTab = (event: React.SyntheticEvent, newValue: number) => {
     //     setTabValue(newValue);
@@ -64,6 +52,7 @@ function Basis({ name, desc, setValues }: Anyevent) {
         } = event;
         setPersonName(typeof value === 'string' ? value.split(',') : value);
     };
+
     return (
         <Card sx={{ padding: '16px 0' }}>
             {/* <Tabs sx={{ marginBottom: 2 }} value={tabValue} onChange={changeTab} aria-label="basic tabs example">
@@ -78,7 +67,10 @@ function Basis({ name, desc, setValues }: Anyevent) {
                         required
                         InputLabelProps={{ shrink: true }}
                         value={formik?.values.name}
-                        onChange={handleValue}
+                        onChange={(e) => {
+                            formik.handleChange(e);
+                            setValues({ name: e.target.name, value: e.target.value });
+                        }}
                         error={formik?.touched.name && Boolean(formik?.errors.name)}
                         helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ' '}
                         label="Template Name"
@@ -92,18 +84,14 @@ function Basis({ name, desc, setValues }: Anyevent) {
                         label="Template Description"
                         name="desc"
                         value={formik.values.desc}
-                        onChange={handleValue}
+                        onChange={(e) => {
+                            formik.handleChange(e);
+                            setValues({ name: e.target.name, value: e.target.value });
+                        }}
                         placeholder="Please enter template description"
                         helperText={' '}
                         variant="outlined"
                     />
-                    <button
-                        onClick={() => {
-                            formik.handleSubmit();
-                        }}
-                    >
-                        111
-                    </button>
                 </form>
             )}
             {tabValue === 1 && (

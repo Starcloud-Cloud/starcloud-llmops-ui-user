@@ -7,21 +7,22 @@ import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
-function CarryOut({ config, changeData, changeAllSon, loadings, allExecute }: any) {
+function CarryOut({ config, changeData, loadings, allExecute, variableChange, promptChange }: any) {
     return (
         <Box>
             <Grid container spacing={4}>
                 {/* <Grid item lg={7} md={7} sm={7}> */}
                 <Grid item lg={12} md={12} sm={12}>
                     <Typography variant="h5" sx={{ fontSize: '1.3rem' }} my={2}>
-                        {config.description}
+                        {config?.description}
                     </Typography>
                     <Perform
-                        config={config.workflowConfig}
+                        config={config?.workflowConfig}
                         changeSon={changeData}
-                        changeAllSon={changeAllSon}
                         loadings={loadings}
                         isallExecute={allExecute}
+                        variableChange={variableChange}
+                        promptChange={promptChange}
                         source="market"
                     />
                     <Box sx={{ px: 2 }}>
@@ -43,13 +44,13 @@ function CarryOut({ config, changeData, changeAllSon, loadings, allExecute }: an
                                 }
                             }}
                         >
-                            {t('market.version')}:{config.version}
+                            {t('market.version')}:{config?.version}
                             {/* <Divider orientation="vertical" flexItem /> */}
                             {/* {t('market.plugLevel')}:2 */}
                             {/* <Divider orientation="vertical" flexItem /> */}
                             {/* {t('market.plugVersion')}:3 */}
                             <Divider orientation="vertical" flexItem />
-                            {t('generate.createTime')}:{formatDate(config.createTime)}
+                            {t('generate.createTime')}:{formatDate(config?.createTime)}
                         </Box>
                     </Box>
                 </Grid>

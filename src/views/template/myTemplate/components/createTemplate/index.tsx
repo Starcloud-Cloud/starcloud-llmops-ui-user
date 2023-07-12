@@ -40,7 +40,7 @@ function CreateDetail() {
     const { setUserInfo }: any = userInfoStore();
     //是否全部执行
     let isAllExecute = false;
-    const [detail, setDetail] = useState({} as Details);
+    const [detail, setDetail] = useState(null as unknown as Details);
     const [loadings, setLoadings] = useState<any[]>([]);
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -147,14 +147,6 @@ function CreateDetail() {
         };
         fetchData();
     };
-    //全部执行
-    const changeAllSon = (newValue: any) => {
-        isAllExecute = true;
-        const oldV = { ...detail };
-        oldV.workflowConfig = newValue;
-        changeData({ stepId: oldV.workflowConfig.steps[0].field, index: 0, steps: oldV.workflowConfig.steps[0] });
-        return oldV;
-    };
     useEffect(() => {
         getApp({ uid: searchParams.get('uid') as string }).then((res) => {
             setDetail(res);
@@ -168,84 +160,40 @@ function CreateDetail() {
             [data.name]: data.value
         });
     };
-
+    //设置执行的步骤
+    const exeChange = ({ e, steps, i }: any) => {
+        const newValue = { ...detail };
+        newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        setDetail(newValue);
+    };
+    //设置执行的prompt
+    const promptChange = ({ e, steps, i }: any) => {
+        const newValue = { ...detail };
+        newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+        setDetail(newValue);
+    };
     //设置提示词编排步骤的name desc
-    const editChange = ({ index, label, value }: { index: number; label: string; value: string }) => {
-        setDetail({
-            ...detail,
-            workflowConfig: {
-                steps: [
-                    ...detail.workflowConfig.steps.slice(0, index),
-                    {
-                        ...detail.workflowConfig.steps[index],
-                        flowStep: {
-                            ...detail.workflowConfig.steps[index].flowStep,
-                            [label]: value
-                        }
-                    },
-                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
-                ]
-            }
-        });
+    const editChange = ({ num, label, value }: { num: number; label: string; value: string }) => {
+        const oldvalue = { ...detail };
+        oldvalue.workflowConfig.steps[num][label] = value;
+        setDetail(oldvalue);
     };
     //提示词更改
     const basisChange = ({ e, index, i }: any) => {
-        setDetail({
-            ...detail,
-            workflowConfig: {
-                steps: [
-                    ...detail.workflowConfig.steps.slice(0, index),
-                    {
-                        ...detail.workflowConfig.steps[index],
-                        flowStep: {
-                            ...detail.workflowConfig.steps[index].flowStep,
-                            variable: {
-                                variables: [
-                                    ...detail.workflowConfig.steps[index].flowStep.variable.variables.slice(0, i),
-                                    {
-                                        ...detail.workflowConfig.steps[index].flowStep.variable.variables[i],
-                                        value: e.value
-                                    },
-                                    ...detail.workflowConfig.steps[index].flowStep.variable.variables.slice(
-                                        i + 1,
-                                        detail.workflowConfig.steps[index].flowStep.variable.variables.length
-                                    )
-                                ]
-                            }
-                        }
-                    },
-                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
-                ]
-            }
-        });
+        const oldValue = { ...detail };
+        oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
+        setDetail(oldValue);
     };
     //步骤更改
     const variableChange = ({ e, index, i }: any) => {
-        setDetail({
-            ...detail,
-            workflowConfig: {
-                steps: [
-                    ...detail.workflowConfig.steps.slice(0, index),
-                    {
-                        ...detail.workflowConfig.steps[index],
-                        variable: {
-                            variables: [
-                                ...detail.workflowConfig.steps[index].variable.variables.slice(0, i),
-                                {
-                                    ...detail.workflowConfig.steps[index].variable.variables[i],
-                                    value: e.value
-                                },
-                                ...detail.workflowConfig.steps[index].variable.variables.slice(
-                                    i + 1,
-                                    detail.workflowConfig.steps[index].variable.variables.length
-                                )
-                            ]
-                        }
-                    },
-                    ...detail.workflowConfig.steps.slice(index + 1, detail.workflowConfig.steps.length)
-                ]
-            }
-        });
+        const newValue = { ...detail };
+        newValue.workflowConfig.steps[index].variable.variables[i].value = e.value;
+        setDetail(newValue);
+    };
+    const statusChange = ({ i, index }: { i: number; index: number }) => {
+        const value = { ...detail };
+        value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
+        setDetail(value);
     };
     //tabs
     const [value, setValue] = useState(0);
@@ -291,14 +239,15 @@ function CreateDetail() {
             <TabPanel value={value} index={0}>
                 <Grid container spacing={5}>
                     <Grid item lg={5}>
-                        <Basis name={detail.name} desc={detail.description} setValues={setData} />
+                        {detail && <Basis initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />}
                     </Grid>
                     <Grid item lg={7}>
                         <Perform
-                            config={detail.workflowConfig}
+                            config={detail?.workflowConfig}
                             changeSon={changeData}
-                            changeAllSon={changeAllSon}
                             loadings={loadings}
+                            variableChange={exeChange}
+                            promptChange={promptChange}
                             isallExecute={(flag: boolean) => {
                                 isAllExecute = flag;
                             }}
@@ -311,14 +260,25 @@ function CreateDetail() {
                 <Grid container spacing={5}>
                     <Grid item lg={5}>
                         <Arrange
-                            config={detail.workflowConfig}
+                            config={detail?.workflowConfig}
                             editChange={editChange}
                             variableChange={variableChange}
                             basisChange={basisChange}
+                            statusChange={statusChange}
                         />
                     </Grid>
                     <Grid item lg={7}>
-                        <Perform config={detail.workflowConfig} changeSon={changeData} source="myApp" />
+                        <Perform
+                            config={detail?.workflowConfig}
+                            changeSon={changeData}
+                            loadings={loadings}
+                            variableChange={exeChange}
+                            promptChange={promptChange}
+                            isallExecute={(flag: boolean) => {
+                                isAllExecute = flag;
+                            }}
+                            source="myApp"
+                        />
                     </Grid>
                 </Grid>
             </TabPanel>

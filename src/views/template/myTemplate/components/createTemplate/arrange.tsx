@@ -61,7 +61,7 @@ const validationSchema = yup.object({
     label: yup.string().required('label is required')
 });
 
-function Arrange({ config, editChange, variableChange, basisChange }: any) {
+function Arrange({ config, editChange, variableChange, basisChange, statusChange }: any) {
     const formik = useFormik({
         initialValues: {
             variable: '',
@@ -72,7 +72,6 @@ function Arrange({ config, editChange, variableChange, basisChange }: any) {
         validationSchema,
         onSubmit: (values) => {}
     });
-    const rows = [{ name: 'Frozen yoghurt', calories: 159, fat: 12 }];
     //弹窗
     const [open, setOpen] = useState(false);
     const handleClose = () => {
@@ -84,22 +83,22 @@ function Arrange({ config, editChange, variableChange, basisChange }: any) {
             {config?.steps.map((item: any, index: number) => (
                 <Card key={item.field} sx={{ padding: '16px 0' }}>
                     <Grid container spacing={2}>
-                        <Grid item lg={4}>
+                        <Grid item lg={4} xs={12}>
                             <TextField
                                 label="标题"
-                                value={item.buttonLabel}
-                                name="label"
+                                value={item.name}
+                                name="name"
                                 InputLabelProps={{ shrink: true }}
                                 onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
                                 helperText={' '}
                                 fullWidth
                             />
                         </Grid>
-                        <Grid item lg={8}>
+                        <Grid item lg={8} xs={12}>
                             <TextField
                                 label="描述"
                                 value={item.description}
-                                name="desc"
+                                name="description"
                                 InputLabelProps={{ shrink: true }}
                                 onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
                                 helperText={' '}
@@ -111,12 +110,12 @@ function Arrange({ config, editChange, variableChange, basisChange }: any) {
                     <Grid container spacing={2}>
                         {item.variable &&
                             item.variable.variables.map((el: any, i: number) => (
-                                <Grid item md={3} key={i + 'prompt'}>
+                                <Grid item md={4} xs={12} key={i + 'prompt'}>
                                     <Form item={el} onChange={(e: any) => variableChange({ e, index, i })} />
                                 </Grid>
                             ))}
                         {item.flowStep.variable?.variables.map((el: any, i: number) => (
-                            <Grid item md={12} key={i + 'variables'}>
+                            <Grid item md={12} xs={12} key={i + 'variables'}>
                                 <Form item={el} onChange={(e: any) => basisChange({ e, index, i })} />
                             </Grid>
                         ))}
@@ -139,26 +138,36 @@ function Arrange({ config, editChange, variableChange, basisChange }: any) {
                                     <TableRow>
                                         <TableCell>变量 KEY</TableCell>
                                         <TableCell>字段名称</TableCell>
-                                        <TableCell> 可选</TableCell>
+                                        <TableCell> 是否显示</TableCell>
                                         <TableCell>操作</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {rows.map((row) => (
-                                        <TableRow hover key={row.name}>
-                                            <TableCell>{row.name}</TableCell>
-                                            <TableCell>{row.calories}</TableCell>
-                                            <TableCell>{row.fat}</TableCell>
-                                            <TableCell>
-                                                <IconButton color="primary">
-                                                    <SettingsIcon />
-                                                </IconButton>
-                                                <IconButton color="error">
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {item.variable.variables.map(
+                                        (row: { field: 'string'; label: 'string'; isShow: boolean; value: 'string' }, i: number) => (
+                                            <TableRow hover key={row.field}>
+                                                <TableCell>{row.field}</TableCell>
+                                                <TableCell>{row.label}</TableCell>
+                                                <TableCell>
+                                                    <Switch
+                                                        name={row.field}
+                                                        onChange={() => {
+                                                            statusChange({ i, index });
+                                                        }}
+                                                        checked={row?.isShow}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton color="primary">
+                                                        <SettingsIcon />
+                                                    </IconButton>
+                                                    <IconButton color="error">
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>

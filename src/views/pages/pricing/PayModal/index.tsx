@@ -56,7 +56,7 @@ const Body = React.forwardRef(({ modalStyle, handleClose, url }: BodyProps, ref:
                     <Grid item xs={12} sm={12} md={12}>
                         <div className="flex justify-center flex-col items-center">
                             <div className="text-base mb-2">请扫描下方二维码完成支付</div>
-                            <img className="w-[250px] h-[250px]" src={url} alt="" />
+                            <iframe title={'pay'} className="w-[260px] h-[260px] overflow-hidden" src={url} frameBorder={'no'} />
                             <div className="text-sm mt-2">二维码将在 10 分钟内失效</div>
                         </div>
                     </Grid>

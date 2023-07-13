@@ -35,7 +35,7 @@ const MiddleCards = () => {
         {
             Icon: EventNoteIcon,
             title: '每日签到',
-            description: '送2000字/2张图片',
+            description: '送3000字/2张图片',
             buttonText: signInStatus ? '已签到' : '立即签到',
             isDisabled: signInStatus ? true : false,
             onClick: !signInStatus ? handleSignIn : undefined

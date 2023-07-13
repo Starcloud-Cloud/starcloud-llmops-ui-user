@@ -180,7 +180,7 @@ const Price1 = () => {
                 const resOrder = await submitOrder({
                     id: res,
                     channelCode: 'alipay_pc',
-                    channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
+                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
                     displayMode: 'qr_code'
                 });
                 setPayUrl(resOrder.displayContent);

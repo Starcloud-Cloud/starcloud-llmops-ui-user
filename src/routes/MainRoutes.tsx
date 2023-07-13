@@ -140,7 +140,7 @@ const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
 // Rewards
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
-// const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/record')));
+const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/record')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -553,11 +553,11 @@ const MainRoutes = {
         {
             path: '/exchange',
             element: <Redemption />
+        },
+        {
+            path: '/orderRecord',
+            element: <OrderRecord />
         }
-        // {
-        //     path: '/orderRecord',
-        //     element: <OrderRecord />
-        // }
     ]
 };
 

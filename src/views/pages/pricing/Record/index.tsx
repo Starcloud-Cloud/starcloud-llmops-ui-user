@@ -1,10 +1,8 @@
-import CloseIcon from '@mui/icons-material/Close';
 import { Button } from '@mui/material';
 
 // material-ui
 import {
     Box,
-    IconButton,
     Table,
     TableBody,
     TableCell,
@@ -22,9 +20,10 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { getOrderRecord } from 'api/vip';
-import { useEffect, useState } from 'react';
+import { getOrderRecord, submitOrder } from 'api/vip';
+import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
+import { PayModal } from '../PayModal/index';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -108,12 +107,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-interface ShareProps {
-    open: boolean;
-    handleClose: () => void;
-}
-
-const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
+const Record: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
@@ -179,7 +173,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     };
 
     // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    // const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const transformValue = (v: number) => {
         switch (v) {
@@ -192,11 +186,31 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
         }
     };
 
+    console.log('rows', rows);
+
+    const [open, setOpen] = React.useState(false);
+    const [payUrl, setPayUrl] = useState('');
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const handlePay = async (id: number) => {
+        const resOrder = await submitOrder({
+            id,
+            channelCode: 'alipay_pc',
+            channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
+            displayMode: 'qr_code'
+        });
+        setPayUrl(resOrder.displayContent);
+        handleOpen();
+    };
+
     return (
         <MainCard content={false} title="订单记录">
-            <IconButton aria-label="close" onClick={handleClose} sx={{ position: 'absolute', right: 15, top: 15, bgcolor: '#ffffff' }}>
-                <CloseIcon />
-            </IconButton>
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
@@ -212,7 +226,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                             rows.filter((row) => typeof row !== 'number'),
                             getComparator(order, orderBy)
                         )
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row, index) => {
                                 if (typeof row === 'number') {
                                     return null; // 忽略数字类型的行
@@ -227,23 +241,18 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>
                                         <TableCell align="center">
-                                            <Button variant="text" color="secondary" disabled={row.status === 10}>
+                                            <Button
+                                                variant="text"
+                                                color="secondary"
+                                                disabled={row.status === 10}
+                                                onClick={() => handlePay(row.id)}
+                                            >
                                                 支付
                                             </Button>
                                         </TableCell>
                                     </TableRow>
                                 );
                             })}
-
-                        {emptyRows > 0 && (
-                            <TableRow
-                                style={{
-                                    height: (dense ? 33 : 53) * emptyRows
-                                }}
-                            >
-                                <TableCell colSpan={7} />
-                            </TableRow>
-                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -259,6 +268,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
+            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
         </MainCard>
     );
 };

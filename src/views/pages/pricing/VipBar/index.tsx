@@ -8,6 +8,8 @@ import Logo from 'ui-component/Logo';
 
 // assets
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import useAuth from 'hooks/useAuth';
+import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 
 // elevation scroll
 interface ElevationScrollProps {
@@ -36,25 +38,30 @@ function ElevationScroll({ children, window }: ElevationScrollProps) {
 
 export const VipBar = ({ ...others }) => {
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
     return (
         <ElevationScroll {...others}>
             <MuiAppBar>
                 <Container>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
-                        <div className="cursor-pointer" onClick={() => navigate('/dashboard/default')}>
+                        <div className="cursor-pointer" onClick={() => navigate('/appMarket/list')}>
                             <Logo />
                         </div>
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
-                            <Button
-                                component={RouterLink}
-                                to="/login"
-                                target="_blank"
-                                disableElevation
-                                variant="contained"
-                                color="secondary"
-                            >
-                                登录/注册
-                            </Button>
+                            {isLoggedIn ? (
+                                <ProfileSection />
+                            ) : (
+                                <Button
+                                    component={RouterLink}
+                                    to="/login"
+                                    target="_blank"
+                                    disableElevation
+                                    variant="contained"
+                                    color="secondary"
+                                >
+                                    登录/注册
+                                </Button>
+                            )}
                         </Stack>
                     </Toolbar>
                 </Container>

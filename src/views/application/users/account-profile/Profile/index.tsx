@@ -87,6 +87,9 @@ const Profilnew = () => {
     const theme = useTheme();
     const [value, setValue] = useState<number>(0);
     const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
+    const [updateCount, setUpdateCount] = useState(0);
+
+    const forceUpdate = () => setUpdateCount((pre) => pre + 1);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,7 +97,7 @@ const Profilnew = () => {
             setUserProfile(result);
         };
         fetchData();
-    }, []);
+    }, [updateCount]);
 
     const handleChange = (event: SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -261,7 +264,7 @@ const Profilnew = () => {
                         ))}
                     </Tabs>
                     <TabPanel value={value} index={0}>
-                        <MyAccount userProfile={userProfile} />
+                        <MyAccount userProfile={userProfile} forceUpdate={forceUpdate} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ChangePassword />

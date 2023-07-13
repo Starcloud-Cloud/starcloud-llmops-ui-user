@@ -12,13 +12,13 @@ const Redemption = () => {
     return (
         <Grid>
             <Header />
-            <Typography variant="h3" textAlign="center" sx={{ my: 5 }}>
+            <Typography variant="h3" textAlign="center" sx={{ my: 3 }}>
                 {t('redemption.obtain')}
             </Typography>
             <Typography
                 variant="h5"
                 textAlign="right"
-                sx={{ cursor: 'pointer', color: '#7e7e7e', my: 5, mr: 2 }}
+                sx={{ cursor: 'pointer', color: '#7e7e7e', my: 3, mr: 2 }}
                 onClick={handleOpenRecord}
             >
                 {'查看权益记录 >'}

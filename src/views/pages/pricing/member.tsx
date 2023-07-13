@@ -179,8 +179,7 @@ const Price1 = () => {
                 const res = await createOrder({ productCode: code, timestamp: new Date().getTime(), timeZone });
                 const resOrder = await submitOrder({
                     id: res,
-                    channelCode: 'alipay_pc',
-                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+                    channelCode: 'alipay_qr',
                     displayMode: 'qr_code'
                 });
                 setPayUrl(resOrder.displayContent);

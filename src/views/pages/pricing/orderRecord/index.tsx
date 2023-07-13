@@ -201,8 +201,7 @@ const Record: React.FC = () => {
     const handlePay = async (id: number) => {
         const resOrder = await submitOrder({
             id,
-            channelCode: 'alipay_pc',
-            channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+            channelCode: 'alipay_qr',
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);

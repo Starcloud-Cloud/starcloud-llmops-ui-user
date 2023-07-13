@@ -68,7 +68,7 @@ const RedemptionHeader = () => {
     return (
         <CustomMainCard
             sx={{
-                '.MuiCardHeader-title': { fontSize: { xs: '0.875rem !important', md: '1.5rem !important', xl: '1.5rem !important' } }
+                '.MuiCardHeader-title': { fontSize: { xs: '0.875rem !important', md: '1.2rem !important', xl: '1.2rem !important' } }
             }}
             title="注册即获取基础权益：5000字数 10张图片"
         >
@@ -119,7 +119,7 @@ const RedemptionHeader = () => {
                                     spacing={2}
                                     sx={{ paddingLeft: { xs: '0', sm: '100px !important' } }}
                                 >
-                                    <Grid item xs={7} sm={8} md={9} lg={10}>
+                                    <Grid item xs={7} sm={7} md={6} lg={5}>
                                         <TextField
                                             id="outlined-basic"
                                             fullWidth

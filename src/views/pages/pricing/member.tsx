@@ -159,6 +159,7 @@ const Price1 = () => {
     };
 
     const handleClose = () => {
+        setPayUrl('');
         setOpen(false);
     };
 
@@ -176,15 +177,15 @@ const Price1 = () => {
             try {
                 const options = Intl.DateTimeFormat().resolvedOptions();
                 const timeZone = options.timeZone;
+
+                handleOpen();
                 const res = await createOrder({ productCode: code, timestamp: new Date().getTime(), timeZone });
                 const resOrder = await submitOrder({
                     id: res,
-                    channelCode: 'alipay_pc',
-                    channelExtras: { qr_pay_mode: '4', qr_code_width: 100 },
+                    channelCode: 'alipay_qr',
                     displayMode: 'qr_code'
                 });
                 setPayUrl(resOrder.displayContent);
-                handleOpen();
             } catch (e) {
                 const TEXT_MESSAGE = '登录超时,请重新登录!';
                 if (e === TEXT_MESSAGE) {
@@ -202,7 +203,7 @@ const Price1 = () => {
     const handleClick = (index: number, code?: string) => {
         switch (index) {
             case 0:
-                return navigate('/dashboard/default');
+                return navigate('/exchange');
             case 1:
                 return handleCreateOrder(code);
             case 2:
@@ -219,7 +220,7 @@ const Price1 = () => {
             </HeaderWrapper>
             <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
                 <div className="w-4/5">
-                    <div className="flex justify-center mb-10 text-5xl">立即订阅，创作无限可能！</div>
+                    <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
                             <Radio.Button value="1" style={{ width: '150px', textAlign: 'center' }}>

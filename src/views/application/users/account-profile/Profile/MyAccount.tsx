@@ -29,7 +29,7 @@ const currencies = [
 
 // ==============================|| PROFILE 1 - MY ACCOUNT ||============================== //
 
-const MyAccount = ({ userProfile }: MyAccountProps) => {
+const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate: () => void }) => {
     const initialSex = userProfile?.sex === 1 ? 'man' : 'woman';
     const [sex, setSex] = useState(initialSex);
     const [username, setUsername] = useState(userProfile?.username || '');
@@ -60,6 +60,7 @@ const MyAccount = ({ userProfile }: MyAccountProps) => {
             sex: sex === 'man' ? 1 : 0
         });
         if (res) {
+            forceUpdate();
             dispatch(
                 openSnackbar({
                     open: true,

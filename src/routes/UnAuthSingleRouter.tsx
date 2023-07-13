@@ -14,7 +14,7 @@ const UnAuthSingleRouter = {
     ),
     children: [
         {
-            path: '/member/subscribe',
+            path: '/subscribe',
             element: <PagesPrice />
         }
     ]

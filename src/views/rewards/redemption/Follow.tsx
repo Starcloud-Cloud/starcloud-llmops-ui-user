@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Modal, IconButton, Typography, CardContent, CardMedia } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import douyin from 'assets/images/landing/douyin.png';
+import redBook from 'assets/images/landing/red-book-qrcode.png';
 
 interface ShareProps {
     open: boolean;
@@ -14,7 +15,7 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
         {
             name: '官方小红书账号',
             link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
-            image: douyin
+            image: redBook
         },
         {
             name: '官方抖音账号',
@@ -78,7 +79,7 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                             {socialPlatforms.map((platform, index) => (
                                 <div
                                     key={index}
-                                    style={{ marginBottom: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                                    style={{ marginBottom: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}
                                 >
                                     <CardMedia
                                         component="img"

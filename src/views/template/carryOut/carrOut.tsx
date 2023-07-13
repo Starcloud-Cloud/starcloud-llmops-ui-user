@@ -105,7 +105,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                 </Box>
                 <form>
                     <Grid container spacing={1}>
-                        {item.variable?.variables.map((el: any, i: number) =>
+                        {item.variable?.variables?.map((el: any, i: number) =>
                             el.isShow ? (
                                 <Grid item key={el.field} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
                                     <FormExecute formik={formik} item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
@@ -113,7 +113,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                             ) : null
                         )}
                         {item.flowStep.variable.variables.length !== 0 &&
-                            item.flowStep.variable.variables.map((el: any, i: number) =>
+                            item.flowStep.variable?.variables?.map((el: any, i: number) =>
                                 el.isShow ? (
                                     <Grid
                                         item

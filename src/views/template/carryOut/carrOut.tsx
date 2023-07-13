@@ -13,10 +13,9 @@ import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import copy from 'clipboard-copy';
-const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, items, steps, callBack }: any, ref) => {
+const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
-    const item = JSON.parse(JSON.stringify(items));
     useImperativeHandle(ref, () => ({
         submit: () => {
             if (!formik.isValid) {
@@ -52,7 +51,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
         if (mdRef.current) {
             mdRef.current.scrollTop = mdRef.current.scrollHeight;
         }
-    }, []);
+    }, [item?.flowStep.response.answer]);
     return (
         <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
             {loadings[steps] && (

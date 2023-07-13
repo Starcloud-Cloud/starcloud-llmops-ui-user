@@ -18,9 +18,14 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    FormControl,
     FormControlLabel,
+    Select,
+    MenuItem,
+    InputLabel,
     Switch
 } from '@mui/material';
+import { Popconfirm } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
 
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -32,6 +37,10 @@ import Form from 'views/template/components/form';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+interface Option {
+    label: string;
+    value: string;
+}
 function BootstrapDialogTitle(props: any) {
     const { children, onClose, ...other } = props;
 
@@ -57,25 +66,84 @@ function BootstrapDialogTitle(props: any) {
 }
 
 const validationSchema = yup.object({
-    variable: yup.string().required('variable is required'),
+    field: yup.string().required('variable is required'),
     label: yup.string().required('label is required')
 });
 
-function Arrange({ config, editChange, variableChange, basisChange, statusChange }: any) {
+function Arrange({ config, editChange, variableChange, basisChange, statusChange, changeConfigs }: any) {
     const formik = useFormik({
         initialValues: {
-            variable: '',
+            field: '',
             label: '',
             value: '',
-            is_show: ''
+            style: 'INPUT',
+            isShow: true
         },
         validationSchema,
-        onSubmit: (values) => {}
+        onSubmit: (values) => {
+            const oldValue = { ...config };
+            if (title === 'Add') {
+                if (!oldValue.steps[modal].variable) {
+                    oldValue.steps[modal].variable = { variables: [] };
+                }
+                oldValue.steps[modal].variable.variables.push({ ...values, options });
+            } else {
+                oldValue.steps[modal].variable.variables[stepIndex] = {
+                    ...oldValue.steps[modal].variable.variables[stepIndex],
+                    ...values,
+                    options
+                };
+            }
+            changeConfigs(oldValue);
+            handleClose();
+        }
     });
+    const [modal, setModal] = useState<number>(0);
+    const [stepIndex, setStepIndex] = useState<number>(0);
+    const [options, setOptions] = useState<Option[]>([]);
     //弹窗
     const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    const typeList = [
+        { label: 'Input', value: 'INPUT' },
+        { label: 'Textarea', value: 'TEXTAREA' },
+        { label: 'Select', value: 'SELECT' }
+    ];
+    //关闭弹窗
     const handleClose = () => {
+        formik.resetForm();
+        setOptions([]);
         setOpen(false);
+    };
+    //添加变量
+    const addVariable = () => {
+        setOptions([...options, { label: 'label', value: 'value' }]);
+    };
+    //编辑变量
+    const editModal = (row: any, i: number, index: number) => {
+        for (let key in formik.values) {
+            formik.setFieldValue(key, row[key]);
+        }
+        if (row.options) setOptions(row.options);
+        setTitle('Edit');
+        setModal(index);
+        setStepIndex(i);
+        setOpen(true);
+    };
+    //删除变量
+    const delModal = (i: number, index: number) => {
+        setModal(index);
+        setStepIndex(i);
+        const oldValues = { ...config };
+        oldValues.steps[index].variable.variables.splice(i, 1);
+        changeConfigs(oldValues);
+    };
+    const optionChange = (e: { target: { name: string; value: string } }, index: number) => {
+        const { name, value } = e.target;
+        const oldOption = [...options];
+        const updatedOption = { ...oldOption[index], [name]: value };
+        oldOption[index] = updatedOption;
+        setOptions(oldOption);
     };
     return (
         <Box>
@@ -126,7 +194,15 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                         title="Basic Table"
                         secondary={
                             <Stack direction="row" spacing={2} alignItems="center">
-                                <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<Add />}>
+                                <Button
+                                    onClick={() => {
+                                        setModal(index);
+                                        setOpen(true);
+                                        setTitle('Add');
+                                    }}
+                                    variant="outlined"
+                                    startIcon={<Add />}
+                                >
                                     Add
                                 </Button>
                             </Stack>
@@ -143,7 +219,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {item.variable.variables.map(
+                                    {item?.variable?.variables.map(
                                         (row: { field: 'string'; label: 'string'; isShow: boolean; value: 'string' }, i: number) => (
                                             <TableRow hover key={row.field}>
                                                 <TableCell>{row.field}</TableCell>
@@ -158,12 +234,26 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <IconButton color="primary">
+                                                    <IconButton
+                                                        onClick={() => {
+                                                            editModal(row, i, index);
+                                                        }}
+                                                        color="primary"
+                                                    >
                                                         <SettingsIcon />
                                                     </IconButton>
-                                                    <IconButton color="error">
-                                                        <DeleteIcon />
-                                                    </IconButton>
+                                                    <Popconfirm
+                                                        title="Delete the task"
+                                                        description="Are you sure to delete this task?"
+                                                        onConfirm={() => delModal(i, index)}
+                                                        onCancel={() => {}}
+                                                        okText="Yes"
+                                                        cancelText="No"
+                                                    >
+                                                        <IconButton color="error">
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    </Popconfirm>
                                                 </TableCell>
                                             </TableRow>
                                         )
@@ -176,20 +266,20 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
             ))}
             <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    Modal title
+                    {title}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                     <form onSubmit={formik.handleSubmit}>
                         <TextField
                             fullWidth
-                            id="variable"
-                            name="variable"
-                            label="variable"
-                            value={formik.values.variable}
+                            id="field"
+                            name="field"
+                            label="field"
+                            value={formik.values.field}
                             onChange={formik.handleChange}
                             InputLabelProps={{ shrink: true }}
-                            error={formik.touched.variable && Boolean(formik.errors.variable)}
-                            helperText={formik.touched.variable && formik.errors.variable ? String(formik.errors.variable) : ' '}
+                            error={formik.touched.field && Boolean(formik.errors.field)}
+                            helperText={formik.touched.field && formik.errors.field ? String(formik.errors.field) : '请保持field是唯一的'}
                         />
                         <TextField
                             fullWidth
@@ -212,7 +302,50 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
-                        <FormControlLabel value="formik.values.is_show" control={<Switch />} label="是否显示" labelPlacement="start" />
+                        <FormControl fullWidth>
+                            <InputLabel id="sort">type</InputLabel>
+                            <Select onChange={formik.handleChange} name="style" value={formik.values.style} label="type">
+                                {typeList.map((el: any) => (
+                                    <MenuItem key={el.value} value={el.value}>
+                                        {el.label}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControlLabel
+                            control={<Switch name="isShow" defaultChecked onChange={formik.handleChange} value={formik.values.isShow} />}
+                            label="是否显示"
+                            labelPlacement="start"
+                        />
+                        {formik.values.style === 'SELECT' && (
+                            <Box>
+                                {options.map((item, vIndex: number) => (
+                                    <Box key={vIndex}>
+                                        <TextField
+                                            name="label"
+                                            label="label"
+                                            value={item.label}
+                                            onChange={(e) => optionChange(e, vIndex)}
+                                            InputLabelProps={{ shrink: true }}
+                                            helperText=" "
+                                        />
+                                        <span style={{ display: 'inline-block', margin: '20px 10px 0 10px' }}>—</span>
+                                        <TextField
+                                            name="value"
+                                            label="value"
+                                            value={item.value}
+                                            onChange={(e) => optionChange(e, vIndex)}
+                                            InputLabelProps={{ shrink: true }}
+                                            helperText=" "
+                                        />
+                                    </Box>
+                                ))}
+                                <br />
+                                <Button size="small" variant="outlined" startIcon={<Add />} onClick={addVariable}>
+                                    addVariable
+                                </Button>
+                            </Box>
+                        )}
                     </form>
                 </DialogContent>
                 <DialogActions>

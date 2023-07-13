@@ -153,6 +153,7 @@ function CreateDetail() {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
         setDetail({
@@ -172,6 +173,15 @@ function CreateDetail() {
         newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         setDetail(newValue);
     };
+
+    //增加 删除变量
+    const changeConfigs = (data: any) => {
+        setDetail({
+            ...detail,
+            workflowConfig: data
+        });
+        setPerform(perform + 1);
+    };
     //设置提示词编排步骤的name desc
     const editChange = ({ num, label, value }: { num: number; label: string; value: string }) => {
         const oldvalue = { ...detail };
@@ -183,12 +193,14 @@ function CreateDetail() {
         const oldValue = { ...detail };
         oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
         setDetail(oldValue);
+        setPerform(perform + 1);
     };
     //步骤更改
     const variableChange = ({ e, index, i }: any) => {
         const newValue = { ...detail };
         newValue.workflowConfig.steps[index].variable.variables[i].value = e.value;
         setDetail(newValue);
+        setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = { ...detail };
@@ -243,6 +255,7 @@ function CreateDetail() {
                     </Grid>
                     <Grid item lg={7}>
                         <Perform
+                            key={perform}
                             config={detail?.workflowConfig}
                             changeSon={changeData}
                             loadings={loadings}
@@ -265,10 +278,12 @@ function CreateDetail() {
                             variableChange={variableChange}
                             basisChange={basisChange}
                             statusChange={statusChange}
+                            changeConfigs={changeConfigs}
                         />
                     </Grid>
                     <Grid item lg={7}>
                         <Perform
+                            key={perform}
                             config={detail?.workflowConfig}
                             changeSon={changeData}
                             loadings={loadings}

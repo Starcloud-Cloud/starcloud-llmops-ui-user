@@ -48,7 +48,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                             config={config}
                             ref={(el) => (refs.current[steps] = el)}
                             key={steps}
-                            items={item}
+                            item={item}
                             steps={steps}
                             callBack={callBack}
                         />

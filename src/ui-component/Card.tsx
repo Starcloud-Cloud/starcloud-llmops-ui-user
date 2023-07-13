@@ -148,7 +148,7 @@ const Cards = () => {
                             {userInfo?.userLevel !== 'pro' && (
                                 <Button
                                     onClick={() => {
-                                        navigate('/subscribe');
+                                        navigate('/member/subscribe');
                                     }}
                                     size="small"
                                     variant="contained"

@@ -31,7 +31,7 @@ interface NavItemProps {
 
 const NavItem = ({ item, level, parentId }: NavItemProps) => {
     // 针对会员跳转特殊处理
-    if (item.url === 'member') {
+    if (item.url === 'subscribe') {
         item.external = true;
         item.url = '/member/subscribe';
     }

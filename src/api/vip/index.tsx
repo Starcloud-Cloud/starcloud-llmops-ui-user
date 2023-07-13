@@ -32,3 +32,7 @@ export const submitOrder = (data: any) => {
 export const getOrderRecord = (data: any) => {
     return request.post({ url: '/llm/pay/order/user/page', data });
 };
+
+export const getOrderIsPay = (data: any) => {
+    return request.post({ url: '/llm/pay/order/is-success', data });
+};

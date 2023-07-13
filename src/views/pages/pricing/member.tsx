@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // material-ui
 import {
@@ -31,7 +31,7 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { createOrder } from 'api/vip';
+import { createOrder, getOrderIsPay } from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -126,12 +126,16 @@ const planList = [
 ];
 
 // ===============================|| PRICING - PRICE 1 ||=============================== //
+
+let interval: any;
+
 const Price1 = () => {
     const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
 
     const [openDialog, setOpenDialog] = useState(false);
+    const [openPayDialog, setOpenPayDialog] = useState(false);
 
     const priceListDisable = {
         opacity: '0.4',
@@ -154,6 +158,10 @@ const Price1 = () => {
 
     const [payUrl, setPayUrl] = useState('');
 
+    const [isTimeout, setIsTimeout] = useState(false);
+
+    const [orderId, setOrderId] = useState('');
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -161,10 +169,43 @@ const Price1 = () => {
     const handleClose = () => {
         setPayUrl('');
         setOpen(false);
+        clearInterval(interval);
     };
+
+    useEffect(() => {
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
 
     const onChange = (e: RadioChangeEvent) => {
         setValue(e.target.value);
+    };
+
+    const onRefresh = async () => {
+        const resOrder = await submitOrder({
+            orderId,
+            channelCode: 'alipay_qr',
+            displayMode: 'qr_code'
+        });
+        setPayUrl(resOrder.displayContent);
+        setIsTimeout(false);
+        interval = setInterval(() => {
+            getOrderIsPay({ orderId }).then((isPayRes) => {
+                if (isPayRes) {
+                    handleClose();
+                    setOpenPayDialog(true);
+                    setTimeout(() => {
+                        navigate('/orderRecord');
+                    }, 3000);
+                }
+            });
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            setIsTimeout(true);
+        }, 5 * 60 * 1000);
     };
 
     const handleCreateOrder = async (code?: string) => {
@@ -177,15 +218,32 @@ const Price1 = () => {
             try {
                 const options = Intl.DateTimeFormat().resolvedOptions();
                 const timeZone = options.timeZone;
-
                 handleOpen();
                 const res = await createOrder({ productCode: code, timestamp: new Date().getTime(), timeZone });
+                setOrderId(res);
                 const resOrder = await submitOrder({
-                    id: res,
+                    orderId: res,
                     channelCode: 'alipay_qr',
                     displayMode: 'qr_code'
                 });
                 setPayUrl(resOrder.displayContent);
+
+                interval = setInterval(() => {
+                    getOrderIsPay({ orderId: res }).then((isPayRes) => {
+                        if (isPayRes) {
+                            handleClose();
+                            setOpenPayDialog(true);
+                            setTimeout(() => {
+                                navigate('/orderRecord');
+                            }, 3000);
+                        }
+                    });
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    setIsTimeout(true);
+                }, 5 * 60 * 1000);
             } catch (e) {
                 const TEXT_MESSAGE = '登录超时,请重新登录!';
                 if (e === TEXT_MESSAGE) {
@@ -213,6 +271,7 @@ const Price1 = () => {
         }
     };
 
+    console.log(openPayDialog, 'openPayDialog');
     return (
         <div>
             <HeaderWrapper id="vip">
@@ -388,7 +447,7 @@ const Price1 = () => {
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />
             </SectionWrapper>
-            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
+            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} isTimeout={isTimeout} onRefresh={onRefresh} />
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}
             <Dialog
                 open={openDialog}
@@ -404,6 +463,26 @@ const Price1 = () => {
                             <DialogContentText id="alert-dialog-description">
                                 <Typography variant="h5" component="span">
                                     当前用户未登录，3S后跳转至登录页...
+                                </Typography>
+                            </DialogContentText>
+                        </DialogContent>
+                    </>
+                )}
+            </Dialog>
+            <Dialog
+                open={openPayDialog}
+                onClose={() => setOpenPayDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ p: 2 }}
+            >
+                {openPayDialog && (
+                    <>
+                        <DialogTitle id="alert-dialog-title">提示</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Typography variant="h5" component="span">
+                                    支付成功，3S后跳转至订单记录页...
                                 </Typography>
                             </DialogContentText>
                         </DialogContent>

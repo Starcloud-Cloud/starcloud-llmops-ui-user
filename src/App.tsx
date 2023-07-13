@@ -1,6 +1,7 @@
 // routing
 import Routes from 'routes';
 
+import zhCN from 'antd/locale/zh_CN';
 // project imports
 
 import NavigationScroll from 'layout/NavigationScroll';
@@ -59,7 +60,7 @@ const App = () => {
     // if (!loading) return <Loader />;
 
     return (
-        <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }}>
+        <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }} locale={zhCN}>
             <ThemeCustomization>
                 <RTLLayout>
                     <NavigationScroll>

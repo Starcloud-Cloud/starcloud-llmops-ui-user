@@ -216,10 +216,10 @@ function Deatail() {
                             </Typography>
                         </Box>
                         <Box my={0.5}>
-                            {detailData?.categories.map((item: any) => (
+                            {detailData?.categories?.map((item: any) => (
                                 <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
                             ))}
-                            {detailData?.tags.map((el: any) => (
+                            {detailData?.tags?.map((el: any) => (
                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                             ))}
                         </Box>

@@ -37,7 +37,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                     </Tooltip>
                 </Box>
             ) : null}
-            {config?.steps.map(
+            {config?.steps?.map(
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (
                         <CarrOut

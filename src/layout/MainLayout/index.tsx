@@ -9,7 +9,7 @@ import { AppBar, Box, Container, CssBaseline, Toolbar, useMediaQuery } from '@mu
 import Header from './Header';
 import Sidebar from './Sidebar';
 import HorizontalBar from './HorizontalBar';
-import Customization from '../Customization';
+// import Customization from '../Customization';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 
 import getMenuItems from 'menu-items';
@@ -142,13 +142,14 @@ const MainLayout = () => {
 
             {/* main content */}
             <Main theme={theme} open={drawerOpen} layout={layout}>
-                <Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>
+                {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
+                <Container className={'max-w-[1300px]'} {...(!container && { sx: { px: { xs: 0 } } })}>
                     {/* breadcrumb */}
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />
                 </Container>
             </Main>
-            <Customization />
+            {/*<Customization />*/}
         </Box>
     );
 };

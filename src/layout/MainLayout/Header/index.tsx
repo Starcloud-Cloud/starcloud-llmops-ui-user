@@ -1,6 +1,6 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Box, useMediaQuery } from '@mui/material';
+import { Avatar, Box, FormControlLabel, Switch, useMediaQuery } from '@mui/material';
 
 // project imports
 import LAYOUT_CONST from 'constant';
@@ -23,13 +23,14 @@ import { IconMenu2 } from '@tabler/icons';
 
 const Header = () => {
     const theme = useTheme();
-
+    const { navType, onChangeMenuType } = useConfig();
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const { layout } = useConfig();
 
+    // @ts-ignore
     return (
         <>
             {/* logo & toggler button */}
@@ -77,6 +78,19 @@ const Header = () => {
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />
             </Box> */}
+
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <FormControlLabel
+                    value={navType === 'light'}
+                    onChange={(e: any) => onChangeMenuType(e.target?.checked ? 'light' : 'dark')}
+                    control={<Switch defaultChecked color="secondary" />}
+                    label={navType === 'dark' ? 'Dark' : 'Light'}
+                    sx={{
+                        '& .MuiSvgIcon-root': { fontSize: 28 },
+                        '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
+                    }}
+                />
+            </Box>
 
             {/* live customization & localization */}
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

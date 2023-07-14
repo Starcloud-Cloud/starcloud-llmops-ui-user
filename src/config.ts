@@ -20,7 +20,7 @@ const config: ConfigProps = {
     presetColor: 'default', // default, theme1, theme2, theme3, theme4, theme5, theme6
     locale: 'en', // 'en' - English, 'fr' - French, 'ro' - Romanian, 'zh' - Chinese
     rtlLayout: false,
-    container: false
+    container: true
 };
 
 export default config;

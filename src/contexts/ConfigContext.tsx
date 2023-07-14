@@ -42,7 +42,8 @@ function ConfigProvider({ children }: ConfigProviderProps) {
         navType: initialState.navType,
         presetColor: initialState.presetColor,
         locale: initialState.locale,
-        rtlLayout: initialState.rtlLayout
+        rtlLayout: initialState.rtlLayout,
+        container: initialState.container
     });
 
     const onChangeLayout = (layout: string) => {

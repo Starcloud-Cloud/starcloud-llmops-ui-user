@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material';
 
 // material-ui
 import {
@@ -20,10 +20,11 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { getOrderRecord, submitOrder } from 'api/vip';
+import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { PayModal } from '../PayModal/index';
+import { useNavigate } from 'react-router-dom';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -106,8 +107,10 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 }
 
 // ==============================|| TABLE - ENHANCED ||============================== //
+let interval: any;
 
 const Record: React.FC = () => {
+    const navigate = useNavigate();
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
@@ -123,7 +126,6 @@ const Record: React.FC = () => {
             // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
             getOrderRecord(pageVO)
                 .then((res) => {
-                    console.log(res, 'res');
                     // Once the data is fetched, map it and update rows state
                     const fetchedRows = res.list;
                     console.log(fetchedRows, 'fetchedRows');
@@ -186,26 +188,72 @@ const Record: React.FC = () => {
         }
     };
 
-    console.log('rows', rows);
-
     const [open, setOpen] = React.useState(false);
     const [payUrl, setPayUrl] = useState('');
+    const [isTimeout, setIsTimeout] = useState(false);
+    const [openPayDialog, setOpenPayDialog] = useState(false);
+    const [orderId, setOrderId] = useState<string>();
 
     const handleOpen = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
+        setPayUrl('');
         setOpen(false);
     };
-    const handlePay = async (id: number) => {
+
+    const onRefresh = async () => {
         const resOrder = await submitOrder({
-            id,
+            orderId,
+            channelCode: 'alipay_qr',
+            displayMode: 'qr_code'
+        });
+        setPayUrl(resOrder.displayContent);
+        setIsTimeout(false);
+        interval = setInterval(() => {
+            getOrderIsPay({ orderId }).then((isPayRes) => {
+                if (isPayRes) {
+                    handleClose();
+                    setOpenPayDialog(true);
+                    setTimeout(() => {
+                        navigate('/orderRecord');
+                    }, 3000);
+                }
+            });
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            setIsTimeout(true);
+        }, 5 * 60 * 1000);
+    };
+
+    const handlePay = async (id: string) => {
+        setOrderId(id);
+        const resOrder = await submitOrder({
+            orderId: id,
             channelCode: 'alipay_qr',
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);
         handleOpen();
+        interval = setInterval(() => {
+            getOrderIsPay({ orderId: id }).then((isPayRes) => {
+                if (isPayRes) {
+                    handleClose();
+                    setOpenPayDialog(true);
+                    setTimeout(() => {
+                        navigate('/orderRecord');
+                    }, 3000);
+                }
+            });
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            setIsTimeout(true);
+        }, 5 * 60 * 1000);
     };
 
     return (
@@ -244,7 +292,7 @@ const Record: React.FC = () => {
                                                 variant="text"
                                                 color="secondary"
                                                 disabled={row.status === 10}
-                                                onClick={() => handlePay(row.id)}
+                                                onClick={() => handlePay(row.merchantOrderId)}
                                             >
                                                 支付
                                             </Button>
@@ -267,7 +315,27 @@ const Record: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
-            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} />
+            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} isTimeout={isTimeout} onRefresh={onRefresh} />
+            <Dialog
+                open={openPayDialog}
+                onClose={() => setOpenPayDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ p: 2 }}
+            >
+                {openPayDialog && (
+                    <>
+                        <DialogTitle id="alert-dialog-title">提示</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Typography variant="h5" component="span">
+                                    支付成功，3S后跳转至订单记录页...
+                                </Typography>
+                            </DialogContentText>
+                        </DialogContent>
+                    </>
+                )}
+            </Dialog>
         </MainCard>
     );
 };

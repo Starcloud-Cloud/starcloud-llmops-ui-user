@@ -126,7 +126,6 @@ const Record: React.FC = () => {
             // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
             getOrderRecord(pageVO)
                 .then((res) => {
-                    console.log(res, 'res');
                     // Once the data is fetched, map it and update rows state
                     const fetchedRows = res.list;
                     console.log(fetchedRows, 'fetchedRows');
@@ -233,7 +232,7 @@ const Record: React.FC = () => {
     const handlePay = async (id: string) => {
         setOrderId(id);
         const resOrder = await submitOrder({
-            id,
+            orderId: id,
             channelCode: 'alipay_qr',
             displayMode: 'qr_code'
         });

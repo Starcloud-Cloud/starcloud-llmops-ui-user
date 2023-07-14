@@ -142,7 +142,8 @@ const MainLayout = () => {
 
             {/* main content */}
             <Main theme={theme} open={drawerOpen} layout={layout}>
-                <Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>
+                {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
+                <Container className={'max-w-[1300px]'} {...(!container && { sx: { px: { xs: 0 } } })}>
                     {/* breadcrumb */}
                     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                     <Outlet />

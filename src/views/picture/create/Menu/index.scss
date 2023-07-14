@@ -4,8 +4,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%; 
-    position: relative;
+    height: 100%;
 }
 
 .pcm_menu_hidden {
@@ -16,7 +15,8 @@
     align-items: center;
     height: 100%; 
     position: absolute;
-    left: -370px; 
+    left: -370px;
+    top: 30px;
 }
 
 .pcm_tab_span_wrapper {
@@ -61,10 +61,12 @@
 
 .pcm_collapse_child_wrapper {
     display: flex;
+    flex-direction: column;
 }
 
 .pcm_collapse_child_item {
     display: flex;
+    flex-direction: column;
 }
 
 .panel-collapse-border-handle {

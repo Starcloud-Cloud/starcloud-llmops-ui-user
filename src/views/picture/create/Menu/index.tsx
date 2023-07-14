@@ -1,33 +1,89 @@
 import { Button } from '@mui/material';
-import { Col, Collapse, Input, Row, Space, Tag, Typography } from 'antd';
+import { Col, Divider, Input, Row, Space, Tag } from 'antd';
 
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { EyeInvisibleOutlined, EyeOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { Slider } from '@mui/material';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.scss';
+import { createText2Img, getImgMeta } from '../../../../api/picture/create';
 
 const { TextArea } = Input;
 const { CheckableTag } = Tag;
 
-const tagsData = ['Movies', 'Books', 'Music', 'Sports'];
+const CollapseChildren = ({
+    selectedGuidancePresetTags,
+    setSelectedGuidancePresetTags,
+    selectedSamplerTags,
+    setSamplerSelectedTags,
+    selectedStylePresetTags,
+    setSelectedStylePresetTags,
+    params
+}: {
+    selectedGuidancePresetTags: number[];
+    setSelectedGuidancePresetTags: (selectedGuidancePresetTags: number[]) => void;
+    selectedSamplerTags: number[];
+    setSamplerSelectedTags: (selectedGuidancePresetTags: number[]) => void;
+    selectedStylePresetTags: string[];
+    setSelectedStylePresetTags: (selectedGuidancePresetTags: string[]) => void;
+    params: IParamsType | null;
+}) => {
+    const handleGuidanceChange = (tag: number, checked: boolean) => {
+        const nextSelectedTags = checked ? [tag] : selectedGuidancePresetTags.filter((t) => t !== tag);
+        setSelectedGuidancePresetTags(nextSelectedTags);
+    };
 
-const CollapseChildren = () => {
-    const [selectedTags, setSelectedTags] = useState<string[]>(['Books']);
+    const handleSamplerChange = (tag: number, checked: boolean) => {
+        const nextSelectedTags = checked ? [tag] : selectedSamplerTags.filter((t) => t !== tag);
+        setSamplerSelectedTags(nextSelectedTags);
+    };
 
-    const handleChange = (tag: string, checked: boolean) => {
-        const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t) => t !== tag);
-        console.log('You are interested in: ', nextSelectedTags);
-        setSelectedTags(nextSelectedTags);
+    const handlePresetChange = (tag: string, checked: boolean) => {
+        const nextSelectedTags = checked ? [tag] : selectedStylePresetTags.filter((t) => t !== tag);
+        setSelectedStylePresetTags(nextSelectedTags);
     };
 
     return (
         <div className="pcm_collapse_child_wrapper">
             <div className="pcm_collapse_child_item">
-                <span style={{ marginRight: 8 }}>Categories:</span>
+                <span className={'mb-1.5 text-base'}>guidancePreset:</span>
                 <Space size={[0, 8]} wrap>
-                    {tagsData.map((tag) => (
-                        <CheckableTag key={tag} checked={selectedTags.includes(tag)} onChange={(checked) => handleChange(tag, checked)}>
-                            {tag}
+                    {params?.guidancePreset.map((tag) => (
+                        <CheckableTag
+                            key={tag.value}
+                            checked={selectedGuidancePresetTags.includes(tag.value)}
+                            onChange={(checked) => handleGuidanceChange(tag.value, checked)}
+                        >
+                            {tag.label}
+                        </CheckableTag>
+                    ))}
+                </Space>
+            </div>
+            <Divider type={'horizontal'} />
+            <div className="pcm_collapse_child_item">
+                <span className={'mb-1.5 text-base'}>sampler:</span>
+                <Space size={[0, 8]} wrap>
+                    {params?.sampler.map((tag) => (
+                        <CheckableTag
+                            key={tag.value}
+                            checked={selectedSamplerTags.includes(tag.value)}
+                            onChange={(checked) => handleSamplerChange(tag.value, checked)}
+                        >
+                            {tag.label}
+                        </CheckableTag>
+                    ))}
+                </Space>
+            </div>
+            <Divider type={'horizontal'} />
+            <div className="pcm_collapse_child_item">
+                <span className={'mb-1.5 text-base'}>stylePreset:</span>
+                <Space size={[0, 8]} wrap>
+                    {params?.stylePreset.map((tag) => (
+                        <CheckableTag
+                            key={tag.value}
+                            checked={selectedStylePresetTags.includes(tag.value)}
+                            onChange={(checked) => handlePresetChange(tag.value, checked)}
+                        >
+                            {tag.label}
                         </CheckableTag>
                     ))}
                 </Space>
@@ -40,85 +96,149 @@ type IPictureCreateMenuProps = {
     menuVisible: boolean;
     setMenuVisible: (menuVisible: boolean) => void;
 };
-
+export type IParamsType = {
+    guidancePreset: IParamsTypeGuidancePreset[];
+    stylePreset: IParamsTypeStylePreset[];
+    imageSize: IParamsTypeImageSize[];
+    samples: IParamsTypeSamples[];
+    sampler: IParamsTypeSampler[];
+};
+export type IParamsTypeGuidancePreset = {
+    label: string;
+    value: number;
+    description: string;
+    image: string;
+};
+export type IParamsTypeStylePreset = {
+    label: string;
+    value: string;
+    description: string;
+    image: string;
+};
+export type IParamsTypeImageSize = {
+    label: string;
+    value: string;
+    description: string;
+    scale: string;
+};
+export type IParamsTypeSamples = {
+    label: string;
+    value: number;
+    description: string;
+};
+export type IParamsTypeSampler = {
+    label: string;
+    value: number;
+    description: string;
+    image: string;
+};
 export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreateMenuProps) => {
-    const [select, setSelect] = useState<undefined | number>(undefined);
+    const [select, setSelect] = useState<undefined | string>(undefined);
     const [inputValue, setInputValue] = useState('');
+    const [visible, setVisible] = useState(false);
+    const [params, setParams] = useState<null | IParamsType>(null);
+    const [selectedGuidancePresetTags, setSelectedGuidancePresetTags] = useState<number[]>([]);
+    const [selectedSamplerTags, setSamplerSelectedTags] = useState<number[]>([]);
+    const [selectedStylePresetTags, setSelectedStylePresetTags] = useState<string[]>([]);
+    const [samples, setSamples] = useState(4);
 
+    useEffect(() => {
+        (async () => {
+            const res = await getImgMeta();
+            setParams(res);
+        })();
+    }, []);
+
+    const handleCreate = async () => {
+        await createText2Img({
+            imageRequest: {
+                prompt: inputValue,
+                width: select?.split('x')?.[0],
+                height: select?.split('x')?.[1],
+                samples,
+                style_preset: selectedStylePresetTags?.[0],
+                guidance_preset: selectedGuidancePresetTags?.[0],
+                sampler: selectedSamplerTags?.[0]
+            }
+        });
+    };
     return (
         <Col className={menuVisible ? 'pcm_menu' : 'pcm_menu_hidden'}>
-            <Row style={{ width: '90%', marginTop: '15px' }}>
-                <Typography.Text aria-level={1} style={{ fontSize: '16px' }}>
-                    图片描述
-                </Typography.Text>
-                <TextArea
-                    rows={6}
-                    style={{ width: '100%', marginTop: '5px', resize: 'none' }}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={
-                        '在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素'
-                    }
-                />
-            </Row>
-            <Row style={{ width: '90%', marginTop: '30px' }}>
-                <span style={{ fontSize: '16px' }}>尺寸选择</span>
-                <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
-                    <div className={'pcm_tab_span_wrapper'}>
-                        <span onClick={() => setSelect(1)} className={select === 1 ? 'pcm_tab_span_active' : 'pcm_tab_span'}>
-                            1:1
-                        </span>
-                    </div>
-                    <div className={'pcm_tab_span_wrapper'}>
-                        <span onClick={() => setSelect(2)} className={select === 2 ? 'pcm_tab_span_active' : 'pcm_tab_span'}>
-                            16:9
-                        </span>
-                    </div>
-                    <div className={'pcm_tab_span_wrapper'}>
-                        <span onClick={() => setSelect(3)} className={select === 3 ? 'pcm_tab_span_active' : 'pcm_tab_span'}>
-                            9:16
-                        </span>
-                    </div>
-                </div>
-            </Row>
-            <Row style={{ width: '90%', marginTop: '30px' }}>
-                <span style={{ fontSize: '16px' }}>生成张数</span>
-                <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
-                    <Slider
-                        color="secondary"
-                        defaultValue={4}
-                        // size="small"
-                        // getAriaValueText={valueText}
-                        valueLabelDisplay="on"
-                        aria-labelledby="discrete-slider-small-steps"
-                        marks
-                        step={1}
-                        min={1}
-                        max={10}
-                    />
-                </div>
-            </Row>
-            <Row style={{ width: '90%', marginTop: '30px' }}>
-                <Collapse
-                    style={{ width: '100%' }}
-                    items={[
-                        {
-                            key: '1',
-                            label: '高级',
-                            children: <CollapseChildren />
+            <div style={{ height: 'calc(100% - 60px)' }} className={'overflow-auto flex flex-col items-center pb-2'}>
+                <Row style={{ width: '90%', marginTop: '15px' }}>
+                    <span className={'text-base font-medium'}>图片描述</span>
+                    <TextArea
+                        rows={6}
+                        style={{ width: '100%', marginTop: '5px', resize: 'none' }}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder={
+                            '在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素'
                         }
-                    ]}
-                />
-            </Row>
-            <Row style={{ width: '90%', marginTop: '30px' }} className="flex">
-                <span style={{ fontSize: '16px' }}>最终描述</span>
-                <div style={{ width: '100%', display: 'flex', marginTop: '5px' }} className="font-medium">
-                    {inputValue}
-                </div>
-            </Row>
+                    />
+                </Row>
+                <Row style={{ width: '90%', marginTop: '30px' }}>
+                    <span className={'text-base font-medium'}>尺寸选择</span>
+                    <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px' }}>
+                        {params?.imageSize.map((item, index: number) => (
+                            <div className={'w-1/3 mb-2'} key={index}>
+                                <span
+                                    onClick={() => setSelect(item.value)}
+                                    className={select === item.value ? 'pcm_tab_span_active' : 'pcm_tab_span'}
+                                >
+                                    {item.label}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </Row>
+                <Row style={{ width: '90%', marginTop: '30px' }}>
+                    <span className={'text-base font-medium'}>生成张数</span>
+                    <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
+                        <Slider
+                            color="secondary"
+                            defaultValue={4}
+                            valueLabelDisplay="on"
+                            aria-labelledby="discrete-slider-small-steps"
+                            marks
+                            step={1}
+                            min={1}
+                            max={8}
+                            onChange={(e, value, number) => setSamples(value as number)}
+                        />
+                    </div>
+                </Row>
+                <Row style={{ width: '90%', marginTop: '30px' }}>
+                    <span className={'text-base font-medium'}>
+                        高级
+                        {visible ? (
+                            <EyeOutlined rev={undefined} className={'cursor-pointer ml-1'} onClick={() => setVisible(!visible)} />
+                        ) : (
+                            <EyeInvisibleOutlined className={'cursor-pointer ml-1'} rev={undefined} onClick={() => setVisible(!visible)} />
+                        )}
+                    </span>
+                    {visible && (
+                        <div className={'px-1 mt-[5px]'}>
+                            <CollapseChildren
+                                selectedGuidancePresetTags={selectedGuidancePresetTags}
+                                setSelectedGuidancePresetTags={setSelectedGuidancePresetTags}
+                                params={params}
+                                setSelectedStylePresetTags={setSelectedStylePresetTags}
+                                selectedStylePresetTags={selectedStylePresetTags}
+                                setSamplerSelectedTags={setSamplerSelectedTags}
+                                selectedSamplerTags={selectedSamplerTags}
+                            />
+                        </div>
+                    )}
+                </Row>
+                {/*<Row style={{ width: '90%', marginTop: '30px' }} className="flex">*/}
+                {/*    <span className={'text-base font-medium'}>最终描述</span>*/}
+                {/*    <div style={{ width: '100%', display: 'flex', marginTop: '5px' }} className="font-medium">*/}
+                {/*        {!selectedGuidancePresetTags.length ? inputValue : `${inputValue} ${selectedGuidancePresetTags.join('，')}`}*/}
+                {/*    </div>*/}
+                {/*</Row>*/}
+            </div>
             <Row
                 style={{
-                    position: 'absolute',
-                    bottom: 0,
                     height: '60px',
                     borderTop: '0.5px solid #d9d9d9',
                     width: '100%'
@@ -126,7 +246,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                 justify={'center'}
                 align={'middle'}
             >
-                <Button variant="contained" color="secondary" style={{ width: '94%' }}>
+                <Button variant="contained" color="secondary" style={{ width: '94%' }} onClick={() => handleCreate()}>
                     生成
                 </Button>
             </Row>

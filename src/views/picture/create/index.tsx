@@ -1,13 +1,14 @@
 import { Row } from 'antd';
 import { useState } from 'react';
 import { useWindowSize } from '../../../hooks/useWindowSize';
-import { PictureCreateContainer } from './Container/index';
+import { PictureCreateContainer } from './Container';
 import { PictureCreateHeader } from './Header';
 import { PictureCreateMenu } from './Menu';
 
 const PictureCreate = () => {
     const [menuVisible, setMenuVisible] = useState<boolean>(true);
     const size = useWindowSize();
+    // const [imgList, setImgList] = useState([]);
 
     if (size.width < 768) {
         return (

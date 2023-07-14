@@ -206,7 +206,8 @@ const Record: React.FC = () => {
     const onRefresh = async () => {
         const resOrder = await submitOrder({
             orderId,
-            channelCode: 'alipay_qr',
+            channelCode: 'alipay_pc',
+            channelExtras: { qr_pay_mode: '4', qr_code_width: 300 },
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);
@@ -233,7 +234,8 @@ const Record: React.FC = () => {
         setOrderId(id);
         const resOrder = await submitOrder({
             orderId: id,
-            channelCode: 'alipay_qr',
+            channelCode: 'alipay_pc',
+            channelExtras: { qr_pay_mode: '4', qr_code_width: 300 },
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);

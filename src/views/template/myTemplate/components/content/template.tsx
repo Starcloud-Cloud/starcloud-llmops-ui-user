@@ -1,7 +1,7 @@
 import { Card, CardContent, Box, Typography, Tooltip, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import marketStore from 'store/market';
-import './textnoWarp.css';
+import './textnoWarp.scss';
 
 function Template({ data, handleDetail }: any) {
     const { categoryList } = marketStore();
@@ -9,7 +9,7 @@ function Template({ data, handleDetail }: any) {
     return (
         <Card
             sx={{
-                aspectRatio: '186 / 220',
+                aspectRatio: '186 / 235',
                 overflow: 'hidden',
                 position: 'relative',
                 border: '1px solid',
@@ -51,21 +51,23 @@ function Template({ data, handleDetail }: any) {
                         {data.name}
                     </Typography>
                 </Tooltip>
-                <Typography
-                    sx={{ fontSize: '.75rem', color: 'rgba(21,39,55,.6)' }}
-                    onClick={() => handleDetail(data)}
-                    className="cursor desc"
-                    variant="body2"
-                    component="div"
-                    lineHeight={1.2}
-                >
-                    {data.description}
-                </Typography>
+                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.description}</Box>}>
+                    <Typography
+                        sx={{ fontSize: '.75rem', color: 'rgba(21,39,55,.6)' }}
+                        onClick={() => handleDetail(data)}
+                        className="cursor desc"
+                        variant="body2"
+                        component="div"
+                        lineHeight={1.2}
+                    >
+                        {data.description}
+                    </Typography>
+                </Tooltip>
             </CardContent>
-            <Box position="absolute" left="8px" bottom="8px">
+            <Box position="absolute" left="16px" bottom="5px">
                 {data.categories &&
                     data.categories.map((item: string) => (
-                        <Link href="#" key={item} mr={1} className="active cursor underline" fontSize={14}>
+                        <Link color="secondary" href="#" key={item} mr={1} className="active cursor underline" fontSize=".75rem">
                             #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
                         </Link>
                     ))}

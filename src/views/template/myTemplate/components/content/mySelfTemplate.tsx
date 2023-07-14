@@ -3,7 +3,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import { Item } from 'types/template';
 import { useNavigate } from 'react-router-dom';
 import marketStore from 'store/market';
-import './textnoWarp.css';
+import './textnoWarp.scss';
 function MyselfTemplate({ appList }: { appList: Item[] }) {
     const navigate = useNavigate();
     const { categoryList } = marketStore();

@@ -1,5 +1,5 @@
 import { Card, Box, Grid, Link, AppBar, Toolbar, Button, Tab, Tabs } from '@mui/material';
-import { getApp } from 'api/template/index';
+import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { executeApp } from 'api/template/fetch';
@@ -7,7 +7,7 @@ import Basis from './basis';
 import Arrange from './arrange';
 import Upload from './upLoad';
 import Perform from 'views/template/carryOut/perform';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
@@ -42,6 +42,8 @@ function CreateDetail() {
     let isAllExecute = false;
     const [detail, setDetail] = useState(null as unknown as Details);
     const [loadings, setLoadings] = useState<any[]>([]);
+    const basis = useRef<any>(null);
+    //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
         const newValue = [...loadings];
@@ -148,9 +150,16 @@ function CreateDetail() {
         fetchData();
     };
     useEffect(() => {
-        getApp({ uid: searchParams.get('uid') as string }).then((res) => {
-            setDetail(res);
-        });
+        if (searchParams.get('uid')) {
+            getApp({ uid: searchParams.get('uid') as string }).then((res) => {
+                setDetail(res);
+            });
+        } else {
+            getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
+                setDetail(res);
+            });
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const [perform, setPerform] = useState('perform');
@@ -207,6 +216,46 @@ function CreateDetail() {
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
     };
+    //保存更改
+    const saveDetail = () => {
+        if (basis?.current?.submit()) {
+            if (searchParams.get('uid')) {
+                appModify(detail).then((res) => {
+                    if (res.data) {
+                        navigate('/my-app');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.modify'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    }
+                });
+            } else {
+                appCreate(detail).then((res) => {
+                    if (res.data) {
+                        navigate('/my-app');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.create'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    }
+                });
+            }
+        }
+    };
     //tabs
     const [value, setValue] = useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -217,7 +266,10 @@ function CreateDetail() {
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <Button startIcon={<ArrowBackIcon />} color="inherit" onClick={() => navigate('/template/createCenter')}>
-                        Back
+                        {t('myApp.back')}
+                    </Button>
+                    <Button disabled={value !== 0} autoFocus color="inherit" onClick={saveDetail}>
+                        {t('myApp.save')}
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -244,14 +296,16 @@ function CreateDetail() {
                 variant="scrollable"
                 onChange={handleChange}
             >
-                <Tab component={Link} label="基础设置" {...a11yProps(0)} />
-                <Tab component={Link} label="提示词编排" {...a11yProps(1)} />
-                <Tab component={Link} label="应用发布" {...a11yProps(2)} />
+                <Tab component={Link} label={t('myApp.basis')} {...a11yProps(0)} />
+                <Tab component={Link} label={t('myApp.arrangement')} {...a11yProps(1)} />
+                <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={5}>
                     <Grid item lg={5}>
-                        {detail && <Basis initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />}
+                        {detail && (
+                            <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
+                        )}
                     </Grid>
                     <Grid item lg={7}>
                         <Perform

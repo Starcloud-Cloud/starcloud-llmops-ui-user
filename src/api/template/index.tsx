@@ -50,3 +50,15 @@ export const infoPage = (data: any) => {
 export const getApp = (data: { uid: string }) => {
     return request.get({ url: `/llm/app/get/${data.uid}` });
 };
+//获取推荐
+export const getRecommendApp = (data: { recommend: string }) => {
+    return request.get({ url: `/llm/app/getRecommendApp/${data.recommend}` });
+};
+//创建应用
+export const appCreate = (data: any) => {
+    return request.postOriginal({ url: `/llm/app/create`, data });
+};
+//更新应用
+export const appModify = (data: any) => {
+    return request.putOriginal({ url: `/llm/app/modify`, data });
+};

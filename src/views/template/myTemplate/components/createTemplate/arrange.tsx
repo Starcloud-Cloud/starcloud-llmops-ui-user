@@ -33,6 +33,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Add from '@mui/icons-material/Add';
 
+import { t } from 'hooks/web/useI18n';
+
 import Form from 'views/template/components/form';
 import { useState } from 'react';
 import { useFormik } from 'formik';
@@ -147,13 +149,13 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
     };
     return (
         <Box>
-            <Typography variant="h3">模板流程</Typography>
+            <Typography variant="h3">{t('myApp.flow')}</Typography>
             {config?.steps.map((item: any, index: number) => (
                 <Card key={item.field} sx={{ padding: '16px 0' }}>
                     <Grid container spacing={2}>
                         <Grid item lg={4} xs={12}>
                             <TextField
-                                label="标题"
+                                label={t('myApp.title')}
                                 value={item.name}
                                 name="name"
                                 InputLabelProps={{ shrink: true }}
@@ -164,7 +166,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                         </Grid>
                         <Grid item lg={8} xs={12}>
                             <TextField
-                                label="描述"
+                                label={t('myApp.desc')}
                                 value={item.description}
                                 name="description"
                                 InputLabelProps={{ shrink: true }}
@@ -174,7 +176,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             />
                         </Grid>
                     </Grid>
-                    <Typography variant="h3">变量</Typography>
+                    <Typography variant="h3">{t('myApp.variable')}</Typography>
                     <Grid container spacing={2}>
                         {item.variable &&
                             item.variable.variables.map((el: any, i: number) => (
@@ -191,7 +193,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                     <Divider sx={{ margin: '16px 0' }} />
                     <MainCard
                         content={false}
-                        title="Basic Table"
+                        title={t('myApp.table')}
                         secondary={
                             <Stack direction="row" spacing={2} alignItems="center">
                                 <Button
@@ -203,7 +205,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                     variant="outlined"
                                     startIcon={<Add />}
                                 >
-                                    Add
+                                    {t('myApp.add')}
                                 </Button>
                             </Stack>
                         }
@@ -212,10 +214,10 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>变量 KEY</TableCell>
-                                        <TableCell>字段名称</TableCell>
-                                        <TableCell> 是否显示</TableCell>
-                                        <TableCell>操作</TableCell>
+                                        <TableCell>{t('myApp.field')}</TableCell>
+                                        <TableCell>{t('myApp.name')}</TableCell>
+                                        <TableCell> {t('myApp.isShow')}</TableCell>
+                                        <TableCell>{t('myApp.operation')}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -243,12 +245,12 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                                         <SettingsIcon />
                                                     </IconButton>
                                                     <Popconfirm
-                                                        title="Delete the task"
-                                                        description="Are you sure to delete this task?"
+                                                        title={t('myApp.del')}
+                                                        description={t('myApp.delDesc')}
                                                         onConfirm={() => delModal(i, index)}
                                                         onCancel={() => {}}
-                                                        okText="Yes"
-                                                        cancelText="No"
+                                                        okText={t('myApp.confirm')}
+                                                        cancelText={t('myApp.cancel')}
                                                     >
                                                         <IconButton color="error">
                                                             <DeleteIcon />
@@ -274,18 +276,18 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             fullWidth
                             id="field"
                             name="field"
-                            label="field"
+                            label={t('myApp.field')}
                             value={formik.values.field}
                             onChange={formik.handleChange}
                             InputLabelProps={{ shrink: true }}
                             error={formik.touched.field && Boolean(formik.errors.field)}
-                            helperText={formik.touched.field && formik.errors.field ? String(formik.errors.field) : '请保持field是唯一的'}
+                            helperText={formik.touched.field && formik.errors.field ? String(formik.errors.field) : ' '}
                         />
                         <TextField
                             fullWidth
                             id="label"
                             name="label"
-                            label="label"
+                            label={t('myApp.name')}
                             value={formik.values.label}
                             onChange={formik.handleChange}
                             InputLabelProps={{ shrink: true }}
@@ -296,15 +298,15 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             fullWidth
                             id="value"
                             name="value"
-                            label="value"
+                            label={t('myApp.value')}
                             value={formik.values.value}
                             onChange={formik.handleChange}
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
                         <FormControl fullWidth>
-                            <InputLabel id="sort">type</InputLabel>
-                            <Select onChange={formik.handleChange} name="style" value={formik.values.style} label="type">
+                            <InputLabel id="sort">{t('myApp.type')}</InputLabel>
+                            <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
                                 {typeList.map((el: any) => (
                                     <MenuItem key={el.value} value={el.value}>
                                         {el.label}
@@ -314,7 +316,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                         </FormControl>
                         <FormControlLabel
                             control={<Switch name="isShow" defaultChecked onChange={formik.handleChange} value={formik.values.isShow} />}
-                            label="是否显示"
+                            label={t('myApp.isShow')}
                             labelPlacement="start"
                         />
                         {formik.values.style === 'SELECT' && (
@@ -342,7 +344,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                 ))}
                                 <br />
                                 <Button size="small" variant="outlined" startIcon={<Add />} onClick={addVariable}>
-                                    addVariable
+                                    {t('myApp.addOption')}
                                 </Button>
                             </Box>
                         )}
@@ -355,7 +357,7 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                             formik.handleSubmit();
                         }}
                     >
-                        Save changes
+                        {t('myApp.confirm')}
                     </Button>
                 </DialogActions>
             </Dialog>

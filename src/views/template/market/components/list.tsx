@@ -21,8 +21,6 @@ function List() {
                 setSorllList(res.list.slice(0, 30));
                 setTotal(res.page.total);
             });
-        } else {
-            setSorllList(templateList.slice(0, 30));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

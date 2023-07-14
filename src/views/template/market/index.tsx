@@ -50,11 +50,9 @@ function TemplateMarket() {
     const handleSearch = () => {
         let newList = templateList.filter((item: MarketList) => {
             let nameMatch = true;
-
             if (queryParams.name) {
                 nameMatch = item.name?.toLowerCase().includes(queryParams.name.toLowerCase());
             }
-
             let categoryMatch = true;
             if (queryParams.category) {
                 if (queryParams.category === 'ALL') {

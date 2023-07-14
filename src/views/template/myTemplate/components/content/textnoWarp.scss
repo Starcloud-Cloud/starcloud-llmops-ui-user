@@ -6,10 +6,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .desc {
     display: -webkit-box;
-    -webkit-line-clamp: 5;
-    height: 80px;
+    -webkit-line-clamp: 2;
     line-height: 1rem;
     /* 指定行数 */
     -webkit-box-orient: vertical;
@@ -30,12 +30,13 @@
 }
 
 .active:hover {
-    color: #7367f0;
+    color: #673ab7;
 }
 
 .underline {
     text-decoration: underline !important;
 }
+
 .custom-card {
     position: relative;
 }

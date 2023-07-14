@@ -623,8 +623,8 @@
     "password": "密码",
     "emailaddress": "电子邮箱",
     "free": "免费",
-    "plus": "普通",
-    "pro": "专业",
+    "plus": "高级",
+    "pro": "团队",
     "令牌": "令牌",
     "图片": "图片",
     "remaining": "余"

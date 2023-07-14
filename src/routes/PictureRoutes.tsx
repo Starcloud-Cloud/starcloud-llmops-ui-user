@@ -19,7 +19,7 @@ const PictureRoutes = {
     ),
     children: [
         {
-            path: '/picture/create',
+            path: '/picture/create1',
             element: <PictureCreate />
         }
     ]

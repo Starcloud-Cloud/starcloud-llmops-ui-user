@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useImperativeHandle, forwardRef } from 'react';
 import {
     Box,
     Card,
@@ -15,13 +15,21 @@ import {
     OutlinedInput,
     Typography
 } from '@mui/material';
+import { t } from 'hooks/web/useI18n';
 import { Anyevent } from 'types/template';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 const validationSchema = yup.object({
-    name: yup.string().required('Name is required')
+    name: yup.string().required(t('myApp.isrequire'))
 });
-function Basis({ initialValues, setValues }: Anyevent) {
+
+const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
+    useImperativeHandle(ref, () => ({
+        submit: () => {
+            formik.handleSubmit();
+            return formik.isValid;
+        }
+    }));
     const formik = useFormik({
         initialValues,
         validationSchema,
@@ -73,22 +81,20 @@ function Basis({ initialValues, setValues }: Anyevent) {
                         }}
                         error={formik?.touched.name && Boolean(formik?.errors.name)}
                         helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ' '}
-                        label="Template Name"
+                        label="App Name"
                         name="name"
-                        placeholder="Please enter template name"
                         variant="outlined"
                     />
                     <TextField
                         fullWidth
                         InputLabelProps={{ shrink: true }}
-                        label="Template Description"
+                        label="App Description"
                         name="desc"
                         value={formik.values.desc}
                         onChange={(e) => {
                             formik.handleChange(e);
                             setValues({ name: e.target.name, value: e.target.value });
                         }}
-                        placeholder="Please enter template description"
                         helperText={' '}
                         variant="outlined"
                     />
@@ -139,5 +145,5 @@ function Basis({ initialValues, setValues }: Anyevent) {
             )}
         </Card>
     );
-}
+});
 export default Basis;

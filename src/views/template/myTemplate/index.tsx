@@ -81,8 +81,8 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     //弹窗
-    const handleDetail = () => {
-        navigate('/createApp');
+    const handleDetail = (data: { recommend: string }) => {
+        navigate('/createApp?recommend=' + data.recommend);
     };
     return (
         <Box>
@@ -98,8 +98,8 @@ function MyTemplate() {
                 </Grid>
             </Grid>
             <Box display="flex" alignItems="end" my={2}>
-                <Typography variant="h5">{t('apply.tag')}</Typography>
-                <Link href="#" fontSize={14} color="#7367f0" ml={1}>
+                <Typography variant="h5">{t('apply.recommend')}</Typography>
+                <Link href="https://www.mdc.ai/document-en" fontSize={14} color="#7367f0" ml={1}>
                     {t('apply.instruction')}
                 </Link>
             </Box>

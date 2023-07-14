@@ -1,4 +1,4 @@
-import { Card, Box, Grid, Link, AppBar, Toolbar, Button, Tab, Tabs } from '@mui/material';
+import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider } from '@mui/material';
 import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -263,16 +263,26 @@ function CreateDetail() {
     };
     return (
         <Card>
-            <AppBar sx={{ position: 'relative' }}>
-                <Toolbar sx={{ justifyContent: 'space-between' }}>
-                    <Button startIcon={<ArrowBackIcon />} color="inherit" onClick={() => navigate('/template/createCenter')}>
+            <CardHeader
+                sx={{ padding: 2 }}
+                avatar={
+                    <Button
+                        variant="contained"
+                        startIcon={<ArrowBackIcon />}
+                        color="secondary"
+                        onClick={() => navigate('/template/createCenter')}
+                    >
                         {t('myApp.back')}
                     </Button>
-                    <Button disabled={value !== 0} autoFocus color="inherit" onClick={saveDetail}>
+                }
+                title={detail?.name}
+                action={
+                    <Button variant="contained" color="secondary" disabled={value !== 0} autoFocus onClick={saveDetail}>
                         {t('myApp.save')}
                     </Button>
-                </Toolbar>
-            </AppBar>
+                }
+            ></CardHeader>
+            <Divider />
             <Tabs
                 sx={{
                     m: 3,

@@ -1,4 +1,4 @@
-import { Tooltip, TextField, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress } from '@mui/material';
+import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress } from '@mui/material';
 import ReplyIcon from '@mui/icons-material/Reply';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
@@ -128,16 +128,12 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                     </Grid>
                 </form>
                 <Box my={2} display="flex">
-                    {item.flowStep.response.style === 'INPUT' ? (
-                        <TextField
-                            label={t('market.ai')}
-                            InputLabelProps={{ shrink: true }}
-                            value={item.flowStep.response.answer}
-                            fullWidth
-                        />
-                    ) : item.flowStep.response.style === 'TEXTAREA' ? (
+                    {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
                         <Box width="100%" sx={{ background: '#f8fafc' }}>
-                            <Box sx={{ p: 2, height: '300px', overflow: 'auto' }} ref={mdRef}>
+                            <Box
+                                sx={{ p: 2, height: item.flowStep.response.style === 'TEXTAREA' ? '300px' : '100px', overflow: 'auto' }}
+                                ref={mdRef}
+                            >
                                 <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
                             </Box>
                             {item.flowStep.response.answer && (

@@ -1,13 +1,12 @@
-import { Typography, Grid, Box, FormControl, InputLabel, Select, MenuItem, InputAdornment, TextField, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
+import { Box, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import ScrollMenus from './ScrollMenu';
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
+import ScrollMenus from './ScrollMenu';
 interface MarketList {
     name: string;
     tags: string[];
@@ -46,12 +45,12 @@ function TemplateMarket() {
             [name]: value
         });
     };
-    const handleClearValue = () => {
-        setQueryParams({
-            ...queryParams,
-            sort: ''
-        });
-    };
+    // const handleClearValue = () => {
+    //     setQueryParams({
+    //         ...queryParams,
+    //         sort: ''
+    //     });
+    // };
     //当用户更改了筛选触发的逻辑
     const handleSearch = () => {
         let newList = templateList.filter((item: MarketList) => {

@@ -293,9 +293,9 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
                                 </Box>
                             </AccordionDetails>
                         </Accordion>
-                        <IconButton sx={{ display: 'block', margin: '0 auto' }} size="small" color="secondary">
+                        {/* <IconButton sx={{ display: 'block', margin: '0 auto' }} size="small" color="secondary">
                             <AddBoxIcon />
-                        </IconButton>
+                        </IconButton> */}
                     </>
                 ))}
             </Card>

@@ -179,11 +179,11 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                                             {t('market.share')}
                                         </Button>
                                     </Box>
-                                    {item.flowStep.response.answer && (
+                                    {/* {item.flowStep.response.answer && (
                                         <Typography sx={{ mt: 1, fontSize: '.75rem', mr: '24px' }}>
                                             {item.flowStep.response.answer?.length} {t('market.words')}
                                         </Typography>
-                                    )}
+                                    )} */}
                                 </Box>
                             )}
                         </Box>

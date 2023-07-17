@@ -27,18 +27,19 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                 />
                             )}
                             <Box overflow="hidden" marginLeft="20px">
-                                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.name}</Box>}>
-                                    <Typography variant="h3" sx={{ display: 'inline-block' }} noWrap mb={0.5}>
+                                <Tooltip title={data.name}>
+                                    <Typography variant="h3" noWrap mb={0.5}>
                                         {data?.name}
                                     </Typography>
                                 </Tooltip>
-                                <Tooltip title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{data.description}</Box>}>
-                                    <div className="textnoWarp">{data?.description} </div>
+                                <Tooltip title={data.description}>
+                                    <Typography noWrap variant="body2">
+                                        {data?.description}
+                                    </Typography>
                                 </Tooltip>
-
                                 <Box fontSize={12}>
                                     {data?.categories.map((el) => (
-                                        <Link key={el} href="#" fontSize={14} mr={0.5}>
+                                        <Link color="secondary" key={el} href="#" fontSize={12} mr={0.5}>
                                             #{categoryList?.find((i: { code: string }) => i.code === el)?.name}
                                         </Link>
                                     ))}

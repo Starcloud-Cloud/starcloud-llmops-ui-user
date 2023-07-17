@@ -1,9 +1,9 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
 
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+// import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+// import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+// import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import {
     marketDeatail
     // installTemplate
@@ -16,11 +16,12 @@ import { Execute, Details } from 'types/template';
 import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { useTheme } from '@mui/material/styles';
 function Deatail() {
+    const ref = useRef<HTMLDivElement | null>(null);
     const { setUserInfo }: any = userInfoStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
@@ -151,13 +152,19 @@ function Deatail() {
             setAllLoading(false);
             setDetailData(res);
         });
+        if (ref.current !== null && ref.current.parentNode !== null) {
+            const top: any = ref.current.parentNode;
+            setTimeout(() => {
+                top.scrollTop = 286;
+            }, 100);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const iconStyle = {
-        fontSize: '16px',
-        display: 'inline-block',
-        margin: '0 8px 0 4px'
-    };
+    // const iconStyle = {
+    //     fontSize: '16px',
+    //     display: 'inline-block',
+    //     margin: '0 8px 0 4px'
+    // };
     //下载模板
     // const [loading, setLoading] = useState(false);
     // const install = () => {
@@ -179,7 +186,7 @@ function Deatail() {
     //过滤出category
     const categoryList = marketStore((state) => state.categoryList);
     return (
-        <Card elevation={2} sx={{ padding: 2, position: 'relative' }}>
+        <Card ref={ref} elevation={2} sx={{ padding: 2, position: 'relative' }}>
             {allLoading && (
                 <div
                     style={{
@@ -223,14 +230,14 @@ function Deatail() {
                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                             ))}
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <RemoveRedEyeIcon fontSize="small" />
                             <span style={iconStyle}>{detailData?.viewCount}</span>
                             <VerticalAlignBottomIcon fontSize="small" />
                             <span style={iconStyle}>{detailData?.installCount}</span>
                             <ThumbUpIcon fontSize="small" />
                             <span style={iconStyle}>{detailData?.likeCount}</span>
-                        </Box>
+                        </Box> */}
                     </Box>
                 </Box>
                 {/* <LoadingButton

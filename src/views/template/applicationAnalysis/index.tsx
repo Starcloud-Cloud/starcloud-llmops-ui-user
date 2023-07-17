@@ -69,13 +69,13 @@ function ApplicationAnalysis() {
     const getStatistic = () => {
         logStatistics(queryParams).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
-            const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
+            // const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
+            // const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
             setGenerate([
                 { title: t('generateLog.messageTotal'), data: message },
-                { title: t('generateLog.usertotal'), data: userCount },
-                { title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg },
+                // { title: t('generateLog.usertotal'), data: userCount },
+                // { title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg },
                 { title: t('generateLog.tokenTotal'), data: tokens }
             ]);
         });

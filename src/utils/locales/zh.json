@@ -748,10 +748,10 @@
     "COMPLETION": "生成"
   },
   "generateLog": {
-    "messageTotal": "消息数总数",
+    "messageTotal": "使用次数",
     "usertotal": "用户总数",
     "TimeConsuming": "平均耗时",
-    "tokenTotal": "Tokens总数",
+    "tokenTotal": "字数总数",
     "name": "名称",
     "date": "时间",
     "search": "搜索"

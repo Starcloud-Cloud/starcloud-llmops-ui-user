@@ -23,7 +23,10 @@ import {
     Select,
     MenuItem,
     InputLabel,
-    Switch
+    Switch,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary
 } from '@mui/material';
 import { Popconfirm } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
@@ -31,7 +34,9 @@ import MainCard from 'ui-component/cards/MainCard';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Add from '@mui/icons-material/Add';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 import { t } from 'hooks/web/useI18n';
 
@@ -147,125 +152,153 @@ function Arrange({ config, editChange, variableChange, basisChange, statusChange
         oldOption[index] = updatedOption;
         setOptions(oldOption);
     };
+    const [expanded, setExpanded] = useState<string | boolean | null>(null);
+    const expandChange = (flag: boolean, field: string) => {
+        setExpanded(flag ? field : flag);
+    };
     return (
         <Box>
             <Typography variant="h3">{t('myApp.flow')}</Typography>
-            {config?.steps.map((item: any, index: number) => (
-                <Card key={item.field} sx={{ padding: '16px 0' }}>
-                    <Grid container spacing={2}>
-                        <Grid item lg={4} xs={12}>
-                            <TextField
-                                label={t('myApp.title')}
-                                value={item.name}
-                                name="name"
-                                InputLabelProps={{ shrink: true }}
-                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
-                                helperText={' '}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item lg={8} xs={12}>
-                            <TextField
-                                label={t('myApp.desc')}
-                                value={item.description}
-                                name="description"
-                                InputLabelProps={{ shrink: true }}
-                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
-                                helperText={' '}
-                                fullWidth
-                            />
-                        </Grid>
-                    </Grid>
-                    <Typography variant="h3">{t('myApp.variable')}</Typography>
-                    <Grid container spacing={2}>
-                        {item.variable &&
-                            item.variable.variables.map((el: any, i: number) => (
-                                <Grid item md={4} xs={12} key={i + 'prompt'}>
-                                    <Form item={el} onChange={(e: any) => variableChange({ e, index, i })} />
-                                </Grid>
-                            ))}
-                        {item.flowStep.variable?.variables.map((el: any, i: number) => (
-                            <Grid item md={12} xs={12} key={i + 'variables'}>
-                                <Form item={el} onChange={(e: any) => basisChange({ e, index, i })} />
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <Divider sx={{ margin: '16px 0' }} />
-                    <MainCard
-                        content={false}
-                        title={t('myApp.table')}
-                        secondary={
-                            <Stack direction="row" spacing={2} alignItems="center">
-                                <Button
-                                    onClick={() => {
-                                        setModal(index);
-                                        setOpen(true);
-                                        setTitle('Add');
-                                    }}
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                >
-                                    {t('myApp.add')}
-                                </Button>
-                            </Stack>
-                        }
-                    >
-                        <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('myApp.field')}</TableCell>
-                                        <TableCell>{t('myApp.name')}</TableCell>
-                                        <TableCell> {t('myApp.isShow')}</TableCell>
-                                        <TableCell>{t('myApp.operation')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {item?.variable?.variables.map(
-                                        (row: { field: 'string'; label: 'string'; isShow: boolean; value: 'string' }, i: number) => (
-                                            <TableRow hover key={row.field}>
-                                                <TableCell>{row.field}</TableCell>
-                                                <TableCell>{row.label}</TableCell>
-                                                <TableCell>
-                                                    <Switch
-                                                        name={row.field}
-                                                        onChange={() => {
-                                                            statusChange({ i, index });
-                                                        }}
-                                                        checked={row?.isShow}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            editModal(row, i, index);
-                                                        }}
-                                                        color="primary"
-                                                    >
-                                                        <SettingsIcon />
-                                                    </IconButton>
-                                                    <Popconfirm
-                                                        title={t('myApp.del')}
-                                                        description={t('myApp.delDesc')}
-                                                        onConfirm={() => delModal(i, index)}
-                                                        onCancel={() => {}}
-                                                        okText={t('myApp.confirm')}
-                                                        cancelText={t('myApp.cancel')}
-                                                    >
-                                                        <IconButton color="error">
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                    </Popconfirm>
-                                                </TableCell>
-                                            </TableRow>
-                                        )
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </MainCard>
-                </Card>
-            ))}
+            <Card>
+                {config?.steps.map((item: any, index: number) => (
+                    <>
+                        <Accordion
+                            key={item.field}
+                            expanded={expanded === item.field}
+                            onChange={(e, flag) => {
+                                expandChange(flag, item.field);
+                            }}
+                        >
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2bh-content" id="panel2bh-header">
+                                <Typography sx={{ width: '33%', flexShrink: 0 }}>{item.name}</Typography>
+                                <Typography sx={{ color: 'text.secondary' }}>{item.description}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Box>
+                                    <Grid container spacing={2}>
+                                        <Grid item lg={4} xs={12}>
+                                            <TextField
+                                                label={t('myApp.title')}
+                                                value={item.name}
+                                                name="name"
+                                                InputLabelProps={{ shrink: true }}
+                                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
+                                                helperText={' '}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item lg={8} xs={12}>
+                                            <TextField
+                                                label={t('myApp.desc')}
+                                                value={item.description}
+                                                name="description"
+                                                InputLabelProps={{ shrink: true }}
+                                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
+                                                helperText={' '}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Typography variant="h3">{t('myApp.variable')}</Typography>
+                                    <Grid container spacing={2}>
+                                        {item.variable &&
+                                            item.variable.variables.map((el: any, i: number) => (
+                                                <Grid item md={4} xs={12} key={i + 'prompt'}>
+                                                    <Form item={el} onChange={(e: any) => variableChange({ e, index, i })} />
+                                                </Grid>
+                                            ))}
+                                        {item.flowStep.variable?.variables.map((el: any, i: number) => (
+                                            <Grid item md={12} xs={12} key={i + 'variables'}>
+                                                <Form item={el} onChange={(e: any) => basisChange({ e, index, i })} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                    <Divider sx={{ margin: '16px 0' }} />
+                                    <MainCard
+                                        content={false}
+                                        title={t('myApp.table')}
+                                        secondary={
+                                            <Stack direction="row" spacing={2} alignItems="center">
+                                                <Button
+                                                    onClick={() => {
+                                                        setModal(index);
+                                                        setOpen(true);
+                                                        setTitle('Add');
+                                                    }}
+                                                    variant="outlined"
+                                                    startIcon={<Add />}
+                                                >
+                                                    {t('myApp.add')}
+                                                </Button>
+                                            </Stack>
+                                        }
+                                    >
+                                        <TableContainer>
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>{t('myApp.field')}</TableCell>
+                                                        <TableCell>{t('myApp.name')}</TableCell>
+                                                        <TableCell> {t('myApp.isShow')}</TableCell>
+                                                        <TableCell>{t('myApp.operation')}</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {item?.variable?.variables.map(
+                                                        (
+                                                            row: { field: 'string'; label: 'string'; isShow: boolean; value: 'string' },
+                                                            i: number
+                                                        ) => (
+                                                            <TableRow hover key={row.field}>
+                                                                <TableCell>{row.field}</TableCell>
+                                                                <TableCell>{row.label}</TableCell>
+                                                                <TableCell>
+                                                                    <Switch
+                                                                        name={row.field}
+                                                                        onChange={() => {
+                                                                            statusChange({ i, index });
+                                                                        }}
+                                                                        checked={row?.isShow}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <IconButton
+                                                                        onClick={() => {
+                                                                            editModal(row, i, index);
+                                                                        }}
+                                                                        color="primary"
+                                                                    >
+                                                                        <SettingsIcon />
+                                                                    </IconButton>
+                                                                    <Popconfirm
+                                                                        title={t('myApp.del')}
+                                                                        description={t('myApp.delDesc')}
+                                                                        onConfirm={() => delModal(i, index)}
+                                                                        onCancel={() => {}}
+                                                                        okText={t('myApp.confirm')}
+                                                                        cancelText={t('myApp.cancel')}
+                                                                    >
+                                                                        <IconButton color="error">
+                                                                            <DeleteIcon />
+                                                                        </IconButton>
+                                                                    </Popconfirm>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )
+                                                    )}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </MainCard>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
+                        <IconButton sx={{ display: 'block', margin: '0 auto' }} size="small" color="secondary">
+                            <AddBoxIcon />
+                        </IconButton>
+                    </>
+                ))}
+            </Card>
             <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                     {title}

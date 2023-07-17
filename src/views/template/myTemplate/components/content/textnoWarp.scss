@@ -1,6 +1,6 @@
 .textnoWarp {
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     /* 指定行数 */
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -10,7 +10,7 @@
 .desc {
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-height: 1rem;
+    line-height: .75rem;
     /* 指定行数 */
     -webkit-box-orient: vertical;
     overflow: hidden;

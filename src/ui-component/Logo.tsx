@@ -46,10 +46,9 @@ const Logo = ({ ...others }) => {
                     width="48px"
                     height="48px"
                     viewBox="0 0 48 48"
-                    enable-background="new 0 0 48 48"
+                    enableBackground="new 0 0 48 48"
                     xmlSpace="preserve"
                 >
-                    {' '}
                     <image
                         id="image0"
                         width="48"

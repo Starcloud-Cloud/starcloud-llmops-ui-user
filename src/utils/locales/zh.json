@@ -618,6 +618,62 @@
       "content2": "魔法AI是一个基于人工智能的营销内容创作平台。魔法AI相关网站、服务、产品、应用程序与内容，在《魔法AI用户服务协议》（以下简称“本协议”）中统称为“本服务”。个人用户、授权用户统称为“您”。"
     }
   },
+  "2profile": {
+    "user": {
+      "title": "个人信息",
+      "username": "用户名称",
+      "nickname": "用户昵称",
+      "mobile": "手机号码",
+      "email": "用户邮箱",
+      "dept": "所属部门",
+      "posts": "所属岗位",
+      "roles": "所属角色",
+      "sex": "性别",
+      "man": "男",
+      "woman": "女",
+      "createTime": "创建日期",
+      "upload": "上传头像",
+      "confirm": "确认",
+      "general": "基础设置"
+    },
+    "info": {
+      "title": "基本信息",
+      "basicInfo": "基本资料",
+      "resetPwd": "修改密码",
+      "userSocial": "社交信息"
+    },
+    "rules": {
+      "nickname": "请输入用户昵称",
+      "mail": "请输入邮箱地址",
+      "truemail": "请输入正确的邮箱地址",
+      "phone": "请输入正确的手机号码",
+      "truephone": "请输入正确的手机号码"
+    },
+    "apply": {
+      "name": "应用名称",
+      "category": "分类",
+      "tag": "标签",
+      "recommend": "推荐应用",
+      "instruction": "使用说明",
+      "downLoad": "已下载应用",
+      "more": "More",
+      "self": "我的应用"
+    },
+    "password": {
+      "oldPassword": "旧密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码",
+      "oldPwdMsg": "请输入旧密码",
+      "newPwdMsg": "请输入新密码",
+      "cfPwdMsg": "请输入确认密码",
+      "pwdRules": "长度在 6 到 20 个字符",
+      "diffPwd": "两次输入密码不一致",
+      "changepassword": "修改密码",
+      "currentpassword": "当前密码",
+      "newpassword": "新密码",
+      "confirmpassword": "确认密码"
+    }
+  },
   "user": {
     "username": "用户名称",
     "password": "密码",

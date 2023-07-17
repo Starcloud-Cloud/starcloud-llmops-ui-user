@@ -585,6 +585,39 @@
       "content2": "魔法AI是一个基于人工智能的营销内容创作平台。魔法AI相关网站、服务、产品、应用程序与内容，在《魔法AI用户服务协议》（以下简称“本协议”）中统称为“本服务”。个人用户、授权用户统称为“您”。"
     }
   },
+  "2profile": {
+    "user": {
+      "username": "Username",
+      "nickname": "Nickname",
+      "mobile": "Phone",
+      "email": "Email",
+      "upload": "Upload Avatar",
+      "confirm": "Confirm",
+      "general": "General Setting",
+      "sex": "Gender"
+    },
+    "info": {
+      "basicInfo": "Basic Info",
+      "resetPwd": "Reset Password"
+    },
+    "apply": {
+      "name": "Application Name",
+      "category": "Category",
+      "tag": "Tag",
+      "recommend": "Get Started",
+      "instruction": "Trial Instruction",
+      "downLoad": "Collection Template",
+      "more": "More",
+      "self": "My App"
+    },
+    "password": {
+      "diffPwd": "New password and confirm password do not match!",
+      "changepassword": "Change Password",
+      "currentpassword": "Current Password",
+      "newpassword": "New Password",
+      "confirmpassword": "Confirm Password"
+    }
+  },
   "user": {
     "username": "Username",
     "password": "Password",

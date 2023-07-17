@@ -38,6 +38,7 @@ import { submitOrder } from '../../../api/vip/index';
 import FooterSection from '../landing/FooterSection';
 import { SectionWrapper } from '../landing/index';
 import { PayModal } from './PayModal';
+import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 
 const plans = [
     {
@@ -379,11 +380,7 @@ const Price1 = () => {
                                                     <Popover
                                                         content={
                                                             <div className="flex justify-start items-center flex-col">
-                                                                <img
-                                                                    className="w-40"
-                                                                    src={'/static/media/wechat.707dac08a28c8844005e.png'}
-                                                                    alt=""
-                                                                />
+                                                                <img className="w-40" src={workWechatPay} alt="" />
                                                                 <div className="text-sm">微信扫码咨询</div>
                                                             </div>
                                                         }

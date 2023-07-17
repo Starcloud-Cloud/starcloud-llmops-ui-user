@@ -3,8 +3,9 @@ import { Divider, Space } from 'antd';
 import React from 'react';
 import { useState } from 'react';
 import './index.scss';
+import { IImageListType } from '../index';
 
-export const PictureCreateContainer = ({ menuVisible }: { menuVisible?: boolean }) => {
+export const PictureCreateContainer = ({ menuVisible, imgList }: { menuVisible?: boolean; imgList: IImageListType }) => {
     const [visible, setVisible] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<number | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -16,11 +17,6 @@ export const PictureCreateContainer = ({ menuVisible }: { menuVisible?: boolean 
     const handleMouseLeave = () => {
         setHoveredIndex(undefined);
     };
-    const imgList = [
-        'https://aigc.meitudata.com/editor/out/d3ed5ddd-6239-400c-40b5-63e2b0370ed1.png?imageMogr2/thumbnail/480x480&k=95673745db4e97165c83738aae22e8c3&t=64b19158',
-        'https://aigc.meitudata.com/editor/out/198672c7-e4a0-4260-48eb-268a19d54519.png?imageMogr2/thumbnail/480x480&k=853be54dd50963363b3fe12f5f659d77&t=64b19158',
-        'https://aigc.meitudata.com/editor/out/400f2c80-b659-4a5e-4374-8946cf19d8a7.png?imageMogr2/thumbnail/480x480&k=610aced190d0f3862121b47a5dcd1d81&t=64b19158'
-    ];
 
     const handlePrev = () => {
         if (currentIndex === 0) {
@@ -52,50 +48,59 @@ export const PictureCreateContainer = ({ menuVisible }: { menuVisible?: boolean 
         <div className="pcm_container" style={menuVisible ? {} : { width: '100vw' }}>
             <div className="pcm_container_wrapper">
                 {!visible ? (
-                    <>
-                        <div className="flex flex-col">
-                            <div className="flex justify-between">
-                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
-                                    <span className="font-normal">2023/01/10</span>
-                                    <span className="ml-1">
-                                        在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素
-                                    </span>
-                                </p>
-                                <Space>
-                                    <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                        <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                    <div>
+                        {imgList.map((item, index) => (
+                            <div key={index}>
+                                <div className="flex flex-col">
+                                    <div className="flex justify-between">
+                                        <p className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
+                                            <span className="font-normal">2023/01/10</span>
+                                            <span className="ml-1">
+                                                在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素
+                                            </span>
+                                        </p>
+                                        <Space>
+                                            <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                            </div>
+                                            <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />
+                                            </div>
+                                        </Space>
                                     </div>
-                                    <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                        <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    <div className="flex overflow-y-auto">
+                                        {item.images.map((img, indexImg) => (
+                                            <div
+                                                className="w-200 mr-4 relative"
+                                                key={indexImg}
+                                                onMouseEnter={() => handleMouseEnter(indexImg)}
+                                                onMouseLeave={handleMouseLeave}
+                                                onClick={() => setCurrentIndex(indexImg)}
+                                            >
+                                                <img
+                                                    onClick={() => setVisible(true)}
+                                                    className="rounded-md cursor-pointer"
+                                                    src={img.url}
+                                                    alt={img.uuid}
+                                                />
+                                                {hoveredIndex === index && (
+                                                    <Space className="absolute top-2 right-2">
+                                                        <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                            <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                        </div>
+                                                        <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                            <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                        </div>
+                                                    </Space>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
-                                </Space>
+                                </div>
+                                <Divider type={'horizontal'} />
                             </div>
-                            <div className="flex overflow-y-auto">
-                                {imgList.map((item, index) => (
-                                    <div
-                                        className="w-200 mr-4 relative"
-                                        key={index}
-                                        onMouseEnter={() => handleMouseEnter(index)}
-                                        onMouseLeave={handleMouseLeave}
-                                        onClick={() => setCurrentIndex(index)}
-                                    >
-                                        <img onClick={() => setVisible(true)} className="rounded-md cursor-pointer" src={item} alt={item} />
-                                        {hoveredIndex === index && (
-                                            <Space className="absolute top-2 right-2">
-                                                <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                    <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                                                </div>
-                                                <div className="bg-slate-900 opacity-80 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                    <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />
-                                                </div>
-                                            </Space>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <Divider type={'horizontal'} />
-                    </>
+                        ))}
+                    </div>
                 ) : (
                     <div className="h-full flex justify-center items-center relative">
                         <div className="absolute right-0 top-10 flex flex-col">
@@ -122,11 +127,11 @@ export const PictureCreateContainer = ({ menuVisible }: { menuVisible?: boolean 
                             </button>
                             <div className="flex flex-col justify-center text-center">
                                 <div className="w-full cursor-pointer">
-                                    <img className="rounded-md xs:w-9/12 sm:w-4/12" src={imgList[currentIndex]} alt="" />
+                                    <img className="rounded-md xs:w-9/12 sm:w-4/12" src={''} alt="" />
                                 </div>
                                 <div className="w-full mt-2">
                                     {imgList.map((item, index) => (
-                                        <img className="rounded-md xs:w-3/12 sm:w-1/12 mr-2 cursor-pointer" src={item} alt={item} />
+                                        <img className="rounded-md xs:w-3/12 sm:w-1/12 mr-2 cursor-pointer" src={''} alt={''} />
                                     ))}
                                 </div>
                             </div>

@@ -30,11 +30,6 @@ interface NavItemProps {
 }
 
 const NavItem = ({ item, level, parentId }: NavItemProps) => {
-    // 针对会员跳转特殊处理
-    if (item.url === 'subscribe') {
-        item.external = true;
-    }
-
     const theme = useTheme();
     const matchesSM = useMediaQuery(theme.breakpoints.down('lg'));
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));

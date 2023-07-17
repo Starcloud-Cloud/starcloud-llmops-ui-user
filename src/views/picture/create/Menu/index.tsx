@@ -95,6 +95,7 @@ const CollapseChildren = ({
 type IPictureCreateMenuProps = {
     menuVisible: boolean;
     setMenuVisible: (menuVisible: boolean) => void;
+    setImgList: (imgList: []) => void;
 };
 export type IParamsType = {
     guidancePreset: IParamsTypeGuidancePreset[];
@@ -132,7 +133,7 @@ export type IParamsTypeSampler = {
     description: string;
     image: string;
 };
-export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreateMenuProps) => {
+export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: IPictureCreateMenuProps) => {
     const [select, setSelect] = useState<undefined | string>(undefined);
     const [inputValue, setInputValue] = useState('');
     const [visible, setVisible] = useState(false);
@@ -150,7 +151,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
     }, []);
 
     const handleCreate = async () => {
-        await createText2Img({
+        const res = await createText2Img({
             imageRequest: {
                 prompt: inputValue,
                 width: select?.split('x')?.[0],
@@ -161,10 +162,11 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible }: IPictureCreat
                 sampler: selectedSamplerTags?.[0]
             }
         });
+        setImgList(res.messages || []);
     };
     return (
         <Col className={menuVisible ? 'pcm_menu' : 'pcm_menu_hidden'}>
-            <div style={{ height: 'calc(100% - 60px)' }} className={'overflow-auto flex flex-col items-center pb-2'}>
+            <div style={{ height: 'calc(100% - 60px)' }} className={'overflow-auto flex flex-col items-center pb-2 w-full'}>
                 <Row style={{ width: '90%', marginTop: '15px' }}>
                     <span className={'text-base font-medium'}>图片描述</span>
                     <TextArea

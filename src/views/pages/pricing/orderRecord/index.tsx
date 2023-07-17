@@ -23,8 +23,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
-import { PayModal } from '../PayModal/index';
-import { useNavigate } from 'react-router-dom';
+import { PayModal } from '../PayModal';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -110,7 +109,6 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 let interval: any;
 
 const Record: React.FC = () => {
-    const navigate = useNavigate();
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
@@ -119,6 +117,8 @@ const Record: React.FC = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const [total, setTotal] = useState(0);
+    const [count, setCount] = useState(0);
+    const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
         const fetchPageData = async () => {
@@ -141,7 +141,7 @@ const Record: React.FC = () => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage]);
+    }, [page, rowsPerPage, count]);
 
     // Add a new state for rows
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
@@ -218,7 +218,8 @@ const Record: React.FC = () => {
                     handleClose();
                     setOpenPayDialog(true);
                     setTimeout(() => {
-                        navigate('/orderRecord');
+                        setOpenPayDialog(false);
+                        forceUpdate();
                     }, 3000);
                 }
             });
@@ -246,7 +247,8 @@ const Record: React.FC = () => {
                     handleClose();
                     setOpenPayDialog(true);
                     setTimeout(() => {
-                        navigate('/orderRecord');
+                        setOpenPayDialog(false);
+                        forceUpdate();
                     }, 3000);
                 }
             });

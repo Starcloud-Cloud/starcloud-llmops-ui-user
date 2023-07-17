@@ -1,19 +1,19 @@
 // project imports
 
-import { useTheme } from '@mui/material/styles';
 import { Button, Card, CardContent, CardMedia, Grid, TextField, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // assets
 import Card3 from 'assets/images/cards/card-3.jpg';
 import wechat1 from 'assets/images/landing/wechat.png';
 
-import React, { useState } from 'react';
-import MainCard from 'ui-component/cards/MainCard';
 import { styled } from '@mui/system';
 import { redeemBenefits } from 'api/rewards';
+import { t } from 'hooks/web/useI18n';
+import { useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { t } from 'hooks/web/useI18n';
+import MainCard from 'ui-component/cards/MainCard';
 
 const CustomMainCard = styled(MainCard)({
     '& .MuiCardContent-root': {
@@ -68,13 +68,18 @@ const RedemptionHeader = () => {
     return (
         <CustomMainCard
             sx={{
-                '.MuiCardHeader-title': { fontSize: { xs: '0.875rem !important', md: '1.2rem !important', xl: '1.2rem !important' } }
+                '.MuiCardHeader-root': {
+                    padding: '12px !important'
+                },
+                '.MuiCardHeader-title': {
+                    fontSize: { xs: '0.875rem !important', md: '1rem !important', xl: '1rem !important' }
+                }
             }}
             title="注册即获取基础权益：5000字数 10张图片"
         >
             <Card>
                 <CardMedia image={Card3} title="Card 3">
-                    <CardContent sx={{ height: '300px', display: 'flex', alignItems: 'center' }}>
+                    <CardContent sx={{ height: '260px', display: 'flex', alignItems: 'center' }}>
                         <Grid
                             container
                             spacing={2}
@@ -84,7 +89,8 @@ const RedemptionHeader = () => {
                             textAlign="center"
                             sx={{
                                 '> .MuiGrid-root': {
-                                    width: '100%'
+                                    width: '100%',
+                                    marginTop: '10px'
                                 }
                             }}
                         >
@@ -92,7 +98,7 @@ const RedemptionHeader = () => {
                                 <Typography
                                     variant="h1"
                                     sx={{
-                                        fontSize: { xs: '1.2rem', md: '3.125rem', xl: '3.125rem' }
+                                        fontSize: { xs: '1.2rem', md: '2.125rem', xl: '2.125rem', marginTop: '30px' }
                                     }}
                                 >
                                     {t('redemption.title')}
@@ -106,7 +112,12 @@ const RedemptionHeader = () => {
                                 direction={{ xs: 'column', sm: 'row' }}
                                 justifyContent="center" // Change this line
                                 alignItems="center"
-                                sx={{ width: '90%' }} // Add this line
+                                sx={{
+                                    width: '90% !important',
+                                    marginTop: '0 !important',
+                                    position: 'relative',
+                                    top: { sm: '-40px', xs: '-17px' }
+                                }} // Add this line
                             >
                                 <Grid
                                     item
@@ -148,7 +159,18 @@ const RedemptionHeader = () => {
                                         </Button>
                                     </Grid>
                                 </Grid>
-                                <Grid item xs={12} sm={3} container direction="row" alignItems="center" justifyContent="center">
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={3}
+                                    container
+                                    direction="row"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    sx={{
+                                        paddingTop: '6 !important'
+                                    }}
+                                >
                                     <div
                                         style={{
                                             display: 'flex',
@@ -157,7 +179,8 @@ const RedemptionHeader = () => {
                                             justifyContent: 'center',
                                             padding: '10px 5px',
                                             background: 'linear-gradient(180deg, rgba(74,237,255,.44), rgba(122,120,255,.22))',
-                                            gap: '5px'
+                                            gap: '5px',
+                                            marginBottom: '20px'
                                         }}
                                     >
                                         <CardMedia

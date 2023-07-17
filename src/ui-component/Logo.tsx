@@ -1,5 +1,5 @@
+import { Box, Typography, useScrollTrigger, useTheme } from '@mui/material';
 import { cloneElement, ReactElement } from 'react';
-import { Box, Typography, useTheme, useScrollTrigger } from '@mui/material';
 interface ElevationScrollProps {
     children: ReactElement;
     window?: Window | Node;
@@ -245,7 +245,7 @@ const Logo = ({ ...others }) => {
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        AI让企业更美好
+                        跨境营销创意大师
                     </Typography>
                 </Box>
             </Typography>

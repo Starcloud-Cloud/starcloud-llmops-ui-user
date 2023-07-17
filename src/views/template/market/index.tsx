@@ -1,6 +1,6 @@
-import { Typography, Grid, Box, FormControl, InputLabel, Select, MenuItem, InputAdornment, TextField } from '@mui/material';
+import { Typography, Grid, Box, FormControl, InputLabel, Select, MenuItem, InputAdornment, TextField, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-
+import ClearIcon from '@mui/icons-material/Clear';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
@@ -44,6 +44,12 @@ function TemplateMarket() {
         setQueryParams({
             ...queryParams,
             [name]: value
+        });
+    };
+    const handleClearValue = () => {
+        setQueryParams({
+            ...queryParams,
+            sort: ''
         });
     };
     //当用户更改了筛选触发的逻辑

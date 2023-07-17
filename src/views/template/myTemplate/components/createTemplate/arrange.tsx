@@ -36,7 +36,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Add from '@mui/icons-material/Add';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 
 import { t } from 'hooks/web/useI18n';
 

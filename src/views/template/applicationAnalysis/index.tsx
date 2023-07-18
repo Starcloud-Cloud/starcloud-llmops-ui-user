@@ -112,6 +112,9 @@ function ApplicationAnalysis() {
             height: 200,
             type: 'area',
             options: {
+                tooltip: {
+                    enabled: true
+                },
                 chart: {
                     id: item.title,
                     toolbar: {
@@ -243,7 +246,7 @@ function ApplicationAnalysis() {
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell>{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell>{row.appName}</TableCell>
-                                <TableCell>{row.totalAnswerTokens}</TableCell>
+                                <TableCell>{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell>{row.totalElapsed}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell>{formatDate(row.createTime)}</TableCell>

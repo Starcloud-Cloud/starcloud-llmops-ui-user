@@ -1,11 +1,13 @@
 import { Button } from '@mui/material';
 import { Col, Divider, Input, Row, Space, Tag } from 'antd';
 
-import { EyeInvisibleOutlined, EyeOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Slider } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './index.scss';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
+import { IImageListType } from '../index';
+import { useWindowSize } from '../../../../hooks/useWindowSize';
 
 const { TextArea } = Input;
 const { CheckableTag } = Tag;
@@ -95,7 +97,8 @@ const CollapseChildren = ({
 type IPictureCreateMenuProps = {
     menuVisible: boolean;
     setMenuVisible: (menuVisible: boolean) => void;
-    setImgList: (imgList: []) => void;
+    setImgList: (imgList: IImageListType) => void;
+    imgList: IImageListType;
 };
 export type IParamsType = {
     guidancePreset: IParamsTypeGuidancePreset[];
@@ -133,7 +136,7 @@ export type IParamsTypeSampler = {
     description: string;
     image: string;
 };
-export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: IPictureCreateMenuProps) => {
+export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList, imgList }: IPictureCreateMenuProps) => {
     const [select, setSelect] = useState<undefined | string>(undefined);
     const [inputValue, setInputValue] = useState('');
     const [visible, setVisible] = useState(false);
@@ -142,6 +145,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
     const [selectedSamplerTags, setSamplerSelectedTags] = useState<number[]>([]);
     const [selectedStylePresetTags, setSelectedStylePresetTags] = useState<string[]>([]);
     const [samples, setSamples] = useState(4);
+    const size = useWindowSize();
 
     useEffect(() => {
         (async () => {
@@ -162,12 +166,12 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                 sampler: selectedSamplerTags?.[0]
             }
         });
-        setImgList(res.messages || []);
+        setImgList([...res.messages, ...imgList] || []);
     };
     return (
-        <Col className={menuVisible ? 'pcm_menu' : 'pcm_menu_hidden'}>
-            <div style={{ height: 'calc(100% - 60px)' }} className={'overflow-auto flex flex-col items-center pb-2 w-full'}>
-                <Row style={{ width: '90%', marginTop: '15px' }}>
+        <Col className={menuVisible ? (size.width < 768 ? 'pcm_menu_m' : 'pcm_menu') : 'pcm_menu_hidden'}>
+            <div className={'overflow-y-auto overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)]'}>
+                <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>图片描述</span>
                     <TextArea
                         rows={6}
@@ -178,7 +182,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                         }
                     />
                 </Row>
-                <Row style={{ width: '90%', marginTop: '30px' }}>
+                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>尺寸选择</span>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px' }}>
                         {params?.imageSize.map((item, index: number) => (
@@ -193,7 +197,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                         ))}
                     </div>
                 </Row>
-                <Row style={{ width: '90%', marginTop: '30px' }}>
+                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>生成张数</span>
                     <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
                         <Slider
@@ -209,7 +213,7 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                         />
                     </div>
                 </Row>
-                <Row style={{ width: '90%', marginTop: '30px' }}>
+                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>
                         高级
                         {visible ? (
@@ -232,18 +236,13 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                         </div>
                     )}
                 </Row>
-                {/*<Row style={{ width: '90%', marginTop: '30px' }} className="flex">*/}
-                {/*    <span className={'text-base font-medium'}>最终描述</span>*/}
-                {/*    <div style={{ width: '100%', display: 'flex', marginTop: '5px' }} className="font-medium">*/}
-                {/*        {!selectedGuidancePresetTags.length ? inputValue : `${inputValue} ${selectedGuidancePresetTags.join('，')}`}*/}
-                {/*    </div>*/}
-                {/*</Row>*/}
             </div>
             <Row
                 style={{
                     height: '60px',
-                    borderTop: '0.5px solid #d9d9d9',
-                    width: '100%'
+                    width: '100%',
+                    position: 'absolute',
+                    bottom: 0
                 }}
                 justify={'center'}
                 align={'middle'}
@@ -252,24 +251,24 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList }: I
                     生成
                 </Button>
             </Row>
-            <div
-                className="flex cursor-pointer h-24 w-5 items-center justify-end bg-white outline-none rotate-180 absolute z-10 top-1/2 -translate-y-1/2 transform -right-5"
-                onClick={() => setMenuVisible(!menuVisible)}
-            ></div>
-            <span className="panel-collapse-border-handle z-10 h-24 w-[21px] bg-neutral-200 absolute top-1/2 -translate-y-1/2 transform -right-5 rotate-180"></span>
-            {menuVisible ? (
-                <LeftOutlined
-                    rev={undefined}
-                    className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"
-                    onClick={() => setMenuVisible(!menuVisible)}
-                />
-            ) : (
-                <RightOutlined
-                    rev={undefined}
-                    className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"
-                    onClick={() => setMenuVisible(!menuVisible)}
-                />
-            )}
+            {/*<div*/}
+            {/*    className="flex cursor-pointer h-24 w-5 items-center justify-end bg-white outline-none rotate-180 absolute z-10 top-1/2 -translate-y-1/2 transform -right-5"*/}
+            {/*    onClick={() => setMenuVisible(!menuVisible)}*/}
+            {/*></div>*/}
+            {/*<span className="panel-collapse-border-handle z-10 h-24 w-[21px] bg-neutral-200 absolute top-1/2 -translate-y-1/2 transform -right-5 rotate-180"></span>*/}
+            {/*{menuVisible ? (*/}
+            {/*    <LeftOutlined*/}
+            {/*        rev={undefined}*/}
+            {/*        className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"*/}
+            {/*        onClick={() => setMenuVisible(!menuVisible)}*/}
+            {/*    />*/}
+            {/*) : (*/}
+            {/*    <RightOutlined*/}
+            {/*        rev={undefined}*/}
+            {/*        className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"*/}
+            {/*        onClick={() => setMenuVisible(!menuVisible)}*/}
+            {/*    />*/}
+            {/*)}*/}
         </Col>
     );
 };

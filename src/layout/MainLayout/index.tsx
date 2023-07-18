@@ -93,7 +93,7 @@ const MainLayout = () => {
     const { drawerType, container, layout } = useConfig();
 
     const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/createChatApp'];
+        const IS_LARGE_PATH = ['/createChatApp', '/textToImage'];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);
     }, [location]);
@@ -150,13 +150,13 @@ const MainLayout = () => {
             <Main theme={theme} open={drawerOpen} layout={layout}>
                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                 {!isLarge ? (
-                    <Container className={'max-w-[1300px]'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                    <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
                         {/* breadcrumb */}
                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                         <Outlet />
                     </Container>
                 ) : (
-                    <Container maxWidth={false} {...(!container && { sx: { px: { xs: 0 } } })}>
+                    <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                         <Outlet />
                     </Container>

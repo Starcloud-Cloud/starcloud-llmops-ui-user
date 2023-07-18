@@ -6,7 +6,7 @@ const initialMenuItems: { items: NavItemType[] } = {
     items: [template]
 };
 
-const targetIds = ['2164', '2168', '2170', '2171']; // 添加或删除你需要的id
+const targetIds = ['2164', '2168', '2170', '2178', '2171']; // 添加或删除你需要的id
 
 const getMenuItems = () => {
     let menuItems = { ...initialMenuItems };

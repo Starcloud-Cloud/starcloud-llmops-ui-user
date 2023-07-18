@@ -11,7 +11,7 @@ const MarketList = Loadable(lazy(() => import('views/template/market/components/
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));
-const CreateChatApp = Loadable(lazy(() => import('views/template/myTemplate/components/createChatApp')));
+// const CreateChatApp = Loadable(lazy(() => import('views/template/myTemplate/components/createChatApp')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -142,6 +142,9 @@ const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 // Rewards
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
 const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord')));
+
+// pic
+const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -551,10 +554,10 @@ const MainRoutes = {
             path: '/createApp',
             element: <CreateDetail />
         },
-        {
-            path: '/createChatApp',
-            element: <CreateChatApp />
-        },
+        // {
+        //     path: '/createChatApp',
+        //     element: <CreateChatApp />
+        // },
         {
             path: '/exchange',
             element: <Redemption />
@@ -562,6 +565,10 @@ const MainRoutes = {
         {
             path: '/orderRecord',
             element: <OrderRecord />
+        },
+        {
+            path: '/textToImage',
+            element: <PictureCreate />
         }
     ]
 };

@@ -1,10 +1,12 @@
 import { Row } from 'antd';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { PictureCreateContainer } from './Container';
-import { PictureCreateHeader } from './Header';
 import { PictureCreateMenu } from './Menu';
 import { getImgList } from '../../../api/picture/create';
+import { appDrawerWidth as drawerWidth } from '../../../store/constant';
+import { Drawer, useMediaQuery, useTheme } from '@mui/material';
+import useConfig from '../../../hooks/useConfig';
 
 export type IImageListType = IImageListTypeChild[];
 export type IImageListTypeChildImages = {
@@ -19,9 +21,13 @@ export type IImageListTypeChild = {
 };
 
 const PictureCreate = () => {
+    const theme = useTheme();
     const [menuVisible, setMenuVisible] = useState<boolean>(true);
     const size = useWindowSize();
     const [imgList, setImgList] = useState<IImageListType>([]);
+
+    const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
+    const { borderRadius } = useConfig();
 
     useEffect(() => {
         (async () => {
@@ -32,24 +38,44 @@ const PictureCreate = () => {
 
     if (size.width < 768) {
         return (
-            <div>
-                <PictureCreateHeader />
-                <Row style={{ height: 'calc(100vh - 60px)' }} className={menuVisible ? '' : 'justify-between'}>
-                    <PictureCreateMenu menuVisible={menuVisible} setMenuVisible={setMenuVisible} setImgList={setImgList} />
-                    {!menuVisible && <PictureCreateContainer imgList={imgList} />}
-                </Row>
-            </div>
+            <Row className={menuVisible ? 'h-full' : 'justify-between h-full'}>
+                <Drawer
+                    sx={{
+                        width: drawerWidth,
+                        flexShrink: 0,
+                        zIndex: { xs: 1100, lg: 0 },
+                        '& .MuiDrawer-paper': {
+                            height: matchDownLG ? '100%' : 'auto',
+                            width: drawerWidth,
+                            boxSizing: 'border-box',
+                            position: 'relative',
+                            border: 'none',
+                            borderRadius: matchDownLG ? 'none' : `${borderRadius}px`
+                        }
+                    }}
+                    variant={matchDownLG ? 'temporary' : 'persistent'}
+                    anchor="left"
+                    open={menuVisible}
+                    ModalProps={{ keepMounted: true }}
+                    onClose={() => setMenuVisible(false)}
+                >
+                    <PictureCreateMenu
+                        menuVisible={menuVisible}
+                        setMenuVisible={setMenuVisible}
+                        setImgList={setImgList}
+                        imgList={imgList}
+                    />
+                </Drawer>
+                <PictureCreateContainer menuVisible={menuVisible} imgList={imgList} setMenuVisible={setMenuVisible} />
+            </Row>
         );
     }
 
     return (
-        <div>
-            <PictureCreateHeader />
-            <Row style={{ height: 'calc(100vh - 60px)' }} className="justify-between">
-                <PictureCreateMenu menuVisible={menuVisible} setMenuVisible={setMenuVisible} setImgList={setImgList} />
-                <PictureCreateContainer menuVisible={menuVisible} imgList={imgList} />
-            </Row>
-        </div>
+        <Row className="justify-between h-full">
+            <PictureCreateMenu menuVisible={menuVisible} setMenuVisible={setMenuVisible} setImgList={setImgList} imgList={imgList} />
+            <PictureCreateContainer menuVisible={menuVisible} imgList={imgList} setMenuVisible={setMenuVisible} />
+        </Row>
     );
 };
 

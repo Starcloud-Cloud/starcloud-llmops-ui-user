@@ -318,7 +318,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                                 </TableCell>
                                                 <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
                                                 <TableCell align="right">
-                                                    {row.validity} {row.validityUnit}
+                                                    {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
                                                 </TableCell>
                                                 <TableCell sx={{ pr: 3 }} align="right">
                                                     {formatTime(row.expirationTime)}

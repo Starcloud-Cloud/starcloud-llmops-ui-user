@@ -24,6 +24,7 @@ import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { PayModal } from '../PayModal';
+import dayjs from 'dayjs';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -32,6 +33,7 @@ type TableEnhancedCreateDataType = {
     body: string;
     merchantOrderId: string;
     subject: string;
+    createTime: number;
 };
 
 // table filter
@@ -67,6 +69,7 @@ const headCells = [
     { id: 'body', numeric: false, disablePadding: false, label: '商品描述' },
     { id: 'amount', numeric: false, disablePadding: false, label: '支付金额(元)' },
     { id: 'status', numeric: false, disablePadding: false, label: '支付状态' },
+    { id: 'createTime', numeric: false, disablePadding: false, label: '支付时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -291,11 +294,12 @@ const Record: React.FC = () => {
                                         <TableCell align="center">{row.body}</TableCell>
                                         <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>
+                                        <TableCell align="center">{dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
                                         <TableCell align="center">
                                             <Button
                                                 variant="text"
                                                 color="secondary"
-                                                disabled={row.status === 10}
+                                                disabled={row.status === 10 || row.status === 20}
                                                 onClick={() => handlePay(row.merchantOrderId)}
                                             >
                                                 支付

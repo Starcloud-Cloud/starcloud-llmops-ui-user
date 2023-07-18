@@ -335,7 +335,7 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <Grid container spacing={5}>
-                    <Grid item lg={5}>
+                    <Grid item lg={5} sx={{ width: '100%' }}>
                         <Arrange
                             config={detail?.workflowConfig}
                             editChange={editChange}

@@ -10,18 +10,24 @@ import { Carousel } from 'react-responsive-carousel';
 // assets
 import { IconChevronRight, IconChevronLeft, IconLink } from '@tabler/icons';
 
-import SliderLight1 from 'assets/images/landing/pre-apps/slider-light-1.png';
-import SliderDark1 from 'assets/images/landing/pre-apps/slider-dark-1.png';
-import SliderLight2 from 'assets/images/landing/pre-apps/slider-light-2.png';
-import SliderDark2 from 'assets/images/landing/pre-apps/slider-dark-2.png';
-import SliderLight3 from 'assets/images/landing/pre-apps/slider-light-3.png';
-import SliderDark3 from 'assets/images/landing/pre-apps/slider-dark-3.png';
-import SliderLight4 from 'assets/images/landing/pre-apps/slider-light-4.png';
-import SliderDark4 from 'assets/images/landing/pre-apps/slider-dark-4.png';
-import SliderLight5 from 'assets/images/landing/pre-apps/slider-light-5.png';
-import SliderDark5 from 'assets/images/landing/pre-apps/slider-dark-5.png';
-import SliderLight6 from 'assets/images/landing/pre-apps/slider-light-6.png';
-import SliderDark6 from 'assets/images/landing/pre-apps/slider-dark-6.png';
+// import SliderLight1 from 'assets/images/landing/pre-apps/slider-light-1.png';
+// import SliderDark1 from 'assets/images/landing/pre-apps/slider-dark-1.png';
+// import SliderLight2 from 'assets/images/landing/pre-apps/slider-light-2.png';
+// import SliderDark2 from 'assets/images/landing/pre-apps/slider-dark-2.png';
+// import SliderLight3 from 'assets/images/landing/pre-apps/slider-light-3.png';
+// import SliderDark3 from 'assets/images/landing/pre-apps/slider-dark-3.png';
+// import SliderLight4 from 'assets/images/landing/pre-apps/slider-light-4.png';
+// import SliderDark4 from 'assets/images/landing/pre-apps/slider-dark-4.png';
+// import SliderLight5 from 'assets/images/landing/pre-apps/slider-light-5.png';
+// import SliderDark5 from 'assets/images/landing/pre-apps/slider-dark-5.png';
+// import SliderLight6 from 'assets/images/landing/pre-apps/slider-light-6.png';
+// import SliderDark6 from 'assets/images/landing/pre-apps/slider-dark-6.png';
+
+import market from 'assets/images/landing/pre-apps/market.jpg';
+import amzon from 'assets/images/landing/pre-apps/amzon.jpg';
+import site from 'assets/images/landing/pre-apps/site.jpg';
+import social from 'assets/images/landing/pre-apps/social.jpg';
+import template from 'assets/images/landing/pre-apps/template.jpg';
 
 // styles
 const Images = styled('img')({
@@ -201,32 +207,11 @@ const PreBuildDashBoard = () => {
                                 hasNext && <SampleNextArrow onClickHandler={onClickHandler} hasNext={hasNext} label={label} />
                             }
                         >
-                            <Items
-                                title="Mail/Message App"
-                                image={theme.palette.mode === 'dark' ? SliderDark5 : SliderLight5}
-                                link="/app/mail"
-                            />
-                            <Items title="Chat App" image={theme.palette.mode === 'dark' ? SliderDark3 : SliderLight3} link="/app/chat" />
-                            <Items
-                                title="Kanban App"
-                                image={theme.palette.mode === 'dark' ? SliderDark4 : SliderLight4}
-                                link="/app/kanban/board"
-                            />
-                            <Items
-                                title="Calendar App"
-                                image={theme.palette.mode === 'dark' ? SliderDark2 : SliderLight2}
-                                link="/app/calendar"
-                            />
-                            <Items
-                                title="Ecommerce App"
-                                image={theme.palette.mode === 'dark' ? SliderDark1 : SliderLight1}
-                                link="/e-commerce/products"
-                            />
-                            <Items
-                                title="Social Profile"
-                                image={theme.palette.mode === 'dark' ? SliderDark6 : SliderLight6}
-                                link="/user/social-profile/posts"
-                            />
+                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link="/appMarket/list" />
+                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link="/appMarket/list" />
+                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link="/appMarket/list" />
+                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link="/appMarket/list" />
+                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link="/appMarket/list" />
                         </Carousel>
                     </Box>
                 </Grid>

@@ -1,9 +1,8 @@
-import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { Modal, IconButton, Typography, CardContent, CardMedia } from '@mui/material';
-import MainCard from 'ui-component/cards/MainCard';
+import { CardContent, CardMedia, IconButton, Modal, Typography } from '@mui/material';
 import douyin from 'assets/images/landing/douyin.png';
 import redBook from 'assets/images/landing/red-book-qrcode.png';
+import MainCard from 'ui-component/cards/MainCard';
 
 interface ShareProps {
     open: boolean;
@@ -72,7 +71,7 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                     >
                         <Typography id="modal-description" sx={{ mb: 1 }}>
                             关注魔法AI的官方抖音号、小红书号，后台私信发送 "mofaai"
-                            ，即可获取权益兑换码，可免费兑换基础权益8000字和2张图片。如有问题请加入魔法AI微信群联系运营人员。
+                            ，即可获取权益兑换码，可免费兑换基础权益5000字和2张图片。如有问题请加入魔法AI微信群联系运营人员。
                         </Typography>
 
                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

@@ -33,3 +33,23 @@ export interface Anyevent {
     };
     setValues: (data: { name: string; value: string }) => void;
 }
+export type Rows = {
+    field: string;
+    label: string;
+    type: string;
+    isShow: boolean;
+    value: string;
+    defaultValue: string;
+    description: string;
+};
+export interface Validas {
+    variables: Rows[];
+    index: number;
+    basisChange: (data: { e: any; index: number; i: number }) => void;
+    setModal: (index: number) => void;
+    setOpen: (flag: boolean) => void;
+    setTitle: (data: string) => void;
+    statusChange: (data: { i: number; index: number }) => void;
+    editModal: (row: Rows, i: number, index: number) => void;
+    delModal: (i: number, index: number) => void;
+}

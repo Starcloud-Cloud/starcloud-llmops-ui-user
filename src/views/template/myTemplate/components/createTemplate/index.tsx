@@ -53,9 +53,9 @@ function CreateDetail() {
         } else {
             const value: any[] = [];
             for (let i = index; i < detail.workflowConfig.steps.length; i++) {
-                console.log(i);
                 value[i] = true;
             }
+            setLoadings(value);
         }
         const fetchData = async () => {
             let resp: any = await executeApp({
@@ -204,13 +204,6 @@ function CreateDetail() {
         setDetail(oldValue);
         setPerform(perform + 1);
     };
-    //步骤更改
-    const variableChange = ({ e, index, i }: any) => {
-        const newValue = { ...detail };
-        newValue.workflowConfig.steps[index].variable.variables[i].value = e.value;
-        setDetail(newValue);
-        setPerform(perform + 1);
-    };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = { ...detail };
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
@@ -312,12 +305,12 @@ function CreateDetail() {
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={5}>
-                    <Grid item lg={5}>
+                    <Grid item lg={7}>
                         {detail && (
                             <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
                         )}
                     </Grid>
-                    <Grid item lg={7}>
+                    <Grid item lg={5}>
                         <Perform
                             key={perform}
                             config={detail?.workflowConfig}
@@ -335,17 +328,16 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <Grid container spacing={5}>
-                    <Grid item lg={5} sx={{ width: '100%' }}>
+                    <Grid item lg={7} sx={{ width: '100%' }}>
                         <Arrange
                             config={detail?.workflowConfig}
                             editChange={editChange}
-                            variableChange={variableChange}
                             basisChange={basisChange}
                             statusChange={statusChange}
                             changeConfigs={changeConfigs}
                         />
                     </Grid>
-                    <Grid item lg={7}>
+                    <Grid item lg={5}>
                         <Perform
                             key={perform}
                             config={detail?.workflowConfig}

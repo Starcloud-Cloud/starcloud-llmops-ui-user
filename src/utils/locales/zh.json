@@ -771,7 +771,7 @@
     "add": "新增",
     "field": "变量唯一值",
     "name": "变量名称",
-    "value": "变量值",
+    "value": "变量默认值",
     "isShow": "是否显示",
     "operation": "操作",
     "type": "类型",

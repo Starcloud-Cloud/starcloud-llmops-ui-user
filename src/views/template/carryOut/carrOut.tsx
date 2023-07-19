@@ -31,7 +31,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
         data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
             const { field, isShow, value } = variable;
             if (isShow) {
-                Data[field] = value;
+                Data[field] = value !== null && value !== undefined ? value : '';
             }
         });
         return Data;

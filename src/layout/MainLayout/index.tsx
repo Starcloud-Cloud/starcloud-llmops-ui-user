@@ -1,23 +1,23 @@
 import { useEffect, useMemo } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 // material-ui
-import { styled, useTheme, Theme } from '@mui/material/styles';
 import { AppBar, Box, Container, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
+import { Theme, styled, useTheme } from '@mui/material/styles';
 
 // project imports
 import Header from './Header';
-import Sidebar from './Sidebar';
 import HorizontalBar from './HorizontalBar';
+import Sidebar from './Sidebar';
 // import Customization from '../Customization';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 
-import getMenuItems from 'menu-items';
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
+import getMenuItems from 'menu-items';
+import { useDispatch, useSelector } from 'store';
 import { drawerWidth } from 'store/constant';
 import { openDrawer } from 'store/slices/menu';
-import { useDispatch, useSelector } from 'store';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
@@ -85,12 +85,18 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 const MainLayout = () => {
     const navigation = getMenuItems();
     const theme = useTheme();
+    const location = useLocation();
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
     const { drawerType, container, layout } = useConfig();
 
+    const isLarge = useMemo(() => {
+        const IS_LARGE_PATH = ['/createChatApp', '/textToImage'];
+        const path = location.pathname;
+        return IS_LARGE_PATH.includes(path);
+    }, [location]);
     // useEffect(() => {
     //     if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER) {
     //         dispatch(openDrawer(true));
@@ -143,11 +149,18 @@ const MainLayout = () => {
             {/* main content */}
             <Main theme={theme} open={drawerOpen} layout={layout}>
                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
-                <Container className={'max-w-[1300px]'} {...(!container && { sx: { px: { xs: 0 } } })}>
-                    {/* breadcrumb */}
-                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                    <Outlet />
-                </Container>
+                {!isLarge ? (
+                    <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                        {/* breadcrumb */}
+                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                        <Outlet />
+                    </Container>
+                ) : (
+                    <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                        <Outlet />
+                    </Container>
+                )}
             </Main>
             {/*<Customization />*/}
         </Box>

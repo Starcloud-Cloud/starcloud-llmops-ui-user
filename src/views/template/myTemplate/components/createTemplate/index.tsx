@@ -1,21 +1,21 @@
-import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider } from '@mui/material';
-import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
-import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Card, CardHeader, Divider, Grid, Link, Tab, Tabs } from '@mui/material';
+import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
-import Basis from './basis';
-import Arrange from './arrange';
-import Upload from './upLoad';
-import Perform from 'views/template/carryOut/perform';
-import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
+import { t } from 'hooks/web/useI18n';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { dispatch } from 'store';
+import userInfoStore from 'store/entitlementAction';
+import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/slices/snackbar';
-import { t } from 'hooks/web/useI18n';
-import userInfoStore from 'store/entitlementAction';
-function TabPanel({ children, value, index, ...other }: TabsProps) {
+import Perform from 'views/template/carryOut/perform';
+import Arrange from './arrange';
+import Basis from './basis';
+import Upload from './upLoad';
+export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
             {value === index && (
@@ -26,7 +26,7 @@ function TabPanel({ children, value, index, ...other }: TabsProps) {
         </div>
     );
 }
-function a11yProps(index: number) {
+export function a11yProps(index: number) {
     return {
         id: `simple-tab-${index}`,
         'aria-controls': `simple-tabpanel-${index}`

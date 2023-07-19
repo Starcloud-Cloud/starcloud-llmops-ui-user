@@ -116,7 +116,7 @@ const BottomCards: React.FC = () => {
             description: '一键关注，即可马上兑换',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送8000字/2张图片',
+            endText: '送5000字/2张图片',
             onClick: handleOpenFollow
         }
     ];

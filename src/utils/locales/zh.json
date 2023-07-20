@@ -565,7 +565,14 @@
     "words": "个字符",
     "warning": "请求错误",
     "modify": "编辑成功",
-    "create": "创建成功"
+    "create": "创建成功",
+    "debug": "调试与预览",
+    "steps": "步骤",
+    "editName": "编辑步骤名称",
+    "addDesc": "点击添加描述",
+    "desc": "编辑",
+    "delete": "删除",
+    "model": "模型变量"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -771,7 +778,7 @@
     "add": "新增",
     "field": "变量唯一值",
     "name": "变量名称",
-    "value": "变量值",
+    "value": "变量默认值",
     "isShow": "是否显示",
     "operation": "操作",
     "type": "类型",

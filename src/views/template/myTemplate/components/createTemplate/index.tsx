@@ -1,4 +1,4 @@
-import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider } from '@mui/material';
+import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider, Typography } from '@mui/material';
 import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -304,30 +304,33 @@ function CreateDetail() {
                 <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
-                <Grid container spacing={5}>
+                <Grid container spacing={2}>
                     <Grid item lg={7}>
                         {detail && (
                             <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
                         )}
                     </Grid>
                     <Grid item lg={5}>
-                        <Perform
-                            key={perform}
-                            config={detail?.workflowConfig}
-                            changeSon={changeData}
-                            loadings={loadings}
-                            variableChange={exeChange}
-                            promptChange={promptChange}
-                            isallExecute={(flag: boolean) => {
-                                isAllExecute = flag;
-                            }}
-                            source="myApp"
-                        />
+                        <Typography variant="h3">{t('market.debug')}</Typography>
+                        <Card elevation={2} sx={{ p: 2 }}>
+                            <Perform
+                                key={perform}
+                                config={detail?.workflowConfig}
+                                changeSon={changeData}
+                                loadings={loadings}
+                                variableChange={exeChange}
+                                promptChange={promptChange}
+                                isallExecute={(flag: boolean) => {
+                                    isAllExecute = flag;
+                                }}
+                                source="myApp"
+                            />
+                        </Card>
                     </Grid>
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid container spacing={5}>
+                <Grid container spacing={2}>
                     <Grid item lg={7} sx={{ width: '100%' }}>
                         <Arrange
                             config={detail?.workflowConfig}
@@ -338,18 +341,21 @@ function CreateDetail() {
                         />
                     </Grid>
                     <Grid item lg={5}>
-                        <Perform
-                            key={perform}
-                            config={detail?.workflowConfig}
-                            changeSon={changeData}
-                            loadings={loadings}
-                            variableChange={exeChange}
-                            promptChange={promptChange}
-                            isallExecute={(flag: boolean) => {
-                                isAllExecute = flag;
-                            }}
-                            source="myApp"
-                        />
+                        <Typography variant="h3">调试与预览</Typography>
+                        <Card elevation={2} sx={{ p: 2 }}>
+                            <Perform
+                                key={perform}
+                                config={detail?.workflowConfig}
+                                changeSon={changeData}
+                                loadings={loadings}
+                                variableChange={exeChange}
+                                promptChange={promptChange}
+                                isallExecute={(flag: boolean) => {
+                                    isAllExecute = flag;
+                                }}
+                                source="myApp"
+                            />
+                        </Card>
                     </Grid>
                 </Grid>
             </TabPanel>

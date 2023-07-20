@@ -62,3 +62,7 @@ export const appCreate = (data: any) => {
 export const appModify = (data: any) => {
     return request.putOriginal({ url: `/llm/app/modify`, data });
 };
+//增加步骤
+export const stepList = () => {
+    return request.get({ url: `/llm/app/stepList` });
+};

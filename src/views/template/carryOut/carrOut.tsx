@@ -18,7 +18,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
     const isDarkMode = theme.palette.mode === 'dark';
     useImperativeHandle(ref, () => ({
         submit: () => {
-            if (!formik.isValid) {
+            if (Object.values(formik.values).some((value) => value === '')) {
                 formik.handleSubmit();
                 return false;
             } else {
@@ -76,7 +76,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                 <Box display="flex" justifyContent="space-between" alignItems="top">
                     {config?.steps.length > 1 || source === 'myApp' ? (
                         <Box>
-                            <Typography variant="h3">{item.name}</Typography>
+                            <Typography variant="h4">{item.name}</Typography>
                             <Typography variant="caption" display="block">
                                 {item.description}
                             </Typography>

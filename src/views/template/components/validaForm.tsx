@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
-
+import { useRef } from 'react';
 function FormExecute({ formik, item, onChange }: any) {
     const mt = {
         marginTop: 2
     };
+    const timeoutRef = useRef<any>();
     return (
         <Box>
             {item.style === 'INPUT' ? (
@@ -24,7 +25,10 @@ function FormExecute({ formik, item, onChange }: any) {
                     }
                     onChange={(e) => {
                         formik.handleChange(e);
-                        onChange(e.target);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
                     }}
                     fullWidth
                 />
@@ -47,7 +51,10 @@ function FormExecute({ formik, item, onChange }: any) {
                     }
                     onChange={(e) => {
                         formik.handleChange(e);
-                        onChange(e.target);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
                     }}
                     fullWidth
                 />
@@ -68,7 +75,10 @@ function FormExecute({ formik, item, onChange }: any) {
                     placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     onChange={(e) => {
                         formik.handleChange(e);
-                        onChange(e.target);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
                     }}
                     fullWidth
                 >

@@ -43,6 +43,7 @@ export type Rows = {
     description: string;
 };
 export interface Validas {
+    variable: Rows[];
     variables: Rows[];
     index: number;
     basisChange: (data: { e: any; index: number; i: number }) => void;

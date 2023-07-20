@@ -535,7 +535,14 @@
     "words": "Words",
     "warning": "Request Error",
     "modify": "Edit Success",
-    "create": "Create Success"
+    "create": "Create Success",
+    "debug": "Debugging And previewing",
+    "steps": "Steps",
+    "editName": "Edit Step Name",
+    "addDesc": "Click Add Description",
+    "desc": "Edit",
+    "delete": "Delete",
+    "model": "Model Variable"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",

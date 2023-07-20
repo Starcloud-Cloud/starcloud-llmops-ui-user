@@ -28,12 +28,14 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import fun from 'assets/images/category/fun.svg';
 import Add from '@mui/icons-material/Add';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
+import SouthIcon from '@mui/icons-material/South';
 
 import { t } from 'hooks/web/useI18n';
 
 // import Form from 'views/template/components/form';
+import { stepList } from 'api/template';
 import Valida from 'views/template/myTemplate/components/createTemplate/validaForm';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 interface Option {
@@ -147,6 +149,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     };
     const [expanded, setExpanded] = useState<(boolean | null | undefined)[]>([]);
     const expandChange = (index: number) => {
+        boxRef.current[index].allValida();
         let newValue = [...expanded];
         newValue = newValue.map((item: boolean | null | undefined) => false);
         newValue[index] = true;
@@ -175,11 +178,46 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         newValue.steps.splice(index, 1);
         changeConfigs(newValue);
     };
+    //增加步骤
+    const [stepLists, setStepList] = useState<{ name: string; field: string }[]>([]);
+    const [addAnchorEl, setAddAnchorEl] = useState<(null | HTMLElement)[]>([]);
+    const addOpen = addAnchorEl.map((item) => Boolean(item));
+    const addClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+        const newVal = [...addAnchorEl];
+        newVal[index] = event.currentTarget;
+
+        setAddAnchorEl(newVal);
+    };
+    const addClose = (index: number) => {
+        const newVal = [...addAnchorEl];
+        newVal[index] = null;
+        setAddAnchorEl(newVal);
+    };
+    const addStep = (step: any, index: number) => {
+        const newValue = { ...config };
+        newValue.steps.splice(index, 0, step);
+        changeConfigs(newValue);
+        let newVal = [...expanded];
+        newVal = newVal.map(() => false);
+        newVal[index + 1] = true;
+        setExpanded(newVal);
+    };
+    const [borderLeft, setBorder] = useState<any[]>([]);
+    const boxRef = useRef<any>([]);
+    useEffect(() => {
+        setBorder(boxRef.current.map((item: any) => (item.allValidas ? '5px solid #ff6376' : 'none')));
+    }, []);
+
     return (
         <Box>
             <Typography variant="h3">{t('myApp.flow')}</Typography>
             {config?.steps.map((item: any, index: number) => (
                 <Box key={index}>
+                    {index !== 0 && (
+                        <Box display="flex" justifyContent="center">
+                            <SouthIcon />
+                        </Box>
+                    )}
                     <SubCard
                         sx={{ position: 'relative', overflow: 'visible' }}
                         contentSX={{
@@ -188,7 +226,21 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             overflow: 'visible'
                         }}
                     >
-                        <Box height="100px" display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                            sx={{
+                                borderRadius: '4px',
+                                overflow: 'hidden',
+                                borderLeft: boxRef.current[index]
+                                    ? !expanded[index] && boxRef.current[index]?.allValidas
+                                        ? '5px solid #ff6376'
+                                        : 'none'
+                                    : borderLeft[index]
+                            }}
+                            height="100px"
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
                             <Box display="flex" alignItems="center" flexWrap="wrap">
                                 <Box
                                     width="3.125rem"
@@ -203,15 +255,15 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     <img style={{ width: '2.5rem', height: '2.5rem' }} src={fun} alt="svg" />
                                 </Box>
                                 <Box display="flex" alignItems="end">
-                                    <Typography fontWeight="600" fontSize="1.125rem">
-                                        步骤{index + 1}：
+                                    <Typography variant="h4">
+                                        {t('market.steps')}
+                                        {index + 1}：
                                     </Typography>
                                     {!editStatus[index] && (
                                         <Typography
                                             noWrap
-                                            sx={{ width: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}
-                                            fontWeight="600"
-                                            fontSize="1.125rem"
+                                            sx={{ maxWidth: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}
+                                            variant="h4"
                                         >
                                             {item.name}
                                         </Typography>
@@ -235,7 +287,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     )}
                                     {expanded[index] && (
                                         <>
-                                            <Tooltip placement="top" title="编辑步骤名称">
+                                            <Tooltip placement="top" title={t('market.editName')}>
                                                 <IconButton
                                                     onClick={() => {
                                                         const newValue = { ...editStatus };
@@ -247,7 +299,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                     <BorderColorIcon fontSize="small" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip placement="top" title={item.description ? item.description : '点击添加描述'}>
+                                            <Tooltip placement="top" title={item.description ? item.description : t('market.addDesc')}>
                                                 <IconButton
                                                     onClick={() => {
                                                         const newValue = { ...editStatus };
@@ -292,11 +344,11 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                         variant="outlined"
                                         startIcon={<BorderColorIcon />}
                                     >
-                                        编辑
+                                        {t('market.desc')}
                                     </Button>
                                 )}
                                 <IconButton
-                                    aria-controls={menuOpen[index] ? 'basic-menu' : undefined}
+                                    aria-controls={menuOpen[index] ? 'del' + index : undefined}
                                     aria-haspopup="true"
                                     aria-expanded={menuOpen[index] ? 'true' : undefined}
                                     onClick={(e) => {
@@ -306,31 +358,32 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     <MoreHorizIcon />
                                 </IconButton>
                                 <Menu
-                                    id="basic-menu"
+                                    id={'del' + index}
                                     open={menuOpen[index] ? true : false}
                                     onClose={() => {
                                         menuClose(index);
                                     }}
                                     anchorEl={anchorEl[index]}
                                 >
-                                    <MenuItem>
-                                        <DeleteIcon
-                                            color="error"
-                                            onClick={() => {
-                                                const newVal = [...anchorEl];
-                                                newVal[index] = null;
-                                                setAnchorEl(newVal);
-                                                delStep(index);
-                                            }}
-                                        />
-                                        删除
+                                    <MenuItem
+                                        onClick={() => {
+                                            delStep(index);
+                                            const newVal = [...anchorEl];
+                                            newVal[index] = null;
+                                            setAnchorEl(newVal);
+                                        }}
+                                    >
+                                        <DeleteIcon color="error" />
+                                        {t('market.delete')}
                                     </MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
                         {expanded[index] && <Divider />}
-                        {expanded[index] && (
+                        <Box sx={{ display: expanded[index] ? 'block' : 'none' }}>
                             <Valida
+                                ref={(el) => (boxRef.current[index] = el)}
+                                variable={item.variable?.variables}
                                 variables={item.flowStep.variable.variables}
                                 basisChange={basisChange}
                                 index={index}
@@ -341,11 +394,48 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                 editModal={editModal}
                                 delModal={delModal}
                             />
-                        )}
+                        </Box>
                     </SubCard>
-                    <IconButton color="secondary" sx={{ display: 'block', margin: '5px auto', fontSize: 'unset' }}>
+                    <Box textAlign="center" fontSize="25px" fontWeight={600} mt={1}>
+                        |
+                    </Box>
+                    <IconButton
+                        aria-controls={addOpen[index] ? 'add' + index : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={addOpen[index] ? 'true' : undefined}
+                        onClick={(e) => {
+                            stepList().then((res) => {
+                                setStepList(res);
+                            });
+                            addClick(e, index);
+                        }}
+                        color="secondary"
+                        sx={{ display: 'block', margin: '0 auto', fontSize: 'unset' }}
+                    >
                         <AddCircleSharpIcon />
                     </IconButton>
+                    <Menu
+                        id={'add' + index}
+                        open={addOpen[index] ? true : false}
+                        onClose={() => {
+                            addClose(index);
+                        }}
+                        anchorEl={addAnchorEl[index]}
+                    >
+                        {stepLists.map((step) => (
+                            <MenuItem
+                                key={step.field}
+                                onClick={() => {
+                                    addStep(step, index);
+                                    const newVal = [...anchorEl];
+                                    newVal[index] = null;
+                                    setAddAnchorEl(newVal);
+                                }}
+                            >
+                                {step.name}
+                            </MenuItem>
+                        ))}
+                    </Menu>
                 </Box>
             ))}
             <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>

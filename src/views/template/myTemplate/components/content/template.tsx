@@ -44,7 +44,7 @@ function Template({ data, handleDetail }: any) {
                         className="textnoWarp active cursor"
                         gutterBottom
                         variant="h3"
-                        sx={{ fontSize: '1rem' }}
+                        sx={{ fontSize: '1.1rem' }}
                         component="div"
                         my={1}
                     >
@@ -53,7 +53,7 @@ function Template({ data, handleDetail }: any) {
                 </Tooltip>
                 <Tooltip disableInteractive title={data.description}>
                     <Typography
-                        sx={{ fontSize: '.75rem' }}
+                        sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
                         onClick={() => handleDetail(data)}
                         className="cursor desc"
                         variant="body2"
@@ -67,7 +67,7 @@ function Template({ data, handleDetail }: any) {
             <Box position="absolute" left="16px" bottom="5px">
                 {data.categories &&
                     data.categories.map((item: string) => (
-                        <Link color="secondary" href="#" key={item} mr={1} fontSize=".75rem">
+                        <Link color="secondary" href="#" key={item} mr={1} fontSize=".9rem">
                             #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
                         </Link>
                     ))}

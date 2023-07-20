@@ -205,7 +205,7 @@ function Deatail() {
                     <CircularProgress />
                 </div>
             )}
-            <Breadcrumbs sx={{ padding: 2 }} aria-label="breadcrumb">
+            <Breadcrumbs aria-label="breadcrumb">
                 <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket/list')}>
                     {t('market.all')}
                 </Link>
@@ -213,16 +213,16 @@ function Deatail() {
                     {categoryList?.find((el: { code: string }) => el.code === (detailData?.categories && detailData?.categories[0]))?.name}
                 </Typography>
             </Breadcrumbs>
-            <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <AccessAlarm sx={{ fontSize: '80px' }} />
+                    <AccessAlarm sx={{ fontSize: '70px' }} />
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
                                 {detailData?.name}
                             </Typography>
                         </Box>
-                        <Box my={0.5}>
+                        <Box>
                             {detailData?.categories?.map((item: any) => (
                                 <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
                             ))}

@@ -88,7 +88,7 @@ export default function PicModal({
                         <div className="grid grid-cols-3 gap-1 p-4 max-h-[90%] min-h-[90%]">
                             <div className="h-full sm:col-span-2 group relative bg-white xs:col-span-3 flex justify-center">
                                 <img
-                                    className="xs:w-full h-full grow basis-0  duration-100 opacity-100 rounded sm:max-w-[670px]"
+                                    className="xs:w-full h-full grow basis-0  duration-100 opacity-100 rounded sm:max-w-[670px] object-contain"
                                     src={currentImageList?.[currentIndex]?.url}
                                     alt={currentImageList?.[currentIndex]?.uuid}
                                 />

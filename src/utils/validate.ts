@@ -24,3 +24,12 @@ export const validateColor = (value: string) => {
     const regex = /^#[0-9A-Fa-f]{6}$/;
     return regex.test(value);
 };
+
+export function removeFalseProperties(obj: any) {
+    for (const key in obj) {
+        if (obj[key] === '' || obj[key] === null || obj[key] === undefined || obj[key] === 'null' || obj[key] === 'undefined') {
+            delete obj[key];
+        }
+    }
+    return obj;
+}

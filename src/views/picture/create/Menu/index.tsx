@@ -13,6 +13,7 @@ import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
 import { useEffect, useState } from 'react';
+import { removeFalseProperties } from 'utils/validate';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { IImageListType } from '../index';
@@ -220,23 +221,26 @@ export const PictureCreateMenu = ({
     };
 
     const handleCreate = async () => {
+        const imageRequest = {
+            prompt: inputValue,
+            width: width,
+            height: height,
+            samples,
+            style_preset: currentStyle,
+            image_strength: imageStrength / 100,
+            seed: seed,
+            steps: step,
+            negative_prompt: voidInputValue,
+            engine: selectModel,
+            init_image: uploadFile,
+            guidance_strength: strength
+        };
+
         const res = await createText2Img({
             conversationUid: conversationId,
             scene: 'WEB_ADMIN',
             appUid: 'BASE_GENERATE_IMAGE',
-            imageRequest: {
-                prompt: inputValue,
-                width: width,
-                height: height,
-                samples,
-                style_preset: currentStyle,
-                image_strength: imageStrength / 100,
-                seed: seed,
-                steps: step,
-                negative_prompt: voidInputValue,
-                engine: selectModel,
-                strength
-            }
+            imageRequest: removeFalseProperties(imageRequest)
         });
         setIsFirst(false);
         setImgList([res, ...imgList] || []);

@@ -190,6 +190,7 @@ export const PictureCreateMenu = ({
             const randomIndex = Math.floor(Math.random() * params?.examplePrompt.length);
             setInputValue(params?.examplePrompt?.[randomIndex].value);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params?.examplePrompt]);
 
     const onDice = () => {
@@ -228,7 +229,13 @@ export const PictureCreateMenu = ({
                 width: width,
                 height: height,
                 samples,
-                style_preset: currentStyle
+                style_preset: currentStyle,
+                image_strength: imageStrength / 100,
+                seed: seed,
+                steps: step,
+                negative_prompt: voidInputValue,
+                engine: selectModel,
+                strength
             }
         });
         setIsFirst(false);

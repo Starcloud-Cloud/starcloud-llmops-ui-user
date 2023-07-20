@@ -1,11 +1,12 @@
 import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { Button, IconButton } from '@mui/material';
-import { Divider, Space } from 'antd';
+import { Box, Button, Divider, IconButton } from '@mui/material';
+import { Space } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { downloadFile } from 'utils/download';
+import PicModal from '../Modal';
 import { IImageListType, IImageListTypeChildImages } from '../index';
 import './index.scss';
 
@@ -28,6 +29,10 @@ export const PictureCreateContainer = ({
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [currentImageList, setCurrentImageList] = useState<IImageListTypeChildImages[]>([]);
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
     const handleMouseEnter = (index: string) => {
         setHoveredIndex(index);
@@ -65,13 +70,11 @@ export const PictureCreateContainer = ({
 
     return (
         <div className="pcm_container" style={menuVisible ? {} : { width: '100%' }}>
-            {!visible && (
-                <div>
-                    <IconButton onClick={() => setMenuVisible(!menuVisible)} size="large" aria-label="chat menu collapse">
-                        <MenuRoundedIcon />
-                    </IconButton>
-                </div>
-            )}
+            <div>
+                <IconButton onClick={() => setMenuVisible(!menuVisible)} size="large" aria-label="chat menu collapse">
+                    <MenuRoundedIcon />
+                </IconButton>
+            </div>
             <div className="h-full overflow-y-hidden hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
                 {!visible ? (
                     <div>
@@ -80,11 +83,6 @@ export const PictureCreateContainer = ({
                                 <div className="flex flex-col gap-4">
                                     <div className="flex justify-between">
                                         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
-                                            {item.createTime > 0 && (
-                                                <span className="text-base text-zinc-500">
-                                                    {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                                </span>
-                                            )}
                                             <span className="ml-1">{item.prompt}</span>
                                         </div>
                                         <Space>
@@ -298,7 +296,7 @@ export const PictureCreateContainer = ({
                                                 >
                                                     <img
                                                         onClick={() => {
-                                                            setVisible(true);
+                                                            handleOpen();
                                                             setCurrentImageList(item.images);
                                                         }}
                                                         className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
@@ -320,9 +318,26 @@ export const PictureCreateContainer = ({
                                         )}
                                     </div>
                                 </div>
-                                <Divider type={'horizontal'} />
+                                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                                    <Divider sx={{ flexGrow: 1 }} />
+                                    <Box px={2}>
+                                        {item.createTime > 0 && (
+                                            <span className="text-base text-zinc-500">
+                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            </span>
+                                        )}
+                                    </Box>
+                                    <Divider sx={{ flexGrow: 1 }} />
+                                </Box>
                             </div>
                         ))}
+                        <PicModal
+                            open={open}
+                            setOpen={setOpen}
+                            currentImageList={currentImageList}
+                            currentIndex={currentIndex}
+                            setCurrentIndex={setCurrentIndex}
+                        />
                     </div>
                 ) : (
                     <div className="h-full flex justify-center items-center relative">
@@ -360,21 +375,11 @@ export const PictureCreateContainer = ({
                                         alt={currentImageList[currentIndex].uuid}
                                     />
                                 </div>
-                                <div className="w-full mt-2 flex justify-center overflow-y-auto">
-                                    {currentImageList.map((item, index) => (
-                                        <img
-                                            key={index}
-                                            className="rounded-md xs:w-3/12 sm:w-1/12 mr-2 cursor-pointer"
-                                            src={item.url}
-                                            alt={item.uuid}
-                                        />
-                                    ))}
-                                </div>
                             </div>
                             <button
                                 className={`${
                                     btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
-                                } bg-black/50 flex-none w-10 h-10 flex justify-center items-center rounded-md border-none`}
+                                } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none`}
                                 onClick={() => handleNext()}
                             >
                                 <RightOutlined rev={undefined} style={{ color: '#fff' }} />

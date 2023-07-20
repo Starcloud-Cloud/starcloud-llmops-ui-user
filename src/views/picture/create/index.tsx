@@ -30,7 +30,7 @@ const PictureCreate = () => {
     const [width, setWidth] = useState(512);
     const [height, setHeight] = useState(512);
     const [samples, setSamples] = useState(4);
-    const [inputValue, setInputValue] = useState('a dog');
+    const [inputValue, setInputValue] = useState('');
     const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
 
@@ -41,6 +41,7 @@ const PictureCreate = () => {
 
     useEffect(() => {
         dispatch(openDrawer(false));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

@@ -1,8 +1,8 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Card, CardHeader, Divider, Grid, Link, Tab, Tabs } from '@mui/material';
+import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider, Typography } from '@mui/material';
+import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { executeApp } from 'api/template/fetch';
-import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -53,9 +53,9 @@ function CreateDetail() {
         } else {
             const value: any[] = [];
             for (let i = index; i < detail.workflowConfig.steps.length; i++) {
-                console.log(i);
                 value[i] = true;
             }
+            setLoadings(value);
         }
         const fetchData = async () => {
             let resp: any = await executeApp({
@@ -204,13 +204,6 @@ function CreateDetail() {
         setDetail(oldValue);
         setPerform(perform + 1);
     };
-    //步骤更改
-    const variableChange = ({ e, index, i }: any) => {
-        const newValue = { ...detail };
-        newValue.workflowConfig.steps[index].variable.variables[i].value = e.value;
-        setDetail(newValue);
-        setPerform(perform + 1);
-    };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = { ...detail };
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
@@ -311,53 +304,58 @@ function CreateDetail() {
                 <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
-                <Grid container spacing={5}>
-                    <Grid item lg={5}>
+                <Grid container spacing={2}>
+                    <Grid item lg={7}>
                         {detail && (
                             <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
                         )}
                     </Grid>
-                    <Grid item lg={7}>
-                        <Perform
-                            key={perform}
-                            config={detail?.workflowConfig}
-                            changeSon={changeData}
-                            loadings={loadings}
-                            variableChange={exeChange}
-                            promptChange={promptChange}
-                            isallExecute={(flag: boolean) => {
-                                isAllExecute = flag;
-                            }}
-                            source="myApp"
-                        />
+                    <Grid item lg={5}>
+                        <Typography variant="h3">{t('market.debug')}</Typography>
+                        <Card elevation={2} sx={{ p: 2 }}>
+                            <Perform
+                                key={perform}
+                                config={detail?.workflowConfig}
+                                changeSon={changeData}
+                                loadings={loadings}
+                                variableChange={exeChange}
+                                promptChange={promptChange}
+                                isallExecute={(flag: boolean) => {
+                                    isAllExecute = flag;
+                                }}
+                                source="myApp"
+                            />
+                        </Card>
                     </Grid>
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid container spacing={5}>
-                    <Grid item lg={5}>
+                <Grid container spacing={2}>
+                    <Grid item lg={7} sx={{ width: '100%' }}>
                         <Arrange
                             config={detail?.workflowConfig}
                             editChange={editChange}
-                            variableChange={variableChange}
                             basisChange={basisChange}
                             statusChange={statusChange}
                             changeConfigs={changeConfigs}
                         />
                     </Grid>
-                    <Grid item lg={7}>
-                        <Perform
-                            key={perform}
-                            config={detail?.workflowConfig}
-                            changeSon={changeData}
-                            loadings={loadings}
-                            variableChange={exeChange}
-                            promptChange={promptChange}
-                            isallExecute={(flag: boolean) => {
-                                isAllExecute = flag;
-                            }}
-                            source="myApp"
-                        />
+                    <Grid item lg={5}>
+                        <Typography variant="h3">调试与预览</Typography>
+                        <Card elevation={2} sx={{ p: 2 }}>
+                            <Perform
+                                key={perform}
+                                config={detail?.workflowConfig}
+                                changeSon={changeData}
+                                loadings={loadings}
+                                variableChange={exeChange}
+                                promptChange={promptChange}
+                                isallExecute={(flag: boolean) => {
+                                    isAllExecute = flag;
+                                }}
+                                source="myApp"
+                            />
+                        </Card>
                     </Grid>
                 </Grid>
             </TabPanel>

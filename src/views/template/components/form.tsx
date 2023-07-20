@@ -25,7 +25,8 @@ function Form({ item, onChange }: any) {
                     value={item.value || ''}
                     id={item.field}
                     multiline
-                    maxRows={4}
+                    maxRows={6}
+                    minRows={4}
                     InputLabelProps={{ shrink: true }}
                     onChange={(e) => onChange(e.target)}
                     fullWidth

@@ -45,12 +45,6 @@ function TemplateMarket() {
             [name]: value
         });
     };
-    // const handleClearValue = () => {
-    //     setQueryParams({
-    //         ...queryParams,
-    //         sort: ''
-    //     });
-    // };
     //当用户更改了筛选触发的逻辑
     const handleSearch = () => {
         let newList = templateList.filter((item: MarketList) => {

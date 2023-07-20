@@ -1,15 +1,15 @@
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, FormControlLabel, Switch, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
 import LogoSection from '../LogoSection';
-import SearchSection from './SearchSection';
+import LocalizationSection from './LocalizationSection';
 import MobileSection from './MobileSection';
 import ProfileSection from './ProfileSection';
-import LocalizationSection from './LocalizationSection';
+import SearchSection from './SearchSection';
 // import MegaMenuSection from './MegaMenuSection';
 // import NotificationSection from './NotificationSection';
 

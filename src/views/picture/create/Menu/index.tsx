@@ -1,111 +1,109 @@
-import { Button } from '@mui/material';
-import { Col, Divider, Input, Row, Space, Tag } from 'antd';
+import { Autocomplete, Button, TextField } from '@mui/material';
+import { Col, Input, Row } from 'antd';
 
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import CasinoIcon from '@mui/icons-material/Casino';
 import { Slider } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import './index.scss';
+
+import { InboxOutlined } from '@ant-design/icons';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import type { UploadProps } from 'antd';
+import { Upload } from 'antd';
+import { RcFile } from 'antd/es/upload';
+import { useEffect, useState } from 'react';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
-import { IImageListType } from '../index';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
+import { IImageListType } from '../index';
+import './index.scss';
+
+const { Dragger } = Upload;
+
+const marks = [
+    {
+        value: 1,
+        label: '7:4',
+        data: '896x512'
+    },
+    {
+        value: 2,
+        label: '3:2',
+        data: '768x512'
+    },
+    {
+        value: 3,
+        label: '4:3',
+        data: '683x512'
+    },
+    {
+        value: 4,
+        label: '5:4',
+        data: '640x512'
+    },
+    {
+        value: 5,
+        label: '1:1',
+        data: '512x512'
+    },
+    {
+        value: 6,
+        label: '4:5',
+        data: '512x640'
+    },
+    {
+        value: 7,
+        label: '3:4',
+        data: '512x683'
+    },
+    {
+        value: 8,
+        label: '2:3',
+        data: '512x768'
+    },
+    {
+        value: 9,
+        label: '4:7',
+        data: '512x896'
+    }
+];
+
+function valueLabelFormat(value: number) {
+    return marks.find((v) => v.value === value)?.data;
+}
 
 const { TextArea } = Input;
-const { CheckableTag } = Tag;
-
-const CollapseChildren = ({
-    selectedGuidancePresetTags,
-    setSelectedGuidancePresetTags,
-    selectedSamplerTags,
-    setSamplerSelectedTags,
-    selectedStylePresetTags,
-    setSelectedStylePresetTags,
-    params
-}: {
-    selectedGuidancePresetTags: number[];
-    setSelectedGuidancePresetTags: (selectedGuidancePresetTags: number[]) => void;
-    selectedSamplerTags: number[];
-    setSamplerSelectedTags: (selectedGuidancePresetTags: number[]) => void;
-    selectedStylePresetTags: string[];
-    setSelectedStylePresetTags: (selectedGuidancePresetTags: string[]) => void;
-    params: IParamsType | null;
-}) => {
-    const handleGuidanceChange = (tag: number, checked: boolean) => {
-        const nextSelectedTags = checked ? [tag] : selectedGuidancePresetTags.filter((t) => t !== tag);
-        setSelectedGuidancePresetTags(nextSelectedTags);
-    };
-
-    const handleSamplerChange = (tag: number, checked: boolean) => {
-        const nextSelectedTags = checked ? [tag] : selectedSamplerTags.filter((t) => t !== tag);
-        setSamplerSelectedTags(nextSelectedTags);
-    };
-
-    const handlePresetChange = (tag: string, checked: boolean) => {
-        const nextSelectedTags = checked ? [tag] : selectedStylePresetTags.filter((t) => t !== tag);
-        setSelectedStylePresetTags(nextSelectedTags);
-    };
-
-    return (
-        <div className="pcm_collapse_child_wrapper">
-            <div className="pcm_collapse_child_item">
-                <span className={'mb-1.5 text-base'}>guidancePreset:</span>
-                <Space size={[0, 8]} wrap>
-                    {params?.guidancePreset.map((tag) => (
-                        <CheckableTag
-                            key={tag.value}
-                            checked={selectedGuidancePresetTags.includes(tag.value)}
-                            onChange={(checked) => handleGuidanceChange(tag.value, checked)}
-                        >
-                            {tag.label}
-                        </CheckableTag>
-                    ))}
-                </Space>
-            </div>
-            <Divider type={'horizontal'} />
-            <div className="pcm_collapse_child_item">
-                <span className={'mb-1.5 text-base'}>sampler:</span>
-                <Space size={[0, 8]} wrap>
-                    {params?.sampler.map((tag) => (
-                        <CheckableTag
-                            key={tag.value}
-                            checked={selectedSamplerTags.includes(tag.value)}
-                            onChange={(checked) => handleSamplerChange(tag.value, checked)}
-                        >
-                            {tag.label}
-                        </CheckableTag>
-                    ))}
-                </Space>
-            </div>
-            <Divider type={'horizontal'} />
-            <div className="pcm_collapse_child_item">
-                <span className={'mb-1.5 text-base'}>stylePreset:</span>
-                <Space size={[0, 8]} wrap>
-                    {params?.stylePreset.map((tag) => (
-                        <CheckableTag
-                            key={tag.value}
-                            checked={selectedStylePresetTags.includes(tag.value)}
-                            onChange={(checked) => handlePresetChange(tag.value, checked)}
-                        >
-                            {tag.label}
-                        </CheckableTag>
-                    ))}
-                </Space>
-            </div>
-        </div>
-    );
-};
 
 type IPictureCreateMenuProps = {
     menuVisible: boolean;
     setMenuVisible: (menuVisible: boolean) => void;
     setImgList: (imgList: IImageListType) => void;
     imgList: IImageListType;
+    width: number;
+    height: number;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    samples: number;
+    setSamples: (samples: number) => void;
+    inputValue: string;
+    setInputValue: (inputValue: string) => void;
+    conversationId: string;
+    setIsFirst: (flag: boolean) => void;
 };
+
 export type IParamsType = {
     guidancePreset: IParamsTypeGuidancePreset[];
     stylePreset: IParamsTypeStylePreset[];
     imageSize: IParamsTypeImageSize[];
     samples: IParamsTypeSamples[];
     sampler: IParamsTypeSampler[];
+    examplePrompt: IExamplePrompt[];
+    model: IModelType[];
+};
+
+export type IExamplePrompt = {
+    label: string;
+    value: string;
 };
 export type IParamsTypeGuidancePreset = {
     label: string;
@@ -136,15 +134,48 @@ export type IParamsTypeSampler = {
     description: string;
     image: string;
 };
-export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList, imgList }: IPictureCreateMenuProps) => {
-    const [select, setSelect] = useState<undefined | string>(undefined);
-    const [inputValue, setInputValue] = useState('');
+
+export type IModelType = {
+    label: string;
+    value: string;
+    description: string;
+};
+
+const getBase64 = (img: RcFile, callback: (url: string) => void) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result as string));
+    reader.readAsDataURL(img);
+};
+
+export const PictureCreateMenu = ({
+    setMenuVisible,
+    menuVisible,
+    setImgList,
+    imgList,
+    width,
+    height,
+    setWidth,
+    setHeight,
+    samples,
+    setSamples,
+    inputValue,
+    setInputValue,
+    conversationId,
+    setIsFirst
+}: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
+    const [showVoidInputValue, setShowVoidInputValue] = useState(false);
+    const [voidInputValue, setVoidInputValue] = useState('');
     const [params, setParams] = useState<null | IParamsType>(null);
-    const [selectedGuidancePresetTags, setSelectedGuidancePresetTags] = useState<number[]>([]);
-    const [selectedSamplerTags, setSamplerSelectedTags] = useState<number[]>([]);
-    const [selectedStylePresetTags, setSelectedStylePresetTags] = useState<string[]>([]);
-    const [samples, setSamples] = useState(4);
+    const [currentStyle, setCurrentStyle] = useState('');
+    const [seed, setSeed] = useState<number>();
+    const [step, setStep] = useState<number>();
+    const [strength, setStrength] = useState<number>();
+    const [uploadFile, setUploadFile] = useState<string>('');
+    const [showImg, setShowImg] = useState(false);
+    const [imageStrength, setImageStrength] = useState(45);
+    const [selectModel, setSelectModel] = useState('stable-diffusion-xl-beta-v2-2-2');
+
     const size = useWindowSize();
 
     useEffect(() => {
@@ -154,64 +185,201 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList, img
         })();
     }, []);
 
+    useEffect(() => {
+        if (params?.examplePrompt) {
+            const randomIndex = Math.floor(Math.random() * params?.examplePrompt.length);
+            setInputValue(params?.examplePrompt?.[randomIndex].value);
+        }
+    }, [params?.examplePrompt]);
+
+    const onDice = () => {
+        if (params?.examplePrompt) {
+            const randomIndex = Math.floor(Math.random() * params?.examplePrompt.length);
+            setInputValue(params?.examplePrompt?.[randomIndex].value);
+        }
+    };
+
+    const props: UploadProps = {
+        name: 'file',
+        multiple: true,
+        fileList: [],
+        customRequest: async ({ file, onSuccess, onError }) => {
+            try {
+                // 模拟文件上传请求（这里使用了setTimeout来模拟异步请求）
+                getBase64(file as RcFile, (url) => {
+                    setUploadFile(url);
+                });
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        }
+    };
+
     const handleCreate = async () => {
         const res = await createText2Img({
+            conversationUid: conversationId,
+            scene: 'WEB_ADMIN',
+            appUid: 'BASE_GENERATE_IMAGE',
             imageRequest: {
                 prompt: inputValue,
-                width: select?.split('x')?.[0],
-                height: select?.split('x')?.[1],
+                width: width,
+                height: height,
                 samples,
-                style_preset: selectedStylePresetTags?.[0],
-                guidance_preset: selectedGuidancePresetTags?.[0],
-                sampler: selectedSamplerTags?.[0]
+                style_preset: currentStyle
             }
         });
-        setImgList([...res.messages, ...imgList] || []);
+        setIsFirst(false);
+        setImgList([res, ...imgList] || []);
     };
+    // @ts-ignore
     return (
         <Col className={menuVisible ? (size.width < 768 ? 'pcm_menu_m' : 'pcm_menu') : 'pcm_menu_hidden'}>
-            <div className={'overflow-y-auto overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)]'}>
+            <div
+                style={{ scrollbarGutter: 'stable' }}
+                className={
+                    'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] overflow-y-hidden hover:overflow-y-auto'
+                }
+            >
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>图片描述</span>
-                    <TextArea
-                        rows={6}
-                        style={{ width: '100%', marginTop: '5px', resize: 'none' }}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder={
-                            '在这里输入你对图片的描述，例如：大海边，蓝天白云，一座小房子，房子旁边有许多椰子树，或者，帅气的年轻男子，上身穿一件皮夹克，裤子是牛仔裤，站在纽约的时代广场，电影感，4K像素'
-                        }
-                    />
-                </Row>
-                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>尺寸选择</span>
-                    <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px' }}>
-                        {params?.imageSize.map((item, index: number) => (
-                            <div className={'w-1/3 mb-2'} key={index}>
-                                <span
-                                    onClick={() => setSelect(item.value)}
-                                    className={select === item.value ? 'pcm_tab_span_active' : 'pcm_tab_span'}
-                                >
-                                    {item.label}
-                                </span>
+                    <span className={'text-base font-medium'}>选择样式</span>
+                    <div
+                        style={{ scrollbarGutter: 'stable' }}
+                        className={'grid gap-4 grid-cols-3 w-full h-[375px] mt-3 overflow-y-hidden hover:overflow-y-auto'}
+                    >
+                        {params?.stylePreset.map((item, index) => (
+                            <div key={index} className="w-full">
+                                <img
+                                    src={item.image}
+                                    alt={item.label}
+                                    className={`w-[calc(100%-2px)] rounded cursor-pointer  ${
+                                        item.value === currentStyle ? 'border-solid border border-[#673ab7]' : ''
+                                    } hover:border-solid hover:border hover:border-[#673ab7] `}
+                                    onClick={() => setCurrentStyle(item.value)}
+                                />
+                                <span className="text-xs">{item.label}</span>
                             </div>
                         ))}
                     </div>
                 </Row>
-                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>生成张数</span>
-                    <div style={{ width: '100%', display: 'flex', marginTop: '5px' }}>
-                        <Slider
-                            color="secondary"
-                            defaultValue={4}
-                            valueLabelDisplay="on"
-                            aria-labelledby="discrete-slider-small-steps"
-                            marks
-                            step={1}
-                            min={1}
-                            max={8}
-                            onChange={(e, value, number) => setSamples(value as number)}
-                        />
+
+                <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
+                    <span className={'text-base font-medium'}>图片描述</span>
+                    <TextArea rows={6} className=" w-full mt-3" onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
+                    <CasinoIcon className="absolute right-[18px] top-[54px] cursor-pointer text-base hidden dice" onClick={onDice} />
+                    <div className="flex items-center mt-5 cursor-pointer" onClick={() => setShowVoidInputValue(!showVoidInputValue)}>
+                        <div className={'text-base font-medium'}>反向描述</div>
+                        {showVoidInputValue ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                     </div>
+                    {showVoidInputValue && (
+                        <TextArea
+                            rows={3}
+                            className=" w-full mt-3"
+                            onChange={(e) => setVoidInputValue(e.target.value)}
+                            value={voidInputValue}
+                            placeholder="你想避免什么"
+                        />
+                    )}
+                </Row>
+                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
+                    <span className={'text-base font-medium'}>尺寸选择</span>
+                    <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
+                        <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
+                            <Slider
+                                color="secondary"
+                                aria-label="Always visible"
+                                defaultValue={5}
+                                step={1}
+                                marks={marks}
+                                valueLabelDisplay="auto"
+                                min={1}
+                                max={9}
+                                valueLabelFormat={valueLabelFormat}
+                                onChange={(e, value, number) => {
+                                    const data = marks.find((v) => v?.value === value)?.data;
+                                    setWidth(Number(data?.split('x')[0]));
+                                    setHeight(Number(data?.split('x')[1]));
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
+                        <div className={'text-base font-medium mt-[15px] w-full'}>生成张数</div>
+                        <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
+                            <Slider
+                                color="secondary"
+                                defaultValue={4}
+                                valueLabelDisplay="auto"
+                                aria-labelledby="discrete-slider-small-steps"
+                                marks
+                                step={1}
+                                min={1}
+                                max={8}
+                                onChange={(e, value, number) => setSamples(value as number)}
+                            />
+                        </div>
+                    </div>
+                </Row>
+                <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
+                    <div className="flex items-center cursor-pointer justify-between">
+                        <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
+                            <span className={'text-base font-medium'}>图像</span>
+                            {showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                        </div>
+                        {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
+                    </div>
+                    {showImg && (
+                        <div className="mt-[15px]">
+                            {uploadFile ? (
+                                <div className="w-full justify-center flex flex-col items-center">
+                                    <Dragger {...props} className="w-full">
+                                        <div className="flex justify-center">
+                                            <div className="h-[140px] w-[140px] overflow-hidden">
+                                                <img
+                                                    className="upload_img h-[140px] object-cover aspect-square"
+                                                    src={uploadFile}
+                                                    alt={uploadFile}
+                                                    style={{
+                                                        filter: `blur(${imageStrength / 10}px)`
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Dragger>
+                                    <div
+                                        style={{
+                                            width: '92%',
+                                            display: 'flex',
+                                            marginTop: '5px',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <Slider
+                                            color="secondary"
+                                            defaultValue={45}
+                                            valueLabelDisplay="auto"
+                                            aria-labelledby="discrete-slider-small-steps"
+                                            step={1}
+                                            min={0}
+                                            max={100}
+                                            onChange={(e, value, number) => setImageStrength(value as number)}
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <Dragger {...props}>
+                                    <div>
+                                        <p className="ant-upload-drag-icon">
+                                            <InboxOutlined rev={undefined} />
+                                        </p>
+                                        <p className="ant-upload-text">Upload an image to create variations</p>
+                                    </div>
+                                </Dragger>
+                            )}
+                        </div>
+                    )}
                 </Row>
                 <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>
@@ -223,15 +391,58 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList, img
                         )}
                     </span>
                     {visible && (
-                        <div className={'px-1 mt-[5px]'}>
-                            <CollapseChildren
-                                selectedGuidancePresetTags={selectedGuidancePresetTags}
-                                setSelectedGuidancePresetTags={setSelectedGuidancePresetTags}
-                                params={params}
-                                setSelectedStylePresetTags={setSelectedStylePresetTags}
-                                selectedStylePresetTags={selectedStylePresetTags}
-                                setSamplerSelectedTags={setSamplerSelectedTags}
-                                selectedSamplerTags={selectedSamplerTags}
+                        <div className={'px-1 mt-[5px] grid grid-cols-2 gap-4'}>
+                            <TextField
+                                value={width}
+                                type={'number'}
+                                name="宽度"
+                                label="Width"
+                                fullWidth
+                                autoComplete="given-name"
+                                onChange={(e) => setWidth(e.target.value as unknown as number)}
+                            />
+                            <TextField
+                                value={height}
+                                type={'number'}
+                                name="高度"
+                                label="Height"
+                                fullWidth
+                                autoComplete="given-name"
+                                onChange={(e) => setHeight(e.target.value as unknown as number)}
+                            />
+                            <TextField
+                                type={'number'}
+                                name="高度"
+                                label="Prompt strength"
+                                fullWidth
+                                autoComplete="given-name"
+                                onChange={(e) => setStrength(e.target.value as unknown as number)}
+                            />
+                            <TextField
+                                defaultValue={50}
+                                type={'number'}
+                                name="高度"
+                                label="Generation steps"
+                                fullWidth
+                                autoComplete="given-name"
+                                onChange={(e) => setStep(e.target.value as unknown as number)}
+                            />
+                            <TextField
+                                type={'number'}
+                                name="高度"
+                                label="Seed"
+                                fullWidth
+                                autoComplete="given-name"
+                                onChange={(e) => setSeed(e.target.value as unknown as number)}
+                            />
+                            <Autocomplete
+                                className="col-span-2"
+                                // disablePortal
+                                options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
+                                defaultValue={'stable-diffusion-xl-beta-v2-2-2'}
+                                renderInput={(paramsData: any) => (
+                                    <TextField {...paramsData} label="Model" onChange={(e) => setSelectModel(e.target.value)} />
+                                )}
                             />
                         </div>
                     )}
@@ -251,24 +462,6 @@ export const PictureCreateMenu = ({ setMenuVisible, menuVisible, setImgList, img
                     生成
                 </Button>
             </Row>
-            {/*<div*/}
-            {/*    className="flex cursor-pointer h-24 w-5 items-center justify-end bg-white outline-none rotate-180 absolute z-10 top-1/2 -translate-y-1/2 transform -right-5"*/}
-            {/*    onClick={() => setMenuVisible(!menuVisible)}*/}
-            {/*></div>*/}
-            {/*<span className="panel-collapse-border-handle z-10 h-24 w-[21px] bg-neutral-200 absolute top-1/2 -translate-y-1/2 transform -right-5 rotate-180"></span>*/}
-            {/*{menuVisible ? (*/}
-            {/*    <LeftOutlined*/}
-            {/*        rev={undefined}*/}
-            {/*        className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"*/}
-            {/*        onClick={() => setMenuVisible(!menuVisible)}*/}
-            {/*    />*/}
-            {/*) : (*/}
-            {/*    <RightOutlined*/}
-            {/*        rev={undefined}*/}
-            {/*        className="cursor-pointer z-20 absolute top-1/2 -translate-y-1/2 transform -right-4"*/}
-            {/*        onClick={() => setMenuVisible(!menuVisible)}*/}
-            {/*    />*/}
-            {/*)}*/}
         </Col>
     );
 };

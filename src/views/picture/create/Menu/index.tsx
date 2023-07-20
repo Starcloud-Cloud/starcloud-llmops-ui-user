@@ -446,7 +446,7 @@ export const PictureCreateMenu = ({
                                 className="col-span-2"
                                 // disablePortal
                                 options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
-                                defaultValue={'stable-diffusion-xl-beta-v2-2-2'}
+                                defaultValue={selectModel}
                                 renderInput={(paramsData: any) => (
                                     <TextField {...paramsData} label="Model" onChange={(e) => setSelectModel(e.target.value)} />
                                 )}

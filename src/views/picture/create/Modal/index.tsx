@@ -1,13 +1,14 @@
 // material-ui
-import { Grid, IconButton, Modal } from '@mui/material';
+import { Divider, Grid, IconButton, Modal } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 
 // assets
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import CloseIcon from '@mui/icons-material/Close';
 import React from 'react';
+import { downloadFile } from 'utils/download';
 import { IImageListTypeChildImages } from '../index';
 
 export default function PicModal({
@@ -15,13 +16,21 @@ export default function PicModal({
     setOpen,
     currentIndex,
     setCurrentIndex,
-    currentImageList
+    currentImageList,
+    width,
+    height,
+    engine,
+    prompt
 }: {
     open: boolean;
     setOpen: (open: boolean) => void;
     currentIndex: number;
     setCurrentIndex: (currentIndex: number) => void;
     currentImageList: IImageListTypeChildImages[];
+    width: number;
+    height: number;
+    engine: string;
+    prompt: string;
 }) {
     // getModalStyle is not a pure function, we roll the style only on the first render
 
@@ -75,11 +84,11 @@ export default function PicModal({
                         </IconButton>
                     }
                 >
-                    <div className="w-full bg-[#f4f6f8] h-[90%]">
-                        <div className="h-full grid grid-cols-3 gap-1 p-4">
+                    <div className="w-full bg-[#f4f6f8] h-full">
+                        <div className="grid grid-cols-3 gap-1 p-4 max-h-[90%] min-h-[90%]">
                             <div className="h-full sm:col-span-2 group relative bg-white xs:col-span-3 flex justify-center">
                                 <img
-                                    className="w-full grow basis-0  duration-100 opacity-100 rounded"
+                                    className="xs:w-full h-full grow basis-0  duration-100 opacity-100 rounded sm:max-w-[670px]"
                                     src={currentImageList?.[currentIndex]?.url}
                                     alt={currentImageList?.[currentIndex]?.uuid}
                                 />
@@ -104,15 +113,31 @@ export default function PicModal({
                             <div className="h-full sm:col-span-1 p-4 bg-white xs:col-span-3">
                                 <div className="flex flex-col mt-3">
                                     <span className="text-base">prompt:</span>
-                                    <span>Vibrant street fair with colorful stalls and bustling crowds, lively, busy, high detail</span>
+                                    <span>{prompt}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
                                     <span className="text-base">Model:</span>
-                                    <span>sdfs</span>
+                                    <span>{engine}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
                                     <span className="text-base">Size:</span>
-                                    <span>512 × 512</span>
+                                    <span>
+                                        {width} x {height}
+                                    </span>
+                                </div>
+                                <Divider className="mt-3 mb-3" />
+                                <div
+                                    className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                    onClick={() =>
+                                        downloadFile(
+                                            currentImageList[currentIndex].url,
+                                            `${currentImageList[currentIndex].uuid}.${
+                                                currentImageList[currentIndex].media_type?.split('/')[1]
+                                            }`
+                                        )
+                                    }
+                                >
+                                    <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
                                 </div>
                             </div>
                         </div>

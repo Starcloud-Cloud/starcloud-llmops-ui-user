@@ -1,7 +1,6 @@
-import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { CloudDownloadOutlined } from '@ant-design/icons';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { Box, Button, Divider, IconButton } from '@mui/material';
+import { Box, Divider, IconButton } from '@mui/material';
 import { Space } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -15,21 +14,25 @@ export const PictureCreateContainer = ({
     imgList,
     setMenuVisible,
     width,
-    height,
-    samples
+    height
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
     setMenuVisible: (menuVisible: boolean) => void;
     width: number;
     height: number;
-    samples: number;
 }) => {
-    const [visible, setVisible] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [currentImageList, setCurrentImageList] = useState<IImageListTypeChildImages[]>([]);
     const [open, setOpen] = React.useState(false);
+    const [record, setRecord] = useState<{
+        height: number;
+        width: number;
+        engine: string;
+        prompt: string;
+    } | null>(null);
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -42,30 +45,10 @@ export const PictureCreateContainer = ({
         setHoveredIndex(undefined);
     };
 
-    const handlePrev = () => {
-        if (currentIndex === 0) {
-            return;
-        }
-        setCurrentIndex((pre) => pre - 1);
-    };
-
-    const btnDisable = React.useMemo(() => {
-        const obj = { preDis: false, nextDis: false };
-        if (currentIndex === 0) {
-            obj.preDis = true;
-        }
-        if (currentIndex === currentImageList.length - 1) {
-            obj.nextDis = true;
-        }
-        return obj;
-    }, [currentIndex, currentImageList.length]);
-
-    const handleNext = () => {
-        const length = currentImageList.length - 1;
-        if (currentIndex === length) {
-            return;
-        }
-        setCurrentIndex((pre) => pre + 1);
+    const batchHandle = (images: IImageListTypeChildImages[]) => {
+        images.forEach((img) => {
+            downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`);
+        });
     };
 
     return (
@@ -76,58 +59,65 @@ export const PictureCreateContainer = ({
                 </IconButton>
             </div>
             <div className="h-full overflow-y-hidden hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-                {!visible ? (
-                    <div>
-                        {imgList.map((item, index) => (
-                            <div key={index}>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex justify-between">
-                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
-                                            <span className="ml-1">{item.prompt}</span>
-                                        </div>
+                <div>
+                    {imgList.map((item, index) => (
+                        <div key={index}>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex justify-between">
+                                    <div className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
+                                        <span className="ml-1">{item.prompt}</span>
+                                    </div>
+                                    {!!item.createTime && (
                                         <Space>
                                             <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                <CloudDownloadOutlined
+                                                    rev={undefined}
+                                                    style={{ color: '#fff' }}
+                                                    onClick={() => batchHandle(item.images)}
+                                                />
                                             </div>
                                             {/*<div className="bg-slate-900 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">*/}
                                             {/*    <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />*/}
                                             {/*</div>*/}
                                         </Space>
-                                    </div>
-                                    <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                                        {item.images.map((img, imgIndex) =>
-                                            img.url === 'new_img' ? (
+                                    )}
+                                </div>
+                                <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                                    {item.images.map((img, imgIndex) =>
+                                        img.url === 'new_img' ? (
+                                            <div
+                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                key={imgIndex}
+                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                onMouseLeave={handleMouseLeave}
+                                                onClick={() => {
+                                                    setCurrentIndex(imgIndex);
+                                                }}
+                                            >
                                                 <div
-                                                    className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
-                                                    key={img.uuid}
-                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                    onMouseLeave={handleMouseLeave}
-                                                    onClick={() => setCurrentIndex(imgIndex)}
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
+                                                    style={{ aspectRatio: width / height }}
                                                 >
-                                                    <div
-                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
-                                                        style={{ aspectRatio: width / height }}
+                                                    <svg
+                                                        version="1.1"
+                                                        id="Layer_1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                        x="0px"
+                                                        y="0px"
+                                                        width="48px"
+                                                        height="48px"
+                                                        viewBox="0 0 48 48"
+                                                        enableBackground="new 0 0 48 48"
+                                                        xmlSpace="preserve"
                                                     >
-                                                        <svg
-                                                            version="1.1"
-                                                            id="Layer_1"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                            x="0px"
-                                                            y="0px"
-                                                            width="48px"
-                                                            height="48px"
-                                                            viewBox="0 0 48 48"
-                                                            enableBackground="new 0 0 48 48"
-                                                            xmlSpace="preserve"
-                                                        >
-                                                            <image
-                                                                id="image0"
-                                                                width="48"
-                                                                height="48"
-                                                                x="0"
-                                                                y="0"
-                                                                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                        <image
+                                                            id="image0"
+                                                            width="48"
+                                                            height="48"
+                                                            x="0"
+                                                            y="0"
+                                                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -282,110 +272,78 @@ export const PictureCreateContainer = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                            />
-                                                        </svg>
-                                                    </div>
+                                                        />
+                                                    </svg>
                                                 </div>
-                                            ) : (
-                                                <div
-                                                    className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
-                                                    key={img.uuid}
-                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                    onMouseLeave={handleMouseLeave}
-                                                    onClick={() => setCurrentIndex(imgIndex)}
-                                                >
-                                                    <img
-                                                        onClick={() => {
-                                                            handleOpen();
-                                                            setCurrentImageList(item.images);
-                                                        }}
-                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
-                                                        src={img.url}
-                                                        alt={img.uuid}
-                                                    />
-                                                    {hoveredIndex === img.uuid && (
-                                                        <Space className="absolute top-2 right-2">
-                                                            <div
-                                                                className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
-                                                                onClick={() => downloadFile(img.url, img.url)}
-                                                            >
-                                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                                                            </div>
-                                                        </Space>
-                                                    )}
-                                                </div>
-                                            )
-                                        )}
-                                    </div>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                key={img.uuid}
+                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                onMouseLeave={handleMouseLeave}
+                                                onClick={() => {
+                                                    setCurrentIndex(imgIndex);
+                                                    setRecord({
+                                                        height: item.height,
+                                                        width: item.width,
+                                                        prompt: item.prompt,
+                                                        engine: item.engine
+                                                    });
+                                                }}
+                                            >
+                                                <img
+                                                    onClick={() => {
+                                                        handleOpen();
+                                                        setCurrentImageList(item.images);
+                                                    }}
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
+                                                    src={img.url}
+                                                    alt={img.uuid}
+                                                />
+                                                {hoveredIndex === img.uuid && (
+                                                    <Space className="absolute top-2 right-2">
+                                                        <div
+                                                            className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                                            onClick={() =>
+                                                                downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
+                                                            }
+                                                        >
+                                                            <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                        </div>
+                                                    </Space>
+                                                )}
+                                            </div>
+                                        )
+                                    )}
                                 </div>
-                                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                                    <Divider sx={{ flexGrow: 1 }} />
-                                    <Box px={2}>
-                                        {item.createTime > 0 && (
-                                            <span className="text-base text-zinc-500">
-                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                            </span>
-                                        )}
-                                    </Box>
-                                    <Divider sx={{ flexGrow: 1 }} />
+                            </div>
+                            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                                <Divider sx={{ flexGrow: 1 }} />
+                                <Box px={2}>
+                                    {item.createTime > 0 && (
+                                        <span className="text-base text-zinc-500">
+                                            {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        </span>
+                                    )}
                                 </Box>
-                            </div>
-                        ))}
-                        <PicModal
-                            open={open}
-                            setOpen={setOpen}
-                            currentImageList={currentImageList}
-                            currentIndex={currentIndex}
-                            setCurrentIndex={setCurrentIndex}
-                        />
-                    </div>
-                ) : (
-                    <div className="h-full flex justify-center items-center relative">
-                        <div className={'absolute left-0 top-0'}>
-                            <Button
-                                className="ml-2"
-                                variant="contained"
-                                startIcon={<ArrowBackIosIcon />}
-                                color="secondary"
-                                onClick={() => setVisible(false)}
-                            >
-                                返回
-                            </Button>
+                                <Divider sx={{ flexGrow: 1 }} />
+                            </Box>
                         </div>
-                        <div className="absolute right-0 top-0 flex flex-col">
-                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </div>
-                        </div>
-                        <div className="flex justify-center items-center">
-                            <button
-                                className={`${
-                                    btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
-                                } flex-none w-10 h-10 flex justify-center items-center rounded-md  border-none`}
-                                onClick={() => handlePrev()}
-                                disabled={btnDisable.preDis}
-                            >
-                                <LeftOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </button>
-                            <div className="flex flex-col justify-center text-center">
-                                <div className="w-full cursor-pointer">
-                                    <img
-                                        className="rounded-md w-[70%]"
-                                        src={currentImageList[currentIndex].url}
-                                        alt={currentImageList[currentIndex].uuid}
-                                    />
-                                </div>
-                            </div>
-                            <button
-                                className={`${
-                                    btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
-                                } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none`}
-                                onClick={() => handleNext()}
-                            >
-                                <RightOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </button>
-                        </div>
-                    </div>
+                    ))}
+                </div>
+                {record && (
+                    <PicModal
+                        open={open}
+                        setOpen={setOpen}
+                        currentImageList={currentImageList}
+                        currentIndex={currentIndex}
+                        setCurrentIndex={setCurrentIndex}
+                        engine={record?.engine}
+                        prompt={record?.prompt}
+                        width={record?.width}
+                        height={record?.height}
+                    />
                 )}
             </div>
         </div>

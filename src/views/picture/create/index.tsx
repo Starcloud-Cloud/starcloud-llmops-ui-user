@@ -20,6 +20,9 @@ export type IImageListTypeChild = {
     prompt: string;
     createTime: number;
     images: IImageListTypeChildImages[];
+    engine: string;
+    width: number;
+    height: number;
 };
 
 const PictureCreate = () => {
@@ -125,11 +128,10 @@ const PictureCreate = () => {
                 </Drawer>
                 <PictureCreateContainer
                     menuVisible={menuVisible}
-                    imgList={images}
+                    imgList={images as any}
                     setMenuVisible={setMenuVisible}
                     width={width}
                     height={height}
-                    samples={samples}
                 />
             </Row>
         );
@@ -155,11 +157,10 @@ const PictureCreate = () => {
             />
             <PictureCreateContainer
                 menuVisible={menuVisible}
-                imgList={images}
+                imgList={images as any}
                 setMenuVisible={setMenuVisible}
                 width={width}
                 height={height}
-                samples={samples}
             />
         </Row>
     );

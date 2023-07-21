@@ -14,6 +14,7 @@ import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
+import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 import { removeFalseProperties } from 'utils/validate';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
@@ -184,9 +185,13 @@ export const PictureCreateMenu = ({
         label: string;
     }>({ id: 'stable-diffusion-xl-beta-v2-2-2', label: 'SDXL Beta' });
 
-    console.log(selectModel, 'selectModel');
-
     const size = useWindowSize();
+
+    useEffect(() => {
+        if (params?.stylePreset) {
+            setCurrentStyle(params?.stylePreset[0].value);
+        }
+    }, [params]);
 
     useEffect(() => {
         (async () => {
@@ -288,7 +293,7 @@ export const PictureCreateMenu = ({
                                     } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
                                     onClick={() => setCurrentStyle(item.value)}
                                 />
-                                <span className="text-xs">{item.label}</span>
+                                <span className="text-xs">{t(`textToImage.${item.label}`)}</span>
                             </div>
                         ))}
                     </div>
@@ -338,13 +343,13 @@ export const PictureCreateMenu = ({
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 className="opacity-muted-extra w-[28px] absolute left-0 top-0"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                             >
                                 <path
                                     d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
                                     stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
                                 ></path>
                                 <rect
                                     x="19"
@@ -353,7 +358,7 @@ export const PictureCreateMenu = ({
                                     height="8"
                                     transform="rotate(180 19 16)"
                                     stroke="currentColor"
-                                    stroke-linejoin="round"
+                                    strokeLinejoin="round"
                                 ></rect>
                                 <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
                                 <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>
@@ -364,13 +369,13 @@ export const PictureCreateMenu = ({
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 className="opacity-muted-extra w-[28px] absolute right-0 top-0 rotate-90"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                             >
                                 <path
                                     d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
                                     stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
                                 ></path>
                                 <rect
                                     x="19"
@@ -379,7 +384,7 @@ export const PictureCreateMenu = ({
                                     height="8"
                                     transform="rotate(180 19 16)"
                                     stroke="currentColor"
-                                    stroke-linejoin="round"
+                                    strokeLinejoin="round"
                                 ></rect>
                                 <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
                                 <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>

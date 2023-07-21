@@ -2,6 +2,7 @@ import { CloudDownloadOutlined } from '@ant-design/icons';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { Box, Divider, IconButton } from '@mui/material';
 import { Space } from 'antd';
+import imgLoading from 'assets/images/picture/loading.gif';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { downloadFile } from 'utils/download';
@@ -14,13 +15,15 @@ export const PictureCreateContainer = ({
     imgList,
     setMenuVisible,
     width,
-    height
+    height,
+    isFetch
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
     setMenuVisible: (menuVisible: boolean) => void;
     width: number;
     height: number;
+    isFetch: boolean;
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -98,26 +101,29 @@ export const PictureCreateContainer = ({
                                                     className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
                                                     style={{ aspectRatio: width / height }}
                                                 >
-                                                    <svg
-                                                        version="1.1"
-                                                        id="Layer_1"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                        x="0px"
-                                                        y="0px"
-                                                        width="48px"
-                                                        height="48px"
-                                                        viewBox="0 0 48 48"
-                                                        enableBackground="new 0 0 48 48"
-                                                        xmlSpace="preserve"
-                                                    >
-                                                        <image
-                                                            id="image0"
-                                                            width="48"
-                                                            height="48"
-                                                            x="0"
-                                                            y="0"
-                                                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                    {isFetch ? (
+                                                        <img width={60} src={imgLoading} alt="loading" />
+                                                    ) : (
+                                                        <svg
+                                                            version="1.1"
+                                                            id="Layer_1"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                            x="0px"
+                                                            y="0px"
+                                                            width="48px"
+                                                            height="48px"
+                                                            viewBox="0 0 48 48"
+                                                            enableBackground="new 0 0 48 48"
+                                                            xmlSpace="preserve"
+                                                        >
+                                                            <image
+                                                                id="image0"
+                                                                width="48"
+                                                                height="48"
+                                                                x="0"
+                                                                y="0"
+                                                                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -272,8 +278,9 @@ export const PictureCreateContainer = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                        />
-                                                    </svg>
+                                                            />
+                                                        </svg>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (

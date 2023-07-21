@@ -36,6 +36,7 @@ const PictureCreate = () => {
     const [inputValue, setInputValue] = useState('');
     const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
+    const [isFetch, setIsFetch] = useState(false);
 
     const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
     const { borderRadius } = useConfig();
@@ -59,32 +60,35 @@ const PictureCreate = () => {
 
     const images = useMemo(() => {
         if (isFirst) {
-            if (!imgList.length) {
-                return [
-                    {
-                        prompt: inputValue,
-                        createTime: 0,
-                        images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
-                        width,
-                        height
-                    }
-                ];
-            } else {
-                return [
-                    {
-                        prompt: inputValue,
-                        createTime: 0,
-                        images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
-                        width,
-                        height
-                    },
-                    ...imgList
-                ];
-            }
-        } else {
+            return [
+                {
+                    prompt: inputValue,
+                    createTime: 0,
+                    images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
+                    width,
+                    height,
+                    isFetch
+                },
+                ...imgList
+            ];
+        }
+        if (!isFirst && !isFetch) {
             return imgList;
         }
-    }, [height, imgList, inputValue, samples, width, isFirst]);
+        if (!isFirst && isFetch) {
+            return [
+                {
+                    prompt: inputValue,
+                    createTime: 0,
+                    images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
+                    width,
+                    height,
+                    isFetch
+                },
+                ...imgList
+            ];
+        }
+    }, [height, imgList, inputValue, samples, width, isFirst, isFetch]);
 
     if (size.width < 768) {
         return (
@@ -124,6 +128,7 @@ const PictureCreate = () => {
                         setInputValue={setInputValue}
                         conversationId={conversationId}
                         setIsFirst={setIsFirst}
+                        setIsFetch={setIsFetch}
                     />
                 </Drawer>
                 <PictureCreateContainer
@@ -132,6 +137,7 @@ const PictureCreate = () => {
                     setMenuVisible={setMenuVisible}
                     width={width}
                     height={height}
+                    isFetch={isFetch}
                 />
             </Row>
         );
@@ -154,6 +160,7 @@ const PictureCreate = () => {
                 setInputValue={setInputValue}
                 conversationId={conversationId}
                 setIsFirst={setIsFirst}
+                setIsFetch={setIsFetch}
             />
             <PictureCreateContainer
                 menuVisible={menuVisible}
@@ -161,6 +168,7 @@ const PictureCreate = () => {
                 setMenuVisible={setMenuVisible}
                 width={width}
                 height={height}
+                isFetch={isFetch}
             />
         </Row>
     );

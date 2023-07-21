@@ -90,6 +90,7 @@ type IPictureCreateMenuProps = {
     setInputValue: (inputValue: string) => void;
     conversationId: string;
     setIsFirst: (flag: boolean) => void;
+    setIsFetch: (flag: boolean) => void;
 };
 
 export type IParamsType = {
@@ -162,7 +163,8 @@ export const PictureCreateMenu = ({
     inputValue,
     setInputValue,
     conversationId,
-    setIsFirst
+    setIsFirst,
+    setIsFetch
 }: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
@@ -221,6 +223,7 @@ export const PictureCreateMenu = ({
     };
 
     const handleCreate = async () => {
+        setIsFetch(true);
         const imageRequest = {
             prompt: inputValue,
             width: width,
@@ -242,6 +245,7 @@ export const PictureCreateMenu = ({
             appUid: 'BASE_GENERATE_IMAGE',
             imageRequest: removeFalseProperties(imageRequest)
         });
+        setIsFetch(false);
         setIsFirst(false);
         setImgList([res, ...imgList] || []);
     };

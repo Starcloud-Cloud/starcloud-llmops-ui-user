@@ -25,7 +25,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import fun from 'assets/images/category/fun.svg';
 import Add from '@mui/icons-material/Add';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
 import SouthIcon from '@mui/icons-material/South';
@@ -149,12 +148,14 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     };
     const [expanded, setExpanded] = useState<(boolean | null | undefined)[]>([]);
     const expandChange = (index: number) => {
-        boxRef.current[index].allValida();
+        boxRef.current[index]?.allValida();
         let newValue = [...expanded];
         newValue = newValue.map((item: boolean | null | undefined) => false);
         newValue[index] = true;
         setExpanded(newValue);
     };
+    //判断步骤名称是否重复
+    const [errIpt, setErrIpt] = useState<(null | undefined | boolean)[]>([]);
     //步骤名称是显示还是编辑状态
     const [editStatus, setEditStatus] = useState<(boolean | null | undefined)[]>([]);
     //步骤描述是显示还是编辑状态
@@ -185,7 +186,6 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     const addClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
         const newVal = [...addAnchorEl];
         newVal[index] = event.currentTarget;
-
         setAddAnchorEl(newVal);
     };
     const addClose = (index: number) => {
@@ -193,19 +193,31 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         newVal[index] = null;
         setAddAnchorEl(newVal);
     };
+    const stepEtch = (index: number, name: string, steps: any, newStep: any, i: number) => {
+        if (steps.some((item: { name: string }) => item.name === name + index)) {
+            stepEtch(index + 1, name, steps, newStep, i);
+        } else {
+            const Name = { ...newStep };
+            Name.name = Name.name + index;
+            Name.field = Name.field + index;
+            const newValue = { ...config };
+            newValue.steps.splice(i + 1, 0, Name);
+            changeConfigs(newValue);
+            let newVal = [...expanded];
+            newVal = newVal.map(() => false);
+            newVal[i + 1] = true;
+            setExpanded(newVal);
+        }
+    };
     const addStep = (step: any, index: number) => {
-        const newValue = { ...config };
-        newValue.steps.splice(index, 0, step);
-        changeConfigs(newValue);
-        let newVal = [...expanded];
-        newVal = newVal.map(() => false);
-        newVal[index + 1] = true;
-        setExpanded(newVal);
+        const newStep = { ...step };
+        stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
     const [borderLeft, setBorder] = useState<any[]>([]);
     const boxRef = useRef<any>([]);
+    const timeoutRef = useRef<any>();
     useEffect(() => {
-        setBorder(boxRef.current.map((item: any) => (item.allValidas ? '5px solid #ff6376' : 'none')));
+        setBorder(boxRef.current.map((item: any) => (item?.allValidas ? '5px solid #ff6376' : 'none')));
     }, []);
 
     return (
@@ -219,7 +231,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         </Box>
                     )}
                     <SubCard
-                        sx={{ position: 'relative', overflow: 'visible' }}
+                        sx={{ overflow: 'visible' }}
                         contentSX={{
                             padding: '0 !important',
                             height: '100%',
@@ -229,7 +241,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         <Box
                             sx={{
                                 borderRadius: '4px',
-                                overflow: 'hidden',
+                                overflow: 'visible',
                                 borderLeft: boxRef.current[index]
                                     ? !expanded[index] && boxRef.current[index]?.allValidas
                                         ? '5px solid #ff6376'
@@ -241,7 +253,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             justifyContent="space-between"
                             alignItems="center"
                         >
-                            <Box display="flex" alignItems="center" flexWrap="wrap">
+                            <Box display="flex" alignItems="center" flexWrap="wrap" overflow="visible">
                                 <Box
                                     width="3.125rem"
                                     height="3.125rem"
@@ -252,9 +264,13 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     borderRadius="6px"
                                     margin="0 8px"
                                 >
-                                    <img style={{ width: '2.5rem', height: '2.5rem' }} src={fun} alt="svg" />
+                                    <img
+                                        style={{ width: '2.5rem', height: '2.5rem' }}
+                                        src={require('../../../../../assets/images/carryOut/' + item.flowStep.icon + '.svg')}
+                                        alt="svg"
+                                    />
                                 </Box>
-                                <Box display="flex" alignItems="end">
+                                <Box display="flex" alignItems="center">
                                     <Typography variant="h4">
                                         {t('market.steps')}
                                         {index + 1}：
@@ -272,11 +288,36 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                         <Box sx={{ width: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}>
                                             <TextField
                                                 onBlur={() => {
-                                                    const newValue = { ...editStatus };
-                                                    newValue[index] = false;
-                                                    setEditStatus(newValue);
+                                                    const newVal = [...errIpt];
+                                                    if (
+                                                        config?.steps.every((value: { name: string }, i: number) => {
+                                                            if (index === i) {
+                                                                return true;
+                                                            } else {
+                                                                return value.name !== item.name;
+                                                            }
+                                                        })
+                                                    ) {
+                                                        newVal[index] = false;
+                                                        setErrIpt(newVal);
+                                                        const newValue = { ...editStatus };
+                                                        newValue[index] = false;
+                                                        setEditStatus(newValue);
+                                                    } else {
+                                                        newVal[index] = true;
+                                                        setErrIpt(newVal);
+                                                    }
                                                 }}
-                                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
+                                                error={errIpt[index] ? true : false}
+                                                onChange={(e) => {
+                                                    console.log(e.target.value);
+                                                    const { name, value }: { name: string; value: string } = e.target;
+                                                    clearTimeout(timeoutRef.current);
+                                                    timeoutRef.current = setTimeout(() => {
+                                                        editChange({ num: index, label: name, value: value, flag: true });
+                                                    }, 20);
+                                                }}
+                                                helperText={errIpt[index] ? '步骤名称不能重复' : ' '}
                                                 name="name"
                                                 fullWidth
                                                 autoFocus
@@ -299,37 +340,41 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                     <BorderColorIcon fontSize="small" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip placement="top" title={item.description ? item.description : t('market.addDesc')}>
-                                                <IconButton
-                                                    onClick={() => {
-                                                        const newValue = { ...editStatus };
-                                                        newValue[index] = true;
-                                                        setDescStatus(newValue);
-                                                    }}
-                                                    size="small"
-                                                >
-                                                    <ChatBubbleIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
+                                            <Box display="inline-block" position="relative">
+                                                <Tooltip placement="top" title={item.description ? item.description : t('market.addDesc')}>
+                                                    <IconButton
+                                                        onClick={() => {
+                                                            const newValue = { ...editStatus };
+                                                            newValue[index] = true;
+                                                            setDescStatus(newValue);
+                                                        }}
+                                                        size="small"
+                                                    >
+                                                        <ChatBubbleIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                {descStatus[index] && (
+                                                    <Box position="absolute" bottom="-120px" right="-200px" zIndex={10} width="380px">
+                                                        <TextField
+                                                            onBlur={() => {
+                                                                const newValue = { ...editStatus };
+                                                                newValue[index] = false;
+                                                                setDescStatus(newValue);
+                                                            }}
+                                                            onChange={(e) =>
+                                                                editChange({ num: index, label: e.target.name, value: e.target.value })
+                                                            }
+                                                            autoFocus
+                                                            name="description"
+                                                            fullWidth
+                                                            value={item.description}
+                                                            multiline
+                                                            minRows={4}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Box>
                                         </>
-                                    )}
-                                    {descStatus[index] && (
-                                        <Box position="absolute" top="70px" right="10px" zIndex={9999} width="380px">
-                                            <TextField
-                                                onBlur={() => {
-                                                    const newValue = { ...editStatus };
-                                                    newValue[index] = false;
-                                                    setDescStatus(newValue);
-                                                }}
-                                                onChange={(e) => editChange({ num: index, label: e.target.name, value: e.target.value })}
-                                                autoFocus
-                                                name="description"
-                                                fullWidth
-                                                value={item.description}
-                                                multiline
-                                                minRows={4}
-                                            />
-                                        </Box>
                                     )}
                                 </Box>
                             </Box>

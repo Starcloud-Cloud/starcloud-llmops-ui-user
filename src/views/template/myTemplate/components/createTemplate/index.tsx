@@ -59,7 +59,7 @@ function CreateDetail() {
         }
         const fetchData = async () => {
             let resp: any = await executeApp({
-                appUid: searchParams.get('uid'),
+                appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
                 stepId: stepId,
                 appReqVO: detail
             });
@@ -192,15 +192,20 @@ function CreateDetail() {
         setPerform(perform + 1);
     };
     //设置提示词编排步骤的name desc
-    const editChange = ({ num, label, value }: { num: number; label: string; value: string }) => {
+    const editChange = ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
         const oldvalue = { ...detail };
+        if (flag) {
+            oldvalue.workflowConfig.steps[num].field = value;
+        }
+        console.log(value);
+
         oldvalue.workflowConfig.steps[num][label] = value;
         setDetail(oldvalue);
     };
     //提示词更改
     const basisChange = ({ e, index, i }: any) => {
         const oldValue = { ...detail };
-        oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
+        oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
         setDetail(oldValue);
         setPerform(perform + 1);
     };
@@ -279,6 +284,7 @@ function CreateDetail() {
             <Tabs
                 sx={{
                     m: 3,
+                    mb: 0,
                     '& a': {
                         minHeight: 'auto',
                         minWidth: 10,
@@ -305,12 +311,12 @@ function CreateDetail() {
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
-                    <Grid item lg={7}>
+                    <Grid item lg={6}>
                         {detail && (
                             <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
                         )}
                     </Grid>
-                    <Grid item lg={5}>
+                    <Grid item lg={6}>
                         <Typography variant="h3">{t('market.debug')}</Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Perform
@@ -331,7 +337,7 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <Grid container spacing={2}>
-                    <Grid item lg={7} sx={{ width: '100%' }}>
+                    <Grid item lg={6} sx={{ width: '100%' }}>
                         <Arrange
                             config={detail?.workflowConfig}
                             editChange={editChange}
@@ -340,7 +346,7 @@ function CreateDetail() {
                             changeConfigs={changeConfigs}
                         />
                     </Grid>
-                    <Grid item lg={5}>
+                    <Grid item lg={6}>
                         <Typography variant="h3">调试与预览</Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Perform

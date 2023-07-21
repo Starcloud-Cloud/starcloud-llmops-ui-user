@@ -299,9 +299,14 @@ export const PictureCreateMenu = ({
 
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
                     <div className={'text-base font-medium flex items-center justify-between w-full'}>
-                        <div className="flex items-center justify-between">创意描述</div>
+                        <div className="flex items-center justify-between">
+                            创意描述
+                            <span className="text-slate-500 text-xs">(暂只支持英文)</span>
+                        </div>
                         <div>
-                            <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
+                            <MuiTooltip title="随机生成描述示例" arrow placement="top">
+                                <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
+                            </MuiTooltip>
                         </div>
                     </div>
                     <TextArea
@@ -432,7 +437,7 @@ export const PictureCreateMenu = ({
                                     }
                                 }}
                                 color="secondary"
-                                defaultValue={4}
+                                defaultValue={samples}
                                 valueLabelDisplay="auto"
                                 aria-labelledby="discrete-slider-small-steps"
                                 marks

@@ -119,7 +119,7 @@ export const PictureCreateContainer = ({
                                                 }}
                                             >
                                                 <div
-                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center border-solid border-2 border-[#673ab7]"
                                                     style={{ aspectRatio: width / height }}
                                                 >
                                                     {isFetch ? (
@@ -306,7 +306,8 @@ export const PictureCreateContainer = ({
                                             </div>
                                         ) : (
                                             <div
-                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center"
+                                                style={{ aspectRatio: width / height }}
                                                 key={img.uuid}
                                                 onMouseEnter={() => handleMouseEnter(img.uuid)}
                                                 onMouseLeave={handleMouseLeave}

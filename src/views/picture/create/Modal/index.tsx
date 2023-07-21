@@ -1,13 +1,15 @@
 // material-ui
-import { Grid, IconButton, Modal } from '@mui/material';
+import { Divider, Grid, IconButton, Modal } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 
 // assets
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import CloseIcon from '@mui/icons-material/Close';
+import MuiTooltip from '@mui/material/Tooltip';
 import React from 'react';
+import { downloadFile } from 'utils/download';
 import { IImageListTypeChildImages } from '../index';
 
 export default function PicModal({
@@ -15,13 +17,21 @@ export default function PicModal({
     setOpen,
     currentIndex,
     setCurrentIndex,
-    currentImageList
+    currentImageList,
+    width,
+    height,
+    engine,
+    prompt
 }: {
     open: boolean;
     setOpen: (open: boolean) => void;
     currentIndex: number;
     setCurrentIndex: (currentIndex: number) => void;
     currentImageList: IImageListTypeChildImages[];
+    width: number;
+    height: number;
+    engine: string;
+    prompt: string;
 }) {
     // getModalStyle is not a pure function, we roll the style only on the first render
 
@@ -75,17 +85,24 @@ export default function PicModal({
                         </IconButton>
                     }
                 >
-                    <div className="w-full bg-[#f4f6f8] h-[90%]">
-                        <div className="h-full grid grid-cols-3 gap-1 p-4">
+                    <div className="w-full bg-[#f4f6f8] h-full">
+                        <div className="grid grid-cols-3 gap-1 p-4 max-h-[90%] min-h-[90%] overflow-auto">
                             <div className="h-full sm:col-span-2 group relative bg-white xs:col-span-3 flex justify-center">
-                                <img
-                                    className="w-full grow basis-0  duration-100 opacity-100 rounded"
-                                    src={currentImageList?.[currentIndex]?.url}
-                                    alt={currentImageList?.[currentIndex]?.uuid}
-                                />
+                                <div className="h-full sm:max-w-[500px] flex flex-col w-full justify-around">
+                                    <img
+                                        className="xs:w-full duration-100 rounded  object-contain"
+                                        src={currentImageList?.[currentIndex]?.url}
+                                        alt={currentImageList?.[currentIndex]?.uuid}
+                                    />
+                                    <div className="flex overflow-auto justify-center w-full mt-2">
+                                        {currentImageList.map((item) => (
+                                            <img className="w-[100px] rounded mx-2" src={item.url} alt={item.uuid} />
+                                        ))}
+                                    </div>
+                                </div>
                                 <button
                                     className={`${
-                                        btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
+                                        btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/80 cursor-pointer'
                                     } flex-none w-10 h-10 flex justify-center items-center rounded-md  border-none absolute left-0 top-[48%]`}
                                     onClick={() => handlePrev()}
                                     disabled={btnDisable.preDis}
@@ -94,7 +111,7 @@ export default function PicModal({
                                 </button>
                                 <button
                                     className={`${
-                                        btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
+                                        btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/80 cursor-pointer'
                                     } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none absolute right-0 top-[48%]`}
                                     onClick={() => handleNext()}
                                 >
@@ -103,16 +120,34 @@ export default function PicModal({
                             </div>
                             <div className="h-full sm:col-span-1 p-4 bg-white xs:col-span-3">
                                 <div className="flex flex-col mt-3">
-                                    <span className="text-base">prompt:</span>
-                                    <span>Vibrant street fair with colorful stalls and bustling crowds, lively, busy, high detail</span>
+                                    <span className="text-lg font-medium">描述:</span>
+                                    <span className="text-base">{prompt}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
-                                    <span className="text-base">Model:</span>
-                                    <span>sdfs</span>
+                                    <span className="text-lg font-medium">模型:</span>
+                                    <span className="text-base">{engine}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
-                                    <span className="text-base">Size:</span>
-                                    <span>512 × 512</span>
+                                    <span className="text-lg font-medium">尺寸:</span>
+                                    <span className="text-base">
+                                        {width} x {height}
+                                    </span>
+                                </div>
+                                <Divider className="mt-3 mb-3" />
+                                <div
+                                    className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                    onClick={() =>
+                                        downloadFile(
+                                            currentImageList[currentIndex].url,
+                                            `${currentImageList[currentIndex].uuid}.${
+                                                currentImageList[currentIndex].media_type?.split('/')[1]
+                                            }`
+                                        )
+                                    }
+                                >
+                                    <MuiTooltip title="下载" arrow placement="top">
+                                        <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    </MuiTooltip>
                                 </div>
                             </div>
                         </div>

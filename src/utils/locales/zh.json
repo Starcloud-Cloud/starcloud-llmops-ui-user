@@ -572,8 +572,7 @@
     "addDesc": "点击添加描述",
     "desc": "编辑",
     "delete": "删除",
-    "model": "模型变量",
-    "prompt": "提示词"
+    "model": "模型变量"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -788,5 +787,23 @@
     "cancel": "取消",
     "confirm": "确认",
     "addOption": "新增选项"
+  },
+  "textToImage": {
+    "Enhance": "增强",
+    "Anime": "动漫",
+    "Photographic": "摄影",
+    "Digital Art": "数字艺术",
+    "Comic Book": "漫画风",
+    "Fantasy Art": "奇幻艺术",
+    "Analog Film": "胶片风",
+    "Neon Punk": "霓虹朋克",
+    "Isometric": "等轴投影",
+    "Low Poly": "低多边形",
+    "Origami": "折纸",
+    "Line Art": "线条艺术",
+    "Craft clay": "手工泥塑",
+    "Cinematic": "电影风",
+    "Model 3D": "三维模型",
+    "Pixel Art": "像素艺术"
   }
 }

@@ -1,8 +1,10 @@
-import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { CloudDownloadOutlined } from '@ant-design/icons';
+import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { Box, Button, Divider, IconButton } from '@mui/material';
-import { Space } from 'antd';
+import { IconButton } from '@mui/material';
+import MuiTooltip from '@mui/material/Tooltip';
+import { Divider, Space } from 'antd';
+import imgLoading from 'assets/images/picture/loading.gif';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { downloadFile } from 'utils/download';
@@ -16,20 +18,28 @@ export const PictureCreateContainer = ({
     setMenuVisible,
     width,
     height,
-    samples
+    isFetch,
+    setInputValue
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
     setMenuVisible: (menuVisible: boolean) => void;
     width: number;
     height: number;
-    samples: number;
+    isFetch: boolean;
+    setInputValue: (value: string) => void;
 }) => {
-    const [visible, setVisible] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [currentImageList, setCurrentImageList] = useState<IImageListTypeChildImages[]>([]);
     const [open, setOpen] = React.useState(false);
+    const [record, setRecord] = useState<{
+        height: number;
+        width: number;
+        engine: string;
+        prompt: string;
+    } | null>(null);
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -42,30 +52,10 @@ export const PictureCreateContainer = ({
         setHoveredIndex(undefined);
     };
 
-    const handlePrev = () => {
-        if (currentIndex === 0) {
-            return;
-        }
-        setCurrentIndex((pre) => pre - 1);
-    };
-
-    const btnDisable = React.useMemo(() => {
-        const obj = { preDis: false, nextDis: false };
-        if (currentIndex === 0) {
-            obj.preDis = true;
-        }
-        if (currentIndex === currentImageList.length - 1) {
-            obj.nextDis = true;
-        }
-        return obj;
-    }, [currentIndex, currentImageList.length]);
-
-    const handleNext = () => {
-        const length = currentImageList.length - 1;
-        if (currentIndex === length) {
-            return;
-        }
-        setCurrentIndex((pre) => pre + 1);
+    const batchHandle = (images: IImageListTypeChildImages[]) => {
+        images.forEach((img) => {
+            downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`);
+        });
     };
 
     return (
@@ -75,39 +65,66 @@ export const PictureCreateContainer = ({
                     <MenuRoundedIcon />
                 </IconButton>
             </div>
-            <div className="h-full overflow-y-hidden hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-                {!visible ? (
-                    <div>
-                        {imgList.map((item, index) => (
-                            <div key={index}>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex justify-between">
-                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
+            <div className="h-full xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+                <div>
+                    {imgList.map((item, index) => (
+                        <div key={index}>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex justify-between w-full">
+                                    <div className="flex items-center w-4/5">
+                                        {!item.create && (
+                                            <div className="text-base text-zinc-500" style={{ flex: '0 0 160px' }}>
+                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            </div>
+                                        )}
+                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium">
                                             <span className="ml-1">{item.prompt}</span>
                                         </div>
-                                        <Space>
+                                        {!item.create && (
+                                            <MuiTooltip title="再次使用描述" arrow placement="top">
+                                                <ArrowCircleLeftOutlinedIcon
+                                                    className="cursor-pointer"
+                                                    onClick={() => setInputValue(item.prompt)}
+                                                />
+                                            </MuiTooltip>
+                                        )}
+                                    </div>
+                                    {!item.create && (
+                                        <Space className="w-1/5 flex justify-end">
                                             <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                <MuiTooltip title="下载" arrow placement="top">
+                                                    <CloudDownloadOutlined
+                                                        rev={undefined}
+                                                        style={{ color: '#fff' }}
+                                                        onClick={() => batchHandle(item.images)}
+                                                    />
+                                                </MuiTooltip>
                                             </div>
                                             {/*<div className="bg-slate-900 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">*/}
                                             {/*    <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />*/}
                                             {/*</div>*/}
                                         </Space>
-                                    </div>
-                                    <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                                        {item.images.map((img, imgIndex) =>
-                                            img.url === 'new_img' ? (
+                                    )}
+                                </div>
+                                <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                                    {item.images.map((img, imgIndex) =>
+                                        img.url === 'new_img' ? (
+                                            <div
+                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                key={imgIndex}
+                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                onMouseLeave={handleMouseLeave}
+                                                onClick={() => {
+                                                    setCurrentIndex(imgIndex);
+                                                }}
+                                            >
                                                 <div
-                                                    className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
-                                                    key={img.uuid}
-                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                    onMouseLeave={handleMouseLeave}
-                                                    onClick={() => setCurrentIndex(imgIndex)}
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
+                                                    style={{ aspectRatio: width / height }}
                                                 >
-                                                    <div
-                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-black flex justify-center items-center border-solid border-2 border-[#673ab7]"
-                                                        style={{ aspectRatio: width / height }}
-                                                    >
+                                                    {isFetch ? (
+                                                        <img width={60} src={imgLoading} alt="loading" />
+                                                    ) : (
                                                         <svg
                                                             version="1.1"
                                                             id="Layer_1"
@@ -284,108 +301,69 @@ export const PictureCreateContainer = ({
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
                                                             />
                                                         </svg>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
-                                                    key={img.uuid}
-                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                    onMouseLeave={handleMouseLeave}
-                                                    onClick={() => setCurrentIndex(imgIndex)}
-                                                >
-                                                    <img
-                                                        onClick={() => {
-                                                            handleOpen();
-                                                            setCurrentImageList(item.images);
-                                                        }}
-                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
-                                                        src={img.url}
-                                                        alt={img.uuid}
-                                                    />
-                                                    {hoveredIndex === img.uuid && (
-                                                        <Space className="absolute top-2 right-2">
-                                                            <div
-                                                                className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
-                                                                onClick={() => downloadFile(img.url, img.url)}
-                                                            >
-                                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                                                            </div>
-                                                        </Space>
                                                     )}
                                                 </div>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-                                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                                    <Divider sx={{ flexGrow: 1 }} />
-                                    <Box px={2}>
-                                        {item.createTime > 0 && (
-                                            <span className="text-base text-zinc-500">
-                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                            </span>
-                                        )}
-                                    </Box>
-                                    <Divider sx={{ flexGrow: 1 }} />
-                                </Box>
-                            </div>
-                        ))}
-                        <PicModal
-                            open={open}
-                            setOpen={setOpen}
-                            currentImageList={currentImageList}
-                            currentIndex={currentIndex}
-                            setCurrentIndex={setCurrentIndex}
-                        />
-                    </div>
-                ) : (
-                    <div className="h-full flex justify-center items-center relative">
-                        <div className={'absolute left-0 top-0'}>
-                            <Button
-                                className="ml-2"
-                                variant="contained"
-                                startIcon={<ArrowBackIosIcon />}
-                                color="secondary"
-                                onClick={() => setVisible(false)}
-                            >
-                                返回
-                            </Button>
-                        </div>
-                        <div className="absolute right-0 top-0 flex flex-col">
-                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </div>
-                        </div>
-                        <div className="flex justify-center items-center">
-                            <button
-                                className={`${
-                                    btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
-                                } flex-none w-10 h-10 flex justify-center items-center rounded-md  border-none`}
-                                onClick={() => handlePrev()}
-                                disabled={btnDisable.preDis}
-                            >
-                                <LeftOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </button>
-                            <div className="flex flex-col justify-center text-center">
-                                <div className="w-full cursor-pointer">
-                                    <img
-                                        className="rounded-md w-[70%]"
-                                        src={currentImageList[currentIndex].url}
-                                        alt={currentImageList[currentIndex].uuid}
-                                    />
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                key={img.uuid}
+                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                onMouseLeave={handleMouseLeave}
+                                                onClick={() => {
+                                                    setCurrentIndex(imgIndex);
+                                                    setRecord({
+                                                        height: item.height,
+                                                        width: item.width,
+                                                        prompt: item.prompt,
+                                                        engine: item.engine
+                                                    });
+                                                }}
+                                            >
+                                                <img
+                                                    onClick={() => {
+                                                        handleOpen();
+                                                        setCurrentImageList(item.images);
+                                                    }}
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
+                                                    src={img.url}
+                                                    alt={img.uuid}
+                                                />
+                                                {hoveredIndex === img.uuid && (
+                                                    <Space className="absolute top-2 right-2">
+                                                        <div
+                                                            className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                                            onClick={() =>
+                                                                downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
+                                                            }
+                                                        >
+                                                            <MuiTooltip title="下载" arrow placement="top">
+                                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                            </MuiTooltip>
+                                                        </div>
+                                                    </Space>
+                                                )}
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             </div>
-                            <button
-                                className={`${
-                                    btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
-                                } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none`}
-                                onClick={() => handleNext()}
-                            >
-                                <RightOutlined rev={undefined} style={{ color: '#fff' }} />
-                            </button>
+                            <Divider type="horizontal" />
                         </div>
-                    </div>
+                    ))}
+                </div>
+                {record && (
+                    <PicModal
+                        open={open}
+                        setOpen={setOpen}
+                        currentImageList={currentImageList}
+                        currentIndex={currentIndex}
+                        setCurrentIndex={setCurrentIndex}
+                        engine={record?.engine}
+                        prompt={record?.prompt}
+                        width={record?.width}
+                        height={record?.height}
+                    />
                 )}
             </div>
         </div>

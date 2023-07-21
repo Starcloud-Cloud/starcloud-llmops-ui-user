@@ -9,6 +9,7 @@ import { appDrawerWidth as drawerWidth } from '../../../store/constant';
 import { PictureCreateContainer } from './Container';
 import { PictureCreateMenu } from './Menu';
 
+import dayjs from 'dayjs';
 import { useDispatch } from 'store';
 export type IImageListType = IImageListTypeChild[];
 export type IImageListTypeChildImages = {
@@ -20,6 +21,10 @@ export type IImageListTypeChild = {
     prompt: string;
     createTime: number;
     images: IImageListTypeChildImages[];
+    engine: string;
+    width: number;
+    height: number;
+    create: boolean;
 };
 
 const PictureCreate = () => {
@@ -29,10 +34,11 @@ const PictureCreate = () => {
     const [imgList, setImgList] = useState<IImageListType>([]);
     const [width, setWidth] = useState(512);
     const [height, setHeight] = useState(512);
-    const [samples, setSamples] = useState(4);
+    const [samples, setSamples] = useState(2);
     const [inputValue, setInputValue] = useState('');
     const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
+    const [isFetch, setIsFetch] = useState(false);
 
     const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
     const { borderRadius } = useConfig();
@@ -48,40 +54,43 @@ const PictureCreate = () => {
         (async () => {
             const res = await getImgList();
             setConversationId(res.conversationUid);
-            setTimeout(() => {
-                setImgList(res.messages);
-            }, 2000);
+            setImgList(res.messages);
         })();
     }, []);
 
     const images = useMemo(() => {
         if (isFirst) {
-            if (!imgList.length) {
-                return [
-                    {
-                        prompt: inputValue,
-                        createTime: 0,
-                        images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
-                        width,
-                        height
-                    }
-                ];
-            } else {
-                return [
-                    {
-                        prompt: inputValue,
-                        createTime: 0,
-                        images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
-                        width,
-                        height
-                    },
-                    ...imgList
-                ];
-            }
-        } else {
+            return [
+                {
+                    prompt: inputValue,
+                    createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                    images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
+                    width,
+                    height,
+                    isFetch,
+                    create: true
+                },
+                ...imgList
+            ];
+        }
+        if (!isFirst && !isFetch) {
             return imgList;
         }
-    }, [height, imgList, inputValue, samples, width, isFirst]);
+        if (!isFirst && isFetch) {
+            return [
+                {
+                    prompt: inputValue,
+                    createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                    images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
+                    width,
+                    height,
+                    isFetch,
+                    create: true
+                },
+                ...imgList
+            ];
+        }
+    }, [height, imgList, inputValue, samples, width, isFirst, isFetch]);
 
     if (size.width < 768) {
         return (
@@ -121,15 +130,17 @@ const PictureCreate = () => {
                         setInputValue={setInputValue}
                         conversationId={conversationId}
                         setIsFirst={setIsFirst}
+                        setIsFetch={setIsFetch}
                     />
                 </Drawer>
                 <PictureCreateContainer
                     menuVisible={menuVisible}
-                    imgList={images}
+                    imgList={images as any}
                     setMenuVisible={setMenuVisible}
                     width={width}
                     height={height}
-                    samples={samples}
+                    isFetch={isFetch}
+                    setInputValue={setInputValue}
                 />
             </Row>
         );
@@ -152,14 +163,16 @@ const PictureCreate = () => {
                 setInputValue={setInputValue}
                 conversationId={conversationId}
                 setIsFirst={setIsFirst}
+                setIsFetch={setIsFetch}
             />
             <PictureCreateContainer
                 menuVisible={menuVisible}
-                imgList={images}
+                imgList={images as any}
                 setMenuVisible={setMenuVisible}
                 width={width}
                 height={height}
-                samples={samples}
+                isFetch={isFetch}
+                setInputValue={setInputValue}
             />
         </Row>
     );

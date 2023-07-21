@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Col, Input, Row } from 'antd';
 
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
@@ -9,10 +9,14 @@ import { InboxOutlined } from '@ant-design/icons';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
+import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
+import { removeFalseProperties } from 'utils/validate';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { IImageListType } from '../index';
@@ -89,6 +93,7 @@ type IPictureCreateMenuProps = {
     setInputValue: (inputValue: string) => void;
     conversationId: string;
     setIsFirst: (flag: boolean) => void;
+    setIsFetch: (flag: boolean) => void;
 };
 
 export type IParamsType = {
@@ -161,7 +166,8 @@ export const PictureCreateMenu = ({
     inputValue,
     setInputValue,
     conversationId,
-    setIsFirst
+    setIsFirst,
+    setIsFetch
 }: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
@@ -174,9 +180,15 @@ export const PictureCreateMenu = ({
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
     const [imageStrength, setImageStrength] = useState(45);
-    const [selectModel, setSelectModel] = useState('stable-diffusion-xl-beta-v2-2-2');
+    const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
 
     const size = useWindowSize();
+
+    useEffect(() => {
+        if (params?.stylePreset) {
+            setCurrentStyle(params?.stylePreset[0].value);
+        }
+    }, [params]);
 
     useEffect(() => {
         (async () => {
@@ -220,24 +232,29 @@ export const PictureCreateMenu = ({
     };
 
     const handleCreate = async () => {
+        setIsFetch(true);
+        const imageRequest = {
+            prompt: inputValue,
+            width: width,
+            height: height,
+            samples,
+            style_preset: currentStyle,
+            image_strength: imageStrength / 100,
+            seed: seed,
+            steps: step,
+            negative_prompt: voidInputValue,
+            engine: selectModel,
+            init_image: uploadFile,
+            guidance_strength: strength
+        };
+
         const res = await createText2Img({
             conversationUid: conversationId,
             scene: 'WEB_ADMIN',
             appUid: 'BASE_GENERATE_IMAGE',
-            imageRequest: {
-                prompt: inputValue,
-                width: width,
-                height: height,
-                samples,
-                style_preset: currentStyle,
-                image_strength: imageStrength / 100,
-                seed: seed,
-                steps: step,
-                negative_prompt: voidInputValue,
-                engine: selectModel,
-                strength
-            }
+            imageRequest: removeFalseProperties(imageRequest)
         });
+        setIsFetch(false);
         setIsFirst(false);
         setImgList([res, ...imgList] || []);
     };
@@ -247,73 +264,153 @@ export const PictureCreateMenu = ({
             <div
                 style={{ scrollbarGutter: 'stable' }}
                 className={
-                    'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] overflow-y-hidden hover:overflow-y-auto'
+                    'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto'
                 }
             >
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>选择样式</span>
+                    <span className={'text-base font-medium flex items-center'}>风格模型</span>
                     <div
                         style={{ scrollbarGutter: 'stable' }}
-                        className={'grid gap-4 grid-cols-3 w-full h-[375px] mt-3 overflow-y-hidden hover:overflow-y-auto'}
+                        className={
+                            'grid gap-4 grid-cols-3 w-full h-[375px] mt-3  p-[4px] xs:overflow-y-auto lg:overflow-y-hidden hover:overflow-y-auto'
+                        }
                     >
                         {params?.stylePreset.map((item, index) => (
                             <div key={index} className="w-full">
                                 <img
                                     src={item.image}
                                     alt={item.label}
-                                    className={`w-[calc(100%-2px)] rounded cursor-pointer  ${
-                                        item.value === currentStyle ? 'border-solid border border-[#673ab7]' : ''
-                                    } hover:border-solid hover:border hover:border-[#673ab7] `}
+                                    className={` w-[calc(100%-2px)] rounded cursor-pointer  ${
+                                        item.value === currentStyle ? 'outline outline-offset-2 outline-[#673ab7]' : ''
+                                    } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
                                     onClick={() => setCurrentStyle(item.value)}
                                 />
-                                <span className="text-xs">{item.label}</span>
+                                <span className="text-xs">{t(`textToImage.${item.label}`)}</span>
                             </div>
                         ))}
                     </div>
                 </Row>
 
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
-                    <span className={'text-base font-medium'}>图片描述</span>
-                    <TextArea rows={6} className=" w-full mt-3" onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
-                    <CasinoIcon className="absolute right-[18px] top-[54px] cursor-pointer text-base hidden dice" onClick={onDice} />
+                    <div className={'text-base font-medium flex items-center justify-between w-full'}>
+                        <div className="flex items-center justify-between">创意描述</div>
+                        <div>
+                            <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
+                        </div>
+                    </div>
+                    <TextArea
+                        autoSize={{ minRows: 6 }}
+                        className=" w-full mt-3"
+                        onChange={(e) => setInputValue(e.target.value)}
+                        value={inputValue}
+                        placeholder={'请输入你的创意'}
+                        // maxLength={800}
+                        // showCount
+                    />
                     <div className="flex items-center mt-5 cursor-pointer" onClick={() => setShowVoidInputValue(!showVoidInputValue)}>
-                        <div className={'text-base font-medium'}>反向描述</div>
+                        <div className={'text-base font-medium'}>不希望呈现的内容</div>
                         {showVoidInputValue ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                     </div>
                     {showVoidInputValue && (
                         <TextArea
-                            rows={3}
+                            autoSize={{ minRows: 3 }}
                             className=" w-full mt-3"
                             onChange={(e) => setVoidInputValue(e.target.value)}
                             value={voidInputValue}
-                            placeholder="你想避免什么"
+                            placeholder="请输入不希望呈现的内容"
+                            // maxLength={800}
+                            // showCount
                         />
                     )}
                 </Row>
                 <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>尺寸选择</span>
+                    <span className={'text-base font-medium flex items-center'}>
+                        尺寸选择
+                        <MuiTooltip title="选择需要的比例与尺寸，尺寸越大耗时越久" arrow placement="top">
+                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                        </MuiTooltip>
+                    </span>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
-                        <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
-                            <Slider
-                                color="secondary"
-                                aria-label="Always visible"
-                                defaultValue={5}
-                                step={1}
-                                marks={marks}
-                                valueLabelDisplay="auto"
-                                min={1}
-                                max={9}
-                                valueLabelFormat={valueLabelFormat}
-                                onChange={(e, value, number) => {
-                                    const data = marks.find((v) => v?.value === value)?.data;
-                                    setWidth(Number(data?.split('x')[0]));
-                                    setHeight(Number(data?.split('x')[1]));
-                                }}
-                            />
+                        <div style={{ width: '92%', display: 'flex', marginTop: '5px', position: 'relative' }}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="opacity-muted-extra w-[28px] absolute left-0 top-0"
+                                strokeWidth="1.5"
+                            >
+                                <path
+                                    d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                ></path>
+                                <rect
+                                    x="19"
+                                    y="16"
+                                    width="14"
+                                    height="8"
+                                    transform="rotate(180 19 16)"
+                                    stroke="currentColor"
+                                    strokeLinejoin="round"
+                                ></rect>
+                                <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
+                                <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>
+                                <rect x="20" y="14" width="16" height="4" transform="rotate(180 20 14)" fill="#18181B"></rect>
+                            </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="opacity-muted-extra w-[28px] absolute right-0 top-0 rotate-90"
+                                strokeWidth="1.5"
+                            >
+                                <path
+                                    d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                ></path>
+                                <rect
+                                    x="19"
+                                    y="16"
+                                    width="14"
+                                    height="8"
+                                    transform="rotate(180 19 16)"
+                                    stroke="currentColor"
+                                    strokeLinejoin="round"
+                                ></rect>
+                                <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
+                                <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>
+                                <rect x="20" y="14" width="16" height="4" transform="rotate(180 20 14)" fill="#18181B"></rect>
+                            </svg>
+                            <div className="mt-[20px] w-full">
+                                <Slider
+                                    color="secondary"
+                                    aria-label="Always visible"
+                                    defaultValue={5}
+                                    step={1}
+                                    marks={marks}
+                                    valueLabelDisplay="auto"
+                                    min={1}
+                                    max={9}
+                                    valueLabelFormat={valueLabelFormat}
+                                    onChange={(e, value, number) => {
+                                        const data = marks.find((v) => v?.value === value)?.data;
+                                        setWidth(Number(data?.split('x')[0]));
+                                        setHeight(Number(data?.split('x')[1]));
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
-                        <div className={'text-base font-medium mt-[15px] w-full'}>生成张数</div>
+                        <div className={'text-base font-medium mt-[15px] w-full flex items-center'}>
+                            生成张数
+                            <MuiTooltip title="生成张数越多，耗时越久" arrow placement="top">
+                                <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                            </MuiTooltip>
+                        </div>
                         <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
                             <Slider
                                 color="secondary"
@@ -357,22 +454,39 @@ export const PictureCreateMenu = ({
                                     </Dragger>
                                     <div
                                         style={{
-                                            width: '92%',
                                             display: 'flex',
-                                            marginTop: '5px',
-                                            justifyContent: 'center'
+                                            marginTop: '15px',
+                                            justifyContent: 'center',
+                                            flexDirection: 'column',
+                                            width: '100%'
                                         }}
                                     >
-                                        <Slider
-                                            color="secondary"
-                                            defaultValue={45}
-                                            valueLabelDisplay="auto"
-                                            aria-labelledby="discrete-slider-small-steps"
-                                            step={1}
-                                            min={0}
-                                            max={100}
-                                            onChange={(e, value, number) => setImageStrength(value as number)}
-                                        />
+                                        <span className={'text-base font-medium'}>图像强度</span>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                marginTop: '5px',
+                                                justifyContent: 'center',
+                                                width: '100%'
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: '92%'
+                                                }}
+                                            >
+                                                <Slider
+                                                    color="secondary"
+                                                    defaultValue={45}
+                                                    valueLabelDisplay="auto"
+                                                    aria-labelledby="discrete-slider-small-steps"
+                                                    step={1}
+                                                    min={0}
+                                                    max={100}
+                                                    onChange={(e, value, number) => setImageStrength(value as number)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -381,7 +495,7 @@ export const PictureCreateMenu = ({
                                         <p className="ant-upload-drag-icon">
                                             <InboxOutlined rev={undefined} />
                                         </p>
-                                        <p className="ant-upload-text">Upload an image to create variations</p>
+                                        <p className="ant-upload-text">上传图片以创建变体</p>
                                     </div>
                                 </Dragger>
                             )}
@@ -398,12 +512,11 @@ export const PictureCreateMenu = ({
                         )}
                     </span>
                     {visible && (
-                        <div className={'px-1 mt-[5px] grid grid-cols-2 gap-4'}>
+                        <div className={'px-1 mt-[15px] grid grid-cols-2 gap-4'}>
                             <TextField
                                 value={width}
                                 type={'number'}
-                                name="宽度"
-                                label="Width"
+                                label="宽度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setWidth(e.target.value as unknown as number)}
@@ -411,8 +524,7 @@ export const PictureCreateMenu = ({
                             <TextField
                                 value={height}
                                 type={'number'}
-                                name="高度"
-                                label="Height"
+                                label="高度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setHeight(e.target.value as unknown as number)}
@@ -420,7 +532,7 @@ export const PictureCreateMenu = ({
                             <TextField
                                 type={'number'}
                                 name="高度"
-                                label="Prompt strength"
+                                label="预设强度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setStrength(e.target.value as unknown as number)}
@@ -428,29 +540,36 @@ export const PictureCreateMenu = ({
                             <TextField
                                 defaultValue={50}
                                 type={'number'}
-                                name="高度"
-                                label="Generation steps"
+                                label="采样步骤"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setStep(e.target.value as unknown as number)}
                             />
                             <TextField
                                 type={'number'}
-                                name="高度"
-                                label="Seed"
+                                label="种子"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setSeed(e.target.value as unknown as number)}
                             />
-                            <Autocomplete
-                                className="col-span-2"
-                                // disablePortal
-                                options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
-                                defaultValue={'stable-diffusion-xl-beta-v2-2-2'}
-                                renderInput={(paramsData: any) => (
-                                    <TextField {...paramsData} label="Model" onChange={(e) => setSelectModel(e.target.value)} />
-                                )}
-                            />
+                            <div className="col-span-2 flex items-center">
+                                <FormControl sx={{ width: '100%' }}>
+                                    <InputLabel id="age-select">模型</InputLabel>
+                                    <Select
+                                        className="w-full"
+                                        onChange={(e: any) => setSelectModel(e.target.value)}
+                                        value={selectModel}
+                                        label={'模型'}
+                                        name="模型"
+                                    >
+                                        {params?.model.map((el: any) => (
+                                            <MenuItem key={el.value} value={el.value}>
+                                                {el.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </div>
                         </div>
                     )}
                 </Row>

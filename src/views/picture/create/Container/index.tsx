@@ -1,7 +1,9 @@
 import { CloudDownloadOutlined } from '@ant-design/icons';
+import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { Box, Divider, IconButton } from '@mui/material';
-import { Space } from 'antd';
+import { IconButton } from '@mui/material';
+import MuiTooltip from '@mui/material/Tooltip';
+import { Divider, Space } from 'antd';
 import imgLoading from 'assets/images/picture/loading.gif';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -16,7 +18,8 @@ export const PictureCreateContainer = ({
     setMenuVisible,
     width,
     height,
-    isFetch
+    isFetch,
+    setInputValue
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
@@ -24,6 +27,7 @@ export const PictureCreateContainer = ({
     width: number;
     height: number;
     isFetch: boolean;
+    setInputValue: (value: string) => void;
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -66,18 +70,35 @@ export const PictureCreateContainer = ({
                     {imgList.map((item, index) => (
                         <div key={index}>
                             <div className="flex flex-col gap-4">
-                                <div className="flex justify-between">
-                                    <div className="overflow-hidden overflow-ellipsis whitespace-nowrap w-1/2 text-base font-medium">
-                                        <span className="ml-1">{item.prompt}</span>
-                                    </div>
-                                    {!!item.createTime && (
-                                        <Space>
-                                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                <CloudDownloadOutlined
-                                                    rev={undefined}
-                                                    style={{ color: '#fff' }}
-                                                    onClick={() => batchHandle(item.images)}
+                                <div className="flex justify-between w-full">
+                                    <div className="flex items-center w-4/5">
+                                        {!item.create && (
+                                            <div className="text-base text-zinc-500" style={{ flex: '0 0 160px' }}>
+                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            </div>
+                                        )}
+                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium">
+                                            <span className="ml-1">{item.prompt}</span>
+                                        </div>
+                                        {!item.create && (
+                                            <MuiTooltip title="再次使用提示" arrow placement="top">
+                                                <ArrowCircleLeftOutlinedIcon
+                                                    className="cursor-pointer"
+                                                    onClick={() => setInputValue(item.prompt)}
                                                 />
+                                            </MuiTooltip>
+                                        )}
+                                    </div>
+                                    {!item.create && (
+                                        <Space className="w-1/5 flex justify-end">
+                                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                <MuiTooltip title="下载" arrow placement="top">
+                                                    <CloudDownloadOutlined
+                                                        rev={undefined}
+                                                        style={{ color: '#fff' }}
+                                                        onClick={() => batchHandle(item.images)}
+                                                    />
+                                                </MuiTooltip>
                                             </div>
                                             {/*<div className="bg-slate-900 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">*/}
                                             {/*    <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />*/}
@@ -316,7 +337,9 @@ export const PictureCreateContainer = ({
                                                                 downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
                                                             }
                                                         >
-                                                            <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                            <MuiTooltip title="下载" arrow placement="top">
+                                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                            </MuiTooltip>
                                                         </div>
                                                     </Space>
                                                 )}
@@ -325,17 +348,7 @@ export const PictureCreateContainer = ({
                                     )}
                                 </div>
                             </div>
-                            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                                <Divider sx={{ flexGrow: 1 }} />
-                                <Box px={2}>
-                                    {item.createTime > 0 && (
-                                        <span className="text-base text-zinc-500">
-                                            {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                        </span>
-                                    )}
-                                </Box>
-                                <Divider sx={{ flexGrow: 1 }} />
-                            </Box>
+                            <Divider type="horizontal" />
                         </div>
                     ))}
                 </div>

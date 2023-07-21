@@ -9,6 +9,8 @@ import { InboxOutlined } from '@ant-design/icons';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
@@ -177,7 +179,12 @@ export const PictureCreateMenu = ({
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
     const [imageStrength, setImageStrength] = useState(45);
-    const [selectModel, setSelectModel] = useState('stable-diffusion-xl-beta-v2-2-2');
+    const [selectModel, setSelectModel] = useState<{
+        id: string;
+        label: string;
+    }>({ id: 'stable-diffusion-xl-beta-v2-2-2', label: 'SDXL Beta' });
+
+    console.log(selectModel, 'selectModel');
 
     const size = useWindowSize();
 
@@ -234,7 +241,7 @@ export const PictureCreateMenu = ({
             seed: seed,
             steps: step,
             negative_prompt: voidInputValue,
-            engine: selectModel,
+            engine: selectModel.id,
             init_image: uploadFile,
             guidance_strength: strength
         };
@@ -259,19 +266,24 @@ export const PictureCreateMenu = ({
                 }
             >
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>选择样式</span>
+                    <span className={'text-base font-medium flex items-center'}>
+                        选择样式
+                        <MuiTooltip title="Add" arrow placement="top">
+                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                        </MuiTooltip>
+                    </span>
                     <div
                         style={{ scrollbarGutter: 'stable' }}
-                        className={'grid gap-4 grid-cols-3 w-full h-[375px] mt-3 overflow-y-hidden hover:overflow-y-auto'}
+                        className={'grid gap-4 grid-cols-3 w-full h-[375px] mt-3 overflow-y-hidden hover:overflow-y-auto p-[4px]'}
                     >
                         {params?.stylePreset.map((item, index) => (
                             <div key={index} className="w-full">
                                 <img
                                     src={item.image}
                                     alt={item.label}
-                                    className={`w-[calc(100%-2px)] rounded cursor-pointer  ${
-                                        item.value === currentStyle ? 'border-solid border border-[#673ab7]' : ''
-                                    } hover:border-solid hover:border hover:border-[#673ab7] `}
+                                    className={` w-[calc(100%-2px)] rounded cursor-pointer  ${
+                                        item.value === currentStyle ? 'outline outline-offset-2 outline-[#673ab7]' : ''
+                                    } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
                                     onClick={() => setCurrentStyle(item.value)}
                                 />
                                 <span className="text-xs">{item.label}</span>
@@ -281,16 +293,33 @@ export const PictureCreateMenu = ({
                 </Row>
 
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
-                    <span className={'text-base font-medium'}>图片描述</span>
-                    <TextArea rows={6} className=" w-full mt-3" onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
-                    <CasinoIcon className="absolute right-[18px] top-[54px] cursor-pointer text-base hidden dice" onClick={onDice} />
+                    <div className={'text-base font-medium flex items-center justify-between w-full'}>
+                        <div className="flex items-center justify-between">
+                            图片描述
+                            <MuiTooltip title="Add" arrow placement="top">
+                                <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                            </MuiTooltip>
+                        </div>
+                        <div>
+                            <CasinoIcon className="cursor-pointer text-base hidden dice" onClick={onDice} />
+                        </div>
+                    </div>
+                    <TextArea
+                        autoSize={{ minRows: 6 }}
+                        className=" w-full mt-3"
+                        onChange={(e) => setInputValue(e.target.value)}
+                        value={inputValue}
+                    />
                     <div className="flex items-center mt-5 cursor-pointer" onClick={() => setShowVoidInputValue(!showVoidInputValue)}>
                         <div className={'text-base font-medium'}>反向描述</div>
+                        <MuiTooltip title="Add" arrow placement="top">
+                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                        </MuiTooltip>
                         {showVoidInputValue ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                     </div>
                     {showVoidInputValue && (
                         <TextArea
-                            rows={3}
+                            autoSize={{ minRows: 3 }}
                             className=" w-full mt-3"
                             onChange={(e) => setVoidInputValue(e.target.value)}
                             value={voidInputValue}
@@ -389,7 +418,7 @@ export const PictureCreateMenu = ({
                                         <p className="ant-upload-drag-icon">
                                             <InboxOutlined rev={undefined} />
                                         </p>
-                                        <p className="ant-upload-text">Upload an image to create variations</p>
+                                        <p className="ant-upload-text">上传图片以创建变体</p>
                                     </div>
                                 </Dragger>
                             )}
@@ -406,12 +435,11 @@ export const PictureCreateMenu = ({
                         )}
                     </span>
                     {visible && (
-                        <div className={'px-1 mt-[5px] grid grid-cols-2 gap-4'}>
+                        <div className={'px-1 mt-[15px] grid grid-cols-2 gap-4'}>
                             <TextField
                                 value={width}
                                 type={'number'}
-                                name="宽度"
-                                label="Width"
+                                label="宽度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setWidth(e.target.value as unknown as number)}
@@ -419,8 +447,7 @@ export const PictureCreateMenu = ({
                             <TextField
                                 value={height}
                                 type={'number'}
-                                name="高度"
-                                label="Height"
+                                label="高度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setHeight(e.target.value as unknown as number)}
@@ -428,7 +455,7 @@ export const PictureCreateMenu = ({
                             <TextField
                                 type={'number'}
                                 name="高度"
-                                label="Prompt strength"
+                                label="预设强度"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setStrength(e.target.value as unknown as number)}
@@ -436,29 +463,33 @@ export const PictureCreateMenu = ({
                             <TextField
                                 defaultValue={50}
                                 type={'number'}
-                                name="高度"
-                                label="Generation steps"
+                                label="生成步骤"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setStep(e.target.value as unknown as number)}
                             />
                             <TextField
                                 type={'number'}
-                                name="高度"
-                                label="Seed"
+                                label="种子"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setSeed(e.target.value as unknown as number)}
                             />
-                            <Autocomplete
-                                className="col-span-2"
-                                // disablePortal
-                                options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
-                                defaultValue={selectModel}
-                                renderInput={(paramsData: any) => (
-                                    <TextField {...paramsData} label="Model" onChange={(e) => setSelectModel(e.target.value)} />
-                                )}
-                            />
+                            <div className="col-span-2 flex items-center">
+                                <Autocomplete
+                                    className="flex-auto"
+                                    disableClearable
+                                    onChange={(event: any, newValue: any) => {
+                                        setSelectModel(newValue);
+                                    }}
+                                    options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
+                                    value={selectModel}
+                                    renderInput={(paramsData: any) => <TextField {...paramsData} label="模型" />}
+                                />
+                                <MuiTooltip title="Add" arrow placement="top">
+                                    <HelpOutlineOutlinedIcon className="ml-1 cursor-pointer w-[30px] text-lg" />
+                                </MuiTooltip>
+                            </div>
                         </div>
                     )}
                 </Row>

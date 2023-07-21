@@ -9,6 +9,7 @@ import { appDrawerWidth as drawerWidth } from '../../../store/constant';
 import { PictureCreateContainer } from './Container';
 import { PictureCreateMenu } from './Menu';
 
+import dayjs from 'dayjs';
 import { useDispatch } from 'store';
 export type IImageListType = IImageListTypeChild[];
 export type IImageListTypeChildImages = {
@@ -23,6 +24,7 @@ export type IImageListTypeChild = {
     engine: string;
     width: number;
     height: number;
+    create: boolean;
 };
 
 const PictureCreate = () => {
@@ -63,11 +65,12 @@ const PictureCreate = () => {
             return [
                 {
                     prompt: inputValue,
-                    createTime: 0,
+                    createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                     images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
                     width,
                     height,
-                    isFetch
+                    isFetch,
+                    create: true
                 },
                 ...imgList
             ];
@@ -79,11 +82,12 @@ const PictureCreate = () => {
             return [
                 {
                     prompt: inputValue,
-                    createTime: 0,
+                    createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                     images: Array.from({ length: samples }, (_, index) => index).map(() => ({ uuid: 'uuid', url: 'new_img' })),
                     width,
                     height,
-                    isFetch
+                    isFetch,
+                    create: true
                 },
                 ...imgList
             ];
@@ -138,6 +142,7 @@ const PictureCreate = () => {
                     width={width}
                     height={height}
                     isFetch={isFetch}
+                    setInputValue={setInputValue}
                 />
             </Row>
         );
@@ -169,6 +174,7 @@ const PictureCreate = () => {
                 width={width}
                 height={height}
                 isFetch={isFetch}
+                setInputValue={setInputValue}
             />
         </Row>
     );

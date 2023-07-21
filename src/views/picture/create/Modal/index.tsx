@@ -7,6 +7,7 @@ import MainCard from 'ui-component/cards/MainCard';
 // assets
 import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import CloseIcon from '@mui/icons-material/Close';
+import MuiTooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { downloadFile } from 'utils/download';
 import { IImageListTypeChildImages } from '../index';
@@ -137,7 +138,9 @@ export default function PicModal({
                                         )
                                     }
                                 >
-                                    <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    <MuiTooltip title="下载" arrow placement="top">
+                                        <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    </MuiTooltip>
                                 </div>
                             </div>
                         </div>

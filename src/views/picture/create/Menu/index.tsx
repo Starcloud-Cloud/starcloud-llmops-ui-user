@@ -14,8 +14,10 @@ import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
+import { userBenefits } from 'api/template';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
+import userInfoStore from 'store/entitlementAction';
 import { removeFalseProperties } from 'utils/validate';
 import { createText2Img, getImgMeta } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
@@ -183,6 +185,7 @@ export const PictureCreateMenu = ({
     const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
 
     const size = useWindowSize();
+    const { setUserInfo }: any = userInfoStore();
 
     useEffect(() => {
         if (params?.stylePreset) {
@@ -254,6 +257,9 @@ export const PictureCreateMenu = ({
             appUid: 'BASE_GENERATE_IMAGE',
             imageRequest: removeFalseProperties(imageRequest)
         });
+        const benefitsRes = await userBenefits();
+        setUserInfo(benefitsRes);
+
         setIsFetch(false);
         setIsFirst(false);
         setImgList([res, ...imgList] || []);

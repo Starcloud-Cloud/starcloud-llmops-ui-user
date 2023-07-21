@@ -11,12 +11,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
+import { El } from 'types/template';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import copy from 'clipboard-copy';
 const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
     useImperativeHandle(ref, () => ({
+        formiks: formik,
         submit: () => {
             if (Object.values(formik.values).some((value) => value === '')) {
                 formik.handleSubmit();
@@ -47,6 +49,23 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
         }
     });
     const mdRef = useRef<any>(null);
+    const disSteps = (index: number) => {
+        const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
+            if (el.isShow) {
+                return el.value ? false : true;
+            } else {
+                return el.defaultValue ? false : true;
+            }
+        });
+        const variable = config?.steps[index].variable?.variables.map((el: El) => {
+            if (el.isShow) {
+                return el.value ? false : true;
+            } else {
+                return false;
+            }
+        });
+        return model?.some((value: boolean) => value === true) || variable?.some((value: boolean) => value === true) ? true : false;
+    };
     useEffect(() => {
         if (mdRef.current) {
             mdRef.current.scrollTop = mdRef.current.scrollHeight;
@@ -93,6 +112,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                             onClick={() => {
                                 formik.handleSubmit();
                             }}
+                            disabled={disSteps(steps)}
                             color="secondary"
                             size="small"
                             startIcon={<NotStartedIcon />}

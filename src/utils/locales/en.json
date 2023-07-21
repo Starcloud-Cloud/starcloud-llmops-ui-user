@@ -542,7 +542,8 @@
     "addDesc": "Click Add Description",
     "desc": "Edit",
     "delete": "Delete",
-    "model": "Model Variable"
+    "model": "Model Variable",
+    "prompt": "Promtp"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",

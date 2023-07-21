@@ -3,6 +3,7 @@ import AlbumIcon from '@mui/icons-material/Album';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 // import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 // import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
+import { El } from 'types/template';
 import { t } from 'hooks/web/useI18n';
 import { useRef } from 'react';
 import CarrOut from './carrOut';
@@ -23,11 +24,32 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
             changeSon({ stepId: config.steps[0].field, index: 0 });
         }
     };
+    //是否全部禁用
+    const allDisable = () => {
+        const flag = config?.steps?.map((item: any) => {
+            const model = item.flowStep.variable?.variables.map((el: El) => {
+                if (el.isShow) {
+                    return el.value ? false : true;
+                } else {
+                    return el.defaultValue ? false : true;
+                }
+            });
+            const variable = item?.variable?.variables.map((el: El) => {
+                if (el.isShow) {
+                    return el.value ? false : true;
+                } else {
+                    return false;
+                }
+            });
+            return model?.some((value: boolean) => value === true) || variable?.some((value: boolean) => value === true);
+        });
+        return flag?.some((value: boolean) => value === true);
+    };
     return (
         <Box>
-            {config?.steps.length > 1 ? (
+            {config?.steps.length > 1 && (
                 <Box mb={1}>
-                    <Button color="secondary" startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
+                    <Button disabled={allDisable()} color="secondary" startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
                         {t('market.allExecute')}
                     </Button>
                     <Tooltip title={t('market.allStepTips')}>
@@ -36,7 +58,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                         </IconButton>
                     </Tooltip>
                 </Box>
-            ) : null}
+            )}
             {config?.steps?.map(
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (

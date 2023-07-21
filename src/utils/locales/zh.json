@@ -572,7 +572,8 @@
     "addDesc": "点击添加描述",
     "desc": "编辑",
     "delete": "删除",
-    "model": "模型变量"
+    "model": "模型变量",
+    "prompt": "提示词"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"

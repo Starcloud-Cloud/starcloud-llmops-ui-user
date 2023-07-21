@@ -41,8 +41,7 @@ function FormExecute({ formik, item, onChange }: any) {
                     required
                     name={item.field}
                     multiline
-                    minRows={2}
-                    maxRows={4}
+                    minRows={6}
                     InputLabelProps={{ shrink: true }}
                     placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}

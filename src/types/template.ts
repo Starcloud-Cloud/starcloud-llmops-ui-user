@@ -54,3 +54,8 @@ export interface Validas {
     editModal: (row: Rows, i: number, index: number) => void;
     delModal: (i: number, index: number) => void;
 }
+export interface El {
+    value: null | undefined | string;
+    defaultValue: null | undefined | string;
+    isShow: boolean;
+}

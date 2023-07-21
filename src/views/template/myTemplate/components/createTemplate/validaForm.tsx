@@ -36,7 +36,8 @@ import FormExecute from 'views/template/components/validaForm';
 
 import { forwardRef, useImperativeHandle } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
-    border: `1px solid ${theme.palette.divider}`,
+    borderTop: `1px solid ${theme.palette.divider}`,
+    borderBottom: `1px solid ${theme.palette.divider}`,
     '&:not(:last-child)': {
         borderBottom: 0
     },
@@ -89,14 +90,14 @@ const Valida = forwardRef(
             onSubmit: () => {}
         });
         return (
-            <Box p={1}>
+            <Box py={1}>
                 <form>
                     <Accordion>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                             {formik.values.prompt !== '' && <CheckCircleIcon fontSize="small" color="success" />}
                             {formik.values.prompt === '' && <CancelIcon fontSize="small" color="error" />}
                             <Typography ml={2} fontSize="16px">
-                                Promtp
+                                {t('market.prompt')}
                             </Typography>
                         </AccordionSummary>
                         <AccordionDetails>

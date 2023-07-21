@@ -62,7 +62,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
     };
 
     return (
-        <Card sx={{ padding: '16px 0' }}>
+        <Card sx={{ overflow: 'visible' }}>
             {/* <Tabs sx={{ marginBottom: 2 }} value={tabValue} onChange={changeTab} aria-label="basic tabs example">
                 <Tab label="Foundation" />
                 <Tab label="Model" />

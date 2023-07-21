@@ -386,6 +386,12 @@ export const PictureCreateMenu = ({
                             </svg>
                             <div className="mt-[20px] w-full">
                                 <Slider
+                                    sx={{
+                                        '& .MuiSlider-thumb': {
+                                            width: 14,
+                                            height: 14
+                                        }
+                                    }}
                                     color="secondary"
                                     aria-label="Always visible"
                                     defaultValue={5}
@@ -413,6 +419,12 @@ export const PictureCreateMenu = ({
                         </div>
                         <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
                             <Slider
+                                sx={{
+                                    '& .MuiSlider-thumb': {
+                                        width: 14,
+                                        height: 14
+                                    }
+                                }}
                                 color="secondary"
                                 defaultValue={4}
                                 valueLabelDisplay="auto"

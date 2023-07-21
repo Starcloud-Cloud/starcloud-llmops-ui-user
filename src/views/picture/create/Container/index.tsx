@@ -81,7 +81,7 @@ export const PictureCreateContainer = ({
                                             <span className="ml-1">{item.prompt}</span>
                                         </div>
                                         {!item.create && (
-                                            <MuiTooltip title="再次使用提示" arrow placement="top">
+                                            <MuiTooltip title="再次使用描述" arrow placement="top">
                                                 <ArrowCircleLeftOutlinedIcon
                                                     className="cursor-pointer"
                                                     onClick={() => setInputValue(item.prompt)}

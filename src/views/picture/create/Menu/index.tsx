@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Col, Input, Row } from 'antd';
 
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
@@ -180,10 +180,7 @@ export const PictureCreateMenu = ({
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
     const [imageStrength, setImageStrength] = useState(45);
-    const [selectModel, setSelectModel] = useState<{
-        id: string;
-        label: string;
-    }>({ id: 'stable-diffusion-xl-beta-v2-2-2', label: 'SDXL Beta' });
+    const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
 
     const size = useWindowSize();
 
@@ -246,7 +243,7 @@ export const PictureCreateMenu = ({
             seed: seed,
             steps: step,
             negative_prompt: voidInputValue,
-            engine: selectModel.id,
+            engine: selectModel,
             init_image: uploadFile,
             guidance_strength: strength
         };
@@ -271,12 +268,7 @@ export const PictureCreateMenu = ({
                 }
             >
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium flex items-center'}>
-                        选择样式
-                        <MuiTooltip title="Add" arrow placement="top">
-                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
-                        </MuiTooltip>
-                    </span>
+                    <span className={'text-base font-medium flex items-center'}>风格模型</span>
                     <div
                         style={{ scrollbarGutter: 'stable' }}
                         className={
@@ -301,12 +293,7 @@ export const PictureCreateMenu = ({
 
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
                     <div className={'text-base font-medium flex items-center justify-between w-full'}>
-                        <div className="flex items-center justify-between">
-                            图片描述
-                            <MuiTooltip title="Add" arrow placement="top">
-                                <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
-                            </MuiTooltip>
-                        </div>
+                        <div className="flex items-center justify-between">创意描述</div>
                         <div>
                             <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
                         </div>
@@ -316,12 +303,12 @@ export const PictureCreateMenu = ({
                         className=" w-full mt-3"
                         onChange={(e) => setInputValue(e.target.value)}
                         value={inputValue}
+                        placeholder={'请输入你的创意'}
+                        // maxLength={800}
+                        // showCount
                     />
                     <div className="flex items-center mt-5 cursor-pointer" onClick={() => setShowVoidInputValue(!showVoidInputValue)}>
-                        <div className={'text-base font-medium'}>反向描述</div>
-                        <MuiTooltip title="Add" arrow placement="top">
-                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
-                        </MuiTooltip>
+                        <div className={'text-base font-medium'}>不希望呈现的内容</div>
                         {showVoidInputValue ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                     </div>
                     {showVoidInputValue && (
@@ -330,12 +317,19 @@ export const PictureCreateMenu = ({
                             className=" w-full mt-3"
                             onChange={(e) => setVoidInputValue(e.target.value)}
                             value={voidInputValue}
-                            placeholder="你想避免什么"
+                            placeholder="请输入不希望呈现的内容"
+                            // maxLength={800}
+                            // showCount
                         />
                     )}
                 </Row>
                 <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>尺寸选择</span>
+                    <span className={'text-base font-medium flex items-center'}>
+                        尺寸选择
+                        <MuiTooltip title="选择需要的比例与尺寸，尺寸越大耗时越久" arrow placement="top">
+                            <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                        </MuiTooltip>
+                    </span>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
                         <div style={{ width: '92%', display: 'flex', marginTop: '5px', position: 'relative' }}>
                             <svg
@@ -411,7 +405,12 @@ export const PictureCreateMenu = ({
                         </div>
                     </div>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
-                        <div className={'text-base font-medium mt-[15px] w-full'}>生成张数</div>
+                        <div className={'text-base font-medium mt-[15px] w-full flex items-center'}>
+                            生成张数
+                            <MuiTooltip title="生成张数越多，耗时越久" arrow placement="top">
+                                <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                            </MuiTooltip>
+                        </div>
                         <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
                             <Slider
                                 color="secondary"
@@ -541,7 +540,7 @@ export const PictureCreateMenu = ({
                             <TextField
                                 defaultValue={50}
                                 type={'number'}
-                                label="生成步骤"
+                                label="采样步骤"
                                 fullWidth
                                 autoComplete="given-name"
                                 onChange={(e) => setStep(e.target.value as unknown as number)}
@@ -554,19 +553,22 @@ export const PictureCreateMenu = ({
                                 onChange={(e) => setSeed(e.target.value as unknown as number)}
                             />
                             <div className="col-span-2 flex items-center">
-                                <Autocomplete
-                                    className="flex-auto"
-                                    disableClearable
-                                    onChange={(event: any, newValue: any) => {
-                                        setSelectModel(newValue);
-                                    }}
-                                    options={params?.model.map((item) => ({ label: item.label, id: item.value })) as any}
-                                    value={selectModel}
-                                    renderInput={(paramsData: any) => <TextField {...paramsData} label="模型" />}
-                                />
-                                <MuiTooltip title="Add" arrow placement="top">
-                                    <HelpOutlineOutlinedIcon className="ml-1 cursor-pointer w-[30px] text-lg" />
-                                </MuiTooltip>
+                                <FormControl sx={{ width: '100%' }}>
+                                    <InputLabel id="age-select">模型</InputLabel>
+                                    <Select
+                                        className="w-full"
+                                        onChange={(e: any) => setSelectModel(e.target.value)}
+                                        value={selectModel}
+                                        label={'模型'}
+                                        name="模型"
+                                    >
+                                        {params?.model.map((el: any) => (
+                                            <MenuItem key={el.value} value={el.value}>
+                                                {el.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </div>
                         </div>
                     )}

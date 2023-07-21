@@ -120,7 +120,7 @@ export default function PicModal({
                             </div>
                             <div className="h-full sm:col-span-1 p-4 bg-white xs:col-span-3">
                                 <div className="flex flex-col mt-3">
-                                    <span className="text-lg font-medium">提示:</span>
+                                    <span className="text-lg font-medium">描述:</span>
                                     <span className="text-base">{prompt}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">

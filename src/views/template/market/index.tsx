@@ -115,7 +115,18 @@ function TemplateMarket() {
         });
     };
     return (
-        <Box maxWidth="1300px" margin="0 auto" height="calc(100vh - 128px)" overflow="auto" onScroll={goodsScroll}>
+        <Box
+            maxWidth="1300px"
+            margin="0 auto"
+            height="calc(100vh - 128px)"
+            overflow="hidden"
+            onScroll={goodsScroll}
+            sx={{
+                '&:hover': {
+                    overflow: 'auto'
+                }
+            }}
+        >
             <Typography variant="h1" mt={3} textAlign="center">
                 {t('market.title')}
             </Typography>

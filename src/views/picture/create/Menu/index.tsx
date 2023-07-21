@@ -262,7 +262,7 @@ export const PictureCreateMenu = ({
             <div
                 style={{ scrollbarGutter: 'stable' }}
                 className={
-                    'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] overflow-y-hidden hover:overflow-y-auto'
+                    'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto'
                 }
             >
                 <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
@@ -274,7 +274,9 @@ export const PictureCreateMenu = ({
                     </span>
                     <div
                         style={{ scrollbarGutter: 'stable' }}
-                        className={'grid gap-4 grid-cols-3 w-full h-[375px] mt-3 overflow-y-hidden hover:overflow-y-auto p-[4px]'}
+                        className={
+                            'grid gap-4 grid-cols-3 w-full h-[375px] mt-3  p-[4px] xs:overflow-y-auto lg:overflow-y-hidden hover:overflow-y-auto'
+                        }
                     >
                         {params?.stylePreset.map((item, index) => (
                             <div key={index} className="w-full">
@@ -301,7 +303,7 @@ export const PictureCreateMenu = ({
                             </MuiTooltip>
                         </div>
                         <div>
-                            <CasinoIcon className="cursor-pointer text-base hidden dice" onClick={onDice} />
+                            <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
                         </div>
                     </div>
                     <TextArea
@@ -330,23 +332,77 @@ export const PictureCreateMenu = ({
                 <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                     <span className={'text-base font-medium'}>尺寸选择</span>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
-                        <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
-                            <Slider
-                                color="secondary"
-                                aria-label="Always visible"
-                                defaultValue={5}
-                                step={1}
-                                marks={marks}
-                                valueLabelDisplay="auto"
-                                min={1}
-                                max={9}
-                                valueLabelFormat={valueLabelFormat}
-                                onChange={(e, value, number) => {
-                                    const data = marks.find((v) => v?.value === value)?.data;
-                                    setWidth(Number(data?.split('x')[0]));
-                                    setHeight(Number(data?.split('x')[1]));
-                                }}
-                            />
+                        <div style={{ width: '92%', display: 'flex', marginTop: '5px', position: 'relative' }}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="opacity-muted-extra w-[28px] absolute left-0 top-0"
+                                stroke-width="1.5"
+                            >
+                                <path
+                                    d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                                <rect
+                                    x="19"
+                                    y="16"
+                                    width="14"
+                                    height="8"
+                                    transform="rotate(180 19 16)"
+                                    stroke="currentColor"
+                                    stroke-linejoin="round"
+                                ></rect>
+                                <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
+                                <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>
+                                <rect x="20" y="14" width="16" height="4" transform="rotate(180 20 14)" fill="#18181B"></rect>
+                            </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="opacity-muted-extra w-[28px] absolute right-0 top-0 rotate-90"
+                                stroke-width="1.5"
+                            >
+                                <path
+                                    d="M3.33333 19L20.6667 19C21.403 19 22 18.3036 22 17.4444L22 6.55556C22 5.69645 21.403 5 20.6667 5L3.33333 5C2.59695 5 2 5.69645 2 6.55556L2 17.4444C2 18.3036 2.59695 19 3.33333 19Z"
+                                    stroke="currentColor"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                                <rect
+                                    x="19"
+                                    y="16"
+                                    width="14"
+                                    height="8"
+                                    transform="rotate(180 19 16)"
+                                    stroke="currentColor"
+                                    stroke-linejoin="round"
+                                ></rect>
+                                <rect x="16" y="16" width="8" height="8" transform="rotate(180 16 16)" fill="currentColor"></rect>
+                                <rect x="17" y="17" width="10" height="10" transform="rotate(180 17 17)" fill="#18181B"></rect>
+                                <rect x="20" y="14" width="16" height="4" transform="rotate(180 20 14)" fill="#18181B"></rect>
+                            </svg>
+                            <div className="mt-[20px] w-full">
+                                <Slider
+                                    color="secondary"
+                                    aria-label="Always visible"
+                                    defaultValue={5}
+                                    step={1}
+                                    marks={marks}
+                                    valueLabelDisplay="auto"
+                                    min={1}
+                                    max={9}
+                                    valueLabelFormat={valueLabelFormat}
+                                    onChange={(e, value, number) => {
+                                        const data = marks.find((v) => v?.value === value)?.data;
+                                        setWidth(Number(data?.split('x')[0]));
+                                        setHeight(Number(data?.split('x')[1]));
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
@@ -394,22 +450,39 @@ export const PictureCreateMenu = ({
                                     </Dragger>
                                     <div
                                         style={{
-                                            width: '92%',
                                             display: 'flex',
-                                            marginTop: '5px',
-                                            justifyContent: 'center'
+                                            marginTop: '15px',
+                                            justifyContent: 'center',
+                                            flexDirection: 'column',
+                                            width: '100%'
                                         }}
                                     >
-                                        <Slider
-                                            color="secondary"
-                                            defaultValue={45}
-                                            valueLabelDisplay="auto"
-                                            aria-labelledby="discrete-slider-small-steps"
-                                            step={1}
-                                            min={0}
-                                            max={100}
-                                            onChange={(e, value, number) => setImageStrength(value as number)}
-                                        />
+                                        <span className={'text-base font-medium'}>图像强度</span>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                marginTop: '5px',
+                                                justifyContent: 'center',
+                                                width: '100%'
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: '92%'
+                                                }}
+                                            >
+                                                <Slider
+                                                    color="secondary"
+                                                    defaultValue={45}
+                                                    valueLabelDisplay="auto"
+                                                    aria-labelledby="discrete-slider-small-steps"
+                                                    step={1}
+                                                    min={0}
+                                                    max={100}
+                                                    onChange={(e, value, number) => setImageStrength(value as number)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (

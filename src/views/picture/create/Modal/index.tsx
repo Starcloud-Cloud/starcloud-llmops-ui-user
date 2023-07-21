@@ -86,16 +86,23 @@ export default function PicModal({
                     }
                 >
                     <div className="w-full bg-[#f4f6f8] h-full">
-                        <div className="grid grid-cols-3 gap-1 p-4 max-h-[90%] min-h-[90%]">
+                        <div className="grid grid-cols-3 gap-1 p-4 max-h-[90%] min-h-[90%] overflow-auto">
                             <div className="h-full sm:col-span-2 group relative bg-white xs:col-span-3 flex justify-center">
-                                <img
-                                    className="xs:w-full h-full grow basis-0  duration-100 opacity-100 rounded sm:max-w-[670px] object-contain"
-                                    src={currentImageList?.[currentIndex]?.url}
-                                    alt={currentImageList?.[currentIndex]?.uuid}
-                                />
+                                <div className="h-full sm:max-w-[500px] flex flex-col w-full justify-around">
+                                    <img
+                                        className="xs:w-full duration-100 rounded  object-contain"
+                                        src={currentImageList?.[currentIndex]?.url}
+                                        alt={currentImageList?.[currentIndex]?.uuid}
+                                    />
+                                    <div className="flex overflow-auto justify-center w-full mt-2">
+                                        {currentImageList.map((item) => (
+                                            <img className="w-[100px] rounded mx-2" src={item.url} alt={item.uuid} />
+                                        ))}
+                                    </div>
+                                </div>
                                 <button
                                     className={`${
-                                        btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
+                                        btnDisable.preDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/80 cursor-pointer'
                                     } flex-none w-10 h-10 flex justify-center items-center rounded-md  border-none absolute left-0 top-[48%]`}
                                     onClick={() => handlePrev()}
                                     disabled={btnDisable.preDis}
@@ -104,7 +111,7 @@ export default function PicModal({
                                 </button>
                                 <button
                                     className={`${
-                                        btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/50 cursor-pointer'
+                                        btnDisable.nextDis ? 'bg-black/20 cursor-not-allowed' : 'bg-black/80 cursor-pointer'
                                     } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none absolute right-0 top-[48%]`}
                                     onClick={() => handleNext()}
                                 >
@@ -113,16 +120,16 @@ export default function PicModal({
                             </div>
                             <div className="h-full sm:col-span-1 p-4 bg-white xs:col-span-3">
                                 <div className="flex flex-col mt-3">
-                                    <span className="text-base">prompt:</span>
-                                    <span>{prompt}</span>
+                                    <span className="text-lg font-medium">提示:</span>
+                                    <span className="text-base">{prompt}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
-                                    <span className="text-base">Model:</span>
-                                    <span>{engine}</span>
+                                    <span className="text-lg font-medium">模型:</span>
+                                    <span className="text-base">{engine}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
-                                    <span className="text-base">Size:</span>
-                                    <span>
+                                    <span className="text-lg font-medium">尺寸:</span>
+                                    <span className="text-base">
                                         {width} x {height}
                                     </span>
                                 </div>

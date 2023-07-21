@@ -65,7 +65,7 @@ export const PictureCreateContainer = ({
                     <MenuRoundedIcon />
                 </IconButton>
             </div>
-            <div className="h-full overflow-y-hidden hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+            <div className="h-full xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
                 <div>
                     {imgList.map((item, index) => (
                         <div key={index}>

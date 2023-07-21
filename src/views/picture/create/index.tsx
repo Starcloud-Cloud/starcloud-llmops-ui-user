@@ -54,9 +54,7 @@ const PictureCreate = () => {
         (async () => {
             const res = await getImgList();
             setConversationId(res.conversationUid);
-            setTimeout(() => {
-                setImgList(res.messages);
-            }, 2000);
+            setImgList(res.messages);
         })();
     }, []);
 

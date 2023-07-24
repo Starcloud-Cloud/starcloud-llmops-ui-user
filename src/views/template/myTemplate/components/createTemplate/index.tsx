@@ -1,8 +1,8 @@
-import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider, Typography } from '@mui/material';
-import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
-import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Card, CardHeader, Divider, Grid, Link, Tab, Tabs, Typography } from '@mui/material';
+import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
+import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,9 +12,9 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
+import PublishTab from './PublishTab';
 import Arrange from './arrange';
 import Basis from './basis';
-import Upload from './upLoad';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -365,9 +365,10 @@ function CreateDetail() {
                     </Grid>
                 </Grid>
             </TabPanel>
-            <TabPanel value={value} index={2}>
-                <Upload />
-            </TabPanel>
+            {/* <TabPanel value={value} index={2}> */}
+            {/* <Upload /> */}
+            {/* </TabPanel> */}
+            <PublishTab currentTab={2} />
         </Card>
     );
 }

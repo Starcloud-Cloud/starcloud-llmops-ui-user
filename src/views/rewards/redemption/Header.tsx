@@ -152,7 +152,8 @@ const RedemptionHeader = () => {
                                                 ':hover': {
                                                     boxShadow: 'none'
                                                 },
-                                                boxSizing: 'border-box'
+                                                boxSizing: 'border-box',
+                                                fontSize: { xs: '0.65rem !important', md: '0.7rem !important', xl: '1rem !important' }
                                             }}
                                         >
                                             {t('redemption.redeem')}

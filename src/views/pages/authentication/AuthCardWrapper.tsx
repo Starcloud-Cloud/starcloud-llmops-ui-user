@@ -9,7 +9,8 @@ import MainCard, { MainCardProps } from 'ui-component/cards/MainCard';
 const AuthCardWrapper = ({ children, ...other }: MainCardProps) => (
     <MainCard
         sx={{
-            maxWidth: { xs: 400, lg: 475 },
+            width: { xs: 350, lg: 475 },
+            height: { xs: 400, lg: 435 },
             margin: { xs: 2.5, md: 3 },
             '& > *': {
                 flexGrow: 1,

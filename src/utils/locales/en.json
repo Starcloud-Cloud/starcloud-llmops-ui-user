@@ -521,8 +521,10 @@
     "version": "Version",
     "plugLevel": "Plug-in Level",
     "plugVersion": "Plug-in Version",
-    "invitation": "Exclusive invitation link",
+    "invitation": "Scan Send Friends",
     "tips": "Recommend friends to register, increase the amount of rights and interests",
+    "inGive": "Invite & Rewards",
+    "insucess": "Invite successful send you and friends no token limit, no limit",
     "copy": "Click Copy Invitation code",
     "error": "The currently used tokens are insufficient",
     "welcome": "Welcome",
@@ -543,7 +545,11 @@
     "desc": "Edit",
     "delete": "Delete",
     "model": "Model Variable",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "max_tokens": "Max Tokens",
+    "temperature": "Temperature",
+    "n": "N",
+    "copyFiend": "Copy the link and send it to a friend"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",

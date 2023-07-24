@@ -551,7 +551,9 @@
     "version": "版本",
     "plugLevel": "插件等级",
     "plugVersion": "插件版本",
-    "invitation": "专属邀请链接",
+    "invitation": "扫码发送给好友",
+    "inGive": "邀请有奖",
+    "insucess": "邀请成功就送您和好友没人令牌额度,没有上限",
     "tips": "推荐好友注册，提升权益额度",
     "copy": "点击复制邀请码",
     "error": "当前使用的token不足",
@@ -572,7 +574,12 @@
     "addDesc": "点击添加描述",
     "desc": "编辑",
     "delete": "删除",
-    "model": "模型变量"
+    "model": "模型变量",
+    "prompt": "提示词",
+    "max_tokens": "最大令牌数",
+    "temperature": "温度",
+    "n": "N",
+    "copyFiend": "复制链接发送给好友"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"

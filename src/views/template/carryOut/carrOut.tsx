@@ -52,14 +52,14 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
             if (el.isShow) {
-                return el.value ? false : true;
+                return el.value || el.value === false ? false : true;
             } else {
-                return el.defaultValue ? false : true;
+                return el.defaultValue || el.defaultValue === false ? false : true;
             }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
-                return el.value ? false : true;
+                return el.value || el.value === false ? false : true;
             } else {
                 return false;
             }
@@ -126,7 +126,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                     <Grid container spacing={1}>
                         {item.variable?.variables?.map((el: any, i: number) =>
                             el.isShow ? (
-                                <Grid item key={el.field} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
+                                <Grid item key={i} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
                                     <FormExecute formik={formik} item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
                                 </Grid>
                             ) : null
@@ -139,7 +139,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                                         lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
                                         md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
                                         xs={12}
-                                        key={el.field}
+                                        key={i}
                                     >
                                         <FormExecute formik={formik} item={el} onChange={(e: any) => promptChange({ e, steps, i })} />
                                     </Grid>
@@ -149,9 +149,14 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                 </form>
                 <Box my={2} display="flex">
                     {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
-                        <Box width="100%" sx={{ background: '#f8fafc' }}>
+                        <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
                             <Box
-                                sx={{ p: 2, height: item.flowStep.response.style === 'TEXTAREA' ? '300px' : '100px', overflow: 'auto' }}
+                                sx={{
+                                    p: 2,
+                                    minHeight: item.flowStep.response.style === 'TEXTAREA' ? '200px' : '50px',
+                                    maxHeight: item.flowStep.response.style === 'TEXTAREA' ? '400px' : '100px',
+                                    overflow: 'auto'
+                                }}
                                 ref={mdRef}
                             >
                                 <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />

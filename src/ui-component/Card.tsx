@@ -8,10 +8,12 @@ import {
     LinearProgress,
     List,
     ListItem,
+    ListItemIcon,
     ListItemText,
     Tooltip,
     Typography,
-    linearProgressClasses
+    linearProgressClasses,
+    Divider
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { userBenefits } from 'api/template';
@@ -20,6 +22,13 @@ import { t } from 'hooks/web/useI18n';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userInfoStore from 'store/entitlementAction';
+import Share from 'assets/images/share/share.png';
+import LinkIcon from '@mui/icons-material/Link';
+import infoStore from 'store/entitlementAction';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import QRCode from 'qrcode.react';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -122,10 +131,25 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     );
 }
 
-const Cards = () => {
+const Cards = ({ flag = false }) => {
     const theme = useTheme();
+    const { invitationCode } = infoStore();
     const navigate = useNavigate();
     const { userInfo, setUserInfo }: any = userInfoStore();
+    const copyCode = () => {
+        copy(window.location.protocol + '//' + window.location.host + '/register?q=' + invitationCode);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '复制成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
     useEffect(() => {
         if (!userInfo) {
             userBenefits().then((res) => {
@@ -135,8 +159,8 @@ const Cards = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
-        <CardStyle level={userInfo?.userLevel} theme={theme}>
-            <CardContent sx={{ p: 2 }}>
+        <CardStyle sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0 }} level={userInfo?.userLevel} theme={theme}>
+            <CardContent sx={{ p: '16px !important' }}>
                 <List sx={{ p: 0, m: 0 }}>
                     <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>
                         <ListItemText sx={{ mt: 0 }}>
@@ -170,6 +194,60 @@ const Cards = () => {
                     </ListItem>
                 </List>
                 <LinearProgressWithLabel info={userInfo} />
+                {flag && (
+                    <Box mt={1} color={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black}>
+                        <Divider sx={{ mb: 1 }} />
+                        <Box position="relative">
+                            <img style={{ width: '100%' }} src={Share} alt="" />
+                            <Typography
+                                sx={{
+                                    position: 'absolute',
+                                    top: '5px',
+                                    left: 0,
+                                    right: 0,
+                                    margin: 'auto',
+                                    textAlign: 'center',
+                                    fontWeight: 600,
+                                    color: '#111936'
+                                }}
+                            >
+                                {t('market.inGive')}
+                            </Typography>
+                        </Box>
+                        <Box mt={1} whiteSpace="normal">
+                            {t('market.insucess')}
+                        </Box>
+                        <List sx={{ pb: 0 }}>
+                            <ListItem sx={{ padding: 0, fontSize: '12px' }}>
+                                <ListItemIcon>
+                                    <LinkIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={t('market.copyFiend')} />
+                            </ListItem>
+                        </List>
+                        <Tooltip arrow placement="top" title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{t('market.copy')}</Box>}>
+                            <Typography
+                                onClick={copyCode}
+                                sx={{
+                                    whiteSpace: 'normal',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    '&:hover': { color: '#673ab7' }
+                                }}
+                            >
+                                {`${window.location.protocol}//${window.location.host}
+                            /register?q=${invitationCode}`}
+                            </Typography>
+                        </Tooltip>
+                        <Box marginTop={3} textAlign="center">
+                            <QRCode
+                                size={100}
+                                value={window.location.protocol + '//' + window.location.host + '/register?q=' + invitationCode}
+                            />
+                            <Typography variant="h5">{t('market.invitation')}</Typography>
+                        </Box>
+                    </Box>
+                )}
             </CardContent>
         </CardStyle>
     );

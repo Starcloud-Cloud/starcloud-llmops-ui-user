@@ -55,7 +55,7 @@ export interface Validas {
     delModal: (i: number, index: number) => void;
 }
 export interface El {
-    value: null | undefined | string;
-    defaultValue: null | undefined | string;
+    value: null | undefined | string | boolean;
+    defaultValue: null | undefined | string | boolean;
     isShow: boolean;
 }

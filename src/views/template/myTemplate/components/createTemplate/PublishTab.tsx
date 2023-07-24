@@ -1,4 +1,6 @@
 import ContentCopyTwoToneIcon from '@mui/icons-material/ContentCopyTwoTone';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LanguageIcon from '@mui/icons-material/Language';
 import ShareIcon from '@mui/icons-material/Share';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -9,6 +11,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { useDispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import ChatAccordion from './ChatAccordion';
+import { PublishRecord } from './PublishRecord';
 import { TabPanel } from './index';
 type KnowledgeTabProps = {
     currentTab: number;
@@ -17,6 +20,7 @@ type KnowledgeTabProps = {
 const PublishTab = ({ currentTab }: KnowledgeTabProps) => {
     const dispatch = useDispatch();
     const [text1, setText1] = useState('');
+    const [visibleRecord, setVisibleRecord] = useState(false);
 
     const defaultExpandData = [
         {
@@ -85,10 +89,10 @@ const PublishTab = ({ currentTab }: KnowledgeTabProps) => {
                     <div className="flex flex-col ml-3">
                         <div>
                             <span>Marketplace</span>
-                            <Chip className="ml-2" label="Disabled" variant="outlined" disabled size="small" />
-                            <Chip className="ml-2" label="Success" variant="outlined" color="primary" size="small" />
-                            <Chip className="ml-2" label="Default" variant="outlined" color="warning" size="small" />
-                            <Chip className="ml-2" label="Default" variant="outlined" color="error" size="small" />
+                            <Chip className="ml-2" label="未发布" variant="outlined" disabled size="small" />
+                            <Chip className="ml-2" label="发布成功" variant="outlined" color="primary" size="small" />
+                            <Chip className="ml-2" label="待审批" variant="outlined" color="warning" size="small" />
+                            <Chip className="ml-2" label="拒绝" variant="outlined" color="error" size="small" />
                         </div>
                         <span className="text-xs font-normal text-slate-400">
                             Publish Genius to Marketplace, where all the other users can interact with it.
@@ -97,11 +101,18 @@ const PublishTab = ({ currentTab }: KnowledgeTabProps) => {
                 </div>
             ),
             content: (
-                <>
-                    <Button color="secondary" type="submit" variant="contained" size="small">
-                        发布
-                    </Button>
-                </>
+                <div>
+                    <div className="flex items-center">
+                        <Button color="secondary" type="submit" variant="contained" size="small">
+                            发布
+                        </Button>
+                        <div className="flex items-center cursor-pointer ml-3" onClick={() => setVisibleRecord(!visibleRecord)}>
+                            <span>查看发记录</span>
+                            {!visibleRecord ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </div>
+                    </div>
+                    {visibleRecord && <PublishRecord />}
+                </div>
             )
         },
         {

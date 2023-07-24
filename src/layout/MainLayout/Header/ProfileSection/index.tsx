@@ -257,7 +257,7 @@ const ProfileSection = () => {
                                                             }
                                                         />
                                                         <Typography variant="h5" mb={1}>
-                                                            专属邀请码
+                                                            {t('market.invitation')}
                                                         </Typography>
                                                     </Box>
                                                 </Card>

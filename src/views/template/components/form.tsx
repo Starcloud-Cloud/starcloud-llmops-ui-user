@@ -1,46 +1,85 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
-
-function Form({ item, onChange }: any) {
+import { useRef } from 'react';
+import { t } from 'hooks/web/useI18n';
+function Form({ formik, item, onChange }: any) {
     const mt = {
         marginTop: 2
     };
+    const timeoutRef = useRef<any>();
     return (
         <Box>
             {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
-                    label={item.label}
-                    value={item.value || ''}
+                    label={t('market.' + item.field)}
+                    value={formik.values[item.field]}
                     id={item.field}
+                    required
+                    name={item.field}
                     InputLabelProps={{ shrink: true }}
-                    onChange={(e) => onChange(e.target)}
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
+                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
+                    onChange={(e) => {
+                        formik.handleChange(e);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
+                    }}
                     fullWidth
                 />
             ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     sx={mt}
-                    label={item.label}
-                    value={item.value || ''}
+                    label={t('market.' + item.field)}
+                    value={formik.values[item.field]}
                     id={item.field}
+                    required
+                    name={item.field}
                     multiline
-                    maxRows={6}
-                    minRows={4}
+                    minRows={6}
                     InputLabelProps={{ shrink: true }}
-                    onChange={(e) => onChange(e.target)}
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
+                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
+                    onChange={(e) => {
+                        formik.handleChange(e);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
+                    }}
                     fullWidth
                 />
             ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
-                    value={item.value || ''}
+                    value={formik.values[item.field]}
                     InputLabelProps={{ shrink: true }}
                     select
+                    required
                     id={item.field}
                     name={item.field}
-                    label={item.label}
-                    onChange={(e) => onChange(e.target)}
+                    label={t('market.' + item.field)}
+                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
+                    helperText={
+                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
+                    }
+                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
+                    onChange={(e) => {
+                        formik.handleChange(e);
+                        clearTimeout(timeoutRef.current);
+                        timeoutRef.current = setTimeout(() => {
+                            onChange(e.target);
+                        }, 200);
+                    }}
                     fullWidth
                 >
                     {item.options.map((el: any) => (

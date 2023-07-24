@@ -32,7 +32,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useFormik as Formik } from 'formik';
 import generateValidationSchema from 'hooks/usevalid';
 import { Validas, Rows } from 'types/template';
-import FormExecute from 'views/template/components/validaForm';
+import FormExecute from 'views/template/components/form';
 
 import { forwardRef, useImperativeHandle } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
@@ -118,10 +118,11 @@ const Valida = forwardRef(
                                 </Grid>
                             ))}
                             <MainCard
+                                sx={{ p: 0 }}
                                 content={false}
                                 title={t('myApp.table')}
                                 secondary={
-                                    <Stack direction="row" spacing={2} alignItems="center">
+                                    <Stack direction="row" alignItems="center">
                                         <Button
                                             size="small"
                                             color="secondary"
@@ -139,7 +140,7 @@ const Valida = forwardRef(
                                 }
                             >
                                 <TableContainer>
-                                    <Table>
+                                    <Table size="small">
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>{t('myApp.field')}</TableCell>

@@ -4,7 +4,7 @@ import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { executeApp } from 'api/template/fetch';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import userInfoStore from 'store/entitlementAction';
@@ -192,16 +192,17 @@ function CreateDetail() {
         setPerform(perform + 1);
     };
     //设置提示词编排步骤的name desc
-    const editChange = ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
-        const oldvalue = { ...detail };
-        if (flag) {
-            oldvalue.workflowConfig.steps[num].field = value;
-        }
-        console.log(value);
-
-        oldvalue.workflowConfig.steps[num][label] = value;
-        setDetail(oldvalue);
-    };
+    const editChange = useCallback(
+        ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
+            const oldvalue = { ...detail };
+            if (flag) {
+                oldvalue.workflowConfig.steps[num].field = value;
+            }
+            oldvalue.workflowConfig.steps[num][label] = value;
+            setDetail(oldvalue);
+        },
+        [detail]
+    );
     //提示词更改
     const basisChange = ({ e, index, i }: any) => {
         const oldValue = { ...detail };

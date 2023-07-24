@@ -25,6 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import HelpIcon from '@mui/icons-material/Help';
 import Add from '@mui/icons-material/Add';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
 import SouthIcon from '@mui/icons-material/South';
@@ -34,7 +35,7 @@ import { t } from 'hooks/web/useI18n';
 // import Form from 'views/template/components/form';
 import { stepList } from 'api/template';
 import Valida from 'views/template/myTemplate/components/createTemplate/validaForm';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 interface Option {
@@ -215,7 +216,6 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     };
     const [borderLeft, setBorder] = useState<any[]>([]);
     const boxRef = useRef<any>([]);
-    const timeoutRef = useRef<any>();
     useEffect(() => {
         setBorder(boxRef.current.map((item: any) => (item?.allValidas ? '5px solid #ff6376' : 'none')));
     }, []);
@@ -310,12 +310,9 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                 }}
                                                 error={errIpt[index] ? true : false}
                                                 onChange={(e) => {
-                                                    console.log(e.target.value);
                                                     const { name, value }: { name: string; value: string } = e.target;
-                                                    clearTimeout(timeoutRef.current);
-                                                    timeoutRef.current = setTimeout(() => {
-                                                        editChange({ num: index, label: name, value: value, flag: true });
-                                                    }, 20);
+                                                    const newValue = value.replace(/\s/g, '');
+                                                    editChange({ num: index, label: name, value: newValue, flag: true });
                                                 }}
                                                 helperText={errIpt[index] ? '步骤名称不能重复' : ' '}
                                                 name="name"
@@ -326,6 +323,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                             />
                                         </Box>
                                     )}
+                                    {/* 编辑名称和描述 */}
                                     {expanded[index] && (
                                         <>
                                             <Tooltip placement="top" title={t('market.editName')}>
@@ -378,7 +376,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     )}
                                 </Box>
                             </Box>
-                            <Box>
+                            <Box display="flex" alignItems="center">
                                 {!expanded[index] && (
                                     <Button
                                         onClick={() => {
@@ -391,6 +389,11 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     >
                                         {t('market.desc')}
                                     </Button>
+                                )}
+                                {expanded[index] && (
+                                    <Tooltip placement="top" title={item.flowStep.description}>
+                                        <HelpIcon fontSize="small" />
+                                    </Tooltip>
                                 )}
                                 <IconButton
                                     aria-controls={menuOpen[index] ? 'del' + index : undefined}
@@ -593,4 +596,4 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         </Box>
     );
 }
-export default Arrange;
+export default memo(Arrange);

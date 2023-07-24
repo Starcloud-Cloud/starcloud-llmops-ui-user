@@ -44,7 +44,7 @@ const Sidebar = () => {
     const drawerContent = (
         <>
             <MenuList />
-            {layout === LAYOUT_CONST.VERTICAL_LAYOUT && drawerOpen && <Cards />}
+            {layout === LAYOUT_CONST.VERTICAL_LAYOUT && drawerOpen && <Cards flag={true} />}
         </>
     );
 

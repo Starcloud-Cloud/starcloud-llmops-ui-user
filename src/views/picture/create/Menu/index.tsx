@@ -235,6 +235,11 @@ export const PictureCreateMenu = ({
     };
 
     const handleCreate = async () => {
+        if (!inputValue) {
+            PubSub.publish('global.error', { message: '请填写创意描述', type: 'error' });
+            return false;
+        }
+
         setIsFetch(true);
         const imageRequest = {
             prompt: inputValue,
@@ -251,18 +256,22 @@ export const PictureCreateMenu = ({
             guidance_strength: strength
         };
 
-        const res = await createText2Img({
-            conversationUid: conversationId,
-            scene: 'WEB_ADMIN',
-            appUid: 'BASE_GENERATE_IMAGE',
-            imageRequest: removeFalseProperties(imageRequest)
-        });
-        const benefitsRes = await userBenefits();
-        setUserInfo(benefitsRes);
+        try {
+            const res = await createText2Img({
+                conversationUid: conversationId,
+                scene: 'WEB_ADMIN',
+                appUid: 'BASE_GENERATE_IMAGE',
+                imageRequest: removeFalseProperties(imageRequest)
+            });
+            const benefitsRes = await userBenefits();
+            setUserInfo(benefitsRes);
 
-        setIsFetch(false);
-        setIsFirst(false);
-        setImgList([res, ...imgList] || []);
+            setIsFetch(false);
+            setIsFirst(false);
+            setImgList([res, ...imgList] || []);
+        } catch (e) {
+            setIsFetch(false);
+        }
     };
     // @ts-ignore
     return (

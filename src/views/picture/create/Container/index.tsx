@@ -73,7 +73,7 @@ export const PictureCreateContainer = ({
                                 <div className="flex justify-between w-full">
                                     <div className="flex items-center w-4/5">
                                         {!item.create && (
-                                            <div className="text-base text-zinc-500" style={{ flex: '0 0 160px' }}>
+                                            <div className="text-base text-zinc-500" style={{ flex: '0 0 170px' }}>
                                                 {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </div>
                                         )}

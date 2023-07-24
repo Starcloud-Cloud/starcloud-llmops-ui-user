@@ -6,11 +6,15 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // assets
 import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import LinkIcon from '@mui/icons-material/Link';
 import CloseIcon from '@mui/icons-material/Close';
 import MuiTooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { downloadFile } from 'utils/download';
 import { IImageListTypeChildImages } from '../index';
+import { openSnackbar } from '../../../../store/slices/snackbar';
+import CopyToClipboard from 'react-copy-to-clipboard';
+import { useDispatch } from '../../../../store';
 
 export default function PicModal({
     open,
@@ -34,6 +38,8 @@ export default function PicModal({
     prompt: string;
 }) {
     // getModalStyle is not a pure function, we roll the style only on the first render
+
+    const dispatch = useDispatch();
 
     const handleClose = () => {
         setOpen(false);
@@ -134,20 +140,46 @@ export default function PicModal({
                                     </span>
                                 </div>
                                 <Divider className="mt-3 mb-3" />
-                                <div
-                                    className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
-                                    onClick={() =>
-                                        downloadFile(
-                                            currentImageList[currentIndex].url,
-                                            `${currentImageList[currentIndex].uuid}.${
-                                                currentImageList[currentIndex].media_type?.split('/')[1]
-                                            }`
-                                        )
-                                    }
-                                >
-                                    <MuiTooltip title="下载" arrow placement="top">
-                                        <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
-                                    </MuiTooltip>
+                                <div className={'flex'}>
+                                    <div
+                                        className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                        onClick={() =>
+                                            downloadFile(
+                                                currentImageList[currentIndex].url,
+                                                `${currentImageList[currentIndex].uuid}.${
+                                                    currentImageList[currentIndex].media_type?.split('/')[1]
+                                                }`
+                                            )
+                                        }
+                                    >
+                                        <MuiTooltip title="下载" arrow placement="top">
+                                            <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                        </MuiTooltip>
+                                    </div>
+                                    <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer ml-2">
+                                        <CopyToClipboard
+                                            text={currentImageList[currentIndex].url}
+                                            onCopy={() =>
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '复制成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        close: false,
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        transition: 'SlideLeft'
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            <MuiTooltip title="复制链接" arrow placement="top">
+                                                <LinkIcon style={{ color: '#fff', fontSize: '16px' }} />
+                                            </MuiTooltip>
+                                        </CopyToClipboard>
+                                    </div>
                                 </div>
                             </div>
                         </div>

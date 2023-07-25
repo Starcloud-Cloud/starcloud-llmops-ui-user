@@ -1,9 +1,11 @@
 // material-ui
+import LinkIcon from '@mui/icons-material/Link';
 import {
     Box,
     Button,
     Card,
     CardContent,
+    Divider,
     Grid,
     LinearProgress,
     List,
@@ -12,23 +14,20 @@ import {
     ListItemText,
     Tooltip,
     Typography,
-    linearProgressClasses,
-    Divider
+    linearProgressClasses
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { userBenefits } from 'api/template';
+import Share from 'assets/images/share/share.png';
+import copy from 'clipboard-copy';
 import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
 import { t } from 'hooks/web/useI18n';
+import QRCode from 'qrcode.react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userInfoStore from 'store/entitlementAction';
-import Share from 'assets/images/share/share.png';
-import LinkIcon from '@mui/icons-material/Link';
-import infoStore from 'store/entitlementAction';
-import copy from 'clipboard-copy';
 import { dispatch } from 'store';
+import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
-import QRCode from 'qrcode.react';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -151,11 +150,9 @@ const Cards = ({ flag = false }) => {
         );
     };
     useEffect(() => {
-        if (!userInfo) {
-            userBenefits().then((res) => {
-                setUserInfo(res);
-            });
-        }
+        userBenefits().then((res) => {
+            setUserInfo(res);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (

@@ -12,6 +12,7 @@ function Form({ formik, item, onChange }: any) {
         <Box>
             {item.style === 'INPUT' ? (
                 <TextField
+                    color="secondary"
                     sx={mt}
                     label={t('market.' + item.field)}
                     value={formik.values[item.field]}
@@ -35,8 +36,9 @@ function Form({ formik, item, onChange }: any) {
                 />
             ) : item.style === 'TEXTAREA' ? (
                 <TextField
+                    color="secondary"
                     sx={mt}
-                    label={t('market.' + item.field)}
+                    label={item.field === 'prompt' ? '' : t('market.' + item.field)}
                     value={formik.values[item.field]}
                     id={item.field}
                     required
@@ -61,6 +63,7 @@ function Form({ formik, item, onChange }: any) {
             ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
+                    color="secondary"
                     value={formik.values[item.field]}
                     InputLabelProps={{ shrink: true }}
                     select

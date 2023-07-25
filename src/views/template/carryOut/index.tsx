@@ -13,7 +13,7 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
             <Grid container spacing={4}>
                 {/* <Grid item lg={7} md={7} sm={7}> */}
                 <Grid item lg={12} md={12} sm={12}>
-                    <Typography variant="h5" sx={{ fontSize: '1.3rem' }} mb={1}>
+                    <Typography variant="h5" sx={{ fontSize: '1.1rem' }} mb={1}>
                         {config?.description}
                     </Typography>
                     <Perform

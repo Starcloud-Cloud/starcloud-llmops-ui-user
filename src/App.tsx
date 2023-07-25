@@ -1,6 +1,6 @@
 // routing
 import Routes from 'routes';
-
+import './App.scss';
 import zhCN from 'antd/locale/zh_CN';
 // project imports
 

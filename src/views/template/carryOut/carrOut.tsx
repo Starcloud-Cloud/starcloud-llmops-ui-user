@@ -147,36 +147,40 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                             )}
                     </Grid>
                 </form>
-                <Box my={2} display="flex">
+                <Box my={2}>
                     {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
-                        <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
-                            <Box
-                                sx={{
-                                    p: 2,
-                                    minHeight: item.flowStep.response.style === 'TEXTAREA' ? '200px' : '50px',
-                                    maxHeight: item.flowStep.response.style === 'TEXTAREA' ? '400px' : '100px',
-                                    overflow: 'auto'
-                                }}
-                                ref={mdRef}
-                            >
-                                <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
-                            </Box>
-                            {item.flowStep.response.answer && (
-                                <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
-                                    <Box>
-                                        <Button
-                                            sx={{ mt: 1, mr: 1 }}
-                                            size="small"
-                                            variant="outlined"
-                                            color="secondary"
-                                            startIcon={<ContentPasteIcon />}
-                                            onClick={() => {
-                                                copy(item.flowStep.response.answer);
-                                            }}
-                                        >
-                                            {t('market.copys')}
-                                        </Button>
-                                        {/* <Button
+                        <>
+                            <Typography fontSize=".875rem" ml={1} mb={-3}>
+                                {t('myApp.execuent')}
+                            </Typography>
+                            <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
+                                <Box
+                                    sx={{
+                                        p: 2,
+                                        minHeight: item.flowStep.response.style === 'TEXTAREA' ? '200px' : '50px',
+                                        maxHeight: item.flowStep.response.style === 'TEXTAREA' ? '400px' : '100px',
+                                        overflow: 'auto'
+                                    }}
+                                    ref={mdRef}
+                                >
+                                    <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
+                                </Box>
+                                {item.flowStep.response.answer && (
+                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
+                                        <Box>
+                                            <Button
+                                                sx={{ mt: 1, mr: 1 }}
+                                                size="small"
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<ContentPasteIcon />}
+                                                onClick={() => {
+                                                    copy(item.flowStep.response.answer);
+                                                }}
+                                            >
+                                                {t('market.copys')}
+                                            </Button>
+                                            {/* <Button
                                     sx={{ mt: 1, mr: 1 }}
                                     size="small"
                                     variant="outlined"
@@ -194,24 +198,20 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                                 >
                                     {t('market.Step')}
                                 </Button> */}
-                                        <Button
-                                            sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
-                                            size="small"
-                                            variant="outlined"
-                                            color="secondary"
-                                            startIcon={<ReplyIcon />}
-                                        >
-                                            {t('market.share')}
-                                        </Button>
+                                            <Button
+                                                sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
+                                                size="small"
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<ReplyIcon />}
+                                            >
+                                                {t('market.share')}
+                                            </Button>
+                                        </Box>
                                     </Box>
-                                    {/* {item.flowStep.response.answer && (
-                                        <Typography sx={{ mt: 1, fontSize: '.75rem', mr: '24px' }}>
-                                            {item.flowStep.response.answer?.length} {t('market.words')}
-                                        </Typography>
-                                    )} */}
-                                </Box>
-                            )}
-                        </Box>
+                                )}
+                            </Box>
+                        </>
                     ) : (
                         <Card
                             elevation={3}

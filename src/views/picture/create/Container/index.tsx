@@ -97,7 +97,7 @@ export const PictureCreateContainer = ({
                                                 {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </div>
                                         )}
-                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium">
+                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium min-h-[24px]">
                                             {index > 0 ? (
                                                 <MuiTooltip
                                                     title={

@@ -177,9 +177,7 @@ export const PictureCreateMenu = ({
 }: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
-    const [voidInputValue, setVoidInputValue] = useState(
-        'ugly, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy, monster, nude, female, sex, porn, nude, violence, murder, perversion, finger, stump, arm, body, nude, nipple, sexual organs, Low quality, distorted, ugly, normal quality, low quality, worst quality, painting, sketch, (worst quality, low quality: 1.4), poor anatomy, watermark, text, signature, blurry, messy, Low Quality, Bad Artist Sketch, (Semi-Realistic, Sketch, Cartoon, Drawing, Anime: 1.4), Cropped, Out of Frame, Worst Quality, Low Quality, Artifacts vignetting, NSFW, distort, Plastic sensation, vague, draft, grainy, bad art, low contrast.'
-    );
+    const [voidInputValue, setVoidInputValue] = useState('');
     const [params, setParams] = useState<null | IParamsType>(null);
     const [currentStyle, setCurrentStyle] = useState('');
     const [seed, setSeed] = useState<number>();
@@ -236,7 +234,17 @@ export const PictureCreateMenu = ({
     useEffect(() => {
         if (params?.examplePrompt) {
             const randomIndex = Math.floor(Math.random() * params?.examplePrompt.length);
-            setInputValue(params?.examplePrompt?.[randomIndex].value);
+            translateText({
+                textList: [params?.examplePrompt?.[randomIndex].value],
+                sourceLanguage: 'en',
+                targetLanguage: 'zh'
+            })
+                .then((res) => {
+                    setInputValue(res.translatedList[0].translated);
+                })
+                .catch(() => {
+                    setInputValue(params?.examplePrompt?.[randomIndex].value);
+                });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params?.examplePrompt]);
@@ -294,24 +302,34 @@ export const PictureCreateMenu = ({
         setVoidInputValueTranslate(true);
         const result = containsChineseCharactersAndSymbols(inputValue);
         if (result) {
-            const resTranslate = await translateText({
-                textList: [inputValue],
-                sourceLanguage: 'zh',
-                targetLanguage: 'en'
-            });
-            imageRequest.prompt = resTranslate.translatedList[0].translated;
-            setInputValue(resTranslate.translatedList[0].translated);
+            try {
+                const resTranslate = await translateText({
+                    textList: [inputValue],
+                    sourceLanguage: 'zh',
+                    targetLanguage: 'en'
+                });
+                imageRequest.prompt = resTranslate.translatedList[0].translated;
+                setInputValue(resTranslate.translatedList[0].translated);
+            } catch (e) {
+                imageRequest.prompt = inputValue;
+                setInputValue(inputValue);
+            }
         }
 
         const resultVoidInputValue = containsChineseCharactersAndSymbols(voidInputValue);
         if (resultVoidInputValue) {
-            const resVoidTranslate = await translateText({
-                textList: [voidInputValue],
-                sourceLanguage: 'zh',
-                targetLanguage: 'en'
-            });
-            imageRequest.negative_prompt = resVoidTranslate.translatedList[0].translated;
-            setVoidInputValue(resVoidTranslate.translatedList[0].translated);
+            try {
+                const resVoidTranslate = await translateText({
+                    textList: [voidInputValue],
+                    sourceLanguage: 'zh',
+                    targetLanguage: 'en'
+                });
+                imageRequest.negative_prompt = resVoidTranslate.translatedList[0].translated;
+                setVoidInputValue(resVoidTranslate.translatedList[0].translated);
+            } catch (e) {
+                imageRequest.negative_prompt = voidInputValue;
+                setVoidInputValue(voidInputValue);
+            }
         }
 
         try {

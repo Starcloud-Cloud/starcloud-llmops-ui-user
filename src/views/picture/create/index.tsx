@@ -39,7 +39,7 @@ const PictureCreate = () => {
     const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
     const [isFetch, setIsFetch] = useState(false);
-    const [inputValueTranslate, setInputValueTranslate] = useState(true);
+    const [inputValueTranslate, setInputValueTranslate] = useState(false);
 
     const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
     const { borderRadius } = useConfig();

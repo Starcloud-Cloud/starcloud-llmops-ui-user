@@ -173,7 +173,9 @@ export const PictureCreateMenu = ({
 }: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
-    const [voidInputValue, setVoidInputValue] = useState('');
+    const [voidInputValue, setVoidInputValue] = useState(
+        'ugly, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy, monster, nude, female, sex, porn, nude, violence, murder, perversion, finger, stump, arm, body, nude,nipple，sexual organs,Low quality, distorted, ugly, normal quality, low quality, worst quality, painting, sketch, (worst quality, low quality: 1.4), poor anatomy, watermark, text, signature, blurry, messy , Low Quality, Bad Artist Sketch, (Semi-Realistic, Sketch, Cartoon, Drawing, Anime: 1.4), Cropped, Out of Frame, Worst Quality, Low Quality, Artifacts vignetting, NSFW, distort, Plastic sensation, vague，draft, grainy，bad art，low contrast'
+    );
     const [params, setParams] = useState<null | IParamsType>(null);
     const [currentStyle, setCurrentStyle] = useState('');
     const [seed, setSeed] = useState<number>();

@@ -33,3 +33,13 @@ export function removeFalseProperties(obj: any) {
     }
     return obj;
 }
+
+/**
+ * 判断是否包含中文字和中文符号
+ * @param text
+ * @returns
+ */
+export function containsChineseCharactersAndSymbols(text: string): boolean {
+    const chineseCharactersAndSymbolsRegex = /[\u4e00-\u9fa5\u3000-\u303F\uFF00-\uFFEF]/;
+    return chineseCharactersAndSymbolsRegex.test(text);
+}

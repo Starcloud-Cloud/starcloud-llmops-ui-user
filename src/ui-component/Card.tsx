@@ -159,7 +159,11 @@ const Cards = ({ flag = false }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
-        <CardStyle sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0 }} level={userInfo?.userLevel} theme={theme}>
+        <CardStyle
+            sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
+            level={userInfo?.userLevel}
+            theme={theme}
+        >
             <CardContent sx={{ p: '16px !important' }}>
                 <List sx={{ p: 0, m: 0 }}>
                     <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>

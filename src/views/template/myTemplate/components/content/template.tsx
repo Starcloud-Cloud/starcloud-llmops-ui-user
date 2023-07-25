@@ -53,12 +53,11 @@ function Template({ data, handleDetail }: any) {
                 </Tooltip>
                 <Tooltip disableInteractive title={data.description}>
                     <Typography
-                        sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
+                        sx={{ fontSize: '.8rem' }}
                         onClick={() => handleDetail(data)}
                         className="cursor desc"
                         variant="body2"
-                        component="div"
-                        lineHeight={1.2}
+                        lineHeight="1.1rem"
                     >
                         {data.description}
                     </Typography>

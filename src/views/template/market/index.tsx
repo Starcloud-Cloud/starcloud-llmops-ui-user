@@ -122,8 +122,9 @@ function TemplateMarket() {
             overflow="hidden"
             onScroll={goodsScroll}
             sx={{
+                scrollbarGutter: 'stable',
                 '&:hover': {
-                    overflow: 'auto'
+                    overflow: 'scroll'
                 }
             }}
         >

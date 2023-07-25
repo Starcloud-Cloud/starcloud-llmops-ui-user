@@ -251,7 +251,7 @@ function Deatail() {
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
             </Box>
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{ mb: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
                 config={detailData}
                 changeData={changeData}

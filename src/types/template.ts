@@ -30,13 +30,16 @@ export interface Anyevent {
     initialValues: {
         name: string;
         desc: string;
+        categories: string[];
+        tags: string[];
     };
-    setValues: (data: { name: string; value: string }) => void;
+    setValues: (data: { name: string; value: string | string[] }) => void;
 }
 export type Rows = {
     field: string;
     label: string;
     type: string;
+    style: string;
     isShow: boolean;
     value: string;
     defaultValue: string;
@@ -45,8 +48,9 @@ export type Rows = {
 export interface Validas {
     variable: Rows[];
     variables: Rows[];
+    responent: { style: string };
     index: number;
-    basisChange: (data: { e: any; index: number; i: number }) => void;
+    basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null }) => void;
     setModal: (index: number) => void;
     setOpen: (flag: boolean) => void;
     setTitle: (data: string) => void;

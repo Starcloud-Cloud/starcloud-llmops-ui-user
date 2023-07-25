@@ -12,6 +12,7 @@ function FormExecute({ formik, item, onChange }: any) {
             {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
+                    color="secondary"
                     label={item.label}
                     value={formik.values[item.field]}
                     id={item.field}
@@ -35,6 +36,7 @@ function FormExecute({ formik, item, onChange }: any) {
             ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     sx={mt}
+                    color="secondary"
                     label={item.label}
                     value={formik.values[item.field]}
                     id={item.field}
@@ -60,6 +62,7 @@ function FormExecute({ formik, item, onChange }: any) {
             ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
+                    color="secondary"
                     value={formik.values[item.field]}
                     InputLabelProps={{ shrink: true }}
                     select

@@ -1,7 +1,8 @@
-import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider, Typography } from '@mui/material';
+import { Card, CardHeader, Box, Grid, Button, Tab, Tabs, Divider, Typography, Chip } from '@mui/material';
 import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { executeApp } from 'api/template/fetch';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -15,11 +16,12 @@ import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
 import Upload from './upLoad';
+import marketStore from 'store/market';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <Box sx={{ p: 2 }}>
                     <Box>{children}</Box>
                 </Box>
             )}
@@ -33,6 +35,7 @@ export function a11yProps(index: number) {
     };
 }
 function CreateDetail() {
+    const categoryList = marketStore((state) => state.categoryList);
     //路由跳转
     const navigate = useNavigate();
     const location = useLocation();
@@ -204,9 +207,18 @@ function CreateDetail() {
         [detail]
     );
     //提示词更改
-    const basisChange = ({ e, index, i }: any) => {
+    const basisChange = ({ e, index, i, flag = false }: any) => {
         const oldValue = { ...detail };
-        oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+        if (flag) {
+            oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
+                !oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow;
+        } else {
+            if (e.name === 'res') {
+                oldValue.workflowConfig.steps[index].flowStep.response.style = e.value;
+            } else {
+                oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+            }
+        }
         setDetail(oldValue);
         setPerform(perform + 1);
     };
@@ -282,44 +294,58 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <Tabs
-                sx={{
-                    m: 3,
-                    mb: 0,
-                    '& a': {
-                        minHeight: 'auto',
-                        minWidth: 10,
-                        py: 1.5,
-                        px: 1,
-                        mr: 2.2,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    },
-                    '& a > svg': {
-                        mb: '0px !important',
-                        mr: 1.1
-                    }
-                }}
-                value={value}
-                variant="scrollable"
-                onChange={handleChange}
-            >
-                <Tab component={Link} label={t('myApp.basis')} {...a11yProps(0)} />
-                <Tab component={Link} label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
+            <Tabs value={value} onChange={handleChange}>
+                <Tab label={t('myApp.basis')} {...a11yProps(0)} />
+                <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
+                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
                     <Grid item lg={6}>
                         {detail && (
-                            <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
+                            <Basis
+                                ref={basis}
+                                initialValues={{
+                                    name: detail?.name,
+                                    desc: detail?.description,
+                                    categories: detail?.categories,
+                                    tags: detail?.tags
+                                }}
+                                setValues={setData}
+                            />
                         )}
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h3">{t('market.debug')}</Typography>
+                        <Typography variant="h5" mb={1}>
+                            {t('market.debug')}
+                        </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                                    <Box>
+                                        <Box>
+                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                {detail?.name}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            {detail?.categories?.map((item: any) => (
+                                                <span key={item}>
+                                                    #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
+                                                </span>
+                                            ))}
+                                            {detail?.tags?.map((el: any) => (
+                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
+                            <Divider sx={{ mb: 1 }} />
+                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 1 }} mb={1}>
+                                {detail?.description}
+                            </Typography>
                             <Perform
                                 key={perform}
                                 config={detail?.workflowConfig}
@@ -348,8 +374,36 @@ function CreateDetail() {
                         />
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h3">调试与预览</Typography>
+                        <Typography variant="h5" mb={1}>
+                            {t('market.debug')}
+                        </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                                    <Box>
+                                        <Box>
+                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                {detail?.name}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            {detail?.categories?.map((item: any) => (
+                                                <span key={item}>
+                                                    #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
+                                                </span>
+                                            ))}
+                                            {detail?.tags?.map((el: any) => (
+                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
+                            <Divider sx={{ mb: 1 }} />
+                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 1 }} mb={1}>
+                                {detail?.description}
+                            </Typography>
                             <Perform
                                 key={perform}
                                 config={detail?.workflowConfig}

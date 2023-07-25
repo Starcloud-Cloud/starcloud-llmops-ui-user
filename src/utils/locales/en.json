@@ -725,7 +725,7 @@
     "title": "Title",
     "desc": "Description",
     "variable": "Variable",
-    "table": "Variable Table",
+    "table": "Variable",
     "add": "Add",
     "field": "Variable Key",
     "name": "Name",
@@ -737,6 +737,16 @@
     "delDesc": "Confirm to delete this data",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "addOption": "Add Option"
+    "addOption": "Add Option",
+    "edit": "Edit",
+    "input": "INPUT",
+    "select": "SELECT",
+    "textarea": "TEXTAREA",
+    "execuent": "AI Exportation",
+    "responent": "Output Format",
+    "appName": "App Name",
+    "appDesc": "App Description",
+    "categary": "Categories",
+    "scense": "Scense"
   }
 }

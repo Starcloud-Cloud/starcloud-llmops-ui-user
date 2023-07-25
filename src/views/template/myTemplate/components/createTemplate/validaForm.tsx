@@ -10,16 +10,20 @@ import {
     TableRow,
     Button,
     IconButton,
-    Stack,
-    Switch
+    Switch,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import ErrorIcon from '@mui/icons-material/Error';
 import { t } from 'hooks/web/useI18n';
-import { Popconfirm } from 'antd';
+import { Divider, Popconfirm } from 'antd';
 
 import MainCard from 'ui-component/cards/MainCard';
 import Add from '@mui/icons-material/Add';
@@ -64,7 +68,10 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     borderTop: '1px solid rgba(0, 0, 0, .125)'
 }));
 const Valida = forwardRef(
-    ({ variable, variables, basisChange, index, setModal, setOpen, setTitle, statusChange, editModal, delModal }: Validas, ref) => {
+    (
+        { variable, variables, responent, basisChange, index, setModal, setOpen, setTitle, statusChange, editModal, delModal }: Validas,
+        ref
+    ) => {
         useImperativeHandle(ref, () => ({
             allValidas: Object.values(formik.values).some((value) => value === ''),
             allValida: () => {
@@ -76,6 +83,10 @@ const Valida = forwardRef(
                 }
             }
         }));
+        const typeList = [
+            { label: t('myApp.input'), value: 'INPUT' },
+            { label: t('myApp.textarea'), value: 'TEXTAREA' }
+        ];
         const fn = (data: any[]) => {
             const Data: Record<string, any> = {};
             data.forEach((item: { field: string; defaultValue: string }) => {
@@ -85,15 +96,15 @@ const Valida = forwardRef(
             return Data;
         };
         const formik = Formik({
-            initialValues: fn(variables),
-            validationSchema: generateValidationSchema(variables, true),
+            initialValues: fn(JSON.parse(JSON.stringify(variables))),
+            validationSchema: generateValidationSchema(JSON.parse(JSON.stringify(variables)), true),
             onSubmit: () => {}
         });
         return (
             <Box py={1}>
                 <form>
                     <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content1" id="panel1a-header1">
                             {formik.values.prompt !== '' && <CheckCircleIcon fontSize="small" color="success" />}
                             {formik.values.prompt === '' && <CancelIcon fontSize="small" color="error" />}
                             <Typography ml={2} fontSize="16px">
@@ -105,46 +116,61 @@ const Valida = forwardRef(
                                 <Grid item md={12} xs={12} key={i + 'variables'}>
                                     {el.field === 'prompt' && (
                                         <>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Box display="flex" alignItems="center">
+                                                    <Typography mr={1} variant="h5">
+                                                        {t('market.' + el.field)}
+                                                    </Typography>
+                                                    <ErrorIcon fontSize="small" />
+                                                </Box>
+                                                <Box>
+                                                    <Switch
+                                                        name="promptisShow"
+                                                        onChange={(e) => {
+                                                            basisChange({ e: e.target, index, i, flag: true });
+                                                        }}
+                                                        checked={el.isShow}
+                                                    />
+                                                </Box>
+                                            </Box>
                                             <FormExecute
                                                 formik={formik}
                                                 item={el}
                                                 onChange={(e: any) => {
-                                                    basisChange({ e, index, i });
+                                                    basisChange({ e, index, i, flag: false });
                                                 }}
                                             />
-                                            {Boolean(formik.errors[el.field])}
                                         </>
                                     )}
                                 </Grid>
                             ))}
-                            <MainCard
-                                sx={{ p: 0 }}
-                                content={false}
-                                title={t('myApp.table')}
-                                secondary={
-                                    <Stack direction="row" alignItems="center">
-                                        <Button
-                                            size="small"
-                                            color="secondary"
-                                            onClick={() => {
-                                                setModal(index);
-                                                setOpen(true);
-                                                setTitle('Add');
-                                            }}
-                                            variant="outlined"
-                                            startIcon={<Add />}
-                                        >
-                                            {t('myApp.add')}
-                                        </Button>
-                                    </Stack>
-                                }
-                            >
+                            <MainCard>
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box mr={1}>{t('myApp.table')}</Box> <ErrorIcon fontSize="small" />
+                                    </Typography>
+                                    <Button
+                                        size="small"
+                                        color="secondary"
+                                        onClick={() => {
+                                            setModal(index);
+                                            setOpen(true);
+                                            setTitle(t('myApp.add'));
+                                        }}
+                                        variant="outlined"
+                                        startIcon={<Add />}
+                                    >
+                                        {t('myApp.add')}
+                                    </Button>
+                                </Box>
+                                <Divider style={{ margin: '10px 0' }} />
                                 <TableContainer>
                                     <Table size="small">
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>{t('myApp.field')}</TableCell>
                                                 <TableCell>{t('myApp.name')}</TableCell>
+                                                <TableCell>{t('myApp.type')}</TableCell>
                                                 <TableCell>{t('myApp.value')}</TableCell>
                                                 <TableCell> {t('myApp.isShow')}</TableCell>
                                                 <TableCell>{t('myApp.operation')}</TableCell>
@@ -155,6 +181,7 @@ const Valida = forwardRef(
                                                 <TableRow hover key={row.field}>
                                                     <TableCell>{row.field}</TableCell>
                                                     <TableCell>{row.label}</TableCell>
+                                                    <TableCell>{row.style}</TableCell>
                                                     <TableCell>{row.defaultValue}</TableCell>
                                                     <TableCell>
                                                         <Switch
@@ -196,7 +223,7 @@ const Valida = forwardRef(
                         </AccordionDetails>
                     </Accordion>
                     <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
                             {Object.entries({ ...formik.values }).every((value) => {
                                 if (value[0] !== 'prompt') {
                                     return value[1] !== '';
@@ -219,10 +246,40 @@ const Valida = forwardRef(
                             {variables?.map((el: any, i: number) => (
                                 <Grid item md={12} xs={12} key={i + 'variables'}>
                                     {el.field !== 'prompt' && (
-                                        <FormExecute formik={formik} item={el} onChange={(e: any) => basisChange({ e, index, i })} />
+                                        <FormExecute
+                                            formik={formik}
+                                            item={el}
+                                            onChange={(e: any) => basisChange({ e, index, i, flag: false })}
+                                        />
                                     )}
                                 </Grid>
                             ))}
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
+                            <Typography fontSize="16px">{t('myApp.responent')}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <FormControl fullWidth>
+                                <InputLabel id="responent">{t('myApp.responent')}</InputLabel>
+                                <Select
+                                    color="secondary"
+                                    onChange={(e) => {
+                                        basisChange({ e: e.target, index, i: 0, flag: false });
+                                    }}
+                                    name="res"
+                                    labelId="responent"
+                                    value={responent.style}
+                                    label={t('myApp.responent')}
+                                >
+                                    {typeList.map((item, i) => (
+                                        <MenuItem key={i} value={item.value}>
+                                            {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </AccordionDetails>
                     </Accordion>
                 </form>

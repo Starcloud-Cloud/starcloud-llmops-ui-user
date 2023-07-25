@@ -72,6 +72,7 @@ const validationSchema = yup.object({
 });
 
 function Arrange({ config, editChange, basisChange, statusChange, changeConfigs }: any) {
+    const [stepTitle, setStepTitle] = useState<string[]>([]);
     const formik = useFormik({
         initialValues: {
             field: '',
@@ -84,7 +85,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         validationSchema,
         onSubmit: (values) => {
             const oldValue = { ...config };
-            if (title === 'Add') {
+            if (title === t('myApp.add')) {
                 if (!oldValue.steps[modal].variable) {
                     oldValue.steps[modal].variable = { variables: [] };
                 }
@@ -107,9 +108,9 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
     const typeList = [
-        { label: 'Input', value: 'INPUT' },
-        { label: 'Textarea', value: 'TEXTAREA' },
-        { label: 'Select', value: 'SELECT' }
+        { label: t('myApp.input'), value: 'INPUT' },
+        { label: t('myApp.textarea'), value: 'TEXTAREA' },
+        { label: t('myApp.select'), value: 'SELECT' }
     ];
     //关闭弹窗
     const handleClose = () => {
@@ -127,7 +128,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
             formik.setFieldValue(key, row[key]);
         }
         if (row.options) setOptions(row.options);
-        setTitle('Edit');
+        setTitle(t('myApp.edit'));
         setModal(index);
         setStepIndex(i);
         setOpen(true);
@@ -181,7 +182,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         changeConfigs(newValue);
     };
     //增加步骤
-    const [stepLists, setStepList] = useState<{ name: string; field: string }[]>([]);
+    const [stepLists, setStepList] = useState<{ name: string; field: string; description: string }[]>([]);
     const [addAnchorEl, setAddAnchorEl] = useState<(null | HTMLElement)[]>([]);
     const addOpen = addAnchorEl.map((item) => Boolean(item));
     const addClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
@@ -218,11 +219,17 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     const boxRef = useRef<any>([]);
     useEffect(() => {
         setBorder(boxRef.current.map((item: any) => (item?.allValidas ? '5px solid #ff6376' : 'none')));
+        if (config) {
+            setStepTitle(config.steps.map((item: { name: string }) => item.name));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <Box>
-            <Typography variant="h3">{t('myApp.flow')}</Typography>
+            <Typography variant="h5" mb={1}>
+                {t('myApp.flow')}
+            </Typography>
             {config?.steps.map((item: any, index: number) => (
                 <Box key={index}>
                     {index !== 0 && (
@@ -285,11 +292,15 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                         </Typography>
                                     )}
                                     {editStatus[index] && (
-                                        <Box sx={{ width: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}>
+                                        <Box sx={{ width: { xs: '90px', sm: '180px', md: '400px', lg: '140px' } }}>
                                             <TextField
                                                 onBlur={() => {
                                                     const newVal = [...errIpt];
-                                                    if (
+                                                    if (!stepTitle[index]) {
+                                                        const newValue = { ...editStatus };
+                                                        newValue[index] = false;
+                                                        setEditStatus(newValue);
+                                                    } else if (
                                                         config?.steps.every((value: { name: string }, i: number) => {
                                                             if (index === i) {
                                                                 return true;
@@ -303,6 +314,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                         const newValue = { ...editStatus };
                                                         newValue[index] = false;
                                                         setEditStatus(newValue);
+                                                        editChange({ num: index, label: 'name', value: stepTitle[index], flag: true });
                                                     } else {
                                                         newVal[index] = true;
                                                         setErrIpt(newVal);
@@ -310,15 +322,17 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                 }}
                                                 error={errIpt[index] ? true : false}
                                                 onChange={(e) => {
-                                                    const { name, value }: { name: string; value: string } = e.target;
+                                                    const { value }: { name: string; value: string } = e.target;
                                                     const newValue = value.replace(/\s/g, '');
-                                                    editChange({ num: index, label: name, value: newValue, flag: true });
+                                                    const titIndex = [...stepTitle];
+                                                    titIndex[index] = newValue;
+                                                    setStepTitle(titIndex);
                                                 }}
                                                 helperText={errIpt[index] ? '步骤名称不能重复' : ' '}
                                                 name="name"
                                                 fullWidth
                                                 autoFocus
-                                                value={item.name}
+                                                value={stepTitle[index]}
                                                 variant="standard"
                                             />
                                         </Box>
@@ -329,6 +343,11 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                             <Tooltip placement="top" title={t('market.editName')}>
                                                 <IconButton
                                                     onClick={() => {
+                                                        if (stepTitle[index] === '') {
+                                                            const val = [...stepTitle];
+                                                            val[index] = JSON.parse(JSON.stringify(item.name));
+                                                            setStepTitle(val);
+                                                        }
                                                         const newValue = { ...editStatus };
                                                         newValue[index] = true;
                                                         setEditStatus(newValue);
@@ -433,6 +452,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                 ref={(el) => (boxRef.current[index] = el)}
                                 variable={item.variable?.variables}
                                 variables={item.flowStep.variable.variables}
+                                responent={item.flowStep.response}
                                 basisChange={basisChange}
                                 index={index}
                                 setModal={setModal}
@@ -472,6 +492,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                     >
                         {stepLists.map((step) => (
                             <MenuItem
+                                sx={{ display: 'block', maxWidth: '500px', whiteSpace: 'normal' }}
                                 key={step.field}
                                 onClick={() => {
                                     addStep(step, index);
@@ -480,7 +501,8 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     setAddAnchorEl(newVal);
                                 }}
                             >
-                                {step.name}
+                                <Typography variant="h5">{step.name}</Typography>
+                                <Typography>{step.description}</Typography>
                             </MenuItem>
                         ))}
                     </Menu>

@@ -39,6 +39,7 @@ const PictureCreate = () => {
     const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
     const [isFetch, setIsFetch] = useState(false);
+    const [inputValueTranslate, setInputValueTranslate] = useState(true);
 
     const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
     const { borderRadius } = useConfig();
@@ -131,6 +132,8 @@ const PictureCreate = () => {
                         conversationId={conversationId}
                         setIsFirst={setIsFirst}
                         setIsFetch={setIsFetch}
+                        inputValueTranslate={inputValueTranslate}
+                        setInputValueTranslate={setInputValueTranslate}
                     />
                 </Drawer>
                 <PictureCreateContainer
@@ -141,6 +144,7 @@ const PictureCreate = () => {
                     height={height}
                     isFetch={isFetch}
                     setInputValue={setInputValue}
+                    setInputValueTranslate={setInputValueTranslate}
                 />
             </Row>
         );
@@ -164,6 +168,8 @@ const PictureCreate = () => {
                 conversationId={conversationId}
                 setIsFirst={setIsFirst}
                 setIsFetch={setIsFetch}
+                inputValueTranslate={inputValueTranslate}
+                setInputValueTranslate={setInputValueTranslate}
             />
             <PictureCreateContainer
                 menuVisible={menuVisible}
@@ -173,6 +179,7 @@ const PictureCreate = () => {
                 height={height}
                 isFetch={isFetch}
                 setInputValue={setInputValue}
+                setInputValueTranslate={setInputValueTranslate}
             />
         </Row>
     );

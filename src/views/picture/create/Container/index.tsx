@@ -4,6 +4,7 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { IconButton } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
 import { Divider, Space } from 'antd';
+import { translateText } from 'api/picture/create';
 import imgLoading from 'assets/images/picture/loading.gif';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -19,7 +20,8 @@ export const PictureCreateContainer = ({
     width,
     height,
     isFetch,
-    setInputValue
+    setInputValue,
+    setInputValueTranslate
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
@@ -28,6 +30,7 @@ export const PictureCreateContainer = ({
     height: number;
     isFetch: boolean;
     setInputValue: (value: string) => void;
+    setInputValueTranslate: (flag: boolean) => void;
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -39,6 +42,23 @@ export const PictureCreateContainer = ({
         engine: string;
         prompt: string;
     } | null>(null);
+
+    const [currentTranslateIndex, setCurrentTranslateIndex] = useState<number>();
+    const [currentTranslateText, setCurrentTranslateText] = useState<string>('');
+
+    const handleInputValueTranslate = (value: string, index: number) => {
+        setCurrentTranslateText('翻译中...');
+        setCurrentTranslateIndex(index);
+        if (value) {
+            translateText({
+                textList: [value],
+                sourceLanguage: 'en',
+                targetLanguage: 'zh'
+            }).then((res) => {
+                setCurrentTranslateText(res.translatedList[0].translated);
+            });
+        }
+    };
 
     const handleOpen = () => {
         setOpen(true);
@@ -78,19 +98,64 @@ export const PictureCreateContainer = ({
                                             </div>
                                         )}
                                         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium">
-                                            <span className="ml-1">{item.prompt}</span>
+                                            {index > 0 ? (
+                                                <MuiTooltip
+                                                    title={
+                                                        <div>
+                                                            <span>
+                                                                {index === currentTranslateIndex ? currentTranslateText : item.prompt}
+                                                            </span>
+                                                        </div>
+                                                    }
+                                                    placement="top-start"
+                                                >
+                                                    <span className="ml-1">
+                                                        {index === currentTranslateIndex ? currentTranslateText : item.prompt}
+                                                    </span>
+                                                </MuiTooltip>
+                                            ) : (
+                                                item.prompt
+                                            )}
                                         </div>
                                         {!item.create && (
                                             <MuiTooltip title="再次使用描述" arrow placement="top">
                                                 <ArrowCircleLeftOutlinedIcon
                                                     className="cursor-pointer"
-                                                    onClick={() => setInputValue(item.prompt)}
+                                                    onClick={() => {
+                                                        setInputValue(item.prompt);
+                                                        setInputValueTranslate(true);
+                                                    }}
                                                 />
                                             </MuiTooltip>
                                         )}
                                     </div>
                                     {!item.create && (
                                         <Space className="w-1/5 flex justify-end">
+                                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                <MuiTooltip title="翻译成中文" arrow placement="top">
+                                                    <svg
+                                                        onClick={() => handleInputValueTranslate(item.prompt, index)}
+                                                        className="text-base cursor-pointer"
+                                                        viewBox="0 0 1024 1024"
+                                                        version="1.1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        p-id="11576"
+                                                        width="16"
+                                                        height="16"
+                                                    >
+                                                        <path
+                                                            d="M160 144a32 32 0 0 0-32 32V864a32 32 0 0 0 32 32h688a32 32 0 0 0 32-32V176a32 32 0 0 0-32-32H160z m0-64h688a96 96 0 0 1 96 96V864a96 96 0 0 1-96 96H160a96 96 0 0 1-96-96V176a96 96 0 0 1 96-96z"
+                                                            fill="#ffffff"
+                                                            p-id="11577"
+                                                        ></path>
+                                                        <path
+                                                            d="M482.176 262.272h59.616v94.4h196v239.072h-196v184.416h-59.616v-184.416H286.72v-239.04h195.456V262.24z m-137.504 277.152h137.504v-126.4H344.64v126.4z m197.12 0h138.048v-126.4H541.76v126.4z"
+                                                            fill="#ffffff"
+                                                            p-id="11578"
+                                                        ></path>
+                                                    </svg>
+                                                </MuiTooltip>
+                                            </div>
                                             <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
                                                 <MuiTooltip title="下载" arrow placement="top">
                                                     <CloudDownloadOutlined
@@ -100,9 +165,6 @@ export const PictureCreateContainer = ({
                                                     />
                                                 </MuiTooltip>
                                             </div>
-                                            {/*<div className="bg-slate-900 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">*/}
-                                            {/*    <ShareAltOutlined rev={undefined} style={{ color: '#fff' }} />*/}
-                                            {/*</div>*/}
                                         </Space>
                                     )}
                                 </div>

@@ -15,6 +15,9 @@ import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
 import Upload from './upLoad';
+import { FashionStyling } from './chat/FashionStyling';
+import { Regulation } from './chat/Regulation';
+
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -26,12 +29,14 @@ export function TabPanel({ children, value, index, ...other }: TabsProps) {
         </div>
     );
 }
+
 export function a11yProps(index: number) {
     return {
         id: `simple-tab-${index}`,
         'aria-controls': `simple-tabpanel-${index}`
     };
 }
+
 function CreateDetail() {
     //路由跳转
     const navigate = useNavigate();
@@ -260,6 +265,7 @@ function CreateDetail() {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
     return (
         <Card>
             <CardHeader
@@ -309,6 +315,8 @@ function CreateDetail() {
                 <Tab component={Link} label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab component={Link} label={t('myApp.arrangement')} {...a11yProps(1)} />
                 <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
+                <Tab component={Link} label={'形象设计'} {...a11yProps(3)} />
+                <Tab component={Link} label={'规则设定'} {...a11yProps(4)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -369,7 +377,14 @@ function CreateDetail() {
             <TabPanel value={value} index={2}>
                 <Upload />
             </TabPanel>
+            <TabPanel value={value} index={3}>
+                <FashionStyling />
+            </TabPanel>
+            <TabPanel value={value} index={4}>
+                <Regulation />
+            </TabPanel>
         </Card>
     );
 }
+
 export default CreateDetail;

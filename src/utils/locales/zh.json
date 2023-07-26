@@ -579,7 +579,10 @@
     "max_tokens": "最大令牌数",
     "temperature": "温度",
     "n": "N",
-    "copyFiend": "复制链接发送给好友"
+    "copyFiend": "复制链接发送给好友",
+    "promptDesc": "提示词用于对 AI 的回复做出一系列指令和约束。可插入变量，例如 {变量KEY}",
+    "varableDesc": "变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量",
+    "addPrompt": "像这样将这个变量添加到提示符中"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -775,10 +778,10 @@
     "back": "返回",
     "save": "保存",
     "basis": "基础设置",
-    "arrangement": "提示词编排",
+    "arrangement": "流程编排",
     "upload": "应用发布",
     "isrequire": "App的名称是必填的",
-    "flow": "模板流程",
+    "flow": "执行流程",
     "title": "标题",
     "desc": "描述",
     "variable": "变量",
@@ -799,12 +802,15 @@
     "input": "输入框",
     "select": "下拉框",
     "textarea": "文本框",
-    "execuent": "AI输出",
+    "execuent": "AI 结果",
     "responent": "输出格式",
     "appName": "应用名称",
     "appDesc": "应用描述",
     "categary": "类目",
-    "scense": "标签"
+    "scense": "标签",
+    "stepStyle": "步骤格式",
+    "exeLabel": "执行按钮内容",
+    "categoryVaid": "类目是必填的"
   },
   "textToImage": {
     "Enhance": "增强",

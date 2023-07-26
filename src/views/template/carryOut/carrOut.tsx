@@ -2,6 +2,7 @@ import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, 
 import ReplyIcon from '@mui/icons-material/Reply';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import NotStartedIcon from '@mui/icons-material/NotStarted';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useFormik as Formik } from 'formik';
@@ -147,11 +148,12 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                             )}
                     </Grid>
                 </form>
-                <Box my={2}>
+                <Box my={1}>
                     {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
                         <>
-                            <Typography fontSize=".875rem" ml={1} mb={-3}>
-                                {t('myApp.execuent')}
+                            <Typography color="#697586" ml={1} mb={-1.5} display="flex" alignItems="center">
+                                <AutoAwesomeIcon fontSize="small" />
+                                &nbsp; {t('myApp.execuent')}
                             </Typography>
                             <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
                                 <Box

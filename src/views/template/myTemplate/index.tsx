@@ -1,4 +1,4 @@
-import { Box, Grid, Link, Pagination, TextField, Typography, Button } from '@mui/material';
+import { Box, Grid, Pagination, TextField, Typography, Button } from '@mui/material';
 
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
@@ -97,11 +97,8 @@ function MyTemplate() {
                     <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />
                 </Grid>
             </Grid>
-            <Box display="flex" alignItems="end" my={2}>
-                <Typography variant="h5">{t('apply.recommend')}</Typography>
-                <Link href="https://www.mdc.ai/document-en" fontSize={14} color="#7367f0" ml={1}>
-                    {t('apply.instruction')}
-                </Link>
+            <Box display="flex" alignItems="end" mt={2} mb={1}>
+                <Typography variant="h3">{t('apply.recommend')}</Typography>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
@@ -114,7 +111,7 @@ function MyTemplate() {
             </Box>
             {total > 0 && (
                 <Box>
-                    <Typography variant="h5" my={2}>
+                    <Typography variant="h3" mt={2} mb={1}>
                         {t('apply.self')}
                     </Typography>
                     <MyselfTemplate appList={newAppList} />

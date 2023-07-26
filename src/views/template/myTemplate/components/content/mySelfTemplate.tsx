@@ -10,7 +10,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
     return (
         <Grid container spacing={2}>
             {appList?.map((data) => (
-                <Grid key={data.uid} item xs={12} md={6} lg={4}>
+                <Grid key={data.uid} item xs={12} md={12} lg={6}>
                     <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                         <Box
                             onClick={() => {
@@ -28,12 +28,12 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                             )}
                             <Box overflow="hidden" marginLeft="20px">
                                 <Tooltip title={data.name}>
-                                    <Typography variant="h3" noWrap mb={0.5}>
+                                    <Typography variant="h3" noWrap mb={1}>
                                         {data?.name}
                                     </Typography>
                                 </Tooltip>
                                 <Tooltip title={data.description}>
-                                    <Typography noWrap variant="body2">
+                                    <Typography className="desc" variant="body2">
                                         {data?.description}
                                     </Typography>
                                 </Tooltip>

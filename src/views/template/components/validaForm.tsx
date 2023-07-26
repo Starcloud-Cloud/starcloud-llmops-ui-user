@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { useRef } from 'react';
+import { t } from 'i18next';
 function FormExecute({ formik, item, onChange }: any) {
     const mt = {
         marginTop: 2
@@ -37,7 +38,7 @@ function FormExecute({ formik, item, onChange }: any) {
                 <TextField
                     sx={mt}
                     color="secondary"
-                    label={item.label}
+                    label={item.label === 'Prompt' ? t('market.' + item.field) : item.label}
                     value={formik.values[item.field]}
                     id={item.field}
                     required

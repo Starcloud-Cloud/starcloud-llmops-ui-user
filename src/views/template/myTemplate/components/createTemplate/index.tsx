@@ -20,11 +20,11 @@ import marketStore from 'store/market';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            {value === index && (
-                <Box sx={{ p: 2 }}>
-                    <Box>{children}</Box>
-                </Box>
-            )}
+            {/* {value === index && ( */}
+            <Box sx={{ p: 2, display: value === index ? 'block' : 'none' }}>
+                <Box>{children}</Box>
+            </Box>
+            {/* )} */}
         </div>
     );
 }
@@ -199,7 +199,8 @@ function CreateDetail() {
         ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
             const oldvalue = { ...detail };
             if (flag) {
-                oldvalue.workflowConfig.steps[num].field = value;
+                const changeValue = value;
+                oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
             }
             oldvalue.workflowConfig.steps[num][label] = value;
             setDetail(oldvalue);
@@ -265,6 +266,8 @@ function CreateDetail() {
                     }
                 });
             }
+        } else {
+            setValue(0);
         }
     };
     //tabs
@@ -288,7 +291,7 @@ function CreateDetail() {
                 }
                 title={detail?.name}
                 action={
-                    <Button variant="contained" color="secondary" disabled={value !== 0} autoFocus onClick={saveDetail}>
+                    <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
                         {t('myApp.save')}
                     </Button>
                 }
@@ -343,7 +346,7 @@ function CreateDetail() {
                                 </Box>
                             </Box>
                             <Divider sx={{ mb: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 1 }} mb={1}>
+                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
                             <Perform
@@ -365,13 +368,15 @@ function CreateDetail() {
             <TabPanel value={value} index={1}>
                 <Grid container spacing={2}>
                     <Grid item lg={6} sx={{ width: '100%' }}>
-                        <Arrange
-                            config={detail?.workflowConfig}
-                            editChange={editChange}
-                            basisChange={basisChange}
-                            statusChange={statusChange}
-                            changeConfigs={changeConfigs}
-                        />
+                        {detail && (
+                            <Arrange
+                                config={detail?.workflowConfig}
+                                editChange={editChange}
+                                basisChange={basisChange}
+                                statusChange={statusChange}
+                                changeConfigs={changeConfigs}
+                            />
+                        )}
                     </Grid>
                     <Grid item lg={6}>
                         <Typography variant="h5" mb={1}>
@@ -401,7 +406,7 @@ function CreateDetail() {
                                 </Box>
                             </Box>
                             <Divider sx={{ mb: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 1 }} mb={1}>
+                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
                             <Perform

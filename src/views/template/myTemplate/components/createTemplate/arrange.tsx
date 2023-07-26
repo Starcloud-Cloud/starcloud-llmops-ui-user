@@ -46,7 +46,7 @@ function BootstrapDialogTitle(props: any) {
     const { children, onClose, ...other } = props;
 
     return (
-        <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+        <DialogTitle sx={{ m: 0, px: 2 }} {...other}>
             {children}
             {onClose ? (
                 <IconButton
@@ -67,7 +67,10 @@ function BootstrapDialogTitle(props: any) {
 }
 
 const validationSchema = yup.object({
-    field: yup.string().required('variable is required'),
+    field: yup
+        .string()
+        .required('variable is required')
+        .matches(/^[A-Z0-9_-]+$/, '只能输入大写字母、数字、_、-'),
     label: yup.string().required('label is required')
 });
 
@@ -323,9 +326,8 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                                 error={errIpt[index] ? true : false}
                                                 onChange={(e) => {
                                                     const { value }: { name: string; value: string } = e.target;
-                                                    const newValue = value.replace(/\s/g, '');
                                                     const titIndex = [...stepTitle];
-                                                    titIndex[index] = newValue;
+                                                    titIndex[index] = value;
                                                     setStepTitle(titIndex);
                                                 }}
                                                 helperText={errIpt[index] ? '步骤名称不能重复' : ' '}
@@ -433,6 +435,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                     anchorEl={anchorEl[index]}
                                 >
                                     <MenuItem
+                                        disabled={config?.steps.length === 1}
                                         onClick={() => {
                                             delStep(index);
                                             const newVal = [...anchorEl];
@@ -453,11 +456,15 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                 variable={item.variable?.variables}
                                 variables={item.flowStep.variable.variables}
                                 responent={item.flowStep.response}
+                                buttonLabel={item.buttonLabel}
                                 basisChange={basisChange}
                                 index={index}
-                                setModal={setModal}
+                                setModal={(i) => {
+                                    setModal(i);
+                                }}
                                 setOpen={setOpen}
                                 setTitle={setTitle}
+                                editChange={editChange}
                                 statusChange={statusChange}
                                 editModal={editModal}
                                 delModal={delModal}
@@ -510,9 +517,15 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
             ))}
             <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    {title}
+                    <Typography fontSize="1.25rem" fontWeight={600}>
+                        {title}
+                    </Typography>
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
+                    <Typography variant="body2">{t('market.addPrompt')}:</Typography>
+                    <Typography variant="body2" mb={2}>
+                        {'{STEP.' + config?.steps[modal].field + '.' + formik.values.field + '}'}
+                    </Typography>
                     <form onSubmit={formik.handleSubmit}>
                         <TextField
                             fullWidth

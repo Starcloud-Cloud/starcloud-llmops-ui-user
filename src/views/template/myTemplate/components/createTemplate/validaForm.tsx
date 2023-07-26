@@ -14,7 +14,9 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    TextField,
+    Tooltip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
@@ -37,6 +39,7 @@ import { useFormik as Formik } from 'formik';
 import generateValidationSchema from 'hooks/usevalid';
 import { Validas, Rows } from 'types/template';
 import FormExecute from 'views/template/components/form';
+import { useState } from 'react';
 
 import { forwardRef, useImperativeHandle } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
@@ -69,7 +72,21 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 const Valida = forwardRef(
     (
-        { variable, variables, responent, basisChange, index, setModal, setOpen, setTitle, statusChange, editModal, delModal }: Validas,
+        {
+            variable,
+            variables,
+            responent,
+            buttonLabel,
+            basisChange,
+            index,
+            editChange,
+            setModal,
+            setOpen,
+            setTitle,
+            statusChange,
+            editModal,
+            delModal
+        }: Validas,
         ref
     ) => {
         useImperativeHandle(ref, () => ({
@@ -100,10 +117,15 @@ const Valida = forwardRef(
             validationSchema: generateValidationSchema(JSON.parse(JSON.stringify(variables)), true),
             onSubmit: () => {}
         });
+        const [expanded, setExpanded] = useState<string | false>('panel1');
+
+        const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpanded(isExpanded ? panel : false);
+        };
         return (
             <Box py={1}>
                 <form>
-                    <Accordion>
+                    <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content1" id="panel1a-header1">
                             {formik.values.prompt !== '' && <CheckCircleIcon fontSize="small" color="success" />}
                             {formik.values.prompt === '' && <CancelIcon fontSize="small" color="error" />}
@@ -121,7 +143,9 @@ const Valida = forwardRef(
                                                     <Typography mr={1} variant="h5">
                                                         {t('market.' + el.field)}
                                                     </Typography>
-                                                    <ErrorIcon fontSize="small" />
+                                                    <Tooltip placement="top" title={t('market.promptDesc')}>
+                                                        <ErrorIcon fontSize="small" />
+                                                    </Tooltip>
                                                 </Box>
                                                 <Box>
                                                     <Switch
@@ -144,10 +168,13 @@ const Valida = forwardRef(
                                     )}
                                 </Grid>
                             ))}
-                            <MainCard>
+                            <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
                                 <Box display="flex" justifyContent="space-between" alignItems="center">
                                     <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Box mr={1}>{t('myApp.table')}</Box> <ErrorIcon fontSize="small" />
+                                        <Box mr={1}>{t('myApp.table')}</Box>
+                                        <Tooltip title={t('market.varableDesc')}>
+                                            <ErrorIcon fontSize="small" />
+                                        </Tooltip>
                                     </Typography>
                                     <Button
                                         size="small"
@@ -222,7 +249,7 @@ const Valida = forwardRef(
                             </MainCard>
                         </AccordionDetails>
                     </Accordion>
-                    <Accordion>
+                    <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
                             {Object.entries({ ...formik.values }).every((value) => {
                                 if (value[0] !== 'prompt') {
@@ -256,9 +283,9 @@ const Valida = forwardRef(
                             ))}
                         </AccordionDetails>
                     </Accordion>
-                    <Accordion>
+                    <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
-                            <Typography fontSize="16px">{t('myApp.responent')}</Typography>
+                            <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <FormControl fullWidth>
@@ -280,6 +307,18 @@ const Valida = forwardRef(
                                     ))}
                                 </Select>
                             </FormControl>
+                            <TextField
+                                required
+                                name="buttonLabel"
+                                fullWidth
+                                label={t('myApp.exeLabel')}
+                                variant="outlined"
+                                onChange={(e) => {
+                                    editChange({ num: index, label: e.target.name, value: e.target.value });
+                                }}
+                                value={buttonLabel}
+                                sx={{ mt: 2 }}
+                            />
                         </AccordionDetails>
                     </Accordion>
                 </form>

@@ -1,5 +1,18 @@
 import { useImperativeHandle, forwardRef } from 'react';
-import { Card, TextField, FormControl, InputLabel, Select, MenuItem, Autocomplete, Chip } from '@mui/material';
+import {
+    Card,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Autocomplete,
+    Chip,
+    OutlinedInput,
+    Box,
+    Stack,
+    FormHelperText
+} from '@mui/material';
 import { t } from 'hooks/web/useI18n';
 import { Anyevent } from 'types/template';
 import { useFormik } from 'formik';
@@ -7,7 +20,7 @@ import marketStore from 'store/market';
 import * as yup from 'yup';
 const validationSchema = yup.object({
     name: yup.string().required(t('myApp.isrequire')),
-    categary: yup.string().required(t('myApp.isrequire'))
+    categories: yup.array().min(1, t('myApp.categoryVaid'))
 });
 
 const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
@@ -16,7 +29,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
     useImperativeHandle(ref, () => ({
         submit: () => {
             formik.handleSubmit();
-            return formik.isValid;
+            return Object.values(formik.values).every((value) => value.length > 0);
         }
     }));
     const formik = useFormik({
@@ -60,7 +73,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                     }}
                     variant="outlined"
                 />
-                <FormControl fullWidth sx={{ my: 4 }}>
+                <FormControl fullWidth sx={{ mt: 4 }} error={formik?.touched.categories && Boolean(formik?.errors.categories)}>
                     <InputLabel color="secondary" id="categories">
                         {t('myApp.categary')}
                     </InputLabel>
@@ -74,28 +87,47 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                             formik.handleChange(e);
                             setValues({ name: e.target.name, value: e.target.value });
                         }}
+                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                    <Chip key={value} label={value} />
+                                ))}
+                            </Box>
+                        )}
                         label={t('myApp.categary')}
                     >
-                        {categoryList.map((item) => (
-                            <MenuItem key={item.code} value={item.code}>
-                                {item.name}
-                            </MenuItem>
-                        ))}
+                        {categoryList.map(
+                            (item) =>
+                                item.name !== 'All' && (
+                                    <MenuItem key={item.code} value={item.code}>
+                                        {item.name}
+                                    </MenuItem>
+                                )
+                        )}
                     </Select>
+                    <FormHelperText>
+                        {formik?.touched.categories && formik?.errors.categories ? formik?.errors.categories : ' '}
+                    </FormHelperText>
                 </FormControl>
-                <Autocomplete
-                    multiple
-                    id="tags-filled"
-                    options={[]}
-                    defaultValue={formik.values.tags}
-                    freeSolo
-                    renderTags={(value: readonly string[], getTagProps) =>
-                        value.map((option: string, index: number) => (
-                            <Chip color="secondary" variant="outlined" label={option} {...getTagProps({ index })} />
-                        ))
-                    }
-                    renderInput={(params: any) => <TextField color="secondary" {...params} variant="outlined" label={t('myApp.scense')} />}
-                />
+                <Stack sx={{ mt: 4 }}>
+                    <Autocomplete
+                        multiple
+                        id="tags-filled"
+                        options={[]}
+                        defaultValue={formik.values.tags}
+                        freeSolo
+                        renderTags={(value: readonly string[], getTagProps) =>
+                            value.map((option: string, index: number) => (
+                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                            ))
+                        }
+                        onChange={(e: any, newValue) => {
+                            setValues({ name: 'tags', value: newValue });
+                        }}
+                        renderInput={(params: any) => <TextField name="tags" color="secondary" {...params} label={t('myApp.scense')} />}
+                    />
+                </Stack>
             </form>
         </Card>
     );

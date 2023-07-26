@@ -49,7 +49,9 @@ export interface Validas {
     variable: Rows[];
     variables: Rows[];
     responent: { style: string };
+    buttonLabel: string;
     index: number;
+    editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
     basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null }) => void;
     setModal: (index: number) => void;
     setOpen: (flag: boolean) => void;

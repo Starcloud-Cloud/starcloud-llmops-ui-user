@@ -549,7 +549,10 @@
     "max_tokens": "Max Tokens",
     "temperature": "Temperature",
     "n": "N",
-    "copyFiend": "Copy the link and send it to a friend"
+    "copyFiend": "Copy the link and send it to a friend",
+    "promptDesc": "The prompt word is used to make a series of instructions and constraints on the AI's reply. Insertable variables, such as {variable KEY}",
+    "varableDesc": "The variables are presented as a form for the user to fill in before execution, and the content of the form that the user fills in automatically replaces the variables in the prompt word",
+    "addPrompt": "Add this variable to the prompt like this"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",
@@ -718,10 +721,10 @@
     "back": "Back",
     "save": "Save",
     "basis": "Basic Setup",
-    "arrangement": "Prompt Word Arrangement",
+    "arrangement": "Flow Choreography",
     "upload": "App Publishing",
     "isrequire": "Name is required",
-    "flow": "Template flow",
+    "flow": "Execution Process",
     "title": "Title",
     "desc": "Description",
     "variable": "Variable",
@@ -742,11 +745,14 @@
     "input": "INPUT",
     "select": "SELECT",
     "textarea": "TEXTAREA",
-    "execuent": "AI Exportation",
+    "execuent": "AI Result",
     "responent": "Output Format",
     "appName": "App Name",
     "appDesc": "App Description",
     "categary": "Categories",
-    "scense": "Scense"
+    "scense": "Scense",
+    "stepStyle": "Step Format",
+    "exeLabel": "Execute Button Content",
+    "categoryVaid": "Categories Is Required"
   }
 }

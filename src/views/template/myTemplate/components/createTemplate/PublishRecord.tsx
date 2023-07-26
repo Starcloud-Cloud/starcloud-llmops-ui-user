@@ -121,6 +121,11 @@ export const PublishRecord: React.FC = () => {
     const [count, setCount] = useState(0);
     const forceUpdate = () => setCount((pre) => pre + 1);
 
+    // TODO 删除
+    useEffect(() => {
+        forceUpdate();
+    }, []);
+
     useEffect(() => {
         const fetchPageData = async () => {
             const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
@@ -216,7 +221,6 @@ export const PublishRecord: React.FC = () => {
 
                                 return (
                                     <TableRow hover key={row.id}>
-                                        {/* <TableCell align="center">{row.id}</TableCell> */}
                                         <TableCell align="center">{row.merchantOrderId}</TableCell>
                                         <TableCell align="center">{row.subject}</TableCell>
                                         <TableCell align="center">{row.body}</TableCell>

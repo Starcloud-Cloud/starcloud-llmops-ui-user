@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material/styles';
 
 // assets
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MuiTooltip from '@mui/material/Tooltip';
 
 type AccordionItem = {
     id: string;
@@ -62,26 +63,56 @@ const ChatAccordion = ({ data, defaultExpandedId = null, expandIcon, square, tog
                             }
                         }}
                     >
-                        <MuiAccordion
-                            key={item.id}
-                            defaultExpanded={!item.disabled && item.defaultExpand}
-                            expanded={(!toggle && !item.disabled && item.expanded) || (toggle && expanded === item.id)}
-                            disabled={item.disabled}
-                            square={square}
-                            onChange={handleChange(item.id)}
-                        >
-                            <MuiAccordionSummary
-                                expandIcon={expandIcon || expandIcon === false ? expandIcon : <ExpandMoreIcon />}
-                                sx={{ color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.800', fontWeight: 500 }}
+                        {item.disabled ? (
+                            <MuiTooltip title="暂未开通" arrow placement="top">
+                                <MuiAccordion
+                                    key={item.id}
+                                    defaultExpanded={!item.disabled && item.defaultExpand}
+                                    expanded={(!toggle && !item.disabled && item.expanded) || (toggle && expanded === item.id)}
+                                    disabled={item.disabled}
+                                    square={square}
+                                    onChange={handleChange(item.id)}
+                                    sx={{
+                                        '&.Mui-disabled': {
+                                            backgroundColor: 'transparent'
+                                        }
+                                    }}
+                                >
+                                    <MuiAccordionSummary
+                                        expandIcon={expandIcon || expandIcon === false ? expandIcon : <ExpandMoreIcon />}
+                                        sx={{ color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.800', fontWeight: 500 }}
+                                    >
+                                        {item.title}
+                                    </MuiAccordionSummary>
+                                    <MuiAccordionDetails>{item.content}</MuiAccordionDetails>
+                                </MuiAccordion>
+                            </MuiTooltip>
+                        ) : (
+                            <MuiAccordion
+                                key={item.id}
+                                defaultExpanded={!item.disabled && item.defaultExpand}
+                                expanded={(!toggle && !item.disabled && item.expanded) || (toggle && expanded === item.id)}
+                                disabled={item.disabled}
+                                square={square}
+                                onChange={handleChange(item.id)}
+                                sx={{
+                                    '&.Mui-disabled': {
+                                        backgroundColor: 'transparent'
+                                    }
+                                }}
                             >
-                                {item.title}
-                            </MuiAccordionSummary>
-                            <MuiAccordionDetails>{item.content}</MuiAccordionDetails>
-                        </MuiAccordion>
+                                <MuiAccordionSummary
+                                    expandIcon={expandIcon || expandIcon === false ? expandIcon : <ExpandMoreIcon />}
+                                    sx={{ color: theme.palette.mode === 'dark' ? 'grey.500' : 'grey.800', fontWeight: 500 }}
+                                >
+                                    {item.title}
+                                </MuiAccordionSummary>
+                                <MuiAccordionDetails>{item.content}</MuiAccordionDetails>
+                            </MuiAccordion>
+                        )}
                     </Box>
                 ))}
         </>
     );
 };
-
 export default ChatAccordion;

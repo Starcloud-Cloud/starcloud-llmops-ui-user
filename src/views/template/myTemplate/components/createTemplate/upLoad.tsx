@@ -1,79 +1,81 @@
-import {
-    Box,
-    Card,
-    Grid,
-    Typography,
-    Chip,
-    IconButton,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    TextField,
-    DialogActions,
-    Button
-} from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
-import ShareIcon from '@mui/icons-material/Share';
-import CloseIcon from '@mui/icons-material/Close';
-
-import { useState } from 'react';
-
-function BootstrapDialogTitle(props: any) {
-    const { children, onClose, ...other } = props;
-    return (
-        <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-            {children}
-            {onClose ? (
-                <IconButton
-                    aria-label="close"
-                    onClick={onClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            ) : null}
-        </DialogTitle>
-    );
-}
+import CodeIcon from '@mui/icons-material/Code';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 function Upload() {
-    const [open, setOpen] = useState(false);
+    const upLoadList = [
+        {
+            title: '网页',
+            desc: '用户在此链接可以直接和您的机器人聊天',
+            action: ['复制链接', '预览体验', '域名部署']
+        },
+        {
+            title: 'JS嵌入',
+            desc: '可添加到网站的任何位置，将此 iframe 添加到 html 代码中',
+            action: ['创建站点', '查看代码']
+        },
+        {
+            title: 'API调用',
+            desc: '通过API，可直接进行调用或发出请求',
+            action: ['接口秘钥', '接口文档']
+        },
+        {
+            title: '微信群聊',
+            desc: '微信群在新创建的微信群聊中提供机器人服务，首位进群人员为管理员；',
+            action: ['创建群聊', '查看群聊']
+        },
+        {
+            title: '微信公众号',
+            desc: '可在微信公众号后台配置，提供机器人服务',
+            action: ['配置微信公众号']
+        }
+    ];
     return (
         <Box>
-            <Typography variant="h2">概况</Typography>
             <Grid container spacing={2}>
-                <Grid item md={6} xs={12}>
-                    <SubCard contentSX={{ height: '78px' }}>11111</SubCard>
-                    {/* <Card elevation={5} sx={{ height: '200px', padding: 2 }} onClick={() => setOpen(true)}>
-                        <Box display="flex" justifyContent="space-between">
-                            <Box display="flex" alignItems="center">
-                                <ShareIcon />
-                                <Box ml={2}>
-                                    <Typography variant="body1">应用市场</Typography>
-                                    <Typography variant="body1">可发布到应用市场，让所有的用户可以使用</Typography>
+                {upLoadList.map((item) => (
+                    <Grid item md={6} xs={12}>
+                        <SubCard contentSX={{ height: '120px', p: '20px', display: 'flex' }}>
+                            <Box>
+                                <Box
+                                    width="40px"
+                                    height="40px"
+                                    borderRadius="50%"
+                                    sx={{ background: '#673ab74f' }}
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <CodeIcon color="secondary" />
                                 </Box>
                             </Box>
-                            <Chip variant="outlined" label="运行中" color="primary"></Chip>
-                        </Box>
-                    </Card> */}
-                </Grid>
+                            <Box ml={2}>
+                                <Typography fontSize={16} fontWeight={500}>
+                                    {item.title}
+                                </Typography>
+                                <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
+                                    {item.desc}
+                                </Typography>
+                                <Box display="flex">
+                                    {item.action.map((el) => (
+                                        <Box
+                                            color="#b5bed0"
+                                            fontSize="12px"
+                                            display="flex"
+                                            alignItems="center"
+                                            mr={2}
+                                            sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
+                                        >
+                                            <ContentPasteIcon sx={{ fontSize: '12px' }} />
+                                            &nbsp;&nbsp; {el}
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+                        </SubCard>
+                    </Grid>
+                ))}
             </Grid>
-            <Dialog onClose={() => setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={() => setOpen(false)}>
-                    Modal title
-                </BootstrapDialogTitle>
-                <DialogContent dividers sx={{ width: '500px' }}>
-                    <form>
-                        <TextField fullWidth id="variable" name="variable" label="variable" InputLabelProps={{ shrink: true }} />
-                    </form>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Save changes</Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }

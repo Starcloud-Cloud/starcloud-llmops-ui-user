@@ -108,7 +108,7 @@ const ProfileSection = () => {
     };
     const [loading, setLoading] = useState(false);
     const copyCode = () => {
-        copy(window.location.protocol + '//' + window.location.host + '/register?q=' + invitationCode);
+        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode);
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -242,7 +242,7 @@ const ProfileSection = () => {
                                                         </Grid>
                                                     </Grid>
                                                     <Typography variant="body1" sx={{ width: '220px', textDecoration: 'underline' }}>
-                                                        {window.location.protocol + '//' + window.location.host}/register?q=
+                                                        {window.location.protocol + '//' + window.location.host}/login?q=
                                                         {invitationCode}
                                                     </Typography>
                                                     <Box marginTop={1} textAlign="center">
@@ -252,7 +252,7 @@ const ProfileSection = () => {
                                                                 window.location.protocol +
                                                                 '//' +
                                                                 window.location.host +
-                                                                '/register?q=' +
+                                                                '/login?q=' +
                                                                 invitationCode
                                                             }
                                                         />

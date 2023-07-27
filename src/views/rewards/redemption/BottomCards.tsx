@@ -35,7 +35,7 @@ const BottomCards: React.FC = () => {
             });
             if (response?.inviteCode) {
                 const currentURL = window.location.protocol + '//' + window.location.host;
-                const inviteURL = `${currentURL}/register?q=${response.inviteCode}`; // 创建邀请链接
+                const inviteURL = `${currentURL}/login?q=${response.inviteCode}`; // 创建邀请链接
 
                 navigator.clipboard
                     .writeText(inviteURL)

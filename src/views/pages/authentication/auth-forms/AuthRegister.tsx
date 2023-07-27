@@ -90,7 +90,6 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                     email: '',
                     password: '',
                     userName: '',
-                    inviteCode: inviteCode,
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -99,7 +98,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        const res = await register(values.email, values.password, values.userName, values.inviteCode);
+                        const res = await register(values.email, values.password, values.userName, inviteCode);
                         if (res?.data) {
                             if (scriptedRef.current) {
                                 setStatus({ success: true });
@@ -236,11 +235,6 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                 </Box>
                             </FormControl>
                         )}
-
-                        <FormControl fullWidth sx={{ display: 'none' }}>
-                            <InputLabel htmlFor="inviteCode">Invite Code</InputLabel>
-                            <OutlinedInput id="inviteCode" type="text" value={values.inviteCode} name="inviteCode" />
-                        </FormControl>
 
                         <Grid container alignItems="center" justifyContent="space-between">
                             <Grid item>

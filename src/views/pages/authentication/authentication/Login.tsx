@@ -10,7 +10,7 @@ import Logo from 'ui-component/Logo';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
 import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
-import AuthCardWrapper from '../AuthCardWrapper';
+import { AuthLoginCardWrapper } from '../AuthCardWrapper';
 import AuthWrapper2 from '../AuthWrapper2';
 import AuthLogin from '../auth-forms/AuthLogin';
 
@@ -67,13 +67,13 @@ const Login = () => {
                                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                                     <Logo />
                                 </Box>
-                                <AuthCardWrapper border={matchDownMD} className="border rounded border-[#e0e0e098] border-solid">
+                                <AuthLoginCardWrapper border={matchDownMD} className="border rounded border-[#e0e0e098] border-solid">
                                     <Grid container spacing={2} justifyContent="center">
                                         <Grid item xs={12}>
                                             <AuthLogin />
                                         </Grid>
                                     </Grid>
-                                </AuthCardWrapper>
+                                </AuthLoginCardWrapper>
                             </Stack>
                         </Grid>
                         <Grid item xs={12} sx={{ m: 3 }}>

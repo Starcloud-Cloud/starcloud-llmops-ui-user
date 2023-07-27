@@ -136,7 +136,7 @@ const Cards = ({ flag = false }) => {
     const navigate = useNavigate();
     const { userInfo, setUserInfo }: any = userInfoStore();
     const copyCode = () => {
-        copy(window.location.protocol + '//' + window.location.host + '/register?q=' + invitationCode);
+        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode);
         dispatch(
             openSnackbar({
                 open: true,
@@ -237,13 +237,13 @@ const Cards = ({ flag = false }) => {
                                 }}
                             >
                                 {`${window.location.protocol}//${window.location.host}
-                            /register?q=${invitationCode}`}
+                            /login?q=${invitationCode}`}
                             </Typography>
                         </Tooltip>
                         <Box marginTop={3} textAlign="center">
                             <QRCode
                                 size={100}
-                                value={window.location.protocol + '//' + window.location.host + '/register?q=' + invitationCode}
+                                value={window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode}
                             />
                             <Typography variant="h5">{t('market.invitation')}</Typography>
                         </Box>

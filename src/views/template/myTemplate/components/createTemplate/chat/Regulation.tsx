@@ -1,5 +1,5 @@
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, Slider, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export const Regulation = () => {
     const [regulationText, setRegulationText] = useState('');
@@ -29,8 +29,17 @@ export const Regulation = () => {
                     />
                     <div className={'flex  items-center mt-3'}>
                         <FormControl sx={{ width: '150px' }}>
-                            <InputLabel id="age-select">回复语气</InputLabel>
-                            <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setMood(e.target.value)}>
+                            <InputLabel size="small" id="age-select">
+                                回复语气
+                            </InputLabel>
+                            <Select
+                                size="small"
+                                id="columnId"
+                                name="columnId"
+                                label={'style'}
+                                fullWidth
+                                onChange={(e: any) => setMood(e.target.value)}
+                            >
                                 <MenuItem value="0">默认</MenuItem>
                                 <MenuItem value="1">亲切</MenuItem>
                                 <MenuItem value="2">可爱</MenuItem>
@@ -40,8 +49,11 @@ export const Regulation = () => {
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
-                            <InputLabel id="age-select">最大回复长度</InputLabel>
+                            <InputLabel size={'small'} id="age-select">
+                                最大回复长度
+                            </InputLabel>
                             <Select
+                                size={'small'}
                                 id="columnId"
                                 name="columnId"
                                 label={'style'}
@@ -57,8 +69,11 @@ export const Regulation = () => {
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
-                            <InputLabel id="age-select">回复语种</InputLabel>
+                            <InputLabel size={'small'} id="age-select">
+                                回复语种
+                            </InputLabel>
                             <Select
+                                size={'small'}
                                 id="columnId"
                                 name="columnId"
                                 label={'style'}

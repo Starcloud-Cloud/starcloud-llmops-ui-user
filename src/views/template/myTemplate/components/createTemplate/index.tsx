@@ -1,10 +1,10 @@
-import { Card, CardHeader, Box, Grid, Link, Button, Tab, Tabs, Divider, Typography } from '@mui/material';
-import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
-import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Card, CardHeader, Divider, Grid, Link, Tab, Tabs, Typography } from '@mui/material';
+import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
+import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import userInfoStore from 'store/entitlementAction';
@@ -14,9 +14,11 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-import Upload from './upLoad';
 import { FashionStyling } from './chat/FashionStyling';
+import { Knowledge } from './chat/Knowledge';
 import { Regulation } from './chat/Regulation';
+import { Skill } from './chat/Skill';
+import Upload from './upLoad';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -317,6 +319,8 @@ function CreateDetail() {
                 <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
                 <Tab component={Link} label={'形象设计'} {...a11yProps(3)} />
                 <Tab component={Link} label={'规则设定'} {...a11yProps(4)} />
+                <Tab component={Link} label={'知识库'} {...a11yProps(5)} />
+                <Tab component={Link} label={'技能'} {...a11yProps(6)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -382,6 +386,12 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={4}>
                 <Regulation />
+            </TabPanel>
+            <TabPanel value={value} index={5}>
+                <Knowledge />
+            </TabPanel>
+            <TabPanel value={value} index={6}>
+                <Skill />
             </TabPanel>
         </Card>
     );

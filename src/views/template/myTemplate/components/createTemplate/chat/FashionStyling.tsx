@@ -1,4 +1,9 @@
 import { PlusOutlined } from '@ant-design/icons';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
     Button,
     CardActions,
@@ -19,15 +24,10 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import React, { useState } from 'react';
-import GraphicEqIcon from '@mui/icons-material/GraphicEq';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ShortcutRecord from './ShortcutRecord';
-import MainCard from '../../../../../../ui-component/cards/MainCard';
-import CloseIcon from '@mui/icons-material/Close';
+import { useState } from 'react';
 import { gridSpacing } from '../../../../../../store/constant';
+import MainCard from '../../../../../../ui-component/cards/MainCard';
+import ShortcutRecord from './ShortcutRecord';
 
 const uploadButton = (
     <div>

@@ -810,7 +810,8 @@
     "scense": "标签",
     "stepStyle": "步骤格式",
     "exeLabel": "执行按钮内容",
-    "categoryVaid": "类目是必填的"
+    "categoryVaid": "类目是必填的",
+    "delApp": "删除应用"
   },
   "textToImage": {
     "Enhance": "增强",

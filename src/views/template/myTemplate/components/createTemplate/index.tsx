@@ -1,4 +1,19 @@
-import { Card, CardHeader, Box, Grid, Button, Tab, Tabs, Divider, Typography, Chip } from '@mui/material';
+import {
+    Card,
+    CardHeader,
+    Box,
+    Grid,
+    Button,
+    Tab,
+    Tabs,
+    Divider,
+    Typography,
+    Chip,
+    IconButton,
+    Menu,
+    MenuItem,
+    ListItemIcon
+} from '@mui/material';
 import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -6,6 +21,8 @@ import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { executeApp } from 'api/template/fetch';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useRef, useState, useCallback } from 'react';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import userInfoStore from 'store/entitlementAction';
@@ -17,6 +34,7 @@ import Arrange from './arrange';
 import Basis from './basis';
 import Upload from './upLoad';
 import marketStore from 'store/market';
+import { del } from 'api/template';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -185,7 +203,6 @@ function CreateDetail() {
         newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         setDetail(newValue);
     };
-
     //增加 删除变量
     const changeConfigs = (data: any) => {
         setDetail({
@@ -275,6 +292,9 @@ function CreateDetail() {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+    // 删除按钮的menu
+    const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
+    const delOpen = Boolean(delAnchorEl);
     return (
         <Card>
             <CardHeader
@@ -291,9 +311,54 @@ function CreateDetail() {
                 }
                 title={detail?.name}
                 action={
-                    <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
-                        {t('myApp.save')}
-                    </Button>
+                    <>
+                        {searchParams.get('uid') && (
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-controls={delOpen ? 'long-menu' : undefined}
+                                aria-expanded={delOpen ? 'true' : undefined}
+                                aria-haspopup="true"
+                                onClick={(e) => {
+                                    setDelAnchorEl(e.currentTarget);
+                                }}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                        )}
+                        <Menu
+                            id="del-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'del-button'
+                            }}
+                            anchorEl={delAnchorEl}
+                            open={delOpen}
+                            onClose={() => {
+                                setDelAnchorEl(null);
+                            }}
+                        >
+                            <MenuItem
+                                onClick={() => {
+                                    del(searchParams.get('uid') as string).then((res) => {
+                                        if (res) {
+                                            setDelAnchorEl(null);
+                                            navigate('/my-app');
+                                        }
+                                    });
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <DeleteIcon color="error" />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    {t('myApp.delApp')}
+                                </Typography>
+                            </MenuItem>
+                        </Menu>
+                        <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                            {t('myApp.save')}
+                        </Button>
+                    </>
                 }
             ></CardHeader>
             <Divider />

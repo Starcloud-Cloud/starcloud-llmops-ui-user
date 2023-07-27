@@ -753,6 +753,7 @@
     "scense": "Scense",
     "stepStyle": "Step Format",
     "exeLabel": "Execute Button Content",
-    "categoryVaid": "Categories Is Required"
+    "categoryVaid": "Categories Is Required",
+    "delApp": "Delete App"
   }
 }

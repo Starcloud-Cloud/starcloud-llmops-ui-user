@@ -32,6 +32,10 @@ export const recommends = () => {
 export const appPage = (params: { pageNo: number; pageSize: number }) => {
     return request.get({ url: '/llm/app/page', params });
 };
+//删除应用
+export const del = (uid: string) => {
+    return request.delete({ url: `/llm/app/delete/${uid}` });
+};
 
 //执行记录echart
 export const logStatistics = (data: { appName: string; timeType: string }) => {

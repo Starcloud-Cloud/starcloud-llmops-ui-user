@@ -368,7 +368,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         <Grid item container direction="column" alignItems="center" xs={12}>
                             <Typography
                                 component={Link}
-                                to={`/register?q=${inviteCode}`}
+                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
                                 variant="subtitle1"
                                 sx={{ textDecoration: 'none' }}
                             >
@@ -408,7 +408,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         <Grid item container direction="column" alignItems="center" xs={12}>
                             <Typography
                                 component={Link}
-                                to={`/register?q=${inviteCode}`}
+                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
                                 variant="subtitle1"
                                 sx={{ textDecoration: 'none' }}
                             >

@@ -12,6 +12,7 @@ import {
     DialogActions,
     Button
 } from '@mui/material';
+import SubCard from 'ui-component/cards/SubCard';
 import ShareIcon from '@mui/icons-material/Share';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -43,9 +44,10 @@ function Upload() {
     return (
         <Box>
             <Typography variant="h2">概况</Typography>
-            <Grid container spacing={5}>
-                <Grid item md={3} lg={4}>
-                    <Card elevation={5} sx={{ height: '200px', padding: 2 }} onClick={() => setOpen(true)}>
+            <Grid container spacing={2}>
+                <Grid item md={6} xs={12}>
+                    <SubCard contentSX={{ height: '78px' }}>11111</SubCard>
+                    {/* <Card elevation={5} sx={{ height: '200px', padding: 2 }} onClick={() => setOpen(true)}>
                         <Box display="flex" justifyContent="space-between">
                             <Box display="flex" alignItems="center">
                                 <ShareIcon />
@@ -56,7 +58,7 @@ function Upload() {
                             </Box>
                             <Chip variant="outlined" label="运行中" color="primary"></Chip>
                         </Box>
-                    </Card>
+                    </Card> */}
                 </Grid>
             </Grid>
             <Dialog onClose={() => setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>

@@ -552,7 +552,9 @@
     "copyFiend": "Copy the link and send it to a friend",
     "promptDesc": "The prompt word is used to make a series of instructions and constraints on the AI's reply. Insertable variables, such as {variable KEY}",
     "varableDesc": "The variables are presented as a form for the user to fill in before execution, and the content of the form that the user fills in automatically replaces the variables in the prompt word",
-    "addPrompt": "Add this variable to the prompt like this"
+    "addPrompt": "Add this variable to the prompt like this",
+    "copyPrompt": "click Copy Variable Key",
+    "copySuccess": "Copy Success"
   },
   "redemption": {
     "title": "Get MoFaAI Redemption",
@@ -751,8 +753,8 @@
     "appDesc": "App Description",
     "categary": "Categories",
     "scense": "Scense",
-    "stepStyle": "Step Format",
-    "exeLabel": "Execute Button Content",
+    "stepStyle": "Style Configuration",
+    "exeLabel": "Execute Button Name",
     "categoryVaid": "Categories Is Required",
     "delApp": "Delete App"
   }

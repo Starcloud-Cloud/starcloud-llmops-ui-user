@@ -173,16 +173,25 @@ function CreateDetail() {
     useEffect(() => {
         if (searchParams.get('uid')) {
             getApp({ uid: searchParams.get('uid') as string }).then((res) => {
-                setDetail(res);
+                resUpperCase(res);
             });
         } else {
             getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
-                setDetail(res);
+                resUpperCase(res);
             });
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const resUpperCase = (result: Details) => {
+        const newValue = { ...result };
+        newValue.workflowConfig.steps?.forEach((item) => {
+            item.variable?.variables.forEach((el: { field: string }) => {
+                el.field = el.field.toUpperCase();
+            });
+        });
+        setDetail(newValue);
+    };
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {

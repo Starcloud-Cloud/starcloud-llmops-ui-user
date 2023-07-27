@@ -30,6 +30,16 @@ export interface TabsProps {
     value: string | number;
     index: number;
 }
+type Variable = {
+    variable?: {
+        variables: [{ field: string }];
+    };
+};
+export interface Result {
+    workflowConfig: {
+        steps: Variable[];
+    };
+}
 
 export interface GenericCardProps {
     title?: string;

@@ -6,11 +6,28 @@ import MainCard, { MainCardProps } from 'ui-component/cards/MainCard';
 
 // ==============================|| AUTHENTICATION CARD WRAPPER ||============================== //
 
-const AuthCardWrapper = ({ children, ...other }: MainCardProps) => (
+export const AuthLoginCardWrapper = ({ children, ...other }: MainCardProps) => (
     <MainCard
         sx={{
             width: { xs: 350, lg: 475 },
             height: { xs: 400, lg: 435 },
+            margin: { xs: 2.5, md: 3 },
+            '& > *': {
+                flexGrow: 1,
+                flexBasis: '50%'
+            }
+        }}
+        content={false}
+        {...other}
+    >
+        <Box sx={{ p: { xs: 2, sm: 3, xl: 5 } }}>{children}</Box>
+    </MainCard>
+);
+
+const AuthCardWrapper = ({ children, ...other }: MainCardProps) => (
+    <MainCard
+        sx={{
+            maxWidth: { xs: 400, lg: 475 },
             margin: { xs: 2.5, md: 3 },
             '& > *': {
                 flexGrow: 1,

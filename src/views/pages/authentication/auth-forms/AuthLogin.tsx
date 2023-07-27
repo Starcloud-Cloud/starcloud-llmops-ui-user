@@ -67,6 +67,9 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const [inviteCode, setInviteCode] = useState('');
 
     const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const urlInviteCode = query.get('q');
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -105,24 +108,24 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         }
     }, [open]);
 
-    const getInviteCodeFromLocalStorage = () => {
-        const localInviteCode = localStorage.getItem('inviteCode');
-        return localInviteCode || '';
-    };
+    // 获取存储在localStorage的inviteCode及其过期时间
     useEffect(() => {
-        // 获取URL中的邀请码
-        const query = new URLSearchParams(location.search);
-        let inviteCodeFromUrl = query.get('q') || '';
+        const storedInviteCode = localStorage.getItem('inviteCode');
+        const inviteCodeExpiry = localStorage.getItem('inviteCodeExpiry');
 
-        if (!inviteCodeFromUrl) {
-            // 如果URL中没有邀请码，尝试从localStorage获取
-            inviteCodeFromUrl = getInviteCodeFromLocalStorage();
+        // 如果url中没有inviteCode，且localStorage中的inviteCode未过期，那么使用localStorage中的inviteCode
+        if (!urlInviteCode && storedInviteCode && inviteCodeExpiry && new Date().getTime() < Number(inviteCodeExpiry)) {
+            setInviteCode(storedInviteCode);
         }
-
-        // 设置邀请码
-        setInviteCode(inviteCodeFromUrl);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        // 如果url中有inviteCode，那么使用url中的inviteCode，并更新localStorage
+        else if (urlInviteCode) {
+            const currentTime = new Date().getTime();
+            const expiryTime = currentTime + 24 * 60 * 60 * 1000; // 24 hours from now
+            localStorage.setItem('inviteCode', urlInviteCode);
+            localStorage.setItem('inviteCodeExpiry', expiryTime.toString());
+            setInviteCode(urlInviteCode);
+        }
+    }, [urlInviteCode]);
 
     // 增加一个登录状态的state
 
@@ -363,7 +366,12 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Grid item container direction="column" alignItems="center" xs={12}>
-                            <Typography component={Link} to="/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                            <Typography
+                                component={Link}
+                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
+                                variant="subtitle1"
+                                sx={{ textDecoration: 'none' }}
+                            >
                                 {t('auth.login.account')}
                             </Typography>
                         </Grid>
@@ -387,12 +395,27 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     <div className="flex justify-center mt-5">
                         <img
                             className="border rounded border-[#e0e0e098] border-solid"
-                            height="250"
-                            width="250"
+                            height="233"
+                            width="233"
                             src={qrUrl ? qrUrl : 'https://via.placeholder.com/200'}
                             alt="QR code"
                         />
                     </div>
+                    <Grid item xs={12} className="pt-3 pb-3">
+                        <Divider />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Grid item container direction="column" alignItems="center" xs={12}>
+                            <Typography
+                                component={Link}
+                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
+                                variant="subtitle1"
+                                sx={{ textDecoration: 'none' }}
+                            >
+                                {t('auth.login.account')}
+                            </Typography>
+                        </Grid>
+                    </Grid>
                 </div>
             )}
         </div>

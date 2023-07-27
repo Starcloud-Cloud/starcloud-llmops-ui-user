@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import { Box, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
-import AuthWrapper2 from '../AuthWrapper2';
-import AuthCardWrapper from '../AuthCardWrapper';
+import { useLocation } from 'react-router-dom';
+import { AuthSliderProps } from 'types';
 import Logo from 'ui-component/Logo';
-import AuthRegister from '../auth-forms/AuthRegister';
-import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
-import { AuthSliderProps } from 'types';
-import { useLocation } from 'react-router-dom';
+import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
+import AuthCardWrapper from '../AuthCardWrapper';
+import AuthWrapper2 from '../AuthWrapper2';
+import AuthRegister from '../auth-forms/AuthRegister';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
@@ -124,7 +124,7 @@ const Register = () => {
                                             <Grid item container direction="column" alignItems="center" xs={12}>
                                                 <Typography
                                                     component={Link}
-                                                    to="/login"
+                                                    to={inviteCode ? `/login?q=${inviteCode}` : '/login'}
                                                     variant="subtitle1"
                                                     sx={{ textDecoration: 'none' }}
                                                 >

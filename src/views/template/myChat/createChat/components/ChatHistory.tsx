@@ -6,7 +6,8 @@ import { Card, CardContent, Grid, Theme, Typography } from '@mui/material';
 // project imports
 import { gridSpacing } from 'store/constant';
 import { UserProfile } from 'types/user-profile';
-import { IHistory } from './chat';
+import { IHistory } from './Chat';
+import { LoadingDot } from 'ui-component/LoadingDot';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -16,7 +17,7 @@ interface ChartHistoryProps {
     user: UserProfile;
 }
 
-const ChartHistory = ({ data, theme, user }: ChartHistoryProps) => (
+const ChatHistory = ({ data, theme, user }: ChartHistoryProps) => (
     <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
             {data.map((history, index) => (
@@ -91,7 +92,8 @@ const ChartHistory = ({ data, theme, user }: ChartHistoryProps) => (
                                             <CardContent sx={{ p: 2, pb: '16px !important' }}>
                                                 <Grid container spacing={1}>
                                                     <Grid item xs={12}>
-                                                        <Typography variant="body2">{history.text}</Typography>
+                                                        {/*<Typography variant="body2">{history.text}</Typography>*/}
+                                                        <LoadingDot />
                                                     </Grid>
                                                 </Grid>
                                             </CardContent>
@@ -107,4 +109,4 @@ const ChartHistory = ({ data, theme, user }: ChartHistoryProps) => (
     </Grid>
 );
 
-export default ChartHistory;
+export default ChatHistory;

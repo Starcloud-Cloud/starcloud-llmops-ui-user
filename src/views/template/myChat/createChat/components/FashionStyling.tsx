@@ -25,10 +25,9 @@ import {
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
 import { useState } from 'react';
-import { gridSpacing } from '../../../../../../store/constant';
-import MainCard from '../../../../../../ui-component/cards/MainCard';
+import { gridSpacing } from 'store/constant';
+import MainCard from 'ui-component/cards/MainCard';
 import ShortcutRecord from './ShortcutRecord';
-import { Chat } from './chat';
 
 const uploadButton = (
     <div>
@@ -211,7 +210,7 @@ export const FashionStyling = () => {
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
     return (
         <div className={'flex '}>
-            <div className={'w-8/12'}>
+            <div>
                 <div>
                     <span
                         className={
@@ -362,9 +361,6 @@ export const FashionStyling = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className={'w-4/12 ml-5'}>
-                <Chat />
             </div>
             <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />

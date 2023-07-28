@@ -146,6 +146,9 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 
+const MyChat = Loadable(lazy(() => import('views/template/myChat')));
+const CreateChat = Loadable(lazy(() => import('views/template/myChat/createChat')));
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -554,10 +557,6 @@ const MainRoutes = {
             path: '/createApp',
             element: <CreateDetail />
         },
-        // {
-        //     path: '/createChatApp',
-        //     element: <CreateChatApp />
-        // },
         {
             path: '/exchange',
             element: <Redemption />
@@ -569,6 +568,14 @@ const MainRoutes = {
         {
             path: '/textToImage',
             element: <PictureCreate />
+        },
+        {
+            path: '/my-chat',
+            element: <MyChat />
+        },
+        {
+            path: '/createChat',
+            element: <CreateChat />
         }
     ]
 };

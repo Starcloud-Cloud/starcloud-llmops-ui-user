@@ -1,5 +1,5 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Card, CardHeader, Divider, Grid, Link, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Card, CardHeader, Divider, Link, Tab, Tabs } from '@mui/material';
 import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
@@ -11,10 +11,11 @@ import userInfoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
-import Perform from 'views/template/carryOut/perform';
-import Arrange from './arrange';
-import Basis from './basis';
-import Upload from './upLoad';
+import { FashionStyling } from './components/FashionStyling';
+import { Knowledge } from './components/Knowledge';
+import { Regulation } from './components/Regulation';
+import { Skill } from './components/Skill';
+import { Chat } from './components/Chat';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -264,116 +265,82 @@ function CreateDetail() {
         setValue(newValue);
     };
 
+    console.log(value, 'value');
     return (
-        <Card>
-            <CardHeader
-                sx={{ padding: 2 }}
-                avatar={
-                    <Button
-                        variant="contained"
-                        startIcon={<ArrowBackIcon />}
-                        color="secondary"
-                        onClick={() => navigate('/template/createCenter')}
-                    >
-                        {t('myApp.back')}
-                    </Button>
-                }
-                title={detail?.name}
-                action={
-                    <Button variant="contained" color="secondary" disabled={value !== 0} autoFocus onClick={saveDetail}>
-                        {t('myApp.save')}
-                    </Button>
-                }
-            ></CardHeader>
-            <Divider />
-            <Tabs
-                sx={{
-                    m: 3,
-                    mb: 0,
-                    '& a': {
-                        minHeight: 'auto',
-                        minWidth: 10,
-                        py: 1.5,
-                        px: 1,
-                        mr: 2.2,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    },
-                    '& a > svg': {
-                        mb: '0px !important',
-                        mr: 1.1
+        <div className="grid grid-cols-12 gap-4">
+            <Card className="col-span-8">
+                <CardHeader
+                    sx={{ padding: 2 }}
+                    avatar={
+                        <Button
+                            variant="contained"
+                            startIcon={<ArrowBackIcon />}
+                            color="secondary"
+                            onClick={() => navigate('/template/createCenter')}
+                        >
+                            {t('myApp.back')}
+                        </Button>
                     }
-                }}
-                value={value}
-                variant="scrollable"
-                onChange={handleChange}
-            >
-                <Tab component={Link} label={t('myApp.basis')} {...a11yProps(0)} />
-                <Tab component={Link} label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab component={Link} label={t('myApp.upload')} {...a11yProps(2)} />
-            </Tabs>
-            <TabPanel value={value} index={0}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6}>
-                        {detail && (
-                            <Basis ref={basis} initialValues={{ name: detail?.name, desc: detail?.description }} setValues={setData} />
-                        )}
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h3">{t('market.debug')}</Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
-                        </Card>
-                    </Grid>
-                </Grid>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6} sx={{ width: '100%' }}>
-                        <Arrange
-                            config={detail?.workflowConfig}
-                            editChange={editChange}
-                            basisChange={basisChange}
-                            statusChange={statusChange}
-                            changeConfigs={changeConfigs}
-                        />
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h3">调试与预览</Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
-                        </Card>
-                    </Grid>
-                </Grid>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <Upload />
-            </TabPanel>
-        </Card>
+                    title={detail?.name}
+                    action={
+                        <Button variant="contained" color="secondary" disabled={value !== 0} autoFocus onClick={saveDetail}>
+                            {t('myApp.save')}
+                        </Button>
+                    }
+                ></CardHeader>
+                <Divider />
+                <Tabs
+                    sx={{
+                        m: 3,
+                        mb: 0,
+                        '& a': {
+                            minHeight: 'auto',
+                            minWidth: 10,
+                            py: 1.5,
+                            px: 1,
+                            mr: 2.2,
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        },
+                        '& a > svg': {
+                            mb: '0px !important',
+                            mr: 1.1
+                        }
+                    }}
+                    value={value}
+                    variant="scrollable"
+                    onChange={handleChange}
+                >
+                    <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
+                    <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
+                    <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
+                    <Tab component={Link} label={'技能'} {...a11yProps(3)} />
+                    <Tab component={Link} label={'会话'} {...a11yProps(4)} />
+                </Tabs>
+                <TabPanel value={value} index={0}>
+                    <FashionStyling />
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                    <Regulation />
+                </TabPanel>
+                <TabPanel value={value} index={2}>
+                    <Knowledge />
+                </TabPanel>
+                <TabPanel value={value} index={3}>
+                    <Skill />
+                </TabPanel>
+                <TabPanel value={value} index={4}>
+                    <Chat />
+                </TabPanel>
+            </Card>
+            {value !== 4 && (
+                <Card className="col-span-4 h-[calc(100vh-130px)]">
+                    <Chat />
+                </Card>
+            )}
+        </div>
     );
 }
 

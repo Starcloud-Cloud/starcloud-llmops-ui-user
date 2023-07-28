@@ -23,10 +23,16 @@ import {
     useTheme
 } from '@mui/material';
 import { Upload, UploadProps } from 'antd';
+import { useFormik } from 'formik';
 import React, { useState } from 'react';
+import { useDispatch } from 'store';
 import { gridSpacing } from 'store/constant';
+import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import MainCard from 'ui-component/cards/MainCard';
+import * as yup from 'yup';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { LoadingSpin } from '../../../../../ui-component/LoadingSpin';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -47,8 +53,14 @@ function a11yProps(index: number) {
     };
 }
 
+const validationSchema = yup.object({
+    email: yup.string().email('Enter a valid email').required('Email is required'),
+    password: yup.string().min(8, 'Password should be of minimum 8 characters length').required('Password is required')
+});
+
 const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const theme = useTheme();
+    const dispatch = useDispatch();
     const [valueLabel, setValueLabel] = useState('checked');
     const [value, setValue] = React.useState(0);
 
@@ -57,6 +69,27 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
     };
 
     const { Dragger } = Upload;
+
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            password: ''
+        },
+        validationSchema,
+        onSubmit: (values) => {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'Submit Success',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+        }
+    });
 
     const props: UploadProps = {
         name: 'file',
@@ -135,24 +168,50 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
                                     <p className="ant-upload-drag-icon">
                                         <InboxOutlined rev={undefined} />
                                     </p>
-                                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                    <p className="ant-upload-hint">
-                                        Support for a single or bulk upload. Strictly prohibited from uploading company data or other banned
-                                        files.
-                                    </p>
+                                    <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
                                 </Dragger>
                             </div>
                         </TabPanel>
                         <TabPanel value={value} index={1}>
-                            <TextField label={'问题'} fullWidth />
-                            <TextField label={'回答'} className={'mt-3'} fullWidth multiline minRows={6} />
+                            <form onSubmit={formik.handleSubmit}>
+                                <TextField
+                                    label={'问题'}
+                                    fullWidth
+                                    id="label"
+                                    name="label"
+                                    value={formik.values.email}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.email && Boolean(formik.errors.email)}
+                                    helperText={formik.touched.email && formik.errors.email}
+                                />
+                                <TextField
+                                    label={'答案'}
+                                    fullWidth
+                                    id="label"
+                                    name="label"
+                                    value={formik.values.email}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.email && Boolean(formik.errors.email)}
+                                    helperText={formik.touched.email && formik.errors.email}
+                                    className={'mt-3'}
+                                    multiline
+                                    minRows={6}
+                                />
+                            </form>
                         </TabPanel>
                     </>
                 </CardContent>
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" color="secondary">
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                                console.log(formik);
+                            }}
+                        >
                             保存
                         </Button>
                     </Grid>
@@ -252,11 +311,7 @@ const DocumentModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                                     <p className="ant-upload-drag-icon">
                                         <InboxOutlined rev={undefined} />
                                     </p>
-                                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                    <p className="ant-upload-hint">
-                                        Support for a single or bulk upload. Strictly prohibited from uploading company data or other banned
-                                        files.
-                                    </p>
+                                    <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
                                 </Dragger>
                             </div>
                         </TabPanel>
@@ -307,6 +362,115 @@ export const Knowledge = () => {
     return (
         <div>
             <div>
+                <div>
+                    <span
+                        className={
+                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                        }
+                    >
+                        文档式
+                    </span>
+                    <div className={'mt-3'}>
+                        <div className="flex justify-end">
+                            <Button
+                                variant={'contained'}
+                                startIcon={<AddIcon />}
+                                color={'secondary'}
+                                size={'small'}
+                                onClick={() => setDocumentVisible(true)}
+                            >
+                                添加文档
+                            </Button>
+                        </div>
+                        <div>
+                            <MainCard>
+                                <Grid container direction="row" spacing={gridSpacing}>
+                                    <Grid item xs={12} sm={6} xl={4}>
+                                        <Card
+                                            sx={{
+                                                p: 2,
+                                                background:
+                                                    theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
+                                                border: '1px solid #e3e8ef',
+                                                '&:hover': {
+                                                    borderColor: theme.palette.primary.main
+                                                }
+                                            }}
+                                        >
+                                            <Grid container spacing={gridSpacing}>
+                                                <Grid item xs={12}>
+                                                    <Grid container spacing={gridSpacing}>
+                                                        <Grid item xs zeroMinWidth>
+                                                            <div className="flex items-center">
+                                                                <EditIcon className="text-[#5e35b1] text-base mr-2" />
+                                                                <Typography variant="h4" component="div" color={'#0009'}>
+                                                                    这里是问题
+                                                                </Typography>
+                                                            </div>
+                                                        </Grid>
+
+                                                        <Grid item>
+                                                            <IconButton
+                                                                size="small"
+                                                                sx={{ mt: -0.75, mr: -0.75 }}
+                                                                onClick={handleClick}
+                                                                aria-label="more-options"
+                                                            >
+                                                                <MoreHorizOutlinedIcon
+                                                                    fontSize="small"
+                                                                    color="inherit"
+                                                                    aria-controls="menu-friend-card"
+                                                                    aria-haspopup="true"
+                                                                    sx={{ opacity: 0.6 }}
+                                                                />
+                                                            </IconButton>
+                                                            {anchorEl && (
+                                                                <Menu
+                                                                    id="menu-user-details-card"
+                                                                    anchorEl={anchorEl}
+                                                                    keepMounted
+                                                                    open={Boolean(anchorEl)}
+                                                                    onClose={handleClose}
+                                                                    variant="selectedMenu"
+                                                                    anchorOrigin={{
+                                                                        vertical: 'bottom',
+                                                                        horizontal: 'right'
+                                                                    }}
+                                                                    transformOrigin={{
+                                                                        vertical: 'top',
+                                                                        horizontal: 'right'
+                                                                    }}
+                                                                >
+                                                                    <MenuItem onClick={handleClose}>Edit</MenuItem>
+                                                                    <MenuItem onClick={handleClose}>Delete</MenuItem>
+                                                                </Menu>
+                                                            )}
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid item xs={12} className="!pt-[10px]">
+                                                    <Typography variant="h5" component="div" color={'#0009'}>
+                                                        这里是答案
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12} className="!pt-[10px]">
+                                                    <Divider variant="fullWidth" />
+                                                </Grid>
+                                                <Grid item xs={12} className="!pt-[10px] flex items-center">
+                                                    <LoadingSpin />
+                                                    <CheckCircleIcon sx={{ color: 'success.dark', width: 14, height: 14 }} />
+                                                    <Typography variant="caption">From Custom Input</Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Card>
+                                    </Grid>
+                                </Grid>
+                            </MainCard>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <span
                     className={
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
@@ -314,7 +478,7 @@ export const Knowledge = () => {
                 >
                     问答式
                 </span>
-                <div className={'mt-5'}>
+                <div className={'mt-3'}>
                     <div className="flex justify-end">
                         <Button
                             variant={'contained'}
@@ -326,10 +490,10 @@ export const Knowledge = () => {
                             添加问答
                         </Button>
                     </div>
-                    <div className="mt-3">
+                    <div>
                         <MainCard>
                             <Grid container direction="row" spacing={gridSpacing}>
-                                <Grid item xs={12} sm={6} lg={4} xl={3}>
+                                <Grid item xs={12} sm={6} xl={4}>
                                     <Card
                                         sx={{
                                             p: 2,
@@ -402,7 +566,7 @@ export const Knowledge = () => {
                                             <Grid item xs={12}>
                                                 <Divider variant="fullWidth" />
                                             </Grid>
-                                            <Grid item xs={12} className="!pt-[10px]">
+                                            <Grid item xs={12} className="!pt-[3px]">
                                                 <Typography variant="caption">From Custom Input</Typography>
                                             </Grid>
                                         </Grid>
@@ -413,122 +577,7 @@ export const Knowledge = () => {
                     </div>
                 </div>
             </div>
-            <div>
-                <div>
-                    <span
-                        className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                        }
-                    >
-                        文档式
-                    </span>
-                    <div className={'mt-5'}>
-                        <div className="flex justify-end">
-                            <Button
-                                variant={'contained'}
-                                startIcon={<AddIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                onClick={() => setDocumentVisible(true)}
-                            >
-                                添加文档
-                            </Button>
-                        </div>
-                        <div className="mt-3">
-                            <MainCard>
-                                <Grid container direction="row" spacing={gridSpacing}>
-                                    <Grid item xs={12} sm={6} lg={4} xl={3}>
-                                        <Card
-                                            sx={{
-                                                p: 2,
-                                                background:
-                                                    theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
-                                                border:
-                                                    theme.palette.mode === 'dark'
-                                                        ? '1px solid transparent'
-                                                        : `1px solid${theme.palette.grey[100]}`,
-                                                '&:hover': {
-                                                    borderColor: theme.palette.primary.main
-                                                }
-                                            }}
-                                        >
-                                            <Grid container spacing={gridSpacing}>
-                                                <Grid item xs={12}>
-                                                    <Grid container spacing={gridSpacing}>
-                                                        <Grid item xs zeroMinWidth>
-                                                            <div className="flex items-center">
-                                                                <EditIcon className="text-[#0009] text-lg" />
-                                                                <Typography variant="h4" component="div" color={'#0009'}>
-                                                                    这里是问题
-                                                                </Typography>
-                                                            </div>
-                                                        </Grid>
 
-                                                        <Grid item>
-                                                            <IconButton
-                                                                size="small"
-                                                                sx={{ mt: -0.75, mr: -0.75 }}
-                                                                onClick={handleClick}
-                                                                aria-label="more-options"
-                                                            >
-                                                                <MoreHorizOutlinedIcon
-                                                                    fontSize="small"
-                                                                    color="inherit"
-                                                                    aria-controls="menu-friend-card"
-                                                                    aria-haspopup="true"
-                                                                    sx={{ opacity: 0.6 }}
-                                                                />
-                                                            </IconButton>
-                                                            {anchorEl && (
-                                                                <Menu
-                                                                    id="menu-user-details-card"
-                                                                    anchorEl={anchorEl}
-                                                                    keepMounted
-                                                                    open={Boolean(anchorEl)}
-                                                                    onClose={handleClose}
-                                                                    variant="selectedMenu"
-                                                                    anchorOrigin={{
-                                                                        vertical: 'bottom',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                    transformOrigin={{
-                                                                        vertical: 'top',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                >
-                                                                    <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                                                    <MenuItem onClick={handleClose}>Delete</MenuItem>
-                                                                </Menu>
-                                                            )}
-                                                        </Grid>
-                                                    </Grid>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Typography variant="h5" component="div" color={'#0009'}>
-                                                        这里是答案
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={12}
-                                                    sx={{
-                                                        paddingTop: '10px'
-                                                    }}
-                                                >
-                                                    <Divider variant="fullWidth" />
-                                                </Grid>
-                                                <Grid item xs={12} className="!pt-[10px]">
-                                                    <Typography variant="caption">From Custom Input</Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Card>
-                                    </Grid>
-                                </Grid>
-                            </MainCard>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />
             <DocumentModal open={documentVisible} handleClose={() => setDocumentVisible(false)} />
         </div>

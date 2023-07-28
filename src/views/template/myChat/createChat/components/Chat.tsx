@@ -3,12 +3,24 @@ import HistoryToggleOffSharpIcon from '@mui/icons-material/HistoryToggleOffSharp
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
 import SendIcon from '@mui/icons-material/Send';
-import { CardContent, Grid, IconButton, InputAdornment, Menu, MenuItem, OutlinedInput, useMediaQuery, useTheme } from '@mui/material';
+import {
+    Card,
+    CardContent,
+    Divider,
+    Grid,
+    IconButton,
+    InputAdornment,
+    Menu,
+    MenuItem,
+    OutlinedInput,
+    useMediaQuery,
+    useTheme
+} from '@mui/material';
 import dayjs from 'dayjs';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Chip from 'ui-component/extended/Chip';
-import ChartHistory from './ChartHistory';
+import ChatHistory from './ChatHistory';
 
 export type IHistory = {
     type: number;
@@ -126,10 +138,20 @@ export const Chat = () => {
     }, [matchDownSM]);
 
     return (
-        <div className="bg-[#f4f6f8] rounded-md">
-            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 440px)', overflowX: 'hidden', minHeight: 525 }}>
+        // <div className="bg-[#f4f6f8] rounded-md">
+        <div>
+            <div className={'flex justify-center items-center py-[15px]'}>
+                <img
+                    className="w-[38px] h-[38px] rounded-xl ml-2"
+                    src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
+                    alt=""
+                />
+                <text className={'text-lg font-medium ml-3'}>产品经理</text>
+            </div>
+            <Divider variant={'fullWidth'} />
+            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 310px)', overflowX: 'hidden', minHeight: 525 }}>
                 <CardContent>
-                    <ChartHistory theme={theme} user={user} data={data} />
+                    <ChatHistory theme={theme} user={user} data={data} />
                     {/* @ts-ignore */}
                     {/* <span ref={scrollRef} /> */}
                 </CardContent>

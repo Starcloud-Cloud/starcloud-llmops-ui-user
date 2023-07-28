@@ -93,7 +93,7 @@ const MainLayout = () => {
     const { drawerType, container, layout } = useConfig();
 
     const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/createChatApp', '/textToImage', '/createApp'];
+        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);
     }, [location]);

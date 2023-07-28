@@ -15,6 +15,7 @@ import { t } from 'hooks/web/useI18n';
 import { El } from 'types/template';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 // import copy from 'clipboard-copy';
+
 const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';

@@ -139,8 +139,8 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     //弹窗
-    const handleDetail = (data: { recommend: string }) => {
-        navigate('/createApp?recommend=' + data.recommend);
+    const handleDetail = (data: { uid: string }) => {
+        navigate('/createApp?recommend=' + data.uid);
     };
     const timeoutRef = useRef<any>();
     return (

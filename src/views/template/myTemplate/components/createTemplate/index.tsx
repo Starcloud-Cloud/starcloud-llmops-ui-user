@@ -32,7 +32,7 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-import Upload from './upLoad';
+// import Upload from './upLoad';
 import marketStore from 'store/market';
 import { del } from 'api/template';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
@@ -318,7 +318,7 @@ function CreateDetail() {
                         {t('myApp.back')}
                     </Button>
                 }
-                title={detail?.name}
+                title={<Typography variant="h3">{detail?.name}</Typography>}
                 action={
                     <>
                         {searchParams.get('uid') && (
@@ -374,7 +374,7 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
+                {/* <Tab label={t('myApp.upload')} {...a11yProps(2)} /> */}
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -393,7 +393,7 @@ function CreateDetail() {
                         )}
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h5" mb={1}>
+                        <Typography variant="h5" fontSize="1rem" mb={1}>
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
@@ -453,7 +453,7 @@ function CreateDetail() {
                         )}
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h5" mb={1}>
+                        <Typography variant="h5" fontSize="1rem" mb={1}>
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
@@ -499,9 +499,9 @@ function CreateDetail() {
                     </Grid>
                 </Grid>
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            {/* <TabPanel value={value} index={2}>
                 <Upload />
-            </TabPanel>
+            </TabPanel> */}
         </Card>
     );
 }

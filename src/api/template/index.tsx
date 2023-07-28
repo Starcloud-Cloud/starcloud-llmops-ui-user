@@ -5,7 +5,7 @@ export const marketPage = (params: PageParam) => {
 };
 //模板市场详情
 export const marketDeatail = (data: { uid: string }) => {
-    return request.get({ url: `/llm/app/market/getByUid/${data.uid}` });
+    return request.get({ url: `/llm/app/market/get/${data.uid}` });
 };
 //获取等级
 export const userBenefits = () => {

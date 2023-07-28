@@ -230,7 +230,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
 
     return (
         <Box>
-            <Typography variant="h5" mb={1}>
+            <Typography variant="h5" fontSize="1rem" mb={1}>
                 {t('myApp.flow')}
             </Typography>
             {config?.steps.map((item: any, index: number) => (

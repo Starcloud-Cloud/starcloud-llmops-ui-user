@@ -27,6 +27,7 @@ import { Upload, UploadFile, UploadProps } from 'antd';
 import { useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
+import { IChatInfo } from '../index';
 import ShortcutRecord from './ShortcutRecord';
 
 const uploadButton = (
@@ -196,7 +197,13 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
  * 形象设计
  * @constructor
  */
-export const FashionStyling = () => {
+export const FashionStyling = ({
+    setChatBotInfo,
+    chatBotInfo
+}: {
+    setChatBotInfo: (chatInfo: IChatInfo) => void;
+    chatBotInfo: IChatInfo;
+}) => {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [guideList, setGuideList] = useState(['', '']);
     const [visibleVoice, setVisibleVoice] = useState(false);
@@ -220,7 +227,16 @@ export const FashionStyling = () => {
                         基本信息
                     </span>
                     <div className={'mt-5 w-1/3'}>
-                        <TextField label={'名称'} className={'mt-1'} fullWidth size={'small'} />
+                        <TextField
+                            label={'名称'}
+                            className={'mt-1'}
+                            fullWidth
+                            size={'small'}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setChatBotInfo({ ...chatBotInfo, name: value });
+                            }}
+                        />
                     </div>
                     <div className={'mt-5'}>
                         <span className={'text-base'}>头像</span>
@@ -246,6 +262,10 @@ export const FashionStyling = () => {
                             minRows={3}
                             aria-valuemax={200}
                             label={'简介'}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setChatBotInfo({ ...chatBotInfo, introduction: value });
+                            }}
                         />
                     </div>
                     <div className={'mt-5'}>

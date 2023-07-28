@@ -13,6 +13,7 @@ import {
     Menu,
     MenuItem,
     OutlinedInput,
+    Typography,
     useMediaQuery,
     useTheme
 } from '@mui/material';
@@ -20,6 +21,7 @@ import dayjs from 'dayjs';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Chip from 'ui-component/extended/Chip';
+import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
 
 export type IHistory = {
@@ -28,7 +30,7 @@ export type IHistory = {
     time?: string;
 };
 
-export const Chat = () => {
+export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const theme = useTheme();
     const scrollRef = React.useRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
@@ -146,10 +148,15 @@ export const Chat = () => {
                     src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
                     alt=""
                 />
-                <text className={'text-lg font-medium ml-3'}>产品经理</text>
+                <text className={'text-lg font-medium ml-3'}>{chatBotInfo.name}</text>
             </div>
             <Divider variant={'fullWidth'} />
             <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 310px)', overflowX: 'hidden', minHeight: 525 }}>
+                <Card className="bg-[#f2f3f5] m-[24px] p-[16px]">
+                    <Typography align="left" variant="subtitle2">
+                        {chatBotInfo.introduction}
+                    </Typography>
+                </Card>
                 <CardContent>
                     <ChatHistory theme={theme} user={user} data={data} />
                     {/* @ts-ignore */}

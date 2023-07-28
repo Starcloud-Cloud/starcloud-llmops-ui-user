@@ -17,6 +17,7 @@ import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { t } from 'hooks/web/useI18n';
 import { useContext } from 'react';
 import { Item } from 'types/template';
+import FormDialog from './components/FormDialog';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -62,6 +63,8 @@ function MyTemplate() {
         pageSize: 20
     });
     const [total, setTotal] = useState(0);
+    const [open, setOpen] = useState(false);
+
     useEffect(() => {
         recommends({ mode: 'CHAT' }).then((res) => {
             setRecommends(res);
@@ -82,8 +85,13 @@ function MyTemplate() {
     };
     //弹窗
     const handleDetail = (data: { recommend: string }) => {
-        navigate('/createChat?recommend=' + data.recommend);
+        setOpen(true);
     };
+
+    const handleCreate = () => {
+        navigate('/createChat?recommend=' + 'test');
+    };
+
     return (
         <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -123,6 +131,7 @@ function MyTemplate() {
                     </Box>
                 </Box>
             )}
+            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} />
         </Box>
     );
 }

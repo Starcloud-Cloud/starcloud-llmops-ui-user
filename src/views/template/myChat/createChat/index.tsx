@@ -11,11 +11,11 @@ import userInfoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
+import { Chat } from './components/Chat';
 import { FashionStyling } from './components/FashionStyling';
 import { Knowledge } from './components/Knowledge';
 import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
-import { Chat } from './components/Chat';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -36,6 +36,12 @@ export function a11yProps(index: number) {
     };
 }
 
+export type IChatInfo = {
+    name?: string;
+    avatar?: string;
+    introduction?: string;
+};
+
 function CreateDetail() {
     //路由跳转
     const navigate = useNavigate();
@@ -47,6 +53,12 @@ function CreateDetail() {
     const [detail, setDetail] = useState(null as unknown as Details);
     const [loadings, setLoadings] = useState<any[]>([]);
     const basis = useRef<any>(null);
+    const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
+        name: '1',
+        avatar: '',
+        introduction: '2'
+    });
+
     //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -320,7 +332,7 @@ function CreateDetail() {
                     <Tab component={Link} label={'会话'} {...a11yProps(4)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
-                    <FashionStyling />
+                    <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={1}>
                     <Regulation />
@@ -332,12 +344,12 @@ function CreateDetail() {
                     <Skill />
                 </TabPanel>
                 <TabPanel value={value} index={4}>
-                    <Chat />
+                    <Chat chatBotInfo={chatBotInfo} />
                 </TabPanel>
             </Card>
             {value !== 4 && (
                 <Card className="col-span-4 h-[calc(100vh-130px)]">
-                    <Chat />
+                    <Chat chatBotInfo={chatBotInfo} />
                 </Card>
             )}
         </div>

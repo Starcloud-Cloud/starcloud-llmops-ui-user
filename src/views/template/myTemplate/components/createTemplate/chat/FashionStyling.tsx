@@ -211,7 +211,7 @@ export const FashionStyling = () => {
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
     return (
         <div className={'flex '}>
-            <div className={'w-4/12'}>
+            <div className={'w-8/12'}>
                 <div>
                     <span
                         className={
@@ -363,7 +363,7 @@ export const FashionStyling = () => {
                     </div>
                 </div>
             </div>
-            <div className={'w-8/12 ml-3'}>
+            <div className={'w-4/12 ml-5'}>
                 <Chat />
             </div>
             <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />

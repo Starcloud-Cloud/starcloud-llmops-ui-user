@@ -18,6 +18,7 @@ import { FashionStyling } from './chat/FashionStyling';
 import { Knowledge } from './chat/Knowledge';
 import { Regulation } from './chat/Regulation';
 import { Skill } from './chat/Skill';
+import { Chat } from './chat/chat';
 import Upload from './upLoad';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
@@ -321,6 +322,7 @@ function CreateDetail() {
                 <Tab component={Link} label={'规则设定'} {...a11yProps(4)} />
                 <Tab component={Link} label={'知识库'} {...a11yProps(5)} />
                 <Tab component={Link} label={'技能'} {...a11yProps(6)} />
+                <Tab component={Link} label={'会话'} {...a11yProps(7)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -392,6 +394,9 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={6}>
                 <Skill />
+            </TabPanel>
+            <TabPanel value={value} index={7}>
+                <Chat />
             </TabPanel>
         </Card>
     );

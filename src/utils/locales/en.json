@@ -497,9 +497,10 @@
     "name": "Application Name",
     "category": "Category",
     "tag": "Tag",
-    "recommend": "Get Started",
+    "recommend": "Template Application",
     "instruction": "Trial Instruction",
-    "self": "My App"
+    "self": "My App",
+    "AppDesc": "Select A Began To Write"
   },
   "market": {
     "title": "Application Market",

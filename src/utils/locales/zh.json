@@ -527,9 +527,10 @@
     "name": "应用名称",
     "category": "分类",
     "tag": "标签",
-    "recommend": "推荐应用",
+    "recommend": "模版应用",
     "instruction": "使用说明",
-    "self": "我的应用"
+    "self": "我的应用",
+    "AppDesc": "选择一个开始创作"
   },
   "market": {
     "title": "应用市场",

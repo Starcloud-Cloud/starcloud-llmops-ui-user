@@ -240,6 +240,9 @@ function MyTemplate() {
             </Grid>
             <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>
+                <Typography fontSize="12px" ml={1}>
+                    {t('apply.AppDesc')}
+                </Typography>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>

@@ -46,7 +46,6 @@ import { AiOutlineWechat } from 'react-icons/ai';
 const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const theme = useTheme();
     const { login } = useAuth();
-    const [open, setOpen] = useState(true);
     const [ticket, setTicket] = useState('');
     const scriptedRef = useScriptRef();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -65,7 +64,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [qrUrl, setQrurl] = useState(null);
     const [inviteCode, setInviteCode] = useState('');
-
+    const [open, setOpen] = useState(true);
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
@@ -87,26 +86,6 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     //         console.log('getTenantId', authUtil.getTenantId());
     //     }
     // };
-    useEffect(() => {
-        if (open) {
-            (async () => {
-                const res = await LoginApi.getQRcode();
-                if (res) {
-                    setQrurl(res?.url);
-                    setTicket(res?.ticket);
-                    if (intervalIdRef.current) {
-                        clearInterval(intervalIdRef.current as unknown as number);
-                    }
-                    isClearedRef.current = false;
-                }
-            })();
-        } else {
-            if (intervalIdRef.current) {
-                clearInterval(intervalIdRef.current as unknown as number);
-            }
-            isClearedRef.current = true;
-        }
-    }, [open]);
 
     // 获取存储在localStorage的inviteCode及其过期时间
     useEffect(() => {
@@ -131,7 +110,27 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
     const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // 使用ref存储定时器id
     const isClearedRef = useRef(false); // 用来跟踪是否已经清除了定时器
-
+    useEffect(() => {
+        if (open) {
+            (async () => {
+                const res = await LoginApi.getQRcode({ inviteCode: urlInviteCode });
+                if (res) {
+                    setQrurl(res?.url);
+                    setTicket(res?.ticket);
+                    if (intervalIdRef.current) {
+                        clearInterval(intervalIdRef.current as unknown as number);
+                    }
+                    isClearedRef.current = false;
+                }
+            })();
+        } else {
+            if (intervalIdRef.current) {
+                clearInterval(intervalIdRef.current as unknown as number);
+            }
+            isClearedRef.current = true;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
     useEffect(() => {
         const polling = async () => {
             const res = await LoginApi.qRcodeLogin({ ticket, inviteCode });

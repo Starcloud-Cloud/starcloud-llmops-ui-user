@@ -110,10 +110,13 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
     const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // 使用ref存储定时器id
     const isClearedRef = useRef(false); // 用来跟踪是否已经清除了定时器
+    const [qsState, setQs] = useState(false);
+
     useEffect(() => {
-        if (open) {
+        setQs(true);
+        if (open && qsState) {
             (async () => {
-                const res = await LoginApi.getQRcode({ inviteCode: urlInviteCode });
+                const res = await LoginApi.getQRcode({ inviteCode });
                 if (res) {
                     setQrurl(res?.url);
                     setTicket(res?.ticket);
@@ -130,7 +133,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             isClearedRef.current = true;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+    }, [open, inviteCode, qsState]);
     useEffect(() => {
         const polling = async () => {
             const res = await LoginApi.qRcodeLogin({ ticket, inviteCode });

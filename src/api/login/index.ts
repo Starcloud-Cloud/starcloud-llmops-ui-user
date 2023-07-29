@@ -76,9 +76,7 @@ export const getUserInfo = () => {
 
 // 获取登陆二维码 | QRcode
 export const getQRcode = (data: { inviteCode: string | null }) => {
-    console.log(data);
-
-    return request.get({ url: !data.inviteCode ? '/llm/wechat/qr' : '/llm/wechat/qr?inviteCode=' + data.inviteCode });
+    return request.get({ url: '/llm/wechat/qr?inviteCode=' + data.inviteCode });
 };
 
 // 注册 | Register

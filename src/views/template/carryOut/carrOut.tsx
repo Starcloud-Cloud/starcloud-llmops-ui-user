@@ -1,20 +1,21 @@
-import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress } from '@mui/material';
-import ReplyIcon from '@mui/icons-material/Reply';
+import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress, TextField } from '@mui/material';
+// import ReplyIcon from '@mui/icons-material/Reply';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+// import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import NotStartedIcon from '@mui/icons-material/NotStarted';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useFormik as Formik } from 'formik';
 import FormExecute from 'views/template/components/validaForm';
 import generateValidationSchema from 'hooks/usevalid';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+// import ReactMarkdown from 'react-markdown';
+// import remarkGfm from 'remark-gfm';
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 import { El } from 'types/template';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
-import copy from 'clipboard-copy';
+// import copy from 'clipboard-copy';
+
 const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
@@ -150,70 +151,88 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                 </form>
                 <Box my={1}>
                     {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
-                        <>
-                            <Typography color="#697586" ml={1} mb={-1.5} display="flex" alignItems="center">
-                                <AutoAwesomeIcon fontSize="small" />
-                                &nbsp; {t('myApp.execuent')}
-                            </Typography>
-                            <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
-                                <Box
-                                    sx={{
-                                        p: 2,
-                                        minHeight: item.flowStep.response.style === 'TEXTAREA' ? '200px' : '50px',
-                                        maxHeight: item.flowStep.response.style === 'TEXTAREA' ? '400px' : '100px',
-                                        overflow: 'auto'
-                                    }}
-                                    ref={mdRef}
-                                >
-                                    <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
+                        // <>
+                        //     <Typography color="#697586" ml={1} mb={-1.5} display="flex" alignItems="center">
+                        //         <AutoAwesomeIcon fontSize="small" />
+                        //         &nbsp; {t('myApp.execuent')}
+                        //     </Typography>
+                        //     <Box width="100%" sx={{ background: isDarkMode ? '#1a223f' : '#f8fafc' }}>
+                        //         <Box
+                        //             sx={{
+                        //                 p: 2,
+                        //                 minHeight: item.flowStep.response.style === 'TEXTAREA' ? '200px' : '50px',
+                        //                 maxHeight: item.flowStep.response.style === 'TEXTAREA' ? '400px' : '100px',
+                        //                 overflow: 'auto'
+                        //             }}
+                        //             ref={mdRef}
+                        //         >
+                        //             <ReactMarkdown children={item.flowStep.response.answer} remarkPlugins={[remarkGfm]} />
+                        //         </Box>
+                        //         {item.flowStep.response.answer && (
+                        //             <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
+                        //                 <Box>
+                        //                     <Button
+                        //                         sx={{ mt: 1, mr: 1 }}
+                        //                         size="small"
+                        //                         variant="outlined"
+                        //                         color="secondary"
+                        //                         startIcon={<ContentPasteIcon />}
+                        //                         onClick={() => {
+                        //                             copy(item.flowStep.response.answer);
+                        //                         }}
+                        //                     >
+                        //                         {t('market.copys')}
+                        //                     </Button>
+                        //                     {/* <Button
+                        //             sx={{ mt: 1, mr: 1 }}
+                        //             size="small"
+                        //             variant="outlined"
+                        //             color="secondary"
+                        //             startIcon={<ThumbUpAltOutlinedIcon />}
+                        //         >
+                        //             {t('market.like')}
+                        //         </Button>
+                        //         <Button
+                        //             sx={{ mt: 1, mr: 1 }}
+                        //             size="small"
+                        //             variant="outlined"
+                        //             color="secondary"
+                        //             startIcon={<ThumbDownOutlinedIcon />}
+                        //         >
+                        //             {t('market.Step')}
+                        //         </Button> */}
+                        //                     <Button
+                        //                         sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
+                        //                         size="small"
+                        //                         variant="outlined"
+                        //                         color="secondary"
+                        //                         startIcon={<ReplyIcon />}
+                        //                     >
+                        //                         {t('market.share')}
+                        //                     </Button>
+                        //                 </Box>
+                        //             </Box>
+                        //         )}
+                        //     </Box>
+                        // </>
+
+                        <TextField
+                            sx={{ mt: 2 }}
+                            inputRef={mdRef}
+                            fullWidth
+                            color="secondary"
+                            InputLabelProps={{ shrink: true }}
+                            label={
+                                <Box display="flex" alignItems="center">
+                                    <AutoAwesomeIcon fontSize="small" />
+                                    {t('myApp.execuent')}
                                 </Box>
-                                {item.flowStep.response.answer && (
-                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
-                                        <Box>
-                                            <Button
-                                                sx={{ mt: 1, mr: 1 }}
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                startIcon={<ContentPasteIcon />}
-                                                onClick={() => {
-                                                    copy(item.flowStep.response.answer);
-                                                }}
-                                            >
-                                                {t('market.copys')}
-                                            </Button>
-                                            {/* <Button
-                                    sx={{ mt: 1, mr: 1 }}
-                                    size="small"
-                                    variant="outlined"
-                                    color="secondary"
-                                    startIcon={<ThumbUpAltOutlinedIcon />}
-                                >
-                                    {t('market.like')}
-                                </Button>
-                                <Button
-                                    sx={{ mt: 1, mr: 1 }}
-                                    size="small"
-                                    variant="outlined"
-                                    color="secondary"
-                                    startIcon={<ThumbDownOutlinedIcon />}
-                                >
-                                    {t('market.Step')}
-                                </Button> */}
-                                            <Button
-                                                sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                startIcon={<ReplyIcon />}
-                                            >
-                                                {t('market.share')}
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )}
-                            </Box>
-                        </>
+                            }
+                            value={item.flowStep.response.answer}
+                            multiline
+                            minRows={item.flowStep.response.style === 'TEXTAREA' ? 8 : 1}
+                            maxRows={item.flowStep.response.style === 'TEXTAREA' ? 16 : 3}
+                        />
                     ) : (
                         <Card
                             elevation={3}

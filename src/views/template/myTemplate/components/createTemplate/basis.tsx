@@ -119,7 +119,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                         freeSolo
                         renderTags={(value: readonly string[], getTagProps) =>
                             value.map((option: string, index: number) => (
-                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                <Chip key={index} label={option} onDelete={getTagProps({ index }).onDelete} />
                             ))
                         }
                         onChange={(e: any, newValue) => {

@@ -1,11 +1,24 @@
-import { Box, Grid, Pagination, TextField, Typography, Button } from '@mui/material';
+import {
+    Box,
+    Grid,
+    Pagination,
+    TextField,
+    Typography,
+    Button,
+    OutlinedInput,
+    FormControl,
+    InputLabel,
+    Chip,
+    MenuItem,
+    Select
+} from '@mui/material';
 
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 
 import { recommends, appPage } from 'api/template/index';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -13,7 +26,8 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
-
+import marketStore from 'store/market';
+import myApp from 'store/myApp';
 import { useContext } from 'react';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
@@ -55,21 +69,65 @@ function MyTemplate() {
     //路由跳转
     const navigate = useNavigate();
     const [recommendList, setRecommends] = useState([]);
-    const [appList, setAppList] = useState([]);
-    const [newAppList, setNewApp] = useState([]);
+    const [appList, setAppList] = useState<any[]>([]);
+    const [newAppList, setNewApp] = useState<any[]>([]);
     const [pageQuery, setPageQuery] = useState({
         pageNo: 1,
         pageSize: 20
     });
-    const [total, setTotal] = useState(0);
+    const categoryList = marketStore((state) => state.categoryList);
+    const [queryParams, setQueryParams] = useState<{ name: string; categories: (string | null)[]; tags: (string | null)[] }>({
+        name: '',
+        categories: [],
+        tags: []
+    });
+    const { totals, totalList, setTotals, setTotalList } = myApp();
+    const changeParams = (e: any) => {
+        const { name, value } = e.target;
+        setQueryParams({
+            ...queryParams,
+            [name]: value
+        });
+    };
+    const query = ({ name, value }: any) => {
+        const newValue = { ...queryParams };
+        (newValue as any)[name] = value;
+        const setValue = totalList.filter((item) => {
+            let nameMatch = true;
+            let topicMatch = true;
+            let tagMatch = true;
+            if (newValue.name) {
+                nameMatch = item.name.toLowerCase().includes(newValue.name.toLowerCase());
+            }
+            if (newValue.categories && newValue.categories.length > 0) {
+                if (item.categories) {
+                    topicMatch = newValue.categories.some((topic) => item.categories.includes(topic));
+                } else {
+                    topicMatch = false;
+                }
+            }
+            // if (newValue.tags && newValue.tags.length > 0) {
+            //     if (item.tags) {
+            //         tagMatch = newValue.tags.some((tag) => item.tags.includes(tag));
+            //     } else {
+            //         tagMatch = false;
+            //     }
+            // }
+            return nameMatch && topicMatch && tagMatch;
+        });
+        setAppList(setValue);
+        setTotals(setValue.length);
+        setNewApp(setValue.slice(0, pageQuery.pageSize));
+    };
     useEffect(() => {
         recommends().then((res) => {
             setRecommends(res);
         });
         appPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
             setAppList(res.list);
+            setTotalList(res.list);
+            setTotals(res.page.total);
             setNewApp(res.list.slice(0, pageQuery.pageSize));
-            setTotal(res.page.total);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -81,24 +139,110 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     //弹窗
-    const handleDetail = (data: { recommend: string }) => {
-        navigate('/createApp?recommend=' + data.recommend);
+    const handleDetail = (data: { uid: string }) => {
+        navigate('/createApp?recommend=' + data.uid);
     };
+    const timeoutRef = useRef<any>();
     return (
         <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.name" label={t('apply.name')} InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField
+                        label={t('apply.name')}
+                        onChange={(e) => {
+                            changeParams(e);
+                            clearTimeout(timeoutRef.current);
+                            timeoutRef.current = setTimeout(() => {
+                                query(e.target);
+                            }, 200);
+                        }}
+                        name="name"
+                        value={queryParams.name}
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                    />
                 </Grid>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />
+                    <FormControl fullWidth>
+                        <InputLabel color="secondary" id="categories">
+                            {t('myApp.categary')}
+                        </InputLabel>
+                        <Select
+                            labelId="categories"
+                            name="categories"
+                            multiple
+                            color="secondary"
+                            value={queryParams?.categories}
+                            onChange={(e) => {
+                                changeParams(e);
+                                clearTimeout(timeoutRef.current);
+                                timeoutRef.current = setTimeout(() => {
+                                    query(e.target);
+                                }, 200);
+                            }}
+                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected?.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            )}
+                            label={t('myApp.categary')}
+                        >
+                            {categoryList?.map(
+                                (item) =>
+                                    item.name !== 'All' && (
+                                        <MenuItem key={item.code} value={item.code}>
+                                            {item.name}
+                                        </MenuItem>
+                                    )
+                            )}
+                        </Select>
+                    </FormControl>
                 </Grid>
-                <Grid item lg={3}>
-                    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />
-                </Grid>
+                {/* <Grid item lg={3}>
+                    <FormControl fullWidth>
+                        <InputLabel color="secondary" id="tags">
+                            {t('apply.tag')}
+                        </InputLabel>
+                        <Select
+                            labelId="tags"
+                            name="tags"
+                            multiple
+                            color="secondary"
+                            value={queryParams?.tags}
+                            onChange={(e) => {
+                                changeParams(e);
+                                clearTimeout(timeoutRef.current);
+                                timeoutRef.current = setTimeout(() => {
+                                    query(e.target);
+                                }, 200);
+                            }}
+                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected?.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            )}
+                            label={t('apply.tag')}
+                        >
+                            {categoryList?.map((item) => (
+                                <MenuItem key={item.code} value={item.code}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid> */}
             </Grid>
-            <Box display="flex" alignItems="end" mt={2} mb={1}>
+            <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>
+                <Typography fontSize="12px" ml={1}>
+                    {t('apply.AppDesc')}
+                </Typography>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
@@ -109,14 +253,14 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
-            {total > 0 && (
+            {totals > 0 && (
                 <Box>
-                    <Typography variant="h3" mt={2} mb={1}>
+                    <Typography variant="h3" mt={4} mb={2}>
                         {t('apply.self')}
                     </Typography>
                     <MyselfTemplate appList={newAppList} />
                     <Box my={2}>
-                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                        <Pagination page={pageQuery.pageNo} count={Math.ceil(totals / pageQuery.pageSize)} onChange={paginationChange} />
                     </Box>
                 </Box>
             )}

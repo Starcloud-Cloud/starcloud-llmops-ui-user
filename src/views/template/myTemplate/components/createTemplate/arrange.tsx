@@ -230,7 +230,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
 
     return (
         <Box>
-            <Typography variant="h5" mb={1}>
+            <Typography variant="h5" fontSize="1rem" mb={1}>
                 {t('myApp.flow')}
             </Typography>
             {config?.steps.map((item: any, index: number) => (
@@ -543,6 +543,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             fullWidth
                             id="label"
                             name="label"
+                            sx={{ mt: 2 }}
                             required
                             label={t('myApp.name')}
                             value={formik.values.label}
@@ -555,6 +556,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             fullWidth
                             id="defaultValue"
                             name="defaultValue"
+                            sx={{ mt: 2 }}
                             label={t('myApp.value')}
                             value={formik.values.defaultValue}
                             onChange={formik.handleChange}
@@ -565,13 +567,14 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             fullWidth
                             id="description"
                             name="description"
+                            sx={{ mt: 2 }}
                             label={t('myApp.desc')}
                             value={formik.values.description}
                             onChange={formik.handleChange}
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
-                        <FormControl fullWidth>
+                        <FormControl fullWidth sx={{ mt: 2 }}>
                             <InputLabel>{t('myApp.type')}</InputLabel>
                             <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
                                 {typeList.map((el: any) => (
@@ -582,6 +585,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             </Select>
                         </FormControl>
                         <FormControlLabel
+                            sx={{ mt: 2 }}
                             control={<Switch name="isShow" defaultChecked onChange={formik.handleChange} value={formik.values.isShow} />}
                             label={t('myApp.isShow')}
                             labelPlacement="start"
@@ -589,7 +593,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         {formik.values.style === 'SELECT' && (
                             <Box>
                                 {options.map((item, vIndex: number) => (
-                                    <Box key={vIndex}>
+                                    <Box key={vIndex} mt={2}>
                                         <TextField
                                             name="label"
                                             label="label"

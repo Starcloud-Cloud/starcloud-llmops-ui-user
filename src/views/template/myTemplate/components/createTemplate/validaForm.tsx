@@ -23,10 +23,12 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import copy from 'clipboard-copy';
 import ErrorIcon from '@mui/icons-material/Error';
 import { t } from 'hooks/web/useI18n';
 import { Divider, Popconfirm } from 'antd';
-
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Add from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -195,10 +197,10 @@ const Valida = forwardRef(
                                     <Table size="small">
                                         <TableHead>
                                             <TableRow>
+                                                <TableCell></TableCell>
                                                 <TableCell>{t('myApp.field')}</TableCell>
                                                 <TableCell>{t('myApp.name')}</TableCell>
                                                 <TableCell>{t('myApp.type')}</TableCell>
-                                                <TableCell>{t('myApp.value')}</TableCell>
                                                 <TableCell> {t('myApp.isShow')}</TableCell>
                                                 <TableCell>{t('myApp.operation')}</TableCell>
                                             </TableRow>
@@ -206,10 +208,31 @@ const Valida = forwardRef(
                                         <TableBody>
                                             {variable?.map((row: Rows, i: number) => (
                                                 <TableRow hover key={row.field}>
+                                                    <TableCell>
+                                                        <Tooltip title={t('market.copyPrompt')}>
+                                                            <IconButton
+                                                                onClick={() => {
+                                                                    copy(row.field);
+                                                                    dispatch(
+                                                                        openSnackbar({
+                                                                            open: true,
+                                                                            message: t('market.copySuccess'),
+                                                                            variant: 'alert',
+                                                                            alert: {
+                                                                                color: 'success'
+                                                                            },
+                                                                            close: false
+                                                                        })
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <ErrorIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </TableCell>
                                                     <TableCell>{row.field}</TableCell>
                                                     <TableCell>{row.label}</TableCell>
-                                                    <TableCell>{row.style}</TableCell>
-                                                    <TableCell>{row.defaultValue}</TableCell>
+                                                    <TableCell>{t('myApp.' + row.style.toLowerCase())}</TableCell>
                                                     <TableCell>
                                                         <Switch
                                                             name={row.field}

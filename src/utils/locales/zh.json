@@ -527,9 +527,10 @@
     "name": "应用名称",
     "category": "分类",
     "tag": "标签",
-    "recommend": "推荐应用",
+    "recommend": "模版应用",
     "instruction": "使用说明",
-    "self": "我的应用"
+    "self": "我的应用",
+    "AppDesc": "选择一个开始创作"
   },
   "market": {
     "title": "应用市场",
@@ -582,7 +583,9 @@
     "copyFiend": "复制链接发送给好友",
     "promptDesc": "提示词用于对 AI 的回复做出一系列指令和约束。可插入变量，例如 {变量KEY}",
     "varableDesc": "变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量",
-    "addPrompt": "像这样将这个变量添加到提示符中"
+    "addPrompt": "像这样将这个变量添加到提示符中",
+    "copyPrompt": "点击复制变量KEY",
+    "copySuccess": "复制成功"
   },
   "rede": {
     "title": "免费兑换MoFaAI创作权益"
@@ -808,8 +811,8 @@
     "appDesc": "应用描述",
     "categary": "类目",
     "scense": "标签",
-    "stepStyle": "步骤格式",
-    "exeLabel": "执行按钮内容",
+    "stepStyle": "样式配置",
+    "exeLabel": "执行按钮的名称",
     "categoryVaid": "类目是必填的",
     "delApp": "删除应用"
   },

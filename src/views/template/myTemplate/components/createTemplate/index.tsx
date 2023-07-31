@@ -32,9 +32,10 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-// import Upload from './upLoad';
+import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
+import { getImgList } from 'api/picture/create';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -171,18 +172,26 @@ function CreateDetail() {
         fetchData();
     };
     useEffect(() => {
-        if (searchParams.get('uid')) {
-            getApp({ uid: searchParams.get('uid') as string }).then((res) => {
+        getList();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const getList = (data: string | null = null) => {
+        if (data) {
+            getApp({ uid: data }).then((res) => {
                 resUpperCase(res);
             });
         } else {
-            getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
-                resUpperCase(res);
-            });
+            if (searchParams.get('uid')) {
+                getApp({ uid: searchParams.get('uid') as string }).then((res) => {
+                    resUpperCase(res);
+                });
+            } else {
+                getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
+                    resUpperCase(res);
+                });
+            }
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    };
     const resUpperCase = (result: Details) => {
         const newValue = { ...result };
         newValue.workflowConfig.steps?.forEach((item) => {
@@ -254,13 +263,15 @@ function CreateDetail() {
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
     };
+    //应用发布是否可点击更新
+    const [uploadState, setUpLoad] = useState(false);
     //保存更改
     const saveDetail = () => {
         if (basis?.current?.submit()) {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        setUpLoad(true);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -277,7 +288,8 @@ function CreateDetail() {
             } else {
                 appCreate(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        navigate('/createApp?uid=' + res.data.uid);
+                        getList(res.data.uid);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -374,7 +386,7 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                {/* <Tab label={t('myApp.upload')} {...a11yProps(2)} /> */}
+                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -499,9 +511,9 @@ function CreateDetail() {
                     </Grid>
                 </Grid>
             </TabPanel>
-            {/* <TabPanel value={value} index={2}>
-                <Upload />
-            </TabPanel> */}
+            <TabPanel value={value} index={2}>
+                <Upload appUid={detail?.uid} uploadState={uploadState} />
+            </TabPanel>
         </Card>
     );
 }

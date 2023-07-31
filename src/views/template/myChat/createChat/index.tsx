@@ -329,7 +329,6 @@ function CreateDetail() {
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
                     <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(3)} />
-                    <Tab component={Link} label={'会话'} {...a11yProps(4)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -342,9 +341,6 @@ function CreateDetail() {
                 </TabPanel>
                 <TabPanel value={value} index={3}>
                     <Skill />
-                </TabPanel>
-                <TabPanel value={value} index={4}>
-                    <Chat chatBotInfo={chatBotInfo} />
                 </TabPanel>
             </Card>
             {value !== 4 && (

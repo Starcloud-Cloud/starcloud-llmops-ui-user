@@ -148,6 +148,7 @@ const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
 const CreateChat = Loadable(lazy(() => import('views/template/myChat/createChat')));
+const ChatMy = Loadable(lazy(() => import('views/chat/my')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -576,6 +577,10 @@ const MainRoutes = {
         {
             path: '/createChat',
             element: <CreateChat />
+        },
+        {
+            path: '/chat/my',
+            element: <ChatMy />
         }
     ]
 };

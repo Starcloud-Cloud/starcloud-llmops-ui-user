@@ -1,7 +1,10 @@
 import { InboxOutlined } from '@ant-design/icons';
 import AddIcon from '@mui/icons-material/Add';
+import ArticleIcon from '@mui/icons-material/Article';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/EditTwoTone';
+import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import {
     Box,
@@ -19,6 +22,7 @@ import {
     Tab,
     Tabs,
     TextField,
+    Tooltip,
     Typography,
     useTheme
 } from '@mui/material';
@@ -31,8 +35,9 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import MainCard from 'ui-component/cards/MainCard';
 import * as yup from 'yup';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { delDataset, getDatasetSource, uploadCharacters, uploadUrls } from '../../../../../api/chat';
 import { LoadingSpin } from '../../../../../ui-component/LoadingSpin';
+import { getAccessToken } from '../../../../../utils/auth';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -54,9 +59,20 @@ function a11yProps(index: number) {
 }
 
 const validationSchema = yup.object({
-    email: yup.string().email('Enter a valid email').required('Email is required'),
-    password: yup.string().min(8, 'Password should be of minimum 8 characters length').required('Password is required')
+    title: yup.string().required(''),
+    context: yup.string().required('')
 });
+
+const transformDataType = (dataType: string) => {
+    switch (dataType) {
+        case 'DOCUMENT':
+            return <ArticleIcon className="text-[#5e35b1] text-base mr-2" />;
+        case 'URL':
+            return <LinkIcon className="text-[#5e35b1] text-base mr-2" />;
+        case 'CHARACTERS':
+            return <EditIcon className="text-[#5e35b1] text-base mr-2" />;
+    }
+};
 
 const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const theme = useTheme();
@@ -72,8 +88,8 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
 
     const formik = useFormik({
         initialValues: {
-            email: '',
-            password: ''
+            title: '',
+            context: ''
         },
         validationSchema,
         onSubmit: (values) => {
@@ -177,22 +193,22 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
                                 <TextField
                                     label={'问题'}
                                     fullWidth
-                                    id="label"
-                                    name="label"
-                                    value={formik.values.email}
+                                    id="title"
+                                    name="title"
+                                    value={formik.values.title}
                                     onChange={formik.handleChange}
-                                    error={formik.touched.email && Boolean(formik.errors.email)}
-                                    helperText={formik.touched.email && formik.errors.email}
+                                    error={formik.touched.title && Boolean(formik.errors.title)}
+                                    helperText={formik.touched.title && formik.errors.title}
                                 />
                                 <TextField
                                     label={'答案'}
                                     fullWidth
-                                    id="label"
-                                    name="label"
-                                    value={formik.values.email}
+                                    id="context"
+                                    name="context"
+                                    value={formik.values.context}
                                     onChange={formik.handleChange}
-                                    error={formik.touched.email && Boolean(formik.errors.email)}
-                                    helperText={formik.touched.email && formik.errors.email}
+                                    error={formik.touched.context && Boolean(formik.errors.context)}
+                                    helperText={formik.touched.context && formik.errors.context}
                                     className={'mt-3'}
                                     multiline
                                     minRows={6}
@@ -221,8 +237,9 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
     );
 };
 
-const DocumentModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+const DocumentModal = ({ open, handleClose, forceUpdate }: { open: boolean; handleClose: () => void; forceUpdate: () => void }) => {
     const theme = useTheme();
+    const dispatch = useDispatch();
     const [valueLabel, setValueLabel] = useState('checked');
     const [value, setValue] = React.useState(0);
 
@@ -232,16 +249,24 @@ const DocumentModal = ({ open, handleClose }: { open: boolean; handleClose: () =
 
     const { Dragger } = Upload;
 
+    // TODO 最大20M, 以及错误的提示
     const props: UploadProps = {
-        name: 'file',
+        name: 'files',
         multiple: true,
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles/1683395894274936832`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        accept: '.pdf, .docx, .txt, .pptx, .epub, .md, .csv',
+        maxCount: 20,
         onChange(info) {
             const { status } = info.file;
             if (status !== 'uploading') {
                 console.log(info.file, info.fileList);
             }
             if (status === 'done') {
+                handleClose();
+                forceUpdate();
             } else if (status === 'error') {
             }
         },
@@ -250,6 +275,58 @@ const DocumentModal = ({ open, handleClose }: { open: boolean; handleClose: () =
         }
     };
 
+    const formik = useFormik({
+        initialValues: {
+            title: '',
+            context: ''
+        },
+        validationSchema: yup.object({
+            title: yup.string().required('12jl'),
+            context: yup.string().required('12')
+        }),
+        onSubmit: (values) => {
+            uploadCharacters({ datasetId: '1683395894274936832', uploadCharacterReqVOs: [values] }).then((res) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: 'Submit Success',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                handleClose();
+                forceUpdate();
+            });
+        }
+    });
+    const formikUrl = useFormik({
+        initialValues: {
+            url: ''
+        },
+        validationSchema: yup.object({
+            url: yup.string().required('12jl')
+        }),
+        onSubmit: (values) => {
+            uploadUrls({ datasetId: '1683395894274936832', urls: values.url.split(',') }).then((res) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: 'Submit Success',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                handleClose();
+                forceUpdate();
+            });
+        }
+    });
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -316,35 +393,87 @@ const DocumentModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                             </div>
                         </TabPanel>
                         <TabPanel value={value} index={1}>
-                            <TextField label={'标题'} fullWidth />
-                            <TextField label={'内容'} className={'mt-3'} fullWidth multiline minRows={6} />
+                            <form onSubmit={formik.handleSubmit}>
+                                <TextField
+                                    label={'标题'}
+                                    fullWidth
+                                    id="title"
+                                    name="title"
+                                    value={formik.values.title}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.title && Boolean(formik.errors.title)}
+                                    helperText={formik.touched.title && formik.errors.title}
+                                />
+                                <TextField
+                                    label={'内容'}
+                                    fullWidth
+                                    id="context"
+                                    name="context"
+                                    value={formik.values.context}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.context && Boolean(formik.errors.context)}
+                                    helperText={formik.touched.context && formik.errors.context}
+                                    className={'mt-3'}
+                                    multiline
+                                    minRows={6}
+                                />
+                                <Divider />
+                                <CardActions>
+                                    <Grid container justifyContent="flex-end">
+                                        <Button variant="contained" type="submit" color="secondary">
+                                            保存
+                                        </Button>
+                                    </Grid>
+                                </CardActions>
+                            </form>
                         </TabPanel>
                         <TabPanel value={value} index={2}>
                             <div className="text-sm text-[#9da3af]">
                                 请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
                             </div>
-                            <TextField
-                                label={'网页地址'}
-                                className={'mt-3'}
-                                fullWidth
-                                multiline
-                                minRows={6}
-                                placeholder="输入要爬取的网页地址，使用英文,分隔"
-                            />
+                            <form onSubmit={formikUrl.handleSubmit}>
+                                <TextField
+                                    label={'网页地址'}
+                                    fullWidth
+                                    id="url"
+                                    name="url"
+                                    value={formikUrl.values.url}
+                                    onChange={formikUrl.handleChange}
+                                    error={formikUrl.touched.url && Boolean(formikUrl.errors.url)}
+                                    helperText={formikUrl.touched.url && formikUrl.errors.url}
+                                    className={'mt-3'}
+                                    multiline
+                                    minRows={6}
+                                />
+                                <Divider />
+                                <CardActions>
+                                    <Grid container justifyContent="flex-end">
+                                        <Button variant="contained" type="submit" color="secondary">
+                                            保存
+                                        </Button>
+                                    </Grid>
+                                </CardActions>
+                            </form>
                         </TabPanel>
                     </>
                 </CardContent>
-                <Divider />
-                <CardActions>
-                    <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" color="secondary">
-                            保存
-                        </Button>
-                    </Grid>
-                </CardActions>
             </MainCard>
         </Modal>
     );
+};
+
+export type typeDocument = typeDocumentChild[];
+export type typeDocumentChild = {
+    id: number;
+    uid: string;
+    name: string;
+    position: number;
+    dataSourceInfo?: any;
+    batch?: any;
+    status?: any;
+    wordCount: number;
+    tokens?: any;
+    dataType: string;
 };
 
 export const Knowledge = () => {
@@ -352,13 +481,32 @@ export const Knowledge = () => {
     const [anchorEl, setAnchorEl] = useState<Element | ((element: Element) => Element) | null | undefined>(null);
     const [qaVisible, setQaVisible] = useState(false);
     const [documentVisible, setDocumentVisible] = useState(false);
+    const [documentList, setDocumentList] = useState<typeDocument>([]);
+    const [QAList, setQAList] = useState([]);
+    const [update, setUpdate] = useState(0);
+
+    const forceUpdate = () => setUpdate((pre) => pre + 1);
+
+    React.useEffect(() => {
+        (async () => {
+            const res = await getDatasetSource({ datasetId: '1683395894274936832' });
+            setDocumentList(res);
+        })();
+    }, [update]);
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
         setAnchorEl(event?.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleClose = async () => {
         setAnchorEl(null);
     };
+
+    const handleDel = async (item: typeDocumentChild) => {
+        setAnchorEl(null);
+        const res = await delDataset({ id: item.id });
+    };
+
     return (
         <div>
             <div>
@@ -384,86 +532,100 @@ export const Knowledge = () => {
                         </div>
                         <div>
                             <MainCard>
-                                <Grid container direction="row" spacing={gridSpacing}>
-                                    <Grid item xs={12} sm={6} xl={4}>
-                                        <Card
-                                            sx={{
-                                                p: 2,
-                                                background:
-                                                    theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
-                                                border: '1px solid #e3e8ef',
-                                                '&:hover': {
-                                                    borderColor: theme.palette.primary.main
-                                                }
-                                            }}
-                                        >
-                                            <Grid container spacing={gridSpacing}>
-                                                <Grid item xs={12}>
+                                <Grid container direction="row" spacing={gridSpacing} className={'h-[620px] overflow-auto'}>
+                                    {documentList.map((item, index) => {
+                                        return (
+                                            <Grid item xs={12} sm={6} xl={4} key={index}>
+                                                <Card
+                                                    sx={{
+                                                        p: 2,
+                                                        background:
+                                                            theme.palette.mode === 'dark'
+                                                                ? theme.palette.dark.main
+                                                                : theme.palette.grey[50],
+                                                        border: '1px solid #e3e8ef',
+                                                        '&:hover': {
+                                                            borderColor: theme.palette.primary.main
+                                                        }
+                                                    }}
+                                                >
                                                     <Grid container spacing={gridSpacing}>
-                                                        <Grid item xs zeroMinWidth>
-                                                            <div className="flex items-center">
-                                                                <EditIcon className="text-[#5e35b1] text-base mr-2" />
-                                                                <Typography variant="h4" component="div" color={'#0009'}>
-                                                                    这里是问题
-                                                                </Typography>
-                                                            </div>
-                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                            <Grid container spacing={gridSpacing}>
+                                                                <Grid item xs zeroMinWidth>
+                                                                    <div className="flex items-center">
+                                                                        {transformDataType(item.dataType)}
+                                                                        <Tooltip title={item.name}>
+                                                                            <Typography
+                                                                                variant="h4"
+                                                                                component="div"
+                                                                                color={'#0009'}
+                                                                                className={
+                                                                                    'overflow-ellipsis whitespace-nowrap w-full overflow-hidden'
+                                                                                }
+                                                                            >
+                                                                                {item?.name}
+                                                                            </Typography>
+                                                                        </Tooltip>
+                                                                    </div>
+                                                                </Grid>
 
-                                                        <Grid item>
-                                                            <IconButton
-                                                                size="small"
-                                                                sx={{ mt: -0.75, mr: -0.75 }}
-                                                                onClick={handleClick}
-                                                                aria-label="more-options"
-                                                            >
-                                                                <MoreHorizOutlinedIcon
-                                                                    fontSize="small"
-                                                                    color="inherit"
-                                                                    aria-controls="menu-friend-card"
-                                                                    aria-haspopup="true"
-                                                                    sx={{ opacity: 0.6 }}
-                                                                />
-                                                            </IconButton>
-                                                            {anchorEl && (
-                                                                <Menu
-                                                                    id="menu-user-details-card"
-                                                                    anchorEl={anchorEl}
-                                                                    keepMounted
-                                                                    open={Boolean(anchorEl)}
-                                                                    onClose={handleClose}
-                                                                    variant="selectedMenu"
-                                                                    anchorOrigin={{
-                                                                        vertical: 'bottom',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                    transformOrigin={{
-                                                                        vertical: 'top',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                >
-                                                                    <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                                                    <MenuItem onClick={handleClose}>Delete</MenuItem>
-                                                                </Menu>
+                                                                <Grid item>
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        sx={{ mt: -0.75, mr: -0.75 }}
+                                                                        onClick={handleClick}
+                                                                        aria-label="more-options"
+                                                                    >
+                                                                        <MoreHorizOutlinedIcon
+                                                                            fontSize="small"
+                                                                            color="inherit"
+                                                                            aria-controls="menu-friend-card"
+                                                                            aria-haspopup="true"
+                                                                            sx={{ opacity: 0.6 }}
+                                                                        />
+                                                                    </IconButton>
+                                                                    <Menu
+                                                                        id="simple-menu"
+                                                                        anchorEl={anchorEl}
+                                                                        keepMounted
+                                                                        open={Boolean(anchorEl)}
+                                                                        onClose={handleClose}
+                                                                        anchorOrigin={{
+                                                                            vertical: 'bottom',
+                                                                            horizontal: 'right'
+                                                                        }}
+                                                                        transformOrigin={{
+                                                                            vertical: 'top',
+                                                                            horizontal: 'right'
+                                                                        }}
+                                                                    >
+                                                                        <MenuItem onClick={() => console.log(111)}>删除</MenuItem>
+                                                                    </Menu>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Grid>
+                                                        <Grid item xs={12} className="!pt-[10px]">
+                                                            <Typography variant="h5" component="div" color={'#0009'}>
+                                                                这里是答案
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item xs={12} className="!pt-[10px]">
+                                                            <Divider variant="fullWidth" />
+                                                        </Grid>
+                                                        <Grid item xs={12} className="!pt-[10px] flex items-center">
+                                                            {item.status !== 99 ? (
+                                                                <LoadingSpin />
+                                                            ) : (
+                                                                <CheckCircleIcon sx={{ color: 'success.dark', width: 14, height: 14 }} />
                                                             )}
+                                                            <Typography variant="caption">From Custom Input</Typography>
                                                         </Grid>
                                                     </Grid>
-                                                </Grid>
-                                                <Grid item xs={12} className="!pt-[10px]">
-                                                    <Typography variant="h5" component="div" color={'#0009'}>
-                                                        这里是答案
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={12} className="!pt-[10px]">
-                                                    <Divider variant="fullWidth" />
-                                                </Grid>
-                                                <Grid item xs={12} className="!pt-[10px] flex items-center">
-                                                    <LoadingSpin />
-                                                    <CheckCircleIcon sx={{ color: 'success.dark', width: 14, height: 14 }} />
-                                                    <Typography variant="caption">From Custom Input</Typography>
-                                                </Grid>
+                                                </Card>
                                             </Grid>
-                                        </Card>
-                                    </Grid>
+                                        );
+                                    })}
                                 </Grid>
                             </MainCard>
                         </div>
@@ -551,8 +713,7 @@ export const Knowledge = () => {
                                                                     horizontal: 'right'
                                                                 }}
                                                             >
-                                                                <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                                                <MenuItem onClick={handleClose}>Delete</MenuItem>
+                                                                <MenuItem onClick={handleClose}>删除</MenuItem>
                                                             </Menu>
                                                         )}
                                                     </Grid>
@@ -578,8 +739,10 @@ export const Knowledge = () => {
                 </div>
             </div>
 
-            <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />
-            <DocumentModal open={documentVisible} handleClose={() => setDocumentVisible(false)} />
+            {qaVisible && <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />}
+            {documentVisible && (
+                <DocumentModal open={documentVisible} handleClose={() => setDocumentVisible(false)} forceUpdate={forceUpdate} />
+            )}
         </div>
     );
 };

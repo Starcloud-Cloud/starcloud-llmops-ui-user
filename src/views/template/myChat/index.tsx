@@ -18,6 +18,7 @@ import { t } from 'hooks/web/useI18n';
 import { useContext } from 'react';
 import { Item } from 'types/template';
 import FormDialog from './components/FormDialog';
+import { getChatTemplate } from '../../../api/chat';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -66,7 +67,7 @@ function MyTemplate() {
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        recommends({ mode: 'CHAT' }).then((res) => {
+        getChatTemplate({ model: 'CHAT' }).then((res) => {
             setRecommends(res);
         });
         appPage({ pageNo: 1, pageSize: 1000, mode: 'CHAT' }).then((res) => {

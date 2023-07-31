@@ -21,6 +21,10 @@ import dayjs from 'dayjs';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Chip from 'ui-component/extended/Chip';
+import { messageSSE } from '../../../../../api/chat';
+import { t } from '../../../../../hooks/web/useI18n';
+import { dispatch } from '../../../../../store';
+import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
 
@@ -94,7 +98,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     });
 
     // handle new message form
-    const handleOnSend = () => {
+    const handleOnSend = async () => {
         if (!message) {
             return;
         }
@@ -104,7 +108,75 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             text: message,
             time: dayjs().format('YYYY-MM-DD HH:mm')
         };
-        setData((prevState) => [...prevState, newMessage]);
+        // setData((prevState) => [...prevState, newMessage]);
+
+        let resp: any = await messageSSE({
+            appUid: '2196b6cce43f41679e15487d79bde823',
+            scene: 'WEB_MARKET',
+            conversationUid: '17178ad444ed4cdfa18836c54a8011c5',
+            query: message
+        });
+        const reader = resp.getReader();
+        const textDecoder = new TextDecoder();
+        let outerJoins: any;
+        while (1) {
+            let joins = outerJoins;
+            const { done, value } = await reader.read();
+            if (textDecoder.decode(value).includes('2008002007')) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: t('market.error'),
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+                // const newValue1 = [...loadings];
+                // newValue1[index] = false;
+                // setLoadings(newValue1);
+                return;
+            }
+            if (done) {
+                break;
+            }
+            let str = textDecoder.decode(value);
+            const lines = str.split('\n');
+            lines.forEach((message, i: number) => {
+                if (i === 0 && joins) {
+                    message = joins + message;
+                    joins = undefined;
+                }
+                if (i === lines.length - 1) {
+                    if (message && message.indexOf('}') === -1) {
+                        joins = message;
+                        return;
+                    }
+                }
+                let bufferObj;
+                if (message?.startsWith('data:')) {
+                    bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                }
+                if (bufferObj?.code === 200) {
+                    console.log(bufferObj.content);
+                } else if (bufferObj && bufferObj.code !== 200) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: t('market.warning'),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
+                }
+            });
+            outerJoins = joins;
+        }
     };
 
     const handleEnter = (event: React.KeyboardEvent<HTMLDivElement> | undefined) => {

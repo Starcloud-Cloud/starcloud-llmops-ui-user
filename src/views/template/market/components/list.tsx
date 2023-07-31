@@ -14,14 +14,12 @@ function List() {
         navigate(`/appMarket/detail/${data.uid}`);
     };
     useEffect(() => {
-        if (templateList.length === 0) {
-            marketPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
-                setTemplate(res.list);
-                setNewTemplate(res.list);
-                setSorllList(res.list.slice(0, 30));
-                setTotal(res.page.total);
-            });
-        }
+        marketPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
+            setTemplate(res.list);
+            setNewTemplate(res.list);
+            setSorllList(res.list.slice(0, 30));
+            setTotal(res.page.total);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (

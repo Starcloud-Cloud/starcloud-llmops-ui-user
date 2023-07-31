@@ -70,3 +70,20 @@ export const appModify = (data: any) => {
 export const stepList = () => {
     return request.get({ url: `/llm/app/stepList` });
 };
+
+//创建发布记录
+export const publishCreate = (data: { appUid: string }) => {
+    return request.post({ url: `/llm/app/publish/create`, data });
+};
+//发布
+export const publishOperate = (data: { uid: string; status: number; appUid: string }) => {
+    return request.post({ url: `/llm/app/publish/operate`, data });
+};
+//发布状态
+export const publishGetAuditByAppUid = (appUid: string) => {
+    return request.get({ url: `/llm/app/publish/getAuditByAppUid/` + appUid });
+};
+//发布记录
+export const publishPage = (params: { appUid: string }) => {
+    return request.get({ url: `/llm/app/publish/page`, params });
+};

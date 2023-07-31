@@ -254,13 +254,15 @@ function CreateDetail() {
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
     };
+    //应用发布是否可点击更新
+    const [uploadState, setUpLoad] = useState(false);
     //保存更改
     const saveDetail = () => {
         if (basis?.current?.submit()) {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        setUpLoad(true);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -277,7 +279,7 @@ function CreateDetail() {
             } else {
                 appCreate(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        setUpLoad(true);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -500,7 +502,7 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                <Upload />
+                <Upload appUid={detail?.uid} uploadState={uploadState} />
             </TabPanel>
         </Card>
     );

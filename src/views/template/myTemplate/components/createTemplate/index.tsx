@@ -1,28 +1,28 @@
+import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
+    Box,
+    Button,
     Card,
     CardHeader,
-    Box,
-    Grid,
-    Button,
-    Tab,
-    Tabs,
-    Divider,
-    Typography,
     Chip,
+    Divider,
+    Grid,
     IconButton,
+    ListItemIcon,
     Menu,
     MenuItem,
-    ListItemIcon
+    Tab,
+    Tabs,
+    Typography
 } from '@mui/material';
-import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { executeApp } from 'api/template/fetch';
+import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState, useCallback } from 'react';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import userInfoStore from 'store/entitlementAction';
@@ -32,9 +32,9 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-import Upload from './upLoad';
-import marketStore from 'store/market';
+// import Upload from './upLoad';
 import { del } from 'api/template';
+import marketStore from 'store/market';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -173,16 +173,25 @@ function CreateDetail() {
     useEffect(() => {
         if (searchParams.get('uid')) {
             getApp({ uid: searchParams.get('uid') as string }).then((res) => {
-                setDetail(res);
+                resUpperCase(res);
             });
         } else {
             getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
-                setDetail(res);
+                resUpperCase(res);
             });
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const resUpperCase = (result: Details) => {
+        const newValue = { ...result };
+        newValue.workflowConfig.steps?.forEach((item) => {
+            item.variable?.variables.forEach((el: { field: string }) => {
+                el.field = el.field.toUpperCase();
+            });
+        });
+        setDetail(newValue);
+    };
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
@@ -309,7 +318,7 @@ function CreateDetail() {
                         {t('myApp.back')}
                     </Button>
                 }
-                title={detail?.name}
+                title={<Typography variant="h3">{detail?.name}</Typography>}
                 action={
                     <>
                         {searchParams.get('uid') && (
@@ -365,7 +374,7 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
+                {/* <Tab label={t('myApp.upload')} {...a11yProps(2)} /> */}
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -384,7 +393,7 @@ function CreateDetail() {
                         )}
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h5" mb={1}>
+                        <Typography variant="h5" fontSize="1rem" mb={1}>
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
@@ -444,7 +453,7 @@ function CreateDetail() {
                         )}
                     </Grid>
                     <Grid item lg={6}>
-                        <Typography variant="h5" mb={1}>
+                        <Typography variant="h5" fontSize="1rem" mb={1}>
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
@@ -490,9 +499,9 @@ function CreateDetail() {
                     </Grid>
                 </Grid>
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            {/* <TabPanel value={value} index={2}>
                 <Upload />
-            </TabPanel>
+            </TabPanel> */}
         </Card>
     );
 }

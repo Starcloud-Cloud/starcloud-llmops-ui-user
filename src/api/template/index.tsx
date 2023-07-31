@@ -25,11 +25,11 @@ export const executeMarket = (data: any) => {
 };
 
 //推荐应用
-export const recommends = () => {
-    return request.get({ url: '/llm/app/recommends' });
+export const recommends = (params?: any) => {
+    return request.get({ url: '/llm/app/recommends', params });
 };
 //我的应用
-export const appPage = (params: { pageNo: number; pageSize: number }) => {
+export const appPage = (params: { pageNo: number; pageSize: number; mode?: string }) => {
     return request.get({ url: '/llm/app/page', params });
 };
 //删除应用

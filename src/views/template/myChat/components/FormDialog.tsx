@@ -1,12 +1,20 @@
-import React, { useEffect } from 'react';
-
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, TextField, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
-export default function FormDialog({ open, setOpen, handleOk }: { open: boolean; setOpen: (open: boolean) => void; handleOk: () => void }) {
+export default function FormDialog({
+    open,
+    setOpen,
+    handleOk,
+    setValue
+}: {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    handleOk: () => void;
+    setValue: (value: string) => void;
+}) {
     const theme = useTheme();
 
     const handleClose = () => {
@@ -26,7 +34,15 @@ export default function FormDialog({ open, setOpen, handleOk }: { open: boolean;
                                         when no apps are running.
                                     </Typography>
                                 </DialogContentText>
-                                <TextField autoFocus size="small" id="name" label="机器人名称" type="email" fullWidth />
+                                <TextField
+                                    autoFocus
+                                    size="small"
+                                    id="name"
+                                    label="机器人名称"
+                                    type="email"
+                                    fullWidth
+                                    onChange={(e) => setValue(e.target.value)}
+                                />
                             </Stack>
                         </DialogContent>
                         <DialogActions sx={{ pr: 2.5 }}>

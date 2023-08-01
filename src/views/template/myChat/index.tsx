@@ -3,8 +3,6 @@ import { Box, Button, Grid, Link, Pagination, TextField, Typography } from '@mui
 import MyselfTemplate from './components/mySelfTemplate';
 import Template from './components/template';
 
-import { appPage, recommends } from 'api/template/index';
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,8 +15,8 @@ import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { t } from 'hooks/web/useI18n';
 import { useContext } from 'react';
 import { Item } from 'types/template';
+import { createChat, getChatPage, getChatTemplate } from '../../../api/chat';
 import FormDialog from './components/FormDialog';
-import { getChatTemplate } from '../../../api/chat';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -65,12 +63,14 @@ function MyTemplate() {
     });
     const [total, setTotal] = useState(0);
     const [open, setOpen] = useState(false);
+    const [robotName, setRobotName] = useState('');
+    const [currentRow, setCurrentRow] = useState<any>(null);
 
     useEffect(() => {
         getChatTemplate({ model: 'CHAT' }).then((res) => {
             setRecommends(res);
         });
-        appPage({ pageNo: 1, pageSize: 1000, mode: 'CHAT' }).then((res) => {
+        getChatPage({ pageNo: 1, pageSize: 1000, model: 'CHAT' }).then((res) => {
             setAppList(res.list);
             setNewApp(res.list.slice(0, pageQuery.pageSize));
             setTotal(res.page.total);
@@ -85,12 +85,16 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     //弹窗
-    const handleDetail = (data: { recommend: string }) => {
+    const handleDetail = (item: any) => {
         setOpen(true);
+        setCurrentRow(item);
     };
 
-    const handleCreate = () => {
-        navigate('/createChat?recommend=' + 'test');
+    const handleCreate = async () => {
+        const res = await createChat({ robotName: robotName, uid: currentRow?.uid });
+        setOpen(false);
+        setCurrentRow(null);
+        navigate(`/createChat?appId=${res}`);
     };
 
     return (
@@ -132,7 +136,7 @@ function MyTemplate() {
                     </Box>
                 </Box>
             )}
-            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} />
+            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} />
         </Box>
     );
 }

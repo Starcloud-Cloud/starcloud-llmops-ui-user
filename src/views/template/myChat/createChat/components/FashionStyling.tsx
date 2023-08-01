@@ -24,7 +24,8 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { useState } from 'react';
+import { getVoiceList } from 'api/chat';
+import { useEffect, useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { IChatInfo } from '../index';
@@ -39,6 +40,14 @@ const uploadButton = (
 
 const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const [valueLabel, setValueLabel] = useState('checked');
+
+    useEffect(() => {
+        console.log('getVoiceList');
+        (async () => {
+            const res = await getVoiceList();
+        })();
+    }, []);
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -146,12 +155,8 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                     <FormControl sx={{ width: '100%' }}>
                         <InputLabel id="age-select">类型</InputLabel>
                         <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
-                            <MenuItem value="0">
-                                <em>文本内容</em>
-                            </MenuItem>
-                            <MenuItem value="1">
-                                <em>执行AI流程</em>
-                            </MenuItem>
+                            <MenuItem value="0">文本内容</MenuItem>
+                            <MenuItem value="1">执行AI流程</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -204,8 +209,9 @@ export const FashionStyling = ({
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
 }) => {
+    console.log(chatBotInfo.guideList, 'chatBotInfo.guideList');
+
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [guideList, setGuideList] = useState(['', '']);
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
@@ -216,7 +222,7 @@ export const FashionStyling = ({
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
     return (
-        <div className={'flex '}>
+        <>
             <div>
                 <div>
                     <span
@@ -230,6 +236,7 @@ export const FashionStyling = ({
                         <TextField
                             label={'名称'}
                             className={'mt-1'}
+                            value={chatBotInfo.name}
                             fullWidth
                             size={'small'}
                             onChange={(e) => {
@@ -261,6 +268,7 @@ export const FashionStyling = ({
                             maxRows={3}
                             minRows={3}
                             aria-valuemax={200}
+                            value={chatBotInfo.introduction}
                             label={'简介'}
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -316,19 +324,30 @@ export const FashionStyling = ({
                             minRows={3}
                             aria-valuemax={200}
                             label={'欢迎语'}
+                            value={chatBotInfo.statement}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setChatBotInfo({ ...chatBotInfo, statement: value });
+                            }}
                         />
                         <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
-                            {guideList.map((item, index) => (
+                            {chatBotInfo.guideList?.map((item, index) => (
                                 <div className={'flex items-center mt-3 w-1/2'} key={index}>
                                     <TextField
                                         label={'欢迎语'}
                                         className={'mt-1'}
                                         size={'small'}
                                         fullWidth
+                                        value={item}
                                         placeholder={'输入常见问题来指导用户'}
+                                        onChange={(e) => {
+                                            let guideList = [...chatBotInfo.guideList!];
+                                            guideList[index] = e.target.value;
+                                            setChatBotInfo({ ...chatBotInfo, guideList });
+                                        }}
                                     />
-                                    {index + 1 === guideList.length && guideList.length < 5 && (
+                                    {index + 1 === chatBotInfo?.guideList?.length && chatBotInfo.guideList.length < 5 && (
                                         <Button
                                             className={'min-w-[40px] h-[40px] ml-3'}
                                             startIcon={<AddIcon />}
@@ -340,10 +359,12 @@ export const FashionStyling = ({
                                                     marginRight: 0
                                                 }
                                             }}
-                                            onClick={() => setGuideList([...guideList, ''])}
+                                            onClick={() => {
+                                                setChatBotInfo({ ...chatBotInfo, guideList: [...chatBotInfo?.guideList!, ''] });
+                                            }}
                                         />
                                     )}
-                                    {guideList.length !== 1 && (
+                                    {chatBotInfo?.guideList?.length !== 1 && (
                                         <Button
                                             className={'min-w-[40px] h-[40px] ml-2'}
                                             startIcon={<RemoveIcon />}
@@ -356,8 +377,9 @@ export const FashionStyling = ({
                                                 }
                                             }}
                                             onClick={() => {
+                                                const guideList = [...chatBotInfo?.guideList!];
                                                 guideList.splice(index, 1);
-                                                setGuideList([...guideList]);
+                                                setChatBotInfo({ ...chatBotInfo, guideList: [...guideList] });
                                             }}
                                         />
                                     )}
@@ -384,6 +406,6 @@ export const FashionStyling = ({
             </div>
             <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
-        </div>
+        </>
     );
 };

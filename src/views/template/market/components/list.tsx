@@ -9,7 +9,7 @@ function List() {
     //路由跳转
     const navigate = useNavigate();
     //状态管理
-    const { templateList, sorllList, setTotal, setTemplate, setNewTemplate, setSorllList }: any = marketStore();
+    const { sorllList, setTotal, setTemplate, setNewTemplate, setSorllList }: any = marketStore();
     const handleDetail = (data: { uid: string }) => {
         navigate(`/appMarket/detail/${data.uid}`);
     };

@@ -144,20 +144,20 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             }
             let str = textDecoder.decode(value);
             const lines = str.split('\n');
-            lines.forEach((message, i: number) => {
+            lines.forEach((messages, i: number) => {
                 if (i === 0 && joins) {
-                    message = joins + message;
+                    messages = joins + messages;
                     joins = undefined;
                 }
                 if (i === lines.length - 1) {
-                    if (message && message.indexOf('}') === -1) {
-                        joins = message;
+                    if (messages && messages.indexOf('}') === -1) {
+                        joins = messages;
                         return;
                     }
                 }
                 let bufferObj;
-                if (message?.startsWith('data:')) {
-                    bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                if (messages?.startsWith('data:')) {
+                    bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                 }
                 if (bufferObj?.code === 200) {
                     console.log(bufferObj.content);

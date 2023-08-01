@@ -230,7 +230,7 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                             </Box>
                         </Box>
                         <Box ml={2}>
-                            <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
                                 模板市场
                                 <Chip
                                     sx={{ ml: 1.5 }}
@@ -302,7 +302,7 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                                 </Box>
                             </Box>
                             <Box ml={2}>
-                                <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
                                     {item.title}
                                     {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
                                 </Typography>
@@ -349,7 +349,7 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                                 </Box>
                             </Box>
                             <Box ml={2}>
-                                <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
                                     {item.title}
                                     {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
                                 </Typography>
@@ -396,7 +396,7 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                                 </Box>
                             </Box>
                             <Box ml={2}>
-                                <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
                                     {item.title}
                                     {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
                                 </Typography>

@@ -3,6 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/Article';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/EditTwoTone';
 import LinkIcon from '@mui/icons-material/Link';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
@@ -33,6 +34,7 @@ import { useDispatch } from 'store';
 import { gridSpacing } from 'store/constant';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
+import { Confirm } from 'ui-component/Confirm';
 import MainCard from 'ui-component/cards/MainCard';
 import * as yup from 'yup';
 import { delDataset, getDatasetSource, uploadCharacters, uploadUrls } from '../../../../../api/chat';
@@ -484,6 +486,8 @@ export const Knowledge = () => {
     const [documentList, setDocumentList] = useState<typeDocument>([]);
     const [QAList, setQAList] = useState([]);
     const [update, setUpdate] = useState(0);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [current, setCurrent] = useState<typeDocumentChild | null>(null);
 
     const forceUpdate = () => setUpdate((pre) => pre + 1);
 
@@ -505,6 +509,13 @@ export const Knowledge = () => {
     const handleDel = async (item: typeDocumentChild) => {
         setAnchorEl(null);
         const res = await delDataset({ id: item.id });
+    };
+
+    const handleDelDocument = async () => {
+        await delDataset({ id: current?.uid });
+        forceUpdate();
+        setCurrent(null);
+        setOpenConfirm(false);
     };
 
     return (
@@ -574,34 +585,14 @@ export const Knowledge = () => {
                                                                     <IconButton
                                                                         size="small"
                                                                         sx={{ mt: -0.75, mr: -0.75 }}
-                                                                        onClick={handleClick}
                                                                         aria-label="more-options"
+                                                                        onClick={() => {
+                                                                            setOpenConfirm(true);
+                                                                            setCurrent(item);
+                                                                        }}
                                                                     >
-                                                                        <MoreHorizOutlinedIcon
-                                                                            fontSize="small"
-                                                                            color="inherit"
-                                                                            aria-controls="menu-friend-card"
-                                                                            aria-haspopup="true"
-                                                                            sx={{ opacity: 0.6 }}
-                                                                        />
+                                                                        <DeleteOutlineIcon />
                                                                     </IconButton>
-                                                                    <Menu
-                                                                        id="simple-menu"
-                                                                        anchorEl={anchorEl}
-                                                                        keepMounted
-                                                                        open={Boolean(anchorEl)}
-                                                                        onClose={handleClose}
-                                                                        anchorOrigin={{
-                                                                            vertical: 'bottom',
-                                                                            horizontal: 'right'
-                                                                        }}
-                                                                        transformOrigin={{
-                                                                            vertical: 'top',
-                                                                            horizontal: 'right'
-                                                                        }}
-                                                                    >
-                                                                        <MenuItem onClick={() => console.log(111)}>删除</MenuItem>
-                                                                    </Menu>
                                                                 </Grid>
                                                             </Grid>
                                                         </Grid>
@@ -739,6 +730,12 @@ export const Knowledge = () => {
                 </div>
             </div>
 
+            <Confirm
+                open={openConfirm}
+                handleOk={handleDelDocument}
+                handleClose={() => setOpenConfirm(false)}
+                content="确认删除该条记录？"
+            />
             {qaVisible && <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />}
             {documentVisible && (
                 <DocumentModal open={documentVisible} handleClose={() => setDocumentVisible(false)} forceUpdate={forceUpdate} />

@@ -35,7 +35,7 @@ import Basis from './basis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
-import { getImgList } from 'api/picture/create';
+import _ from 'lodash';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -85,7 +85,7 @@ function CreateDetail() {
                 stepId: stepId,
                 appReqVO: detail
             });
-            const contentData = { ...detail };
+            const contentData = _.cloneDeep(detail);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
             setDetail(contentData);
             const reader = resp.getReader();
@@ -204,35 +204,39 @@ function CreateDetail() {
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
-        setDetail({
-            ...detail,
-            [data.name]: data.value
-        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                [data.name]: data.value
+            })
+        );
     };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
-        const newValue = { ...detail };
+        const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         setDetail(newValue);
     };
     //设置执行的prompt
     const promptChange = ({ e, steps, i }: any) => {
-        const newValue = { ...detail };
+        const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         setDetail(newValue);
     };
     //增加 删除变量
     const changeConfigs = (data: any) => {
-        setDetail({
-            ...detail,
-            workflowConfig: data
-        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                workflowConfig: data
+            })
+        );
         setPerform(perform + 1);
     };
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
         ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
-            const oldvalue = { ...detail };
+            const oldvalue = _.cloneDeep(detail);
             if (flag) {
                 const changeValue = value;
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
@@ -244,7 +248,7 @@ function CreateDetail() {
     );
     //提示词更改
     const basisChange = ({ e, index, i, flag = false }: any) => {
-        const oldValue = { ...detail };
+        const oldValue = _.cloneDeep(detail);
         if (flag) {
             oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
                 !oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow;
@@ -259,19 +263,17 @@ function CreateDetail() {
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
-        const value = { ...detail };
+        const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
     };
-    //应用发布是否可点击更新
-    const [uploadState, setUpLoad] = useState(false);
     //保存更改
     const saveDetail = () => {
         if (basis?.current?.submit()) {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
-                        setUpLoad(true);
+                        setSaveState(saveState + 1);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -316,6 +318,7 @@ function CreateDetail() {
     // 删除按钮的menu
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
+    const [saveState, setSaveState] = useState<number>(0);
     return (
         <Card>
             <CardHeader
@@ -435,18 +438,20 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
+                            {detail && (
+                                <Perform
+                                    key={perform}
+                                    config={detail?.workflowConfig}
+                                    changeSon={changeData}
+                                    loadings={loadings}
+                                    variableChange={exeChange}
+                                    promptChange={promptChange}
+                                    isallExecute={(flag: boolean) => {
+                                        isAllExecute = flag;
+                                    }}
+                                    source="myApp"
+                                />
+                            )}
                         </Card>
                     </Grid>
                 </Grid>
@@ -495,24 +500,26 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
+                            {detail && (
+                                <Perform
+                                    key={perform}
+                                    config={detail?.workflowConfig}
+                                    changeSon={changeData}
+                                    loadings={loadings}
+                                    variableChange={exeChange}
+                                    promptChange={promptChange}
+                                    isallExecute={(flag: boolean) => {
+                                        isAllExecute = flag;
+                                    }}
+                                    source="myApp"
+                                />
+                            )}
                         </Card>
                     </Grid>
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                <Upload appUid={detail?.uid} uploadState={uploadState} />
+                <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />
             </TabPanel>
         </Card>
     );

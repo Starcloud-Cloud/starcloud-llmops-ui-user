@@ -12,15 +12,17 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                     <Typography variant="h5" sx={{ fontSize: '1.1rem' }} mb={1}>
                         {config?.description}
                     </Typography>
-                    <Perform
-                        config={config?.workflowConfig}
-                        changeSon={changeData}
-                        loadings={loadings}
-                        isallExecute={allExecute}
-                        variableChange={variableChange}
-                        promptChange={promptChange}
-                        source="market"
-                    />
+                    {config && (
+                        <Perform
+                            config={config?.workflowConfig}
+                            changeSon={changeData}
+                            loadings={loadings}
+                            isallExecute={allExecute}
+                            variableChange={variableChange}
+                            promptChange={promptChange}
+                            source="market"
+                        />
+                    )}
                     <Box sx={{ px: 2 }}>
                         <Divider sx={{ mb: 2 }} />
                         <Box

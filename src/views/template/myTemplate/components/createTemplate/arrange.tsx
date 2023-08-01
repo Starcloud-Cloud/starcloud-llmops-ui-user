@@ -227,7 +227,6 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     return (
         <Box>
             <Typography variant="h5" fontSize="1rem" mb={1}>
@@ -635,4 +634,9 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         </Box>
     );
 }
-export default memo(Arrange);
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    // 自定义比较函数，这里对 data 进行深度比较
+
+    return JSON.stringify(prevProps) === JSON.stringify(nextProps);
+};
+export default memo(Arrange, arePropsEqual);

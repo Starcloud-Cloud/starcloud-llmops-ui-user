@@ -18,11 +18,12 @@ import {
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { Code, ContentPaste, CheckCircle, Storefront, CloudUploadOutlined, HistoryOutlined } from '@mui/icons-material';
+import { Code, ContentPaste, CheckCircle, Storefront, CloudUploadOutlined, HistoryOutlined, Error } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, publishGetAuditByAppUid } from 'api/template';
-function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string }) {
+import { publishCreate, publishOperate, publishPage, getLatest } from 'api/template';
+function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: number; saveDetail: () => void }) {
     const IconList: { [key: string]: any } = {
         cloudUploadOutlined: <CloudUploadOutlined sx={{ fontSize: '12px' }} />,
         historyOutlined: <HistoryOutlined sx={{ fontSize: '12px' }} />,
@@ -116,42 +117,55 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
             action: [{ title: 'App', icon: 'cloudUploadOutlined' }]
         }
     ];
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     useEffect(() => {
-        if (appUid) {
-            getAuditByAppUid();
+        if (appUid && searchParams.get('uid')) {
+            getUpdateBtn();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [appUid]);
-    const getAuditByAppUid = () => {
-        publishGetAuditByAppUid(appUid).then((res) => {
-            setReleaseState(res.audit);
+    const getUpdateBtn = () => {
+        getLatest(appUid).then((res) => {
+            setUpdateBtn(res);
+            setReleaseState(res.auditTag);
             setEffUid(res.uid);
         });
     };
-    const [tableData, setTableData] = useState([]);
-    //点击更新之后保存的值
-    const [upData, setUpdate] = useState<null | { updateTime: number; uid: string }>(null);
     //发布状态
     const [releaseState, setReleaseState] = useState<number>(0);
     //发布uid（页面进入获取的uid）
     const [effUid, setEffUid] = useState('');
-    const handleUpdate = async () => {
-        const result = await publishCreate({ appUid });
-        setUpdate(result);
+    //页面进入判断更新按钮是否可点
+    const [updateBtn, setUpdateBtn] = useState<{
+        needUpdate: boolean;
+        appLastUpdateTime: number;
+        enablePublish: boolean;
+        showPublish: boolean;
+        needTips: boolean;
+    } | null>(null);
+    const [tableData, setTableData] = useState([]);
+    //点击更新之后保存的值
+    const [upData, setUpdate] = useState<null | { updateTime: number; uid: string }>(null);
+    //保存按钮是否触发更新
+    const [updateBtnSate, setUpdateBtnSate] = useState(false);
+    const handleUpdate = () => {
+        setUpdateBtnSate(true);
+        saveDetail();
     };
     //发布到市场
     const uploadMarket = async () => {
         if (upData) {
             const result = await publishOperate({ uid: upData?.uid as string, appUid, status: releaseState === 1 ? 4 : 1 });
             if (result) {
-                getAuditByAppUid();
+                getUpdateBtn();
                 dispatch(
                     openSnackbar({
                         open: true,
                         message: '操作成功',
                         variant: 'alert',
                         alert: {
-                            color: 'error'
+                            color: 'success'
                         },
                         close: false
                     })
@@ -160,14 +174,14 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
         } else if (releaseState === 1) {
             const result = await publishOperate({ uid: effUid, appUid, status: 4 });
             if (result) {
-                getAuditByAppUid();
+                getUpdateBtn();
                 dispatch(
                     openSnackbar({
                         open: true,
                         message: '操作成功',
                         variant: 'alert',
                         alert: {
-                            color: 'error'
+                            color: 'success'
                         },
                         close: false
                     })
@@ -183,6 +197,31 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
         setTableData(result.list);
         setHistorySate(true);
     };
+    useEffect(() => {
+        const show = async () => {
+            if (saveState) {
+                if (updateBtnSate) {
+                    const result = await publishCreate({ appUid });
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '更新成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            close: false
+                        })
+                    );
+                    setUpdateBtnSate(false);
+                    setUpdate(result);
+                }
+                getUpdateBtn();
+            }
+        };
+        show();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [saveState]);
     return (
         <Box>
             <SubCard
@@ -193,14 +232,20 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                     <Typography fontSize={16} fontWeight={500}>
                         点击[更新]按钮保存设置以便发布。
                     </Typography>
-                    {upData && (
+                    {updateBtn?.needUpdate && (
+                        <Box fontSize={12} mt="12px" display="flex" alignItems="center">
+                            <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未保存的设置。最后更新日期:
+                            <Typography color="secondary">{formatDate(updateBtn.appLastUpdateTime)}</Typography>
+                        </Box>
+                    )}
+                    {updateBtn && !updateBtn.needUpdate && (
                         <Box fontSize={12} mt="12px" display="flex" alignItems="center">
                             <CheckCircle color="success" sx={{ fontSize: '14px' }} /> 所有设置已更新!最后一次更新日期：
-                            <Typography color="secondary">{upData && formatDate(upData.updateTime)}</Typography>
+                            <Typography color="secondary">{formatDate(updateBtn.appLastUpdateTime)}</Typography>
                         </Box>
                     )}
                 </Box>
-                <Button disabled={!uploadState} color="secondary" variant="outlined" onClick={handleUpdate}>
+                <Button disabled={!updateBtn?.needUpdate} color="secondary" variant="outlined" onClick={handleUpdate}>
                     更新
                 </Button>
             </SubCard>
@@ -249,6 +294,7 @@ function Upload({ uploadState, appUid }: { uploadState: boolean; appUid: string 
                                             : '已失效'
                                     }
                                 />
+                                <Chip sx={{ ml: 1.5 }} size="small" color="warning" label="应用已更新 需要重新发布" variant="outlined" />
                             </Typography>
                             <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
                                 用户可在模板市场中下载你上传的应用

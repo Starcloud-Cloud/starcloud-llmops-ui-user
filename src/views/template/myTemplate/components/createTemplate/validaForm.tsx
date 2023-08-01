@@ -41,8 +41,7 @@ import { useFormik as Formik } from 'formik';
 import generateValidationSchema from 'hooks/usevalid';
 import { Validas, Rows } from 'types/template';
 import FormExecute from 'views/template/components/form';
-import { useState } from 'react';
-
+import { useState, memo } from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
     borderTop: `1px solid ${theme.palette.divider}`,
@@ -349,4 +348,8 @@ const Valida = forwardRef(
         );
     }
 );
-export default Valida;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    // 自定义比较函数，这里对 data 进行深度比较
+    return JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data);
+};
+export default memo(Valida, arePropsEqual);

@@ -7,7 +7,10 @@ import { El } from 'types/template';
 import { t } from 'hooks/web/useI18n';
 import { useRef } from 'react';
 import CarrOut from './carrOut';
+import _ from 'lodash';
 function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange }: any) {
+    console.log('xxxxxxx');
+
     const refs = useRef<any>([]);
     //子组件返回的值
     const callBack = (data: any) => {
@@ -79,4 +82,6 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
         </Box>
     );
 }
+
+// export default memo(Perform, arePropsEqual);
 export default Perform;

@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
 import { getVoiceList } from 'api/chat';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { IChatInfo } from '../index';
@@ -56,15 +56,24 @@ interface IVoiceType {
     WordsPerMinute: string;
 }
 const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
-    const [valueLabel, setValueLabel] = useState('checked');
+    const [value, setValue] = React.useState('');
     const [list, setList] = useState<IVoiceType[]>([]);
 
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setValue((event.target as HTMLInputElement).value);
+    };
     useEffect(() => {
         (async () => {
             const res = await getVoiceList();
+            setValue(res?.[0]?.LocalName);
             setList(res || []);
         })();
     }, []);
+
+    const styleList = React.useMemo(() => {
+        const item = list.find((item) => item.LocalName === value);
+        return item?.StyleList || [];
+    }, [value]);
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -88,20 +97,14 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                     <Grid container spacing={gridSpacing}>
                         <div className={'w-full px-[24px] '}>
                             <div className={'w-full  pt-[24px]'}>
-                                <RadioGroup
-                                    row
-                                    aria-label="gender"
-                                    value={valueLabel}
-                                    onChange={(e) => setValueLabel(e.target.value)}
-                                    name="row-radio-buttons-group"
-                                >
+                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={value} onChange={handleChange}>
                                     <div className={'grid grid-cols-2 gap-4 w-full'}>
                                         {list.map((item, index) => (
                                             <FormControlLabel
                                                 key={index}
-                                                value="checked"
+                                                value={item.LocalName}
                                                 control={<Radio />}
-                                                label={`${item.LocalName}${item.Gender}`}
+                                                label={`${item.LocalName} (${item.Gender === 'Male' ? '男' : '女'})`}
                                             />
                                         ))}
                                     </div>
@@ -111,11 +114,15 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                             <div className={'flex items-center justify-between mt-5'}>
                                 <div className={'flex-[0 0 150px]'}>
                                     <FormControl sx={{ width: '100%' }}>
-                                        <InputLabel id="age-select">Style</InputLabel>
+                                        <InputLabel id="age-select" size={'small'}>
+                                            Style
+                                        </InputLabel>
                                         <Select size={'small'} id="columnId" name="columnId" label={'style'} className={'w-[150px]'}>
-                                            <MenuItem value="">
-                                                <em>None</em>
-                                            </MenuItem>
+                                            {styleList.map((item, index) => (
+                                                <MenuItem key={index} value={item}>
+                                                    {item}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </FormControl>
                                 </div>
@@ -135,7 +142,7 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                 </div>
                                 <div className={'flex-[0 0 150px]'}>
                                     <Button startIcon={<PlayCircleOutlineIcon />} variant={'contained'} color={'secondary'} size={'small'}>
-                                        林志玲
+                                        {value}
                                     </Button>
                                 </div>
                             </div>

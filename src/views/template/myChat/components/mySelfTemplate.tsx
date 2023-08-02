@@ -14,7 +14,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                     <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                         <Box
                             onClick={() => {
-                                navigate('/createApp?uid=' + data?.uid);
+                                navigate('/createChat?uid=' + data?.uid);
                             }}
                             display="flex"
                             alignItems="center"

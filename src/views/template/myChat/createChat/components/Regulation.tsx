@@ -1,11 +1,94 @@
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, Slider, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { FormControl, Grid, InputLabel, MenuItem, Select, Slider, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { IChatInfo } from '../index';
 
-export const Regulation = () => {
+const marks = [
+    {
+        value: 0.4,
+        label: '最准确'
+    },
+    {
+        value: 0.8,
+        label: '较准确'
+    },
+    {
+        value: 1.2,
+        label: '平衡'
+    },
+    {
+        value: 1.6,
+        label: '强创造力'
+    },
+    {
+        value: 2.0,
+        label: '天马行空'
+    }
+];
+
+export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
     const [regulationText, setRegulationText] = useState('');
-    const [mood, setMood] = useState('');
-    const [length, setLength] = useState('');
-    const [language, setLanguage] = useState('');
+
+    const handleRuleValue = (type: number, value: string) => {
+        if (type === 1) {
+            const pattern = /请使用(.*)语气跟我进行对话/;
+            const matchResult = regulationText.match(pattern);
+            if (matchResult) {
+                const matchedText = matchResult[0]; // 提取匹配到的内容
+                if (value === '默认') {
+                    // 删除
+                    setRegulationText(regulationText.replace(matchedText, ''));
+                } else {
+                    // 替换
+                    setRegulationText(regulationText.replace(matchedText, value));
+                }
+            } else {
+                setRegulationText(`${regulationText} \n ${value}`);
+            }
+        }
+        if (type === 2) {
+            const pattern = /回复长度最好不要超过(.*)字/;
+            const matchResult = regulationText.match(pattern);
+            if (matchResult) {
+                const matchedText = matchResult[0]; // 提取匹配到的内容
+                if (value === '默认') {
+                    // 删除
+                    setRegulationText(regulationText.replace(matchedText, ''));
+                } else {
+                    // 替换
+                    setRegulationText(regulationText.replace(matchedText, value));
+                }
+            } else {
+                setRegulationText(`${regulationText} \n ${value}`);
+            }
+        }
+        if (type === 3) {
+            const pattern = /回复时使用(.*)进行回复/;
+            const matchResult = regulationText.match(pattern);
+            const textIncludes = regulationText.includes(
+                '- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.'
+            );
+            console.log(textIncludes, 'textIncludes');
+            if (matchResult || textIncludes) {
+                const matchedText =
+                    matchResult?.[0] ||
+                    '- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.'; // 提取匹配到的内容
+                if (value === '默认') {
+                    // 删除
+                    setRegulationText(regulationText.replace(matchedText, ''));
+                } else {
+                    // 替换
+                    setRegulationText(regulationText.replace(matchedText, value));
+                }
+            } else {
+                setRegulationText(`${regulationText} \n ${value}`);
+            }
+        }
+    };
+
+    useEffect(() => {
+        setChatBotInfo({ ...chatBotInfo, prePrompt: regulationText });
+    }, []);
+
     return (
         <div>
             <div>
@@ -26,6 +109,7 @@ export const Regulation = () => {
                         maxRows={10}
                         minRows={10}
                         onChange={(e) => setRegulationText(e.target.value)}
+                        value={regulationText}
                     />
                     <div className={'flex  items-center mt-3'}>
                         <FormControl sx={{ width: '150px' }}>
@@ -38,14 +122,14 @@ export const Regulation = () => {
                                 name="columnId"
                                 label={'style'}
                                 fullWidth
-                                onChange={(e: any) => setMood(e.target.value)}
+                                onChange={(e: any) => handleRuleValue(1, e.target.value)}
                             >
-                                <MenuItem value="0">默认</MenuItem>
-                                <MenuItem value="1">亲切</MenuItem>
-                                <MenuItem value="2">可爱</MenuItem>
-                                <MenuItem value="3">礼貌</MenuItem>
-                                <MenuItem value="4">严肃</MenuItem>
-                                <MenuItem value="5">幽默</MenuItem>
+                                <MenuItem value="默认">默认</MenuItem>
+                                <MenuItem value="请使用亲切语气跟我进行对话">亲切</MenuItem>
+                                <MenuItem value="请使用可爱语气跟我进行对话">可爱</MenuItem>
+                                <MenuItem value="请使用礼貌语气跟我进行对话">礼貌</MenuItem>
+                                <MenuItem value="请使用严肃语气跟我进行对话">严肃</MenuItem>
+                                <MenuItem value="请使用幽默语气跟我进行对话">幽默</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
@@ -58,14 +142,14 @@ export const Regulation = () => {
                                 name="columnId"
                                 label={'style'}
                                 fullWidth
-                                onChange={(e: any) => setLength(e.target.value)}
+                                onChange={(e: any) => handleRuleValue(2, e.target.value)}
                             >
-                                <MenuItem value="0">默认</MenuItem>
-                                <MenuItem value="1">50字</MenuItem>
-                                <MenuItem value="2">100字</MenuItem>
-                                <MenuItem value="3">200字</MenuItem>
-                                <MenuItem value="4">300字</MenuItem>
-                                <MenuItem value="5">500字</MenuItem>
+                                <MenuItem value="默认">默认</MenuItem>
+                                <MenuItem value="回复长度最好不要超过50字">50字</MenuItem>
+                                <MenuItem value="回复长度最好不要超过100字">100字</MenuItem>
+                                <MenuItem value="回复长度最好不要超过200字">200字</MenuItem>
+                                <MenuItem value="回复长度最好不要超过300字">300字</MenuItem>
+                                <MenuItem value="回复长度最好不要超过500字">500字</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
@@ -78,11 +162,15 @@ export const Regulation = () => {
                                 name="columnId"
                                 label={'style'}
                                 fullWidth
-                                onChange={(e: any) => setLanguage(e.target.value)}
+                                onChange={(e: any) => handleRuleValue(3, e.target.value)}
                             >
-                                <MenuItem value="0">跟随提问</MenuItem>
-                                <MenuItem value="1">始终中文</MenuItem>
-                                <MenuItem value="2">始终英文</MenuItem>
+                                <MenuItem
+                                    value={`- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.`}
+                                >
+                                    跟随提问
+                                </MenuItem>
+                                <MenuItem value="回复时使用中文进行回复">始终中文</MenuItem>
+                                <MenuItem value="回复时使用英文进行回复">始终英文</MenuItem>
                             </Select>
                         </FormControl>
                     </div>
@@ -98,27 +186,12 @@ export const Regulation = () => {
                 </span>
                 <div className={'mt-3'}>
                     <span className={'text-base'}>回复多样性</span>
-                    <Grid item xs={12} container spacing={2} alignItems="center">
-                        <Grid item>
-                            <Typography variant="h5" color={'#999'}>
-                                最准确
-                            </Typography>
-                        </Grid>
-                        <Grid item xs>
-                            <Slider defaultValue={40} valueLabelDisplay="auto" min={15} max={60} />
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="h5" color={'#999'}>
-                                天马行空
-                            </Typography>
+                    <Grid item xs={12} container spacing={2} className="flex justify-center">
+                        <Grid item className="w-[90%]">
+                            <Slider defaultValue={0.4} step={0.4} valueLabelDisplay="off" min={0.4} max={2} marks={marks} />
                         </Grid>
                     </Grid>
                 </div>
-            </div>
-            <div className={'mt-5'}>
-                <Button variant={'contained'} color={'secondary'}>
-                    保存规则
-                </Button>
             </div>
         </div>
     );

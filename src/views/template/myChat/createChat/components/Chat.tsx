@@ -17,33 +17,70 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import dayjs from 'dayjs';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import { useLocation } from 'react-router-dom';
 import Chip from 'ui-component/extended/Chip';
-import { messageSSE } from '../../../../../api/chat';
+import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
 import { t } from '../../../../../hooks/web/useI18n';
 import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
 
-export type IHistory = {
-    type: number;
-    text?: string;
-    time?: string;
-};
+export type IHistory = Partial<{
+    uid: string;
+    appConversationUid: string;
+    appUid: string;
+    appMode: string;
+    appConfig: string;
+    appStep: string;
+    status: string;
+    errorCode: string;
+    errorMsg: string;
+    variables: string;
+    message: string;
+    messageTokens: number;
+    messageUnitPrice: number;
+    answer: string;
+    answerTokens: number;
+    answerUnitPrice: number;
+    elapsed: number;
+    totalPrice: number;
+    currency: string;
+    fromScene: string;
+    endUser: string;
+    id: string;
+    createTime: number;
+}>;
 
+type IConversation = {
+    uid: string;
+    appUid: string;
+    appName: string;
+    appMode: string;
+    appConfig: string;
+    status: string;
+    fromScene: string;
+    endUser: string;
+    id: string;
+    createTime: number;
+};
 export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const theme = useTheme();
     const scrollRef = React.useRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appId = searchParams.get('appId') as string;
 
     const [user, setUser] = React.useState<any>({});
 
     const [isListening, setIsListening] = React.useState(false);
     // const [recognizedText, setRecognizedText] = React.useState('');
     const [message, setMessage] = React.useState('');
+    const [conversationUid, setConversationUid] = React.useState('');
+    const [data, setData] = React.useState<IHistory[]>([]);
 
     // 创建语音识别对象
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
@@ -69,6 +106,26 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         recognition.stop();
     };
 
+    // 获取会话
+    React.useEffect(() => {
+        (async () => {
+            const res: IConversation[] = await getChat({ scene: 'CHAT_TEST', appUid: appId });
+            if (res && res.length) {
+                setConversationUid(res[0].uid);
+            }
+        })();
+    }, []);
+
+    // 获取历史记录
+    React.useEffect(() => {
+        if (conversationUid) {
+            (async () => {
+                const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
+                setData([...res.list]);
+            })();
+        }
+    }, [conversationUid]);
+
     React.useEffect(() => {
         // 清理语音识别对象
         return () => {
@@ -76,19 +133,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             recognition.onresult = null;
         };
     }, []);
-
-    const [data, setData] = React.useState<IHistory[]>([
-        {
-            type: 2,
-            text: 'Hello, How can I help you?',
-            time: '2023-09-02 10:30'
-        },
-        {
-            type: 1,
-            text: 'Hello, How can I help you?',
-            time: '2023-09-02 10:30'
-        }
-    ]);
 
     React.useLayoutEffect(() => {
         if (scrollRef?.current) {
@@ -103,17 +147,17 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             return;
         }
         setMessage('');
-        const newMessage = {
-            type: 1,
-            text: message,
-            time: dayjs().format('YYYY-MM-DD HH:mm')
+        const newMessage: IHistory = {
+            message,
+            createTime: new Date().getTime(),
+            answer: ''
         };
-        // setData((prevState) => [...prevState, newMessage]);
+        setData([...data, newMessage]);
 
         let resp: any = await messageSSE({
-            appUid: '2196b6cce43f41679e15487d79bde823',
-            scene: 'WEB_MARKET',
-            conversationUid: '17178ad444ed4cdfa18836c54a8011c5',
+            appUid: appId,
+            scene: 'CHAT_TEST',
+            conversationUid,
             query: message
         });
         const reader = resp.getReader();
@@ -134,9 +178,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         close: false
                     })
                 );
-                // const newValue1 = [...loadings];
-                // newValue1[index] = false;
-                // setLoadings(newValue1);
                 return;
             }
             if (done) {
@@ -160,7 +201,11 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                     bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                 }
                 if (bufferObj?.code === 200) {
-                    console.log(bufferObj.content);
+                    setConversationUid(bufferObj.conversationUId);
+                    const currentMessage = data[data.length - 1].answer + bufferObj.content;
+                    const copyData = [...data];
+                    copyData[copyData.length - 1].answer = currentMessage;
+                    setData(copyData);
                 } else if (bufferObj && bufferObj.code !== 200) {
                     dispatch(
                         openSnackbar({
@@ -220,19 +265,28 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                     src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
                     alt=""
                 />
-                <text className={'text-lg font-medium ml-3'}>{chatBotInfo.name}</text>
+                <span className={'text-lg font-medium ml-3'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
             <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 310px)', overflowX: 'hidden', minHeight: 525 }}>
-                <Card className="bg-[#f2f3f5] m-[24px] p-[16px]">
-                    <Typography align="left" variant="subtitle2">
-                        {chatBotInfo.introduction}
-                    </Typography>
-                </Card>
+                {chatBotInfo.introduction && (
+                    <Card className="bg-[#f2f3f5] mx-[24px] my-[12px] p-[16px]">
+                        <Typography align="left" variant="subtitle2">
+                            {chatBotInfo.introduction}
+                        </Typography>
+                    </Card>
+                )}
+                {chatBotInfo.statement && (
+                    <Card className="bg-[#f2f3f5] p-[16px] mx-[24px]">
+                        <Typography align="left" variant="subtitle2">
+                            {chatBotInfo.statement}
+                        </Typography>
+                    </Card>
+                )}
                 <CardContent>
-                    <ChatHistory theme={theme} user={user} data={data} />
+                    <ChatHistory theme={theme} data={data} />
                     {/* @ts-ignore */}
-                    {/* <span ref={scrollRef} /> */}
+                    <span ref={scrollRef} />
                 </CardContent>
             </PerfectScrollbar>
             <Grid container spacing={3} className="px-[24px] mb-3">

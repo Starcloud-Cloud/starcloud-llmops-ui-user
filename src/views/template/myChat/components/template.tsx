@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Link, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import marketStore from 'store/market';
 import './textnoWarp.scss';
@@ -17,6 +17,7 @@ function Template({ data, handleDetail }: any) {
                 flexDirection: 'column',
                 itemAlign: 'center',
                 justifyContent: 'center',
+                cursor: 'pointer',
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'

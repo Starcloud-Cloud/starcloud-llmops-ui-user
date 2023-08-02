@@ -23,10 +23,10 @@ module.exports = function override(config) {
     config.plugins = [
         ...config.plugins,
         new CompressionWebpackPlugin({
+            algorithm: 'gzip',
             test: /\.(js|css)$/, // 压缩 JavaScript 和 CSS 文件
             threshold: 10240, // 仅压缩大于 10KB 的文件
-            minRatio: 0.8, // 仅压缩压缩率大于 0.8 的文件
-            deleteOriginalAssets: true
+            minRatio: 0.8 // 仅压缩压缩率大于 0.8 的文件
         }),
         new webpack.ProvidePlugin({
             process: 'process/browser.js',

@@ -139,11 +139,18 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
     //页面进入判断更新按钮是否可点
     const [updateBtn, setUpdateBtn] = useState<{
         needUpdate: boolean;
-        appLastUpdateTime: number;
+        appLastUpdateTime?: number;
         enablePublish: boolean;
-        showPublish: boolean;
+        showPublish?: boolean;
         needTips: boolean;
-    } | null>(null);
+        isFirstCreatePublishRecord: boolean;
+    }>({
+        needUpdate: false,
+        showPublish: true,
+        enablePublish: false,
+        needTips: true,
+        isFirstCreatePublishRecord: true
+    });
     const [tableData, setTableData] = useState([]);
     //点击更新之后保存的值
     const [upData, setUpdate] = useState<null | { updateTime: number; uid: string }>(null);
@@ -232,16 +239,25 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                     <Typography fontSize={16} fontWeight={500}>
                         点击[更新]按钮保存设置以便发布。
                     </Typography>
-                    {updateBtn?.needUpdate && (
-                        <Box fontSize={12} mt="12px" display="flex" alignItems="center">
-                            <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未保存的设置。最后更新日期:
-                            <Typography color="secondary">{formatDate(updateBtn.appLastUpdateTime)}</Typography>
+                    {updateBtn?.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
+                        <Box fontSize={12} mt="12px">
+                            更新所有连接平台上的设置。
                         </Box>
                     )}
-                    {updateBtn && !updateBtn.needUpdate && (
+                    {updateBtn.needUpdate && (
+                        <Box fontSize={12} mt="12px" display="flex" alignItems="center">
+                            <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未保存的设置。最后更新日期:
+                            <Typography color="secondary">
+                                {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
+                            </Typography>
+                        </Box>
+                    )}
+                    {updateBtn && !updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
                         <Box fontSize={12} mt="12px" display="flex" alignItems="center">
                             <CheckCircle color="success" sx={{ fontSize: '14px' }} /> 所有设置已更新!最后一次更新日期：
-                            <Typography color="secondary">{formatDate(updateBtn.appLastUpdateTime)}</Typography>
+                            <Typography color="secondary">
+                                {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
+                            </Typography>
                         </Box>
                     )}
                 </Box>
@@ -294,7 +310,21 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                                             : '已失效'
                                     }
                                 />
-                                <Chip sx={{ ml: 1.5 }} size="small" color="warning" label="应用已更新 需要重新发布" variant="outlined" />
+                                {updateBtn?.needTips && (
+                                    <Chip
+                                        sx={{ ml: 1.5 }}
+                                        size="small"
+                                        color="warning"
+                                        label={
+                                            updateBtn.needTips && releaseState === 1
+                                                ? '检测到应用已经更新：建议更新重新发布'
+                                                : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                                ? '需要更新后才能发布'
+                                                : '检测到应用已经更新：需要更新重新发布'
+                                        }
+                                        variant="outlined"
+                                    />
+                                )}
                             </Typography>
                             <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
                                 用户可在模板市场中下载你上传的应用
@@ -307,13 +337,23 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                                     alignItems="center"
                                     mr={2}
                                     sx={{
-                                        cursor: upData || releaseState === 1 ? 'pointer' : 'default',
-                                        '&:hover': { color: upData || releaseState === 1 ? '#673ab7' : 'none' }
+                                        cursor:
+                                            !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                ? 'pointer'
+                                                : 'default',
+                                        '&:hover': {
+                                            color:
+                                                !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                    ? '#673ab7'
+                                                    : 'none'
+                                        }
                                     }}
-                                    onClick={uploadMarket}
+                                    onClick={() => {
+                                        if ((updateBtn?.showPublish && updateBtn?.enablePublish) || !updateBtn?.showPublish) uploadMarket();
+                                    }}
                                 >
                                     <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                    &nbsp;&nbsp; {releaseState === 1 ? '取消发布' : '发布到模板市场'}
+                                    &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
                                 </Box>
                                 <Box
                                     color="#b5bed0"

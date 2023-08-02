@@ -1,4 +1,4 @@
-import { sum } from 'lodash';
+import { sum } from 'lodash-es';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'store';
 

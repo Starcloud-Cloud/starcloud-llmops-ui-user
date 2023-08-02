@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'store';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'store';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Button,
@@ -20,23 +19,24 @@ import {
     Typography,
     useMediaQuery
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // third party
-import * as Yup from 'yup';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 // project imports
-import AnimateButton from 'ui-component/extended/AnimateButton';
 import useAuth from 'hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
-import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import { openSnackbar } from 'store/slices/snackbar';
+import AnimateButton from 'ui-component/extended/AnimateButton';
+import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { StringColorProps } from 'types';
 import { t } from 'hooks/web/useI18n';
+import { StringColorProps } from 'types';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 interface JWTRegisterProps {
@@ -97,6 +97,21 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                     password: Yup.string().max(255).required(t('auth.register.passwordrequired'))
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                    if (!checked) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('auth.register.checkTreaty'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                close: false
+                            })
+                        );
+                        return;
+                    }
+
                     try {
                         const res = await register(values.email, values.password, values.userName, inviteCode);
                         if (res?.data) {

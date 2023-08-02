@@ -2,19 +2,21 @@
 import { Divider, Grid, IconButton, Modal } from '@mui/material';
 
 // project imports
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import MainCard from 'ui-component/cards/MainCard';
 
 // assets
-import { CloudDownloadOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import LinkIcon from '@mui/icons-material/Link';
 import CloseIcon from '@mui/icons-material/Close';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import LinkIcon from '@mui/icons-material/Link';
 import MuiTooltip from '@mui/material/Tooltip';
 import React from 'react';
-import { downloadFile } from 'utils/download';
-import { IImageListTypeChildImages } from '../index';
-import { openSnackbar } from '../../../../store/slices/snackbar';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import { downloadFile } from 'utils/download';
 import { useDispatch } from '../../../../store';
+import { openSnackbar } from '../../../../store/slices/snackbar';
+import { IImageListTypeChildImages } from '../index';
 
 export default function PicModal({
     open,
@@ -113,7 +115,7 @@ export default function PicModal({
                                     onClick={() => handlePrev()}
                                     disabled={btnDisable.preDis}
                                 >
-                                    <LeftOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    <ArrowBackIosNewIcon style={{ color: '#fff' }} />
                                 </button>
                                 <button
                                     className={`${
@@ -121,7 +123,7 @@ export default function PicModal({
                                     } flex-none w-10 h-10 flex justify-center items-center rounded-md border-none absolute right-0 top-[48%]`}
                                     onClick={() => handleNext()}
                                 >
-                                    <RightOutlined rev={undefined} style={{ color: '#fff' }} />
+                                    <ArrowForwardIosIcon style={{ color: '#fff' }} />
                                 </button>
                             </div>
                             <div className="h-full sm:col-span-1 p-4 bg-white xs:col-span-3">
@@ -153,7 +155,7 @@ export default function PicModal({
                                         }
                                     >
                                         <MuiTooltip title="下载" arrow placement="top">
-                                            <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                            <CloudDownloadIcon style={{ color: '#fff', height: '16px' }} />
                                         </MuiTooltip>
                                     </div>
                                     <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer ml-2">

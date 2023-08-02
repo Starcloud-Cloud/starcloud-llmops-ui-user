@@ -38,13 +38,31 @@ const uploadButton = (
     </div>
 );
 
+interface IVoiceType {
+    Name: string;
+    DisplayName: string;
+    LocalName: string;
+    ShortName: string;
+    Gender: string;
+    Locale: string;
+    LocaleName: string;
+    StyleList: string[];
+    SecondaryLocaleList?: any;
+    RolePlayList: string[];
+    SampleRateHertz: string;
+    VoiceType: string;
+    Status: string;
+    ExtendedPropertyMap?: any;
+    WordsPerMinute: string;
+}
 const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const [valueLabel, setValueLabel] = useState('checked');
+    const [list, setList] = useState<IVoiceType[]>([]);
 
     useEffect(() => {
-        console.log('getVoiceList');
         (async () => {
             const res = await getVoiceList();
+            setList(res || []);
         })();
     }, []);
 
@@ -78,8 +96,14 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                     name="row-radio-buttons-group"
                                 >
                                     <div className={'grid grid-cols-2 gap-4 w-full'}>
-                                        <FormControlLabel value="checked" control={<Radio />} label="Checked" />
-                                        <FormControlLabel value="unchecked" control={<Radio />} label="Unchecked" />
+                                        {list.map((item, index) => (
+                                            <FormControlLabel
+                                                key={index}
+                                                value="checked"
+                                                control={<Radio />}
+                                                label={`${item.LocalName}${item.Gender}`}
+                                            />
+                                        ))}
                                     </div>
                                 </RadioGroup>
                             </div>

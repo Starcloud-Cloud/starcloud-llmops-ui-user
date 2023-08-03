@@ -1,7 +1,6 @@
-import { useState, ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Button,
@@ -18,25 +17,26 @@ import {
     Typography,
     useMediaQuery
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // third-party
-import * as yup from 'yup';
-import uniqueId from 'lodash/uniqueId';
-import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { uniqueId } from 'lodash-es';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
+import * as yup from 'yup';
 
 // project imports
-import Reply from './Reply';
-import Avatar from 'ui-component/extended/Avatar';
+import { CommentData, Comment as CommentProps, PostProps, Profile } from 'types/user-profile';
 import AnimateButton from 'ui-component/extended/AnimateButton';
-import { Comment as CommentProps, CommentData, PostProps, Profile } from 'types/user-profile';
+import Avatar from 'ui-component/extended/Avatar';
+import Reply from './Reply';
 
 // assets
+import AttachmentRoundedIcon from '@mui/icons-material/AttachmentRounded';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
-import ThumbUpAltTwoToneIcon from '@mui/icons-material/ThumbUpAltTwoTone';
 import ReplyTwoToneIcon from '@mui/icons-material/ReplyTwoTone';
-import AttachmentRoundedIcon from '@mui/icons-material/AttachmentRounded';
+import ThumbUpAltTwoToneIcon from '@mui/icons-material/ThumbUpAltTwoTone';
 import { FormInputProps } from 'types';
 
 const avatarImage = require.context('assets/images/users', true);

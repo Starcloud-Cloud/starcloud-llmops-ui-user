@@ -20,7 +20,7 @@ import {
 
 // third-party
 import * as yup from 'yup';
-import uniqueId from 'lodash/uniqueId';
+import { uniqueId } from 'lodash-es';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import ReactMarkdown from 'react-markdown';

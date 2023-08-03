@@ -1,5 +1,5 @@
-import { CloudDownloadOutlined } from '@ant-design/icons';
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { IconButton } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
@@ -158,9 +158,8 @@ export const PictureCreateContainer = ({
                                             </div>
                                             <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
                                                 <MuiTooltip title="下载" arrow placement="top">
-                                                    <CloudDownloadOutlined
-                                                        rev={undefined}
-                                                        style={{ color: '#fff' }}
+                                                    <CloudDownloadIcon
+                                                        style={{ color: '#fff', height: '16px' }}
                                                         onClick={() => batchHandle(item.images)}
                                                     />
                                                 </MuiTooltip>
@@ -369,7 +368,7 @@ export const PictureCreateContainer = ({
                                         ) : (
                                             <div
                                                 className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center"
-                                                style={{ aspectRatio: width / height }}
+                                                style={{ aspectRatio: item?.width / item?.height }}
                                                 key={img.uuid}
                                                 onMouseEnter={() => handleMouseEnter(img.uuid)}
                                                 onMouseLeave={handleMouseLeave}
@@ -401,7 +400,7 @@ export const PictureCreateContainer = ({
                                                             }
                                                         >
                                                             <MuiTooltip title="下载" arrow placement="top">
-                                                                <CloudDownloadOutlined rev={undefined} style={{ color: '#fff' }} />
+                                                                <CloudDownloadIcon style={{ color: '#fff', height: '16px' }} />
                                                             </MuiTooltip>
                                                         </div>
                                                     </Space>

@@ -1,11 +1,12 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { Col, Input, Row } from 'antd';
 
-import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import CasinoIcon from '@mui/icons-material/Casino';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Slider } from '@mui/material';
 
-import { InboxOutlined } from '@ant-design/icons';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -717,7 +718,7 @@ export const PictureCreateMenu = ({
                                 <Dragger {...props}>
                                     <div>
                                         <p className="ant-upload-drag-icon">
-                                            <InboxOutlined rev={undefined} />
+                                            <CloudUploadOutlinedIcon className="text-4xl" />
                                         </p>
                                         <p className="ant-upload-text">上传图片以创建变体</p>
                                     </div>
@@ -727,12 +728,12 @@ export const PictureCreateMenu = ({
                     )}
                 </Row>
                 <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                    <span className={'text-base font-medium'}>
+                    <span className={'text-base font-medium flex items-center'}>
                         高级
                         {visible ? (
-                            <EyeOutlined rev={undefined} className={'cursor-pointer ml-1'} onClick={() => setVisible(!visible)} />
+                            <VisibilityOutlinedIcon className={'cursor-pointer ml-1 text-lg'} onClick={() => setVisible(!visible)} />
                         ) : (
-                            <EyeInvisibleOutlined className={'cursor-pointer ml-1'} rev={undefined} onClick={() => setVisible(!visible)} />
+                            <VisibilityOffOutlinedIcon className={'cursor-pointer ml-1 text-lg'} onClick={() => setVisible(!visible)} />
                         )}
                     </span>
                     {visible && (

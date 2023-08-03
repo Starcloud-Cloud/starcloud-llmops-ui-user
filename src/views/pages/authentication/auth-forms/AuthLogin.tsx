@@ -65,6 +65,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const [qrUrl, setQrurl] = useState(null);
     const [inviteCode, setInviteCode] = useState('');
     const [open, setOpen] = useState(true);
+    const [checked, setChecked] = React.useState(true);
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
@@ -394,17 +395,49 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                             </div>
                         </Stack>
                     </Grid>
-                    <div className="flex justify-center mt-5">
-                        <img
-                            className="border rounded border-[#e0e0e098] border-solid"
-                            height="233"
-                            width="233"
-                            src={qrUrl ? qrUrl : 'https://via.placeholder.com/200'}
-                            alt="QR code"
-                        />
+                    <div className="flex justify-center mt-5 h-[233] w-[233]">
+                        {checked ? (
+                            <img
+                                className="border rounded border-[#e0e0e098] border-solid"
+                                height="233"
+                                width="233"
+                                src={qrUrl || 'https://via.placeholder.com/200'}
+                                alt="QR code"
+                            />
+                        ) : (
+                            <img
+                                className="border rounded border-[#e0e0e098] border-solid"
+                                height="233"
+                                width="233"
+                                src={'https://via.placeholder.com/200'}
+                                alt="QR code"
+                            />
+                        )}
                     </div>
                     <Grid item xs={12} className="pt-3 pb-3">
                         <Divider />
+                    </Grid>
+                    <Grid container alignItems="center" justifyContent="center">
+                        <Grid item>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={checked}
+                                        onChange={(event) => setChecked(event.target.checked)}
+                                        name="checked"
+                                        color="primary"
+                                    />
+                                }
+                                label={
+                                    <Typography variant="subtitle1">
+                                        {t('auth.require.agree')} &nbsp;
+                                        <Typography variant="subtitle1" component={Link} to="/pages/privacy-policy">
+                                            {t('auth.require.terms')}
+                                        </Typography>
+                                    </Typography>
+                                }
+                            />
+                        </Grid>
                     </Grid>
                     <Grid item xs={12}>
                         <Grid item container direction="column" alignItems="center" xs={12}>

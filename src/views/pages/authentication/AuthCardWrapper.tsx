@@ -10,7 +10,7 @@ export const AuthLoginCardWrapper = ({ children, ...other }: MainCardProps) => (
     <MainCard
         sx={{
             width: { xs: 350, lg: 475 },
-            height: { xs: 400, lg: 435 },
+            height: { xs: 435, lg: 475 },
             margin: { xs: 2.5, md: 3 },
             '& > *': {
                 flexGrow: 1,

@@ -369,7 +369,7 @@ export const PictureCreateContainer = ({
                                         ) : (
                                             <div
                                                 className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center"
-                                                style={{ aspectRatio: width / height }}
+                                                style={{ aspectRatio: item?.width / item?.height }}
                                                 key={img.uuid}
                                                 onMouseEnter={() => handleMouseEnter(img.uuid)}
                                                 onMouseLeave={handleMouseLeave}

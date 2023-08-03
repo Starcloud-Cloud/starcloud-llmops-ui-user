@@ -1,5 +1,4 @@
 import CleaningServicesSharpIcon from '@mui/icons-material/CleaningServicesSharp';
-import HistoryToggleOffSharpIcon from '@mui/icons-material/HistoryToggleOffSharp';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
 import SendIcon from '@mui/icons-material/Send';
@@ -20,7 +19,6 @@ import {
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation } from 'react-router-dom';
-import Chip from 'ui-component/extended/Chip';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
 import { t } from '../../../../../hooks/web/useI18n';
 import { dispatch } from '../../../../../store';
@@ -52,6 +50,9 @@ export type IHistory = Partial<{
     endUser: string;
     id: string;
     createTime: number;
+    robotName: string;
+    robotAvatar: string;
+    isNew: boolean;
 }>;
 
 type IConversation = {
@@ -121,10 +122,11 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         if (conversationUid) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
-                setData([...res.list]);
+                const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+                setData(list);
             })();
         }
-    }, [conversationUid]);
+    }, [conversationUid, chatBotInfo]);
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -148,9 +150,12 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         }
         setMessage('');
         const newMessage: IHistory = {
+            robotName: chatBotInfo.name,
+            robotAvatar: chatBotInfo.avatar,
             message,
             createTime: new Date().getTime(),
-            answer: ''
+            answer: '',
+            isNew: true
         };
         setData([...data, newMessage]);
 
@@ -181,6 +186,9 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 return;
             }
             if (done) {
+                const copyData = [...data];
+                copyData[copyData.length - 1].isNew = false;
+                setData(copyData);
                 break;
             }
             let str = textDecoder.decode(value);
@@ -205,6 +213,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                     const currentMessage = data[data.length - 1].answer + bufferObj.content;
                     const copyData = [...data];
                     copyData[copyData.length - 1].answer = currentMessage;
+                    copyData[copyData.length - 1].isNew = true;
                     setData(copyData);
                 } else if (bufferObj && bufferObj.code !== 200) {
                     dispatch(
@@ -234,6 +243,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const handleClean = () => {
         setAnchorEl(null);
         setData([]);
+        setConversationUid('');
     };
 
     const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);
@@ -259,25 +269,25 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     return (
         // <div className="bg-[#f4f6f8] rounded-md">
         <div>
-            <div className={'flex justify-center items-center py-[15px]'}>
-                <img
-                    className="w-[38px] h-[38px] rounded-xl ml-2"
-                    src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
-                    alt=""
-                />
-                <span className={'text-lg font-medium ml-3'}>{chatBotInfo.name}</span>
+            <div className={'flex justify-center items-center py-[8px]'}>
+                <img className="w-[28px] h-[28px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 310px)', overflowX: 'hidden', minHeight: 525 }}>
-                {chatBotInfo.introduction && (
-                    <Card className="bg-[#f2f3f5] mx-[24px] my-[12px] p-[16px]">
-                        <Typography align="left" variant="subtitle2">
-                            {chatBotInfo.introduction}
-                        </Typography>
+            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 265px)', overflowX: 'hidden', minHeight: 525 }}>
+                {chatBotInfo.introduction && chatBotInfo.enableIntroduction && (
+                    <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
+                        <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                        <div className="flex flex-col ml-3">
+                            <span className={'text-lg font-medium'}>{chatBotInfo.name}</span>
+                            <Typography align="left" variant="subtitle2" color={'#000'}>
+                                {chatBotInfo.introduction}
+                            </Typography>
+                        </div>
                     </Card>
                 )}
                 {chatBotInfo.statement && (
-                    <Card className="bg-[#f2f3f5] p-[16px] mx-[24px]">
+                    <Card className="bg-[#f2f3f5] p-[16px] mx-[24px] mt-[12px]">
                         <Typography align="left" variant="subtitle2">
                             {chatBotInfo.statement}
                         </Typography>
@@ -285,20 +295,15 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 )}
                 <CardContent>
                     <ChatHistory theme={theme} data={data} />
-                    {/* @ts-ignore */}
-                    <span ref={scrollRef} />
                 </CardContent>
             </PerfectScrollbar>
-            <Grid container spacing={3} className="px-[24px] mb-3">
+            {/* <Grid container spacing={3} className="px-[24px] mb-3">
                 <Grid item>
                     <Chip label="Secondary" chipcolor="secondary" size={'small'} className="cursor-pointer" />
                 </Grid>
-            </Grid>
+            </Grid> */}
             <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
                 <Grid item>
-                    {/* <IconButton size="large" aria-label="attachment file" onClick={() => handleClean()}>
-                        <CleaningServicesSharpIcon />
-                    </IconButton> */}
                     <Grid item>
                         <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
                             <MoreHorizTwoToneIcon />
@@ -322,10 +327,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                                 <CleaningServicesSharpIcon className="text-base" />
                                 <span className="text-base ml-3">清除</span>
                             </MenuItem>
-                            <MenuItem onClick={handleCloseSort}>
-                                <HistoryToggleOffSharpIcon className="text-base" />
-                                <span className="text-base ml-3">历史</span>
-                            </MenuItem>
                         </Menu>
                     </Grid>
                 </Grid>
@@ -336,7 +337,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyPress={handleEnter}
-                        placeholder="Type a Message"
+                        placeholder="请输入"
                         endAdornment={
                             <>
                                 <InputAdornment position="end">

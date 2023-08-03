@@ -124,3 +124,11 @@ export const getVoiceList = () => {
 export const speaker = (data: any) => {
     return request.post({ url: '/llm/chat/voice/speak', data });
 };
+
+/**
+ * 获取默认头像
+ * @returns
+ */
+export const getAvatarList = () => {
+    return request.get({ url: '/llm/chat/avatar/default' });
+};

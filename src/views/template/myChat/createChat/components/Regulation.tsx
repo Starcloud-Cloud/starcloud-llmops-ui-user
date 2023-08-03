@@ -94,7 +94,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             <div>
                 <span
                     className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
                     }
                 >
                     基础规则
@@ -108,8 +108,10 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         multiline={true}
                         maxRows={10}
                         minRows={10}
+                        InputLabelProps={{ shrink: true }}
                         onChange={(e) => setRegulationText(e.target.value)}
                         value={regulationText}
+                        helperText="机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。"
                     />
                     <div className={'flex  items-center mt-3'}>
                         <FormControl sx={{ width: '150px' }}>
@@ -176,16 +178,16 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </div>
                 </div>
             </div>
-            <div className={'mt-5'}>
+            <div className={'mt-10'}>
                 <span
                     className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
                     }
                 >
                     高级规则
                 </span>
                 <div className={'mt-3'}>
-                    <span className={'text-base'}>回复多样性</span>
+                    <span className={'text-base text-black'}>回复多样性</span>
                     <Grid item xs={12} container spacing={2} className="flex justify-center">
                         <Grid item className="w-[90%]">
                             <Slider defaultValue={0.4} step={0.4} valueLabelDisplay="off" min={0.4} max={2} marks={marks} />

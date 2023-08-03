@@ -9,6 +9,7 @@ import { gridSpacing } from 'store/constant';
 import { LoadingDot } from 'ui-component/LoadingDot';
 import { IHistory } from './Chat';
 
+import User from 'assets/images/users/user-round.svg';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -54,47 +55,54 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => (
                                         </Card>
                                     </Grid>
                                 </div>
-                                <img
-                                    className="w-[50px] h-[50px] rounded-xl ml-2"
-                                    src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
-                                    alt=""
-                                />
+                                <img className="w-[50px] h-[50px] rounded-xl ml-2" src={User} alt="" />
                             </div>
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} sm={7} className="flex">
-                                <img
-                                    className="w-[50px] h-[50px] rounded-xl mr-2"
-                                    src="https://afu-1255830993.cos.ap-shanghai.myqcloud.com/chato_image/avater_208/ceeb3af9785ac20c3adad8c4cdd00d3e.png"
-                                    alt=""
-                                />
+                                <img className="w-[50px] h-[50px] rounded-xl mr-2" src={history.robotAvatar} alt="" />
                                 <div>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} className="flex items-center">
                                         <Typography align="left" variant="subtitle2">
+                                            {history.robotName}
+                                        </Typography>
+                                        <Typography align="left" variant="subtitle2" className="ml-2">
                                             {dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                         </Typography>
                                     </Grid>
-                                    <Card
-                                        sx={{
-                                            display: 'inline-block',
-                                            background:
-                                                theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.secondary.light
-                                        }}
-                                    >
-                                        <CardContent sx={{ p: 2, pb: '16px !important' }}>
-                                            <Grid container spacing={1}>
-                                                <Grid item xs={12}>
-                                                    {history.answer ? (
-                                                        <Typography variant="body2">{history.answer}</Typography>
-                                                    ) : (
-                                                        <LoadingDot />
-                                                    )}
+                                    <div className="flex flex-col">
+                                        <Card
+                                            sx={{
+                                                display: 'inline-block',
+                                                background:
+                                                    theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.secondary.light
+                                            }}
+                                        >
+                                            <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                <Grid container spacing={1}>
+                                                    <Grid item xs={12}>
+                                                        {history.answer ? (
+                                                            <Typography variant="body2">{history.answer}</Typography>
+                                                        ) : (
+                                                            <LoadingDot />
+                                                        )}
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
-                                        </CardContent>
-                                    </Card>
+                                            </CardContent>
+                                        </Card>
+                                        {history.isNew &&
+                                            (history.answer ? (
+                                                <div className="text-[13px] leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
+                                                    正在回答中...
+                                                </div>
+                                            ) : (
+                                                <div className="text-[13px] leading-5 mt-2  inline-block transition-opacity text-[#B5BED0]">
+                                                    正在思考中...
+                                                </div>
+                                            ))}
+                                    </div>
                                 </div>
                             </Grid>
                         </Grid>

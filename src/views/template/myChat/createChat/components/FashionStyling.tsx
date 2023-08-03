@@ -22,10 +22,12 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { getVoiceList } from 'api/chat';
+import { getAvatarList, getVoiceList } from 'api/chat';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
+import { getAccessToken } from 'utils/auth';
 import { IChatInfo } from '../index';
 
 const uploadButton = (
@@ -244,12 +246,41 @@ export const FashionStyling = ({
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
     const [introductionOpen, setIntroductionOpen] = useState(false);
+    const [avatarList, setAvatarList] = useState<string[]>([]);
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+
+    useEffect(() => {
+        setChatBotInfo({ ...chatBotInfo, enableVoice: visibleVoice });
+    }, [visibleVoice]);
+
+    useEffect(() => {
+        setChatBotInfo({ ...chatBotInfo, enableIntroduction: introductionOpen });
+    }, [introductionOpen]);
 
     const closeVoiceModal = () => {
         setVoiceOpen(false);
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    useEffect(() => {
+        setChatBotInfo({
+            ...chatBotInfo,
+            avatar: fileList?.[0]?.response?.data
+        });
+    }, [fileList]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await getAvatarList();
+            setAvatarList(res);
+        })();
+    }, []);
+
+    console.log(chatBotInfo, 'chatBotInfo');
+
     return (
         <>
             <div>
@@ -266,8 +297,10 @@ export const FashionStyling = ({
                             label={'名称'}
                             className={'mt-1'}
                             value={chatBotInfo.name}
-                            focused
+                            error={!chatBotInfo.name}
+                            helperText={!chatBotInfo.name && '请填写名称'}
                             fullWidth
+                            InputLabelProps={{ shrink: true }}
                             size={'small'}
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -277,16 +310,40 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>
-                        <div className={'mt-1'}>
+                        <div className={'mt-1 flex items-center'}>
                             <Upload
                                 maxCount={1}
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                action={`${process.env.REACT_APP_BASE_URL}${
+                                    process.env.REACT_APP_API_URL
+                                }/llm/chat/avatar/${searchParams.get('appId')}`}
+                                headers={{
+                                    Authorization: 'Bearer ' + getAccessToken()
+                                }}
+                                name="avatarFile"
                                 listType="picture-card"
                                 fileList={fileList}
                                 onChange={handleChange}
+                                className="!w-[110px]"
                             >
-                                {fileList.length >= 8 ? null : uploadButton}
+                                {fileList.length >= 1 ? null : uploadButton}
                             </Upload>
+                            <div className="flex  items-center">
+                                {avatarList.map((item, index) => (
+                                    <img
+                                        onClick={() => {
+                                            setChatBotInfo({
+                                                ...chatBotInfo,
+                                                avatar: item
+                                            });
+                                        }}
+                                        key={index}
+                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:border-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
+                                            chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
+                                        }`}
+                                        src={item}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <div className={'mt-1'}>
@@ -302,11 +359,11 @@ export const FashionStyling = ({
                             className={'mt-1'}
                             size={'small'}
                             fullWidth
-                            focused
                             multiline={true}
                             maxRows={3}
                             minRows={3}
                             aria-valuemax={200}
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
                             label={'简介'}
                             onChange={(e) => {
@@ -355,19 +412,20 @@ export const FashionStyling = ({
                             "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
                         }
                     >
-                        对话元素
+                        对话配置
                     </span>
                     <div className={'mt-5'}>
                         <TextField
                             className={'mt-1'}
                             size={'small'}
                             fullWidth
-                            focused
                             multiline={true}
                             maxRows={3}
                             minRows={3}
                             aria-valuemax={200}
                             label={'欢迎语'}
+                            placeholder="打开聊天窗口后会主动发送"
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.statement}
                             onChange={(e) => {
                                 const value = e.target.value;

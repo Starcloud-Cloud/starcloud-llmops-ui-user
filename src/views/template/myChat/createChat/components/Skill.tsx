@@ -1,22 +1,15 @@
 import { InboxOutlined } from '@ant-design/icons';
-import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/EditTwoTone';
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import {
     Box,
     Button,
-    Card,
     CardActions,
     CardContent,
     Divider,
     Grid,
     IconButton,
     Link,
-    Menu,
-    MenuItem,
     Modal,
-    Switch,
     Tab,
     Tabs,
     TextField,
@@ -312,262 +305,64 @@ export const Skill = () => {
                 <div>
                     <span
                         className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
                         }
                     >
                         学习API
                     </span>
-                    <div className="text-sm text-[#9da3af] ml-3">释放您的天才，访问实时信息并无缝操作数据。</div>
-                </div>
-                <div className={'mt-5'}>
-                    <div className="flex justify-end">
-                        <div className="w-[300px] flex ">
-                            <Button
-                                variant={'contained'}
-                                startIcon={<AddIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                // onClick={() => setQaVisible(true)}
-                            >
-                                官方技能库
-                            </Button>
-                            <Button
-                                className="ml-3"
-                                variant={'contained'}
-                                startIcon={<AddIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                // onClick={() => setQaVisible(true)}
-                            >
-                                API开发
-                            </Button>
-                        </div>
+                    <div className="text-sm text-[#9da3af] ml-3">
+                        让你的机器人可以实时查询信息和操作其他API数据的能力，让你的机器人帮助你完成更多真实的工作。
                     </div>
-                    <div className="mt-3">
+                    <div className={'mt-3'}>
                         <MainCard>
-                            <Grid container direction="row" spacing={gridSpacing}>
-                                <Grid item xs={12} sm={6} lg={4} xl={3}>
-                                    <Card
-                                        sx={{
-                                            p: 2,
-                                            background: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
-                                            border:
-                                                theme.palette.mode === 'dark'
-                                                    ? '1px solid transparent'
-                                                    : `1px solid${theme.palette.grey[100]}`,
-                                            '&:hover': {
-                                                borderColor: theme.palette.primary.main
-                                            }
-                                        }}
-                                    >
-                                        <Grid container spacing={gridSpacing}>
-                                            <Grid item xs={12}>
-                                                <Grid container spacing={gridSpacing}>
-                                                    <Grid item xs zeroMinWidth>
-                                                        <div className="flex items-center">
-                                                            <EditIcon className="text-[#0009] text-lg" />
-                                                            <Typography variant="h4" component="div" color={'#0009'}>
-                                                                旅行计划
-                                                            </Typography>
-                                                        </div>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <IconButton
-                                                            size="small"
-                                                            sx={{ mt: -0.75, mr: -0.75 }}
-                                                            onClick={handleClick}
-                                                            aria-label="more-options"
-                                                        >
-                                                            <MoreHorizOutlinedIcon
-                                                                fontSize="small"
-                                                                color="inherit"
-                                                                aria-controls="menu-friend-card"
-                                                                aria-haspopup="true"
-                                                                sx={{ opacity: 0.6 }}
-                                                            />
-                                                        </IconButton>
-                                                        {anchorEl && (
-                                                            <Menu
-                                                                id="menu-user-details-card"
-                                                                anchorEl={anchorEl}
-                                                                keepMounted
-                                                                open={Boolean(anchorEl)}
-                                                                onClose={handleClose}
-                                                                variant="selectedMenu"
-                                                                anchorOrigin={{
-                                                                    vertical: 'bottom',
-                                                                    horizontal: 'right'
-                                                                }}
-                                                                transformOrigin={{
-                                                                    vertical: 'top',
-                                                                    horizontal: 'right'
-                                                                }}
-                                                            >
-                                                                <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                                                <MenuItem onClick={handleClose}>Delete</MenuItem>
-                                                            </Menu>
-                                                        )}
-                                                    </Grid>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <Typography variant="h5" component="div" color={'#0009'}>
-                                                    该API用于为用户生成详细的出行计划。
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <Divider variant="fullWidth" />
-                                            </Grid>
-                                            <Grid item xs={12} className="!pt-[10px]">
-                                                <Typography variant="caption">未验证</Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
+                            <Grid
+                                container
+                                direction="row"
+                                spacing={gridSpacing}
+                                className={'h-[220px] flex justify-center items-center flex-col'}
+                            >
+                                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+                                    <path
+                                        d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
+                                        fill="#515151"
+                                        p-id="6181"
+                                    ></path>
+                                </svg>
+                                <div className="text-base">即将推出</div>
                             </Grid>
                         </MainCard>
                     </div>
                 </div>
             </div>
-            <div className="mt-5">
-                <div>
-                    <div>
-                        <span
-                            className={
-                                "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                            }
+            <div>
+                <span
+                    className={
+                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
+                    }
+                >
+                    学习工作流程
+                </span>
+                <div className="text-sm text-[#9da3af] ml-3">
+                    让你的机器人可直接执行定制的AI应用，实现更复杂和深度的内容创作和工作内容。{' '}
+                </div>
+                <div className={'mt-3'}>
+                    <MainCard>
+                        <Grid
+                            container
+                            direction="row"
+                            spacing={gridSpacing}
+                            className={'h-[220px] flex justify-center items-center flex-col'}
                         >
-                            学习工作流程
-                        </span>
-                        <div className="text-sm text-[#9da3af] ml-3">利用可定制的思路链，实现全面分析、深度输出。</div>
-                    </div>
-                    <div className={'mt-5'}>
-                        <div className="flex justify-end">
-                            <div className="w-[300px] flex ">
-                                <Button
-                                    variant={'contained'}
-                                    startIcon={<AddIcon />}
-                                    color={'secondary'}
-                                    size={'small'}
-                                    // onClick={() => setDocumentVisible(true)}
-                                >
-                                    工作流程库
-                                </Button>
-                                <Button
-                                    className="ml-3"
-                                    variant={'contained'}
-                                    startIcon={<AddIcon />}
-                                    color={'secondary'}
-                                    size={'small'}
-                                    // onClick={() => setDocumentVisible(true)}
-                                >
-                                    构建新的工作流程
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <MainCard>
-                                <Grid container direction="row" spacing={gridSpacing}>
-                                    <Grid item xs={12} sm={6} lg={4} xl={3}>
-                                        <Card
-                                            sx={{
-                                                p: 2,
-                                                background:
-                                                    theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
-                                                border:
-                                                    theme.palette.mode === 'dark'
-                                                        ? '1px solid transparent'
-                                                        : `1px solid${theme.palette.grey[100]}`,
-                                                '&:hover': {
-                                                    borderColor: theme.palette.primary.main
-                                                }
-                                            }}
-                                        >
-                                            <Grid container spacing={gridSpacing}>
-                                                <Grid item xs={12}>
-                                                    <Grid container spacing={gridSpacing}>
-                                                        <Grid item xs zeroMinWidth>
-                                                            <div className="flex items-center">
-                                                                <EditIcon className="text-[#0009] text-lg" />
-                                                                <Typography variant="h4" component="div" color={'#0009'}>
-                                                                    旅行计划
-                                                                </Typography>
-                                                            </div>
-                                                        </Grid>
-
-                                                        <Grid item>
-                                                            <IconButton
-                                                                size="small"
-                                                                sx={{ mt: -0.75, mr: -0.75 }}
-                                                                onClick={handleClick}
-                                                                aria-label="more-options"
-                                                            >
-                                                                <MoreHorizOutlinedIcon
-                                                                    fontSize="small"
-                                                                    color="inherit"
-                                                                    aria-controls="menu-friend-card"
-                                                                    aria-haspopup="true"
-                                                                    sx={{ opacity: 0.6 }}
-                                                                />
-                                                            </IconButton>
-                                                            {anchorEl && (
-                                                                <Menu
-                                                                    id="menu-user-details-card"
-                                                                    anchorEl={anchorEl}
-                                                                    keepMounted
-                                                                    open={Boolean(anchorEl)}
-                                                                    onClose={handleClose}
-                                                                    variant="selectedMenu"
-                                                                    anchorOrigin={{
-                                                                        vertical: 'bottom',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                    transformOrigin={{
-                                                                        vertical: 'top',
-                                                                        horizontal: 'right'
-                                                                    }}
-                                                                >
-                                                                    <MenuItem onClick={handleClose}>Edit</MenuItem>
-                                                                    <MenuItem onClick={handleClose}>Delete</MenuItem>
-                                                                </Menu>
-                                                            )}
-                                                        </Grid>
-                                                    </Grid>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Typography variant="h5" component="div" color={'#0009'}>
-                                                        该API用于为用户生成详细的出行计划。
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Divider variant="fullWidth" />
-                                                </Grid>
-                                                <Grid item xs={12} className="!pt-[10px]">
-                                                    <Typography variant="caption">未验证</Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Card>
-                                    </Grid>
-                                </Grid>
-                            </MainCard>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="mt-5">
-                <div>
-                    <span
-                        className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                        }
-                    >
-                        如何使用技能
-                    </span>
-                    <div className="text-sm text-[#9da3af] ml-3">指导天才如何以及何时使用技能。</div>
-                </div>
-                <div className={'mt-5'}>
-                    <TextField label={'指导'} className={'mt-3 w-3/4'} fullWidth multiline minRows={1} size="small" />
+                            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+                                <path
+                                    d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
+                                    fill="#515151"
+                                    p-id="6181"
+                                ></path>
+                            </svg>
+                            <div className="text-base">即将推出</div>
+                        </Grid>
+                    </MainCard>
                 </div>
             </div>
             <div className="mt-5">
@@ -580,13 +375,29 @@ export const Skill = () => {
                         >
                             从网络搜索中学习
                         </span>
-                        <Switch className="ml-3" checked={checked} onChange={(e) => setChecked(e.target.checked)} color="secondary" />
+                        {/* <Switch className="ml-3" checked={checked} onChange={(e) => setChecked(e.target.checked)} color="secondary" /> */}
                     </div>
-                    <div className="text-sm text-[#9da3af] ml-3">能够从互联网收集实时信息。 </div>
+                    <div className="text-sm text-[#9da3af] ml-3">能够从互联网上收集实时信息，你可以问机器人最新最近的信息。 </div>
+                    <MainCard>
+                        <Grid
+                            container
+                            direction="row"
+                            spacing={gridSpacing}
+                            className={'h-[220px] flex justify-center items-center flex-col'}
+                        >
+                            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+                                <path
+                                    d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
+                                    fill="#515151"
+                                    p-id="6181"
+                                ></path>
+                            </svg>
+                            <div className="text-base">即将推出</div>
+                        </Grid>
+                    </MainCard>
                 </div>
                 {checked && (
                     <div className={'mt-5'}>
-                        <TextField label={'何时使用网络搜索'} className={'w-3/4'} fullWidth multiline minRows={1} size="small" />
                         <TextField label={'设置网络搜索范围'} className={'mt-3 w-3/4'} fullWidth multiline minRows={3} size="small" />
                     </div>
                 )}

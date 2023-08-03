@@ -1,9 +1,7 @@
-import { PlusOutlined } from '@ant-design/icons';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import RemoveIcon from '@mui/icons-material/Remove';
 import {
     Button,
     CardActions,
@@ -29,12 +27,11 @@ import React, { useEffect, useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { IChatInfo } from '../index';
-import ShortcutRecord from './ShortcutRecord';
 
 const uploadButton = (
     <div>
-        <PlusOutlined rev={undefined} />
-        <div style={{ marginTop: 8 }}>Upload</div>
+        <AddIcon />
+        <div style={{ marginTop: 8 }}>上传</div>
     </div>
 );
 
@@ -71,9 +68,9 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
     }, []);
 
     const styleList = React.useMemo(() => {
-        const item = list.find((item) => item.LocalName === value);
+        const item = list.find((v) => v.LocalName === value);
         return item?.StyleList || [];
-    }, [value]);
+    }, [list, value]);
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -246,6 +243,7 @@ export const FashionStyling = ({
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
+    const [introductionOpen, setIntroductionOpen] = useState(false);
 
     const closeVoiceModal = () => {
         setVoiceOpen(false);
@@ -258,7 +256,7 @@ export const FashionStyling = ({
                 <div>
                     <span
                         className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
                         }
                     >
                         基本信息
@@ -268,6 +266,7 @@ export const FashionStyling = ({
                             label={'名称'}
                             className={'mt-1'}
                             value={chatBotInfo.name}
+                            focused
                             fullWidth
                             size={'small'}
                             onChange={(e) => {
@@ -276,8 +275,8 @@ export const FashionStyling = ({
                             }}
                         />
                     </div>
-                    <div className={'mt-5'}>
-                        <span className={'text-base'}>头像</span>
+                    <div className={'mt-3'}>
+                        <span className={'text-base text-black'}>头像</span>
                         <div className={'mt-1'}>
                             <Upload
                                 maxCount={1}
@@ -290,11 +289,20 @@ export const FashionStyling = ({
                             </Upload>
                         </div>
                     </div>
-                    <div className={'mt-5'}>
+                    <div className={'mt-1'}>
+                        <div className="flex justify-end items-center">
+                            <span className={'text-#697586'}>{introductionOpen ? '展示' : '不展示'}</span>
+                            <Switch
+                                color={'secondary'}
+                                checked={introductionOpen}
+                                onChange={(e) => setIntroductionOpen(e.target.checked)}
+                            />
+                        </div>
                         <TextField
                             className={'mt-1'}
                             size={'small'}
                             fullWidth
+                            focused
                             multiline={true}
                             maxRows={3}
                             minRows={3}
@@ -308,36 +316,40 @@ export const FashionStyling = ({
                         />
                     </div>
                     <div className={'mt-5'}>
-                        <div>
-                            <span className={'text-base'}>声音</span>
-                            <Switch color={'secondary'} checked={visibleVoice} onChange={(e) => setVisibleVoice(e.target.checked)} />
-                        </div>
-                        <div className={'text-[#697586]'}>Enable voices to hear your Genius speak.</div>
-                        {visibleVoice && (
-                            <div className={'mt-3'}>
-                                <Button
-                                    variant={'contained'}
-                                    startIcon={<GraphicEqIcon />}
-                                    color={'secondary'}
-                                    size={'small'}
-                                    onClick={() => setVoiceOpen(true)}
-                                >
-                                    选择声音
-                                </Button>
-                                <Button
-                                    className={'ml-3'}
-                                    startIcon={<PlayCircleOutlineIcon />}
-                                    variant={'contained'}
-                                    color={'secondary'}
-                                    size={'small'}
-                                >
-                                    林志玲
-                                </Button>
+                        <div className="flex justify-between">
+                            <div className="flex justify-between items-center">
+                                <span className={'text-base text-black'}>声音</span>
+                                <span className={'text-#697586 ml-[8px]'}>让你的机器人说话吧！</span>
                             </div>
-                        )}
+
+                            <div className="flex justify-end items-center">
+                                <span className={'text-#697586'}>{visibleVoice ? '启用' : '不启用'}</span>
+                                <Switch color={'secondary'} checked={visibleVoice} onChange={(e) => setVisibleVoice(e.target.checked)} />
+                            </div>
+                        </div>
+                        <div className={'mt-3'}>
+                            <Button
+                                variant={'contained'}
+                                startIcon={<GraphicEqIcon />}
+                                color={'secondary'}
+                                size={'small'}
+                                onClick={() => setVoiceOpen(true)}
+                            >
+                                选择声音
+                            </Button>
+                            <Button
+                                className={'ml-3'}
+                                startIcon={<PlayCircleOutlineIcon />}
+                                variant={'contained'}
+                                color={'secondary'}
+                                size={'small'}
+                            >
+                                林志玲
+                            </Button>
+                        </div>
                     </div>
                 </div>
-                <div className={'mt-5'}>
+                <div className={'mt-10'}>
                     <span
                         className={
                             "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
@@ -350,6 +362,7 @@ export const FashionStyling = ({
                             className={'mt-1'}
                             size={'small'}
                             fullWidth
+                            focused
                             multiline={true}
                             maxRows={3}
                             minRows={3}
@@ -361,7 +374,7 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
-                        <div className={'mt-5'}>
+                        {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (
                                 <div className={'flex items-center mt-3 w-1/2'} key={index}>
@@ -416,9 +429,9 @@ export const FashionStyling = ({
                                     )}
                                 </div>
                             ))}
-                        </div>
+                        </div> */}
                     </div>
-                    <div className={'mt-5'}>
+                    {/* <div className={'mt-5'}>
                         <span className={'text-base'}>快捷方式</span>
                         <div className={'mt-3'}>
                             <Button
@@ -432,7 +445,7 @@ export const FashionStyling = ({
                             </Button>
                             <ShortcutRecord />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />

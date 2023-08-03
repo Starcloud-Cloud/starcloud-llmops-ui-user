@@ -834,5 +834,14 @@
         "Cinematic": "电影风",
         "Model 3D": "三维模型",
         "Pixel Art": "像素艺术"
+    },
+    "chat": {
+        "name": "机器人名称",
+        "recommend": "模版机器人",
+        "recommendDes": "通过模板方便地创建一个机器人",
+        "createRobot": "创建机器人",
+        "createRobotRequire": "机器人名称必填",
+        "typeName": "请填写机器人的名称",
+        "myRobot": "我的机器人"
     }
 }

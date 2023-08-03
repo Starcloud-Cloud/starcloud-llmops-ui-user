@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Link, Pagination, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Pagination, TextField, Typography, useTheme } from '@mui/material';
 
 import MyselfTemplate from './components/mySelfTemplate';
 import Template from './components/template';
@@ -65,6 +65,7 @@ function MyTemplate() {
     const [open, setOpen] = useState(false);
     const [robotName, setRobotName] = useState('');
     const [currentRow, setCurrentRow] = useState<any>(null);
+    const theme = useTheme();
 
     useEffect(() => {
         getChatTemplate({ model: 'CHAT' }).then((res) => {
@@ -101,20 +102,20 @@ function MyTemplate() {
         <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.name" label={t('apply.name')} InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField v-model="queryParams.name" label={t('chat.name')} InputLabelProps={{ shrink: true }} fullWidth />
                 </Grid>
-                <Grid item lg={3}>
-                    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />
-                </Grid>
-                <Grid item lg={3}>
-                    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />
-                </Grid>
+                {/*<Grid item lg={3}>*/}
+                {/*    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />*/}
+                {/*</Grid>*/}
+                {/*<Grid item lg={3}>*/}
+                {/*    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />*/}
+                {/*</Grid>*/}
             </Grid>
             <Box display="flex" alignItems="end" my={2}>
-                <Typography variant="h5">{t('apply.recommend')}</Typography>
-                <Link href="https://www.mdc.ai/document-en" fontSize={14} color="#7367f0" ml={1}>
-                    {t('apply.instruction')}
-                </Link>
+                <Typography variant="h3">{t('chat.recommend')}</Typography>
+                <Typography fontSize="12px" ml={1}>
+                    {t('chat.recommendDes')}
+                </Typography>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
@@ -127,8 +128,8 @@ function MyTemplate() {
             </Box>
             {total > 0 && (
                 <Box>
-                    <Typography variant="h5" my={2}>
-                        {t('apply.self')}
+                    <Typography variant="h3" my={2}>
+                        {t('chat.myRobot')}
                     </Typography>
                     <MyselfTemplate appList={newAppList} />
                     <Box my={2}>
@@ -136,7 +137,7 @@ function MyTemplate() {
                     </Box>
                 </Box>
             )}
-            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} />
+            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} value={robotName} />
         </Box>
     );
 }

@@ -13,13 +13,11 @@ import generateValidationSchema from 'hooks/usevalid';
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 import { El } from 'types/template';
-import { useRef, forwardRef, useImperativeHandle, useEffect, memo } from 'react';
-import _ from 'lodash';
+import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
+import _ from 'lodash-es';
 // import copy from 'clipboard-copy';
 
-const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
-    console.log(222222222222);
-
+const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack, changeanswer }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
     useImperativeHandle(ref, () => ({
@@ -232,6 +230,9 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                                     {t('myApp.execuent')}
                                 </Box>
                             }
+                            onChange={(e) => {
+                                changeanswer({ value: e.target.value, index: steps });
+                            }}
                             value={item.flowStep.response.answer}
                             multiline
                             minRows={item.flowStep.response.style === 'TEXTAREA' ? 8 : 1}
@@ -256,13 +257,4 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
         </Card>
     );
 });
-const arePropsEqual = (prevProps: any, nextProps: any) => {
-    // 自定义比较函数，这里对 data 进行深度比较
-    console.log(_.cloneDeep(prevProps?.config?.steps[prevProps?.steps]));
-    console.log(_.cloneDeep(nextProps?.config?.steps[prevProps?.steps]));
-    console.log(JSON.stringify(prevProps?.config?.steps[prevProps?.steps]) === JSON.stringify(nextProps?.config?.steps[prevProps?.steps]));
-
-    return _.cloneDeep(prevProps?.config?.steps[prevProps?.steps]) === _.cloneDeep(nextProps?.config?.steps[prevProps?.steps]);
-};
-export default memo(CarrOut, arePropsEqual);
-// export default CarrOut;
+export default CarrOut;

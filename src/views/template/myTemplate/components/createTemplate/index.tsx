@@ -35,7 +35,7 @@ import Basis from './basis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
-import _ from 'lodash';
+import _ from 'lodash-es';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -149,9 +149,12 @@ function CreateDetail() {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        const contentData1 = _.cloneDeep(contentData);
                         contentData.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                        setDetail(contentData);
+                        contentData1.workflowConfig.steps[index].flowStep.response.answer =
+                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
                             openSnackbar({
@@ -263,9 +266,17 @@ function CreateDetail() {
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
+        console.log('qirhuan');
+
         const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
+    };
+    //更改answer
+    const changeanswer = ({ value, index }: any) => {
+        const newValue = _.cloneDeep(detail);
+        newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        setDetail(newValue);
     };
     //保存更改
     const saveDetail = () => {
@@ -438,13 +449,14 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            {detail && (
+                            {detail && value === 0 && (
                                 <Perform
                                     key={perform}
                                     config={detail?.workflowConfig}
                                     changeSon={changeData}
                                     loadings={loadings}
                                     variableChange={exeChange}
+                                    changeanswer={changeanswer}
                                     promptChange={promptChange}
                                     isallExecute={(flag: boolean) => {
                                         isAllExecute = flag;
@@ -459,9 +471,9 @@ function CreateDetail() {
             <TabPanel value={value} index={1}>
                 <Grid container spacing={2}>
                     <Grid item lg={6} sx={{ width: '100%' }}>
-                        {detail && (
+                        {detail?.workflowConfig && (
                             <Arrange
-                                config={detail?.workflowConfig}
+                                config={_.cloneDeep(detail.workflowConfig)}
                                 editChange={editChange}
                                 basisChange={basisChange}
                                 statusChange={statusChange}
@@ -500,11 +512,12 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            {detail && (
+                            {detail && value === 1 && (
                                 <Perform
                                     key={perform}
-                                    config={detail?.workflowConfig}
+                                    config={_.cloneDeep(detail.workflowConfig)}
                                     changeSon={changeData}
+                                    changeanswer={changeanswer}
                                     loadings={loadings}
                                     variableChange={exeChange}
                                     promptChange={promptChange}

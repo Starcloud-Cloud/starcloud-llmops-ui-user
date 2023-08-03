@@ -30,7 +30,7 @@ function Form({ formik, item, onChange }: any) {
                         clearTimeout(timeoutRef.current);
                         timeoutRef.current = setTimeout(() => {
                             onChange(e.target);
-                        }, 200);
+                        }, 300);
                     }}
                     fullWidth
                 />
@@ -56,7 +56,7 @@ function Form({ formik, item, onChange }: any) {
                         clearTimeout(timeoutRef.current);
                         timeoutRef.current = setTimeout(() => {
                             onChange(e.target);
-                        }, 200);
+                        }, 300);
                     }}
                     fullWidth
                 />
@@ -81,7 +81,7 @@ function Form({ formik, item, onChange }: any) {
                         clearTimeout(timeoutRef.current);
                         timeoutRef.current = setTimeout(() => {
                             onChange(e.target);
-                        }, 200);
+                        }, 300);
                     }}
                     fullWidth
                 >

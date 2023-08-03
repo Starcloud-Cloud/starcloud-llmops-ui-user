@@ -87,3 +87,11 @@ export const publishPage = (params: { appUid: string }) => {
 export const getLatest = (appUid: string) => {
     return request.get({ url: `/llm/app/publish/getLatest/${appUid}` });
 };
+//管理员审核发布
+export const pageAdmin = (params: { pageNo: number; pageSize: number; name?: string; model?: string; audit?: number | string }) => {
+    return request.get({ url: `/llm/app/publish/pageAdmin`, params });
+};
+//管理员审核
+export const setAudit = (data: { uid: string; appUid: string; status: number }) => {
+    return request.post({ url: `/llm/app/publish/audit`, data });
+};

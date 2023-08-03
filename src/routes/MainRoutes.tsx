@@ -19,6 +19,9 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 
+// 个人设置
+const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -62,6 +65,10 @@ const MainRoutes = {
         {
             path: '/textToImage',
             element: <PictureCreate />
+        },
+        {
+            path: '/user/account-profile/profile',
+            element: <AppUserAccountProfile />
         }
     ]
 };

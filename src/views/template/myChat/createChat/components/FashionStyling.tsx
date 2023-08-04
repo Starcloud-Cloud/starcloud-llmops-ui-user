@@ -104,7 +104,8 @@ const VoiceModal = ({
                 console.log('done');
                 break;
             }
-            console.log(ArrayBuffer.isView(value), '12');
+            console.log(value, ArrayBuffer.isView(value), '12');
+            const uint8Array = new Uint8Array(value);
 
             // 假设您已经有一个ArrayBuffer对象，命名为arrayBuffer
 
@@ -113,7 +114,7 @@ const VoiceModal = ({
 
             // 将ArrayBuffer转换为AudioBuffer
             audioContext.decodeAudioData(
-                value,
+                uint8Array,
                 (buffer) => {
                     // 创建AudioBufferSourceNode
                     const sourceNode = audioContext.createBufferSource();

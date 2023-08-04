@@ -16,7 +16,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React from 'react';
+import React, { useRef } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
@@ -82,6 +82,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const [message, setMessage] = React.useState('');
     const [conversationUid, setConversationUid] = React.useState('');
     const [data, setData] = React.useState<IHistory[]>([]);
+    const dataRef: any = useRef();
 
     // 创建语音识别对象
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
@@ -157,7 +158,9 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             answer: '',
             isNew: true
         };
-        setData([...data, newMessage]);
+        const newData = [...data, newMessage];
+        setData(newData);
+        dataRef.current = newData;
 
         let resp: any = await messageSSE({
             appUid: appId,
@@ -186,9 +189,10 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 return;
             }
             if (done) {
-                const copyData = [...data];
+                const copyData = dataRef.current;
                 copyData[copyData.length - 1].isNew = false;
                 setData(copyData);
+                dataRef.current = copyData;
                 break;
             }
             let str = textDecoder.decode(value);
@@ -211,10 +215,11 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 if (bufferObj?.code === 200) {
                     setConversationUid(bufferObj.conversationUId);
                     const currentMessage = data[data.length - 1].answer + bufferObj.content;
-                    const copyData = [...data];
+                    const copyData = dataRef.current;
                     copyData[copyData.length - 1].answer = currentMessage;
                     copyData[copyData.length - 1].isNew = true;
                     setData(copyData);
+                    dataRef.current = copyData;
                 } else if (bufferObj && bufferObj.code !== 200) {
                     dispatch(
                         openSnackbar({

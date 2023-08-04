@@ -1,9 +1,11 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button, Card, CardHeader, Divider, Link, Tab, Tabs } from '@mui/material';
-import { getChatInfo } from 'api/chat';
+import { chatSave, getChatInfo } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details } from 'types/template';
 import { Chat } from './components/Chat';
@@ -34,12 +36,18 @@ export function a11yProps(index: number) {
 export type IChatInfo = {
     name?: string;
     avatar?: string;
-    introduction?: string;
     prePrompt?: string;
-    statement?: string;
+    statement?: string; // 欢迎语
+    temperature?: number;
     guideList?: string[];
+    introduction?: string; // 简介
     enableIntroduction?: boolean;
     enableVoice?: boolean;
+    defaultImg?: string;
+    voiceName?: string;
+    voiceStyle?: string;
+    voicePitch?: number;
+    voiceSpeed?: number;
 };
 
 function CreateDetail() {
@@ -48,7 +56,6 @@ function CreateDetail() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const [detail, setDetail] = useState(null as unknown as Details);
-    const basis = useRef<any>(null);
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
@@ -60,17 +67,41 @@ function CreateDetail() {
                 setChatBotInfo({
                     ...chatBotInfo,
                     name: res.name,
-                    avatar: res.avatar,
-                    introduction: res.description,
+                    avatar: res?.images?.[0],
+                    introduction: res.description, // 简介
+                    enableIntroduction: res.chatConfig.description.enabled,
                     statement: res.chatConfig.openingStatement.statement,
-                    prePrompt: res.chatConfig.prePrompt
+                    prePrompt: res.chatConfig.prePrompt,
+                    temperature: res.chatConfig.modelConfig.completionParams.temperature,
+                    defaultImg: res?.images?.[0]
                 });
             });
         }
     }, []);
 
     //保存更改
-    const saveDetail = () => {};
+    const saveDetail = async () => {
+        const data: any = detail;
+        data.name = chatBotInfo.name;
+        data.images = [chatBotInfo.avatar];
+        data.chatConfig.prePrompt = chatBotInfo.prePrompt;
+        data.chatConfig.modelConfig.completionParams.temperature = chatBotInfo.temperature;
+        data.chatConfig.openingStatement.statement = chatBotInfo.statement;
+        data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
+        data.description = chatBotInfo.introduction;
+        await chatSave(data);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
 
     //tabs
     const [value, setValue] = useState(0);

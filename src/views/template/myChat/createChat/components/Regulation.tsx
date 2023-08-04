@@ -86,8 +86,10 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
     };
 
     useEffect(() => {
-        setChatBotInfo({ ...chatBotInfo, prePrompt: regulationText });
-    }, []);
+        if (regulationText) {
+            setChatBotInfo({ ...chatBotInfo, prePrompt: regulationText });
+        }
+    }, [regulationText]);
 
     return (
         <div>
@@ -101,6 +103,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 </span>
                 <div className={'mt-5'}>
                     <TextField
+                        value={chatBotInfo.prePrompt}
                         label={'角色描述'}
                         className={'mt-1'}
                         fullWidth
@@ -110,7 +113,6 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         minRows={10}
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => setRegulationText(e.target.value)}
-                        value={regulationText}
                         helperText="机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。"
                     />
                     <div className={'flex  items-center mt-3'}>
@@ -190,7 +192,21 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     <span className={'text-base text-black'}>回复多样性</span>
                     <Grid item xs={12} container spacing={2} className="flex justify-center">
                         <Grid item className="w-[90%]">
-                            <Slider defaultValue={0.4} step={0.4} valueLabelDisplay="off" min={0.4} max={2} marks={marks} />
+                            <Slider
+                                defaultValue={0.4}
+                                step={0.4}
+                                valueLabelDisplay="off"
+                                min={0.4}
+                                max={2}
+                                value={chatBotInfo?.temperature || 0.4}
+                                marks={marks}
+                                onChange={(e, value) => {
+                                    setChatBotInfo({
+                                        ...chatBotInfo,
+                                        temperature: value as number
+                                    });
+                                }}
+                            />
                         </Grid>
                     </Grid>
                 </div>

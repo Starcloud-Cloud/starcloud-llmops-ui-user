@@ -89,7 +89,7 @@ export const createChat = (data: any) => {
  * @returns
  */
 export const chatSave = (data: any) => {
-    return request.post({ url: '/llm/app/modify', data });
+    return request.put({ url: '/llm/app/modify', data });
 };
 
 /**
@@ -122,7 +122,15 @@ export const getVoiceList = () => {
  * @returns
  */
 export const speaker = (data: any) => {
-    return request.post({ url: '/llm/chat/voice/speak', data });
+    return fetch('/llm/chat/voice/speak', 'post', data);
+};
+
+/**
+ * 测试声音
+ * @returns
+ */
+export const testSpeakerSSE = (data: any) => {
+    return fetch('/llm/chat/voice/example', 'post', data);
 };
 
 /**

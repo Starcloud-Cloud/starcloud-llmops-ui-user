@@ -22,7 +22,7 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { getAvatarList, getVoiceList } from 'api/chat';
+import { getAvatarList, getVoiceList, testSpeakerSSE } from 'api/chat';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
@@ -54,25 +54,85 @@ interface IVoiceType {
     ExtendedPropertyMap?: any;
     WordsPerMinute: string;
 }
-const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
-    const [value, setValue] = React.useState('');
+const VoiceModal = ({
+    open,
+    handleClose,
+    chatBotInfo,
+    setChatBotInfo
+}: {
+    open: boolean;
+    handleClose: () => void;
+    chatBotInfo: IChatInfo;
+    setChatBotInfo: (chatInfo: IChatInfo) => void;
+}) => {
+    const [name, setName] = useState('');
+    const [style, setStyle] = useState('');
+    const [speed, setSpeed] = useState(1);
+    const [pitch, setPitch] = useState(1);
+
     const [list, setList] = useState<IVoiceType[]>([]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue((event.target as HTMLInputElement).value);
+        setName((event.target as HTMLInputElement).value);
     };
+
     useEffect(() => {
         (async () => {
             const res = await getVoiceList();
-            setValue(res?.[0]?.LocalName);
+            setName(res?.[0]?.LocalName);
             setList(res || []);
         })();
     }, []);
 
     const styleList = React.useMemo(() => {
-        const item = list.find((v) => v.LocalName === value);
+        const item = list.find((v) => v.LocalName === name);
         return item?.StyleList || [];
-    }, [list, value]);
+    }, [list, name]);
+
+    const handleTest = async () => {
+        let resp: any = await testSpeakerSSE({
+            shortName: 'zh-CN-YunyeNeural'
+            // prosodyRate: 'CHAT_TEST',
+            // prosodyPitch,
+        });
+        const reader = resp.getReader();
+        let outerJoins: any;
+        while (1) {
+            let joins = outerJoins;
+            const { done, value } = await reader.read();
+            if (done) {
+                console.log('done');
+                break;
+            }
+            console.log(ArrayBuffer.isView(value), '12');
+
+            // 假设您已经有一个ArrayBuffer对象，命名为arrayBuffer
+
+            // 创建AudioContext对象
+            const audioContext = new window.AudioContext();
+
+            // 将ArrayBuffer转换为AudioBuffer
+            audioContext.decodeAudioData(
+                value,
+                (buffer) => {
+                    // 创建AudioBufferSourceNode
+                    const sourceNode = audioContext.createBufferSource();
+                    sourceNode.buffer = buffer;
+
+                    // 连接节点到扬声器
+                    sourceNode.connect(audioContext.destination);
+
+                    // 播放音频
+                    sourceNode.start();
+                },
+                (error) => {
+                    console.error('解码音频数据时出错：', error);
+                }
+            );
+
+            outerJoins = joins;
+        }
+    };
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -96,14 +156,14 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                     <Grid container spacing={gridSpacing}>
                         <div className={'w-full px-[24px] '}>
                             <div className={'w-full  pt-[24px]'}>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={value} onChange={handleChange}>
+                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={name} onChange={handleChange}>
                                     <div className={'grid grid-cols-2 gap-4 w-full'}>
                                         {list.map((item, index) => (
                                             <FormControlLabel
                                                 key={index}
                                                 value={item.LocalName}
                                                 control={<Radio />}
-                                                label={`${item.LocalName} (${item.Gender === 'Male' ? '男' : '女'})`}
+                                                label={`${item.LocalName}-${item.Gender === 'Male' ? '男' : '女'}-${item.LocaleName}`}
                                             />
                                         ))}
                                     </div>
@@ -116,7 +176,17 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                         <InputLabel id="age-select" size={'small'}>
                                             Style
                                         </InputLabel>
-                                        <Select size={'small'} id="columnId" name="columnId" label={'style'} className={'w-[150px]'}>
+                                        <Select
+                                            size={'small'}
+                                            id="columnId"
+                                            name="columnId"
+                                            label={'style'}
+                                            className={'w-[150px]'}
+                                            value={style}
+                                            onChange={(e) => {
+                                                setStyle(e.target.value);
+                                            }}
+                                        >
                                             {styleList.map((item, index) => (
                                                 <MenuItem key={index} value={item}>
                                                     {item}
@@ -129,19 +199,52 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                 <div className={'flex-1 flex items-center justify-center'}>
                                     <div className={'w-4/5 flex items-center justify-center'}>
                                         <span className={'text-sm mr-2'}>Pitch</span>
-                                        <Slider defaultValue={40} valueLabelDisplay="auto" min={15} max={60} />
+                                        <Slider
+                                            defaultValue={1}
+                                            step={0.1}
+                                            valueLabelDisplay="auto"
+                                            min={0.5}
+                                            value={chatBotInfo.voicePitch}
+                                            max={1.5}
+                                            onChange={(e, value) => {
+                                                setChatBotInfo({
+                                                    ...chatBotInfo,
+                                                    voicePitch: value as number
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className={'flex-1 flex items-center justify-center'}>
                                     <div className={'w-4/5 flex items-center justify-center'}>
                                         <span className={'text-sm mr-2'}>Speed</span>
-                                        <Slider className={'w-4/5'} defaultValue={40} valueLabelDisplay="auto" min={15} max={60} />{' '}
+                                        <Slider
+                                            className={'w-4/5'}
+                                            defaultValue={1}
+                                            step={0.1}
+                                            valueLabelDisplay="auto"
+                                            min={0.5}
+                                            max={2}
+                                            value={chatBotInfo.voiceSpeed}
+                                            onChange={(e, value) => {
+                                                setChatBotInfo({
+                                                    ...chatBotInfo,
+                                                    voiceSpeed: value as number
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 <div className={'flex-[0 0 150px]'}>
-                                    <Button startIcon={<PlayCircleOutlineIcon />} variant={'contained'} color={'secondary'} size={'small'}>
-                                        {value}
+                                    <Button
+                                        startIcon={<PlayCircleOutlineIcon />}
+                                        variant={'contained'}
+                                        color={'secondary'}
+                                        size={'small'}
+                                        onClick={() => handleTest()}
+                                    >
+                                        播放
                                     </Button>
                                 </div>
                             </div>
@@ -266,20 +369,28 @@ export const FashionStyling = ({
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
 
     useEffect(() => {
-        setChatBotInfo({
-            ...chatBotInfo,
-            avatar: fileList?.[0]?.response?.data
-        });
+        if (fileList?.[0]?.response?.data) {
+            setChatBotInfo({
+                ...chatBotInfo,
+                avatar: fileList?.[0]?.response?.data
+            });
+        }
     }, [fileList]);
 
     useEffect(() => {
         (async () => {
             const res = await getAvatarList();
-            setAvatarList(res);
+            setAvatarList([chatBotInfo.defaultImg, ...res]);
         })();
-    }, []);
+    }, [chatBotInfo]);
 
-    console.log(chatBotInfo, 'chatBotInfo');
+    useEffect(() => {
+        if (fileList?.[0]?.response?.data) {
+            setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
+        }
+    }, [fileList]);
+
+    console.log(chatBotInfo.avatar, 'chatBotInfo.avatar');
 
     return (
         <>
@@ -319,6 +430,7 @@ export const FashionStyling = ({
                                 headers={{
                                     Authorization: 'Bearer ' + getAccessToken()
                                 }}
+                                accept=".png, .jpg, .jpeg"
                                 name="avatarFile"
                                 listType="picture-card"
                                 fileList={fileList}
@@ -337,6 +449,7 @@ export const FashionStyling = ({
                                             });
                                         }}
                                         key={index}
+                                        style={chatBotInfo.avatar === item ? { border: '1px solid #673ab7' } : {}}
                                         className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:border-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
                                             chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
                                         }`}
@@ -351,8 +464,12 @@ export const FashionStyling = ({
                             <span className={'text-#697586'}>{introductionOpen ? '展示' : '不展示'}</span>
                             <Switch
                                 color={'secondary'}
-                                checked={introductionOpen}
-                                onChange={(e) => setIntroductionOpen(e.target.checked)}
+                                checked={chatBotInfo.enableIntroduction}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    console.log(value, 'value');
+                                    setChatBotInfo({ ...chatBotInfo, enableIntroduction: !chatBotInfo.enableIntroduction });
+                                }}
                             />
                         </div>
                         <TextField
@@ -506,7 +623,7 @@ export const FashionStyling = ({
                     </div> */}
                 </div>
             </div>
-            <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />
+            <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} chatBotInfo={chatBotInfo} setChatBotInfo={setChatBotInfo} />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
         </>
     );

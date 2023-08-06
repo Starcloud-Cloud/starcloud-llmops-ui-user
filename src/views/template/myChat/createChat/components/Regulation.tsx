@@ -65,13 +65,13 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             const pattern = /回复时使用(.*)进行回复/;
             const matchResult = regulationText.match(pattern);
             const textIncludes = regulationText.includes(
-                '- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.'
+                'Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.'
             );
             console.log(textIncludes, 'textIncludes');
             if (matchResult || textIncludes) {
                 const matchedText =
                     matchResult?.[0] ||
-                    '- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.'; // 提取匹配到的内容
+                    'Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.'; // 提取匹配到的内容
                 if (value === '默认') {
                     // 删除
                     setRegulationText(regulationText.replace(matchedText, ''));
@@ -85,6 +85,13 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
         }
     };
 
+    useEffect(() => {
+        if (chatBotInfo.prePrompt) {
+            setRegulationText(chatBotInfo.prePrompt);
+        }
+    }, [chatBotInfo]);
+
+    // 监听修改
     useEffect(() => {
         if (regulationText) {
             setChatBotInfo({ ...chatBotInfo, prePrompt: regulationText });
@@ -169,7 +176,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 onChange={(e: any) => handleRuleValue(3, e.target.value)}
                             >
                                 <MenuItem
-                                    value={`- Identify what language users use in questions and use the same language in your answers. - Use English or 中文 to answer questions based on the language of the question.`}
+                                    value={`Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.`}
                                 >
                                     跟随提问
                                 </MenuItem>

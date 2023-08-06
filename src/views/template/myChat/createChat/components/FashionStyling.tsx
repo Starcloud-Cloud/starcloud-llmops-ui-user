@@ -90,6 +90,42 @@ const VoiceModal = ({
     }, [list, name]);
 
     const handleTest = async () => {
+        // try {
+        //     const response = await fetch('http://www.w3schools.com/html/horse.mp3');
+        //     const arrayBuffer = await response.arrayBuffer();
+        //     console.log(arrayBuffer);
+        //     // const response = await axios({
+        //     //     method: 'post',
+        //     //     url: 'http://www.w3schools.com/html/horse.mp3',
+        //     //     responseType: 'arraybuffer'
+        //     // });
+
+        //     const audioContext = new window.AudioContext();
+        //     if (audioContext.state === 'suspended') {
+        //         await audioContext.resume();
+        //     }
+
+        //     // 将ArrayBuffer转换为AudioBuffer
+        //     audioContext.decodeAudioData(
+        //         // response.data,
+        //         arrayBuffer,
+        //         (buffer) => {
+        //             // 创建AudioBufferSourceNode
+        //             const sourceNode = audioContext.createBufferSource();
+        //             sourceNode.buffer = buffer;
+        //             // 连接节点到扬声器
+        //             sourceNode.connect(audioContext.destination);
+        //             // 播放音频
+        //             sourceNode.start();
+        //         },
+        //         (error) => {
+        //             console.error('解码音频数据时出错：', error);
+        //         }
+        //     );
+        // } catch (error) {
+        //     console.error('播放音频时出错：', error);
+        // }
+
         let resp: any = await testSpeakerSSE({
             shortName: 'zh-CN-YunyeNeural'
             // prosodyRate: 'CHAT_TEST',
@@ -104,25 +140,19 @@ const VoiceModal = ({
                 console.log('done');
                 break;
             }
-            console.log(value, ArrayBuffer.isView(value), '12');
-            const uint8Array = new Uint8Array(value);
-
-            // 假设您已经有一个ArrayBuffer对象，命名为arrayBuffer
-
             // 创建AudioContext对象
             const audioContext = new window.AudioContext();
-
+            const uint8Array = new Uint8Array(value);
+            const arrayBuffer = uint8Array.buffer;
             // 将ArrayBuffer转换为AudioBuffer
             audioContext.decodeAudioData(
-                uint8Array,
+                arrayBuffer,
                 (buffer) => {
                     // 创建AudioBufferSourceNode
                     const sourceNode = audioContext.createBufferSource();
                     sourceNode.buffer = buffer;
-
                     // 连接节点到扬声器
                     sourceNode.connect(audioContext.destination);
-
                     // 播放音频
                     sourceNode.start();
                 },
@@ -130,7 +160,6 @@ const VoiceModal = ({
                     console.error('解码音频数据时出错：', error);
                 }
             );
-
             outerJoins = joins;
         }
     };
@@ -343,14 +372,14 @@ export const FashionStyling = ({
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
 }) => {
-    console.log(chatBotInfo.guideList, 'chatBotInfo.guideList');
-
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
     const [introductionOpen, setIntroductionOpen] = useState(false);
     const [avatarList, setAvatarList] = useState<string[]>([]);
+    const [startCheck, setStartCheck] = useState(false);
+    const [isFirst, setIsFirst] = useState(true);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -378,20 +407,26 @@ export const FashionStyling = ({
         }
     }, [fileList]);
 
+    // 获取头像列表和初始头像回显(只有第一次)
     useEffect(() => {
-        (async () => {
-            const res = await getAvatarList();
-            setAvatarList([chatBotInfo.defaultImg, ...res]);
-        })();
-    }, [chatBotInfo]);
+        if (isFirst && chatBotInfo.defaultImg) {
+            (async () => {
+                const res = await getAvatarList();
+                setAvatarList([chatBotInfo.defaultImg, ...res]);
+                setIsFirst(false);
+            })();
+        }
+    }, [chatBotInfo, isFirst]);
 
+    // 上传头像之后头像列表
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
+            console.log(fileList?.[0]?.response?.data, '执行');
             setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
+            // 把fileList清空
+            setFileList([]);
         }
     }, [fileList]);
-
-    console.log(chatBotInfo.avatar, 'chatBotInfo.avatar');
 
     return (
         <>
@@ -409,13 +444,14 @@ export const FashionStyling = ({
                             label={'名称'}
                             className={'mt-1'}
                             value={chatBotInfo.name}
-                            error={!chatBotInfo.name}
+                            error={startCheck && !chatBotInfo.name}
                             helperText={!chatBotInfo.name && '请填写名称'}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             size={'small'}
                             onChange={(e) => {
                                 const value = e.target.value;
+                                setStartCheck(true);
                                 setChatBotInfo({ ...chatBotInfo, name: value });
                             }}
                         />

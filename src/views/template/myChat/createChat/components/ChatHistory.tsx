@@ -23,7 +23,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => (
             {data.map((history, index) => (
                 <React.Fragment key={index}>
                     <Grid item xs={12} className="mt-3">
-                        <Grid container spacing={gridSpacing}>
+                        <Grid container spacing={gridSpacing} style={{ marginLeft: 0, width: '100%' }}>
                             <div className="w-full flex">
                                 <div className="w-full">
                                     <Grid item xs={12}>
@@ -61,7 +61,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => (
                     </Grid>
                     <Grid item xs={12}>
                         <Grid container spacing={gridSpacing}>
-                            <Grid item xs={12} sm={7} className="flex">
+                            <Grid item xs={12} className="flex">
                                 <img className="w-[50px] h-[50px] rounded-xl mr-2" src={history.robotAvatar} alt="" />
                                 <div>
                                     <Grid item xs={12} className="flex items-center">

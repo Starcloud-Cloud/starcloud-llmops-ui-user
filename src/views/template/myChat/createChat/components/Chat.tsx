@@ -82,7 +82,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const [message, setMessage] = React.useState('');
     const [conversationUid, setConversationUid] = React.useState('');
     const [data, setData] = React.useState<IHistory[]>([]);
-    const dataRef: any = useRef();
+    const dataRef: any = useRef(data);
 
     // 创建语音识别对象
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
@@ -118,7 +118,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         })();
     }, []);
 
-    // 获取历史记录
+    // 获取历史记录;
     React.useEffect(() => {
         if (conversationUid) {
             (async () => {
@@ -159,8 +159,8 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             isNew: true
         };
         const newData = [...data, newMessage];
-        setData(newData);
         dataRef.current = newData;
+        setData(newData);
 
         let resp: any = await messageSSE({
             appUid: appId,
@@ -189,10 +189,9 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 return;
             }
             if (done) {
-                const copyData = dataRef.current;
+                const copyData = [...data];
                 copyData[copyData.length - 1].isNew = false;
                 setData(copyData);
-                dataRef.current = copyData;
                 break;
             }
             let str = textDecoder.decode(value);
@@ -214,12 +213,11 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 }
                 if (bufferObj?.code === 200) {
                     setConversationUid(bufferObj.conversationUId);
-                    const currentMessage = data[data.length - 1].answer + bufferObj.content;
-                    const copyData = dataRef.current;
-                    copyData[copyData.length - 1].answer = currentMessage;
+                    const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+                    console.log(copyData);
+                    copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
                     copyData[copyData.length - 1].isNew = true;
                     setData(copyData);
-                    dataRef.current = copyData;
                 } else if (bufferObj && bufferObj.code !== 200) {
                     dispatch(
                         openSnackbar({

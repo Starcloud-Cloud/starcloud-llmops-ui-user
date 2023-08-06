@@ -115,12 +115,7 @@ function CreateDetail() {
                 <CardHeader
                     sx={{ padding: 2 }}
                     avatar={
-                        <Button
-                            variant="contained"
-                            startIcon={<ArrowBackIcon />}
-                            color="secondary"
-                            onClick={() => navigate('/template/createCenter')}
-                        >
+                        <Button variant="contained" startIcon={<ArrowBackIcon />} color="secondary" onClick={() => navigate('/my-chat')}>
                             {t('myApp.back')}
                         </Button>
                     }

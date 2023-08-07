@@ -15,12 +15,12 @@ const generateValidationSchema = (variables: Variable[], flag: boolean = false, 
         variables.forEach((variable: any) => {
             const { field, label, isShow } = variable;
             if (isShow && field === 'prompt' && prompt) {
-                validationSchemaFields[field] = Yup.string().max(10, '最多输入10000个字符').required(`${label}不能为空`);
+                validationSchemaFields[field] = Yup.string().max(10000, '最多输入10000个字符').required(`${label}不能为空`);
             } else {
                 validationSchemaFields[field] = Yup.string().required(`${label}不能为空`);
             }
             if (flag && field === 'prompt' && prompt) {
-                validationSchemaFields[field] = Yup.string().max(10, '最多输入10000个字符').required(`${label}不能为空`);
+                validationSchemaFields[field] = Yup.string().max(10000, '最多输入10000个字符').required(`${label}不能为空`);
             } else if (flag) {
                 validationSchemaFields[field] = Yup.string().required(`${label}不能为空`);
             }

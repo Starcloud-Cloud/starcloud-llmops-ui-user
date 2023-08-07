@@ -1,5 +1,5 @@
-import { config } from 'utils/axios/config';
 import { getAccessToken } from 'utils/auth';
+import { config } from 'utils/axios/config';
 const { base_url } = config;
 export default function fetchRequest(url: string, method: string, body: any, headers = {}) {
     return new Promise((resolve, reject) => {

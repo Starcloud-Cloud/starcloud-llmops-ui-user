@@ -1,5 +1,5 @@
-import { useCache } from 'hooks/web/useCache';
 import { TokenType } from 'api/login/types';
+import { useCache } from 'hooks/web/useCache';
 import { decrypt, encrypt } from 'utils/jsencrypt';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks

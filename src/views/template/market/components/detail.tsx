@@ -20,6 +20,7 @@ import { useEffect, useState, useRef } from 'react';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { useTheme } from '@mui/material/styles';
+import _ from 'lodash-es';
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
     const { setUserInfo }: any = userInfoStore();
@@ -113,9 +114,12 @@ function Deatail() {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        const contentData1 = _.cloneDeep(contentData);
                         contentData.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                        setDetailData(contentData);
+                        contentData1.workflowConfig.steps[index].flowStep.response.answer =
+                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        setDetailData(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
                             openSnackbar({
@@ -134,6 +138,12 @@ function Deatail() {
             }
         };
         fetchData();
+    };
+    //更改answer
+    const changeanswer = ({ value, index }: any) => {
+        const newValue = _.cloneDeep(detailData);
+        newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        setDetailData(newValue);
     };
     //更改prompt的值
     const promptChange = ({ e, steps, el }: any) => {
@@ -258,6 +268,7 @@ function Deatail() {
                 variableChange={variableChange}
                 promptChange={promptChange}
                 loadings={loadings}
+                changeanswer={changeanswer}
                 allExecute={(value: boolean) => {
                     isAllExecute = value;
                 }}

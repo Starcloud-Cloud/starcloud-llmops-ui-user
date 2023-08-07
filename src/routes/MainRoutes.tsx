@@ -19,6 +19,11 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 
+// 聊天
+const MyChat = Loadable(lazy(() => import('views/template/myChat')));
+const CreateChat = Loadable(lazy(() => import('views/template/myChat/createChat')));
+const ChatMy = Loadable(lazy(() => import('views/chat/my')));
+
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 
@@ -32,6 +37,10 @@ const MainRoutes = {
         </AuthGuard>
     ),
     children: [
+        {
+            path: '/user/account-profile/profile',
+            element: <AppUserAccountProfile />
+        },
         {
             path: '/appMarket',
             element: <Market />,
@@ -69,6 +78,18 @@ const MainRoutes = {
         {
             path: '/user/account-profile/profile',
             element: <AppUserAccountProfile />
+        },
+        {
+            path: '/my-chat',
+            element: <MyChat />
+        },
+        {
+            path: '/createChat',
+            element: <CreateChat />
+        },
+        {
+            path: '/chat/my',
+            element: <ChatMy />
         }
     ]
 };

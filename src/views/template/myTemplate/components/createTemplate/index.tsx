@@ -1,28 +1,28 @@
+import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
+    Box,
+    Button,
     Card,
     CardHeader,
-    Box,
-    Grid,
-    Button,
-    Tab,
-    Tabs,
-    Divider,
-    Typography,
     Chip,
+    Divider,
+    Grid,
     IconButton,
+    ListItemIcon,
     Menu,
     MenuItem,
-    ListItemIcon
+    Tab,
+    Tabs,
+    Typography
 } from '@mui/material';
-import { getApp, getRecommendApp, appCreate, appModify } from 'api/template/index';
 import { userBenefits } from 'api/template';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { executeApp } from 'api/template/fetch';
+import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState, useCallback } from 'react';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import userInfoStore from 'store/entitlementAction';
@@ -32,9 +32,10 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-// import Upload from './upLoad';
-import marketStore from 'store/market';
+import Upload from './upLoad';
 import { del } from 'api/template';
+import marketStore from 'store/market';
+import _ from 'lodash-es';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -84,7 +85,7 @@ function CreateDetail() {
                 stepId: stepId,
                 appReqVO: detail
             });
-            const contentData = { ...detail };
+            const contentData = _.cloneDeep(detail);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
             setDetail(contentData);
             const reader = resp.getReader();
@@ -148,9 +149,12 @@ function CreateDetail() {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        const contentData1 = _.cloneDeep(contentData);
                         contentData.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                        setDetail(contentData);
+                        contentData1.workflowConfig.steps[index].flowStep.response.answer =
+                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
                             openSnackbar({
@@ -171,18 +175,26 @@ function CreateDetail() {
         fetchData();
     };
     useEffect(() => {
-        if (searchParams.get('uid')) {
-            getApp({ uid: searchParams.get('uid') as string }).then((res) => {
+        getList();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const getList = (data: string | null = null) => {
+        if (data) {
+            getApp({ uid: data }).then((res) => {
                 resUpperCase(res);
             });
         } else {
-            getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
-                resUpperCase(res);
-            });
+            if (searchParams.get('uid')) {
+                getApp({ uid: searchParams.get('uid') as string }).then((res) => {
+                    resUpperCase(res);
+                });
+            } else {
+                getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
+                    resUpperCase(res);
+                });
+            }
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    };
     const resUpperCase = (result: Details) => {
         const newValue = { ...result };
         newValue.workflowConfig.steps?.forEach((item) => {
@@ -195,35 +207,39 @@ function CreateDetail() {
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
-        setDetail({
-            ...detail,
-            [data.name]: data.value
-        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                [data.name]: data.value
+            })
+        );
     };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
-        const newValue = { ...detail };
+        const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         setDetail(newValue);
     };
     //设置执行的prompt
     const promptChange = ({ e, steps, i }: any) => {
-        const newValue = { ...detail };
+        const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         setDetail(newValue);
     };
     //增加 删除变量
     const changeConfigs = (data: any) => {
-        setDetail({
-            ...detail,
-            workflowConfig: data
-        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                workflowConfig: data
+            })
+        );
         setPerform(perform + 1);
     };
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
         ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
-            const oldvalue = { ...detail };
+            const oldvalue = _.cloneDeep(detail);
             if (flag) {
                 const changeValue = value;
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
@@ -235,7 +251,7 @@ function CreateDetail() {
     );
     //提示词更改
     const basisChange = ({ e, index, i, flag = false }: any) => {
-        const oldValue = { ...detail };
+        const oldValue = _.cloneDeep(detail);
         if (flag) {
             oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
                 !oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow;
@@ -250,9 +266,17 @@ function CreateDetail() {
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
-        const value = { ...detail };
+        console.log('qirhuan');
+
+        const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);
+    };
+    //更改answer
+    const changeanswer = ({ value, index }: any) => {
+        const newValue = _.cloneDeep(detail);
+        newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        setDetail(newValue);
     };
     //保存更改
     const saveDetail = () => {
@@ -260,7 +284,7 @@ function CreateDetail() {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        setSaveState(saveState + 1);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -277,7 +301,8 @@ function CreateDetail() {
             } else {
                 appCreate(detail).then((res) => {
                     if (res.data) {
-                        navigate('/my-app');
+                        navigate('/createApp?uid=' + res.data.uid);
+                        getList(res.data.uid);
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -304,6 +329,7 @@ function CreateDetail() {
     // 删除按钮的menu
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
+    const [saveState, setSaveState] = useState<number>(0);
     return (
         <Card>
             <CardHeader
@@ -374,7 +400,7 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                {/* <Tab label={t('myApp.upload')} {...a11yProps(2)} /> */}
+                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -423,18 +449,21 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
+                            {detail && value === 0 && (
+                                <Perform
+                                    key={perform}
+                                    config={detail?.workflowConfig}
+                                    changeSon={changeData}
+                                    loadings={loadings}
+                                    variableChange={exeChange}
+                                    changeanswer={changeanswer}
+                                    promptChange={promptChange}
+                                    isallExecute={(flag: boolean) => {
+                                        isAllExecute = flag;
+                                    }}
+                                    source="myApp"
+                                />
+                            )}
                         </Card>
                     </Grid>
                 </Grid>
@@ -442,9 +471,9 @@ function CreateDetail() {
             <TabPanel value={value} index={1}>
                 <Grid container spacing={2}>
                     <Grid item lg={6} sx={{ width: '100%' }}>
-                        {detail && (
+                        {detail?.workflowConfig && (
                             <Arrange
-                                config={detail?.workflowConfig}
+                                config={_.cloneDeep(detail.workflowConfig)}
                                 editChange={editChange}
                                 basisChange={basisChange}
                                 statusChange={statusChange}
@@ -483,25 +512,28 @@ function CreateDetail() {
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
-                            <Perform
-                                key={perform}
-                                config={detail?.workflowConfig}
-                                changeSon={changeData}
-                                loadings={loadings}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                source="myApp"
-                            />
+                            {detail && value === 1 && (
+                                <Perform
+                                    key={perform}
+                                    config={_.cloneDeep(detail.workflowConfig)}
+                                    changeSon={changeData}
+                                    changeanswer={changeanswer}
+                                    loadings={loadings}
+                                    variableChange={exeChange}
+                                    promptChange={promptChange}
+                                    isallExecute={(flag: boolean) => {
+                                        isAllExecute = flag;
+                                    }}
+                                    source="myApp"
+                                />
+                            )}
                         </Card>
                     </Grid>
                 </Grid>
             </TabPanel>
-            {/* <TabPanel value={value} index={2}>
-                <Upload />
-            </TabPanel> */}
+            <TabPanel value={value} index={2}>
+                <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />
+            </TabPanel>
         </Card>
     );
 }

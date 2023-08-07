@@ -51,6 +51,7 @@ export interface Validas {
     responent: { style: string };
     buttonLabel: string;
     index: number;
+    allvalida: number | null;
     editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
     basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null }) => void;
     setModal: (index: number) => void;

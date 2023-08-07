@@ -14,9 +14,10 @@ import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 import { El } from 'types/template';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
+import _ from 'lodash-es';
 // import copy from 'clipboard-copy';
 
-const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack }: any, ref) => {
+const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptChange, item, steps, callBack, changeanswer }: any, ref) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
     useImperativeHandle(ref, () => ({
@@ -73,6 +74,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
             mdRef.current.scrollTop = mdRef.current.scrollHeight;
         }
     }, [item?.flowStep.response.answer]);
+
     return (
         <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
             {loadings[steps] && (
@@ -228,6 +230,9 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                                     {t('myApp.execuent')}
                                 </Box>
                             }
+                            onChange={(e) => {
+                                changeanswer({ value: e.target.value, index: steps });
+                            }}
                             value={item.flowStep.response.answer}
                             multiline
                             minRows={item.flowStep.response.style === 'TEXTAREA' ? 8 : 1}

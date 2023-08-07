@@ -32,11 +32,11 @@ import SouthIcon from '@mui/icons-material/South';
 
 import { t } from 'hooks/web/useI18n';
 
-// import Form from 'views/template/components/form';
 import { stepList } from 'api/template';
 import Valida from 'views/template/myTemplate/components/createTemplate/validaForm';
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useFormik } from 'formik';
+import _ from 'lodash-es';
 import * as yup from 'yup';
 interface Option {
     label: string;
@@ -70,12 +70,14 @@ const validationSchema = yup.object({
     field: yup
         .string()
         .required('variable is required')
-        .matches(/^[A-Z0-9_-]+$/, '只能输入大写字母、数字、_、-'),
+        .matches(/^[A-Z0-9_-]+$/, '只能输入大写字母、数字、_、-')
+        .max(20, '最多输入20个字符'),
     label: yup.string().required('label is required')
 });
 
 function Arrange({ config, editChange, basisChange, statusChange, changeConfigs }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
+
     const formik = useFormik({
         initialValues: {
             field: '',
@@ -87,7 +89,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         },
         validationSchema,
         onSubmit: (values) => {
-            const oldValue = { ...config };
+            const oldValue = _.cloneDeep(config);
             if (title === t('myApp.add')) {
                 if (!oldValue.steps[modal].variable) {
                     oldValue.steps[modal].variable = { variables: [] };
@@ -123,7 +125,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     };
     //添加变量
     const addVariable = () => {
-        setOptions([...options, { label: 'label', value: 'value' }]);
+        setOptions([..._.cloneDeep(options), { label: 'label', value: 'value' }]);
     };
     //编辑变量
     const editModal = (row: any, i: number, index: number) => {
@@ -140,21 +142,23 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     const delModal = (i: number, index: number) => {
         setModal(index);
         setStepIndex(i);
-        const oldValues = { ...config };
+        const oldValues = _.cloneDeep(config);
         oldValues.steps[index].variable.variables.splice(i, 1);
         changeConfigs(oldValues);
     };
     const optionChange = (e: { target: { name: string; value: string } }, index: number) => {
         const { name, value } = e.target;
-        const oldOption = [...options];
+        const oldOption = _.cloneDeep(options);
         const updatedOption = { ...oldOption[index], [name]: value };
         oldOption[index] = updatedOption;
         setOptions(oldOption);
     };
     const [expanded, setExpanded] = useState<(boolean | null | undefined)[]>([]);
     const expandChange = (index: number) => {
-        boxRef.current[index]?.allValida();
-        let newValue = [...expanded];
+        const newallvalida = [...allvalida];
+        newallvalida[index] = (allvalida[index] as number) + 1;
+        setallvalida(newallvalida);
+        let newValue = _.cloneDeep(expanded);
         newValue = newValue.map((item: boolean | null | undefined) => false);
         newValue[index] = true;
         setExpanded(newValue);
@@ -180,7 +184,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     };
     //删除步骤
     const delStep = (index: number) => {
-        const newValue = { ...config };
+        const newValue = _.cloneDeep(config);
         newValue.steps.splice(index, 1);
         changeConfigs(newValue);
     };
@@ -202,10 +206,10 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         if (steps.some((item: { name: string }) => item.name === name + index)) {
             stepEtch(index + 1, name, steps, newStep, i);
         } else {
-            const Name = { ...newStep };
+            const Name = _.cloneDeep(newStep);
             Name.name = Name.name + index;
             Name.field = Name.field + index;
-            const newValue = { ...config };
+            const newValue = _.cloneDeep(config);
             newValue.steps.splice(i + 1, 0, Name);
             changeConfigs(newValue);
             let newVal = [...expanded];
@@ -215,18 +219,28 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         }
     };
     const addStep = (step: any, index: number) => {
-        const newStep = { ...step };
+        const newStep = _.cloneDeep(step);
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
-    const [borderLeft, setBorder] = useState<any[]>([]);
-    const boxRef = useRef<any>([]);
     useEffect(() => {
-        setBorder(boxRef.current.map((item: any) => (item?.allValidas ? '5px solid #ff6376' : 'none')));
         if (config) {
             setStepTitle(config.steps.map((item: { name: string }) => item.name));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    useEffect(() => {
+        setallvalidas(
+            config?.steps.map((item: any) => {
+                return item.flowStep.variable.variables.some((el: { defaultValue: string | null }) => {
+                    return el.defaultValue === '';
+                });
+            })
+        );
+    }, [expanded]);
+
+    //改变值让子组件检测到
+    const [allvalida, setallvalida] = useState<(number | null)[]>([]);
+    const [allvalidas, setallvalidas] = useState<(boolean | null)[]>([]);
 
     return (
         <Box>
@@ -252,11 +266,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                             sx={{
                                 borderRadius: '4px',
                                 overflow: 'visible',
-                                borderLeft: boxRef.current[index]
-                                    ? !expanded[index] && boxRef.current[index]?.allValidas
-                                        ? '5px solid #ff6376'
-                                        : 'none'
-                                    : borderLeft[index]
+                                borderLeft: allvalidas[index] ? '5px solid #ff6376' : 'none'
                             }}
                             height="100px"
                             display="flex"
@@ -452,13 +462,14 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         {expanded[index] && <Divider />}
                         <Box sx={{ display: expanded[index] ? 'block' : 'none' }}>
                             <Valida
-                                ref={(el) => (boxRef.current[index] = el)}
+                                key={item.field}
                                 variable={item.variable?.variables}
                                 variables={item.flowStep.variable.variables}
                                 responent={item.flowStep.response}
                                 buttonLabel={item.buttonLabel}
                                 basisChange={basisChange}
                                 index={index}
+                                allvalida={allvalida[index]}
                                 setModal={(i) => {
                                     setModal(i);
                                 }}
@@ -635,4 +646,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         </Box>
     );
 }
-export default memo(Arrange);
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps);
+};
+export default memo(Arrange, arePropsEqual);

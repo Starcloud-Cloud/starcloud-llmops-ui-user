@@ -5,10 +5,12 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 // import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
 import { El } from 'types/template';
 import { t } from 'hooks/web/useI18n';
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import CarrOut from './carrOut';
-function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange }: any) {
+import _ from 'lodash-es';
+function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange, changeanswer }: any) {
     const refs = useRef<any>([]);
+
     //子组件返回的值
     const callBack = (data: any) => {
         isallExecute(false);
@@ -70,13 +72,21 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                             config={config}
                             ref={(el) => (refs.current[steps] = el)}
                             key={steps}
-                            item={item}
+                            item={_.cloneDeep(item)}
                             steps={steps}
                             callBack={callBack}
+                            changeanswer={changeanswer}
                         />
                     )
             )}
         </Box>
     );
 }
-export default Perform;
+
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return (
+        JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
+        JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings)
+    );
+};
+export default memo(Perform, arePropsEqual);

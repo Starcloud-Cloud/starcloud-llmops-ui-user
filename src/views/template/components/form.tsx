@@ -20,7 +20,6 @@ function Form({ formik, item, onChange }: any) {
                     required
                     name={item.field}
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
                     helperText={
                         formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
@@ -46,7 +45,6 @@ function Form({ formik, item, onChange }: any) {
                     multiline
                     minRows={6}
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
                     helperText={
                         formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
@@ -75,7 +73,6 @@ function Form({ formik, item, onChange }: any) {
                     helperText={
                         formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
                     }
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     onChange={(e) => {
                         formik.handleChange(e);
                         clearTimeout(timeoutRef.current);

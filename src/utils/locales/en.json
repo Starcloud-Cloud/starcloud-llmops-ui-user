@@ -761,5 +761,14 @@
     "exeLabel": "Execute Button Name",
     "categoryVaid": "Categories Is Required",
     "delApp": "Delete App"
+  },
+  "chat": {
+    "name": "Robot Name",
+    "recommend": "Template Robot",
+    "recommendDes": "Create a robot easily using a template",
+    "createRobot": "Create Robot",
+    "createRobotRequire": "Robot name is required",
+    "typeName": "Please fill in the robot's name",
+    "myRobot": "My Robot"
   }
 }

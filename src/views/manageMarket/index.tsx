@@ -1,4 +1,17 @@
-import { Box, Pagination, Button, Typography, Tooltip, Grid, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+    Box,
+    Pagination,
+    Button,
+    Typography,
+    Tooltip,
+    Grid,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Chip
+} from '@mui/material';
 import { useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -180,17 +193,32 @@ function Form() {
                                     </Tooltip>
                                 </TableCell>
                                 <TableCell align="center" sx={{ minWidth: '150px' }}>
-                                    {row.audit === 0
-                                        ? '未发表的'
-                                        : row.audit === 1
-                                        ? '待审核的'
-                                        : row.audit === 2
-                                        ? '审核通过'
-                                        : row.audit === 3
-                                        ? '审核未通过'
-                                        : row.audit === 4
-                                        ? '用户已取消'
-                                        : '已失效'}
+                                    <Chip
+                                        size="small"
+                                        variant="outlined"
+                                        color={
+                                            row.audit === 1
+                                                ? 'primary'
+                                                : row.audit === 2
+                                                ? 'success'
+                                                : row.audit === 3
+                                                ? 'error'
+                                                : 'default'
+                                        }
+                                        label={
+                                            row.audit === 0
+                                                ? '未发布'
+                                                : row.audit === 1
+                                                ? '待审核'
+                                                : row.audit === 2
+                                                ? '审核通过'
+                                                : row.audit === 3
+                                                ? '审核未通过'
+                                                : row.audit === 4
+                                                ? '用户已取消'
+                                                : '已失效'
+                                        }
+                                    />
                                 </TableCell>
                                 <TableCell align="center" sx={{ minWidth: '170px' }}>
                                     {formatDate(row.createTime)}
@@ -208,7 +236,7 @@ function Form() {
                                         okText="Yes"
                                         cancelText="No"
                                     >
-                                        <Button size="small" color="secondary">
+                                        <Button disabled={row.audit === 2 || row.audit === 3} size="small" color="secondary">
                                             通过
                                         </Button>
                                     </Popconfirm>
@@ -221,7 +249,9 @@ function Form() {
                                         okText="Yes"
                                         cancelText="No"
                                     >
-                                        <Button size="small">拒绝</Button>
+                                        <Button disabled={row.audit === 2 || row.audit === 3} size="small">
+                                            拒绝
+                                        </Button>
                                     </Popconfirm>
                                 </TableCell>
                             </TableRow>

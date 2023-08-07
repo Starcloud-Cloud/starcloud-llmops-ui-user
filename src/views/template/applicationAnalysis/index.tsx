@@ -15,15 +15,22 @@ import {
     Paper,
     Pagination,
     TextField,
-    Button
+    Button,
+    Drawer,
+    Card,
+    Divider,
+    Chip
 } from '@mui/material';
 import formatDate from 'hooks/useDate';
+import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import SubCard from 'ui-component/cards/SubCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, infoPage, logTimeType } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
+import Perform from '../carryOut/perform';
+import marketStore from 'store/market';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -45,6 +52,12 @@ interface Date {
 interface Query {
     appName: string;
     timeType: string;
+}
+interface Detail {
+    name: string;
+    description: string;
+    categories: string[];
+    tags: string[];
 }
 function ApplicationAnalysis() {
     const [queryParams, setQuery] = useState<Query>({
@@ -178,6 +191,10 @@ function ApplicationAnalysis() {
             return newValue;
         });
     };
+
+    const categoryList = marketStore((state) => state.categoryList);
+    const [open, setOpen] = useState(false);
+    const [detail, setDetail] = useState<Detail | null>(null);
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -233,23 +250,29 @@ function ApplicationAnalysis() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>{t('generate.mode')}</TableCell>
-                            <TableCell>{t('generate.name')}</TableCell>
-                            <TableCell>{t('generate.totalAnswerTokens')}</TableCell>
-                            <TableCell>{t('generate.totalElapsed')} (s)</TableCell>
-                            <TableCell>{t('generate.status')}</TableCell>
-                            <TableCell>{t('generate.createTime')}</TableCell>
+                            <TableCell align="center">{t('generate.mode')}</TableCell>
+                            <TableCell align="center">{t('generate.name')}</TableCell>
+                            <TableCell align="center">{t('generate.totalAnswerTokens')}</TableCell>
+                            <TableCell align="center">{t('generate.totalElapsed')} (s)</TableCell>
+                            <TableCell align="center">{t('generate.status')}</TableCell>
+                            <TableCell align="center">{t('generate.createTime')}</TableCell>
+                            <TableCell align="center"></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {totalData?.map((row) => (
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell>{t('generate.' + row.appMode)}</TableCell>
-                                <TableCell>{row.appName}</TableCell>
-                                <TableCell>{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
-                                <TableCell>{row.totalElapsed}</TableCell>
-                                <TableCell>{row.status}</TableCell>
-                                <TableCell>{formatDate(row.createTime)}</TableCell>
+                                <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
+                                <TableCell align="center">{row.appName}</TableCell>
+                                <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
+                                <TableCell align="center">{row.totalElapsed}</TableCell>
+                                <TableCell align="center">{row.status}</TableCell>
+                                <TableCell align="center">{formatDate(row.createTime)}</TableCell>
+                                <TableCell align="center">
+                                    <Button color="secondary" size="small" onClick={() => setOpen(true)}>
+                                        {t('generate.detail')}
+                                    </Button>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -258,6 +281,44 @@ function ApplicationAnalysis() {
             <Box my={2}>
                 <Pagination page={page.pageNo} count={Math.ceil(total / page.pageSize)} onChange={paginationChange} />
             </Box>
+            <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+                <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <AccessAlarm sx={{ fontSize: '70px' }} />
+                            <Box>
+                                <Box>
+                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                        {detail?.name}
+                                    </Typography>
+                                </Box>
+                                <Box>
+                                    {detail?.categories?.map((item: any) => (
+                                        <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item)?.name}</span>
+                                    ))}
+                                    {detail?.tags?.map((el: any) => (
+                                        <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                    <Divider sx={{ mb: 1 }} />
+                    <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                        {detail?.description}
+                    </Typography>
+                    {/* <Perform
+                        config={{}}
+                        changeSon={() => {}}
+                        changeanswer={() => {}}
+                        loadings={[]}
+                        variableChange={() => {}}
+                        promptChange={() => {}}
+                        isallExecute={() => {}}
+                        source="myApp"
+                    /> */}
+                </Card>
+            </Drawer>
         </Box>
     );
 }

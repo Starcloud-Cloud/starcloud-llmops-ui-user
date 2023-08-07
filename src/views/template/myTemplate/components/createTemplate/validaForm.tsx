@@ -16,7 +16,8 @@ import {
     Select,
     MenuItem,
     TextField,
-    Tooltip
+    Tooltip,
+    Chip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
@@ -43,7 +44,7 @@ import generateValidationSchema from 'hooks/usevalid';
 import _ from 'lodash-es';
 import { Validas, Rows } from 'types/template';
 import FormExecute from 'views/template/components/form';
-import { useState, memo, useEffect } from 'react';
+import { useState, memo, useEffect, useRef } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
     borderTop: `1px solid ${theme.palette.divider}`,
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -107,13 +108,22 @@ const Valida = ({
     };
     const formik = Formik({
         initialValues: fn(_.cloneDeep(variables)),
-        validationSchema: generateValidationSchema(_.cloneDeep(variables), true),
+        validationSchema: generateValidationSchema(_.cloneDeep(variables), true, true),
         onSubmit: () => {}
     });
     const [expanded, setExpanded] = useState<string | false>('panel1');
-
     const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);
+    };
+    const timeoutRef = useRef<any>();
+    const iptRef = useRef<any | null>(null);
+    const changePrompt = (field: string, i: number) => {
+        const newVal = _.cloneDeep(variables);
+        const part1 = newVal[i].defaultValue.slice(0, iptRef.current?.selectionStart);
+        const part2 = newVal[i].defaultValue.slice(iptRef.current?.selectionStart);
+        newVal[i].defaultValue = `${part1}{STEP.标题.${field}}${part2}`;
+        formik.setFieldValue('prompt', newVal[i].defaultValue);
+        basisChange({ e: { name: 'prompt', value: newVal[i].defaultValue }, index, i, flag: false });
     };
     return (
         <Box py={1}>
@@ -128,7 +138,7 @@ const Valida = ({
                     </AccordionSummary>
                     <AccordionDetails>
                         {variables?.map((el: any, i: number) => (
-                            <Grid item md={12} xs={12} key={i + 'variables'}>
+                            <Grid item md={12} xs={12} key={i}>
                                 {el.field === 'prompt' && (
                                     <>
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -150,13 +160,47 @@ const Valida = ({
                                                 />
                                             </Box>
                                         </Box>
-                                        <FormExecute
-                                            formik={formik}
-                                            item={el}
-                                            onChange={(e: any) => {
-                                                basisChange({ e, index, i, flag: false });
+                                        <TextField
+                                            color="secondary"
+                                            sx={{ mt: 2 }}
+                                            inputRef={iptRef}
+                                            label={t('market.' + el.field)}
+                                            value={formik.values[el.field]}
+                                            id={el.field}
+                                            required
+                                            name={el.field}
+                                            multiline
+                                            minRows={6}
+                                            maxRows={6}
+                                            InputLabelProps={{ shrink: true }}
+                                            error={formik.touched[el.field] && Boolean(formik.errors[el.field])}
+                                            helperText={
+                                                formik.touched[el.field] && formik.errors[el.field]
+                                                    ? String(formik.errors[el.field])
+                                                    : el.description
+                                            }
+                                            onChange={(e) => {
+                                                formik.handleChange(e);
+                                                clearTimeout(timeoutRef.current);
+                                                timeoutRef.current = setTimeout(() => {
+                                                    basisChange({ e: e.target, index, i, flag: false });
+                                                }, 300);
                                             }}
+                                            fullWidth
                                         />
+                                        <Box mb={1}>
+                                            {variable?.map((item) => (
+                                                <Tooltip key={item.field} placement="top" title={t('market.fields')}>
+                                                    <Chip
+                                                        sx={{ mr: 1, mt: 1 }}
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => changePrompt(item.field, i)}
+                                                        label={item.field}
+                                                    ></Chip>
+                                                </Tooltip>
+                                            ))}
+                                        </Box>
                                     </>
                                 )}
                             </Grid>
@@ -188,7 +232,6 @@ const Valida = ({
                                 <Table size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell></TableCell>
                                             <TableCell>{t('myApp.field')}</TableCell>
                                             <TableCell>{t('myApp.name')}</TableCell>
                                             <TableCell>{t('myApp.type')}</TableCell>
@@ -199,28 +242,6 @@ const Valida = ({
                                     <TableBody>
                                         {variable?.map((row: Rows, i: number) => (
                                             <TableRow hover key={row.field}>
-                                                <TableCell>
-                                                    <Tooltip title={t('market.copyPrompt')}>
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                copy(row.field);
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: t('market.copySuccess'),
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            }}
-                                                        >
-                                                            <ContentPaste fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </TableCell>
                                                 <TableCell>{row.field}</TableCell>
                                                 <TableCell>{row.label}</TableCell>
                                                 <TableCell>{t('myApp.' + row.style.toLowerCase())}</TableCell>

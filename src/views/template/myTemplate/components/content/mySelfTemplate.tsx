@@ -33,7 +33,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                     </Typography>
                                 </Tooltip>
                                 <Tooltip title={data.description}>
-                                    <Typography className="desc" variant="body2" height="38px" lineHeight="1.1rem">
+                                    <Typography className="desc" variant="body2" height="38px" lineHeight="1.2rem">
                                         {data?.description}
                                     </Typography>
                                 </Tooltip>

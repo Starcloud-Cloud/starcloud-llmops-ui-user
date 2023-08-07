@@ -90,16 +90,16 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                         input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                         renderValue={(selected) => (
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) => (
-                                    <Chip key={value} label={value} />
-                                ))}
+                                {selected.map((value) =>
+                                    categoryList.map((item) => item.code === value && <Chip key={value} label={item.name} />)
+                                )}
                             </Box>
                         )}
                         label={t('myApp.categary')}
                     >
                         {categoryList.map(
                             (item) =>
-                                item.name !== 'All' && (
+                                item.code !== 'ALL' && (
                                     <MenuItem key={item.code} value={item.code}>
                                         {item.name}
                                     </MenuItem>

@@ -206,7 +206,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
         if (steps.some((item: { name: string }) => item.name === name + index)) {
             stepEtch(index + 1, name, steps, newStep, i);
         } else {
-            const Name = { ...newStep };
+            const Name = _.cloneDeep(newStep);
             Name.name = Name.name + index;
             Name.field = Name.field + index;
             const newValue = _.cloneDeep(config);
@@ -462,6 +462,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         {expanded[index] && <Divider />}
                         <Box sx={{ display: expanded[index] ? 'block' : 'none' }}>
                             <Valida
+                                key={item.field}
                                 variable={item.variable?.variables}
                                 variables={item.flowStep.variable.variables}
                                 responent={item.flowStep.response}

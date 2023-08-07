@@ -25,12 +25,14 @@ const marks = [
     }
 ];
 
+const TEXT = `- Identify what language users use in questions and use the same language in your answers. \n - Use English or 中文 to answer questions based on the language of the question.`;
+
 export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
     const [regulationText, setRegulationText] = useState('');
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
-            const pattern = /请使用(.*)语气跟我进行对话/;
+            const pattern = /- 请使用(.*)语气跟我进行对话/;
             const matchResult = regulationText.match(pattern);
             if (matchResult) {
                 const matchedText = matchResult[0]; // 提取匹配到的内容
@@ -42,11 +44,15 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     setRegulationText(regulationText.replace(matchedText, value));
                 }
             } else {
-                setRegulationText(`${regulationText} \n ${value}`);
+                if (value === '默认') {
+                    return;
+                } else {
+                    setRegulationText(`${regulationText} \n ${value}`);
+                }
             }
         }
         if (type === 2) {
-            const pattern = /回复长度最好不要超过(.*)字/;
+            const pattern = /- 回复长度最好不要超过(.*)字/;
             const matchResult = regulationText.match(pattern);
             if (matchResult) {
                 const matchedText = matchResult[0]; // 提取匹配到的内容
@@ -58,20 +64,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     setRegulationText(regulationText.replace(matchedText, value));
                 }
             } else {
-                setRegulationText(`${regulationText} \n ${value}`);
+                if (value === '默认') {
+                    return;
+                } else {
+                    setRegulationText(`${regulationText} \n ${value}`);
+                }
             }
         }
         if (type === 3) {
-            const pattern = /回复时使用(.*)进行回复/;
+            const pattern = /- 回复时使用(.*)进行回复/;
             const matchResult = regulationText.match(pattern);
-            const textIncludes = regulationText.includes(
-                'Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.'
-            );
+            const textIncludes = regulationText.includes(TEXT);
             console.log(textIncludes, 'textIncludes');
             if (matchResult || textIncludes) {
-                const matchedText =
-                    matchResult?.[0] ||
-                    'Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.'; // 提取匹配到的内容
+                const matchedText = matchResult?.[0] || TEXT; // 提取匹配到的内容
                 if (value === '默认') {
                     // 删除
                     setRegulationText(regulationText.replace(matchedText, ''));
@@ -136,11 +142,11 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 onChange={(e: any) => handleRuleValue(1, e.target.value)}
                             >
                                 <MenuItem value="默认">默认</MenuItem>
-                                <MenuItem value="请使用亲切语气跟我进行对话">亲切</MenuItem>
-                                <MenuItem value="请使用可爱语气跟我进行对话">可爱</MenuItem>
-                                <MenuItem value="请使用礼貌语气跟我进行对话">礼貌</MenuItem>
-                                <MenuItem value="请使用严肃语气跟我进行对话">严肃</MenuItem>
-                                <MenuItem value="请使用幽默语气跟我进行对话">幽默</MenuItem>
+                                <MenuItem value="- 请使用亲切语气跟我进行对话">亲切</MenuItem>
+                                <MenuItem value="- 请使用可爱语气跟我进行对话">可爱</MenuItem>
+                                <MenuItem value="- 请使用礼貌语气跟我进行对话">礼貌</MenuItem>
+                                <MenuItem value="- 请使用严肃语气跟我进行对话">严肃</MenuItem>
+                                <MenuItem value="- 请使用幽默语气跟我进行对话">幽默</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
@@ -156,11 +162,11 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 onChange={(e: any) => handleRuleValue(2, e.target.value)}
                             >
                                 <MenuItem value="默认">默认</MenuItem>
-                                <MenuItem value="回复长度最好不要超过50字">50字</MenuItem>
-                                <MenuItem value="回复长度最好不要超过100字">100字</MenuItem>
-                                <MenuItem value="回复长度最好不要超过200字">200字</MenuItem>
-                                <MenuItem value="回复长度最好不要超过300字">300字</MenuItem>
-                                <MenuItem value="回复长度最好不要超过500字">500字</MenuItem>
+                                <MenuItem value="- 回复长度最好不要超过50字">50字</MenuItem>
+                                <MenuItem value="- 回复长度最好不要超过100字">100字</MenuItem>
+                                <MenuItem value="- 回复长度最好不要超过200字">200字</MenuItem>
+                                <MenuItem value="- 回复长度最好不要超过300字">300字</MenuItem>
+                                <MenuItem value="- 回复长度最好不要超过500字">500字</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl sx={{ width: '150px' }} className={'ml-3'}>
@@ -175,13 +181,9 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 fullWidth
                                 onChange={(e: any) => handleRuleValue(3, e.target.value)}
                             >
-                                <MenuItem
-                                    value={`Identify what language users use in questions and use the same language in your answers. \n Use English or 中文 to answer questions based on the language of the question.`}
-                                >
-                                    跟随提问
-                                </MenuItem>
-                                <MenuItem value="回复时使用中文进行回复">始终中文</MenuItem>
-                                <MenuItem value="回复时使用英文进行回复">始终英文</MenuItem>
+                                <MenuItem value={TEXT}>跟随提问</MenuItem>
+                                <MenuItem value="- 回复时使用中文进行回复">始终中文</MenuItem>
+                                <MenuItem value="- 回复时使用英文进行回复">始终英文</MenuItem>
                             </Select>
                         </FormControl>
                     </div>

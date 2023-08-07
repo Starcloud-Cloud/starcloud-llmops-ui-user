@@ -1,15 +1,18 @@
 // material-ui
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField } from '@mui/material';
+import { getChatTemplate } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { dispatch } from 'store';
 import { gridSpacing } from 'store/constant';
+import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
+import Template from './template';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
-export default function FormDialog({
+export default function FormDialogNew({
     open,
     setOpen,
     handleOk,
@@ -19,15 +22,23 @@ export default function FormDialog({
     open: boolean;
     value: string | '';
     setOpen: (open: boolean) => void;
-    handleOk: () => void;
+    handleOk: (uid: string) => void;
     setValue: (value: string) => void;
 }) {
-    const theme = useTheme();
     const [checked, setChecked] = useState(false);
+    const [recommendList, setRecommends] = useState([]);
+    const [uid, setUid] = useState('');
 
     const handleClose = () => {
         setOpen(false);
     };
+
+    useEffect(() => {
+        getChatTemplate({ model: 'CHAT' }).then((res) => {
+            setRecommends(res);
+        });
+    }, []);
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -39,9 +50,16 @@ export default function FormDialog({
                 }}
                 title={t('chat.createRobot')}
                 content={false}
-                className="sm:w-[700px] xs:w-[300px]"
+                className="sm:w-[800px] xs:w-[300px]"
                 secondary={
-                    <IconButton onClick={handleClose} size="large" aria-label="close modal">
+                    <IconButton
+                        onClick={() => {
+                            handleClose();
+                            setUid('');
+                        }}
+                        size="large"
+                        aria-label="close modal"
+                    >
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 }
@@ -64,6 +82,22 @@ export default function FormDialog({
                                 }}
                             />
                         </div>
+                        <div className="pt-[16px] w-full text-base">选择模版</div>
+                        <div className="w-full mt-[8px] grid grid-cols-4 gap-4">
+                            {recommendList.map((item: any, index) => (
+                                <Box
+                                    key={index}
+                                    style={{ width: '203.33px' }}
+                                    className={
+                                        `hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
+                                        (uid === item?.uid ? ' border-[1px] border-solid border-[#673ab7]' : '')
+                                    }
+                                    onClick={() => setUid(item?.uid)}
+                                >
+                                    <Template data={item} />
+                                </Box>
+                            ))}
+                        </div>
                     </Grid>
                 </CardContent>
                 <Divider />
@@ -77,7 +111,21 @@ export default function FormDialog({
                                 if (!value) {
                                     return;
                                 }
-                                handleOk();
+                                if (!uid) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '请选择模版',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    );
+                                    return;
+                                }
+                                handleOk(uid);
                             }}
                         >
                             创建

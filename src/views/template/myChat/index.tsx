@@ -1,9 +1,9 @@
-import { Box, Button, Grid, Link, Pagination, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Pagination, TextField, Typography } from '@mui/material';
 
 import MyselfTemplate from './components/mySelfTemplate';
 import Template from './components/template';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -14,6 +14,7 @@ import 'react-horizontal-scrolling-menu/dist/styles.css';
 
 import { t } from 'hooks/web/useI18n';
 import { useContext } from 'react';
+import myChat from 'store/myChat';
 import { Item } from 'types/template';
 import { createChat, getChatPage, getChatTemplate } from '../../../api/chat';
 import FormDialog from './components/FormDialog';
@@ -55,16 +56,41 @@ function MyTemplate() {
     //路由跳转
     const navigate = useNavigate();
     const [recommendList, setRecommends] = useState([]);
-    const [appList, setAppList] = useState([]);
-    const [newAppList, setNewApp] = useState([]);
+    const [appList, setAppList] = useState<any[]>([]);
+    const [newAppList, setNewApp] = useState<any[]>([]);
     const [pageQuery, setPageQuery] = useState({
         pageNo: 1,
         pageSize: 20
     });
-    const [total, setTotal] = useState(0);
     const [open, setOpen] = useState(false);
     const [robotName, setRobotName] = useState('');
     const [currentRow, setCurrentRow] = useState<any>(null);
+
+    const [queryParams, setQueryParams] = useState<{ name: string }>({
+        name: ''
+    });
+    const { totals, totalList, setTotals, setTotalList } = myChat();
+    const changeParams = (e: any) => {
+        const { name, value } = e.target;
+        setQueryParams({
+            ...queryParams,
+            [name]: value
+        });
+    };
+    const query = ({ name, value }: any) => {
+        const newValue = { ...queryParams };
+        (newValue as any)[name] = value;
+        const setValue = totalList.filter((item) => {
+            let nameMatch = true;
+            if (newValue.name) {
+                nameMatch = item.name.toLowerCase().includes(newValue.name.toLowerCase());
+            }
+            return nameMatch;
+        });
+        setAppList(setValue);
+        setTotals(setValue.length);
+        setNewApp(setValue.slice(0, pageQuery.pageSize));
+    };
 
     useEffect(() => {
         getChatTemplate({ model: 'CHAT' }).then((res) => {
@@ -72,11 +98,13 @@ function MyTemplate() {
         });
         getChatPage({ pageNo: 1, pageSize: 1000, model: 'CHAT' }).then((res) => {
             setAppList(res.list);
+            setTotalList(res.list);
+            setTotals(res.page.total);
             setNewApp(res.list.slice(0, pageQuery.pageSize));
-            setTotal(res.page.total);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     const paginationChange = (event: any, value: number) => {
         setPageQuery({
             ...pageQuery,
@@ -96,25 +124,38 @@ function MyTemplate() {
         setCurrentRow(null);
         navigate(`/createChat?appId=${res}`);
     };
-
+    const timeoutRef = useRef<any>();
     return (
         <Box>
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
-                    <TextField v-model="queryParams.name" label={t('apply.name')} InputLabelProps={{ shrink: true }} fullWidth />
+                    <TextField
+                        onChange={(e) => {
+                            changeParams(e);
+                            clearTimeout(timeoutRef.current);
+                            timeoutRef.current = setTimeout(() => {
+                                query(e.target);
+                            }, 200);
+                        }}
+                        name="name"
+                        value={queryParams.name}
+                        label={t('chat.name')}
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                    />
                 </Grid>
-                <Grid item lg={3}>
-                    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />
-                </Grid>
-                <Grid item lg={3}>
-                    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />
-                </Grid>
+                {/*<Grid item lg={3}>*/}
+                {/*    <TextField v-model="queryParams.topics" label={t('apply.category')} InputLabelProps={{ shrink: true }} fullWidth />*/}
+                {/*</Grid>*/}
+                {/*<Grid item lg={3}>*/}
+                {/*    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />*/}
+                {/*</Grid>*/}
             </Grid>
             <Box display="flex" alignItems="end" my={2}>
-                <Typography variant="h5">{t('apply.recommend')}</Typography>
-                <Link href="https://www.mdc.ai/document-en" fontSize={14} color="#7367f0" ml={1}>
-                    {t('apply.instruction')}
-                </Link>
+                <Typography variant="h3">{t('chat.recommend')}</Typography>
+                <Typography fontSize="12px" ml={1}>
+                    {t('chat.recommendDes')}
+                </Typography>
             </Box>
             <Box sx={{ position: 'relative' }}>
                 <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
@@ -125,18 +166,18 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
-            {total > 0 && (
+            {totals > 0 && (
                 <Box>
-                    <Typography variant="h5" my={2}>
-                        {t('apply.self')}
+                    <Typography variant="h3" my={2}>
+                        {t('chat.myRobot')}
                     </Typography>
                     <MyselfTemplate appList={newAppList} />
                     <Box my={2}>
-                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                        <Pagination page={pageQuery.pageNo} count={Math.ceil(totals / pageQuery.pageSize)} onChange={paginationChange} />
                     </Box>
                 </Box>
             )}
-            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} />
+            <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} value={robotName} />
         </Box>
     );
 }

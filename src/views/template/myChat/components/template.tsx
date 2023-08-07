@@ -8,6 +8,7 @@ function Template({ data, handleDetail }: any) {
     const theme = useTheme();
     return (
         <Card
+            onClick={() => handleDetail(data)}
             sx={{
                 aspectRatio: '186 / 235',
                 overflow: 'hidden',
@@ -26,7 +27,6 @@ function Template({ data, handleDetail }: any) {
         >
             <Box sx={{ textAlign: 'center' }}>
                 <img
-                    onClick={() => handleDetail(data)}
                     alt="图片"
                     className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]"
                     src={data.images && data.images[0]}
@@ -41,7 +41,6 @@ function Template({ data, handleDetail }: any) {
             >
                 <Tooltip disableInteractive title={data.name}>
                     <Typography
-                        onClick={() => handleDetail(data)}
                         className="textnoWarp active cursor"
                         gutterBottom
                         variant="h3"
@@ -55,7 +54,6 @@ function Template({ data, handleDetail }: any) {
                 <Tooltip disableInteractive title={data.description}>
                     <Typography
                         sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
-                        onClick={() => handleDetail(data)}
                         className="cursor desc"
                         variant="body2"
                         component="div"

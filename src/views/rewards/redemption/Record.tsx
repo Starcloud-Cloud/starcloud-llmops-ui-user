@@ -11,9 +11,9 @@ import {
     TableContainer,
     TableHead,
     TablePagination,
-    TableSortLabel,
-    TableRow
+    TableRow,
     // Stack
+    TableSortLabel
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
@@ -22,9 +22,9 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { KeyedObject, ArrangementOrder, EnhancedTableHeadProps } from 'types';
-import { Fragment, useEffect, useState } from 'react';
 import { getUserBenefitsPage } from 'api/rewards';
+import { Fragment, useEffect, useState } from 'react';
+import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 
 type TableEnhancedCreateDataType = {
     benefitsName: string;

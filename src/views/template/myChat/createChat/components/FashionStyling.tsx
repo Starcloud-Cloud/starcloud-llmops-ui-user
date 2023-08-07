@@ -1,9 +1,7 @@
-import { PlusOutlined } from '@ant-design/icons';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import RemoveIcon from '@mui/icons-material/Remove';
 import {
     Button,
     CardActions,
@@ -24,17 +22,18 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { getVoiceList } from 'api/chat';
+import { getAvatarList, getVoiceList, testSpeakerSSE } from 'api/chat';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
+import { getAccessToken } from 'utils/auth';
 import { IChatInfo } from '../index';
-import ShortcutRecord from './ShortcutRecord';
 
 const uploadButton = (
     <div>
-        <PlusOutlined rev={undefined} />
-        <div style={{ marginTop: 8 }}>Upload</div>
+        <AddIcon />
+        <div style={{ marginTop: 8 }}>上传</div>
     </div>
 );
 
@@ -55,25 +54,121 @@ interface IVoiceType {
     ExtendedPropertyMap?: any;
     WordsPerMinute: string;
 }
-const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
-    const [value, setValue] = React.useState('');
+const VoiceModal = ({
+    open,
+    handleClose,
+    chatBotInfo,
+    setChatBotInfo
+}: {
+    open: boolean;
+    handleClose: () => void;
+    chatBotInfo: IChatInfo;
+    setChatBotInfo: (chatInfo: IChatInfo) => void;
+}) => {
+    const [name, setName] = useState('');
+    const [style, setStyle] = useState('');
+    const [speed, setSpeed] = useState(1);
+    const [pitch, setPitch] = useState(1);
+
     const [list, setList] = useState<IVoiceType[]>([]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue((event.target as HTMLInputElement).value);
+        setName((event.target as HTMLInputElement).value);
     };
+
     useEffect(() => {
         (async () => {
             const res = await getVoiceList();
-            setValue(res?.[0]?.LocalName);
+            setName(res?.[0]?.LocalName);
             setList(res || []);
         })();
     }, []);
 
     const styleList = React.useMemo(() => {
-        const item = list.find((item) => item.LocalName === value);
+        const item = list.find((v) => v.LocalName === name);
         return item?.StyleList || [];
-    }, [value]);
+    }, [list, name]);
+
+    const handleTest = async () => {
+        try {
+            // const response = await fetch('http://www.w3schools.com/html/horse.mp3');
+            let response: any = await testSpeakerSSE({
+                shortName: 'zh-CN-YunyeNeural'
+                // prosodyRate: 'CHAT_TEST',
+                // prosodyPitch,
+            });
+            console.log(response);
+            const arrayBuffer = await response.arrayBuffer();
+            console.log(arrayBuffer);
+            // const response = await axios({
+            //     method: 'post',
+            //     url: 'http://www.w3schools.com/html/horse.mp3',
+            //     responseType: 'arraybuffer'
+            // });
+
+            const audioContext = new window.AudioContext();
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            // 将ArrayBuffer转换为AudioBuffer
+            audioContext.decodeAudioData(
+                // response.data,
+                arrayBuffer,
+                (buffer) => {
+                    // 创建AudioBufferSourceNode
+                    const sourceNode = audioContext.createBufferSource();
+                    sourceNode.buffer = buffer;
+                    // 连接节点到扬声器
+                    sourceNode.connect(audioContext.destination);
+                    // 播放音频
+                    sourceNode.start();
+                },
+                (error) => {
+                    console.error('解码音频数据时出错：', error);
+                }
+            );
+        } catch (error) {
+            console.error('播放音频时出错：', error);
+        }
+
+        // let resp: any = await testSpeakerSSE({
+        //     shortName: 'zh-CN-YunyeNeural'
+        //     // prosodyRate: 'CHAT_TEST',
+        //     // prosodyPitch,
+        // });
+        // const reader = resp.getReader();
+        // let outerJoins: any;
+        // while (1) {
+        //     let joins = outerJoins;
+        //     const { done, value } = await reader.read();
+        //     if (done) {
+        //         console.log('done');
+        //         break;
+        //     }
+        //     // 创建AudioContext对象
+        //     const audioContext = new window.AudioContext();
+        //     const uint8Array = new Uint8Array(value);
+        //     const arrayBuffer = uint8Array.buffer;
+        //     // 将ArrayBuffer转换为AudioBuffer
+        //     audioContext.decodeAudioData(
+        //         arrayBuffer,
+        //         (buffer) => {
+        //             // 创建AudioBufferSourceNode
+        //             const sourceNode = audioContext.createBufferSource();
+        //             sourceNode.buffer = buffer;
+        //             // 连接节点到扬声器
+        //             sourceNode.connect(audioContext.destination);
+        //             // 播放音频
+        //             sourceNode.start();
+        //         },
+        //         (error) => {
+        //             console.error('解码音频数据时出错：', error);
+        //         }
+        //     );
+        //     outerJoins = joins;
+        // }
+    };
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -97,14 +192,14 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                     <Grid container spacing={gridSpacing}>
                         <div className={'w-full px-[24px] '}>
                             <div className={'w-full  pt-[24px]'}>
-                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={value} onChange={handleChange}>
+                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={name} onChange={handleChange}>
                                     <div className={'grid grid-cols-2 gap-4 w-full'}>
                                         {list.map((item, index) => (
                                             <FormControlLabel
                                                 key={index}
                                                 value={item.LocalName}
                                                 control={<Radio />}
-                                                label={`${item.LocalName} (${item.Gender === 'Male' ? '男' : '女'})`}
+                                                label={`${item.LocalName}-${item.Gender === 'Male' ? '男' : '女'}-${item.LocaleName}`}
                                             />
                                         ))}
                                     </div>
@@ -117,7 +212,17 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                         <InputLabel id="age-select" size={'small'}>
                                             Style
                                         </InputLabel>
-                                        <Select size={'small'} id="columnId" name="columnId" label={'style'} className={'w-[150px]'}>
+                                        <Select
+                                            size={'small'}
+                                            id="columnId"
+                                            name="columnId"
+                                            label={'style'}
+                                            className={'w-[150px]'}
+                                            value={style}
+                                            onChange={(e) => {
+                                                setStyle(e.target.value);
+                                            }}
+                                        >
                                             {styleList.map((item, index) => (
                                                 <MenuItem key={index} value={item}>
                                                     {item}
@@ -130,19 +235,52 @@ const VoiceModal = ({ open, handleClose }: { open: boolean; handleClose: () => v
                                 <div className={'flex-1 flex items-center justify-center'}>
                                     <div className={'w-4/5 flex items-center justify-center'}>
                                         <span className={'text-sm mr-2'}>Pitch</span>
-                                        <Slider defaultValue={40} valueLabelDisplay="auto" min={15} max={60} />
+                                        <Slider
+                                            defaultValue={1}
+                                            step={0.1}
+                                            valueLabelDisplay="auto"
+                                            min={0.5}
+                                            value={chatBotInfo.voicePitch}
+                                            max={1.5}
+                                            onChange={(e, value) => {
+                                                setChatBotInfo({
+                                                    ...chatBotInfo,
+                                                    voicePitch: value as number
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className={'flex-1 flex items-center justify-center'}>
                                     <div className={'w-4/5 flex items-center justify-center'}>
                                         <span className={'text-sm mr-2'}>Speed</span>
-                                        <Slider className={'w-4/5'} defaultValue={40} valueLabelDisplay="auto" min={15} max={60} />{' '}
+                                        <Slider
+                                            className={'w-4/5'}
+                                            defaultValue={1}
+                                            step={0.1}
+                                            valueLabelDisplay="auto"
+                                            min={0.5}
+                                            max={2}
+                                            value={chatBotInfo.voiceSpeed}
+                                            onChange={(e, value) => {
+                                                setChatBotInfo({
+                                                    ...chatBotInfo,
+                                                    voiceSpeed: value as number
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 <div className={'flex-[0 0 150px]'}>
-                                    <Button startIcon={<PlayCircleOutlineIcon />} variant={'contained'} color={'secondary'} size={'small'}>
-                                        {value}
+                                    <Button
+                                        startIcon={<PlayCircleOutlineIcon />}
+                                        variant={'contained'}
+                                        color={'secondary'}
+                                        size={'small'}
+                                        onClick={() => handleTest()}
+                                    >
+                                        播放
                                     </Button>
                                 </div>
                             </div>
@@ -240,25 +378,69 @@ export const FashionStyling = ({
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
 }) => {
-    console.log(chatBotInfo.guideList, 'chatBotInfo.guideList');
-
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
+    const [introductionOpen, setIntroductionOpen] = useState(false);
+    const [avatarList, setAvatarList] = useState<string[]>([]);
+    const [startCheck, setStartCheck] = useState(false);
+    const [isFirst, setIsFirst] = useState(true);
+
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+
+    useEffect(() => {
+        setChatBotInfo({ ...chatBotInfo, enableVoice: visibleVoice });
+    }, [visibleVoice]);
+
+    useEffect(() => {
+        setChatBotInfo({ ...chatBotInfo, enableIntroduction: introductionOpen });
+    }, [introductionOpen]);
 
     const closeVoiceModal = () => {
         setVoiceOpen(false);
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    useEffect(() => {
+        if (fileList?.[0]?.response?.data) {
+            setChatBotInfo({
+                ...chatBotInfo,
+                avatar: fileList?.[0]?.response?.data
+            });
+        }
+    }, [fileList]);
+
+    // 获取头像列表和初始头像回显(只有第一次)
+    useEffect(() => {
+        if (isFirst && chatBotInfo.defaultImg) {
+            (async () => {
+                const res = await getAvatarList();
+                setAvatarList([chatBotInfo.defaultImg, ...res]);
+                setIsFirst(false);
+            })();
+        }
+    }, [chatBotInfo, isFirst]);
+
+    // 上传头像之后头像列表
+    useEffect(() => {
+        if (fileList?.[0]?.response?.data) {
+            console.log(fileList?.[0]?.response?.data, '执行');
+            setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
+            // 把fileList清空
+            setFileList([]);
+        }
+    }, [fileList]);
+
     return (
         <>
             <div>
                 <div>
                     <span
                         className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
                         }
                     >
                         基本信息
@@ -268,37 +450,80 @@ export const FashionStyling = ({
                             label={'名称'}
                             className={'mt-1'}
                             value={chatBotInfo.name}
+                            error={startCheck && !chatBotInfo.name}
+                            helperText={!chatBotInfo.name && '请填写名称'}
                             fullWidth
+                            InputLabelProps={{ shrink: true }}
                             size={'small'}
                             onChange={(e) => {
                                 const value = e.target.value;
+                                setStartCheck(true);
                                 setChatBotInfo({ ...chatBotInfo, name: value });
                             }}
                         />
                     </div>
-                    <div className={'mt-5'}>
-                        <span className={'text-base'}>头像</span>
-                        <div className={'mt-1'}>
+                    <div className={'mt-3'}>
+                        <span className={'text-base text-black'}>头像</span>
+                        <div className={'mt-1 flex items-center'}>
                             <Upload
                                 maxCount={1}
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                action={`${process.env.REACT_APP_BASE_URL}${
+                                    process.env.REACT_APP_API_URL
+                                }/llm/chat/avatar/${searchParams.get('appId')}`}
+                                headers={{
+                                    Authorization: 'Bearer ' + getAccessToken()
+                                }}
+                                accept=".png, .jpg, .jpeg"
+                                name="avatarFile"
                                 listType="picture-card"
                                 fileList={fileList}
                                 onChange={handleChange}
+                                className="!w-[110px]"
                             >
-                                {fileList.length >= 8 ? null : uploadButton}
+                                {fileList.length >= 1 ? null : uploadButton}
                             </Upload>
+                            <div className="flex  items-center">
+                                {avatarList.map((item, index) => (
+                                    <img
+                                        onClick={() => {
+                                            setChatBotInfo({
+                                                ...chatBotInfo,
+                                                avatar: item
+                                            });
+                                        }}
+                                        key={index}
+                                        style={chatBotInfo.avatar === item ? { border: '1px solid #673ab7' } : {}}
+                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:border-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
+                                            chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
+                                        }`}
+                                        src={item}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <div className={'mt-5'}>
+                    <div className={'mt-1'}>
+                        <div className="flex justify-end items-center">
+                            <span className={'text-#697586'}>{introductionOpen ? '展示' : '不展示'}</span>
+                            <Switch
+                                color={'secondary'}
+                                checked={chatBotInfo.enableIntroduction}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    console.log(value, 'value');
+                                    setChatBotInfo({ ...chatBotInfo, enableIntroduction: !chatBotInfo.enableIntroduction });
+                                }}
+                            />
+                        </div>
                         <TextField
                             className={'mt-1'}
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={3}
-                            minRows={3}
+                            maxRows={5}
+                            minRows={5}
                             aria-valuemax={200}
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
                             label={'简介'}
                             onChange={(e) => {
@@ -308,42 +533,46 @@ export const FashionStyling = ({
                         />
                     </div>
                     <div className={'mt-5'}>
-                        <div>
-                            <span className={'text-base'}>声音</span>
-                            <Switch color={'secondary'} checked={visibleVoice} onChange={(e) => setVisibleVoice(e.target.checked)} />
-                        </div>
-                        <div className={'text-[#697586]'}>Enable voices to hear your Genius speak.</div>
-                        {visibleVoice && (
-                            <div className={'mt-3'}>
-                                <Button
-                                    variant={'contained'}
-                                    startIcon={<GraphicEqIcon />}
-                                    color={'secondary'}
-                                    size={'small'}
-                                    onClick={() => setVoiceOpen(true)}
-                                >
-                                    选择声音
-                                </Button>
-                                <Button
-                                    className={'ml-3'}
-                                    startIcon={<PlayCircleOutlineIcon />}
-                                    variant={'contained'}
-                                    color={'secondary'}
-                                    size={'small'}
-                                >
-                                    林志玲
-                                </Button>
+                        <div className="flex justify-between">
+                            <div className="flex justify-between items-center">
+                                <span className={'text-base text-black'}>声音</span>
+                                <span className={'text-#697586 ml-[8px]'}>让你的机器人说话吧！</span>
                             </div>
-                        )}
+
+                            <div className="flex justify-end items-center">
+                                <span className={'text-#697586'}>{visibleVoice ? '启用' : '不启用'}</span>
+                                <Switch color={'secondary'} checked={visibleVoice} onChange={(e) => setVisibleVoice(e.target.checked)} />
+                            </div>
+                        </div>
+                        <div className={'mt-3'}>
+                            <Button
+                                variant={'contained'}
+                                startIcon={<GraphicEqIcon />}
+                                color={'secondary'}
+                                size={'small'}
+                                onClick={() => setVoiceOpen(true)}
+                            >
+                                选择声音
+                            </Button>
+                            <Button
+                                className={'ml-3'}
+                                startIcon={<PlayCircleOutlineIcon />}
+                                variant={'contained'}
+                                color={'secondary'}
+                                size={'small'}
+                            >
+                                林志玲
+                            </Button>
+                        </div>
                     </div>
                 </div>
-                <div className={'mt-5'}>
+                <div className={'mt-10'}>
                     <span
                         className={
                             "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
                         }
                     >
-                        对话元素
+                        对话配置
                     </span>
                     <div className={'mt-5'}>
                         <TextField
@@ -351,17 +580,19 @@ export const FashionStyling = ({
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={3}
-                            minRows={3}
+                            maxRows={5}
+                            minRows={5}
                             aria-valuemax={200}
                             label={'欢迎语'}
+                            placeholder="打开聊天窗口后会主动发送"
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.statement}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
-                        <div className={'mt-5'}>
+                        {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (
                                 <div className={'flex items-center mt-3 w-1/2'} key={index}>
@@ -416,9 +647,9 @@ export const FashionStyling = ({
                                     )}
                                 </div>
                             ))}
-                        </div>
+                        </div> */}
                     </div>
-                    <div className={'mt-5'}>
+                    {/* <div className={'mt-5'}>
                         <span className={'text-base'}>快捷方式</span>
                         <div className={'mt-3'}>
                             <Button
@@ -432,10 +663,10 @@ export const FashionStyling = ({
                             </Button>
                             <ShortcutRecord />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
-            <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} />
+            <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} chatBotInfo={chatBotInfo} setChatBotInfo={setChatBotInfo} />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
         </>
     );

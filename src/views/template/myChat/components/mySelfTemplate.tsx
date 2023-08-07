@@ -1,19 +1,31 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Box, Grid, Tooltip, Typography } from '@mui/material';
+import { createChat } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import marketStore from 'store/market';
 import { Item } from 'types/template';
 import SubCard from 'ui-component/cards/SubCard';
+import FormDialogNew from './FormDialogNew';
 import './textnoWarp.scss';
 function MyselfTemplate({ appList }: { appList: Item[] }) {
     const navigate = useNavigate();
     const { categoryList } = marketStore();
+    const [openNew, setOpenNew] = useState(false);
+    const [robotName, setRobotName] = useState('');
+
+    const handleCreateNew = async (uid: string) => {
+        const res = await createChat({ robotName: robotName, uid });
+        setOpenNew(false);
+        navigate(`/createChat?appId=${res}`);
+    };
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
                 <SubCard sx={{ height: 150, cursor: 'pointer' }}>
-                    <Box onClick={() => null} display="flex" alignItems="center">
+                    <Box onClick={() => setOpenNew(true)} display="flex" alignItems="center">
                         <AddCircleIcon className="text-[80px]" />
                         <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col justify-around">
                             <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
@@ -29,7 +41,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                         <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                             <Box
                                 onClick={() => {
-                                    navigate('/createChat?uid=' + data?.uid);
+                                    navigate('/createChat?appId=' + data?.uid);
                                 }}
                                 display="flex"
                                 alignItems="center"
@@ -79,6 +91,13 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                     </Grid>
                 </>
             ))}
+            <FormDialogNew
+                open={openNew}
+                setOpen={() => setOpenNew(false)}
+                handleOk={handleCreateNew}
+                setValue={setRobotName}
+                value={robotName}
+            />
         </Grid>
     );
 }

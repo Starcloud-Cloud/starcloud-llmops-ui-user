@@ -103,7 +103,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         matchedText.forEach((v) => {
                             regulationTextRef.current = regulationTextRef.current.replace(v, '');
                         });
-                        setRegulationText(`${regulationTextRef.current}${value}`);
+                        setRegulationText(`${regulationTextRef.current}\n${value}`);
                     } else {
                         // 替换
                         setRegulationText(regulationText.replace(matchedText, value));

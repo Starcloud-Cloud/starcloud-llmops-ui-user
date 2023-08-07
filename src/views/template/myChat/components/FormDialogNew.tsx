@@ -83,13 +83,13 @@ export default function FormDialogNew({
                             />
                         </div>
                         <div className="pt-[16px] w-full text-base">选择模版</div>
-                        <div className="w-full mt-[8px] grid grid-cols-4 gap-4">
+                        <div className="w-full mt-[8px] grid xs:grid-cols-1 gap-4 sm:grid-cols-3">
                             {recommendList.map((item: any, index) => (
                                 <Box
                                     key={index}
-                                    style={{ width: '203.33px' }}
+                                    // style={{ width: '203.33px' }}
                                     className={
-                                        `hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
+                                        `xs:w-full sm:w-[203.33px] hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
                                         (uid === item?.uid ? ' border-[1px] border-solid border-[#673ab7]' : '')
                                     }
                                     onClick={() => setUid(item?.uid)}

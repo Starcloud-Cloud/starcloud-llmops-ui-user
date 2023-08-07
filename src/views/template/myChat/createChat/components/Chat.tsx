@@ -16,7 +16,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useLocation } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
@@ -53,6 +53,7 @@ export type IHistory = Partial<{
     robotName: string;
     robotAvatar: string;
     isNew: boolean;
+    isSystem?: boolean;
 }>;
 
 type IConversation = {
@@ -69,26 +70,27 @@ type IConversation = {
 };
 export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const theme = useTheme();
-    const scrollRef = React.useRef();
+    const scrollRef: any = React.useRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
 
-    const [user, setUser] = React.useState<any>({});
-
     const [isListening, setIsListening] = React.useState(false);
-    // const [recognizedText, setRecognizedText] = React.useState('');
     const [message, setMessage] = React.useState('');
     const [conversationUid, setConversationUid] = React.useState('');
     const [data, setData] = React.useState<IHistory[]>([]);
+    const [time, setTime] = React.useState(1);
+    const [isFirst, setIsFirst] = React.useState(true);
+
     const dataRef: any = useRef(data);
+    const timeOutRef: any = useRef(null);
 
     // 创建语音识别对象
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
 
     // 设置语言为中文
-    recognition.lang = 'zh-CN';
+    // recognition.lang = 'zh-CN';
 
     // 语音识别结果事件处理函数
     recognition.onresult = (event: any) => {
@@ -98,15 +100,26 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
 
     // 开始语音识别
     const startListening = () => {
+        timeOutRef.current = setInterval(() => {
+            setTime((time) => time + 1);
+        }, 1000);
         setIsListening(true);
         recognition.start();
     };
 
     // 停止语音识别
     const stopListening = () => {
+        timeOutRef.current && clearInterval(timeOutRef.current);
+        setTime(1);
         setIsListening(false);
         recognition.stop();
     };
+
+    useEffect(() => {
+        return () => {
+            timeOutRef.current && clearInterval(timeOutRef.current);
+        };
+    }, []);
 
     // 获取会话
     React.useEffect(() => {
@@ -118,16 +131,38 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         })();
     }, []);
 
-    // 获取历史记录;
+    // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (conversationUid) {
+        if (conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
-                setData([...list, { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement }]);
+                setData([
+                    ...list,
+                    { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement, isSystem: true }
+                ]);
+                setIsFirst(false);
             })();
         }
     }, [conversationUid, chatBotInfo]);
+
+    // 更新历史记录
+    React.useEffect(() => {
+        if (!isFirst) {
+            const list = data.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+            setData(list);
+        }
+    }, [chatBotInfo.avatar, chatBotInfo.name, chatBotInfo.statement]);
+
+    // 更新欢迎语
+    React.useEffect(() => {
+        if (!isFirst) {
+            const copyData = [...data];
+            const index = copyData.findIndex((v) => v.isSystem);
+            copyData[index].answer = chatBotInfo.statement;
+            setData(copyData);
+        }
+    }, [chatBotInfo.statement]);
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -144,9 +179,19 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         }
     });
 
+    const handleKeyDown = (event: any) => {
+        // 按下 Shift + Enter 换行
+        if (event.shiftKey && event.keyCode === 13) {
+            setMessage(message + '\n');
+        } else if (!event.shiftKey && event.keyCode === 13) {
+            // 单独按回车键提交表单
+            handleOnSend();
+        }
+    };
+
     // handle new message form
     const handleOnSend = async () => {
-        if (!message) {
+        if (!message.trim()) {
             return;
         }
         setMessage('');
@@ -189,8 +234,8 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 return;
             }
             if (done) {
-                const copyData = [...data];
-                copyData[copyData.length - 1].isNew = false;
+                const copyData = [...dataRef.current];
+                copyData[dataRef.current.length - 1].isNew = false;
                 setData(copyData);
                 break;
             }
@@ -214,9 +259,9 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 if (bufferObj?.code === 200) {
                     setConversationUid(bufferObj.conversationUId);
                     const copyData = [...dataRef.current]; // 使用dataRef.current代替data
-                    console.log(copyData);
                     copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
                     copyData[copyData.length - 1].isNew = true;
+                    dataRef.current = copyData;
                     setData(copyData);
                 } else if (bufferObj && bufferObj.code !== 200) {
                     dispatch(
@@ -234,13 +279,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             });
             outerJoins = joins;
         }
-    };
-
-    const handleEnter = (event: React.KeyboardEvent<HTMLDivElement> | undefined) => {
-        if (event?.key !== 'Enter') {
-            return;
-        }
-        handleOnSend();
     };
 
     const handleClean = () => {
@@ -270,10 +308,9 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     }, [matchDownSM]);
 
     return (
-        // <div className="bg-[#f4f6f8] rounded-md">
         <div>
             <div className={'flex justify-center items-center py-[8px]'}>
-                <img className="w-[28px] h-[28px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
@@ -289,22 +326,11 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         </div>
                     </Card>
                 )}
-                {/* {chatBotInfo.statement && (
-                    <Card className="bg-[#f2f3f5] p-[16px] mx-[24px] mt-[12px]">
-                        <Typography align="left" variant="subtitle2">
-                            {chatBotInfo.statement}
-                        </Typography>
-                    </Card>
-                )} */}
                 <CardContent>
                     <ChatHistory theme={theme} data={data} />
+                    <span ref={scrollRef}></span>
                 </CardContent>
             </PerfectScrollbar>
-            {/* <Grid container spacing={3} className="px-[24px] mb-3">
-                <Grid item>
-                    <Chip label="Secondary" chipcolor="secondary" size={'small'} className="cursor-pointer" />
-                </Grid>
-            </Grid> */}
             <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
                 <Grid item>
                     <Grid item>
@@ -337,22 +363,36 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                     <OutlinedInput
                         id="message-send"
                         fullWidth
+                        multiline
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={handleEnter}
-                        placeholder="请输入"
+                        placeholder="请输入(Shift+Enter换行)"
+                        className="!pt-0"
+                        onKeyDown={handleKeyDown}
+                        maxRows={2}
                         endAdornment={
                             <>
                                 <InputAdornment position="end">
-                                    <IconButton
-                                        className="!p-[4px]"
-                                        disableRipple
-                                        color={isListening ? 'secondary' : 'default'}
-                                        onClick={isListening ? stopListening : startListening}
-                                        aria-label="voice"
-                                    >
-                                        <KeyboardVoiceIcon />
-                                    </IconButton>
+                                    {!isListening ? (
+                                        <IconButton
+                                            className="!p-[4px]"
+                                            disableRipple
+                                            color={'default'}
+                                            onClick={startListening}
+                                            aria-label="voice"
+                                        >
+                                            <KeyboardVoiceIcon />
+                                        </IconButton>
+                                    ) : (
+                                        <div
+                                            onClick={stopListening}
+                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                        >
+                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                {time}
+                                            </div>
+                                        </div>
+                                    )}
                                 </InputAdornment>
                                 <InputAdornment position="end" className="relative">
                                     <IconButton

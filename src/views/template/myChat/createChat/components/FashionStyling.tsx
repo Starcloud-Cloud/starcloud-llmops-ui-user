@@ -427,7 +427,6 @@ export const FashionStyling = ({
     // 上传头像之后头像列表
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
-            console.log(fileList?.[0]?.response?.data, '执行');
             setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
             // 把fileList清空
             setFileList([]);
@@ -538,32 +537,38 @@ export const FashionStyling = ({
                                 <span className={'text-base text-black'}>声音</span>
                                 <span className={'text-#697586 ml-[8px]'}>让你的机器人说话吧！</span>
                             </div>
-
                             <div className="flex justify-end items-center">
                                 <span className={'text-#697586'}>{visibleVoice ? '启用' : '不启用'}</span>
-                                <Switch color={'secondary'} checked={visibleVoice} onChange={(e) => setVisibleVoice(e.target.checked)} />
+                                <Switch
+                                    disabled
+                                    color={'secondary'}
+                                    checked={visibleVoice}
+                                    onChange={(e) => setVisibleVoice(e.target.checked)}
+                                />
                             </div>
                         </div>
-                        <div className={'mt-3'}>
-                            <Button
-                                variant={'contained'}
-                                startIcon={<GraphicEqIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                onClick={() => setVoiceOpen(true)}
-                            >
-                                选择声音
-                            </Button>
-                            <Button
-                                className={'ml-3'}
-                                startIcon={<PlayCircleOutlineIcon />}
-                                variant={'contained'}
-                                color={'secondary'}
-                                size={'small'}
-                            >
-                                林志玲
-                            </Button>
-                        </div>
+                        {false && (
+                            <div className={'mt-3'}>
+                                <Button
+                                    variant={'contained'}
+                                    startIcon={<GraphicEqIcon />}
+                                    color={'secondary'}
+                                    size={'small'}
+                                    onClick={() => setVoiceOpen(true)}
+                                >
+                                    选择声音
+                                </Button>
+                                <Button
+                                    className={'ml-3'}
+                                    startIcon={<PlayCircleOutlineIcon />}
+                                    variant={'contained'}
+                                    color={'secondary'}
+                                    size={'small'}
+                                >
+                                    林志玲
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className={'mt-10'}>

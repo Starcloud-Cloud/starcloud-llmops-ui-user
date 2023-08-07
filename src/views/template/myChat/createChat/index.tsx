@@ -17,11 +17,9 @@ import { Skill } from './components/Skill';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            {value === index && (
-                <Box sx={{ p: 3 }}>
-                    <Box>{children}</Box>
-                </Box>
-            )}
+            <Box sx={{ p: 3 }}>
+                <Box>{children}</Box>
+            </Box>
         </div>
     );
 }
@@ -119,7 +117,7 @@ function CreateDetail() {
                             {t('myApp.back')}
                         </Button>
                     }
-                    title={detail?.name}
+                    title={chatBotInfo?.name}
                     action={
                         (value === 0 || value === 1) && (
                             <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>

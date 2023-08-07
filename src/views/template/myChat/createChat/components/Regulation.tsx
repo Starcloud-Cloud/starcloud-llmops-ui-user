@@ -1,5 +1,5 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select, Slider, TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
 
 const marks = [
@@ -29,45 +29,56 @@ const TEXT = `- Identify what language users use in questions and use the same l
 
 export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
     const [regulationText, setRegulationText] = useState('');
+    const regulationTextRef = useRef(regulationText);
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
-            const pattern = /- 请使用(.*)语气跟我进行对话/;
+            const pattern = /- 请使用(.*)语气跟我进行对话/g;
             const matchResult = regulationText.match(pattern);
             if (matchResult) {
-                const matchedText = matchResult[0]; // 提取匹配到的内容
                 if (value === '默认') {
                     // 删除
-                    setRegulationText(regulationText.replace(matchedText, ''));
+                    matchResult.forEach((v) => {
+                        setRegulationText(regulationText.replace(v, ''));
+                    });
                 } else {
                     // 替换
-                    setRegulationText(regulationText.replace(matchedText, value));
+                    regulationTextRef.current = regulationText;
+                    matchResult.forEach((v) => {
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
+                    });
+                    setRegulationText(`${regulationTextRef.current}${value}`);
                 }
             } else {
                 if (value === '默认') {
                     return;
                 } else {
-                    setRegulationText(`${regulationText} \n ${value}`);
+                    setRegulationText(`${regulationText}\n${value}`);
                 }
             }
         }
         if (type === 2) {
-            const pattern = /- 回复长度最好不要超过(.*)字/;
+            const pattern = /- 回复长度最好不要超过(.*)字/g;
             const matchResult = regulationText.match(pattern);
             if (matchResult) {
-                const matchedText = matchResult[0]; // 提取匹配到的内容
                 if (value === '默认') {
                     // 删除
-                    setRegulationText(regulationText.replace(matchedText, ''));
+                    matchResult.forEach((v) => {
+                        setRegulationText(regulationText.replace(v, ''));
+                    });
                 } else {
                     // 替换
-                    setRegulationText(regulationText.replace(matchedText, value));
+                    regulationTextRef.current = regulationText;
+                    matchResult.forEach((v) => {
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
+                    });
+                    setRegulationText(`${regulationTextRef.current}${value}`);
                 }
             } else {
                 if (value === '默认') {
                     return;
                 } else {
-                    setRegulationText(`${regulationText} \n ${value}`);
+                    setRegulationText(`${regulationText}\n${value}`);
                 }
             }
         }
@@ -75,18 +86,31 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             const pattern = /- 回复时使用(.*)进行回复/;
             const matchResult = regulationText.match(pattern);
             const textIncludes = regulationText.includes(TEXT);
-            console.log(textIncludes, 'textIncludes');
             if (matchResult || textIncludes) {
-                const matchedText = matchResult?.[0] || TEXT; // 提取匹配到的内容
+                const matchedText = matchResult || TEXT; // 提取匹配到的内容
                 if (value === '默认') {
                     // 删除
-                    setRegulationText(regulationText.replace(matchedText, ''));
+                    if (Array.isArray(matchedText)) {
+                        matchedText.forEach((v) => {
+                            setRegulationText(regulationText.replace(v, ''));
+                        });
+                    } else {
+                        setRegulationText(regulationText.replace(matchedText, ''));
+                    }
                 } else {
-                    // 替换
-                    setRegulationText(regulationText.replace(matchedText, value));
+                    if (Array.isArray(matchedText)) {
+                        regulationTextRef.current = regulationText;
+                        matchedText.forEach((v) => {
+                            regulationTextRef.current = regulationTextRef.current.replace(v, '');
+                        });
+                        setRegulationText(`${regulationTextRef.current}${value}`);
+                    } else {
+                        // 替换
+                        setRegulationText(regulationText.replace(matchedText, value));
+                    }
                 }
             } else {
-                setRegulationText(`${regulationText} \n ${value}`);
+                setRegulationText(`${regulationText}\n${value}`);
             }
         }
     };
@@ -116,13 +140,13 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 </span>
                 <div className={'mt-5'}>
                     <TextField
-                        value={chatBotInfo.prePrompt}
+                        value={regulationText}
                         label={'角色描述'}
                         className={'mt-1'}
                         fullWidth
                         size={'small'}
                         multiline={true}
-                        maxRows={10}
+                        maxRows={18}
                         minRows={10}
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => setRegulationText(e.target.value)}

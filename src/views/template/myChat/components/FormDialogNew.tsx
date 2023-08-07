@@ -4,7 +4,9 @@ import { Box, Button, CardActions, CardContent, Divider, Grid, IconButton, Modal
 import { getChatTemplate } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
+import { dispatch } from 'store';
 import { gridSpacing } from 'store/constant';
+import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Template from './template';
 
@@ -50,7 +52,14 @@ export default function FormDialogNew({
                 content={false}
                 className="sm:w-[800px] xs:w-[300px]"
                 secondary={
-                    <IconButton onClick={handleClose} size="large" aria-label="close modal">
+                    <IconButton
+                        onClick={() => {
+                            handleClose();
+                            setUid('');
+                        }}
+                        size="large"
+                        aria-label="close modal"
+                    >
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 }
@@ -94,7 +103,31 @@ export default function FormDialogNew({
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" onClick={() => handleOk(uid)}>
+                        <Button
+                            variant="contained"
+                            type="button"
+                            onClick={() => {
+                                setChecked(true);
+                                if (!value) {
+                                    return;
+                                }
+                                if (!uid) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '请选择模版',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false
+                                        })
+                                    );
+                                    return;
+                                }
+                                handleOk(uid);
+                            }}
+                        >
                             创建
                         </Button>
                     </Grid>

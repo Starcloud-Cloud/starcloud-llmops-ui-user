@@ -22,43 +22,48 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => (
         <Grid container spacing={gridSpacing}>
             {data.map((history, index) => (
                 <React.Fragment key={index}>
-                    <Grid item xs={12} className="mt-3">
-                        <Grid container spacing={gridSpacing} style={{ marginLeft: 0, width: '100%' }}>
-                            <div className="w-full flex">
-                                <div className="w-full">
-                                    <Grid item xs={12}>
+                    {history.message && (
+                        <Grid item xs={12} className="mt-3">
+                            <Grid container spacing={gridSpacing} style={{ marginLeft: 0, width: '100%' }}>
+                                <div className="w-full flex">
+                                    <div className="w-full">
                                         <Grid item xs={12}>
-                                            <Typography
-                                                align="right"
-                                                variant="subtitle2"
-                                                color={theme.palette.mode === 'dark' ? 'dark.900' : ''}
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    align="right"
+                                                    variant="subtitle2"
+                                                    color={theme.palette.mode === 'dark' ? 'dark.900' : ''}
+                                                >
+                                                    {dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                </Typography>
+                                            </Grid>
+                                            <Card
+                                                sx={{
+                                                    display: 'inline-block',
+                                                    float: 'right',
+                                                    bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
+                                                }}
                                             >
-                                                {dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                            </Typography>
-                                        </Grid>
-                                        <Card
-                                            sx={{
-                                                display: 'inline-block',
-                                                float: 'right',
-                                                bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
-                                            }}
-                                        >
-                                            <CardContent sx={{ p: 2, pb: '16px !important', width: 'fit-content', ml: 'auto' }}>
-                                                <Grid container spacing={1}>
-                                                    <Grid item xs={12}>
-                                                        <Typography variant="body2" color={theme.palette.mode === 'dark' ? 'dark.900' : ''}>
-                                                            {history.message}
-                                                        </Typography>
+                                                <CardContent sx={{ p: 2, pb: '16px !important', width: 'fit-content', ml: 'auto' }}>
+                                                    <Grid container spacing={1}>
+                                                        <Grid item xs={12}>
+                                                            <Typography
+                                                                variant="body2"
+                                                                color={theme.palette.mode === 'dark' ? 'dark.900' : ''}
+                                                            >
+                                                                {history.message}
+                                                            </Typography>
+                                                        </Grid>
                                                     </Grid>
-                                                </Grid>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    </div>
+                                    <img className="w-[50px] h-[50px] rounded-xl ml-2" src={User} alt="" />
                                 </div>
-                                <img className="w-[50px] h-[50px] rounded-xl ml-2" src={User} alt="" />
-                            </div>
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    )}
                     <Grid item xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} className="flex">
@@ -75,10 +80,9 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => (
                                     <div className="flex flex-col">
                                         <Card
                                             sx={{
-                                                display: 'inline-block',
-                                                background:
-                                                    theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.secondary.light
+                                                display: 'inline-block'
                                             }}
+                                            className="bg-[#f2f3f5]"
                                         >
                                             <CardContent sx={{ p: 2, pb: '16px !important' }}>
                                                 <Grid container spacing={1}>

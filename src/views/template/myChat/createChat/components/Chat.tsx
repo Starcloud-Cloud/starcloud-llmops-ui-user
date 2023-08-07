@@ -124,7 +124,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
-                setData(list);
+                setData([...list, { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement }]);
             })();
         }
     }, [conversationUid, chatBotInfo]);
@@ -289,13 +289,13 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         </div>
                     </Card>
                 )}
-                {chatBotInfo.statement && (
+                {/* {chatBotInfo.statement && (
                     <Card className="bg-[#f2f3f5] p-[16px] mx-[24px] mt-[12px]">
                         <Typography align="left" variant="subtitle2">
                             {chatBotInfo.statement}
                         </Typography>
                     </Card>
-                )}
+                )} */}
                 <CardContent>
                     <ChatHistory theme={theme} data={data} />
                 </CardContent>

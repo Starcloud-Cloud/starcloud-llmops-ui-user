@@ -90,62 +90,30 @@ const VoiceModal = ({
     }, [list, name]);
 
     const handleTest = async () => {
-        // try {
-        //     const response = await fetch('http://www.w3schools.com/html/horse.mp3');
-        //     const arrayBuffer = await response.arrayBuffer();
-        //     console.log(arrayBuffer);
-        //     // const response = await axios({
-        //     //     method: 'post',
-        //     //     url: 'http://www.w3schools.com/html/horse.mp3',
-        //     //     responseType: 'arraybuffer'
-        //     // });
+        try {
+            // const response = await fetch('http://www.w3schools.com/html/horse.mp3');
+            let response: any = await testSpeakerSSE({
+                shortName: 'zh-CN-YunyeNeural'
+                // prosodyRate: 'CHAT_TEST',
+                // prosodyPitch,
+            });
+            console.log(response);
+            const arrayBuffer = await response.arrayBuffer();
+            console.log(arrayBuffer);
+            // const response = await axios({
+            //     method: 'post',
+            //     url: 'http://www.w3schools.com/html/horse.mp3',
+            //     responseType: 'arraybuffer'
+            // });
 
-        //     const audioContext = new window.AudioContext();
-        //     if (audioContext.state === 'suspended') {
-        //         await audioContext.resume();
-        //     }
-
-        //     // 将ArrayBuffer转换为AudioBuffer
-        //     audioContext.decodeAudioData(
-        //         // response.data,
-        //         arrayBuffer,
-        //         (buffer) => {
-        //             // 创建AudioBufferSourceNode
-        //             const sourceNode = audioContext.createBufferSource();
-        //             sourceNode.buffer = buffer;
-        //             // 连接节点到扬声器
-        //             sourceNode.connect(audioContext.destination);
-        //             // 播放音频
-        //             sourceNode.start();
-        //         },
-        //         (error) => {
-        //             console.error('解码音频数据时出错：', error);
-        //         }
-        //     );
-        // } catch (error) {
-        //     console.error('播放音频时出错：', error);
-        // }
-
-        let resp: any = await testSpeakerSSE({
-            shortName: 'zh-CN-YunyeNeural'
-            // prosodyRate: 'CHAT_TEST',
-            // prosodyPitch,
-        });
-        const reader = resp.getReader();
-        let outerJoins: any;
-        while (1) {
-            let joins = outerJoins;
-            const { done, value } = await reader.read();
-            if (done) {
-                console.log('done');
-                break;
-            }
-            // 创建AudioContext对象
             const audioContext = new window.AudioContext();
-            const uint8Array = new Uint8Array(value);
-            const arrayBuffer = uint8Array.buffer;
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
             // 将ArrayBuffer转换为AudioBuffer
             audioContext.decodeAudioData(
+                // response.data,
                 arrayBuffer,
                 (buffer) => {
                     // 创建AudioBufferSourceNode
@@ -160,8 +128,46 @@ const VoiceModal = ({
                     console.error('解码音频数据时出错：', error);
                 }
             );
-            outerJoins = joins;
+        } catch (error) {
+            console.error('播放音频时出错：', error);
         }
+
+        // let resp: any = await testSpeakerSSE({
+        //     shortName: 'zh-CN-YunyeNeural'
+        //     // prosodyRate: 'CHAT_TEST',
+        //     // prosodyPitch,
+        // });
+        // const reader = resp.getReader();
+        // let outerJoins: any;
+        // while (1) {
+        //     let joins = outerJoins;
+        //     const { done, value } = await reader.read();
+        //     if (done) {
+        //         console.log('done');
+        //         break;
+        //     }
+        //     // 创建AudioContext对象
+        //     const audioContext = new window.AudioContext();
+        //     const uint8Array = new Uint8Array(value);
+        //     const arrayBuffer = uint8Array.buffer;
+        //     // 将ArrayBuffer转换为AudioBuffer
+        //     audioContext.decodeAudioData(
+        //         arrayBuffer,
+        //         (buffer) => {
+        //             // 创建AudioBufferSourceNode
+        //             const sourceNode = audioContext.createBufferSource();
+        //             sourceNode.buffer = buffer;
+        //             // 连接节点到扬声器
+        //             sourceNode.connect(audioContext.destination);
+        //             // 播放音频
+        //             sourceNode.start();
+        //         },
+        //         (error) => {
+        //             console.error('解码音频数据时出错：', error);
+        //         }
+        //     );
+        //     outerJoins = joins;
+        // }
     };
 
     return (
@@ -514,8 +520,8 @@ export const FashionStyling = ({
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={3}
-                            minRows={3}
+                            maxRows={5}
+                            minRows={5}
                             aria-valuemax={200}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
@@ -574,8 +580,8 @@ export const FashionStyling = ({
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={3}
-                            minRows={3}
+                            maxRows={5}
+                            minRows={5}
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"

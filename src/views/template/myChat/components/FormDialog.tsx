@@ -69,7 +69,17 @@ export default function FormDialog({
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" onClick={handleOk}>
+                        <Button
+                            variant="contained"
+                            type="button"
+                            onClick={() => {
+                                setChecked(true);
+                                if (!value) {
+                                    return;
+                                }
+                                handleOk();
+                            }}
+                        >
                             创建
                         </Button>
                     </Grid>

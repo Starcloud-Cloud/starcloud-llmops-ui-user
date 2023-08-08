@@ -1,6 +1,8 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Box, Grid, Tooltip, Typography } from '@mui/material';
-import { createChat } from 'api/chat';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Tooltip, Typography } from '@mui/material';
+import { createChat, deleteApp } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +16,14 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
     const { categoryList } = marketStore();
     const [openNew, setOpenNew] = useState(false);
     const [robotName, setRobotName] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [currentUid, setCurrentUid] = useState('');
+
+    const handleDelete = async () => {
+        const res = await deleteApp(currentUid);
+        setDialogOpen(false);
+        setCurrentUid('');
+    };
 
     const handleCreateNew = async (uid: string) => {
         const res = await createChat({ robotName: robotName, uid });
@@ -35,9 +45,9 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                     </Box>
                 </SubCard>
             </Grid>
-            {appList?.map((data) => (
+            {appList?.map((data: any) => (
                 <>
-                    <Grid key={data.uid} item xs={12} md={6}>
+                    <Grid key={data.uid} item xs={12} md={6} className="relative">
                         <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                             <Box
                                 onClick={() => {
@@ -46,13 +56,11 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                 display="flex"
                                 alignItems="center"
                             >
-                                {data?.icon && (
-                                    <img
-                                        className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]"
-                                        src={require('../../../../assets/images/category/' + data.icon + '.svg')}
-                                        alt="icon"
-                                    />
-                                )}
+                                <img
+                                    className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]"
+                                    src={data?.images?.[0]}
+                                    alt="icon"
+                                />
                                 <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col justify-around">
                                     <Tooltip title={data.name}>
                                         <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
@@ -68,6 +76,21 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                     >
                                         {data.description}
                                     </Typography>
+                                    <div className="flex justify-end absolute bottom-3 right-3">
+                                        <Tooltip title="编辑" arrow>
+                                            <ModeEditIcon className="text-[#666] text-base" />
+                                        </Tooltip>
+                                        <Tooltip title="删除" arrow>
+                                            <DeleteIcon
+                                                className="text-base  text-[#666] ml-2"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDialogOpen(true);
+                                                    setCurrentUid(data.uid);
+                                                }}
+                                            />
+                                        </Tooltip>
+                                    </div>
                                     {/* <Tooltip title={data.description}>
                                     <Typography noWrap variant="body2">
                                         {data?.description}
@@ -98,6 +121,18 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                 setValue={setRobotName}
                 value={robotName}
             />
+            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">提醒</DialogTitle>
+                <DialogContent>
+                    <div className="text-lg w-[240px]">确认删除该机器人？</div>
+                </DialogContent>
+                <Divider />
+                <DialogActions>
+                    <Button onClick={() => handleDelete()} color="primary">
+                        确认
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Grid>
     );
 }

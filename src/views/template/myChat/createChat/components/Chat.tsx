@@ -321,7 +321,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 265px)', overflowX: 'hidden', minHeight: 525 }}>
+            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden', minHeight: 525 }}>
                 {chatBotInfo.enableIntroduction && (
                     <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
                         <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />

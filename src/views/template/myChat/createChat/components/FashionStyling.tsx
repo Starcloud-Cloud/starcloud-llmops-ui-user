@@ -382,7 +382,6 @@ export const FashionStyling = ({
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
-    const [introductionOpen, setIntroductionOpen] = useState(false);
     const [avatarList, setAvatarList] = useState<string[]>([]);
     const [startCheck, setStartCheck] = useState(false);
     const [isFirst, setIsFirst] = useState(true);
@@ -394,10 +393,6 @@ export const FashionStyling = ({
         setChatBotInfo({ ...chatBotInfo, enableVoice: visibleVoice });
     }, [visibleVoice]);
 
-    useEffect(() => {
-        setChatBotInfo({ ...chatBotInfo, enableIntroduction: introductionOpen });
-    }, [introductionOpen]);
-
     const closeVoiceModal = () => {
         setVoiceOpen(false);
     };
@@ -406,6 +401,7 @@ export const FashionStyling = ({
 
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
+            console.log(1);
             setChatBotInfo({
                 ...chatBotInfo,
                 avatar: fileList?.[0]?.response?.data
@@ -416,6 +412,7 @@ export const FashionStyling = ({
     // 获取头像列表和初始头像回显(只有第一次)
     useEffect(() => {
         if (isFirst && chatBotInfo.defaultImg) {
+            console.log(2);
             (async () => {
                 const res = await getAvatarList();
                 setAvatarList([chatBotInfo.defaultImg, ...res]);
@@ -427,11 +424,14 @@ export const FashionStyling = ({
     // 上传头像之后头像列表
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
+            console.log(3);
             setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
             // 把fileList清空
             setFileList([]);
         }
     }, [fileList]);
+
+    console.log(avatarList, fileList);
 
     return (
         <>
@@ -450,7 +450,7 @@ export const FashionStyling = ({
                             className={'mt-1'}
                             value={chatBotInfo.name}
                             error={startCheck && !chatBotInfo.name}
-                            helperText={!chatBotInfo.name && '请填写名称'}
+                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             size={'small'}
@@ -492,7 +492,7 @@ export const FashionStyling = ({
                                         }}
                                         key={index}
                                         style={chatBotInfo.avatar === item ? { border: '1px solid #673ab7' } : {}}
-                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:border-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
+                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:outline-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
                                             chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
                                         }`}
                                         src={item}
@@ -503,7 +503,7 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-1'}>
                         <div className="flex justify-end items-center">
-                            <span className={'text-#697586'}>{introductionOpen ? '展示' : '不展示'}</span>
+                            <span className={'text-#697586'}>{chatBotInfo.enableIntroduction ? '展示' : '不展示'}</span>
                             <Switch
                                 color={'secondary'}
                                 checked={chatBotInfo.enableIntroduction}
@@ -521,21 +521,22 @@ export const FashionStyling = ({
                             multiline={true}
                             maxRows={5}
                             minRows={5}
-                            aria-valuemax={200}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
+                            error={(chatBotInfo?.introduction?.length || 0) > 300}
                             label={'简介'}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 setChatBotInfo({ ...chatBotInfo, introduction: value });
                             }}
                         />
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.introduction?.length || 0}/300</div>
                     </div>
                     <div className={'mt-5'}>
                         <div className="flex justify-between">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between flex-col">
                                 <span className={'text-base text-black'}>声音</span>
-                                <span className={'text-#697586 ml-[8px]'}>让你的机器人说话吧！</span>
+                                <div className={'text-#697586'}>让你的机器人说话吧！</div>
                             </div>
                             <div className="flex justify-end items-center">
                                 <span className={'text-#697586'}>{visibleVoice ? '启用' : '不启用'}</span>
@@ -579,7 +580,18 @@ export const FashionStyling = ({
                     >
                         对话配置
                     </span>
-                    <div className={'mt-5'}>
+                    <div className={'mt-0'}>
+                        <div className="flex justify-end items-center">
+                            <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
+                            <Switch
+                                color={'secondary'}
+                                checked={chatBotInfo.enableStatement}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setChatBotInfo({ ...chatBotInfo, enableStatement: !chatBotInfo.enableStatement });
+                                }}
+                            />
+                        </div>
                         <TextField
                             className={'mt-1'}
                             size={'small'}
@@ -587,6 +599,7 @@ export const FashionStyling = ({
                             multiline={true}
                             maxRows={5}
                             minRows={5}
+                            error={(chatBotInfo?.statement?.length || 0) > 300}
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"
@@ -597,6 +610,7 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300</div>
                         {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (

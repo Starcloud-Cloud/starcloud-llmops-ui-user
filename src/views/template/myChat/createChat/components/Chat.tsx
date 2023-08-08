@@ -12,6 +12,7 @@ import {
     Menu,
     MenuItem,
     OutlinedInput,
+    Tooltip,
     Typography,
     useMediaQuery,
     useTheme
@@ -53,7 +54,7 @@ export type IHistory = Partial<{
     robotName: string;
     robotAvatar: string;
     isNew: boolean;
-    isSystem?: boolean;
+    isStatement?: boolean;
 }>;
 
 type IConversation = {
@@ -90,7 +91,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
 
     // 设置语言为中文
-    // recognition.lang = 'zh-CN';
+    recognition.lang = navigator.language;
 
     // 语音识别结果事件处理函数
     recognition.onresult = (event: any) => {
@@ -139,7 +140,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
                 setData([
                     ...list,
-                    { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement, isSystem: true }
+                    { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement, isStatement: true }
                 ]);
                 setIsFirst(false);
             })();
@@ -158,11 +159,15 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     React.useEffect(() => {
         if (!isFirst) {
             const copyData = [...data];
-            const index = copyData.findIndex((v) => v.isSystem);
-            copyData[index].answer = chatBotInfo.statement;
+            const index = copyData.findIndex((v) => v.isStatement);
+            if (chatBotInfo.enableStatement) {
+                copyData[index].answer = chatBotInfo.statement;
+            } else {
+                copyData[index].answer = '';
+            }
             setData(copyData);
         }
-    }, [chatBotInfo.statement]);
+    }, [chatBotInfo.statement, chatBotInfo.enableStatement]);
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -182,8 +187,10 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const handleKeyDown = (event: any) => {
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
+            event.preventDefault();
             setMessage(message + '\n');
         } else if (!event.shiftKey && event.keyCode === 13) {
+            event.preventDefault();
             // 单独按回车键提交表单
             handleOnSend();
         }
@@ -309,17 +316,17 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
 
     return (
         <div>
-            <div className={'flex justify-center items-center py-[8px]'}>
+            <div className={'flex justify-center items-center py-[20px]'}>
                 <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
             <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 265px)', overflowX: 'hidden', minHeight: 525 }}>
-                {chatBotInfo.introduction && chatBotInfo.enableIntroduction && (
+                {chatBotInfo.enableIntroduction && (
                     <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
                         <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
                         <div className="flex flex-col ml-3">
-                            <span className={'text-lg font-medium'}>{chatBotInfo.name}</span>
+                            <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
                             <Typography align="left" variant="subtitle2" color={'#000'}>
                                 {chatBotInfo.introduction}
                             </Typography>
@@ -328,7 +335,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 )}
                 <CardContent>
                     <ChatHistory theme={theme} data={data} />
-                    <span ref={scrollRef}></span>
+                    {/* <span ref={scrollRef}></span> */}
                 </CardContent>
             </PerfectScrollbar>
             <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
@@ -369,41 +376,41 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         placeholder="请输入(Shift+Enter换行)"
                         className="!pt-0"
                         onKeyDown={handleKeyDown}
-                        maxRows={2}
+                        minRows={1}
+                        maxRows={3}
                         endAdornment={
                             <>
                                 <InputAdornment position="end">
                                     {!isListening ? (
-                                        <IconButton
-                                            className="!p-[4px]"
-                                            disableRipple
-                                            color={'default'}
-                                            onClick={startListening}
-                                            aria-label="voice"
-                                        >
-                                            <KeyboardVoiceIcon />
-                                        </IconButton>
+                                        <Tooltip arrow placement="top" title={'语音输入'}>
+                                            <IconButton disableRipple color={'default'} onClick={startListening} aria-label="voice">
+                                                <KeyboardVoiceIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     ) : (
-                                        <div
-                                            onClick={stopListening}
-                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                        >
-                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                {time}
+                                        <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                            <div
+                                                onClick={stopListening}
+                                                className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                            >
+                                                <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                    {time}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     )}
                                 </InputAdornment>
                                 <InputAdornment position="end" className="relative">
-                                    <IconButton
-                                        className="!p-[4px]"
-                                        disableRipple
-                                        color={message ? 'secondary' : 'default'}
-                                        onClick={handleOnSend}
-                                        aria-label="send message"
-                                    >
-                                        <SendIcon />
-                                    </IconButton>
+                                    <Tooltip placement="top" arrow title={'发送'}>
+                                        <IconButton
+                                            disableRipple
+                                            color={message ? 'secondary' : 'default'}
+                                            onClick={handleOnSend}
+                                            aria-label="send message"
+                                        >
+                                            <SendIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </InputAdornment>
                             </>
                         }

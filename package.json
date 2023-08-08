@@ -104,6 +104,7 @@
     "scripts": {
         "start": "react-app-rewired start",
         "local": "dotenv -e .env.local react-app-rewired start",
+        "ruiqiang": "dotenv -e .env.base react-app-rewired start",
         "build": "react-app-rewired build",
         "build:cn-test": " dotenv -e .env.cn-test react-app-rewired build",
         "build:cn-pro": " dotenv -e .env.cn-pro react-app-rewired build",

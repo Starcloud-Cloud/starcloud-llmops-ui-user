@@ -40,7 +40,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import { useFormik as Formik } from 'formik';
-import generateValidationSchema from 'hooks/usevalid';
+import editValidationSchema from 'hooks/useEditValid';
 import _ from 'lodash-es';
 import { Validas, Rows } from 'types/template';
 import FormExecute from 'views/template/components/form';
@@ -108,7 +108,7 @@ const Valida = ({
     };
     const formik = Formik({
         initialValues: fn(_.cloneDeep(variables)),
-        validationSchema: generateValidationSchema(_.cloneDeep(variables), true, true),
+        validationSchema: editValidationSchema(_.cloneDeep(variables)),
         onSubmit: () => {}
     });
     const [expanded, setExpanded] = useState<string | false>('panel1');

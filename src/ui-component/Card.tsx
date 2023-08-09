@@ -173,7 +173,7 @@ const Cards = ({ flag = false }) => {
                             {userInfo?.userLevel !== 'pro' && (
                                 <Button
                                     onClick={() => {
-                                        navigate('/subscribe');
+                                        navigate('/exchange');
                                     }}
                                     size="small"
                                     variant="contained"

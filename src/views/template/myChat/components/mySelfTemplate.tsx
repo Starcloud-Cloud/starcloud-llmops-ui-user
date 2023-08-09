@@ -40,11 +40,11 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                     <Box onClick={() => setOpenNew(true)} display="flex" alignItems="center">
                         <AddCircleIcon className="text-[80px]" />
                         <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
-                            <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
+                            <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">
                                 {t('chat.createRobot')}
                             </Typography>
                             <Typography
-                                sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
+                                sx={{ lineHeight: '1.2rem' }}
                                 className="cursor desc"
                                 variant="body2"
                                 component="div"
@@ -74,12 +74,12 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                 />
                                 <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
                                     <Tooltip title={data.name}>
-                                        <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
+                                        <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">
                                             {data?.name}
                                         </Typography>
                                     </Tooltip>
                                     <Typography
-                                        sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
+                                        sx={{ lineHeight: '1.2rem' }}
                                         className="cursor desc"
                                         variant="body2"
                                         component="div"
@@ -88,19 +88,19 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                         {data.description}
                                     </Typography>
                                     <div className="flex justify-end absolute bottom-3 left-[155px]">
-                                        <div className="flex items-center text-[#666] text-xs hover:text-[#6839b7]">
-                                            <ModeEditIcon className=" text-xs" />
+                                        <div className="flex items-center text-[#666] text-sm hover:text-[#6839b7]">
+                                            <ModeEditIcon className="text-sm" />
                                             <span>编辑</span>
                                         </div>
                                         <div
-                                            className="flex items-center text-[#666] ml-3 text-xs hover:text-[#6839b7]"
+                                            className="flex items-center text-[#666] ml-3 text-sm hover:text-[#6839b7]"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setDialogOpen(true);
                                                 setCurrentUid(data.uid);
                                             }}
                                         >
-                                            <DeleteIcon className="text-xs" />
+                                            <DeleteIcon className="text-sm" />
                                             <span>删除</span>
                                         </div>
                                     </div>

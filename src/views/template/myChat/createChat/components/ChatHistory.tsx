@@ -25,8 +25,6 @@ interface ChartHistoryProps {
 const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
 
-    console.log(data, 'data');
-
     return (
         <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>

@@ -1,6 +1,7 @@
 import CleaningServicesSharpIcon from '@mui/icons-material/CleaningServicesSharp';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
+import PendingIcon from '@mui/icons-material/Pending';
 import SendIcon from '@mui/icons-material/Send';
 import {
     Card,
@@ -182,7 +183,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         if (isFetch && scrollRef?.current) {
             const scrollContainer = scrollRef.current;
             const contentElement = contentRef.current;
-            console.log(contentElement.scrollHeight);
             scrollContainer.scrollTop = contentElement.scrollHeight;
         }
     });
@@ -277,14 +277,20 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 });
                 outerJoins = joins;
             }
-        } catch (e) {
+        } catch (e: any) {
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
-            copyData[copyData.length - 1].answer = '机器人异常，请重试';
+            if (e.message === 'Request timeout') {
+                copyData[copyData.length - 1].answer = '机器人超时，请重试';
+            } else {
+                copyData[copyData.length - 1].answer = '机器人异常，请重试';
+            }
             copyData[copyData.length - 1].status = 'ERROR';
             dataRef.current = copyData;
             setData(copyData);
             setIsFetch(false);
             copyData[copyData.length - 1].isNew = false;
+        } finally {
+            setIsFetch(false);
         }
     };
 
@@ -384,7 +390,13 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                                 <InputAdornment position="end">
                                     {!isListening ? (
                                         <Tooltip arrow placement="top" title={'语音输入'}>
-                                            <IconButton disableRipple color={'default'} onClick={startListening} aria-label="voice">
+                                            <IconButton
+                                                disableRipple
+                                                color={'default'}
+                                                onClick={startListening}
+                                                aria-label="voice"
+                                                className="p-0"
+                                            >
                                                 <KeyboardVoiceIcon />
                                             </IconButton>
                                         </Tooltip>
@@ -402,16 +414,29 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                                     )}
                                 </InputAdornment>
                                 <InputAdornment position="end" className="relative">
-                                    <Tooltip placement="top" arrow title={'发送'}>
-                                        <IconButton
-                                            disableRipple
-                                            color={message ? 'secondary' : 'default'}
-                                            onClick={handleOnSend}
-                                            aria-label="send message"
-                                        >
-                                            <SendIcon />
-                                        </IconButton>
-                                    </Tooltip>
+                                    {isFetch ? (
+                                        <Tooltip placement="top" arrow title={'请求中'}>
+                                            <IconButton
+                                                disableRipple
+                                                color={message ? 'secondary' : 'default'}
+                                                onClick={handleOnSend}
+                                                aria-label="send message"
+                                            >
+                                                <PendingIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <Tooltip placement="top" arrow title={'发送'}>
+                                            <IconButton
+                                                disableRipple
+                                                color={message ? 'secondary' : 'default'}
+                                                onClick={handleOnSend}
+                                                aria-label="send message"
+                                            >
+                                                <SendIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
                                 </InputAdornment>
                             </>
                         }

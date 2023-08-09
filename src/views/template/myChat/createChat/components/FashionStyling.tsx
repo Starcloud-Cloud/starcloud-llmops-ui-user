@@ -22,12 +22,13 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { getAvatarList, getVoiceList, testSpeakerSSE } from 'api/chat';
+import { getAvatarList, getVoiceList } from 'api/chat';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { getAccessToken } from 'utils/auth';
+import { v4 as uuidv4 } from 'uuid';
 import { IChatInfo } from '../index';
 
 const uploadButton = (
@@ -89,86 +90,7 @@ const VoiceModal = ({
         return item?.StyleList || [];
     }, [list, name]);
 
-    const handleTest = async () => {
-        try {
-            // const response = await fetch('http://www.w3schools.com/html/horse.mp3');
-            let response: any = await testSpeakerSSE({
-                shortName: 'zh-CN-YunyeNeural'
-                // prosodyRate: 'CHAT_TEST',
-                // prosodyPitch,
-            });
-            console.log(response);
-            const arrayBuffer = await response.arrayBuffer();
-            console.log(arrayBuffer);
-            // const response = await axios({
-            //     method: 'post',
-            //     url: 'http://www.w3schools.com/html/horse.mp3',
-            //     responseType: 'arraybuffer'
-            // });
-
-            const audioContext = new window.AudioContext();
-            if (audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
-
-            // 将ArrayBuffer转换为AudioBuffer
-            audioContext.decodeAudioData(
-                // response.data,
-                arrayBuffer,
-                (buffer) => {
-                    // 创建AudioBufferSourceNode
-                    const sourceNode = audioContext.createBufferSource();
-                    sourceNode.buffer = buffer;
-                    // 连接节点到扬声器
-                    sourceNode.connect(audioContext.destination);
-                    // 播放音频
-                    sourceNode.start();
-                },
-                (error) => {
-                    console.error('解码音频数据时出错：', error);
-                }
-            );
-        } catch (error) {
-            console.error('播放音频时出错：', error);
-        }
-
-        // let resp: any = await testSpeakerSSE({
-        //     shortName: 'zh-CN-YunyeNeural'
-        //     // prosodyRate: 'CHAT_TEST',
-        //     // prosodyPitch,
-        // });
-        // const reader = resp.getReader();
-        // let outerJoins: any;
-        // while (1) {
-        //     let joins = outerJoins;
-        //     const { done, value } = await reader.read();
-        //     if (done) {
-        //         console.log('done');
-        //         break;
-        //     }
-        //     // 创建AudioContext对象
-        //     const audioContext = new window.AudioContext();
-        //     const uint8Array = new Uint8Array(value);
-        //     const arrayBuffer = uint8Array.buffer;
-        //     // 将ArrayBuffer转换为AudioBuffer
-        //     audioContext.decodeAudioData(
-        //         arrayBuffer,
-        //         (buffer) => {
-        //             // 创建AudioBufferSourceNode
-        //             const sourceNode = audioContext.createBufferSource();
-        //             sourceNode.buffer = buffer;
-        //             // 连接节点到扬声器
-        //             sourceNode.connect(audioContext.destination);
-        //             // 播放音频
-        //             sourceNode.start();
-        //         },
-        //         (error) => {
-        //             console.error('解码音频数据时出错：', error);
-        //         }
-        //     );
-        //     outerJoins = joins;
-        // }
-    };
+    const handleTest = async () => {};
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -412,10 +334,9 @@ export const FashionStyling = ({
     // 获取头像列表和初始头像回显(只有第一次)
     useEffect(() => {
         if (isFirst && chatBotInfo.defaultImg) {
-            console.log(2);
             (async () => {
                 const res = await getAvatarList();
-                setAvatarList([chatBotInfo.defaultImg, ...res]);
+                setAvatarList([chatBotInfo.defaultImg, ...res.map((item: string, index: number) => `${item}?index=${uuidv4()}`)]);
                 setIsFirst(false);
             })();
         }
@@ -460,7 +381,7 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>
-                        <div className={'mt-1 flex items-center'}>
+                        <div className={'pt-2 flex items-center xs:overflow-x-auto sm:overflow-x-hidden hover:overflow-x-auto'}>
                             <Upload
                                 maxCount={1}
                                 action={`${process.env.REACT_APP_BASE_URL}${
@@ -488,8 +409,8 @@ export const FashionStyling = ({
                                             });
                                         }}
                                         key={index}
-                                        className={`w-[102px] h-[102px]  rounded-lg object-fill cursor-pointer mr-[8px] mb-[8px] hover:outline hover:outline-offset-2 hover:outline-2 hover:outline-[#673ab7] ${
-                                            chatBotInfo.avatar === item ? 'outline outline-offset-2 outline-2 outline-[#673ab7]' : ''
+                                        className={`w-[102px] h-[102px]  rounded-lg object-fill cursor-pointer mr-[8px] mb-[8px] hover:outline hover:outline-offset-2 hover:outline-1 hover:outline-[#673ab7] ${
+                                            chatBotInfo.avatar === item ? 'outline outline-offset-2 outline-1 outline-[#673ab7]' : ''
                                         }`}
                                         src={item}
                                     />
@@ -503,9 +424,7 @@ export const FashionStyling = ({
                             <Switch
                                 color={'secondary'}
                                 checked={chatBotInfo.enableIntroduction}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    console.log(value, 'value');
+                                onChange={() => {
                                     setChatBotInfo({ ...chatBotInfo, enableIntroduction: !chatBotInfo.enableIntroduction });
                                 }}
                             />

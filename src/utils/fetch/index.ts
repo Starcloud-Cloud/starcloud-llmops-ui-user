@@ -20,7 +20,7 @@ export default function fetchRequest(url: string, method: string, body: any, hea
         const timer = setTimeout(() => {
             controller.abort(); // 请求超时时中断请求
             reject(new Error('Request timeout'));
-        }, 1000 * 60);
+        }, 1000 * 60 * 3);
 
         fetch(base_url + url, { ...options, signal })
             .then((response) => {

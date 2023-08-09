@@ -32,6 +32,7 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
+import AppAnalysis from './appAnalysis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
@@ -400,7 +401,8 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
+                <Tab label="应用分析" {...a11yProps(2)} />
+                <Tab label={t('myApp.upload')} {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -532,6 +534,9 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
+                <AppAnalysis />
+            </TabPanel>
+            <TabPanel value={value} index={3}>
                 <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />
             </TabPanel>
         </Card>

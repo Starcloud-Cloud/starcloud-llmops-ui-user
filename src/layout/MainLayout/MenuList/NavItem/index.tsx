@@ -8,6 +8,7 @@ import StarsIcon from '@mui/icons-material/Stars';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import ImageIcon from '@mui/icons-material/Image';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -47,7 +48,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         SelfImprovementIcon,
         CurrencyExchangeIcon,
         UpgradeIcon,
-        ImageIcon
+        SmartToyIcon
     };
     const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
 

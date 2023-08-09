@@ -34,6 +34,7 @@ export function a11yProps(index: number) {
 export type IChatInfo = {
     name?: string;
     avatar?: string;
+    uid?: string;
     prePrompt?: string;
     statement?: string; // 欢迎语
     temperature?: number;
@@ -163,7 +164,7 @@ function CreateDetail() {
                     <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={2}>
-                    <Knowledge />
+                    {detail?.uid && <Knowledge datasetId={detail.uid} />}
                 </TabPanel>
                 <TabPanel value={value} index={3}>
                     <Skill />

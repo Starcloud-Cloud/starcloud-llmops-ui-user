@@ -41,12 +41,15 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     // 删除
                     matchResult.forEach((v) => {
                         setRegulationText(regulationText.replace(`${v}\n`, ''));
+                        setRegulationText(regulationText.replace(v, ''));
                     });
                 } else {
+                    console.log(matchResult, 'matchResult');
                     // 替换
                     regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
                         regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
                     setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 }
@@ -71,7 +74,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     // 替换
                     regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
-                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}`, '');
                     });
                     setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 }
@@ -160,7 +163,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         {startCheck && !regulationText ? (
                             <div className="text-[#f44336]">请输入角色描述</div>
                         ) : (
-                            <div>机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
+                            <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
                         )}
                         <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/800</div>
                     </div>

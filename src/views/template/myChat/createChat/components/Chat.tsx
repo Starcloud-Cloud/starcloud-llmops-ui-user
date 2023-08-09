@@ -17,8 +17,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React, { useEffect, useRef } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
 import { t } from '../../../../../hooks/web/useI18n';
@@ -72,6 +71,7 @@ type IConversation = {
 export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
+    const contentRef: any = useRef(null);
     const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -83,6 +83,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const [data, setData] = React.useState<IHistory[]>([]);
     const [time, setTime] = React.useState(1);
     const [isFirst, setIsFirst] = React.useState(true);
+    const [isFetch, setIsFetch] = useState(false);
 
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
@@ -177,10 +178,12 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         };
     }, []);
 
-    React.useLayoutEffect(() => {
-        if (scrollRef?.current) {
-            // @ts-ignore
-            scrollRef.current.scrollIntoView();
+    React.useEffect(() => {
+        if (isFetch && scrollRef?.current) {
+            const scrollContainer = scrollRef.current;
+            const contentElement = contentRef.current;
+            console.log(contentElement.scrollHeight);
+            scrollContainer.scrollTop = contentElement.scrollHeight;
         }
     });
 
@@ -213,68 +216,25 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         const newData = [...data, newMessage];
         dataRef.current = newData;
         setData(newData);
-
-        let resp: any = await messageSSE({
-            appUid: appId,
-            scene: 'CHAT_TEST',
-            conversationUid,
-            query: message
-        });
-        const reader = resp.getReader();
-        const textDecoder = new TextDecoder();
-        let outerJoins: any;
-        while (1) {
-            let joins = outerJoins;
-            const { done, value } = await reader.read();
-            if (textDecoder.decode(value).includes('2008002007')) {
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: t('market.error'),
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                );
-                return;
-            }
-            if (done) {
-                const copyData = [...dataRef.current];
-                copyData[dataRef.current.length - 1].isNew = false;
-                setData(copyData);
-                break;
-            }
-            let str = textDecoder.decode(value);
-            const lines = str.split('\n');
-            lines.forEach((messages, i: number) => {
-                if (i === 0 && joins) {
-                    messages = joins + messages;
-                    joins = undefined;
-                }
-                if (i === lines.length - 1) {
-                    if (messages && messages.indexOf('}') === -1) {
-                        joins = messages;
-                        return;
-                    }
-                }
-                let bufferObj;
-                if (messages?.startsWith('data:')) {
-                    bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                }
-                if (bufferObj?.code === 200) {
-                    setConversationUid(bufferObj.conversationUId);
-                    const copyData = [...dataRef.current]; // 使用dataRef.current代替data
-                    copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                    copyData[copyData.length - 1].isNew = true;
-                    dataRef.current = copyData;
-                    setData(copyData);
-                } else if (bufferObj && bufferObj.code !== 200) {
+        setIsFetch(true);
+        try {
+            let resp: any = await messageSSE({
+                appUid: appId,
+                scene: 'CHAT_TEST',
+                conversationUid,
+                query: message
+            });
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            let outerJoins: any;
+            while (1) {
+                let joins = outerJoins;
+                const { done, value } = await reader.read();
+                if (textDecoder.decode(value).includes('2008002007')) {
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: t('market.warning'),
+                            message: t('market.error'),
                             variant: 'alert',
                             alert: {
                                 color: 'error'
@@ -282,9 +242,57 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                             close: false
                         })
                     );
+                    return;
                 }
-            });
-            outerJoins = joins;
+                if (done) {
+                    const copyData = [...dataRef.current];
+                    copyData[dataRef.current.length - 1].isNew = false;
+                    setData(copyData);
+                    setIsFetch(false);
+                    break;
+                }
+                let str = textDecoder.decode(value);
+                const lines = str.split('\n');
+                lines.forEach((messages, i: number) => {
+                    if (i === 0 && joins) {
+                        messages = joins + messages;
+                        joins = undefined;
+                    }
+                    if (i === lines.length - 1) {
+                        if (messages && messages.indexOf('}') === -1) {
+                            joins = messages;
+                            return;
+                        }
+                    }
+                    let bufferObj;
+                    if (messages?.startsWith('data:')) {
+                        bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                    }
+                    if (bufferObj?.code === 200) {
+                        setConversationUid(bufferObj.conversationUid);
+                        const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+                        copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+                        copyData[copyData.length - 1].isNew = true;
+                        dataRef.current = copyData;
+                        setData(copyData);
+                    } else if (bufferObj && bufferObj.code !== 200) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.warning'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                close: false
+                            })
+                        );
+                    }
+                });
+                outerJoins = joins;
+            }
+        } catch (e) {
+            setIsFetch(false);
         }
     };
 
@@ -321,23 +329,24 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <PerfectScrollbar style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden', minHeight: 525 }}>
-                {chatBotInfo.enableIntroduction && (
-                    <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
-                        <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
-                        <div className="flex flex-col ml-3">
-                            <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
-                            <Typography align="left" variant="subtitle2" color={'#000'}>
-                                {chatBotInfo.introduction}
-                            </Typography>
-                        </div>
-                    </Card>
-                )}
-                <CardContent>
-                    <ChatHistory theme={theme} data={data} />
-                    {/* <span ref={scrollRef}></span> */}
-                </CardContent>
-            </PerfectScrollbar>
+            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden', minHeight: 525 }} ref={scrollRef}>
+                <div ref={contentRef}>
+                    {chatBotInfo.enableIntroduction && (
+                        <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
+                            <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                            <div className="flex flex-col ml-3">
+                                <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
+                                <Typography align="left" variant="subtitle2" color={'#000'}>
+                                    {chatBotInfo.introduction}
+                                </Typography>
+                            </div>
+                        </Card>
+                    )}
+                    <CardContent>
+                        <ChatHistory theme={theme} data={data} />
+                    </CardContent>
+                </div>
+            </div>
             <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
                 <Grid item>
                     <Grid item>

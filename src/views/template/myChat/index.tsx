@@ -65,6 +65,7 @@ function MyTemplate() {
     const [open, setOpen] = useState(false);
     const [robotName, setRobotName] = useState('');
     const [currentRow, setCurrentRow] = useState<any>(null);
+    const [update, setUpdate] = useState(0);
 
     const [queryParams, setQueryParams] = useState<{ name: string }>({
         name: ''
@@ -103,7 +104,7 @@ function MyTemplate() {
             setNewApp(res.list.slice(0, pageQuery.pageSize));
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [update]);
 
     const paginationChange = (event: any, value: number) => {
         setPageQuery({
@@ -171,7 +172,7 @@ function MyTemplate() {
                     <Typography variant="h3" my={2}>
                         {t('chat.myRobot')}
                     </Typography>
-                    <MyselfTemplate appList={newAppList} />
+                    <MyselfTemplate appList={newAppList} setUpdate={setUpdate} />
                     <Box my={2}>
                         <Pagination page={pageQuery.pageNo} count={Math.ceil(totals / pageQuery.pageSize)} onChange={paginationChange} />
                     </Box>

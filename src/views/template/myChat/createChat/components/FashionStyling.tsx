@@ -424,14 +424,11 @@ export const FashionStyling = ({
     // 上传头像之后头像列表
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
-            console.log(3);
             setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
             // 把fileList清空
             setFileList([]);
         }
     }, [fileList]);
-
-    console.log(avatarList, fileList);
 
     return (
         <>

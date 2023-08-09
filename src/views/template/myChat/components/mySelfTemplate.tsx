@@ -1,17 +1,18 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { createChat, deleteApp } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import marketStore from 'store/market';
 import { Item } from 'types/template';
+import { Confirm } from 'ui-component/Confirm';
 import SubCard from 'ui-component/cards/SubCard';
 import FormDialogNew from './FormDialogNew';
 import './textnoWarp.scss';
-function MyselfTemplate({ appList }: { appList: Item[] }) {
+function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (pre: any) => any }) {
     const navigate = useNavigate();
     const { categoryList } = marketStore();
     const [openNew, setOpenNew] = useState(false);
@@ -21,6 +22,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
 
     const handleDelete = async () => {
         const res = await deleteApp(currentUid);
+        setUpdate((pre: any) => pre + 1);
         setDialogOpen(false);
         setCurrentUid('');
     };
@@ -40,6 +42,15 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                         <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col justify-around">
                             <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
                                 {t('chat.createRobot')}
+                            </Typography>
+                            <Typography
+                                sx={{ fontSize: '.8rem', lineHeight: '1.2rem' }}
+                                className="cursor desc"
+                                variant="body2"
+                                component="div"
+                                lineHeight={1.2}
+                            >
+                                快速创建一个属于自己的机器人🤖️！
                             </Typography>
                         </Box>
                     </Box>
@@ -76,20 +87,22 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                     >
                                         {data.description}
                                     </Typography>
-                                    <div className="flex justify-end absolute bottom-3 right-3">
-                                        <Tooltip title="编辑" arrow>
+                                    <div className="flex justify-end absolute bottom-3 left-[155px]">
+                                        <div className="flex items-center text-[#666] text-base">
                                             <ModeEditIcon className="text-[#666] text-base" />
-                                        </Tooltip>
-                                        <Tooltip title="删除" arrow>
-                                            <DeleteIcon
-                                                className="text-base  text-[#666] ml-2"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDialogOpen(true);
-                                                    setCurrentUid(data.uid);
-                                                }}
-                                            />
-                                        </Tooltip>
+                                            <span>编辑</span>
+                                        </div>
+                                        <div
+                                            className="flex items-center text-[#666] text-base  ml-3"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDialogOpen(true);
+                                                setCurrentUid(data.uid);
+                                            }}
+                                        >
+                                            <DeleteIcon className="text-base  text-[#666]" />
+                                            <span>删除</span>
+                                        </div>
                                     </div>
                                     {/* <Tooltip title={data.description}>
                                     <Typography noWrap variant="body2">
@@ -121,7 +134,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                 setValue={setRobotName}
                 value={robotName}
             />
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} aria-labelledby="form-dialog-title">
+            {/* <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">提醒</DialogTitle>
                 <DialogContent>
                     <div className="text-lg w-[240px]">确认删除该机器人？</div>
@@ -132,7 +145,17 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                         确认
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
+            <Confirm
+                handleOk={() => handleDelete()}
+                open={dialogOpen}
+                handleClose={() => {
+                    setDialogOpen(false);
+                    setCurrentUid('');
+                }}
+                title="提醒"
+                content="确认删除该机器人？"
+            />
         </Grid>
     );
 }

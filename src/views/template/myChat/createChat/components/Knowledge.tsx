@@ -1,10 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/Article';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/EditTwoTone';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LinkIcon from '@mui/icons-material/Link';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import {
@@ -35,7 +40,6 @@ import { gridSpacing } from 'store/constant';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Confirm } from 'ui-component/Confirm';
-import { LoadingSpin } from 'ui-component/LoadingSpin';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
 import * as yup from 'yup';
@@ -490,10 +494,12 @@ interface DetaData {
 const DetailModal = ({
     detailOpen,
     uid,
+    dataType,
     datasetId,
     detailClose
 }: {
     detailOpen: boolean;
+    dataType: string | undefined;
     uid: string | undefined;
     datasetId: string;
     detailClose: () => void;
@@ -528,12 +534,13 @@ const DetailModal = ({
                 }
             >
                 <CardContent>
-                    <Typography variant="h4">Title</Typography>
-                    <TextField value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
+                    <Typography variant="h4">{dataType && dataType === 'DOCUMENT' ? 'Title' : 'Link'}</Typography>
+                    <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
                     <Typography mt={4} mb={2} variant="h4">
                         Summary
                     </Typography>
                     <TextField
+                        disabled
                         value={detaData.summaryContent}
                         multiline
                         minRows={6}
@@ -568,6 +575,7 @@ export type typeDocumentChild = {
     status?: any;
     wordCount: number;
     tokens?: any;
+    summaryContent?: string;
     dataType: string;
 };
 
@@ -592,10 +600,24 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
             clearInterval(timeoutRef.current);
             clearTimeout(InterRef.current);
             const res = await getDatasetSource({ datasetId });
-            if (!res.every((value: { status: number }) => value.status === 99)) {
+            if (
+                !res.every(
+                    (value: { status: string }) =>
+                        value.status === '99' || value.status === '35' || value.status === '45' || value.status === '55'
+                )
+            ) {
                 InterRef.current = setInterval(() => {
                     getDatasetSource({ datasetId }).then((response) => {
                         setDocumentList(response);
+                        if (
+                            response.every(
+                                (value: { status: string }) =>
+                                    value.status === '99' || value.status === '35' || value.status === '45' || value.status === '55'
+                            )
+                        ) {
+                            clearInterval(timeoutRef.current);
+                            clearTimeout(InterRef.current);
+                        }
                     });
                 }, 10000);
                 timeoutRef.current = setTimeout(() => {
@@ -664,7 +686,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     background:
                                                         theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50]
                                                 }}
-                                                contentSX={{ p: '20px important' }}
+                                                contentSX={{ p: '10px !important' }}
                                             >
                                                 <Grid
                                                     onClick={() => {
@@ -695,18 +717,42 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             </Grid>
 
                                                             <Grid item>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    sx={{ mt: -0.75, mr: -0.75 }}
-                                                                    aria-label="more-options"
-                                                                    onClick={(event) => {
-                                                                        event.stopPropagation();
-                                                                        setOpenConfirm(true);
-                                                                        setCurrent(item);
+                                                                <Dropdown
+                                                                    trigger={['click']}
+                                                                    menu={{
+                                                                        items: [
+                                                                            {
+                                                                                key: '1',
+                                                                                label: (
+                                                                                    <Box
+                                                                                        onClick={(event) => {
+                                                                                            event.stopPropagation();
+                                                                                            setOpenConfirm(true);
+                                                                                            setCurrent(item);
+                                                                                        }}
+                                                                                        color="error"
+                                                                                        display="flex"
+                                                                                        alignItems="center"
+                                                                                    >
+                                                                                        <DeleteIcon color="error" /> 删除
+                                                                                    </Box>
+                                                                                )
+                                                                            }
+                                                                        ]
                                                                     }}
+                                                                    placement="bottom"
+                                                                    arrow={{ pointAtCenter: true }}
                                                                 >
-                                                                    <DeleteOutlineIcon />
-                                                                </IconButton>
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        sx={{ mt: -0.75, mr: -0.75 }}
+                                                                        onClick={(event) => {
+                                                                            event.stopPropagation();
+                                                                        }}
+                                                                    >
+                                                                        <MoreHorizIcon />
+                                                                    </IconButton>
+                                                                </Dropdown>
                                                             </Grid>
                                                         </Grid>
                                                     </Grid>
@@ -722,15 +768,31 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             component="div"
                                                             color={'#0006'}
                                                         >
-                                                            这里是答案这里是答案这里是答案这里是答案这里是答案这里是答案这里是答案这里是答案这里案这里是答案这里是答案这里案这里是答案这里是答案这里案这里是答案这里是答案这里案这里是答案这里是答案这里
+                                                            {item?.summaryContent}
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={12} className="!pt-[10px]">
                                                         <Divider variant="fullWidth" />
                                                     </Grid>
-                                                    <Grid item xs={12} className="!pt-[10px] flex items-center">
-                                                        {item.status !== 99 ? (
-                                                            <LoadingSpin />
+                                                    <Grid
+                                                        item
+                                                        xs={12}
+                                                        className="!pt-[10px] flex items-center"
+                                                        sx={{ alignContent: 'center' }}
+                                                    >
+                                                        {item.status === '35' || item.status === '45' || item.status === '55' ? (
+                                                            <HighlightOffIcon
+                                                                sx={{
+                                                                    color: 'error.dark',
+                                                                    width: 14,
+                                                                    height: 14
+                                                                }}
+                                                            />
+                                                        ) : item.status !== 99 ? (
+                                                            <LoadingOutlined
+                                                                style={{ fontSize: '14px', color: '#673ab7' }}
+                                                                rev={undefined}
+                                                            />
                                                         ) : (
                                                             <CheckCircleIcon
                                                                 sx={{
@@ -740,7 +802,31 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 }}
                                                             />
                                                         )}
-                                                        <Typography variant="caption">From Custom Input</Typography>
+                                                        <Typography ml={1} variant="caption">
+                                                            {item.status > '20' && item.status <= '30'
+                                                                ? '数据同步中'
+                                                                : item.status === '31'
+                                                                ? '数据清洗中'
+                                                                : item.status === '35'
+                                                                ? '数据清洗失败'
+                                                                : item.status === '40'
+                                                                ? '数据清洗完成'
+                                                                : item.status === '41'
+                                                                ? '数据分割中'
+                                                                : item.status === '45'
+                                                                ? '数据分割失败'
+                                                                : item.status === '50'
+                                                                ? '数据分割成功'
+                                                                : item.status === '51'
+                                                                ? '正在创建索引'
+                                                                : item.status === '55'
+                                                                ? '创建索引失败'
+                                                                : item.status === '60'
+                                                                ? '创建索引完成'
+                                                                : item.status === '99'
+                                                                ? '完成'
+                                                                : null}
+                                                        </Typography>
                                                     </Grid>
                                                 </Grid>
                                             </SubCard>
@@ -875,7 +961,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                 />
             )}
             {detailOpen && (
-                <DetailModal detailOpen={detailOpen} datasetId={datasetId} uid={current?.uid} detailClose={() => setDetailOpen(false)} />
+                <DetailModal
+                    detailOpen={detailOpen}
+                    dataType={current?.dataType}
+                    datasetId={datasetId}
+                    uid={current?.uid}
+                    detailClose={() => setDetailOpen(false)}
+                />
             )}
         </div>
     );

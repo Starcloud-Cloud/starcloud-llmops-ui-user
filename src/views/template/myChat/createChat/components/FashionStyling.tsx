@@ -488,9 +488,8 @@ export const FashionStyling = ({
                                             });
                                         }}
                                         key={index}
-                                        style={chatBotInfo.avatar === item ? { border: '1px solid #673ab7' } : {}}
-                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:outline-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
-                                            chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
+                                        className={`w-[102px] h-[102px]  rounded-lg object-fill cursor-pointer mr-[8px] mb-[8px] hover:outline hover:outline-offset-2 hover:outline-2 hover:outline-[#673ab7] ${
+                                            chatBotInfo.avatar === item ? 'outline outline-offset-2 outline-2 outline-[#673ab7]' : ''
                                         }`}
                                         src={item}
                                     />

@@ -69,12 +69,14 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     // 删除
                     matchResult.forEach((v) => {
                         setRegulationText(regulationText.replace(`${v}\n`, ''));
+                        setRegulationText(regulationText.replace(v, ''));
                     });
                 } else {
                     // 替换
                     regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
-                        regulationTextRef.current = regulationTextRef.current.replace(`${v}`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
                     setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 }
@@ -97,6 +99,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     if (Array.isArray(matchedText)) {
                         matchedText.forEach((v) => {
                             setRegulationText(regulationText.replace(`${v}\n`, ''));
+                            setRegulationText(regulationText.replace(v, ''));
                         });
                     } else {
                         setRegulationText(regulationText.replace(matchedText, ''));
@@ -106,6 +109,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         regulationTextRef.current = regulationText;
                         matchedText.forEach((v) => {
                             regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                            regulationTextRef.current = regulationTextRef.current.replace(v, '');
                         });
                         setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                     } else {

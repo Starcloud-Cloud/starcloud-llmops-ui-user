@@ -196,7 +196,7 @@ function CreateDetail() {
                     action={
                         (value === 0 || value === 1) && (
                             <Button
-                                className="right-[25px] top-[150px] absolute z-50"
+                                className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
                                 color="secondary"
                                 autoFocus

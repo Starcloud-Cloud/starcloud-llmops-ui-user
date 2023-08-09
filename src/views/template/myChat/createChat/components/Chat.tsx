@@ -230,20 +230,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
-                    return;
-                }
                 if (done) {
                     const copyData = [...dataRef.current];
                     copyData[dataRef.current.length - 1].isNew = false;
@@ -292,7 +278,13 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 outerJoins = joins;
             }
         } catch (e) {
+            const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+            copyData[copyData.length - 1].answer = '机器人异常，请重试';
+            copyData[copyData.length - 1].status = 'ERROR';
+            dataRef.current = copyData;
+            setData(copyData);
             setIsFetch(false);
+            copyData[copyData.length - 1].isNew = false;
         }
     };
 

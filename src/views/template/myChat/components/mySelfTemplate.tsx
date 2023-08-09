@@ -39,7 +39,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                 <SubCard sx={{ height: 150, cursor: 'pointer' }}>
                     <Box onClick={() => setOpenNew(true)} display="flex" alignItems="center">
                         <AddCircleIcon className="text-[80px]" />
-                        <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col justify-around">
+                        <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
                             <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
                                 {t('chat.createRobot')}
                             </Typography>
@@ -72,7 +72,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                     src={data?.images?.[0]}
                                     alt="icon"
                                 />
-                                <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col justify-around">
+                                <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
                                     <Tooltip title={data.name}>
                                         <Typography variant="h3" noWrap mb={0.5} className="text-[#0009]">
                                             {data?.name}
@@ -88,19 +88,19 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                         {data.description}
                                     </Typography>
                                     <div className="flex justify-end absolute bottom-3 left-[155px]">
-                                        <div className="flex items-center text-[#666] text-base">
-                                            <ModeEditIcon className="text-[#666] text-base" />
+                                        <div className="flex items-center text-[#666] text-xs hover:text-[#6839b7]">
+                                            <ModeEditIcon className=" text-xs" />
                                             <span>编辑</span>
                                         </div>
                                         <div
-                                            className="flex items-center text-[#666] text-base  ml-3"
+                                            className="flex items-center text-[#666] ml-3 text-xs hover:text-[#6839b7]"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setDialogOpen(true);
                                                 setCurrentUid(data.uid);
                                             }}
                                         >
-                                            <DeleteIcon className="text-base  text-[#666]" />
+                                            <DeleteIcon className="text-xs" />
                                             <span>删除</span>
                                         </div>
                                     </div>

@@ -25,6 +25,8 @@ interface ChartHistoryProps {
 const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
 
+    console.log(data, 'data');
+
     return (
         <Grid item xs={12}>
             <Grid container spacing={gridSpacing}>
@@ -140,7 +142,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                             <div className="flex flex-col">
                                                 <Card
                                                     sx={{
-                                                        display: 'inline-block'
+                                                        display: 'inline-block',
+                                                        width: 'fit-content'
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
@@ -148,7 +151,12 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
-                                                                    <Typography variant="body2">{history.answer}</Typography>
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        color={history.status === 'ERROR' ? 'red' : ''}
+                                                                    >
+                                                                        {history.answer}
+                                                                    </Typography>
                                                                 ) : (
                                                                     <LoadingDot />
                                                                 )}

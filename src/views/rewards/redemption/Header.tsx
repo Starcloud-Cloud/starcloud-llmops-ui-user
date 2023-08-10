@@ -147,6 +147,7 @@ const RedemptionHeader = () => {
                                             fullWidth
                                             onClick={handleRedeem}
                                             sx={{
+                                                width: '109px',
                                                 height: '100%',
                                                 boxShadow: theme.customShadows.primary,
                                                 ':hover': {

@@ -1,5 +1,5 @@
 // material-ui
-import { Avatar, Box, FormControlLabel, Switch, useMediaQuery } from '@mui/material';
+import { Avatar, Box, Button, FormControlLabel, Switch, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -18,6 +18,8 @@ import { openDrawer } from 'store/slices/menu';
 
 // assets
 import { IconMenu2 } from '@tabler/icons';
+import { t } from 'hooks/web/useI18n';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -26,6 +28,7 @@ const Header = () => {
     const { navType, onChangeMenuType } = useConfig();
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
+    const navigate = useNavigate();
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const { layout } = useConfig();
@@ -78,6 +81,18 @@ const Header = () => {
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />
             </Box> */}
+            <Button
+                className="mr-10"
+                color={'secondary'}
+                size={'small'}
+                variant="contained"
+                sx={{ boxShadow: 'none' }}
+                onClick={() => {
+                    navigate('/exchange');
+                }}
+            >
+                {t('EntitlementCard.ppFreegrades')}
+            </Button>
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <FormControlLabel

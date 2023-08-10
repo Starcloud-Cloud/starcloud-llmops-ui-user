@@ -485,23 +485,24 @@ export const Knowledge = () => {
                     </span>
                     <div className={'mt-3'}>
                         <MainCard>
-                            <Popover
-                                content={
-                                    <div className="flex justify-start items-center flex-col">
-                                        <div className="text-sm text-center">
-                                            <div>功能正在封闭测试中。</div>
-                                            <div>可联系我们产品顾问进一步了解，并获得提前免费使用的权利。</div>
-                                        </div>
-                                        <img className="w-40" src={workWechatPay} alt="" />
-                                    </div>
-                                }
-                                trigger="hover"
+                            <Grid
+                                container
+                                direction="row"
+                                spacing={gridSpacing}
+                                className={'h-[220px] flex justify-center items-center flex-col cursor-pointer'}
                             >
-                                <Grid
-                                    container
-                                    direction="row"
-                                    spacing={gridSpacing}
-                                    className={'h-[220px] flex justify-center items-center flex-col cursor-pointer'}
+                                <Popover
+                                    content={
+                                        <div className="flex justify-start items-center flex-col">
+                                            <div className="text-sm text-center w-[330px]">
+                                                <div>功能正在封闭测试中。</div>
+                                                <div>可联系我们产品顾问进一步了解，</div>
+                                                <div>并获得提前免费使用的权利。</div>
+                                            </div>
+                                            <img className="w-40" src={workWechatPay} alt="" />
+                                        </div>
+                                    }
+                                    trigger="hover"
                                 >
                                     <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
                                         <path
@@ -510,9 +511,9 @@ export const Knowledge = () => {
                                             p-id="6181"
                                         ></path>
                                     </svg>
-                                    <div className="text-base">即将推出</div>
-                                </Grid>
-                            </Popover>
+                                </Popover>
+                                <div className="text-base">即将推出</div>
+                            </Grid>
                         </MainCard>
                     </div>
                 </div>
@@ -527,23 +528,24 @@ export const Knowledge = () => {
                 </span>
                 <div className={'mt-3'}>
                     <MainCard>
-                        <Popover
-                            content={
-                                <div className="flex justify-start items-center flex-col">
-                                    <div className="text-sm text-center">
-                                        <div>功能正在封闭测试中。</div>
-                                        <div>可联系我们产品顾问进一步了解，并获得提前免费使用的权利。</div>
-                                    </div>
-                                    <img className="w-40" src={workWechatPay} alt="" />
-                                </div>
-                            }
-                            trigger="hover"
+                        <Grid
+                            container
+                            direction="row"
+                            spacing={gridSpacing}
+                            className={'h-[220px] flex justify-center items-center flex-col cursor-pointer'}
                         >
-                            <Grid
-                                container
-                                direction="row"
-                                spacing={gridSpacing}
-                                className={'h-[220px] flex justify-center items-center flex-col cursor-pointer'}
+                            <Popover
+                                content={
+                                    <div className="flex justify-start items-center flex-col">
+                                        <div className="text-sm text-center w-[330px]">
+                                            <div>功能正在封闭测试中。</div>
+                                            <div>可联系我们产品顾问进一步了解，</div>
+                                            <div>并获得提前免费使用的权利。</div>
+                                        </div>
+                                        <img className="w-40" src={workWechatPay} alt="" />
+                                    </div>
+                                }
+                                trigger="hover"
                             >
                                 <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
                                     <path
@@ -552,9 +554,9 @@ export const Knowledge = () => {
                                         p-id="6181"
                                     ></path>
                                 </svg>
-                                <div className="text-base">即将推出</div>
-                            </Grid>
-                        </Popover>
+                            </Popover>
+                            <div className="text-base">即将推出</div>
+                        </Grid>
                     </MainCard>
                 </div>
             </div>

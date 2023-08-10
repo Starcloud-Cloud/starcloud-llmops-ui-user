@@ -18,6 +18,7 @@ import {
     Button,
     Drawer,
     Card,
+    Tooltip,
     Divider,
     Chip
 } from '@mui/material';
@@ -26,11 +27,12 @@ import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import SubCard from 'ui-component/cards/SubCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
-import { logStatistics, infoPage, logTimeType } from 'api/template';
+import { logStatistics, infoPage, logTimeType, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
+import PicModal from 'views/picture/create/Modal';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -52,6 +54,8 @@ interface TableData {
     totalElapsed: number;
     status: string;
     createTime: number;
+    errorMessage: string;
+    endUser: string;
 }
 interface Date {
     label: string;
@@ -64,10 +68,20 @@ interface Query {
     fromScene?: string;
 }
 interface Detail {
-    name: string;
-    description: string;
-    categories: string[];
-    tags: string[];
+    name?: string;
+    description?: string;
+    categories?: string[];
+    tags?: string[];
+
+    uid?: string;
+    appMode?: string;
+    appName?: string;
+    fromScene?: string;
+    status?: string;
+    errorMessage?: string;
+    endUser?: string;
+    createTime?: number;
+    imageInfo?: any;
 }
 function ApplicationAnalysis() {
     const [queryParams, setQuery] = useState<Query>({
@@ -208,7 +222,19 @@ function ApplicationAnalysis() {
 
     const categoryList = marketStore((state) => state.categoryList);
     const [open, setOpen] = useState(false);
-    const [detail, setDetail] = useState<Detail | null>(null);
+
+    // 详情
+    const [detail, setDetail] = useState<Detail[] | null>(null);
+    //图片弹框
+    const [picOpen, setPicOpen] = useState(false);
+    const [ImgDetail, setImgDetail] = useState({
+        images: [],
+        prompt: '',
+        engine: '',
+        width: 0,
+        height: 0
+    });
+    const [currentIndex, setCurrentIndex] = useState(0);
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -305,7 +331,21 @@ function ApplicationAnalysis() {
                                 <TableCell align="center">{row.status}</TableCell>
                                 <TableCell align="center">{formatDate(row.createTime)}</TableCell>
                                 <TableCell align="center">
-                                    <Button color="secondary" size="small" onClick={() => setOpen(true)}>
+                                    <Button
+                                        color="secondary"
+                                        size="small"
+                                        onClick={() => {
+                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                                detailImage(row.uid).then((res) => {
+                                                    setDetail(res);
+                                                });
+                                            } else if (row.appMode === 'COMPLETION') {
+                                                detailApp(row.uid).then((res) => {});
+                                            } else {
+                                            }
+                                            setOpen(true);
+                                        }}
+                                    >
                                         {t('generate.detail')}
                                     </Button>
                                 </TableCell>
@@ -319,31 +359,33 @@ function ApplicationAnalysis() {
             </Box>
             <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
                 <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                    {/* 应用 */}
+                    {/* <Box>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <AccessAlarm sx={{ fontSize: '70px' }} />
-                            <Box>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <AccessAlarm sx={{ fontSize: '70px' }} />
                                 <Box>
-                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                        {detail?.name}
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    {detail?.categories?.map((item: any) => (
-                                        <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item)?.name}</span>
-                                    ))}
-                                    {detail?.tags?.map((el: any) => (
-                                        <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                    ))}
+                                    <Box>
+                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                            {detail?.name}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        {detail?.categories?.map((item: any) => (
+                                            <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item)?.name}</span>
+                                        ))}
+                                        {detail?.tags?.map((el: any) => (
+                                            <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                        ))}
+                                    </Box>
                                 </Box>
                             </Box>
                         </Box>
-                    </Box>
-                    <Divider sx={{ mb: 1 }} />
-                    <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                        {detail?.description}
-                    </Typography>
-                    {/* <Perform
+                        <Divider sx={{ mb: 1 }} />
+                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                            {detail?.description}
+                        </Typography>
+                        <Perform
                         config={{}}
                         changeSon={() => {}}
                         changeanswer={() => {}}
@@ -352,9 +394,78 @@ function ApplicationAnalysis() {
                         promptChange={() => {}}
                         isallExecute={() => {}}
                         source="myApp"
-                    /> */}
+                    />
+                    </Box> */}
+                    {/* 图片 */}
+                    <Box>
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">{t('generate.mode')}</TableCell>
+                                    <TableCell align="center">{t('generate.name')}</TableCell>
+                                    <TableCell align="center">执行场景</TableCell>
+                                    <TableCell align="center">{t('generate.status')}</TableCell>
+                                    <TableCell align="center">错误消息</TableCell>
+                                    <TableCell align="center">用户</TableCell>
+                                    <TableCell align="center">{t('generate.createTime')}</TableCell>
+                                    <TableCell align="center"></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {detail?.map((row) => (
+                                    <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                        <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
+                                        <TableCell align="center">{row.appName}</TableCell>
+                                        <TableCell align="center">
+                                            {scenseList.find((item) => item.value === row.fromScene)?.label}
+                                        </TableCell>
+                                        <TableCell align="center">{row.status}</TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title={row.errorMessage}>
+                                                <Typography width="200px" noWrap>
+                                                    {row.errorMessage}
+                                                </Typography>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell align="center">{row.endUser}</TableCell>
+                                        <TableCell align="center">{formatDate(row.createTime as number)}</TableCell>
+                                        <TableCell align="center">
+                                            <Button
+                                                color="secondary"
+                                                size="small"
+                                                onClick={() => {
+                                                    setImgDetail(row.imageInfo);
+                                                    setPicOpen(true);
+                                                }}
+                                            >
+                                                {t('generate.detail')}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Box>
                 </Card>
             </Drawer>
+            {picOpen && (
+                <PicModal
+                    open={picOpen}
+                    setOpen={() => {
+                        setPicOpen(false);
+                        setCurrentIndex(0);
+                    }}
+                    currentIndex={currentIndex}
+                    setCurrentIndex={(currentIndex) => {
+                        setCurrentIndex(currentIndex);
+                    }}
+                    currentImageList={ImgDetail.images}
+                    prompt={ImgDetail.prompt}
+                    engine={ImgDetail.engine}
+                    width={ImgDetail.width}
+                    height={ImgDetail.height}
+                />
+            )}
         </Box>
     );
 }

@@ -49,6 +49,14 @@ export const logTimeType = () => {
 export const infoPage = (data: any) => {
     return request.post({ url: 'llm/app/log/infoPage', data });
 };
+//执行记录图片详情
+export const detailImage = (data: any) => {
+    return request.get({ url: 'llm/app/log/detail/image/' + data });
+};
+//执行记录执行详情
+export const detailApp = (data: any) => {
+    return request.get({ url: 'llm/app/log/detail/app/' + data });
+};
 
 //获取我的应用
 export const getApp = (data: { uid: string }) => {

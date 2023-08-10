@@ -12,6 +12,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import formatDate from 'hooks/useDate';
 import {
     Box,
     Button,
@@ -73,11 +74,23 @@ const validationSchema = yup.object({
 const transformDataType = (dataType: string) => {
     switch (dataType) {
         case 'DOCUMENT':
-            return <ArticleIcon className="text-[#5e35b1] text-base mr-2" />;
+            return (
+                <Tooltip title="TEXT">
+                    <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
+                </Tooltip>
+            );
         case 'URL':
-            return <LinkIcon className="text-[#5e35b1] text-base mr-2" />;
+            return (
+                <Tooltip title="TEXT">
+                    <LinkIcon className="text-[#5e35b1] text-base mr-2" />
+                </Tooltip>
+            );
         case 'CHARACTERS':
-            return <EditIcon className="text-[#5e35b1] text-base mr-2" />;
+            return (
+                <Tooltip title="TEXT">
+                    <EditIcon className="text-[#5e35b1] text-base mr-2" />
+                </Tooltip>
+            );
     }
 };
 
@@ -298,12 +311,12 @@ const DocumentModal = ({
 
     const formik = useFormik({
         initialValues: {
-            title: '',
+            title: `文本：${formatDate(new Date().getTime())}`,
             context: ''
         },
         validationSchema: yup.object({
-            title: yup.string().required('12jl'),
-            context: yup.string().required('12')
+            title: yup.string().required('标题是必填的'),
+            context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {
             uploadCharacters([{ ...values, datasetId, batch: uuidv4() }]).then((res) => {
@@ -328,10 +341,10 @@ const DocumentModal = ({
             url: ''
         },
         validationSchema: yup.object({
-            url: yup.string().required('12jl')
+            url: yup.string().required('网页地址是必填的')
         }),
         onSubmit: (values) => {
-            uploadUrls({ urls: values.url.split(/,|\n/).filter((value) => value.trim() !== ''), batch: uuidv4(), datasetId }).then(
+            uploadUrls({ urls: values.url.split(/[,\s，\n]+/).filter((value) => value.trim() !== ''), batch: uuidv4(), datasetId }).then(
                 (res) => {
                     dispatch(
                         openSnackbar({
@@ -356,9 +369,9 @@ const DocumentModal = ({
                 style={{
                     position: 'absolute',
                     width: '800px',
-                    top: '50%',
+                    top: '10%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%)'
+                    transform: 'translate(-50%, 0)'
                 }}
                 title="添加文档"
                 content={false}
@@ -368,14 +381,13 @@ const DocumentModal = ({
                     </IconButton>
                 }
             >
-                <CardContent>
+                <CardContent sx={{ p: '0 16px !important' }}>
                     <>
                         <Tabs
                             value={value}
                             variant="scrollable"
                             onChange={handleChange}
                             sx={{
-                                mb: 3,
                                 '& a': {
                                     minHeight: 'auto',
                                     minWidth: 10,
@@ -422,6 +434,8 @@ const DocumentModal = ({
                                     fullWidth
                                     id="title"
                                     name="title"
+                                    color="secondary"
+                                    InputLabelProps={{ shrink: true }}
                                     value={formik.values.title}
                                     onChange={formik.handleChange}
                                     error={formik.touched.title && Boolean(formik.errors.title)}
@@ -432,6 +446,9 @@ const DocumentModal = ({
                                     fullWidth
                                     id="context"
                                     name="context"
+                                    color="secondary"
+                                    placeholder="文本内容，请输入 150000 字符以内"
+                                    InputLabelProps={{ shrink: true }}
                                     value={formik.values.context}
                                     onChange={formik.handleChange}
                                     error={formik.touched.context && Boolean(formik.errors.context)}
@@ -456,16 +473,17 @@ const DocumentModal = ({
                             </div>
                             <form onSubmit={formikUrl.handleSubmit}>
                                 <TextField
-                                    label={'网页地址'}
+                                    label="网页地址"
                                     fullWidth
                                     focused
                                     id="url"
                                     name="url"
+                                    color="secondary"
                                     value={formikUrl.values.url}
                                     onChange={formikUrl.handleChange}
                                     error={formikUrl.touched.url && Boolean(formikUrl.errors.url)}
                                     helperText={formikUrl.touched.url && formikUrl.errors.url}
-                                    placeholder="多个网站通过换行或者,分割避免解析错误"
+                                    placeholder="网站通过http或者https开头，多个网站通过换行或者,分割避免解析错误"
                                     className={'mt-3'}
                                     multiline
                                     minRows={6}
@@ -534,10 +552,10 @@ const DetailModal = ({
                 }
             >
                 <CardContent>
-                    <Typography variant="h4">{dataType && dataType === 'DOCUMENT' ? 'Title' : 'Link'}</Typography>
+                    <Typography variant="h4">标题</Typography>
                     <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
                     <Typography mt={4} mb={2} variant="h4">
-                        Summary
+                        总结
                     </Typography>
                     <TextField
                         disabled
@@ -669,17 +687,19 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             startIcon={<AddIcon />}
                             color={'secondary'}
                             size={'small'}
-                            onClick={() => setDocumentVisible(true)}
+                            onClick={() => {
+                                setDocumentVisible(true);
+                            }}
                         >
                             添加文档
                         </Button>
                     </Box>
                     <div className={'mt-3'}>
-                        <MainCard sx={{ height: '620px', overflowY: 'auto' }}>
-                            <Grid container spacing={gridSpacing}>
+                        <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
+                            <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
                                     return (
-                                        <Grid item xs={12} sm={6} xl={4} key={index}>
+                                        <Grid item xs={12} sm={6} md={4} xl={3} key={index}>
                                             <SubCard
                                                 sx={{
                                                     cursor: 'pointer',
@@ -778,55 +798,63 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         item
                                                         xs={12}
                                                         className="!pt-[10px] flex items-center"
-                                                        sx={{ alignContent: 'center' }}
+                                                        sx={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}
                                                     >
-                                                        {item.status === '35' || item.status === '45' || item.status === '55' ? (
-                                                            <HighlightOffIcon
-                                                                sx={{
-                                                                    color: 'error.dark',
-                                                                    width: 14,
-                                                                    height: 14
-                                                                }}
-                                                            />
-                                                        ) : item.status !== 99 ? (
-                                                            <LoadingOutlined
-                                                                style={{ fontSize: '14px', color: '#673ab7' }}
-                                                                rev={undefined}
-                                                            />
-                                                        ) : (
-                                                            <CheckCircleIcon
-                                                                sx={{
-                                                                    color: 'success.dark',
-                                                                    width: 14,
-                                                                    height: 14
-                                                                }}
-                                                            />
-                                                        )}
-                                                        <Typography ml={1} variant="caption">
-                                                            {item.status > '20' && item.status <= '30'
-                                                                ? '数据同步中'
-                                                                : item.status === '31'
-                                                                ? '数据清洗中'
-                                                                : item.status === '35'
-                                                                ? '数据清洗失败'
-                                                                : item.status === '40'
-                                                                ? '数据清洗完成'
-                                                                : item.status === '41'
-                                                                ? '数据分割中'
-                                                                : item.status === '45'
-                                                                ? '数据分割失败'
-                                                                : item.status === '50'
-                                                                ? '数据分割成功'
-                                                                : item.status === '51'
-                                                                ? '正在创建索引'
-                                                                : item.status === '55'
-                                                                ? '创建索引失败'
-                                                                : item.status === '60'
-                                                                ? '创建索引完成'
-                                                                : item.status === '99'
-                                                                ? '完成'
-                                                                : null}
-                                                        </Typography>
+                                                        <Box display="flex" alignItems="center">
+                                                            {item.status === '35' || item.status === '45' || item.status === '55' ? (
+                                                                <HighlightOffIcon
+                                                                    sx={{
+                                                                        color: 'error.dark',
+                                                                        width: 14,
+                                                                        height: 14
+                                                                    }}
+                                                                />
+                                                            ) : item.status !== 99 ? (
+                                                                <LoadingOutlined
+                                                                    style={{ fontSize: '14px', color: '#673ab7' }}
+                                                                    rev={undefined}
+                                                                />
+                                                            ) : (
+                                                                <CheckCircleIcon
+                                                                    sx={{
+                                                                        color: 'success.dark',
+                                                                        width: 14,
+                                                                        height: 14
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            <Typography ml={1} variant="caption">
+                                                                {item.status > '20' && item.status <= '30'
+                                                                    ? '数据同步中'
+                                                                    : item.status === '31'
+                                                                    ? '数据清洗中'
+                                                                    : item.status === '35'
+                                                                    ? '数据清洗失败'
+                                                                    : item.status === '40'
+                                                                    ? '数据清洗完成'
+                                                                    : item.status === '41'
+                                                                    ? '数据分割中'
+                                                                    : item.status === '45'
+                                                                    ? '数据分割失败'
+                                                                    : item.status === '50'
+                                                                    ? '数据分割成功'
+                                                                    : item.status === '51'
+                                                                    ? '正在创建索引'
+                                                                    : item.status === '55'
+                                                                    ? '创建索引失败'
+                                                                    : item.status === '60'
+                                                                    ? '创建索引完成'
+                                                                    : item.status === '99'
+                                                                    ? '完成'
+                                                                    : null}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box>
+                                                            <Typography variant="caption">2012-12-12 12:12:12</Typography>
+                                                            {/* <Typography ml={1} variant="caption">
+                                                                大小/字符
+                                                            </Typography> */}
+                                                        </Box>
                                                     </Grid>
                                                 </Grid>
                                             </SubCard>

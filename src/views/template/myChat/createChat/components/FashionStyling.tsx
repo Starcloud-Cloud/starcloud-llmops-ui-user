@@ -381,7 +381,7 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>
-                        <div className={'pt-2 flex items-center :overflow-x-auto'} style={{ scrollbarGutter: 'stable' }}>
+                        <div className={'pt-2 flex items-center overflow-x-auto'}>
                             <Upload
                                 maxCount={1}
                                 action={`${process.env.REACT_APP_BASE_URL}${

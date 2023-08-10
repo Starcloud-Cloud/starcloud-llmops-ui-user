@@ -1,18 +1,18 @@
 import { Link } from 'react-router-dom';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import { Box, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
-import AuthWrapper2 from '../AuthWrapper2';
-import AuthCardWrapper from '../AuthCardWrapper';
+import { AuthSliderProps } from 'types';
 import Logo from 'ui-component/Logo';
-import AuthResetPassword from '../auth-forms/AuthResetPassword';
-import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
-import { AuthSliderProps } from 'types';
+import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
+import AuthCardWrapper from '../AuthCardWrapper';
+import AuthWrapper2 from '../AuthWrapper2';
+import AuthResetPassword from '../auth-forms/AuthResetPassword';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-resetpass.svg';
@@ -76,10 +76,10 @@ const ResetPassword = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Reset Password
+                                                    重置密码
                                                 </Typography>
                                                 <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    Please choose your new password
+                                                    请选择你的新密码
                                                 </Typography>
                                             </Stack>
                                         </Grid>

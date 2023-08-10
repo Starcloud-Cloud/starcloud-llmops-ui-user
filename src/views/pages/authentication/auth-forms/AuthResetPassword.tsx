@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Button,
@@ -14,10 +13,11 @@ import {
     OutlinedInput,
     Typography
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // third party
-import * as Yup from 'yup';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 // project imports
 // import useAuth from 'hooks/useAuth';
@@ -28,11 +28,11 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { StringColorProps } from 'types';
-import { dispatch } from 'store';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { openSnackbar } from 'store/slices/snackbar';
 import useAuth from 'hooks/useAuth';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { StringColorProps } from 'types';
 
 // ========================|| FIREBASE - RESET PASSWORD ||======================== //
 
@@ -77,7 +77,7 @@ const AuthResetPassword = ({ ...others }) => {
                 password: Yup.string().max(255).required('Password is required'),
                 confirmPassword: Yup.string().when('password', {
                     is: (val: string) => !!(val && val.length > 0),
-                    then: Yup.string().oneOf([Yup.ref('password')], 'Both Password must be match!')
+                    then: Yup.string().oneOf([Yup.ref('password')], '密码和确认密码必须一致')
                 })
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
@@ -128,7 +128,7 @@ const AuthResetPassword = ({ ...others }) => {
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, status }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-password-reset">Password</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-password-reset">密码</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password-reset"
                             type={showPassword ? 'text' : 'password'}
@@ -191,7 +191,7 @@ const AuthResetPassword = ({ ...others }) => {
                         error={Boolean(touched.confirmPassword && errors.confirmPassword)}
                         sx={{ ...theme.typography.customInput }}
                     >
-                        <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-confirm-password">确认密码</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-confirm-password"
                             type="password"
@@ -237,7 +237,7 @@ const AuthResetPassword = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                Reset Password
+                                重置密码
                             </Button>
                         </AnimateButton>
                     </Box>

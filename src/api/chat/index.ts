@@ -154,3 +154,11 @@ export const testSpeakerSSE = (data: any) => {
 export const getAvatarList = () => {
     return request.get({ url: '/llm/chat/avatar/default' });
 };
+
+/**
+ * 删除
+ * @returns
+ */
+export const deleteApp = (appUid: string) => {
+    return request.delete({ url: `/llm/app/delete/${appUid}` });
+};

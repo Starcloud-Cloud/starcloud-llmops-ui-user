@@ -29,6 +29,7 @@ const TEXT = `- Identify what language users use in questions and use the same l
 
 export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
     const [regulationText, setRegulationText] = useState('');
+    const [startCheck, setStartCheck] = useState(false);
     const regulationTextRef = useRef(regulationText);
 
     const handleRuleValue = (type: number, value: string) => {
@@ -38,16 +39,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             if (matchResult) {
                 if (value === '默认') {
                     // 删除
+                    regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
-                        setRegulationText(regulationText.replace(v, ''));
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
+                    setRegulationText(`${regulationTextRef.current.trim()}`);
                 } else {
                     // 替换
                     regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
                         regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
-                    setRegulationText(`${regulationTextRef.current}${value}`);
+                    setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 }
             } else {
                 if (value === '默认') {
@@ -63,16 +68,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             if (matchResult) {
                 if (value === '默认') {
                     // 删除
+                    regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
-                        setRegulationText(regulationText.replace(v, ''));
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
+                    setRegulationText(`${regulationTextRef.current.trim()}`);
                 } else {
                     // 替换
                     regulationTextRef.current = regulationText;
                     matchResult.forEach((v) => {
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
                         regulationTextRef.current = regulationTextRef.current.replace(v, '');
                     });
-                    setRegulationText(`${regulationTextRef.current}${value}`);
+                    setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 }
             } else {
                 if (value === '默认') {
@@ -82,32 +91,24 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 }
             }
         }
+
         if (type === 3) {
-            const pattern = /- 回复时使用(.*)进行回复/;
+            const pattern = /- 回复时使用(.*)进行回复/g;
             const matchResult = regulationText.match(pattern);
             const textIncludes = regulationText.includes(TEXT);
             if (matchResult || textIncludes) {
                 const matchedText = matchResult || TEXT; // 提取匹配到的内容
-                if (value === '默认') {
-                    // 删除
-                    if (Array.isArray(matchedText)) {
-                        matchedText.forEach((v) => {
-                            setRegulationText(regulationText.replace(v, ''));
-                        });
-                    } else {
-                        setRegulationText(regulationText.replace(matchedText, ''));
-                    }
+
+                if (Array.isArray(matchedText)) {
+                    regulationTextRef.current = regulationText;
+                    matchedText.forEach((v) => {
+                        regulationTextRef.current = regulationTextRef.current.replace(`${v}\n`, '');
+                        regulationTextRef.current = regulationTextRef.current.replace(v, '');
+                    });
+                    setRegulationText(`${regulationTextRef.current.trim()}\n${value}`);
                 } else {
-                    if (Array.isArray(matchedText)) {
-                        regulationTextRef.current = regulationText;
-                        matchedText.forEach((v) => {
-                            regulationTextRef.current = regulationTextRef.current.replace(v, '');
-                        });
-                        setRegulationText(`${regulationTextRef.current}\n${value}`);
-                    } else {
-                        // 替换
-                        setRegulationText(regulationText.replace(matchedText, value));
-                    }
+                    // 替换
+                    setRegulationText(regulationText.replace(matchedText, value));
                 }
             } else {
                 setRegulationText(`${regulationText}\n${value}`);
@@ -149,11 +150,35 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         maxRows={18}
                         minRows={10}
                         InputLabelProps={{ shrink: true }}
-                        onChange={(e) => setRegulationText(e.target.value)}
-                        helperText="机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。"
+                        onChange={(e) => {
+                            setStartCheck(true);
+                            setRegulationText(e.target.value);
+                        }}
+                        error={(regulationText?.length || 0) > 800 || (startCheck && !regulationText)}
                     />
+                    <div className="flex justify-between">
+                        {startCheck && !regulationText ? (
+                            <div className="text-[#f44336]">请输入角色描述</div>
+                        ) : (
+                            <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
+                        )}
+                        <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/800</div>
+                    </div>
+
                     <div className={'flex  items-center mt-3'}>
-                        <FormControl sx={{ width: '150px' }}>
+                        <FormControl
+                            sx={{
+                                width: '150px',
+                                '& .Mui-focused': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                },
+                                '& .MuiInputLabel-sizeSmall': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                }
+                            }}
+                        >
                             <InputLabel size="small" id="age-select">
                                 回复语气
                             </InputLabel>
@@ -173,7 +198,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 <MenuItem value="- 请使用幽默语气跟我进行对话">幽默</MenuItem>
                             </Select>
                         </FormControl>
-                        <FormControl sx={{ width: '150px' }} className={'ml-3'}>
+                        <FormControl
+                            sx={{
+                                width: '150px',
+                                '& .Mui-focused': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                },
+                                '& .MuiInputLabel-sizeSmall': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                }
+                            }}
+                            className={'ml-3'}
+                        >
                             <InputLabel size={'small'} id="age-select">
                                 最大回复长度
                             </InputLabel>
@@ -193,7 +231,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 <MenuItem value="- 回复长度最好不要超过500字">500字</MenuItem>
                             </Select>
                         </FormControl>
-                        <FormControl sx={{ width: '150px' }} className={'ml-3'}>
+                        <FormControl
+                            sx={{
+                                width: '150px',
+                                '& .Mui-focused': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                },
+                                '& .MuiInputLabel-sizeSmall': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                }
+                            }}
+                            className={'ml-3'}
+                        >
                             <InputLabel size={'small'} id="age-select">
                                 回复语种
                             </InputLabel>

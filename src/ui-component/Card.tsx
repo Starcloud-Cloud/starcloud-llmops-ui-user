@@ -93,9 +93,10 @@ interface BenefitItem {
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
+    const list = info?.benefits?.filter((v: any) => v.type !== 'BOT');
     return (
         <Box>
-            {info?.benefits?.map((item: BenefitItem) => (
+            {list?.map((item: BenefitItem) => (
                 <Grid key={item.type} container direction="column" spacing={1} sx={{ mt: 1.5 }}>
                     <Grid item>
                         <Grid container justifyContent="space-between">
@@ -173,7 +174,7 @@ const Cards = ({ flag = false }) => {
                             {userInfo?.userLevel !== 'pro' && (
                                 <Button
                                     onClick={() => {
-                                        navigate('/subscribe');
+                                        navigate('/exchange');
                                     }}
                                     size="small"
                                     variant="contained"

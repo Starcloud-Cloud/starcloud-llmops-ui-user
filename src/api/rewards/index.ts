@@ -40,8 +40,8 @@ export interface GetUserBenefitsPageRes {
  * @param {string} pageVO 管理后台 - 用户权益分页 Request VO
  * @returns
  */
-export const getUserBenefitsPage = (pageVO: string): Promise<GetUserBenefitsPageRes> => {
-    return request.get({ url: `llm/user-benefits/page?pageVO=${pageVO}` });
+export const getUserBenefitsPage = (pageVO: any): Promise<GetUserBenefitsPageRes> => {
+    return request.get({ url: `llm/user-benefits/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}` });
 };
 
 // 响应接口

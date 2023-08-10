@@ -521,7 +521,7 @@
   "application-analysis": "应用分析",
   "templateMarket": "模板市场",
   "EntitlementCard": {
-    "ppgrades": "权益升级"
+    "ppgrades": "签到得令牌"
   },
   "apply": {
     "name": "应用名称",
@@ -706,7 +706,8 @@
     "pro": "团队",
     "令牌": "令牌",
     "图片": "图片",
-    "remaining": "余"
+    "remaining": "余",
+    "机器人": "机器人"
   },
   "homepage": {
     "title": {

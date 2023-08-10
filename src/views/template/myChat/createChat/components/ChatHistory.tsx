@@ -80,83 +80,127 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                 </Grid>
                             </Grid>
                         )}
-                        <Grid item xs={12}>
-                            <Grid container spacing={gridSpacing}>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    className="flex"
-                                    onMouseEnter={() => setCurrentChat(`${index}-answer`)}
-                                    onMouseLeave={() => setCurrentChat('')}
-                                >
-                                    <img className="w-[50px] h-[50px] rounded-xl mr-2" src={history.robotAvatar} alt="" />
-                                    <div>
-                                        <Grid item xs={12} className="flex items-center">
-                                            <Typography align="left" variant="subtitle2">
-                                                {history.robotName}
-                                            </Typography>
-                                            <Typography align="left" variant="subtitle2" className="ml-2">
-                                                {currentChat === `${index}-answer` &&
-                                                    dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                            </Typography>
-                                        </Grid>
-                                        <div className="flex flex-col">
-                                            <Card
-                                                sx={{
-                                                    display: 'inline-block'
-                                                }}
-                                                className="bg-[#f2f3f5]"
-                                            >
-                                                <CardContent sx={{ p: 2, pb: '16px !important' }}>
-                                                    <Grid container spacing={1}>
-                                                        <Grid item xs={12}>
-                                                            {history.answer ? (
-                                                                <Typography variant="body2">{history.answer}</Typography>
-                                                            ) : (
-                                                                <LoadingDot />
-                                                            )}
+                        {/* 欢迎语 */}
+                        {history.isStatement ? (
+                            history.answer && (
+                                <Grid item xs={12}>
+                                    <Grid container spacing={gridSpacing}>
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            className="flex"
+                                            onMouseEnter={() => setCurrentChat(`${index}-answer`)}
+                                            onMouseLeave={() => setCurrentChat('')}
+                                        >
+                                            <div className="flex flex-col w-full">
+                                                <Card
+                                                    sx={{
+                                                        display: 'inline-block'
+                                                    }}
+                                                    className="bg-[#f2f3f5]"
+                                                >
+                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                        <Grid container spacing={1}>
+                                                            <Grid item xs={12}>
+                                                                {history.answer ? (
+                                                                    <Typography variant="body2">{history.answer}</Typography>
+                                                                ) : (
+                                                                    <LoadingDot />
+                                                                )}
+                                                            </Grid>
                                                         </Grid>
-                                                    </Grid>
-                                                </CardContent>
-                                            </Card>
-                                            {!history.isSystem && !history.isNew && (
-                                                <div className=" leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
-                                                    <Tooltip title={'复制'}>
-                                                        <ContentCopyIcon
-                                                            className="text-[16px] cursor-pointer"
-                                                            onClick={() => {
-                                                                copy(history.answer || '');
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: t('market.copySuccess'),
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            }}
-                                                        />
-                                                    </Tooltip>
-                                                </div>
-                                            )}
-                                            {history.isNew &&
-                                                (history.answer ? (
-                                                    <div className="text-[13px] leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
-                                                        正在回答中...
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            )
+                        ) : (
+                            <Grid item xs={12}>
+                                <Grid container spacing={gridSpacing}>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        className="flex"
+                                        onMouseEnter={() => setCurrentChat(`${index}-answer`)}
+                                        onMouseLeave={() => setCurrentChat('')}
+                                    >
+                                        <img className="w-[50px] h-[50px] rounded-xl mr-2" src={history.robotAvatar} alt="" />
+                                        <div>
+                                            <Grid item xs={12} className="flex items-center">
+                                                <Typography align="left" variant="subtitle2" className="h-[19px]">
+                                                    {history.robotName}
+                                                </Typography>
+                                                <Typography align="left" variant="subtitle2" className="ml-2">
+                                                    {currentChat === `${index}-answer` &&
+                                                        dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                </Typography>
+                                            </Grid>
+                                            <div className="flex flex-col">
+                                                <Card
+                                                    sx={{
+                                                        display: 'inline-block',
+                                                        width: 'fit-content'
+                                                    }}
+                                                    className="bg-[#f2f3f5]"
+                                                >
+                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                        <Grid container spacing={1}>
+                                                            <Grid item xs={12}>
+                                                                {history.answer ? (
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        color={history.status === 'ERROR' ? 'red' : ''}
+                                                                    >
+                                                                        {history.answer}
+                                                                    </Typography>
+                                                                ) : (
+                                                                    <LoadingDot />
+                                                                )}
+                                                            </Grid>
+                                                        </Grid>
+                                                    </CardContent>
+                                                </Card>
+                                                {!history.isNew && (
+                                                    <div className=" leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
+                                                        <Tooltip title={'复制'}>
+                                                            <ContentCopyIcon
+                                                                className="text-[16px] cursor-pointer"
+                                                                onClick={() => {
+                                                                    copy(history.answer || '');
+                                                                    dispatch(
+                                                                        openSnackbar({
+                                                                            open: true,
+                                                                            message: t('market.copySuccess'),
+                                                                            variant: 'alert',
+                                                                            alert: {
+                                                                                color: 'success'
+                                                                            },
+                                                                            close: false
+                                                                        })
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </Tooltip>
                                                     </div>
-                                                ) : (
-                                                    <div className="text-[13px] leading-5 mt-2  inline-block transition-opacity text-[#B5BED0]">
-                                                        正在思考中...
-                                                    </div>
-                                                ))}
+                                                )}
+                                                {history.isNew &&
+                                                    (history.answer ? (
+                                                        <div className="text-[13px] leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
+                                                            正在回答中...
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-[13px] leading-5 mt-2  inline-block transition-opacity text-[#B5BED0]">
+                                                            正在思考中...
+                                                        </div>
+                                                    ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        )}
                     </React.Fragment>
                 ))}
             </Grid>

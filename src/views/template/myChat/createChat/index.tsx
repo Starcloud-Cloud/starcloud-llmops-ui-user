@@ -1,6 +1,7 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button, Card, CardHeader, Divider, Link, Tab, Tabs } from '@mui/material';
 import { chatSave, getChatInfo } from 'api/chat';
+import { useWindowSize } from 'hooks/useWindowSize';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -37,6 +38,7 @@ export type IChatInfo = {
     uid?: string;
     prePrompt?: string;
     statement?: string; // 欢迎语
+    enableStatement?: boolean;
     temperature?: number;
     guideList?: string[];
     introduction?: string; // 简介
@@ -59,12 +61,15 @@ function CreateDetail() {
         guideList: ['', '']
     });
 
+    const { width } = useWindowSize();
+
     useEffect(() => {
         if (searchParams.get('appId')) {
             getChatInfo({ appId: searchParams.get('appId') as string }).then((res) => {
                 setDetail(res);
                 setChatBotInfo({
                     ...chatBotInfo,
+                    enableStatement: true,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
@@ -80,6 +85,76 @@ function CreateDetail() {
 
     //保存更改
     const saveDetail = async () => {
+        if (chatBotInfo.name === undefined || chatBotInfo.name === '') {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '名称不能为空',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+        if (chatBotInfo.prePrompt === undefined || chatBotInfo.prePrompt === '') {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '角色描述不能为空',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+        if (chatBotInfo.prePrompt.length > 800) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '角色描述不能超过800字',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+        if (chatBotInfo.introduction && chatBotInfo.introduction.length > 300) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '简介不能超过300字',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+        if (chatBotInfo.statement && chatBotInfo.statement.length > 300) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '欢迎语不能超过300字',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
         const data: any = detail;
         data.name = chatBotInfo.name;
         data.images = [chatBotInfo.avatar];
@@ -110,7 +185,7 @@ function CreateDetail() {
 
     return (
         <div className="grid grid-cols-12 gap-4">
-            <Card className="xl:col-span-8 xs:col-span-12">
+            <Card className="xl:col-span-8 xs:col-span-12 relative">
                 <CardHeader
                     sx={{ padding: 2 }}
                     avatar={
@@ -121,7 +196,13 @@ function CreateDetail() {
                     title={chatBotInfo?.name}
                     action={
                         (value === 0 || value === 1) && (
-                            <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                            <Button
+                                className="right-[25px] top-[85px] absolute z-50"
+                                variant="contained"
+                                color="secondary"
+                                autoFocus
+                                onClick={saveDetail}
+                            >
                                 {t('myApp.save')}
                             </Button>
                         )
@@ -156,6 +237,7 @@ function CreateDetail() {
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
                     <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(3)} />
+                    {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(4)} />}
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -168,6 +250,9 @@ function CreateDetail() {
                 </TabPanel>
                 <TabPanel value={value} index={3}>
                     <Skill />
+                </TabPanel>
+                <TabPanel value={value} index={4}>
+                    <Chat chatBotInfo={chatBotInfo} />
                 </TabPanel>
             </Card>
             {value !== 4 && (

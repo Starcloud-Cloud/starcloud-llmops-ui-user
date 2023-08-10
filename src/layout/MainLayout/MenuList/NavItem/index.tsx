@@ -48,6 +48,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         SelfImprovementIcon,
         CurrencyExchangeIcon,
         UpgradeIcon,
+        ImageIcon,
         SmartToyIcon
     };
     const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;

@@ -521,7 +521,8 @@
     "application-analysis": "应用分析",
     "templateMarket": "模板市场",
     "EntitlementCard": {
-        "ppgrades": "签到得令牌"
+        "ppgrades": "签到得令牌",
+        "ppFreegrades": "签到免费得令牌"
     },
     "apply": {
         "name": "应用名称",

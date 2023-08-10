@@ -126,7 +126,9 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                         onMouseEnter={() => setCurrentChat(`${index}-answer`)}
                                         onMouseLeave={() => setCurrentChat('')}
                                     >
-                                        <img className="w-[50px] h-[50px] rounded-xl mr-2" src={history.robotAvatar} alt="" />
+                                        <div className="w-[50px] h-[50px] flex justify-center items-center  mr-2">
+                                            <img className="w-[50px] h-[50px] rounded-xl" src={history.robotAvatar} alt="" />
+                                        </div>
                                         <div>
                                             <Grid item xs={12} className="flex items-center">
                                                 <Typography align="left" variant="subtitle2" className="h-[19px]">

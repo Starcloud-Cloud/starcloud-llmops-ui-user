@@ -3,6 +3,20 @@ const WorkBoxPlugin = require('workbox-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 
 module.exports = function override(config) {
+    const entryPoints = {
+        app: './src/index.tsx',
+        singleChatPage: './src/singlePageChat/index.tsx'
+    };
+
+    const htmlPlugins = Object.keys(entryPoints).map(
+        (entryName) =>
+            new HtmlWebpackPlugin({
+                template: `./src/templates/${entryName}.html`,
+                filename: `${entryName}.html`,
+                chunks: [entryName]
+            })
+    );
+
     config.resolve.fallback = {
         process: require.resolve('process/browser'),
         stream: require.resolve('stream-browserify'),

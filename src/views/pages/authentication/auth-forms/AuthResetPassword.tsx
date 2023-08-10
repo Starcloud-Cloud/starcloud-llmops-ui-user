@@ -74,7 +74,7 @@ const AuthResetPassword = ({ ...others }) => {
                 submit: null
             }}
             validationSchema={Yup.object().shape({
-                password: Yup.string().max(255).required('Password is required'),
+                password: Yup.string().max(255).required('请填写密码'),
                 confirmPassword: Yup.string().when('password', {
                     is: (val: string) => !!(val && val.length > 0),
                     then: Yup.string().oneOf([Yup.ref('password')], '密码和确认密码必须一致')

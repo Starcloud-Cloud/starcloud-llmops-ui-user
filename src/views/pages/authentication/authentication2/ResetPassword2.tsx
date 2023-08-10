@@ -20,16 +20,16 @@ import imgMain from 'assets/images/auth/img-a2-resetpass.svg';
 // carousel items
 const items: AuthSliderProps[] = [
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '海量优质模板',
+        description: '300+模板免费使用'
     },
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: 'AI文案一键生成',
+        description: '10秒生成专业文案'
     },
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '自定义AI模板',
+        description: '可以创建自己的AI模板,分享给好友使用'
     }
 ];
 

@@ -39,8 +39,6 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                 Data[field] = value !== null && value !== undefined ? value : '';
             }
         });
-        console.log(Data);
-
         return Data;
     };
     const formik = Formik({
@@ -50,13 +48,9 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
             ...item.flowStep.variable.variables
         ]),
         onSubmit: () => {
-            console.log(111);
-
             callBack({ item: item.field, steps });
         }
     });
-    console.log(formik);
-
     const mdRef = useRef<any>(null);
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
@@ -120,10 +114,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                         </Tooltip>
                         <Button
                             onClick={() => {
-                                console.log(2222);
-
                                 formik.handleSubmit();
-                                console.log(formik);
                             }}
                             disabled={disSteps(steps)}
                             color="secondary"

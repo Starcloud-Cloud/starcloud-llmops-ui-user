@@ -153,7 +153,7 @@ function Deatail() {
     };
     //更改变量的值
     const variableChange = ({ e, steps, i }: any) => {
-        const newValue = { ...detailData };
+        const newValue = _.cloneDeep(detailData);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         setDetailData(newValue);
     };

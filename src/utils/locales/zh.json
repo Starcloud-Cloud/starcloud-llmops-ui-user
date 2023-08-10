@@ -769,6 +769,7 @@
     "createTime": "创建时间",
     "CHAT": "聊天",
     "COMPLETION": "生成",
+    "BASE_GENERATE_IMAGE": "生成图片",
     "detail": "详情"
   },
   "generateLog": {

@@ -712,6 +712,7 @@
     "createTime": "CreateTime",
     "CHAT": "Chat",
     "COMPLETION": "Completion",
+    "BASE_GENERATE_IMAGE": "Base Generate Image",
     "detail": "Detail"
   },
   "generateLog": {

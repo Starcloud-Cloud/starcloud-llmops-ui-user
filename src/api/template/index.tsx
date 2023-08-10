@@ -38,7 +38,7 @@ export const del = (uid: string) => {
 };
 
 //执行记录echart
-export const logStatistics = (data: { appName: string; timeType: string }) => {
+export const logStatistics = (data: any) => {
     return request.post({ url: '/llm/app/log/statistics', data });
 };
 //获取时间

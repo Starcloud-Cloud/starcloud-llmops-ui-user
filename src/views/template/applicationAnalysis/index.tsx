@@ -43,15 +43,25 @@ interface Charts {
     data: { x: string; y: string | number }[];
 }
 interface TableData {
-    [key: string]: string;
+    uid: string;
+    appMode: string;
+    fromScene: string;
+    appName: string;
+    totalAnswerTokens: number;
+    totalMessageTokens: number;
+    totalElapsed: number;
+    status: string;
+    createTime: number;
 }
 interface Date {
     label: string;
     value: string;
 }
 interface Query {
-    appName: string;
-    timeType: string;
+    appName?: string;
+    timeType?: string;
+    appMode?: string;
+    fromScene?: string;
 }
 interface Detail {
     name: string;
@@ -61,8 +71,7 @@ interface Detail {
 }
 function ApplicationAnalysis() {
     const [queryParams, setQuery] = useState<Query>({
-        timeType: '',
-        appName: ''
+        timeType: 'LAST_7D'
     });
     const [generate, setGenerate] = useState<Charts[]>([]);
     const [total, setTotal] = useState(0);
@@ -94,6 +103,11 @@ function ApplicationAnalysis() {
         });
     };
     const [dateList, setDateList] = useState([] as Date[]);
+    const scenseList = [
+        { label: '创作中心', value: 'WEB_ADMIN' },
+        { label: '应用市场', value: 'WEB_MARKET' },
+        { label: '分享', value: 'SHARE_WEB' }
+    ];
     useEffect(() => {
         //获取echarts
         getStatistic();
@@ -212,6 +226,26 @@ function ApplicationAnalysis() {
                 </Grid>
                 <Grid item md={3} lg={2} xs={12}>
                     <FormControl fullWidth>
+                        <InputLabel id="appMode">模式</InputLabel>
+                        <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
+                            <MenuItem value="COMPLETION">生成</MenuItem>
+                            <MenuItem value="CHAT">聊天</MenuItem>
+                            <MenuItem value="BASE_GENERATE_IMAGE">图片</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={3} lg={2} xs={12}>
+                    <FormControl fullWidth>
+                        <InputLabel id="fromScene">场景</InputLabel>
+                        <Select labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
+                            {scenseList.map((item) => (
+                                <MenuItem value={item.value}>{item.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={3} lg={2} xs={12}>
+                    <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -252,6 +286,7 @@ function ApplicationAnalysis() {
                         <TableRow>
                             <TableCell align="center">{t('generate.mode')}</TableCell>
                             <TableCell align="center">{t('generate.name')}</TableCell>
+                            <TableCell align="center">执行场景</TableCell>
                             <TableCell align="center">{t('generate.totalAnswerTokens')}</TableCell>
                             <TableCell align="center">{t('generate.totalElapsed')} (s)</TableCell>
                             <TableCell align="center">{t('generate.status')}</TableCell>
@@ -264,6 +299,7 @@ function ApplicationAnalysis() {
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{row.appName}</TableCell>
+                                <TableCell align="center">{scenseList.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.status}</TableCell>

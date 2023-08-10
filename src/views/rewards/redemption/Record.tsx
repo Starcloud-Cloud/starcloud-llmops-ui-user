@@ -160,8 +160,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     useEffect(() => {
         const fetchPageData = async () => {
             const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
-            const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
-            getUserBenefitsPage(encodedPageVO)
+            getUserBenefitsPage(pageVO)
                 .then((res) => {
                     // Once the data is fetched, map it and update rows state
                     const fetchedRows = res.list.map((item) =>
@@ -284,55 +283,49 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                 {stableSort(
                                     rows.filter((row) => typeof row !== 'number'),
                                     getComparator(order, orderBy)
-                                )
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row, index) => {
-                                        if (typeof row === 'number') {
-                                            return null; // 忽略数字类型的行
-                                        }
+                                ).map((row, index) => {
+                                    if (typeof row === 'number') {
+                                        return null; // 忽略数字类型的行
+                                    }
 
-                                        const isItemSelected = isSelected(row.benefitsName);
-                                        const labelId = `enhanced-table-checkbox-${index}`;
+                                    const isItemSelected = isSelected(row.benefitsName);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                                        return (
-                                            <TableRow
-                                                hover
-                                                onClick={(event) => handleClick(event, row.benefitsName)}
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.id}
-                                                selected={isItemSelected}
-                                            >
-                                                <TableCell sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
-                                                    {row.benefitsName}
-                                                </TableCell>
-                                                <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
-                                                <TableCell align="center">
-                                                    {row.benefitsList.map((benefit, id) => (
-                                                        <Fragment key={id}>
-                                                            {benefit}
-                                                            <br />
-                                                        </Fragment>
-                                                    ))}
-                                                </TableCell>
-                                                <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
-                                                <TableCell align="right">
-                                                    {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
-                                                </TableCell>
-                                                <TableCell sx={{ pr: 3 }} align="right">
-                                                    {formatTime(row.expirationTime)}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleClick(event, row.benefitsName)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.id}
+                                            selected={isItemSelected}
+                                        >
+                                            <TableCell sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
+                                                {row.benefitsName}
+                                            </TableCell>
+                                            <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
+                                            <TableCell align="center">
+                                                {row.benefitsList.map((benefit, id) => (
+                                                    <Fragment key={id}>
+                                                        {benefit}
+                                                        <br />
+                                                    </Fragment>
+                                                ))}
+                                            </TableCell>
+                                            <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
+                                            <TableCell align="right">
+                                                {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
+                                            </TableCell>
+                                            <TableCell sx={{ pr: 3 }} align="right">
+                                                {formatTime(row.expirationTime)}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
 
                                 {emptyRows > 0 && (
-                                    <TableRow
-                                        style={{
-                                            height: (dense ? 33 : 53) * emptyRows
-                                        }}
-                                    >
+                                    <TableRow>
                                         <TableCell colSpan={7} />
                                     </TableRow>
                                 )}

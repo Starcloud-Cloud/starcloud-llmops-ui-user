@@ -22,12 +22,13 @@ import {
     TextField
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { getAvatarList, getVoiceList, testSpeakerSSE } from 'api/chat';
+import { getAvatarList, getVoiceList } from 'api/chat';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { getAccessToken } from 'utils/auth';
+import { v4 as uuidv4 } from 'uuid';
 import { IChatInfo } from '../index';
 
 const uploadButton = (
@@ -89,86 +90,7 @@ const VoiceModal = ({
         return item?.StyleList || [];
     }, [list, name]);
 
-    const handleTest = async () => {
-        try {
-            // const response = await fetch('http://www.w3schools.com/html/horse.mp3');
-            let response: any = await testSpeakerSSE({
-                shortName: 'zh-CN-YunyeNeural'
-                // prosodyRate: 'CHAT_TEST',
-                // prosodyPitch,
-            });
-            console.log(response);
-            const arrayBuffer = await response.arrayBuffer();
-            console.log(arrayBuffer);
-            // const response = await axios({
-            //     method: 'post',
-            //     url: 'http://www.w3schools.com/html/horse.mp3',
-            //     responseType: 'arraybuffer'
-            // });
-
-            const audioContext = new window.AudioContext();
-            if (audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
-
-            // 将ArrayBuffer转换为AudioBuffer
-            audioContext.decodeAudioData(
-                // response.data,
-                arrayBuffer,
-                (buffer) => {
-                    // 创建AudioBufferSourceNode
-                    const sourceNode = audioContext.createBufferSource();
-                    sourceNode.buffer = buffer;
-                    // 连接节点到扬声器
-                    sourceNode.connect(audioContext.destination);
-                    // 播放音频
-                    sourceNode.start();
-                },
-                (error) => {
-                    console.error('解码音频数据时出错：', error);
-                }
-            );
-        } catch (error) {
-            console.error('播放音频时出错：', error);
-        }
-
-        // let resp: any = await testSpeakerSSE({
-        //     shortName: 'zh-CN-YunyeNeural'
-        //     // prosodyRate: 'CHAT_TEST',
-        //     // prosodyPitch,
-        // });
-        // const reader = resp.getReader();
-        // let outerJoins: any;
-        // while (1) {
-        //     let joins = outerJoins;
-        //     const { done, value } = await reader.read();
-        //     if (done) {
-        //         console.log('done');
-        //         break;
-        //     }
-        //     // 创建AudioContext对象
-        //     const audioContext = new window.AudioContext();
-        //     const uint8Array = new Uint8Array(value);
-        //     const arrayBuffer = uint8Array.buffer;
-        //     // 将ArrayBuffer转换为AudioBuffer
-        //     audioContext.decodeAudioData(
-        //         arrayBuffer,
-        //         (buffer) => {
-        //             // 创建AudioBufferSourceNode
-        //             const sourceNode = audioContext.createBufferSource();
-        //             sourceNode.buffer = buffer;
-        //             // 连接节点到扬声器
-        //             sourceNode.connect(audioContext.destination);
-        //             // 播放音频
-        //             sourceNode.start();
-        //         },
-        //         (error) => {
-        //             console.error('解码音频数据时出错：', error);
-        //         }
-        //     );
-        //     outerJoins = joins;
-        // }
-    };
+    const handleTest = async () => {};
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -382,7 +304,6 @@ export const FashionStyling = ({
     const [visibleVoice, setVisibleVoice] = useState(false);
     const [voiceOpen, setVoiceOpen] = useState(false);
     const [shortcutOpen, setShortcutOpen] = useState(false);
-    const [introductionOpen, setIntroductionOpen] = useState(false);
     const [avatarList, setAvatarList] = useState<string[]>([]);
     const [startCheck, setStartCheck] = useState(false);
     const [isFirst, setIsFirst] = useState(true);
@@ -394,10 +315,6 @@ export const FashionStyling = ({
         setChatBotInfo({ ...chatBotInfo, enableVoice: visibleVoice });
     }, [visibleVoice]);
 
-    useEffect(() => {
-        setChatBotInfo({ ...chatBotInfo, enableIntroduction: introductionOpen });
-    }, [introductionOpen]);
-
     const closeVoiceModal = () => {
         setVoiceOpen(false);
     };
@@ -406,6 +323,7 @@ export const FashionStyling = ({
 
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
+            console.log(1);
             setChatBotInfo({
                 ...chatBotInfo,
                 avatar: fileList?.[0]?.response?.data
@@ -418,7 +336,7 @@ export const FashionStyling = ({
         if (isFirst && chatBotInfo.defaultImg) {
             (async () => {
                 const res = await getAvatarList();
-                setAvatarList([chatBotInfo.defaultImg, ...res]);
+                setAvatarList([chatBotInfo.defaultImg, ...res.map((item: string, index: number) => `${item}?index=${uuidv4()}`)]);
                 setIsFirst(false);
             })();
         }
@@ -450,7 +368,7 @@ export const FashionStyling = ({
                             className={'mt-1'}
                             value={chatBotInfo.name}
                             error={startCheck && !chatBotInfo.name}
-                            helperText={!chatBotInfo.name && '请填写名称'}
+                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             size={'small'}
@@ -463,7 +381,7 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>
-                        <div className={'mt-1 flex items-center'}>
+                        <div className={'pt-2 flex items-center xs:overflow-x-auto sm:overflow-x-hidden hover:overflow-x-auto'}>
                             <Upload
                                 maxCount={1}
                                 action={`${process.env.REACT_APP_BASE_URL}${
@@ -491,9 +409,8 @@ export const FashionStyling = ({
                                             });
                                         }}
                                         key={index}
-                                        style={chatBotInfo.avatar === item ? { border: '1px solid #673ab7' } : {}}
-                                        className={`w-[102px] h-[102px] border-solid border-[#d9d9d9] border rounded-lg hover:border-[#673ab7] object-fill cursor-pointer mr-[8px] mb-[8px] ${
-                                            chatBotInfo.avatar === item ? 'border-[#673ab7]' : ''
+                                        className={`w-[102px] h-[102px]  rounded-lg object-fill cursor-pointer mr-[8px] mb-[8px] hover:outline hover:outline-offset-2 hover:outline-1 hover:outline-[#673ab7] ${
+                                            chatBotInfo.avatar === item ? 'outline outline-offset-2 outline-1 outline-[#673ab7]' : ''
                                         }`}
                                         src={item}
                                     />
@@ -503,13 +420,11 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-1'}>
                         <div className="flex justify-end items-center">
-                            <span className={'text-#697586'}>{introductionOpen ? '展示' : '不展示'}</span>
+                            <span className={'text-#697586'}>{chatBotInfo.enableIntroduction ? '展示' : '不展示'}</span>
                             <Switch
                                 color={'secondary'}
                                 checked={chatBotInfo.enableIntroduction}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    console.log(value, 'value');
+                                onChange={() => {
                                     setChatBotInfo({ ...chatBotInfo, enableIntroduction: !chatBotInfo.enableIntroduction });
                                 }}
                             />
@@ -521,21 +436,22 @@ export const FashionStyling = ({
                             multiline={true}
                             maxRows={5}
                             minRows={5}
-                            aria-valuemax={200}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
+                            error={(chatBotInfo?.introduction?.length || 0) > 300}
                             label={'简介'}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 setChatBotInfo({ ...chatBotInfo, introduction: value });
                             }}
                         />
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.introduction?.length || 0}/300</div>
                     </div>
                     <div className={'mt-5'}>
                         <div className="flex justify-between">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between flex-col">
                                 <span className={'text-base text-black'}>声音</span>
-                                <span className={'text-#697586 ml-[8px]'}>让你的机器人说话吧！</span>
+                                <div className={'text-#697586'}>让你的机器人说话吧！</div>
                             </div>
                             <div className="flex justify-end items-center">
                                 <span className={'text-#697586'}>{visibleVoice ? '启用' : '不启用'}</span>
@@ -579,7 +495,18 @@ export const FashionStyling = ({
                     >
                         对话配置
                     </span>
-                    <div className={'mt-5'}>
+                    <div className={'mt-0'}>
+                        <div className="flex justify-end items-center">
+                            <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
+                            <Switch
+                                color={'secondary'}
+                                checked={chatBotInfo.enableStatement}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setChatBotInfo({ ...chatBotInfo, enableStatement: !chatBotInfo.enableStatement });
+                                }}
+                            />
+                        </div>
                         <TextField
                             className={'mt-1'}
                             size={'small'}
@@ -587,6 +514,7 @@ export const FashionStyling = ({
                             multiline={true}
                             maxRows={5}
                             minRows={5}
+                            error={(chatBotInfo?.statement?.length || 0) > 300}
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"
@@ -597,6 +525,7 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300</div>
                         {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (

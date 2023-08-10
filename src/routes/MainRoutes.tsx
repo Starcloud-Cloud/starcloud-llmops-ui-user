@@ -76,6 +76,10 @@ const MainRoutes = {
             element: <PictureCreate />
         },
         {
+            path: '/user/account-profile/profile',
+            element: <AppUserAccountProfile />
+        },
+        {
             path: '/my-chat',
             element: <MyChat />
         },

@@ -329,7 +329,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden', minHeight: 525 }} ref={scrollRef}>
+            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden' }} ref={scrollRef}>
                 <div ref={contentRef}>
                     {chatBotInfo.enableIntroduction && (
                         <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">

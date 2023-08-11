@@ -20,11 +20,16 @@ import {
     Card,
     Tooltip,
     Divider,
-    Chip
+    Chip,
+    Modal,
+    IconButton,
+    CardContent
 } from '@mui/material';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
+import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, infoPage, logTimeType, detailImage, detailApp } from 'api/template';
@@ -82,6 +87,7 @@ interface Detail {
     endUser?: string;
     createTime?: number;
     imageInfo?: any;
+    appInfo?: any;
 }
 function ApplicationAnalysis() {
     const [queryParams, setQuery] = useState<Query>({
@@ -235,6 +241,9 @@ function ApplicationAnalysis() {
         height: 0
     });
     const [currentIndex, setCurrentIndex] = useState(0);
+    //执行弹窗
+    const [exeOpen, setExeOpen] = useState(false);
+    const [exeDetail, setExeDetail] = useState<any>({});
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -333,10 +342,11 @@ function ApplicationAnalysis() {
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"
+                                        disabled={row.appMode === 'CHAT'}
                                         size="small"
                                         onClick={() => {
                                             if (row.appMode === 'BASE_GENERATE_IMAGE') {
-                                                detailImage(row.uid).then((res) => {
+                                                detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
                                                     setDetail(res.list);
                                                 });
                                             } else if (row.appMode === 'COMPLETION') {
@@ -359,46 +369,15 @@ function ApplicationAnalysis() {
             <Box my={2}>
                 <Pagination page={page.pageNo} count={Math.ceil(total / page.pageSize)} onChange={paginationChange} />
             </Box>
-            <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+            <Drawer
+                anchor="right"
+                open={open}
+                onClose={() => {
+                    setOpen(false);
+                    setDetail(null);
+                }}
+            >
                 <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
-                    {/* 应用 */}
-                    {/* <Box>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <AccessAlarm sx={{ fontSize: '70px' }} />
-                                <Box>
-                                    <Box>
-                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                            {detail?.name}
-                                        </Typography>
-                                    </Box>
-                                    <Box>
-                                        {detail?.categories?.map((item: any) => (
-                                            <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item)?.name}</span>
-                                        ))}
-                                        {detail?.tags?.map((el: any) => (
-                                            <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                        ))}
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box>
-                        <Divider sx={{ mb: 1 }} />
-                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                            {detail?.description}
-                        </Typography>
-                        <Perform
-                        config={{}}
-                        changeSon={() => {}}
-                        changeanswer={() => {}}
-                        loadings={[]}
-                        variableChange={() => {}}
-                        promptChange={() => {}}
-                        isallExecute={() => {}}
-                        source="myApp"
-                    />
-                    </Box> */}
-                    {/* 图片 */}
                     <Box>
                         <Table aria-label="simple table">
                             <TableHead>
@@ -436,8 +415,13 @@ function ApplicationAnalysis() {
                                                 color="secondary"
                                                 size="small"
                                                 onClick={() => {
-                                                    setImgDetail(row.imageInfo);
-                                                    setPicOpen(true);
+                                                    if (row.appMode === 'COMPLETION') {
+                                                        setExeDetail(row.appInfo);
+                                                        setExeOpen(true);
+                                                    } else {
+                                                        setImgDetail(row.imageInfo);
+                                                        setPicOpen(true);
+                                                    }
                                                 }}
                                             >
                                                 {t('generate.detail')}
@@ -467,6 +451,68 @@ function ApplicationAnalysis() {
                     width={ImgDetail.width}
                     height={ImgDetail.height}
                 />
+            )}
+            {exeOpen && (
+                <Modal open={exeOpen} onClose={() => setExeOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
+                    <MainCard
+                        style={{
+                            position: 'absolute',
+                            width: '800px',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}
+                        title="详情"
+                        content={false}
+                        secondary={
+                            <IconButton onClick={() => setExeOpen(false)} size="large" aria-label="close modal">
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        }
+                    >
+                        <CardContent>
+                            <Box>
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                                        <AccessAlarm sx={{ fontSize: '70px' }} />
+                                        <Box>
+                                            <Box>
+                                                <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                    {exeDetail?.name}
+                                                </Typography>
+                                            </Box>
+                                            <Box>
+                                                {exeDetail?.categories?.map((item: any) => (
+                                                    <span key={item}>
+                                                        #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
+                                                    </span>
+                                                ))}
+                                                {exeDetail?.tags?.map((el: any) => (
+                                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                                <Divider sx={{ mb: 1 }} />
+                                <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                    {exeDetail?.description}
+                                </Typography>
+                                <Perform
+                                    history={true}
+                                    config={{}}
+                                    changeSon={() => {}}
+                                    changeanswer={() => {}}
+                                    loadings={[]}
+                                    variableChange={() => {}}
+                                    promptChange={() => {}}
+                                    isallExecute={() => {}}
+                                    source="myApp"
+                                />
+                            </Box>
+                        </CardContent>
+                    </MainCard>
+                </Modal>
             )}
         </Box>
     );

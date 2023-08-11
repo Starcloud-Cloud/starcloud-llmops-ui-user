@@ -51,7 +51,7 @@ export const infoPage = (data: any) => {
 };
 //执行记录图片详情
 export const detailImage = (data: any) => {
-    return request.get({ url: 'llm/app/log/detail/image/' + data });
+    return request.get({ url: 'llm/app/log/detail/image/' + data.uid, data: data.page });
 };
 //执行记录执行详情
 export const detailApp = (data: any) => {

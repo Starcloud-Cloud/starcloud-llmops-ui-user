@@ -8,7 +8,7 @@ import { t } from 'hooks/web/useI18n';
 import { useRef, memo } from 'react';
 import CarrOut from './carrOut';
 import _ from 'lodash-es';
-function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange, changeanswer }: any) {
+function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange, changeanswer, history = false }: any) {
     const refs = useRef<any>([]);
 
     //子组件返回的值
@@ -51,7 +51,13 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
         <Box>
             {config?.steps.length > 1 && (
                 <Box mb={1}>
-                    <Button disabled={allDisable()} color="secondary" startIcon={<AlbumIcon />} variant="contained" onClick={allExecute}>
+                    <Button
+                        disabled={allDisable() || history}
+                        color="secondary"
+                        startIcon={<AlbumIcon />}
+                        variant="contained"
+                        onClick={allExecute}
+                    >
                         {t('market.allExecute')}
                     </Button>
                     <Tooltip title={t('market.allStepTips')}>
@@ -65,6 +71,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (
                         <CarrOut
+                            history={history}
                             source={source}
                             loadings={loadings}
                             variableChange={variableChange}

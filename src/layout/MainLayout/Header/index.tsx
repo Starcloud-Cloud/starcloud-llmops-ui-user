@@ -91,7 +91,7 @@ const Header = () => {
                     navigate('/exchange');
                 }}
             >
-                {t('EntitlementCard.ppgrades')}
+                {t('EntitlementCard.ppFreegrades')}
             </Button>
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

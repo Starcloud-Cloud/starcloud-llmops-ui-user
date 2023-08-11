@@ -49,6 +49,8 @@ export type IChatInfo = {
     voiceStyle?: string;
     voicePitch?: number;
     voiceSpeed?: number;
+    enableSearchInWeb?: boolean;
+    searchInWeb?: string;
 };
 
 function CreateDetail() {
@@ -73,11 +75,13 @@ function CreateDetail() {
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
-                    enableIntroduction: res.chatConfig.description.enabled,
-                    statement: res.chatConfig.openingStatement.statement,
+                    enableIntroduction: res.chatConfig?.description?.enabled,
+                    statement: res.chatConfig?.openingStatement.statement,
                     prePrompt: res.chatConfig.prePrompt,
-                    temperature: res.chatConfig.modelConfig.completionParams.temperature,
-                    defaultImg: res?.images?.[0]
+                    temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
+                    defaultImg: res?.images?.[0],
+                    enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
                 });
             });
         }
@@ -155,6 +159,45 @@ function CreateDetail() {
             );
             return;
         }
+        if (chatBotInfo.searchInWeb) {
+            const websites = chatBotInfo.searchInWeb
+                .trim()
+                .split('\n')
+                .map((item) => item.trim());
+            // 简单验证每个网站地址
+            const isValidInput = websites.every((website) =>
+                /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)
+            );
+            if (websites.length > 10) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '网络搜索范围地址不能超过10个',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+                return;
+            }
+
+            if (!isValidInput) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '请输入正确的网络搜索范围',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+                return;
+            }
+        }
         const data: any = detail;
         data.name = chatBotInfo.name;
         data.images = [chatBotInfo.avatar];
@@ -163,6 +206,10 @@ function CreateDetail() {
         data.chatConfig.openingStatement.statement = chatBotInfo.statement;
         data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
         data.description = chatBotInfo.introduction;
+        data.chatConfig.webSearchConfig = {
+            enabled: chatBotInfo.enableSearchInWeb,
+            webScope: chatBotInfo.searchInWeb
+        };
         await chatSave(data);
         dispatch(
             openSnackbar({
@@ -195,7 +242,7 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        (value === 0 || value === 1) && (
+                        (value === 0 || value === 1 || value === 3) && (
                             <Button
                                 className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
@@ -249,7 +296,7 @@ function CreateDetail() {
                     {detail?.uid && <Knowledge datasetId={detail.uid} />}
                 </TabPanel>
                 <TabPanel value={value} index={3}>
-                    <Skill />
+                    <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={4}>
                     <Chat chatBotInfo={chatBotInfo} />

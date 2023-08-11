@@ -15,6 +15,7 @@ import copy from 'clipboard-copy';
 import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import ChatMarkdown from 'ui-component/Markdown';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -155,7 +156,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                         }`}
                                                                     >
-                                                                        {history.answer}
+                                                                        <ChatMarkdown textContent={history.answer} />
+                                                                        {/* {history.answer} */}
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />

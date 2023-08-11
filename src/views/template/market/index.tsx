@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import ScrollMenus from './ScrollMenu';
+import { useTheme } from '@mui/material/styles';
 interface MarketList {
     name: string;
     tags: string[];
@@ -19,6 +20,7 @@ interface Page {
     pageSize: number;
 }
 function TemplateMarket() {
+    const theme = useTheme();
     const navigate = useNavigate();
     const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList } = marketStore();
     const [page, setPage] = useState<Page>({ pageNo: 1, pageSize: 30 });
@@ -88,6 +90,9 @@ function TemplateMarket() {
     const goodsScroll = (event: any) => {
         const container = event.target;
         const scrollTop = container.scrollTop;
+        if (scrollTop <= 293) {
+            setHeight(293 - scrollTop);
+        }
         const clientHeight = container.clientHeight;
         const scrollHeight = container.scrollHeight;
         if (scrollTop + clientHeight >= scrollHeight - 20) {
@@ -114,61 +119,81 @@ function TemplateMarket() {
             category: data
         });
     };
+    const [maxHeight, setHeight] = useState(293);
     return (
         <Box
-            maxWidth="1300px"
-            margin="0 auto"
-            height="calc(100vh - 128px)"
-            overflow="hidden"
-            onScroll={goodsScroll}
             sx={{
-                scrollbarGutter: 'stable',
-                '&:hover': {
-                    overflow: 'scroll'
+                position: 'relative',
+                '&::after': {
+                    content: '" "',
+                    position: 'absolute',
+                    top: '0',
+                    right: '0px',
+                    width: '5px',
+                    height: maxHeight + 'px',
+                    zIndex: 9999,
+                    backgroundColor: theme.palette.mode === 'dark' ? '#1a223f' : 'rgb(244, 246, 248)',
+                    pointerEvents: 'none'
                 }
             }}
         >
-            <Typography variant="h1" mt={3} textAlign="center">
-                {t('market.title')}
-            </Typography>
-            <Typography variant="h4" my={2} textAlign="center">
-                {t('market.subLeft')} {total} + {t('market.subright')}
-            </Typography>
-            <Box display="flex" justifyContent="center">
-                <TextField
-                    id="filled-start-adornment"
-                    sx={{ width: '600px' }}
-                    placeholder={t('market.place')}
-                    name="name"
-                    value={queryParams.name}
-                    onChange={handleChange}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        )
-                    }}
-                />
+            <Box
+                maxWidth="1300px"
+                margin="0 auto"
+                height="calc(100vh - 128px)"
+                overflow="hidden"
+                onScroll={goodsScroll}
+                sx={{
+                    scrollbarGutter: 'stable',
+                    '&:hover': {
+                        overflow: 'scroll'
+                    }
+                }}
+            >
+                <Box>
+                    <Typography variant="h1" mt={3} textAlign="center">
+                        {t('market.title')}
+                    </Typography>
+                    <Typography variant="h4" my={2} textAlign="center">
+                        {t('market.subLeft')} {total} + {t('market.subright')}
+                    </Typography>
+                    <Box display="flex" justifyContent="center">
+                        <TextField
+                            id="filled-start-adornment"
+                            sx={{ width: '600px' }}
+                            placeholder={t('market.place')}
+                            name="name"
+                            value={queryParams.name}
+                            onChange={handleChange}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </Box>
+                    <Grid container spacing={2} my={2}>
+                        <Grid item xs={12} md={10}>
+                            <ScrollMenus change={changeCategory} />
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                            <FormControl fullWidth>
+                                <InputLabel id="sort">{t('market.sortby')}</InputLabel>
+                                <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label={t('market.sortby')}>
+                                    {sortList.map((el: any) => (
+                                        <MenuItem key={el.key} value={el.key}>
+                                            {el.text}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                </Box>
+                <Outlet />
             </Box>
-            <Grid container spacing={2} my={2}>
-                <Grid item xs={12} md={10}>
-                    <ScrollMenus change={changeCategory} />
-                </Grid>
-                <Grid item xs={12} md={2}>
-                    <FormControl fullWidth>
-                        <InputLabel id="sort">{t('market.sortby')}</InputLabel>
-                        <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label={t('market.sortby')}>
-                            {sortList.map((el: any) => (
-                                <MenuItem key={el.key} value={el.key}>
-                                    {el.text}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Grid>
-            </Grid>
-            <Outlet />
         </Box>
     );
 }

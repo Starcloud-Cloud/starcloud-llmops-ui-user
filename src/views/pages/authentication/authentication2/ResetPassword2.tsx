@@ -1,18 +1,18 @@
 import { Link } from 'react-router-dom';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import { Box, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
-import AuthWrapper2 from '../AuthWrapper2';
-import AuthCardWrapper from '../AuthCardWrapper';
+import { AuthSliderProps } from 'types';
 import Logo from 'ui-component/Logo';
-import AuthResetPassword from '../auth-forms/AuthResetPassword';
-import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthSlider from 'ui-component/cards/AuthSlider';
-import { AuthSliderProps } from 'types';
+import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
+import AuthCardWrapper from '../AuthCardWrapper';
+import AuthWrapper2 from '../AuthWrapper2';
+import AuthResetPassword from '../auth-forms/AuthResetPassword';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-resetpass.svg';
@@ -20,16 +20,16 @@ import imgMain from 'assets/images/auth/img-a2-resetpass.svg';
 // carousel items
 const items: AuthSliderProps[] = [
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '海量优质模板',
+        description: '300+模板免费使用'
     },
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: 'AI文案一键生成',
+        description: '10秒生成专业文案'
     },
     {
-        title: 'Configurable Elements, East to Setup',
-        description: 'Powerful and easy to use multipurpose theme'
+        title: '自定义AI模板',
+        description: '可以创建自己的AI模板,分享给好友使用'
     }
 ];
 
@@ -76,10 +76,10 @@ const ResetPassword = () => {
                                                     gutterBottom
                                                     variant={matchDownSM ? 'h3' : 'h2'}
                                                 >
-                                                    Reset Password
+                                                    重置密码
                                                 </Typography>
                                                 <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    Please choose your new password
+                                                    请选择你的新密码
                                                 </Typography>
                                             </Stack>
                                         </Grid>

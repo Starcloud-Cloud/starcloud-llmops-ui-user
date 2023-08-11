@@ -67,11 +67,9 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                 display="flex"
                                 alignItems="center"
                             >
-                                <img
-                                    className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]"
-                                    src={data?.images?.[0]}
-                                    alt="icon"
-                                />
+                                <div className=" w-[100px] h-[100px] flex justify-center items-center outline outline-1  outline-offset-2 outline-[#6839b7] rounded-full">
+                                    <img className="object-cover rounded-full w-[100px] h-[100px]" src={data?.images?.[0]} alt="icon" />
+                                </div>
                                 <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
                                     <Tooltip title={data.name}>
                                         <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">

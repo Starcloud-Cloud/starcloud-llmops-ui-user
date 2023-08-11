@@ -4,23 +4,23 @@ import { IChatInfo } from '../index';
 
 const marks = [
     {
-        value: 0.4,
+        value: 0,
         label: '最准确'
     },
     {
-        value: 0.8,
+        value: 0.5,
         label: '较准确'
     },
     {
-        value: 1.2,
+        value: 1,
         label: '平衡'
     },
     {
-        value: 1.6,
+        value: 1.5,
         label: '强创造力'
     },
     {
-        value: 2.0,
+        value: 2,
         label: '天马行空'
     }
 ];
@@ -277,12 +277,11 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     <Grid item xs={12} container spacing={2} className="flex justify-center">
                         <Grid item className="w-[90%]">
                             <Slider
-                                defaultValue={0.4}
-                                step={0.4}
+                                step={0.5}
                                 valueLabelDisplay="off"
-                                min={0.4}
+                                min={0}
                                 max={2}
-                                value={chatBotInfo?.temperature || 0.4}
+                                value={chatBotInfo?.temperature}
                                 marks={marks}
                                 onChange={(e, value) => {
                                     setChatBotInfo({

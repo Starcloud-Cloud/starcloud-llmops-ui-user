@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
 import { getAvatarList, getVoiceList } from 'api/chat';
+import { t } from 'hooks/web/useI18n';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
@@ -224,6 +225,7 @@ const VoiceModal = ({
                                             label={'style'}
                                             className={'w-[150px]'}
                                             value={chatBotInfo.voiceStyle}
+                                            disabled={!styleList || styleList?.length === 0}
                                             onChange={(e) => {
                                                 setChatBotInfo({
                                                     ...chatBotInfo,
@@ -233,7 +235,7 @@ const VoiceModal = ({
                                         >
                                             {styleList.map((item, index) => (
                                                 <MenuItem key={index} value={item}>
-                                                    {item}
+                                                    {t(`voiceStyles.${item}`)}
                                                 </MenuItem>
                                             ))}
                                         </Select>

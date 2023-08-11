@@ -48,6 +48,8 @@ export type IChatInfo = {
     voiceStyle?: string;
     voicePitch?: number;
     voiceSpeed?: number;
+    enableSearchInWeb?: boolean;
+    searchInWeb?: string;
 };
 
 function CreateDetail() {
@@ -72,11 +74,13 @@ function CreateDetail() {
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
-                    enableIntroduction: res.chatConfig.description.enabled,
-                    statement: res.chatConfig.openingStatement.statement,
+                    enableIntroduction: res.chatConfig?.description?.enabled,
+                    statement: res.chatConfig?.openingStatement.statement,
                     prePrompt: res.chatConfig.prePrompt,
-                    temperature: res.chatConfig.modelConfig.completionParams.temperature,
-                    defaultImg: res?.images?.[0]
+                    temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
+                    defaultImg: res?.images?.[0],
+                    enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
                 });
             });
         }
@@ -162,6 +166,10 @@ function CreateDetail() {
         data.chatConfig.openingStatement.statement = chatBotInfo.statement;
         data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
         data.description = chatBotInfo.introduction;
+        data.chatConfig.webSearchConfig = {
+            enabled: chatBotInfo.enableSearchInWeb,
+            webScope: chatBotInfo.searchInWeb
+        };
         await chatSave(data);
         dispatch(
             openSnackbar({
@@ -194,7 +202,7 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        (value === 0 || value === 1) && (
+                        (value === 0 || value === 1 || value === 3) && (
                             <Button
                                 className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
@@ -248,7 +256,7 @@ function CreateDetail() {
                     <Knowledge />
                 </TabPanel>
                 <TabPanel value={value} index={3}>
-                    <Skill />
+                    <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={4}>
                     <Chat chatBotInfo={chatBotInfo} />

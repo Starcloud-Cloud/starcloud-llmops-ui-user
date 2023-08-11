@@ -771,5 +771,27 @@
         "createRobotRequire": "Robot name is required",
         "typeName": "Please fill in the robot's name",
         "myRobot": "My Robot"
+    },
+    "voiceStyles": {
+        "affectionate": "affectionate",
+        "embarrassed": "embarrassed",
+        "calm": "calm",
+        "fearful": "fearful",
+        "cheerful": "cheerful",
+        "disgruntled": "disgruntled",
+        "serious": "serious",
+        "angry": "angry",
+        "sad": "sad",
+        "narration-relaxed": "narration-relaxed",
+        "depressed": "depressed",
+        "chat": "chat",
+        "assistant": "assistant",
+        "newscast": "newscast",
+        "gentle": "gentle",
+        "envious": "envious",
+        "customerservice": "customerservice",
+        "lyrical": "lyrical",
+        "poetry-reading": "poetry-reading",
+        "friendly": "friendly"
     }
 }

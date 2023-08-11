@@ -322,16 +322,20 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
 
     return (
         <div>
-            <div className={'flex justify-center items-center py-[20px]'}>
-                <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+            <div className={'flex justify-center items-center py-[8px]'}>
+                <div className="w-[28px] h-[28px] flex justify-center items-center">
+                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                </div>
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden', minHeight: 525 }} ref={scrollRef}>
+            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden' }} ref={scrollRef}>
                 <div ref={contentRef}>
                     {chatBotInfo.enableIntroduction && (
                         <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
-                            <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                            <div className="flex w-[56px] h-[56px] justify-center items-center">
+                                <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                            </div>
                             <div className="flex flex-col ml-3">
                                 <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
                                 <Typography align="left" variant="subtitle2" color={'#000'}>

@@ -308,14 +308,17 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
 
     useEffect(() => {
         if (chatBotInfo.searchInWeb) {
-            const websites = chatBotInfo.searchInWeb.split('\n').map((item) => item.trim());
+            const websites = chatBotInfo.searchInWeb
+                .trim()
+                .split('\n')
+                .map((item) => item.trim());
             // 简单验证每个网站地址
-            const isValidInput = websites.every((website) =>
-                /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)
-            );
+            const isValidInput =
+                websites.every((website) => /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)) &&
+                websites.length < 11;
             setIsValid(isValidInput);
             // 设置网站地址的数量
-            setWebsiteCount(isValidInput ? websites.length : 0);
+            setWebsiteCount(websites.length);
         }
     }, [chatBotInfo.searchInWeb]);
 
@@ -459,7 +462,9 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                         />
                         <div className="flex justify-between">
                             {!isValid ? (
-                                <div className="text-[#f44336] mt-1">请输入正确的URL</div>
+                                <div className="text-[#f44336] mt-1">
+                                    {websiteCount <= 10 ? '请输入正确的网络搜索范围' : '网址不能超过10个'}
+                                </div>
                             ) : (
                                 <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
                             )}

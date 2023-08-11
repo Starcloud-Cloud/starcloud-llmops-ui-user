@@ -63,12 +63,9 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     <CardContent sx={{ p: 2, pb: '16px !important', width: 'fit-content', ml: 'auto' }}>
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
-                                                                <Typography
-                                                                    variant="body2"
-                                                                    color={theme.palette.mode === 'dark' ? 'dark.900' : ''}
-                                                                >
+                                                                <div className="text-sm whitespace-pre-line text-[#364152]">
                                                                     {history.message}
-                                                                </Typography>
+                                                                </div>
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>
@@ -103,7 +100,9 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
-                                                                    <Typography variant="body2">{history.answer}</Typography>
+                                                                    <div className="text-sm whitespace-pre-line text-[#364152]">
+                                                                        {history.answer}
+                                                                    </div>
                                                                 ) : (
                                                                     <LoadingDot />
                                                                 )}
@@ -149,12 +148,13 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
-                                                                    <Typography
-                                                                        variant="body2"
-                                                                        color={history.status === 'ERROR' ? 'red' : ''}
+                                                                    <div
+                                                                        className={`text-sm whitespace-pre-line  ${
+                                                                            history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
+                                                                        }`}
                                                                     >
                                                                         {history.answer}
-                                                                    </Typography>
+                                                                    </div>
                                                                 ) : (
                                                                     <LoadingDot />
                                                                 )}

@@ -17,7 +17,8 @@ import {
     MenuItem,
     TextField,
     Tooltip,
-    Chip
+    Chip,
+    FormControlLabel
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
@@ -100,9 +101,13 @@ const Valida = ({
     ];
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
-        data.forEach((item: { field: string; defaultValue: string }) => {
-            const { field, defaultValue } = item;
-            Data[field] = defaultValue !== null && defaultValue !== undefined ? defaultValue : '';
+        data.forEach((item: { field: string; defaultValue: string; value: string }) => {
+            const { field, defaultValue, value } = item;
+            if (field === 'prompt') {
+                Data[field] = value !== null && value !== undefined ? value : '';
+            } else {
+                Data[field] = defaultValue !== null && defaultValue !== undefined ? defaultValue : '';
+            }
         });
         return Data;
     };
@@ -151,12 +156,17 @@ const Valida = ({
                                                 </Tooltip>
                                             </Box>
                                             <Box>
-                                                <Switch
-                                                    name="promptisShow"
-                                                    onChange={(e) => {
-                                                        basisChange({ e: e.target, index, i, flag: true });
-                                                    }}
-                                                    checked={el.isShow}
+                                                <FormControlLabel
+                                                    label="是否显示"
+                                                    control={
+                                                        <Switch
+                                                            name="promptisShow"
+                                                            onChange={(e) => {
+                                                                basisChange({ e: e.target, index, i, flag: true });
+                                                            }}
+                                                            checked={el.isShow}
+                                                        />
+                                                    }
                                                 />
                                             </Box>
                                         </Box>
@@ -164,7 +174,7 @@ const Valida = ({
                                             color="secondary"
                                             sx={{ mt: 2 }}
                                             inputRef={iptRef}
-                                            label={t('market.' + el.field)}
+                                            placeholder={el.defaultValue}
                                             value={formik.values[el.field]}
                                             id={el.field}
                                             required
@@ -183,7 +193,7 @@ const Valida = ({
                                                 formik.handleChange(e);
                                                 clearTimeout(timeoutRef.current);
                                                 timeoutRef.current = setTimeout(() => {
-                                                    basisChange({ e: e.target, index, i, flag: false });
+                                                    basisChange({ e: e.target, index, i, flag: false, values: true });
                                                 }, 300);
                                             }}
                                             fullWidth

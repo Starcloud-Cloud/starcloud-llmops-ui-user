@@ -31,14 +31,14 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
         const flag = config?.steps?.map((item: any) => {
             const model = item.flowStep.variable?.variables.map((el: El) => {
                 if (el.isShow) {
-                    return el.value ? false : true;
+                    return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
                 } else {
-                    return el.defaultValue ? false : true;
+                    return el.defaultValue || el.defaultValue === false ? false : true;
                 }
             });
             const variable = item?.variable?.variables.map((el: El) => {
                 if (el.isShow) {
-                    return el.value ? false : true;
+                    return el.value || el.value || el.defaultValue || el.defaultValue === false ? false : true;
                 } else {
                     return false;
                 }

@@ -23,12 +23,31 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
     useImperativeHandle(ref, () => ({
         formiks: formik,
         submit: () => {
-            if (Object.values(formik.values).some((value) => value === '')) {
-                formik.handleSubmit();
-                return false;
-            } else {
-                return formik.values;
-            }
+            const curren = async () => {
+                const newValue = _.cloneDeep(config);
+                if (newValue.steps[steps].variable && newValue.steps[steps].variable.variables) {
+                    for (const [i, item] of newValue.steps[steps].variable.variables.entries()) {
+                        if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
+                            await promptChange({ e: { value: item.defaultValue }, steps, i, flag: true });
+                            await formik.setFieldValue(item.field, item.defaultValue);
+                        }
+                    }
+                }
+
+                for (const [i, item] of newValue.steps[steps].flowStep.variable.variables.entries()) {
+                    if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
+                        await promptChange({ e: { value: item.defaultValue }, steps, i });
+                        await formik.setFieldValue(item.field, item.defaultValue);
+                    }
+                }
+                if (Object.values(formik.values).some((value) => value === '')) {
+                    await formik.handleSubmit();
+                    return false;
+                } else {
+                    return formik.values;
+                }
+            };
+            curren();
         }
     }));
     const fn = (data: any[]) => {
@@ -55,19 +74,44 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
             if (el.isShow) {
-                return el.value || el.value === false ? false : true;
+                return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
             } else {
                 return el.defaultValue || el.defaultValue === false ? false : true;
             }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
-                return el.value || el.value === false ? false : true;
+                return el.value || el.value || el.defaultValue || el.defaultValue === false ? false : true;
             } else {
                 return false;
             }
         });
         return model?.some((value: boolean) => value === true) || variable?.some((value: boolean) => value === true) ? true : false;
+    };
+    //点击单个执行
+    const executeAPP = async (index: number) => {
+        const newValue = _.cloneDeep(config);
+        await new Promise(async (resolve) => {
+            if (newValue.steps[index].variable && newValue.steps[index].variable.variables) {
+                for (const [i, item] of newValue.steps[index].variable.variables.entries()) {
+                    if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
+                        await promptChange({ e: { value: item.defaultValue }, steps, i, flag: true });
+                        await formik.setFieldValue(item.field, item.defaultValue);
+                    }
+                }
+            }
+            resolve(true);
+        });
+        await new Promise(async (resolve) => {
+            for (const [i, item] of newValue.steps[index].flowStep.variable.variables.entries()) {
+                if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
+                    await promptChange({ e: { value: item.defaultValue }, steps, i });
+                    await formik.setFieldValue(item.field, item.defaultValue);
+                }
+            }
+            resolve(true);
+        });
+        await formik.handleSubmit();
     };
     useEffect(() => {
         if (mdRef.current) {
@@ -113,9 +157,7 @@ const CarrOut = forwardRef(({ config, source, loadings, variableChange, promptCh
                             </IconButton>
                         </Tooltip>
                         <Button
-                            onClick={() => {
-                                formik.handleSubmit();
-                            }}
+                            onClick={() => executeAPP(steps)}
                             disabled={disSteps(steps)}
                             color="secondary"
                             size="small"

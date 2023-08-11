@@ -145,10 +145,14 @@ function Deatail() {
         newValue.workflowConfig.steps[index].flowStep.response.answer = value;
         setDetailData(newValue);
     };
-    //更改prompt的值
-    const promptChange = ({ e, steps, el }: any) => {
-        const newValue = { ...detailData };
-        newValue.workflowConfig.steps[steps].flowStep.variable.variables[el].value = e.value;
+    //设置执行的prompt
+    const promptChange = ({ e, steps, i, flag = false }: any) => {
+        const newValue = _.cloneDeep(detailData);
+        if (flag) {
+            newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        } else {
+            newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+        }
         setDetailData(newValue);
     };
     //更改变量的值

@@ -53,7 +53,7 @@ export interface Validas {
     index: number;
     allvalida: number | null;
     editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
-    basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null }) => void;
+    basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null; values?: boolean }) => void;
     setModal: (index: number) => void;
     setOpen: (flag: boolean) => void;
     setTitle: (data: string) => void;

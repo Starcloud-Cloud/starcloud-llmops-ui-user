@@ -221,9 +221,13 @@ function CreateDetail() {
         setDetail(newValue);
     };
     //设置执行的prompt
-    const promptChange = ({ e, steps, i }: any) => {
+    const promptChange = ({ e, steps, i, flag = false }: any) => {
         const newValue = _.cloneDeep(detail);
-        newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+        if (flag) {
+            newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        } else {
+            newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+        }
         setDetail(newValue);
     };
     //增加 删除变量
@@ -250,7 +254,7 @@ function CreateDetail() {
         [detail]
     );
     //提示词更改
-    const basisChange = ({ e, index, i, flag = false }: any) => {
+    const basisChange = ({ e, index, i, flag = false, values = false }: any) => {
         const oldValue = _.cloneDeep(detail);
         if (flag) {
             oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
@@ -259,15 +263,17 @@ function CreateDetail() {
             if (e.name === 'res') {
                 oldValue.workflowConfig.steps[index].flowStep.response.style = e.value;
             } else {
-                oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+                if (values) {
+                    oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
+                } else {
+                    oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+                }
             }
         }
         setDetail(oldValue);
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
-        console.log('qirhuan');
-
         const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
         setDetail(value);

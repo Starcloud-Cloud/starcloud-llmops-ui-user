@@ -337,10 +337,12 @@ function ApplicationAnalysis() {
                                         onClick={() => {
                                             if (row.appMode === 'BASE_GENERATE_IMAGE') {
                                                 detailImage(row.uid).then((res) => {
-                                                    setDetail(res);
+                                                    setDetail(res.list);
                                                 });
                                             } else if (row.appMode === 'COMPLETION') {
-                                                detailApp(row.uid).then((res) => {});
+                                                detailApp(row.uid).then((res) => {
+                                                    setDetail(res.list);
+                                                });
                                             } else {
                                             }
                                             setOpen(true);

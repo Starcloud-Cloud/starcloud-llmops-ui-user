@@ -158,6 +158,27 @@ function CreateDetail() {
             );
             return;
         }
+        if (chatBotInfo.searchInWeb) {
+            const websites = chatBotInfo.searchInWeb.split('\n').map((item) => item.trim());
+            // 简单验证每个网站地址
+            const isValidInput = websites.every((website) =>
+                /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)
+            );
+            if (!isValidInput) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '请设置正确的网络搜索范围',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+                return;
+            }
+        }
         const data: any = detail;
         data.name = chatBotInfo.name;
         data.images = [chatBotInfo.avatar];

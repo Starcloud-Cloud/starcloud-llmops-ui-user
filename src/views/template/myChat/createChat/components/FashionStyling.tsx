@@ -21,26 +21,26 @@ import {
     Switch,
     TextField
 } from '@mui/material';
-import {Upload, UploadFile, UploadProps} from 'antd';
-import {getAvatarList, getVoiceList} from 'api/chat';
-import {t} from 'hooks/web/useI18n';
-import React, {useEffect, useState} from 'react';
-import {useLocation} from 'react-router-dom';
-import {dispatch} from 'store';
-import {gridSpacing} from 'store/constant';
-import {openSnackbar} from 'store/slices/snackbar';
+import { Upload, UploadFile, UploadProps } from 'antd';
+import { getAvatarList, getVoiceList } from 'api/chat';
+import { t } from 'hooks/web/useI18n';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { dispatch } from 'store';
+import { gridSpacing } from 'store/constant';
+import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
-import {getAccessToken} from 'utils/auth';
-import {config} from 'utils/axios/config';
-import {v4 as uuidv4} from 'uuid';
-import {IChatInfo} from '../index';
+import { getAccessToken } from 'utils/auth';
+import { config } from 'utils/axios/config';
+import { v4 as uuidv4 } from 'uuid';
+import { IChatInfo } from '../index';
 
-const {base_url} = config;
+const { base_url } = config;
 
 const uploadButton = (
     <div>
-        <AddIcon/>
-        <div style={{marginTop: 8}}>上传</div>
+        <AddIcon />
+        <div style={{ marginTop: 8 }}>上传</div>
     </div>
 );
 
@@ -63,17 +63,17 @@ interface IVoiceType {
 }
 
 const VoiceModal = ({
-                        open,
-                        handleClose,
-                        chatBotInfo,
-                        setChatBotInfo,
-                        list
-                    }: {
+    open,
+    handleClose,
+    chatBotInfo,
+    setChatBotInfo,
+    list
+}: {
     open: boolean;
     handleClose: () => void;
     chatBotInfo: IChatInfo;
     setChatBotInfo: (chatInfo: IChatInfo) => void;
-    list: IVoiceType[]
+    list: IVoiceType[];
 }) => {
     const [name, setName] = useState('');
     const [style, setStyle] = useState('');
@@ -86,12 +86,12 @@ const VoiceModal = ({
 
     useEffect(() => {
         if (chatBotInfo) {
-            setName(chatBotInfo?.voiceName || '')
-            setPitch(chatBotInfo?.voicePitch || 1)
-            setSpeed(chatBotInfo?.voiceSpeed || 1)
-            setStyle(chatBotInfo?.voiceStyle || '')
+            setName(chatBotInfo?.voiceName || '');
+            setPitch(chatBotInfo?.voicePitch || 1);
+            setSpeed(chatBotInfo?.voiceSpeed || 1);
+            setStyle(chatBotInfo?.voiceStyle || '');
         }
-    }, [chatBotInfo])
+    }, [chatBotInfo]);
 
     const styleList = React.useMemo(() => {
         const item = list.find((v) => v.LocalName === name);
@@ -118,7 +118,7 @@ const VoiceModal = ({
                     // 创建新的可读流
                     start(controller) {
                         function read() {
-                            reader.read().then(({done, value}: any) => {
+                            reader.read().then(({ done, value }: any) => {
                                 if (done) {
                                     controller.close(); // 关闭流
                                     return;
@@ -135,7 +135,7 @@ const VoiceModal = ({
             .then((stream) => {
                 let buffer: any;
                 const reader = stream.getReader(); // 获取读取器
-                const processStream: any = ({done, value}: any) => {
+                const processStream: any = ({ done, value }: any) => {
                     if (done) {
                         const audioContext = new window.AudioContext();
                         if (audioContext.state === 'suspended') {
@@ -200,7 +200,7 @@ const VoiceModal = ({
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">
-                        <CloseIcon fontSize="small"/>
+                        <CloseIcon fontSize="small" />
                     </IconButton>
                 }
             >
@@ -208,29 +208,23 @@ const VoiceModal = ({
                     <Grid container spacing={gridSpacing}>
                         <div className={'w-full px-[24px] '}>
                             <div className={'w-full  pt-[24px]'}>
-                                <RadioGroup
-                                    row
-                                    aria-label="gender"
-                                    name="row-radio-buttons-group"
-                                    value={name}
-                                    onChange={handleChange}
-                                >
+                                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={name} onChange={handleChange}>
                                     <div className={'grid grid-cols-2 gap-4 w-full'}>
                                         {list.map((item, index) => (
                                             <FormControlLabel
                                                 key={index}
                                                 value={item.LocalName}
-                                                control={<Radio/>}
+                                                control={<Radio />}
                                                 label={`${item.LocalName}-${item.Gender === 'Male' ? '男' : '女'}-${item.LocaleName}`}
                                             />
                                         ))}
                                     </div>
                                 </RadioGroup>
                             </div>
-                            <Divider className={'py-[15px]'}/>
+                            <Divider className={'py-[15px]'} />
                             <div className={'flex items-center justify-between mt-5'}>
                                 <div className={'flex-[0 0 150px]'}>
-                                    <FormControl sx={{width: '100%'}}>
+                                    <FormControl sx={{ width: '100%' }}>
                                         <InputLabel id="age-select" size={'small'}>
                                             风格
                                         </InputLabel>
@@ -267,7 +261,7 @@ const VoiceModal = ({
                                             value={pitch}
                                             max={1.5}
                                             onChange={(e, value) => {
-                                                setPitch(value as number)
+                                                setPitch(value as number);
                                             }}
                                         />
                                     </div>
@@ -286,14 +280,14 @@ const VoiceModal = ({
                                             max={2}
                                             value={speed}
                                             onChange={(e, value) => {
-                                                setSpeed(value as number)
+                                                setSpeed(value as number);
                                             }}
                                         />
                                     </div>
                                 </div>
                                 <div className={'flex-[0 0 150px]'}>
                                     <Button
-                                        startIcon={<PlayCircleOutlineIcon/>}
+                                        startIcon={<PlayCircleOutlineIcon />}
                                         variant={'contained'}
                                         color={'secondary'}
                                         size={'small'}
@@ -306,19 +300,24 @@ const VoiceModal = ({
                         </div>
                     </Grid>
                 </CardContent>
-                <Divider/>
+                <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" color={'secondary'} onClick={() => {
-                            setChatBotInfo({
-                                ...chatBotInfo,
-                                voiceName: name,
-                                voiceStyle: style,
-                                voicePitch: pitch,
-                                voiceSpeed: speed
-                            })
-                            handleClose()
-                        }}>
+                        <Button
+                            variant="contained"
+                            type="button"
+                            color={'secondary'}
+                            onClick={() => {
+                                setChatBotInfo({
+                                    ...chatBotInfo,
+                                    voiceName: name,
+                                    voiceStyle: style,
+                                    voicePitch: pitch,
+                                    voiceSpeed: speed
+                                });
+                                handleClose();
+                            }}
+                        >
                             保存
                         </Button>
                     </Grid>
@@ -328,7 +327,7 @@ const VoiceModal = ({
     );
 };
 
-const ShortcutModal = ({open, handleClose}: { open: boolean; handleClose: () => void }) => {
+const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const [type, setType] = useState('0');
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -344,21 +343,20 @@ const ShortcutModal = ({open, handleClose}: { open: boolean; handleClose: () => 
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">
-                        <CloseIcon fontSize="small"/>
+                        <CloseIcon fontSize="small" />
                     </IconButton>
                 }
             >
                 <div className={'w-full p-[24px] '}>
-                    <FormControl sx={{width: '100%'}}>
+                    <FormControl sx={{ width: '100%' }}>
                         <InputLabel id="age-select">类型</InputLabel>
-                        <Select id="columnId" name="columnId" label={'style'} fullWidth
-                                onChange={(e: any) => setType(e.target.value)}>
+                        <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
                             <MenuItem value="0">文本内容</MenuItem>
                             <MenuItem value="1">执行AI流程</MenuItem>
                         </Select>
                     </FormControl>
 
-                    <TextField className={'mt-2'} fullWidth label={'关键字'}/>
+                    <TextField className={'mt-2'} fullWidth label={'关键字'} />
                     {type === '0' ? (
                         <TextField
                             className={'mt-2'}
@@ -370,10 +368,9 @@ const ShortcutModal = ({open, handleClose}: { open: boolean; handleClose: () => 
                             label={'回复内容'}
                         />
                     ) : (
-                        <FormControl sx={{width: '100%'}} className={'mt-2'}>
+                        <FormControl sx={{ width: '100%' }} className={'mt-2'}>
                             <InputLabel id="age-select">选择应用</InputLabel>
-                            <Select id="columnId" name="columnId" label={'style'} fullWidth
-                                    onChange={(e: any) => setType(e.target.value)}>
+                            <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
                                 <MenuItem value="0">
                                     <em>文本内容</em>
                                 </MenuItem>
@@ -384,7 +381,7 @@ const ShortcutModal = ({open, handleClose}: { open: boolean; handleClose: () => 
                         </FormControl>
                     )}
                 </div>
-                <Divider/>
+                <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
                         <Button variant="contained" type="button">
@@ -402,9 +399,9 @@ const ShortcutModal = ({open, handleClose}: { open: boolean; handleClose: () => 
  * @constructor
  */
 export const FashionStyling = ({
-                                   setChatBotInfo,
-                                   chatBotInfo
-                               }: {
+    setChatBotInfo,
+    chatBotInfo
+}: {
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
 }) => {
@@ -415,6 +412,8 @@ export const FashionStyling = ({
     const [startCheck, setStartCheck] = useState(false);
     const [isFirst, setIsFirst] = useState(true);
     const [list, setList] = useState<IVoiceType[]>([]);
+    const [isValid, setIsValid] = useState(true);
+    const [websiteCount, setWebsiteCount] = useState(0);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -430,13 +429,13 @@ export const FashionStyling = ({
                 setChatBotInfo({
                     ...chatBotInfo,
                     voiceName: res?.[0]?.LocalName
-                })
+                });
                 setList(res || []);
             }
         })();
     }, [chatBotInfo]);
 
-    const handleChange: UploadProps['onChange'] = ({fileList: newFileList}) => setFileList(newFileList);
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
 
     useEffect(() => {
         if (fileList?.[0]?.response?.data) {
@@ -468,6 +467,18 @@ export const FashionStyling = ({
         }
     }, [fileList]);
 
+    useEffect(() => {
+        if (chatBotInfo?.searchInWeb) {
+            const websites = chatBotInfo?.searchInWeb?.split(/[\n,]/).map((item) => item.trim());
+            // 简单验证每个网站地址
+            const isValidInput = websites.every((website) =>
+                /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)
+            );
+            setIsValid(isValidInput);
+            setWebsiteCount(isValidInput ? websites.length : 0);
+        }
+    }, [chatBotInfo?.searchInWeb]);
+
     return (
         <>
             <div>
@@ -485,14 +496,14 @@ export const FashionStyling = ({
                             className={'mt-1'}
                             value={chatBotInfo.name}
                             error={startCheck && !chatBotInfo.name}
-                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]"/>}
+                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
                             fullWidth
-                            InputLabelProps={{shrink: true}}
+                            InputLabelProps={{ shrink: true }}
                             size={'small'}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 setStartCheck(true);
-                                setChatBotInfo({...chatBotInfo, name: value});
+                                setChatBotInfo({ ...chatBotInfo, name: value });
                             }}
                         />
                     </div>
@@ -556,18 +567,16 @@ export const FashionStyling = ({
                             multiline={true}
                             maxRows={5}
                             minRows={5}
-                            InputLabelProps={{shrink: true}}
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
                             error={(chatBotInfo?.introduction?.length || 0) > 300}
                             label={'简介'}
                             onChange={(e) => {
                                 const value = e.target.value;
-                                setChatBotInfo({...chatBotInfo, introduction: value});
+                                setChatBotInfo({ ...chatBotInfo, introduction: value });
                             }}
                         />
-                        <div
-                            className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.introduction?.length || 0}/300
-                        </div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.introduction?.length || 0}/300</div>
                     </div>
                     <div className={'mt-5'}>
                         <div className="flex justify-between">
@@ -585,7 +594,7 @@ export const FashionStyling = ({
                                         setChatBotInfo({
                                             ...chatBotInfo,
                                             enableVoice: !chatBotInfo.enableVoice
-                                        })
+                                        });
                                     }}
                                 />
                             </div>
@@ -593,24 +602,24 @@ export const FashionStyling = ({
                         <div className={'mt-3'}>
                             <Button
                                 variant={'contained'}
-                                startIcon={<GraphicEqIcon/>}
+                                startIcon={<GraphicEqIcon />}
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => setVoiceOpen(true)}
                             >
                                 选择声音
                             </Button>
-                            {chatBotInfo.voiceName &&
+                            {chatBotInfo.voiceName && (
                                 <Button
                                     className={'ml-3'}
-                                    startIcon={<PlayCircleOutlineIcon/>}
+                                    startIcon={<PlayCircleOutlineIcon />}
                                     variant={'contained'}
                                     color={'secondary'}
                                     size={'small'}
                                 >
                                     {chatBotInfo.voiceName}
                                 </Button>
-                            }
+                            )}
                         </div>
                     </div>
                 </div>
@@ -630,7 +639,7 @@ export const FashionStyling = ({
                                 checked={chatBotInfo.enableStatement}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    setChatBotInfo({...chatBotInfo, enableStatement: !chatBotInfo.enableStatement});
+                                    setChatBotInfo({ ...chatBotInfo, enableStatement: !chatBotInfo.enableStatement });
                                 }}
                             />
                         </div>
@@ -645,15 +654,14 @@ export const FashionStyling = ({
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"
-                            InputLabelProps={{shrink: true}}
+                            InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.statement}
                             onChange={(e) => {
                                 const value = e.target.value;
-                                setChatBotInfo({...chatBotInfo, statement: value});
+                                setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
-                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300
-                        </div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300</div>
                         {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (
@@ -728,9 +736,14 @@ export const FashionStyling = ({
                     </div> */}
                 </div>
             </div>
-            <VoiceModal open={voiceOpen} handleClose={closeVoiceModal} chatBotInfo={chatBotInfo}
-                        setChatBotInfo={setChatBotInfo} list={list}/>
-            <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)}/>
+            <VoiceModal
+                open={voiceOpen}
+                handleClose={closeVoiceModal}
+                chatBotInfo={chatBotInfo}
+                setChatBotInfo={setChatBotInfo}
+                list={list}
+            />
+            <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
         </>
     );
 };

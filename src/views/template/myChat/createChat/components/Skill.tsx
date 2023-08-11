@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { Popover, Upload, UploadProps } from 'antd';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import { TabsProps } from 'types';
 import MainCard from 'ui-component/cards/MainCard';
@@ -294,6 +294,10 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const [anchorEl, setAnchorEl] = useState<Element | ((element: Element) => Element) | null | undefined>(null);
     const [qaVisible, setQaVisible] = useState(false);
     const [documentVisible, setDocumentVisible] = useState(false);
+
+    const [isValid, setIsValid] = useState(true);
+    const [websiteCount, setWebsiteCount] = useState(0);
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
         setAnchorEl(event?.currentTarget);
     };
@@ -301,6 +305,20 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    useEffect(() => {
+        if (chatBotInfo.searchInWeb) {
+            const websites = chatBotInfo.searchInWeb.split('\n').map((item) => item.trim());
+            // 简单验证每个网站地址
+            const isValidInput = websites.every((website) =>
+                /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)
+            );
+            setIsValid(isValidInput);
+            // 设置网站地址的数量
+            setWebsiteCount(isValidInput ? websites.length : 0);
+        }
+    }, [chatBotInfo.searchInWeb]);
+
     return (
         <div>
             <div>
@@ -422,27 +440,32 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                     <div className="text-sm text-[#9da3af] ml-3">能够从互联网上收集实时信息，你可以问机器人最新最近的信息。 </div>
                 </div>
                 {chatBotInfo.enableSearchInWeb && (
-                    <TextField
-                        helperText={
-                            <div>
-                                <div>- 您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如cnn.com。</div>
-                                <div>- 也可以输入ALL，不限制搜索范围。</div>
-                            </div>
-                        }
-                        label={'设置网络搜索范围'}
-                        className={'mt-3'}
-                        fullWidth
-                        onChange={(e) => {
-                            setChatBotInfo({
-                                ...chatBotInfo,
-                                searchInWeb: e.target.value
-                            });
-                        }}
-                        multiline
-                        value={chatBotInfo.searchInWeb}
-                        minRows={3}
-                        size="small"
-                    />
+                    <>
+                        <TextField
+                            label={'设置网络搜索范围'}
+                            className={'mt-3'}
+                            fullWidth
+                            error={!isValid}
+                            onChange={(e) => {
+                                setChatBotInfo({
+                                    ...chatBotInfo,
+                                    searchInWeb: e.target.value
+                                });
+                            }}
+                            multiline
+                            value={chatBotInfo.searchInWeb}
+                            minRows={3}
+                            size="small"
+                        />
+                        <div className="flex justify-between">
+                            {!isValid ? (
+                                <div className="text-[#f44336] mt-1">请输入正确的URL</div>
+                            ) : (
+                                <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
+                            )}
+                            <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/10个</div>
+                        </div>
+                    </>
                 )}
             </div>
             <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />

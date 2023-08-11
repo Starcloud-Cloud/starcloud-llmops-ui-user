@@ -158,14 +158,14 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     />
                     <div className="flex justify-between">
                         {startCheck && !regulationText ? (
-                            <div className="text-[#f44336]">请输入角色描述</div>
+                            <div className="text-[#f44336] mt-1">请输入角色描述</div>
                         ) : (
                             <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
                         )}
                         <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/800</div>
                     </div>
 
-                    <div className={'flex  items-center mt-3'}>
+                    <div className={'flex  items-center mt-5'}>
                         <FormControl
                             sx={{
                                 width: '150px',

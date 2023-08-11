@@ -13,6 +13,8 @@ import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import { AuthLoginCardWrapper } from '../AuthCardWrapper';
 import AuthWrapper2 from '../AuthWrapper2';
 import AuthLogin from '../auth-forms/AuthLogin';
+import { useEffect } from 'react';
+import infoStore from 'store/entitlementAction';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-login.svg';
@@ -39,7 +41,10 @@ const Login = () => {
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
-
+    const { setInvitationCode } = infoStore();
+    useEffect(() => {
+        setInvitationCode(null);
+    }, []);
     return (
         <AuthWrapper2>
             <Grid container justifyContent={matchDownSM ? 'center' : 'space-between'} alignItems="center">

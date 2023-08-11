@@ -2,8 +2,8 @@ import { create } from 'zustand';
 type UserInfo = {
     invitationCode: null | string;
     userInfo: null | any;
-    setUserInfo: (data: string) => void;
-    setInvitationCode: (data: string) => void;
+    setUserInfo: (data: string | null) => void;
+    setInvitationCode: (data: string | null) => void;
 };
 const userInfoStore = create<UserInfo>((set) => ({
     userInfo: null,

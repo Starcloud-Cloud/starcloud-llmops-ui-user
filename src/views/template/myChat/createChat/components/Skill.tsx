@@ -439,6 +439,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                             });
                         }}
                         multiline
+                        value={chatBotInfo.searchInWeb}
                         minRows={3}
                         size="small"
                     />

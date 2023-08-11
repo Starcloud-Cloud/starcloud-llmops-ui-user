@@ -420,12 +420,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                                 <InputAdornment position="end" className="relative">
                                     {isFetch ? (
                                         <Tooltip placement="top" arrow title={'请求中'}>
-                                            <IconButton
-                                                disableRipple
-                                                color={message ? 'secondary' : 'default'}
-                                                onClick={handleOnSend}
-                                                aria-label="send message"
-                                            >
+                                            <IconButton disableRipple color={message ? 'secondary' : 'default'} aria-label="send message">
                                                 <PendingIcon />
                                             </IconButton>
                                         </Tooltip>

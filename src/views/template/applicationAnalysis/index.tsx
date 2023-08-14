@@ -3,6 +3,7 @@ import {
     Grid,
     FormControl,
     InputLabel,
+    InputAdornment,
     Select,
     MenuItem,
     Typography,
@@ -25,6 +26,8 @@ import {
     IconButton,
     CardContent
 } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
@@ -140,6 +143,8 @@ function ApplicationAnalysis() {
     //输入框输入
     const handleChange = (e: any) => {
         const { name, value } = e.target;
+        console.log(name, value);
+
         setQuery({ ...queryParams, [name]: value });
     };
     //切换分页
@@ -230,6 +235,39 @@ function ApplicationAnalysis() {
     const [open, setOpen] = useState(false);
 
     // 详情
+    const [detailTotal, setDetailTotal] = useState(0);
+    const [pageQuery, setPageQuery] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const [row, setRow] = useState<{ appMode: string; uid: string }>({ appMode: '', uid: '' });
+    const getDeList = (row: { appMode: string; uid: string }) => {
+        setRow(row);
+        if (row.appMode === 'BASE_GENERATE_IMAGE') {
+            detailImage({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                setDetail(res.list);
+                setDetailTotal(res.total);
+            });
+        } else if (row.appMode === 'COMPLETION') {
+            detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                setDetail(res.list);
+                setDetailTotal(res.total);
+            });
+        } else {
+        }
+        setOpen(true);
+    };
+    const paginationdeChange = (event: any, value: number) => {
+        setPageQuery({
+            ...pageQuery,
+            pageNo: value
+        });
+    };
+    useEffect(() => {
+        if (row.uid) {
+            getDeList(row);
+        }
+    }, [pageQuery.pageNo]);
     const [detail, setDetail] = useState<Detail[] | null>(null);
     //图片弹框
     const [picOpen, setPicOpen] = useState(false);
@@ -247,19 +285,33 @@ function ApplicationAnalysis() {
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <TextField
                         label={t('generateLog.name')}
                         value={queryParams.appName}
                         name="appName"
                         InputLabelProps={{ shrink: true }}
-                        onChange={(e) => {
-                            setQuery({ ...queryParams, [e.target.name]: e.target.value });
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    {queryParams.appName && (
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                handleChange({ target: { name: 'appName', value: '' } });
+                                            }}
+                                        >
+                                            <ClearIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                </InputAdornment>
+                            )
                         }}
+                        onChange={handleChange}
                         fullWidth
                     />
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="appMode">模式</InputLabel>
                         <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
@@ -269,7 +321,7 @@ function ApplicationAnalysis() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="fromScene">场景</InputLabel>
                         <Select labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
@@ -279,7 +331,7 @@ function ApplicationAnalysis() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Select
@@ -297,7 +349,7 @@ function ApplicationAnalysis() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <Button onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
                         {t('generateLog.search')}
                     </Button>
@@ -345,17 +397,7 @@ function ApplicationAnalysis() {
                                         disabled={row.appMode === 'CHAT'}
                                         size="small"
                                         onClick={() => {
-                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
-                                                detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
-                                                    setDetail(res.list);
-                                                });
-                                            } else if (row.appMode === 'COMPLETION') {
-                                                detailApp(row.uid).then((res) => {
-                                                    setDetail(res.list);
-                                                });
-                                            } else {
-                                            }
-                                            setOpen(true);
+                                            getDeList(row);
                                         }}
                                     >
                                         {t('generate.detail')}
@@ -375,6 +417,15 @@ function ApplicationAnalysis() {
                 onClose={() => {
                     setOpen(false);
                     setDetail(null);
+                    setDetailTotal(0);
+                    setRow({
+                        uid: '',
+                        appMode: ''
+                    });
+                    setPageQuery({
+                        pageNo: 1,
+                        pageSize: 10
+                    });
                 }}
             >
                 <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
@@ -431,6 +482,13 @@ function ApplicationAnalysis() {
                                 ))}
                             </TableBody>
                         </Table>
+                        <Box my={2}>
+                            <Pagination
+                                page={pageQuery.pageNo}
+                                count={Math.ceil(detailTotal / pageQuery.pageSize)}
+                                onChange={paginationdeChange}
+                            />
+                        </Box>
                     </Box>
                 </Card>
             </Drawer>
@@ -453,7 +511,15 @@ function ApplicationAnalysis() {
                 />
             )}
             {exeOpen && (
-                <Modal open={exeOpen} onClose={() => setExeOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
+                <Modal
+                    open={exeOpen}
+                    onClose={() => {
+                        setExeOpen(false);
+                        setExeDetail({});
+                    }}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
                     <MainCard
                         style={{
                             position: 'absolute',
@@ -465,7 +531,14 @@ function ApplicationAnalysis() {
                         title="详情"
                         content={false}
                         secondary={
-                            <IconButton onClick={() => setExeOpen(false)} size="large" aria-label="close modal">
+                            <IconButton
+                                onClick={() => {
+                                    setExeOpen(false);
+                                    setExeDetail({});
+                                }}
+                                size="large"
+                                aria-label="close modal"
+                            >
                                 <CloseIcon fontSize="small" />
                             </IconButton>
                         }
@@ -500,7 +573,7 @@ function ApplicationAnalysis() {
                                 </Typography>
                                 <Perform
                                     history={true}
-                                    config={{}}
+                                    config={exeDetail.workflowConfig}
                                     changeSon={() => {}}
                                     changeanswer={() => {}}
                                     loadings={[]}

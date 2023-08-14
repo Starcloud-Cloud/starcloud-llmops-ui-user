@@ -27,6 +27,7 @@ function Deatail() {
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>(null as unknown as Details);
+    const detailRef: any = useRef(null);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     let isAllExecute = false;
@@ -52,6 +53,7 @@ function Deatail() {
             });
             const contentData = { ...detailData };
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+            detailRef.current = contentData;
             setDetailData(contentData);
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
@@ -119,6 +121,7 @@ function Deatail() {
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        detailRef.current = contentData1;
                         setDetailData(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
@@ -143,27 +146,31 @@ function Deatail() {
     const changeanswer = ({ value, index }: any) => {
         const newValue = _.cloneDeep(detailData);
         newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        detailRef.current = newValue;
         setDetailData(newValue);
     };
     //设置执行的prompt
     const promptChange = ({ e, steps, i, flag = false }: any) => {
-        const newValue = _.cloneDeep(detailData);
+        const newValue = _.cloneDeep(detailRef.current);
         if (flag) {
             newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         } else {
             newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         }
+        detailRef.current = newValue;
         setDetailData(newValue);
     };
     //更改变量的值
     const variableChange = ({ e, steps, i }: any) => {
         const newValue = _.cloneDeep(detailData);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        detailRef.current = newValue;
         setDetailData(newValue);
     };
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
             setAllLoading(false);
+            detailRef.current = res;
             setDetailData(res);
         });
         if (ref.current !== null && ref.current.parentNode !== null) {
@@ -186,6 +193,10 @@ function Deatail() {
     //     installTemplate({ uid }).then((res) => {
     //         if (res.data) {
     //             setLoading(false);
+    // detailRef.current = {
+    //                 ...detailData,
+    //                 installStatus: { installStatus: 'INSTALLED' }
+    //             }
     //             setDetailData({
     //                 ...detailData,
     //                 installStatus: { installStatus: 'INSTALLED' }

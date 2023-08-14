@@ -51,11 +51,11 @@ export const infoPage = (data: any) => {
 };
 //执行记录图片详情
 export const detailImage = (data: any) => {
-    return request.get({ url: 'llm/app/log/detail/image/' + data.uid, data: data.page });
+    return request.post({ url: 'llm/app/log/detail/image', data });
 };
 //执行记录执行详情
 export const detailApp = (data: any) => {
-    return request.get({ url: 'llm/app/log/detail/app/' + data });
+    return request.post({ url: 'llm/app/log/detail/app', data });
 };
 
 //获取我的应用

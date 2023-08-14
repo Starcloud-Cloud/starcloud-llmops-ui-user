@@ -64,6 +64,7 @@ function CreateDetail() {
     //是否全部执行
     let isAllExecute = false;
     const [detail, setDetail] = useState(null as unknown as Details);
+    const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
     const basis = useRef<any>(null);
     //判断是保存还是切换tabs
@@ -88,6 +89,7 @@ function CreateDetail() {
             });
             const contentData = _.cloneDeep(detail);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+            detailRef.current = _.cloneDeep(contentData);
             setDetail(contentData);
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
@@ -155,6 +157,7 @@ function CreateDetail() {
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
@@ -203,11 +206,16 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
         });
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            [data.name]: data.value
+        });
         setDetail(
             _.cloneDeep({
                 ...detail,
@@ -219,20 +227,26 @@ function CreateDetail() {
     const exeChange = ({ e, steps, i }: any) => {
         const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     //设置执行的prompt
-    const promptChange = ({ e, steps, i, flag = false }: any) => {
-        const newValue = _.cloneDeep(detail);
+    const promptChange = async ({ e, steps, i, flag = false }: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
         if (flag) {
             newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         } else {
             newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         }
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     //增加 删除变量
     const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            workflowConfig: data
+        });
         setDetail(
             _.cloneDeep({
                 ...detail,
@@ -250,6 +264,7 @@ function CreateDetail() {
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
             }
             oldvalue.workflowConfig.steps[num][label] = value;
+            detailRef.current = oldvalue;
             setDetail(oldvalue);
         },
         [detail]
@@ -271,18 +286,21 @@ function CreateDetail() {
                 }
             }
         }
+        detailRef.current = _.cloneDeep(oldValue);
         setDetail(oldValue);
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
+        detailRef.current = _.cloneDeep(value);
         setDetail(value);
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
         const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        detailRef.current = newValue;
         setDetail(newValue);
     };
     //保存更改
@@ -460,7 +478,7 @@ function CreateDetail() {
                             {detail && value === 0 && (
                                 <Perform
                                     key={perform}
-                                    config={detail?.workflowConfig}
+                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     loadings={loadings}
                                     variableChange={exeChange}
@@ -523,7 +541,7 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
-                                    config={_.cloneDeep(detail.workflowConfig)}
+                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     changeanswer={changeanswer}
                                     loadings={loadings}

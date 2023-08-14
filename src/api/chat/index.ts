@@ -162,3 +162,11 @@ export const getAvatarList = () => {
 export const deleteApp = (appUid: string) => {
     return request.delete({ url: `/llm/app/delete/${appUid}` });
 };
+
+/**
+ * 聊天记录
+ * @returns 
+ */
+export const getChatRecord = (converstation: string) => {
+    return request.get({ url: `/llm/app/log/detail/chat/${converstation}` });
+};

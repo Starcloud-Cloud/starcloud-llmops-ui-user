@@ -38,6 +38,7 @@ import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
+import { getChatRecord } from 'api/chat';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -353,7 +354,10 @@ function ApplicationAnalysis() {
                                                 detailApp(row.uid).then((res) => {
                                                     setDetail(res.list);
                                                 });
-                                            } else {
+                                            } else if (row.appMode === 'CHAT') {
+                                                getChatRecord(row.uid).then((res) => {
+                                                    setDetail(res.list);
+                                                });
                                             }
                                             setOpen(true);
                                         }}

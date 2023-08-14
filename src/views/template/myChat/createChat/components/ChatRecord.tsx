@@ -40,7 +40,7 @@ export const ChatRecord = ({ list }: { list: any }) => {
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden' }}>
+            <div style={{ width: '100%', height: '100%', overflowX: 'hidden' }}>
                 <div>
                     {chatBotInfo.enableIntroduction && (
                         <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">

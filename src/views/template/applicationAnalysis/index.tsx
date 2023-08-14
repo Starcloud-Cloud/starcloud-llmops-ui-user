@@ -413,7 +413,7 @@ function ApplicationAnalysis() {
                                                 });
                                             } else if (row.appMode === 'CHAT') {
                                                 setChatVisible(true);
-                                                getChatRecord({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
+                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 1000 }).then((res) => {
                                                     setDetail(res.list);
                                                 });
                                             }

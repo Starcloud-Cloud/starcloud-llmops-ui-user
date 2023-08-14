@@ -491,7 +491,8 @@
     "application-analysis": "application Analysis",
     "templateMarket": "templateMarket",
     "EntitlementCard": {
-        "ppgrades": "SignIn get token"
+        "ppgrades": "SignIn get token",
+        "ppFreegrades": "SignIn get free token"
     },
     "apply": {
         "name": "Application Name",

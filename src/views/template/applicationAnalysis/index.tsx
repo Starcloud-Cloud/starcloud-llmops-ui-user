@@ -39,6 +39,7 @@ import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
+import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -245,6 +246,7 @@ function ApplicationAnalysis() {
     //执行弹窗
     const [exeOpen, setExeOpen] = useState(false);
     const [exeDetail, setExeDetail] = useState<any>({});
+    const [chatVisible, setChatVisible] = useState(false);
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -343,23 +345,24 @@ function ApplicationAnalysis() {
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"
-                                        disabled={row.appMode === 'CHAT'}
                                         size="small"
                                         onClick={() => {
                                             if (row.appMode === 'BASE_GENERATE_IMAGE') {
                                                 detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
                                                     setDetail(res.list);
+                                                    setOpen(true);
                                                 });
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp(row.uid).then((res) => {
                                                     setDetail(res.list);
+                                                    setOpen(true);
                                                 });
                                             } else if (row.appMode === 'CHAT') {
+                                                setChatVisible(true);
                                                 getChatRecord(row.uid).then((res) => {
                                                     setDetail(res.list);
                                                 });
                                             }
-                                            setOpen(true);
                                         }}
                                     >
                                         {t('generate.detail')}
@@ -518,6 +521,17 @@ function ApplicationAnalysis() {
                     </MainCard>
                 </Modal>
             )}
+            <Drawer
+                anchor="right"
+                open={chatVisible}
+                onClose={() => {
+                    setChatVisible(false);
+                }}
+            >
+                <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
+                    {/* <ChatRecord /> */}
+                </Card>
+            </Drawer>
         </Box>
     );
 }

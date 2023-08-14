@@ -26,50 +26,9 @@ import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
+import { IConversation, IHistory } from './Chat';
 
-export type IHistory = Partial<{
-    uid: string;
-    appConversationUid: string;
-    appUid: string;
-    appMode: string;
-    appConfig: string;
-    appStep: string;
-    status: string;
-    errorCode: string;
-    errorMsg: string;
-    variables: string;
-    message: string;
-    messageTokens: number;
-    messageUnitPrice: number;
-    answer: string;
-    answerTokens: number;
-    answerUnitPrice: number;
-    elapsed: number;
-    totalPrice: number;
-    currency: string;
-    fromScene: string;
-    endUser: string;
-    id: string;
-    createTime: number;
-    robotName: string;
-    robotAvatar: string;
-    isNew: boolean;
-    isStatement?: boolean;
-}>;
-
-export type IConversation = {
-    uid: string;
-    appUid: string;
-    appName: string;
-    appMode: string;
-    appConfig: string;
-    status: string;
-    fromScene: string;
-    endUser: string;
-    id: string;
-    createTime: number;
-};
-export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
+export const ChatRecord = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -350,7 +309,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 </div>
             </div>
             <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
-                <Grid item>
+                {/* <Grid item>
                     <Grid item>
                         <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
                             <MoreHorizTwoToneIcon />
@@ -376,7 +335,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                             </MenuItem>
                         </Menu>
                     </Grid>
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm zeroMinWidth>
                     <OutlinedInput
                         id="message-send"
@@ -389,6 +348,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                         onKeyDown={handleKeyDown}
                         minRows={1}
                         maxRows={3}
+                        disabled={true}
                         endAdornment={
                             <>
                                 <InputAdornment position="end">

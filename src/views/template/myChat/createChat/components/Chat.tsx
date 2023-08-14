@@ -42,6 +42,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     answer: string;
+    process: any;
     answerTokens: number;
     answerUnitPrice: number;
     elapsed: number;
@@ -216,6 +217,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         const newData = [...data, newMessage];
         dataRef.current = newData;
         setData(newData);
+        data;
         setIsFetch(true);
         try {
             let resp: any = await messageSSE({
@@ -256,11 +258,21 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                     }
                     if (bufferObj?.code === 200) {
                         setConversationUid(bufferObj.conversationUid);
-                        const copyData = [...dataRef.current]; // 使用dataRef.current代替data
-                        copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                        copyData[copyData.length - 1].isNew = true;
-                        dataRef.current = copyData;
-                        setData(copyData);
+                        // 处理流程
+                        if (bufferObj.type === 'i') {
+                            const copyData = [...dataRef.current];
+                            copyData[copyData.length - 1].process = bufferObj.content;
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        }
+                        if (bufferObj.type === 'm') {
+                            // 处理结论
+                            const copyData = [...dataRef.current];
+                            copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+                            copyData[copyData.length - 1].isNew = true;
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        }
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
                             openSnackbar({

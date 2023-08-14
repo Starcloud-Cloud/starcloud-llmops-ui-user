@@ -1,19 +1,18 @@
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
-// darcula webstorm
-// vscDarkPlus vscode暗色主题
-
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import remarkGfm from 'remark-gfm';
 type tProps = {
     textContent: string;
     darkMode?: boolean; // markdown文本
 };
 
 const ChatMarkdown = (props: tProps) => {
-    const { textContent, darkMode } = props;
+    const { textContent } = props;
     return (
         <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
                 code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');

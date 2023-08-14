@@ -16,6 +16,8 @@ import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import ChatMarkdown from 'ui-component/Markdown';
+import { LoadingSpin } from 'ui-component/LoadingSpin';
+import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -150,6 +152,27 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     <CardContent sx={{ p: 2, pb: '16px !important' }}>
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
+                                                                {history.process && (
+                                                                    <div className="flex flex-col">
+                                                                        <div className="flex justify-between items-center">
+                                                                            <div>
+                                                                                <span>正在生成</span>
+                                                                                <LoadingSpin />
+                                                                            </div>
+                                                                            <div>
+                                                                                <span>展示</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div>
+                                                                            {history.process.showType === 'url' && (
+                                                                                <div>
+                                                                                    <div>{history.process.tips}</div>
+                                                                                    <WebPageInfo url={history.process.url} />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                                 {history.answer ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
@@ -157,7 +180,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                         }`}
                                                                     >
                                                                         <ChatMarkdown textContent={history.answer} />
-                                                                        {/* {history.answer} */}
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />
@@ -166,6 +188,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         </Grid>
                                                     </CardContent>
                                                 </Card>
+                                                {/* 正在生成的没有 */}
                                                 {!history.isNew && (
                                                     <div className=" leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
                                                         <Tooltip title={'复制'}>
@@ -189,6 +212,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         </Tooltip>
                                                     </div>
                                                 )}
+                                                {/* 正在执行的才有 */}
                                                 {history.isNew &&
                                                     (history.answer ? (
                                                         <div className="text-[13px] leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">

@@ -18,13 +18,18 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
     };
     //点击全部执行
     const allExecute = async () => {
-        const status = refs?.current?.map((item: any) => {
-            return item.submit();
-        });
-        if (status.every((item: boolean) => item !== false)) {
-            isallExecute(true);
-            changeSon({ stepId: config.steps[0].field, index: 0 });
+        // const status = refs?.current?.map((item: any) => {
+        //     return item.submit();
+        // });
+        const promises = [];
+        for (const item of refs.current) {
+            promises.push(item.submit());
         }
+        await Promise.all(promises);
+        // if (status.every((item: boolean) => item !== false)) {
+        isallExecute(true);
+        await changeSon({ stepId: config.steps[0].field, index: 0 });
+        // }
     };
     //是否全部禁用
     const allDisable = () => {

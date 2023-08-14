@@ -167,6 +167,6 @@ export const deleteApp = (appUid: string) => {
  * 聊天记录
  * @returns 
  */
-export const getChatRecord = (converstation: string) => {
-    return request.get({ url: `/llm/app/log/detail/chat/${converstation}` });
+export const getChatRecord = (data: any) => {
+    return request.post({ url: '/llm/app/log/detail/chat', data });
 };

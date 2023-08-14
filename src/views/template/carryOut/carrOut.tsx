@@ -42,7 +42,7 @@ const CarrOut = forwardRef(
                         }
                     }
                     if (Object.values(formik.values).some((value) => value === '')) {
-                        await formik.handleSubmit();
+                        // await formik.handleSubmit();
                         return false;
                     } else {
                         return formik.values;
@@ -89,29 +89,33 @@ const CarrOut = forwardRef(
             });
             return model?.some((value: boolean) => value === true) || variable?.some((value: boolean) => value === true) ? true : false;
         };
+        const asyncMethos = async (item: any, i: number) => {
+            await promptChange({ e: { value: item.defaultValue }, steps, i, flag: true });
+            await formik.setFieldValue(item.field, item.defaultValue);
+        };
+        const asyncMethos1 = async (item: any, i: number) => {
+            await promptChange({ e: { value: item.defaultValue }, steps, i });
+            await formik.setFieldValue(item.field, item.defaultValue);
+        };
         //点击单个执行
         const executeAPP = async (index: number) => {
             const newValue = _.cloneDeep(config);
-            await new Promise(async (resolve) => {
-                if (newValue.steps[index].variable && newValue.steps[index].variable.variables) {
-                    for (const [i, item] of newValue.steps[index].variable.variables.entries()) {
-                        if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
-                            await promptChange({ e: { value: item.defaultValue }, steps, i, flag: true });
-                            await formik.setFieldValue(item.field, item.defaultValue);
-                        }
-                    }
-                }
-                resolve(true);
-            });
-            await new Promise(async (resolve) => {
-                for (const [i, item] of newValue.steps[index].flowStep.variable.variables.entries()) {
+            const promises: any[] = [];
+            const promises1: any[] = [];
+            if (newValue.steps[index].variable && newValue.steps[index].variable.variables) {
+                for (const [i, item] of newValue.steps[index].variable.variables.entries()) {
                     if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
-                        await promptChange({ e: { value: item.defaultValue }, steps, i });
-                        await formik.setFieldValue(item.field, item.defaultValue);
+                        promises.push(asyncMethos(item, i));
                     }
                 }
-                resolve(true);
-            });
+            }
+            for (const [i, item] of newValue.steps[index].flowStep.variable.variables.entries()) {
+                if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
+                    promises1.push(asyncMethos1(item, i));
+                }
+            }
+            await Promise.all(promises);
+            await Promise.all(promises1);
             await formik.handleSubmit();
         };
         useEffect(() => {
@@ -158,9 +162,7 @@ const CarrOut = forwardRef(
                                 </IconButton>
                             </Tooltip>
                             <Button
-                                onClick={() => {
-                                    formik.handleSubmit();
-                                }}
+                                onClick={() => executeAPP(steps)}
                                 disabled={disSteps(steps) || history}
                                 color="secondary"
                                 size="small"

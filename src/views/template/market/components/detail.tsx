@@ -49,9 +49,9 @@ function Deatail() {
             let resp: any = await executeMarket({
                 appUid: uid,
                 stepId: stepId,
-                appReqVO: detailData
+                appReqVO: detailRef.current
             });
-            const contentData = { ...detailData };
+            const contentData = _.cloneDeep(detailRef.current);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
             detailRef.current = contentData;
             setDetailData(contentData);

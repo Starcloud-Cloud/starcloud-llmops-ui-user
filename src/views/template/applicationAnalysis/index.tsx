@@ -92,7 +92,7 @@ interface Detail {
     imageInfo?: any;
     appInfo?: any;
 }
-function ApplicationAnalysis() {
+function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const [queryParams, setQuery] = useState<Query>({
         timeType: 'LAST_7D'
     });
@@ -105,14 +105,14 @@ function ApplicationAnalysis() {
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
     const infoList = (params: any) => {
-        infoPage({ ...params, ...queryParams }).then((res) => {
+        infoPage({ ...params, ...queryParams, appUid }).then((res) => {
             setTotalData(res.list);
             setTotal(res.total);
         });
     };
     //获取标数据
     const getStatistic = () => {
-        logStatistics(queryParams).then((res) => {
+        logStatistics({ ...queryParams, appUid }).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             // const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));

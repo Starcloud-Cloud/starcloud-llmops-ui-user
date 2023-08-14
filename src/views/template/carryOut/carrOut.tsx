@@ -26,27 +26,30 @@ const CarrOut = forwardRef(
             submit: () => {
                 const curren = async () => {
                     const newValue = _.cloneDeep(config);
+                    const promises: any[] = [];
+                    const promises1: any[] = [];
                     if (newValue.steps[steps].variable && newValue.steps[steps].variable.variables) {
                         for (const [i, item] of newValue.steps[steps].variable.variables.entries()) {
                             if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
-                                await promptChange({ e: { value: item.defaultValue }, steps, i, flag: true });
-                                await formik.setFieldValue(item.field, item.defaultValue);
+                                promises.push(asyncMethos(item, i));
                             }
                         }
                     }
 
                     for (const [i, item] of newValue.steps[steps].flowStep.variable.variables.entries()) {
                         if (item.isShow && item.defaultValue && (item.value === '' || !item.value)) {
-                            await promptChange({ e: { value: item.defaultValue }, steps, i });
-                            await formik.setFieldValue(item.field, item.defaultValue);
+                            promises1.push(asyncMethos1(item, i));
                         }
                     }
-                    if (Object.values(formik.values).some((value) => value === '')) {
-                        // await formik.handleSubmit();
-                        return false;
-                    } else {
-                        return formik.values;
-                    }
+                    await Promise.all(promises);
+                    await Promise.all(promises1);
+
+                    // if (Object.values(formik.values).some((value) => value === '')) {
+                    //      await formik.handleSubmit();
+                    //     return false;
+                    // } else {
+                    //     return formik.values;
+                    // }
                 };
                 curren();
             }

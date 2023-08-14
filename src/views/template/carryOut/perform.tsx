@@ -25,9 +25,9 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
         for (const item of refs.current) {
             promises.push(item.submit());
         }
+        isallExecute(true);
         await Promise.all(promises);
         // if (status.every((item: boolean) => item !== false)) {
-        isallExecute(true);
         await changeSon({ stepId: config.steps[0].field, index: 0 });
         // }
     };

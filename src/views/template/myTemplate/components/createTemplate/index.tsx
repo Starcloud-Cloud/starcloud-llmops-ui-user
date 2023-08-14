@@ -85,9 +85,10 @@ function CreateDetail() {
             let resp: any = await executeApp({
                 appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
                 stepId: stepId,
-                appReqVO: detail
+                appReqVO: detailRef.current
             });
-            const contentData = _.cloneDeep(detail);
+
+            const contentData = _.cloneDeep(detailRef.current);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
             detailRef.current = _.cloneDeep(contentData);
             setDetail(contentData);
@@ -183,6 +184,7 @@ function CreateDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const getList = (data: string | null = null) => {
+        detailRef.current = {};
         if (data) {
             getApp({ uid: data }).then((res) => {
                 resUpperCase(res);
@@ -425,7 +427,7 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab label="应用分析" {...a11yProps(2)} />
+                {searchParams.get('uid') && <Tab label="应用分析" {...a11yProps(2)} />}
                 <Tab label={t('myApp.upload')} {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={value} index={0}>
@@ -558,7 +560,7 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                <AppAnalysis />
+                {detailRef.current?.uid && searchParams.get('uid') && <AppAnalysis appUid={detail?.uid} />}
             </TabPanel>
             <TabPanel value={value} index={3}>
                 <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />

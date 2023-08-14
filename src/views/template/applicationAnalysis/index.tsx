@@ -413,7 +413,7 @@ function ApplicationAnalysis() {
                                                 });
                                             } else if (row.appMode === 'CHAT') {
                                                 setChatVisible(true);
-                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 1000 }).then((res) => {
+                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 100 }).then((res) => {
                                                     setDetail(res.list);
                                                 });
                                             }
@@ -613,9 +613,9 @@ function ApplicationAnalysis() {
                     setChatVisible(false);
                 }}
             >
-                <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
-                    {/* <ChatRecord /> */}
-                </Card>
+                <div className="w-[350px] md:w-[600px] overflow-y-auto h-full">
+                    <ChatRecord list={detail} />
+                </div>
             </Drawer>
         </Box>
     );

@@ -21,6 +21,8 @@ export const ChatRecord = ({ list }: { list: any }) => {
                 avatar: list?.[0]?.images?.[0],
                 name: list?.[0]?.appName
             });
+        } else {
+            setChatBotInfo({});
         }
     }, [list]);
 

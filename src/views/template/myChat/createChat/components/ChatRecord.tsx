@@ -35,12 +35,12 @@ export const ChatRecord = ({ list }: { list: any }) => {
         <div>
             <div className={'flex justify-center items-center py-[8px]'}>
                 <div className="w-[28px] h-[28px] flex justify-center items-center">
-                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                    {chatBotInfo.avatar && <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />}
                 </div>
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <div style={{ width: '100%', height: '100%', overflowX: 'hidden' }}>
+            <div className="h-[calc(100vh-64px)] w-[100%] overflow-y-auto">
                 <div>
                     {chatBotInfo.enableIntroduction && (
                         <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">

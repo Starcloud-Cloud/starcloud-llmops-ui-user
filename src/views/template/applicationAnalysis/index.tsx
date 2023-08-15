@@ -606,17 +606,22 @@ function ApplicationAnalysis() {
                     </MainCard>
                 </Modal>
             )}
-            <Drawer
-                anchor="right"
-                open={chatVisible}
-                onClose={() => {
-                    setChatVisible(false);
-                }}
-            >
-                <div className="w-[350px] md:w-[600px] h-full">
-                    <ChatRecord list={detail} />
-                </div>
-            </Drawer>
+            {chatVisible && (
+                <Drawer
+                    anchor="right"
+                    open={chatVisible}
+                    sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
+                    onClose={() => {
+                        setChatVisible(false);
+                    }}
+                >
+                    <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
+                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%]">
+                            <ChatRecord list={detail} />
+                        </div>
+                    </div>
+                </Drawer>
+            )}
         </Box>
     );
 }

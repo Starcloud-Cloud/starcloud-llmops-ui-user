@@ -553,7 +553,6 @@ const DocumentModal = ({
         </Modal>
     );
 };
-
 interface DetaData {
     name?: string;
     cleanContent?: string;
@@ -600,15 +599,20 @@ const DetailModal = ({
                 });
         }
     }, [detaData]);
+    //切换tabs
+    const [value, setValue] = useState(0);
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
     return (
         <Modal open={detailOpen} onClose={detailClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
                 style={{
                     position: 'absolute',
                     width: '800px',
-                    top: '50%',
+                    top: '10%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%)'
+                    transform: 'translate(-50%, 0)'
                 }}
                 sx={{ maxHeight: '100vh', overflowY: 'auto' }}
                 title="详情"
@@ -620,42 +624,58 @@ const DetailModal = ({
                 }
             >
                 <CardContent>
-                    <Typography variant="h4">标题</Typography>
-                    <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
-                    <Typography mt={2} variant="h4">
-                        原始链接{' '}
-                        <Link color="secondary" sx={{ fontSize: '12px' }} href={detaData.content}>
-                            {detaData.content}
-                        </Link>
-                    </Typography>
-                    <Typography mt={2} mb={2} variant="h4">
-                        原始内容
-                    </Typography>
-                    <TextField multiline minRows={4} maxRows={4} disabled value={oldValue} fullWidth InputLabelProps={{ shrink: true }} />
-                    <Typography mt={2} mb={2} variant="h4">
-                        总结
-                    </Typography>
-                    <TextField
-                        disabled
-                        value={detaData.summary}
-                        multiline
-                        minRows={6}
-                        maxRows={6}
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                    />
-                    {detaList.length > 0 && (
-                        <Typography mt={4} variant="h4">
-                            Content
+                    <Tabs value={value} onChange={handleChange}>
+                        <Tab label="内容" {...a11yProps(0)} />
+                        <Tab label="详情" {...a11yProps(1)} />
+                    </Tabs>
+                    <TabPanel value={value} index={0}>
+                        <Typography variant="h4">标题</Typography>
+                        <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
+                        <Typography mt={2} variant="h4">
+                            原始链接{' '}
+                            <Link color="secondary" sx={{ fontSize: '12px' }} href={detaData.content}>
+                                {detaData.content}
+                            </Link>
                         </Typography>
-                    )}
-                    <Grid container spacing={2}>
-                        {detaList?.map((item) => (
-                            <Grid item md={6} xs={12}>
-                                <TextField multiline minRows={4} maxRows={4} disabled value={item.content} sx={{ mt: 2 }} fullWidth />
-                            </Grid>
-                        ))}
-                    </Grid>
+                        <Typography mt={2} mb={2} variant="h4">
+                            原始内容
+                        </Typography>
+                        <TextField
+                            multiline
+                            minRows={4}
+                            maxRows={4}
+                            disabled
+                            value={oldValue}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <Typography mt={2} mb={2} variant="h4">
+                            总结
+                        </Typography>
+                        <TextField
+                            disabled
+                            value={detaData.summary}
+                            multiline
+                            minRows={6}
+                            maxRows={6}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        {detaList.length > 0 && (
+                            <Typography mt={4} variant="h4">
+                                Content
+                            </Typography>
+                        )}
+                        <Grid container spacing={2}>
+                            {detaList?.map((item) => (
+                                <Grid item md={6} xs={12}>
+                                    <TextField multiline minRows={4} maxRows={4} disabled value={item.content} sx={{ mt: 2 }} fullWidth />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </TabPanel>
                 </CardContent>
             </MainCard>
         </Modal>

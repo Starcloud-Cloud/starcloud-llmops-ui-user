@@ -41,6 +41,8 @@ import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
+import { getChatRecord } from 'api/chat';
+import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -282,6 +284,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     //执行弹窗
     const [exeOpen, setExeOpen] = useState(false);
     const [exeDetail, setExeDetail] = useState<any>({});
+    const [chatVisible, setChatVisible] = useState(false);
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -394,10 +397,26 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"
-                                        disabled={row.appMode === 'CHAT'}
                                         size="small"
                                         onClick={() => {
-                                            getDeList(row);
+                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                                detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
+                                                    setDetail(res.list);
+                                                    setOpen(true);
+                                                    getDeList(row);
+                                                });
+                                            } else if (row.appMode === 'COMPLETION') {
+                                                detailApp(row.uid).then((res) => {
+                                                    setDetail(res.list);
+                                                    setOpen(true);
+                                                    getDeList(row);
+                                                });
+                                            } else if (row.appMode === 'CHAT') {
+                                                setChatVisible(true);
+                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 100 }).then((res) => {
+                                                    setDetail(res.list);
+                                                });
+                                            }
                                         }}
                                     >
                                         {t('generate.detail')}
@@ -586,6 +605,22 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                         </CardContent>
                     </MainCard>
                 </Modal>
+            )}
+            {chatVisible && (
+                <Drawer
+                    anchor="right"
+                    open={chatVisible}
+                    sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
+                    onClose={() => {
+                        setChatVisible(false);
+                    }}
+                >
+                    <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
+                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%]">
+                            <ChatRecord list={detail} />
+                        </div>
+                    </div>
+                </Drawer>
             )}
         </Box>
     );

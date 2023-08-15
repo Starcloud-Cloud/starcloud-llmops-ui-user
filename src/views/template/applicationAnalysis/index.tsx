@@ -133,7 +133,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
         { label: '应用市场', value: 'WEB_MARKET' },
         { label: '分享', value: 'SHARE_WEB' },
         { label: '企业微信群聊', value: 'WECOM_GROUP' },
-        { label: '聊天测试', value: ' CHAT_TEST' },
+        { label: '聊天测试', value: 'CHAT_TEST' },
         { label: '聊天', value: 'CHAT' }
     ];
     useEffect(() => {
@@ -288,6 +288,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const [exeOpen, setExeOpen] = useState(false);
     const [exeDetail, setExeDetail] = useState<any>({});
     const [chatVisible, setChatVisible] = useState(false);
+
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -620,8 +621,10 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                     }}
                 >
                     <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
-                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%]">
-                            <ChatRecord list={detail} />
+                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
+                            <Card>
+                                <ChatRecord list={detail} />
+                            </Card>
                         </div>
                     </div>
                 </Drawer>

@@ -1,6 +1,10 @@
 import { Button, Divider, Drawer, TextField } from '@mui/material';
 import { useState } from 'react';
 import ChatMarkdown from 'ui-component/Markdown';
+import cheerio from 'cheerio';
+import ReactMarkdown from 'react-markdown';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export const SiteDrawerCode = ({
     open,
@@ -17,14 +21,18 @@ export const SiteDrawerCode = ({
     const [checked, setChecked] = useState(false);
 
     const HTML_CODE = ` 
-    \`\`\`javascript
-    <iframe src="https://chato.cn/b/p8eldrk02m95nky0?source=1234jh" width="408px" height="594px" frameborder="0">
-    </iframe>
-    \`\`\`
-    `;
+\`\`\`
+<iframe
+src="https://chato.cn/b/p8eldrk02m95nky0?source=1234jh"
+width="408px"
+height="594px"
+frameborder="0">
+</iframe>
+\`\`\`
+`;
 
     const JS_CODE = `
-    \`\`\`javascript
+\`\`\`
 <script>
 window.tip_chato_color="#fff";
 window.tip_chato_bg="#4C83F3";
@@ -34,9 +42,10 @@ var st = document.createElement("script");
 st.type="text/javascript";
 st.async = true;st.src = "https://chato.cn/assets/iframe.min.js";
 var header = document.getElementsByTagName("head")[0];
-header.appendChild(st);</script>
+header.appendChild(st);
+</script>
 \`\`\`
-    `;
+`;
 
     return (
         <Drawer anchor="right" open={open} sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }} onClose={onClose}>
@@ -60,9 +69,55 @@ header.appendChild(st);</script>
                         />
                         <div className="text-base mt-4">JS代码</div>
                         <div className="text-sm mt-3">机器人代码，请将此 iframe 添加到您的 html 代码中</div>
-                        <ChatMarkdown textContent={HTML_CODE} />
+                        <ReactMarkdown
+                            components={{
+                                code({ node, inline, className, children, ...props }) {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    return true ? (
+                                        <SyntaxHighlighter
+                                            showLineNumbers={true}
+                                            style={vscDarkPlus as any}
+                                            language={'javascript'}
+                                            PreTag="div"
+                                            {...props}
+                                        >
+                                            {String(children).replace(/\n$/, '')}
+                                        </SyntaxHighlighter>
+                                    ) : (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                }
+                            }}
+                        >
+                            {HTML_CODE}
+                        </ReactMarkdown>
                         <div className="text-sm mt-3">添加聊天气泡，请复制添加到您的 html中</div>
-                        <ChatMarkdown textContent={JS_CODE} />
+                        <ReactMarkdown
+                            components={{
+                                code({ node, inline, className, children, ...props }) {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    return true ? (
+                                        <SyntaxHighlighter
+                                            showLineNumbers={true}
+                                            style={vscDarkPlus as any}
+                                            language={'javascript'}
+                                            PreTag="div"
+                                            {...props}
+                                        >
+                                            {String(children).replace(/\n$/, '')}
+                                        </SyntaxHighlighter>
+                                    ) : (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                }
+                            }}
+                        >
+                            {JS_CODE}
+                        </ReactMarkdown>
                         <Divider className="my-[20px]" />
                         <div className="flex items-center justify-end">
                             <Button color={'error'} size={'small'} variant="contained">

@@ -154,7 +154,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             setStartCheck(true);
                             setRegulationText(e.target.value);
                         }}
-                        error={(regulationText?.length || 0) > 800 || (startCheck && !regulationText)}
+                        error={(regulationText?.length || 0) > 1000 || (startCheck && !regulationText)}
                     />
                     <div className="flex justify-between">
                         {startCheck && !regulationText ? (
@@ -162,7 +162,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         ) : (
                             <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
                         )}
-                        <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/800</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/1000</div>
                     </div>
 
                     <div className={'flex  items-center mt-5'}>

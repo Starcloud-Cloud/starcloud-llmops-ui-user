@@ -613,6 +613,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                     sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
                     onClose={() => {
                         setChatVisible(false);
+                        setDetail(null);
                     }}
                 >
                     <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">

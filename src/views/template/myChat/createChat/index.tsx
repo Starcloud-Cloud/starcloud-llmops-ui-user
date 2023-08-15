@@ -120,11 +120,11 @@ function CreateDetail() {
             );
             return;
         }
-        if (chatBotInfo.prePrompt.length > 800) {
+        if (chatBotInfo.prePrompt.length > 1000) {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '角色描述不能超过800字',
+                    message: '角色描述不能超过1000字',
                     variant: 'alert',
                     alert: {
                         color: 'error'

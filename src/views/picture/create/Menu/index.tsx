@@ -336,7 +336,7 @@ export const PictureCreateMenu = ({
         try {
             const res = await createText2Img({
                 conversationUid: conversationId,
-                scene: 'WEB_ADMIN',
+                scene: 'IMAGE',
                 appUid: 'BASE_GENERATE_IMAGE',
                 imageRequest: removeFalseProperties(imageRequest)
             });

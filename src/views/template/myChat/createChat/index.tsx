@@ -315,7 +315,7 @@ function CreateDetail() {
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={5}>
-                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} />}
+                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} mode={'CHAT'} />}
                 </TabPanel>
             </Card>
             {value !== 4 && (

@@ -132,9 +132,9 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
         { label: '创作中心', value: 'WEB_ADMIN' },
         { label: '应用市场', value: 'WEB_MARKET' },
         { label: '分享', value: 'SHARE_WEB' },
-        { label: 'WECOM_GROUP', value: '企业微信群聊' },
-        { label: 'CHAT_TEST', value: ' 聊天测试' },
-        { label: 'CHAT', value: '聊天' }
+        { label: '企业微信群聊', value: 'WECOM_GROUP' },
+        { label: '聊天测试', value: ' CHAT_TEST' },
+        { label: '聊天', value: 'CHAT' }
     ];
     useEffect(() => {
         //获取echarts

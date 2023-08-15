@@ -34,11 +34,30 @@ module.exports = function override(config) {
         })
     ];
 
-    config.optimization = {
-        splitChunks: {
-            chunks: 'all'
-        }
-    };
+    // config.optimization = {
+    //     splitChunks: {
+    //         chunks: 'all', // 该配置表示将应用于所有类型的代码块，包括同步和异步
+    //         minSize: 30000, // 模块的最小大小，大于此值的模块才会被拆分
+    //         maxSize: 0, // 模块的最大大小，0表示没有限制
+    //         minChunks: 1, // 模块的最小引用次数，超过此值的模块才会被拆分
+    //         maxAsyncRequests: 5, // 异步加载时的最大并行请求数
+    //         maxInitialRequests: 3, // 初始加载时的最大并行请求数
+    //         automaticNameDelimiter: '~', // 自定义拆分块的名称分隔符
+    //         name: 'mofa', // 使用默认的块命名
+    //         cacheGroups: {
+    //             // 缓存组配置
+    //             vendors: {
+    //                 test: /[\\/]node_modules[\\/]/, // 将node_modules中的模块拆分到vendors组
+    //                 priority: -10 // 优先级，数值越大优先级越高
+    //             },
+    //             default: {
+    //                 minChunks: 2, // 最小引用次数，至少在两个块中引用的模块才会被拆分到默认组
+    //                 priority: -20, // 优先级
+    //                 reuseExistingChunk: true // 允许复用已存在的块
+    //             }
+    //         }
+    //     }
+    // };
 
     return config;
 };

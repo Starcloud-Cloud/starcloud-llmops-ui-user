@@ -19,14 +19,14 @@ export const ChatRecord = ({ list }: { list: any }) => {
         if (list?.length > 0) {
             setChatBotInfo({
                 avatar: list?.[0]?.images?.[0],
-                name: list?.[0]?.name
+                name: list?.[0]?.appName
             });
         }
     }, [list]);
 
     const data = useMemo(() => {
         if (list) {
-            return list.map((v: any) => ({ ...v, robotName: v?.name, robotAvatar: v?.images?.[0] }));
+            return list.map((v: any) => ({ ...v, robotName: v?.appName, robotAvatar: v?.images?.[0] }));
         }
         return [];
     }, [list]);

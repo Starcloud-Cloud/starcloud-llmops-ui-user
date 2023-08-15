@@ -613,7 +613,7 @@ function ApplicationAnalysis() {
                     setChatVisible(false);
                 }}
             >
-                <div className="w-[350px] md:w-[600px] overflow-y-auto h-full">
+                <div className="w-[350px] md:w-[600px] h-full">
                     <ChatRecord list={detail} />
                 </div>
             </Drawer>

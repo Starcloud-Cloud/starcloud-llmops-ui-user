@@ -131,7 +131,10 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const scenseList = [
         { label: '创作中心', value: 'WEB_ADMIN' },
         { label: '应用市场', value: 'WEB_MARKET' },
-        { label: '分享', value: 'SHARE_WEB' }
+        { label: '分享', value: 'SHARE_WEB' },
+        { label: 'WECOM_GROUP', value: '企业微信群聊' },
+        { label: 'CHAT_TEST', value: ' 聊天测试' },
+        { label: 'CHAT', value: '聊天' }
     ];
     useEffect(() => {
         //获取echarts

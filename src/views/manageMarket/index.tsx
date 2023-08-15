@@ -32,6 +32,7 @@ interface Row {
     appUid: string;
     name: string;
     model: string;
+    submitterUser: string;
     categories: string[];
     language: string;
     description: string;
@@ -164,6 +165,7 @@ function Form() {
                             <TableCell align="center">类别</TableCell>
                             <TableCell align="center">语言</TableCell>
                             <TableCell align="center">简介</TableCell>
+                            <TableCell align="center">发布人</TableCell>
                             <TableCell align="center">审核状态</TableCell>
                             <TableCell align="center">创建时间</TableCell>
                             <TableCell align="center">更新时间</TableCell>
@@ -191,6 +193,9 @@ function Form() {
                                             {row.description}
                                         </Typography>
                                     </Tooltip>
+                                </TableCell>
+                                <TableCell align="center" sx={{ minWidth: '150px' }}>
+                                    {row.submitterUser}
                                 </TableCell>
                                 <TableCell align="center" sx={{ minWidth: '150px' }}>
                                     <Chip

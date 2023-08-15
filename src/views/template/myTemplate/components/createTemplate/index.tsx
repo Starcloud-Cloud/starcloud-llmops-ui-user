@@ -32,6 +32,7 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
+import AppAnalysis from './appAnalysis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
@@ -63,6 +64,7 @@ function CreateDetail() {
     //是否全部执行
     let isAllExecute = false;
     const [detail, setDetail] = useState(null as unknown as Details);
+    const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
     const basis = useRef<any>(null);
     //判断是保存还是切换tabs
@@ -83,10 +85,12 @@ function CreateDetail() {
             let resp: any = await executeApp({
                 appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
                 stepId: stepId,
-                appReqVO: detail
+                appReqVO: detailRef.current
             });
-            const contentData = _.cloneDeep(detail);
+
+            const contentData = _.cloneDeep(detailRef.current);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+            detailRef.current = _.cloneDeep(contentData);
             setDetail(contentData);
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
@@ -154,6 +158,7 @@ function CreateDetail() {
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                        detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
                         dispatch(
@@ -179,6 +184,7 @@ function CreateDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const getList = (data: string | null = null) => {
+        detailRef.current = {};
         if (data) {
             getApp({ uid: data }).then((res) => {
                 resUpperCase(res);
@@ -202,11 +208,16 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
         });
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            [data.name]: data.value
+        });
         setDetail(
             _.cloneDeep({
                 ...detail,
@@ -218,16 +229,26 @@ function CreateDetail() {
     const exeChange = ({ e, steps, i }: any) => {
         const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     //设置执行的prompt
-    const promptChange = ({ e, steps, i }: any) => {
-        const newValue = _.cloneDeep(detail);
-        newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+    const promptChange = async ({ e, steps, i, flag = false }: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        if (flag) {
+            newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        } else {
+            newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
+        }
+        detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
     //增加 删除变量
     const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            workflowConfig: data
+        });
         setDetail(
             _.cloneDeep({
                 ...detail,
@@ -245,12 +266,13 @@ function CreateDetail() {
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
             }
             oldvalue.workflowConfig.steps[num][label] = value;
+            detailRef.current = oldvalue;
             setDetail(oldvalue);
         },
         [detail]
     );
     //提示词更改
-    const basisChange = ({ e, index, i, flag = false }: any) => {
+    const basisChange = ({ e, index, i, flag = false, values = false }: any) => {
         const oldValue = _.cloneDeep(detail);
         if (flag) {
             oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
@@ -259,23 +281,28 @@ function CreateDetail() {
             if (e.name === 'res') {
                 oldValue.workflowConfig.steps[index].flowStep.response.style = e.value;
             } else {
-                oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+                if (values) {
+                    oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
+                } else {
+                    oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].defaultValue = e.value;
+                }
             }
         }
+        detailRef.current = _.cloneDeep(oldValue);
         setDetail(oldValue);
         setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
-        console.log('qirhuan');
-
         const value = _.cloneDeep(detail);
         value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
+        detailRef.current = _.cloneDeep(value);
         setDetail(value);
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
         const newValue = _.cloneDeep(detail);
         newValue.workflowConfig.steps[index].flowStep.response.answer = value;
+        detailRef.current = newValue;
         setDetail(newValue);
     };
     //保存更改
@@ -400,7 +427,8 @@ function CreateDetail() {
             <Tabs value={value} onChange={handleChange}>
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                <Tab label={t('myApp.upload')} {...a11yProps(2)} />
+                {searchParams.get('uid') && <Tab label="应用分析" {...a11yProps(2)} />}
+                <Tab label={t('myApp.upload')} {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -452,7 +480,7 @@ function CreateDetail() {
                             {detail && value === 0 && (
                                 <Perform
                                     key={perform}
-                                    config={detail?.workflowConfig}
+                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     loadings={loadings}
                                     variableChange={exeChange}
@@ -515,7 +543,7 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
-                                    config={_.cloneDeep(detail.workflowConfig)}
+                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     changeanswer={changeanswer}
                                     loadings={loadings}
@@ -532,6 +560,9 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
+                {detailRef.current?.uid && searchParams.get('uid') && <AppAnalysis appUid={detail?.uid} />}
+            </TabPanel>
+            <TabPanel value={value} index={3}>
                 <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />
             </TabPanel>
         </Card>

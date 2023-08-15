@@ -30,7 +30,7 @@ export const getChatPage = (data: any) => {
  * @param data
  */
 export const getDatasetSource = (data: any) => {
-    return request.get({ url: `/llm/dataset-source-data/list/${data.datasetId}` });
+    return request.get({ url: `/llm/dataset-source-data/list/document/${data.datasetId}` });
 };
 
 /**
@@ -38,7 +38,7 @@ export const getDatasetSource = (data: any) => {
  * @param data
  */
 export const uploadCharacters = (data: any) => {
-    return request.post({ url: `/llm/dataset-source-data/uploadCharacters/${data.datasetId}`, data: data.uploadCharacterReqVOs });
+    return request.post({ url: `/llm/dataset-source-data/uploadCharacters`, data });
 };
 
 /**
@@ -46,7 +46,7 @@ export const uploadCharacters = (data: any) => {
  * @param data
  */
 export const uploadUrls = (data: any) => {
-    return request.post({ url: `/llm/dataset-source-data/uploadUrls/${data.datasetId}`, data: data.urls });
+    return request.post({ url: `/llm/dataset-source-data/uploadUrls`, data });
 };
 
 /**
@@ -55,6 +55,20 @@ export const uploadUrls = (data: any) => {
  */
 export const delDataset = (data: any) => {
     return request.delete({ url: `/llm/dataset-source-data/delete`, params: data });
+};
+/**
+ * 获取文档数据集详情
+ * @param data
+ */
+export const getDetails = (data: string) => {
+    return request.get({ url: `/llm/dataset-source-data/details/${data}` });
+};
+/**
+ * 获取文档数据集详情块
+ * @param data
+ */
+export const detailsSplit = (data: any) => {
+    return request.post({ url: `/llm/dataset-source-data/details/split`, data });
 };
 
 /**
@@ -147,4 +161,12 @@ export const getAvatarList = () => {
  */
 export const deleteApp = (appUid: string) => {
     return request.delete({ url: `/llm/app/delete/${appUid}` });
+};
+
+/**
+ * 聊天记录
+ * @returns 
+ */
+export const getChatRecord = (data: any) => {
+    return request.post({ url: '/llm/app/log/detail/chat', data });
 };

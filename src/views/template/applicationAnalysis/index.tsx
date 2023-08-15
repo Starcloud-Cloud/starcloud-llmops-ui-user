@@ -3,6 +3,7 @@ import {
     Grid,
     FormControl,
     InputLabel,
+    InputAdornment,
     Select,
     MenuItem,
     Typography,
@@ -18,19 +19,30 @@ import {
     Button,
     Drawer,
     Card,
+    Tooltip,
     Divider,
-    Chip
+    Chip,
+    Modal,
+    IconButton,
+    CardContent
 } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
+import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
-import { logStatistics, infoPage, logTimeType } from 'api/template';
+import { logStatistics, infoPage, logTimeType, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
+import PicModal from 'views/picture/create/Modal';
+import { getChatRecord } from 'api/chat';
+import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
@@ -43,26 +55,48 @@ interface Charts {
     data: { x: string; y: string | number }[];
 }
 interface TableData {
-    [key: string]: string;
+    uid: string;
+    appMode: string;
+    fromScene: string;
+    appName: string;
+    totalAnswerTokens: number;
+    totalMessageTokens: number;
+    totalElapsed: number;
+    status: string;
+    createTime: number;
+    errorMessage: string;
+    endUser: string;
 }
 interface Date {
     label: string;
     value: string;
 }
 interface Query {
-    appName: string;
-    timeType: string;
+    appName?: string;
+    timeType?: string;
+    appMode?: string;
+    fromScene?: string;
 }
 interface Detail {
-    name: string;
-    description: string;
-    categories: string[];
-    tags: string[];
+    name?: string;
+    description?: string;
+    categories?: string[];
+    tags?: string[];
+
+    uid?: string;
+    appMode?: string;
+    appName?: string;
+    fromScene?: string;
+    status?: string;
+    errorMessage?: string;
+    endUser?: string;
+    createTime?: number;
+    imageInfo?: any;
+    appInfo?: any;
 }
-function ApplicationAnalysis() {
+function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const [queryParams, setQuery] = useState<Query>({
-        timeType: '',
-        appName: ''
+        timeType: 'LAST_7D'
     });
     const [generate, setGenerate] = useState<Charts[]>([]);
     const [total, setTotal] = useState(0);
@@ -73,14 +107,14 @@ function ApplicationAnalysis() {
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
     const infoList = (params: any) => {
-        infoPage({ ...params, ...queryParams }).then((res) => {
+        infoPage({ ...params, ...queryParams, appUid }).then((res) => {
             setTotalData(res.list);
             setTotal(res.total);
         });
     };
     //获取标数据
     const getStatistic = () => {
-        logStatistics(queryParams).then((res) => {
+        logStatistics({ ...queryParams, appUid }).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             // const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
@@ -94,6 +128,14 @@ function ApplicationAnalysis() {
         });
     };
     const [dateList, setDateList] = useState([] as Date[]);
+    const scenseList = [
+        { label: '创作中心', value: 'WEB_ADMIN' },
+        { label: '应用市场', value: 'WEB_MARKET' },
+        { label: '分享', value: 'SHARE_WEB' },
+        { label: '企业微信群聊', value: 'WECOM_GROUP' },
+        { label: '聊天测试', value: 'CHAT_TEST' },
+        { label: '聊天', value: 'CHAT' }
+    ];
     useEffect(() => {
         //获取echarts
         getStatistic();
@@ -106,6 +148,8 @@ function ApplicationAnalysis() {
     //输入框输入
     const handleChange = (e: any) => {
         const { name, value } = e.target;
+        console.log(name, value);
+
         setQuery({ ...queryParams, [name]: value });
     };
     //切换分页
@@ -194,23 +238,107 @@ function ApplicationAnalysis() {
 
     const categoryList = marketStore((state) => state.categoryList);
     const [open, setOpen] = useState(false);
-    const [detail, setDetail] = useState<Detail | null>(null);
+
+    // 详情
+    const [detailTotal, setDetailTotal] = useState(0);
+    const [pageQuery, setPageQuery] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const [row, setRow] = useState<{ appMode: string; uid: string }>({ appMode: '', uid: '' });
+    const getDeList = (row: { appMode: string; uid: string }) => {
+        setRow(row);
+        if (row.appMode === 'BASE_GENERATE_IMAGE') {
+            detailImage({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                setDetail(res.list);
+                setDetailTotal(res.total);
+            });
+        } else if (row.appMode === 'COMPLETION') {
+            detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                setDetail(res.list);
+                setDetailTotal(res.total);
+            });
+        } else {
+        }
+        setOpen(true);
+    };
+    const paginationdeChange = (event: any, value: number) => {
+        setPageQuery({
+            ...pageQuery,
+            pageNo: value
+        });
+    };
+    useEffect(() => {
+        if (row.uid) {
+            getDeList(row);
+        }
+    }, [pageQuery.pageNo]);
+    const [detail, setDetail] = useState<Detail[] | null>(null);
+    //图片弹框
+    const [picOpen, setPicOpen] = useState(false);
+    const [ImgDetail, setImgDetail] = useState({
+        images: [],
+        prompt: '',
+        engine: '',
+        width: 0,
+        height: 0
+    });
+    const [currentIndex, setCurrentIndex] = useState(0);
+    //执行弹窗
+    const [exeOpen, setExeOpen] = useState(false);
+    const [exeDetail, setExeDetail] = useState<any>({});
+    const [chatVisible, setChatVisible] = useState(false);
+
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <TextField
                         label={t('generateLog.name')}
                         value={queryParams.appName}
                         name="appName"
                         InputLabelProps={{ shrink: true }}
-                        onChange={(e) => {
-                            setQuery({ ...queryParams, [e.target.name]: e.target.value });
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    {queryParams.appName && (
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                handleChange({ target: { name: 'appName', value: '' } });
+                                            }}
+                                        >
+                                            <ClearIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                </InputAdornment>
+                            )
                         }}
+                        onChange={handleChange}
                         fullWidth
                     />
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
+                    <FormControl fullWidth>
+                        <InputLabel id="appMode">模式</InputLabel>
+                        <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
+                            <MenuItem value="COMPLETION">生成</MenuItem>
+                            <MenuItem value="CHAT">聊天</MenuItem>
+                            <MenuItem value="BASE_GENERATE_IMAGE">图片</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={4} lg={3} xs={12}>
+                    <FormControl fullWidth>
+                        <InputLabel id="fromScene">场景</InputLabel>
+                        <Select labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
+                            {scenseList.map((item) => (
+                                <MenuItem value={item.value}>{item.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Select
@@ -228,7 +356,7 @@ function ApplicationAnalysis() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3} lg={2} xs={12}>
+                <Grid item md={4} lg={3} xs={12}>
                     <Button onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
                         {t('generateLog.search')}
                     </Button>
@@ -252,6 +380,7 @@ function ApplicationAnalysis() {
                         <TableRow>
                             <TableCell align="center">{t('generate.mode')}</TableCell>
                             <TableCell align="center">{t('generate.name')}</TableCell>
+                            <TableCell align="center">执行场景</TableCell>
                             <TableCell align="center">{t('generate.totalAnswerTokens')}</TableCell>
                             <TableCell align="center">{t('generate.totalElapsed')} (s)</TableCell>
                             <TableCell align="center">{t('generate.status')}</TableCell>
@@ -264,12 +393,36 @@ function ApplicationAnalysis() {
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{row.appName}</TableCell>
+                                <TableCell align="center">{scenseList.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.status}</TableCell>
                                 <TableCell align="center">{formatDate(row.createTime)}</TableCell>
                                 <TableCell align="center">
-                                    <Button color="secondary" size="small" onClick={() => setOpen(true)}>
+                                    <Button
+                                        color="secondary"
+                                        size="small"
+                                        onClick={() => {
+                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                                detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
+                                                    setDetail(res.list);
+                                                    setOpen(true);
+                                                    getDeList(row);
+                                                });
+                                            } else if (row.appMode === 'COMPLETION') {
+                                                detailApp(row.uid).then((res) => {
+                                                    setDetail(res.list);
+                                                    setOpen(true);
+                                                    getDeList(row);
+                                                });
+                                            } else if (row.appMode === 'CHAT') {
+                                                setChatVisible(true);
+                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 100 }).then((res) => {
+                                                    setDetail(res.list);
+                                                });
+                                            }
+                                        }}
+                                    >
                                         {t('generate.detail')}
                                     </Button>
                                 </TableCell>
@@ -281,44 +434,201 @@ function ApplicationAnalysis() {
             <Box my={2}>
                 <Pagination page={page.pageNo} count={Math.ceil(total / page.pageSize)} onChange={paginationChange} />
             </Box>
-            <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+            <Drawer
+                anchor="right"
+                open={open}
+                onClose={() => {
+                    setOpen(false);
+                    setDetail(null);
+                    setDetailTotal(0);
+                    setRow({
+                        uid: '',
+                        appMode: ''
+                    });
+                    setPageQuery({
+                        pageNo: 1,
+                        pageSize: 10
+                    });
+                }}
+            >
                 <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <AccessAlarm sx={{ fontSize: '70px' }} />
-                            <Box>
-                                <Box>
-                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                        {detail?.name}
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    {detail?.categories?.map((item: any) => (
-                                        <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item)?.name}</span>
-                                    ))}
-                                    {detail?.tags?.map((el: any) => (
-                                        <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                    ))}
-                                </Box>
-                            </Box>
+                    <Box>
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">{t('generate.mode')}</TableCell>
+                                    <TableCell align="center">{t('generate.name')}</TableCell>
+                                    <TableCell align="center">执行场景</TableCell>
+                                    <TableCell align="center">{t('generate.status')}</TableCell>
+                                    <TableCell align="center">错误消息</TableCell>
+                                    <TableCell align="center">用户</TableCell>
+                                    <TableCell align="center">{t('generate.createTime')}</TableCell>
+                                    <TableCell align="center"></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {detail?.map((row) => (
+                                    <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                        <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
+                                        <TableCell align="center">{row.appName}</TableCell>
+                                        <TableCell align="center">
+                                            {scenseList.find((item) => item.value === row.fromScene)?.label}
+                                        </TableCell>
+                                        <TableCell align="center">{row.status}</TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title={row.errorMessage}>
+                                                <Typography width="200px" noWrap>
+                                                    {row.errorMessage}
+                                                </Typography>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell align="center">{row.endUser}</TableCell>
+                                        <TableCell align="center">{formatDate(row.createTime as number)}</TableCell>
+                                        <TableCell align="center">
+                                            <Button
+                                                color="secondary"
+                                                size="small"
+                                                onClick={() => {
+                                                    if (row.appMode === 'COMPLETION') {
+                                                        setExeDetail(row.appInfo);
+                                                        setExeOpen(true);
+                                                    } else {
+                                                        setImgDetail(row.imageInfo);
+                                                        setPicOpen(true);
+                                                    }
+                                                }}
+                                            >
+                                                {t('generate.detail')}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Box my={2}>
+                            <Pagination
+                                page={pageQuery.pageNo}
+                                count={Math.ceil(detailTotal / pageQuery.pageSize)}
+                                onChange={paginationdeChange}
+                            />
                         </Box>
                     </Box>
-                    <Divider sx={{ mb: 1 }} />
-                    <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                        {detail?.description}
-                    </Typography>
-                    {/* <Perform
-                        config={{}}
-                        changeSon={() => {}}
-                        changeanswer={() => {}}
-                        loadings={[]}
-                        variableChange={() => {}}
-                        promptChange={() => {}}
-                        isallExecute={() => {}}
-                        source="myApp"
-                    /> */}
                 </Card>
             </Drawer>
+            {picOpen && (
+                <PicModal
+                    open={picOpen}
+                    setOpen={() => {
+                        setPicOpen(false);
+                        setCurrentIndex(0);
+                    }}
+                    currentIndex={currentIndex}
+                    setCurrentIndex={(currentIndex) => {
+                        setCurrentIndex(currentIndex);
+                    }}
+                    currentImageList={ImgDetail.images}
+                    prompt={ImgDetail.prompt}
+                    engine={ImgDetail.engine}
+                    width={ImgDetail.width}
+                    height={ImgDetail.height}
+                />
+            )}
+            {exeOpen && (
+                <Modal
+                    open={exeOpen}
+                    onClose={() => {
+                        setExeOpen(false);
+                        setExeDetail({});
+                    }}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
+                    <MainCard
+                        style={{
+                            position: 'absolute',
+                            width: '800px',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}
+                        title="详情"
+                        content={false}
+                        secondary={
+                            <IconButton
+                                onClick={() => {
+                                    setExeOpen(false);
+                                    setExeDetail({});
+                                }}
+                                size="large"
+                                aria-label="close modal"
+                            >
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        }
+                    >
+                        <CardContent>
+                            <Box>
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                                        <AccessAlarm sx={{ fontSize: '70px' }} />
+                                        <Box>
+                                            <Box>
+                                                <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                    {exeDetail?.name}
+                                                </Typography>
+                                            </Box>
+                                            <Box>
+                                                {exeDetail?.categories?.map((item: any) => (
+                                                    <span key={item}>
+                                                        #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
+                                                    </span>
+                                                ))}
+                                                {exeDetail?.tags?.map((el: any) => (
+                                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                                <Divider sx={{ mb: 1 }} />
+                                <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                    {exeDetail?.description}
+                                </Typography>
+                                <Perform
+                                    history={true}
+                                    config={exeDetail.workflowConfig}
+                                    changeSon={() => {}}
+                                    changeanswer={() => {}}
+                                    loadings={[]}
+                                    variableChange={() => {}}
+                                    promptChange={() => {}}
+                                    isallExecute={() => {}}
+                                    source="myApp"
+                                />
+                            </Box>
+                        </CardContent>
+                    </MainCard>
+                </Modal>
+            )}
+            {chatVisible && (
+                <Drawer
+                    anchor="right"
+                    open={chatVisible}
+                    sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
+                    onClose={() => {
+                        setChatVisible(false);
+                        setDetail(null);
+                    }}
+                >
+                    <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
+                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
+                            <Card>
+                                <ChatRecord list={detail} />
+                            </Card>
+                        </div>
+                    </div>
+                </Drawer>
+            )}
         </Box>
     );
 }

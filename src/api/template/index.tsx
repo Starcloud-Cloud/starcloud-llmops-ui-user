@@ -38,7 +38,7 @@ export const del = (uid: string) => {
 };
 
 //执行记录echart
-export const logStatistics = (data: { appName: string; timeType: string }) => {
+export const logStatistics = (data: any) => {
     return request.post({ url: '/llm/app/log/statistics', data });
 };
 //获取时间
@@ -48,6 +48,14 @@ export const logTimeType = () => {
 //执行记录列表
 export const infoPage = (data: any) => {
     return request.post({ url: 'llm/app/log/infoPage', data });
+};
+//执行记录图片详情
+export const detailImage = (data: any) => {
+    return request.post({ url: 'llm/app/log/detail/image', data });
+};
+//执行记录执行详情
+export const detailApp = (data: any) => {
+    return request.post({ url: 'llm/app/log/detail/app', data });
 };
 
 //获取我的应用

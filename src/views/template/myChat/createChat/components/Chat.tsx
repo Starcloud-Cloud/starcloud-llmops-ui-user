@@ -58,7 +58,7 @@ export type IHistory = Partial<{
     isStatement?: boolean;
 }>;
 
-type IConversation = {
+export type IConversation = {
     uid: string;
     appUid: string;
     appName: string;
@@ -188,7 +188,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         }
     });
 
-    const handleKeyDown = (event: any) => {
+    const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
@@ -196,7 +196,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         } else if (!event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
             // 单独按回车键提交表单
-            handleOnSend();
+            await handleOnSend();
         }
     };
 
@@ -432,12 +432,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                                 <InputAdornment position="end" className="relative">
                                     {isFetch ? (
                                         <Tooltip placement="top" arrow title={'请求中'}>
-                                            <IconButton
-                                                disableRipple
-                                                color={message ? 'secondary' : 'default'}
-                                                onClick={handleOnSend}
-                                                aria-label="send message"
-                                            >
+                                            <IconButton disableRipple color={message ? 'secondary' : 'default'} aria-label="send message">
                                                 <PendingIcon />
                                             </IconButton>
                                         </Tooltip>

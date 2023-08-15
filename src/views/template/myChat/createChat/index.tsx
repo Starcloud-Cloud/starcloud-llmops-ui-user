@@ -14,6 +14,8 @@ import { FashionStyling } from './components/FashionStyling';
 import { Knowledge } from './components/Knowledge';
 import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
+import Upload from '../../myTemplate/components/createTemplate/upLoad';
+import { appModify } from 'api/template';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -28,6 +30,7 @@ export function TabPanel({ children, value, index, ...other }: TabsProps) {
 export function a11yProps(index: number) {
     return {
         id: `simple-tab-${index}`,
+        value: index,
         'aria-controls': `simple-tabpanel-${index}`
     };
 }
@@ -35,6 +38,7 @@ export function a11yProps(index: number) {
 export type IChatInfo = {
     name?: string;
     avatar?: string;
+    uid?: string;
     prePrompt?: string;
     statement?: string; // 欢迎语
     enableStatement?: boolean;
@@ -210,6 +214,7 @@ function CreateDetail() {
             webScope: chatBotInfo.searchInWeb
         };
         await chatSave(data);
+        setSaveState(saveState + 1);
         dispatch(
             openSnackbar({
                 open: true,
@@ -225,8 +230,14 @@ function CreateDetail() {
 
     //tabs
     const [value, setValue] = useState(0);
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const [saveState, setSaveState] = useState(0);
+    const handleChange = (event: any, newValue: number) => {
         setValue(newValue);
+    };
+
+    const updateDetail = async () => {
+        await saveDetail();
+        setSaveState(saveState + 1);
     };
 
     return (
@@ -241,7 +252,7 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        (value === 0 || value === 1 || value === 3) && (
+                        (value === 0 || value === 1 || value === 3 || value === 5) && (
                             <Button
                                 className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
@@ -284,6 +295,7 @@ function CreateDetail() {
                     <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(3)} />
                     {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(4)} />}
+                    <Tab component={Link} label={'机器人发布'} {...a11yProps(5)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -292,13 +304,18 @@ function CreateDetail() {
                     <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={2}>
-                    <Knowledge />
+                    {detail?.uid && <Knowledge datasetId={detail.uid} />}
                 </TabPanel>
                 <TabPanel value={value} index={3}>
                     <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
-                <TabPanel value={value} index={4}>
-                    <Chat chatBotInfo={chatBotInfo} />
+                {width < 1280 && (
+                    <TabPanel value={value} index={4}>
+                        <Chat chatBotInfo={chatBotInfo} />
+                    </TabPanel>
+                )}
+                <TabPanel value={value} index={5}>
+                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} />}
                 </TabPanel>
             </Card>
             {value !== 4 && (

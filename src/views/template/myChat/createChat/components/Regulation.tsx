@@ -284,7 +284,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         <Grid item className="w-[90%] pt-0 mt-[16px]">
                             <Slider
                                 step={0.5}
-                                valueLabelDisplay="off"
+                                valueLabelDisplay="auto"
                                 min={0}
                                 max={2}
                                 value={chatBotInfo?.temperature}

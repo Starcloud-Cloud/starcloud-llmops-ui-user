@@ -131,7 +131,6 @@ function TemplateMarket() {
                     right: '0px',
                     width: '5px',
                     height: maxHeight + 'px',
-                    zIndex: 9999,
                     backgroundColor: theme.palette.mode === 'dark' ? '#1a223f' : 'rgb(244, 246, 248)',
                     pointerEvents: 'none'
                 }

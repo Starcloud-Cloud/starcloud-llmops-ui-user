@@ -67,6 +67,7 @@ function CreateDetail() {
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
     const basis = useRef<any>(null);
+    let conversationUid: undefined | string = undefined;
     //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -85,7 +86,8 @@ function CreateDetail() {
             let resp: any = await executeApp({
                 appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
                 stepId: stepId,
-                appReqVO: detailRef.current
+                appReqVO: detailRef.current,
+                conversationUid
             });
 
             const contentData = _.cloneDeep(detailRef.current);
@@ -153,6 +155,9 @@ function CreateDetail() {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        if (!conversationUid && index === 0 && isAllExecute) {
+                            conversationUid = bufferObj.conversationUid;
+                        }
                         const contentData1 = _.cloneDeep(contentData);
                         contentData.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;

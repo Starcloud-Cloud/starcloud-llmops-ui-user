@@ -1,6 +1,7 @@
-import { FormControl, Grid, InputLabel, MenuItem, Select, Slider, TextField } from '@mui/material';
+import { FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slider, TextField, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const marks = [
     {
@@ -134,7 +135,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
             <div>
                 <span
                     className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
+                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
                     }
                 >
                     基础规则
@@ -154,7 +155,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             setStartCheck(true);
                             setRegulationText(e.target.value);
                         }}
-                        error={(regulationText?.length || 0) > 800 || (startCheck && !regulationText)}
+                        error={(regulationText?.length || 0) > 1000 || (startCheck && !regulationText)}
                     />
                     <div className="flex justify-between">
                         {startCheck && !regulationText ? (
@@ -162,7 +163,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         ) : (
                             <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
                         )}
-                        <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/800</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/1000</div>
                     </div>
 
                     <div className={'flex  items-center mt-5'}>
@@ -273,9 +274,14 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     高级规则
                 </span>
                 <div className={'mt-3'}>
-                    <span className={'text-base text-black'}>回复多样性</span>
+                    <div className="flex items-center">
+                        <span className={'text-sm text-black'}>回复内容的创造性</span>
+                        <Tooltip title={'值越小同一个问题的回复相对固定，值越大回复内容越随机多样具有创造性。'} placement="top">
+                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                        </Tooltip>
+                    </div>
                     <Grid item xs={12} container spacing={2} className="flex justify-center">
-                        <Grid item className="w-[90%]">
+                        <Grid item className="w-[90%] pt-0 mt-[16px]">
                             <Slider
                                 step={0.5}
                                 valueLabelDisplay="off"
@@ -292,6 +298,40 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             />
                         </Grid>
                     </Grid>
+                </div>
+            </div>
+            <div className={'mt-10'}>
+                <div className="flex items-center">
+                    <span className={'text-md text-black'}>首选模型</span>
+                    <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
+                        <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                    </Tooltip>
+                </div>
+                <div className={'mt-3'}>
+                    <FormControl className="w-[280px] md:w-[310px]">
+                        <InputLabel size={'small'} id="age-select">
+                            选择模型
+                        </InputLabel>
+                        <Select
+                            size={'small'}
+                            id="columnId"
+                            name="columnId"
+                            label={'模型选择'}
+                            fullWidth
+                            // onChange={(e: any) => handleRuleValue(3, e.target.value)}
+                        >
+                            <MenuItem value={1}>默认模型3.5</MenuItem>
+                            <MenuItem value={2} disabled>
+                                默认模型4.0(测试中)
+                            </MenuItem>
+                            <MenuItem value={3} disabled>
+                                文心一言(测试中)
+                            </MenuItem>
+                            <MenuItem value={4} disabled>
+                                Llama2(测试中)
+                            </MenuItem>
+                        </Select>
+                    </FormControl>
                 </div>
             </div>
         </div>

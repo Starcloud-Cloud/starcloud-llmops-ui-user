@@ -16,11 +16,12 @@ import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
 import Upload from '../../myTemplate/components/createTemplate/upLoad';
 import { appModify } from 'api/template';
+import ApplicationAnalysis from 'views/template/applicationAnalysis';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 2, display: value === index ? 'block' : 'none' }}>
                 <Box>{children}</Box>
             </Box>
         </div>
@@ -120,11 +121,11 @@ function CreateDetail() {
             );
             return;
         }
-        if (chatBotInfo.prePrompt.length > 800) {
+        if (chatBotInfo.prePrompt.length > 1000) {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '角色描述不能超过800字',
+                    message: '角色描述不能超过1000字',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -254,7 +255,7 @@ function CreateDetail() {
                     action={
                         (value === 0 || value === 1 || value === 3 || value === 5) && (
                             <Button
-                                className="right-[25px] top-[85px] absolute z-50"
+                                // className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
                                 color="secondary"
                                 autoFocus
@@ -266,36 +267,14 @@ function CreateDetail() {
                     }
                 ></CardHeader>
                 <Divider />
-                <Tabs
-                    sx={{
-                        m: 3,
-                        mb: 0,
-                        '& a': {
-                            minHeight: 'auto',
-                            minWidth: 10,
-                            py: 1.5,
-                            px: 1,
-                            mr: 2.2,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        },
-                        '& a > svg': {
-                            mb: '0px !important',
-                            mr: 1.1
-                        }
-                    }}
-                    value={value}
-                    variant="scrollable"
-                    onChange={handleChange}
-                >
+                <Tabs value={value} variant="scrollable" onChange={handleChange}>
                     <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
                     <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(3)} />
-                    {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(4)} />}
-                    <Tab component={Link} label={'机器人发布'} {...a11yProps(5)} />
+                    <Tab component={Link} label={'应用分析'} {...a11yProps(4)} />
+                    {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
+                    <Tab component={Link} label={'机器人发布'} {...a11yProps(6)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -309,16 +288,19 @@ function CreateDetail() {
                 <TabPanel value={value} index={3}>
                     <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
+                <TabPanel value={value} index={4}>
+                    <ApplicationAnalysis appUid={detail?.uid} />
+                </TabPanel>
                 {width < 1280 && (
-                    <TabPanel value={value} index={4}>
+                    <TabPanel value={value} index={5}>
                         <Chat chatBotInfo={chatBotInfo} />
                     </TabPanel>
                 )}
-                <TabPanel value={value} index={5}>
+                <TabPanel value={value} index={6}>
                     {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} mode={'CHAT'} />}
                 </TabPanel>
             </Card>
-            {value !== 4 && (
+            {value !== 5 && (
                 <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
                     <Chat chatBotInfo={chatBotInfo} />
                 </Card>

@@ -31,6 +31,7 @@ export default function FormDialogNew({
 
     const handleClose = () => {
         setOpen(false);
+        setChecked(false);
     };
 
     useEffect(() => {
@@ -72,6 +73,7 @@ export default function FormDialogNew({
                                 autoFocus
                                 size="small"
                                 id="name"
+                                inputProps={{ maxLength: 20 }}
                                 label={t('chat.name')}
                                 placeholder={t('chat.typeName')}
                                 fullWidth

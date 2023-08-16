@@ -43,12 +43,14 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
+import useUserStore from 'store/user';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
     elapsedAvg: number;
     userCount: string;
     tokens: string;
+    feedbackLikeCount: number;
 }
 interface Charts {
     title: string;
@@ -66,6 +68,8 @@ interface TableData {
     createTime: number;
     errorMessage: string;
     endUser: string;
+    appExecutor: string;
+    updateTime: number;
 }
 interface Date {
     label: string;
@@ -92,6 +96,7 @@ interface Detail {
     endUser?: string;
     createTime?: number;
     imageInfo?: any;
+    appExecutor?: string;
     appInfo?: any;
 }
 function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
@@ -112,25 +117,28 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
             setTotal(res.total);
         });
     };
+    const permissions = useUserStore((state) => state.permissions);
     //获取标数据
     const getStatistic = () => {
         logStatistics({ ...queryParams, appUid }).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
-            // const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
+            const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            // const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
-            setGenerate([
-                { title: t('generateLog.messageTotal'), data: message },
-                // { title: t('generateLog.usertotal'), data: userCount },
-                // { title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg },
-                { title: t('generateLog.tokenTotal'), data: tokens }
-            ]);
+            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
+            const newList = [];
+            permissions.includes('log:app:analysis:usageCount') && newList.push({ title: t('generateLog.messageTotal'), data: message });
+            permissions.includes('log:app:analysis:usageToken') && newList.push({ title: t('generateLog.tokenTotal'), data: tokens });
+            permissions.includes('log:app:analysis:avgElapsed') &&
+                newList.push({ title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg });
+            permissions.includes('log:app:analysis:userLike') && newList.push({ title: t('generateLog.usertotal'), data: userCount });
+            setGenerate(newList);
         });
     };
     const [dateList, setDateList] = useState([] as Date[]);
     const scenseList = [
         { label: '创作中心', value: 'WEB_ADMIN' },
         { label: '应用市场', value: 'WEB_MARKET' },
+        { label: 'AI作图', value: 'IMAGE' },
         { label: '分享', value: 'SHARE_WEB' },
         { label: '企业微信群聊', value: 'WECOM_GROUP' },
         { label: '聊天测试', value: 'CHAT_TEST' },
@@ -253,12 +261,6 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                 setDetail(res.list);
                 setDetailTotal(res.total);
             });
-        } else if (row.appMode === 'COMPLETION') {
-            detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
-                setDetail(res.list);
-                setDetailTotal(res.total);
-            });
-        } else {
         }
         setOpen(true);
     };
@@ -287,7 +289,9 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     //执行弹窗
     const [exeOpen, setExeOpen] = useState(false);
     const [exeDetail, setExeDetail] = useState<any>({});
+    //聊天
     const [chatVisible, setChatVisible] = useState(false);
+    //app
 
     return (
         <Box>
@@ -384,7 +388,8 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                             <TableCell align="center">{t('generate.totalAnswerTokens')}</TableCell>
                             <TableCell align="center">{t('generate.totalElapsed')} (s)</TableCell>
                             <TableCell align="center">{t('generate.status')}</TableCell>
-                            <TableCell align="center">{t('generate.createTime')}</TableCell>
+                            <TableCell align="center">用户</TableCell>
+                            <TableCell align="center">更新时间</TableCell>
                             <TableCell align="center"></TableCell>
                         </TableRow>
                     </TableHead>
@@ -397,23 +402,20 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.status}</TableCell>
-                                <TableCell align="center">{formatDate(row.createTime)}</TableCell>
+                                <TableCell align="center">{row.appExecutor}</TableCell>
+                                <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
                                             if (row.appMode === 'BASE_GENERATE_IMAGE') {
-                                                detailImage({ uid: row.uid, page: { pageNo: 1, pageSize: 1000 } }).then((res) => {
-                                                    setDetail(res.list);
-                                                    setOpen(true);
-                                                    getDeList(row);
-                                                });
+                                                setOpen(true);
+                                                getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
-                                                detailApp(row.uid).then((res) => {
-                                                    setDetail(res.list);
-                                                    setOpen(true);
-                                                    getDeList(row);
+                                                detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                                                    setExeDetail(res.appInfo);
+                                                    setExeOpen(true);
                                                 });
                                             } else if (row.appMode === 'CHAT') {
                                                 setChatVisible(true);
@@ -482,7 +484,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                                                 </Typography>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="center">{row.endUser}</TableCell>
+                                        <TableCell align="center">{row.appExecutor}</TableCell>
                                         <TableCell align="center">{formatDate(row.createTime as number)}</TableCell>
                                         <TableCell align="center">
                                             <Button
@@ -533,83 +535,6 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                     height={ImgDetail.height}
                 />
             )}
-            {exeOpen && (
-                <Modal
-                    open={exeOpen}
-                    onClose={() => {
-                        setExeOpen(false);
-                        setExeDetail({});
-                    }}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                >
-                    <MainCard
-                        style={{
-                            position: 'absolute',
-                            width: '800px',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)'
-                        }}
-                        title="详情"
-                        content={false}
-                        secondary={
-                            <IconButton
-                                onClick={() => {
-                                    setExeOpen(false);
-                                    setExeDetail({});
-                                }}
-                                size="large"
-                                aria-label="close modal"
-                            >
-                                <CloseIcon fontSize="small" />
-                            </IconButton>
-                        }
-                    >
-                        <CardContent>
-                            <Box>
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                                        <AccessAlarm sx={{ fontSize: '70px' }} />
-                                        <Box>
-                                            <Box>
-                                                <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                                    {exeDetail?.name}
-                                                </Typography>
-                                            </Box>
-                                            <Box>
-                                                {exeDetail?.categories?.map((item: any) => (
-                                                    <span key={item}>
-                                                        #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
-                                                    </span>
-                                                ))}
-                                                {exeDetail?.tags?.map((el: any) => (
-                                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                                ))}
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                                <Divider sx={{ mb: 1 }} />
-                                <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                    {exeDetail?.description}
-                                </Typography>
-                                <Perform
-                                    history={true}
-                                    config={exeDetail.workflowConfig}
-                                    changeSon={() => {}}
-                                    changeanswer={() => {}}
-                                    loadings={[]}
-                                    variableChange={() => {}}
-                                    promptChange={() => {}}
-                                    isallExecute={() => {}}
-                                    source="myApp"
-                                />
-                            </Box>
-                        </CardContent>
-                    </MainCard>
-                </Modal>
-            )}
             {chatVisible && (
                 <Drawer
                     anchor="right"
@@ -625,6 +550,86 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                             <Card>
                                 <ChatRecord list={detail} />
                             </Card>
+                        </div>
+                    </div>
+                </Drawer>
+            )}
+            {exeOpen && (
+                <Drawer
+                    anchor="right"
+                    open={exeOpen}
+                    sx={{ '& .MuiDrawer-paper': { overflowY: 'auto' } }}
+                    onClose={() => {
+                        setExeOpen(false);
+                        setExeDetail({});
+                    }}
+                >
+                    <div className="bg-[#f4f6f8] w-[1000px] md:w-[800px] flex justify-center">
+                        <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
+                            <MainCard
+                                title="详情"
+                                content={false}
+                                secondary={
+                                    <IconButton
+                                        onClick={() => {
+                                            setExeOpen(false);
+                                            setExeDetail({});
+                                        }}
+                                        size="large"
+                                        aria-label="close modal"
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                }
+                            >
+                                <CardContent>
+                                    <Box>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <AccessAlarm sx={{ fontSize: '70px' }} />
+                                                <Box>
+                                                    <Box>
+                                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                            {exeDetail?.name}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box>
+                                                        {exeDetail?.categories?.map((item: any) => (
+                                                            <span key={item}>
+                                                                #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
+                                                            </span>
+                                                        ))}
+                                                        {exeDetail?.tags?.map((el: any) => (
+                                                            <Chip
+                                                                key={el}
+                                                                sx={{ marginLeft: 1 }}
+                                                                size="small"
+                                                                label={el}
+                                                                variant="outlined"
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+                                        </Box>
+                                        <Divider sx={{ mb: 1 }} />
+                                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                            {exeDetail?.description}
+                                        </Typography>
+                                        <Perform
+                                            history={true}
+                                            config={exeDetail.workflowConfig}
+                                            changeSon={() => {}}
+                                            changeanswer={() => {}}
+                                            loadings={[]}
+                                            variableChange={() => {}}
+                                            promptChange={() => {}}
+                                            isallExecute={() => {}}
+                                            source="myApp"
+                                        />
+                                    </Box>
+                                </CardContent>
+                            </MainCard>
                         </div>
                     </div>
                 </Drawer>

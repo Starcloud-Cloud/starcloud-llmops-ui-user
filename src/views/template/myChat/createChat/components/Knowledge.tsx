@@ -13,6 +13,7 @@ import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import formatDate from 'hooks/useDate';
+// import fetch from 'utils/fetch';
 import {
     Box,
     Button,
@@ -72,23 +73,23 @@ const validationSchema = yup.object({
     context: yup.string().required('')
 });
 
-const transformDataType = (dataType: string) => {
+const transformDataType = (dataType: string, type: string) => {
     switch (dataType) {
         case 'DOCUMENT':
             return (
-                <Tooltip title="TEXT">
+                <Tooltip title={type}>
                     <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
         case 'URL':
             return (
-                <Tooltip title="TEXT">
+                <Tooltip title={type}>
                     <LinkIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
         case 'CHARACTERS':
             return (
-                <Tooltip title="TEXT">
+                <Tooltip title={type}>
                     <EditIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
@@ -299,6 +300,24 @@ const DocumentModal = ({
             //     console.log(info.file, info.fileList);
             // }
             if (info.fileList.every((value) => value.status !== 'uploading')) {
+                const errMsg = info.fileList.map((item: any) => {
+                    if (!item.response.data.status) {
+                        return item.response.data.errMsg;
+                    }
+                });
+
+                errMsg.length > 0 &&
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
                 handleClose();
                 forceUpdate();
             }
@@ -337,33 +356,50 @@ const DocumentModal = ({
             });
         }
     });
-    const formikUrl = useFormik({
-        initialValues: {
-            url: ''
-        },
-        validationSchema: yup.object({
-            url: yup.string().required('网页地址是必填的')
-        }),
-        onSubmit: (values) => {
-            uploadUrls({ urls: values.url.split(/[,\s，\n]+/).filter((value) => value.trim() !== ''), batch: uuidv4(), datasetId }).then(
-                (res) => {
+    const [isValid, setIsValid] = useState(true);
+    const [websiteCount, setWebsiteCount] = useState(0);
+    const [url, setUrl] = useState<string>('');
+    const saveUrl = () => {
+        if (url && isValid) {
+            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), datasetId }).then((res) => {
+                const errMsg = res.filter((item: any) => {
+                    if (!item.status) {
+                        return item.errMsg;
+                    }
+                });
+                errMsg.length > 0 &&
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: 'Submit Success',
+                            message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
                             variant: 'alert',
                             alert: {
-                                color: 'success'
+                                color: 'error'
                             },
                             close: false
                         })
                     );
-                    handleClose();
-                    forceUpdate();
-                }
-            );
+                handleClose();
+                forceUpdate();
+            });
+        } else {
+            setIsValid(false);
         }
-    });
+    };
+    useEffect(() => {
+        if (url) {
+            const websites = url
+                .trim()
+                .split('\n')
+                .map((item) => item.trim());
+            // 简单验证每个网站地址
+            const isValidInput =
+                websites.every((website) => /^(http:\/\/|https:\/\/|www\.)[^\s,，]*$/.test(website)) && websites.length <= 25;
+            setIsValid(isValidInput);
+            // 设置网站地址的数量
+            setWebsiteCount(websites.length);
+        }
+    }, [url]);
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -414,65 +450,74 @@ const DocumentModal = ({
                             <Tab component={Link} label="文本输入" {...a11yProps(1)} />
                             <Tab component={Link} label="网页抓取" {...a11yProps(2)} />
                         </Tabs>
-                        <TabPanel value={value} index={0}>
-                            <div className="text-sm text-[#9da3af]">
-                                格式支持 .pdf .docx .txt .pptx .epub .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
-                                文档中的表格和图片暂时无法学习。
-                            </div>
-                            <div className="mt-3">
-                                <Dragger {...props}>
-                                    <p className="ant-upload-drag-icon">
-                                        <AddIcon />
-                                    </p>
-                                    <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
-                                </Dragger>
-                            </div>
-                        </TabPanel>
-                        <TabPanel value={value} index={1}>
-                            <form onSubmit={formik.handleSubmit}>
-                                <TextField
-                                    label={'标题'}
-                                    fullWidth
-                                    id="title"
-                                    name="title"
-                                    color="secondary"
-                                    InputLabelProps={{ shrink: true }}
-                                    value={formik.values.title}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.title && Boolean(formik.errors.title)}
-                                    helperText={formik.touched.title && formik.errors.title}
-                                />
-                                <TextField
-                                    label={'内容'}
-                                    fullWidth
-                                    id="context"
-                                    name="context"
-                                    color="secondary"
-                                    placeholder="文本内容，请输入 150000 字符以内"
-                                    InputLabelProps={{ shrink: true }}
-                                    value={formik.values.context}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.context && Boolean(formik.errors.context)}
-                                    helperText={formik.touched.context && formik.errors.context}
-                                    className={'mt-3'}
-                                    multiline
-                                    minRows={6}
-                                />
-                                <Divider />
-                                <CardActions>
-                                    <Grid container justifyContent="flex-end">
-                                        <Button variant="contained" type="submit" color="secondary">
-                                            保存
-                                        </Button>
-                                    </Grid>
-                                </CardActions>
-                            </form>
-                        </TabPanel>
-                        <TabPanel value={value} index={2}>
-                            <div className="text-sm text-[#9da3af]">
-                                请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
-                            </div>
-                            <form onSubmit={formikUrl.handleSubmit}>
+                        {value === 0 && (
+                            <Box py={2}>
+                                <div className="text-sm text-[#9da3af]">
+                                    格式支持 .pdf .docx .txt .pptx .epub .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
+                                    文档中的表格和图片暂时无法学习。
+                                </div>
+                                <div className="mt-3">
+                                    <Dragger {...props}>
+                                        <p className="ant-upload-drag-icon">
+                                            <AddIcon />
+                                        </p>
+                                        <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
+                                    </Dragger>
+                                </div>
+                            </Box>
+                        )}
+                        {value === 1 && (
+                            <Box pt={2}>
+                                <form onSubmit={formik.handleSubmit}>
+                                    <TextField
+                                        label={'标题'}
+                                        fullWidth
+                                        id="title"
+                                        name="title"
+                                        color="secondary"
+                                        InputLabelProps={{ shrink: true }}
+                                        value={formik.values.title}
+                                        onChange={formik.handleChange}
+                                        error={formik.touched.title && Boolean(formik.errors.title)}
+                                        helperText={formik.touched.title && formik.errors.title}
+                                    />
+                                    <Box position="relative">
+                                        <TextField
+                                            label={'内容'}
+                                            fullWidth
+                                            id="context"
+                                            name="context"
+                                            color="secondary"
+                                            placeholder="文本内容，请输入 150000 字符以内"
+                                            InputLabelProps={{ shrink: true }}
+                                            value={formik.values.context}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.context && Boolean(formik.errors.context)}
+                                            helperText={(formik.touched.context && formik.errors.context) || ' '}
+                                            className={'mt-3'}
+                                            multiline
+                                            minRows={6}
+                                        />
+                                        <Box position="absolute" bottom="0px" right="5px" fontSize="0.75rem">
+                                            {formik.values.context.length}/150000个
+                                        </Box>
+                                    </Box>
+                                    <Divider sx={{ mt: 2 }} />
+                                    <CardActions sx={{ py: 2, px: 0 }}>
+                                        <Grid container justifyContent="flex-end">
+                                            <Button variant="contained" type="submit" color="secondary">
+                                                保存
+                                            </Button>
+                                        </Grid>
+                                    </CardActions>
+                                </form>
+                            </Box>
+                        )}
+                        {value === 2 && (
+                            <Box pt={2}>
+                                <div className="text-sm text-[#9da3af]">
+                                    请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
+                                </div>
                                 <TextField
                                     label="网页地址"
                                     fullWidth
@@ -480,35 +525,47 @@ const DocumentModal = ({
                                     id="url"
                                     name="url"
                                     color="secondary"
-                                    value={formikUrl.values.url}
-                                    onChange={formikUrl.handleChange}
-                                    error={formikUrl.touched.url && Boolean(formikUrl.errors.url)}
-                                    helperText={formikUrl.touched.url && formikUrl.errors.url}
-                                    placeholder="网站通过http或者https开头，多个网站通过换行或者,分割避免解析错误"
+                                    value={url}
+                                    onChange={(e) => {
+                                        setUrl(e.target.value);
+                                    }}
+                                    error={!isValid}
+                                    placeholder="网站通过http://、https://、www.开头多个网站通过换行分割避免解析错误"
                                     className={'mt-3'}
                                     multiline
                                     minRows={6}
                                 />
-                                <Divider />
-                                <CardActions>
+                                <div className="flex justify-between">
+                                    {!isValid ? (
+                                        <div className="text-[#f44336] mt-1">
+                                            {websiteCount <= 25 ? '请输入正确的网络地址' : '网址不能超过20个'}
+                                        </div>
+                                    ) : (
+                                        <div className="mt-1">网站通过http://、https://、www.开头多个网站通过换行分割避免解析错误</div>
+                                    )}
+                                    <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/25个</div>
+                                </div>
+                                <Divider sx={{ mt: 2 }} />
+                                <CardActions sx={{ py: 2, px: 0 }}>
                                     <Grid container justifyContent="flex-end">
-                                        <Button variant="contained" type="submit" color="secondary">
+                                        <Button variant="contained" onClick={saveUrl} color="secondary">
                                             保存
                                         </Button>
                                     </Grid>
                                 </CardActions>
-                            </form>
-                        </TabPanel>
+                            </Box>
+                        )}
                     </>
                 </CardContent>
             </MainCard>
         </Modal>
     );
 };
-
 interface DetaData {
     name?: string;
-    summaryContent?: string | null;
+    cleanContent?: string;
+    summary?: string | null;
+    content?: string;
 }
 const DetailModal = ({
     detailOpen,
@@ -524,26 +581,48 @@ const DetailModal = ({
     detailClose: () => void;
 }) => {
     const [detaData, setDetaData] = useState<DetaData>({});
-    const [detaList, setDetaList] = useState([]);
+    const [detaList, setDetaList] = useState<{ content: string }[]>([]);
     const getList = async () => {
         const result = await getDetails(uid as string);
         setDetaData(result);
         const res = await detailsSplit({ datasetId, uid, pageNo: 1, pageSize: 1000 });
-        setDetaList(detaList);
+        setDetaList(res.list);
     };
     useEffect(() => {
         getList();
     }, []);
+    //存储原始内容
+    const [oldValue, setOldValue] = useState<any>('');
+    //解析链接
+    useEffect(() => {
+        if (detaData.cleanContent) {
+            fetch(detaData.cleanContent)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                })
+                .then((res) => {
+                    setOldValue(res);
+                });
+        }
+    }, [detaData]);
+    //切换tabs
+    const [value, setValue] = useState(0);
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
     return (
         <Modal open={detailOpen} onClose={detailClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
                 style={{
                     position: 'absolute',
                     width: '800px',
-                    top: '50%',
+                    top: '10%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%)'
+                    transform: 'translate(-50%, 0)'
                 }}
+                sx={{ maxHeight: '100vh', overflowY: 'auto' }}
                 title="详情"
                 content={false}
                 secondary={
@@ -553,30 +632,58 @@ const DetailModal = ({
                 }
             >
                 <CardContent>
-                    <Typography variant="h4">标题</Typography>
-                    <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
-                    <Typography mt={4} mb={2} variant="h4">
-                        总结
-                    </Typography>
-                    <TextField
-                        disabled
-                        value={detaData.summaryContent}
-                        multiline
-                        minRows={6}
-                        maxRows={6}
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                    />
-                    {/* <Typography mt={4} mb={2} variant="h4">
-                        Content
-                    </Typography>
-                    <Grid container spacing={2}>
-                        <Grid item md={6} xs={12}>
-                            <SubCard contentSX={{ p: 2 }}>
-                              
-                            </SubCard>
+                    <Tabs value={value} onChange={handleChange}>
+                        <Tab label="内容" {...a11yProps(0)} />
+                        <Tab label="详情" {...a11yProps(1)} />
+                    </Tabs>
+                    <TabPanel value={value} index={0}>
+                        <Typography variant="h4">标题</Typography>
+                        <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
+                        <Typography mt={2} variant="h4">
+                            原始链接{' '}
+                            <Link color="secondary" sx={{ fontSize: '12px' }} href={detaData.content}>
+                                {detaData.content}
+                            </Link>
+                        </Typography>
+                        <Typography mt={2} mb={2} variant="h4">
+                            原始内容
+                        </Typography>
+                        <TextField
+                            multiline
+                            minRows={4}
+                            maxRows={4}
+                            disabled
+                            value={oldValue}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <Typography mt={2} mb={2} variant="h4">
+                            总结
+                        </Typography>
+                        <TextField
+                            disabled
+                            value={detaData.summary}
+                            multiline
+                            minRows={6}
+                            maxRows={6}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        {detaList.length > 0 && (
+                            <Typography mt={4} variant="h4">
+                                Content
+                            </Typography>
+                        )}
+                        <Grid container spacing={2}>
+                            {detaList?.map((item) => (
+                                <Grid item md={6} xs={12}>
+                                    <TextField multiline minRows={4} maxRows={4} disabled value={item.content} sx={{ mt: 2 }} fullWidth />
+                                </Grid>
+                            ))}
                         </Grid>
-                    </Grid> */}
+                    </TabPanel>
                 </CardContent>
             </MainCard>
         </Modal>
@@ -588,14 +695,17 @@ export type typeDocumentChild = {
     id: number;
     uid: string;
     name: string;
+    type: string;
+    description?: string;
     position: number;
     dataSourceInfo?: any;
     batch?: any;
     status?: any;
-    wordCount: number;
     tokens?: any;
     summaryContent?: string;
     dataType: string;
+    updateTime: number;
+    wordCount: number;
 };
 
 export const Knowledge = ({ datasetId }: { datasetId: string }) => {
@@ -622,7 +732,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
             if (
                 !res.every(
                     (value: { status: string }) =>
-                        value.status === '99' || value.status === '35' || value.status === '45' || value.status === '55'
+                        value.status >= '90' ||
+                        value.status === '0' ||
+                        value.status === '15' ||
+                        value.status === '25' ||
+                        value.status === '35' ||
+                        value.status === '45' ||
+                        value.status === '55'
                 )
             ) {
                 InterRef.current = setInterval(() => {
@@ -631,7 +747,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         if (
                             response.every(
                                 (value: { status: string }) =>
-                                    value.status === '99' || value.status === '35' || value.status === '45' || value.status === '55'
+                                    value.status >= '90' ||
+                                    value.status === '0' ||
+                                    value.status === '15' ||
+                                    value.status === '25' ||
+                                    value.status === '35' ||
+                                    value.status === '45' ||
+                                    value.status === '55'
                             )
                         ) {
                             clearInterval(timeoutRef.current);
@@ -678,7 +800,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     <Box display="flex" justifyContent="space-between" alignContent="center">
                         <span
                             className={
-                                "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                                "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
                             }
                         >
                             文档式
@@ -700,7 +822,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
                                     return (
-                                        <Grid item xs={12} sm={6} md={4} xl={3} key={index}>
+                                        <Grid item xs={12} sm={6} md={6} xl={4} key={index}>
                                             <SubCard
                                                 sx={{
                                                     cursor: 'pointer',
@@ -721,7 +843,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         <Grid container spacing={gridSpacing}>
                                                             <Grid item xs zeroMinWidth>
                                                                 <div className="flex items-center">
-                                                                    {transformDataType(item.dataType)}
+                                                                    {transformDataType(item.dataType, item.type)}
                                                                     <Tooltip title={item.name}>
                                                                         <Typography
                                                                             variant="h4"
@@ -789,10 +911,21 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             component="div"
                                                             color={'#0006'}
                                                         >
-                                                            {item?.summaryContent}
+                                                            {item?.description}
                                                         </Typography>
                                                     </Grid>
-                                                    <Grid item xs={12} className="!pt-[10px]">
+                                                    <Grid
+                                                        item
+                                                        xs={12}
+                                                        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                                        className="!pt-[10px]"
+                                                    >
+                                                        <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        <Box>
+                                                            <Typography variant="caption">{formatDate(item.updateTime)}</Typography>
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item xs={12} className="!pt-[5px]">
                                                         <Divider variant="fullWidth" />
                                                     </Grid>
                                                     <Grid
@@ -802,7 +935,12 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}
                                                     >
                                                         <Box display="flex" alignItems="center">
-                                                            {item.status === '35' || item.status === '45' || item.status === '55' ? (
+                                                            {item.status === '0' ||
+                                                            item.status === '15' ||
+                                                            item.status === '25' ||
+                                                            item.status === '35' ||
+                                                            item.status === '45' ||
+                                                            item.status === '55' ? (
                                                                 <HighlightOffIcon
                                                                     sx={{
                                                                         color: 'error.dark',
@@ -810,12 +948,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                         height: 14
                                                                     }}
                                                                 />
-                                                            ) : item.status !== 99 ? (
-                                                                <LoadingOutlined
-                                                                    style={{ fontSize: '14px', color: '#673ab7' }}
-                                                                    rev={undefined}
-                                                                />
-                                                            ) : (
+                                                            ) : item.status >= '90' ? (
                                                                 <CheckCircleIcon
                                                                     sx={{
                                                                         color: 'success.dark',
@@ -823,38 +956,47 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                         height: 14
                                                                     }}
                                                                 />
+                                                            ) : (
+                                                                <LoadingOutlined
+                                                                    style={{ fontSize: '14px', color: '#673ab7' }}
+                                                                    rev={undefined}
+                                                                />
                                                             )}
-                                                            <Typography ml={1} variant="caption">
-                                                                {item.status > '20' && item.status <= '30'
+                                                            <Typography ml={0.5} variant="caption">
+                                                                {item.status === '0'
+                                                                    ? '数据上传失败'
+                                                                    : item.status === '15'
+                                                                    ? '数据上传失败'
+                                                                    : item.status === '20'
+                                                                    ? '数据上传成功'
+                                                                    : item.status === '21'
                                                                     ? '数据同步中'
+                                                                    : item.status === '25'
+                                                                    ? '数据同步失败'
+                                                                    : item.status === '30'
+                                                                    ? '数据同步完成'
                                                                     : item.status === '31'
-                                                                    ? '数据清洗中'
+                                                                    ? '数据学习中'
                                                                     : item.status === '35'
-                                                                    ? '数据清洗失败'
+                                                                    ? '数据学习失败'
                                                                     : item.status === '40'
-                                                                    ? '数据清洗完成'
+                                                                    ? '数据学习中'
                                                                     : item.status === '41'
-                                                                    ? '数据分割中'
+                                                                    ? '数据学习中'
                                                                     : item.status === '45'
-                                                                    ? '数据分割失败'
+                                                                    ? '数据学习失败'
                                                                     : item.status === '50'
-                                                                    ? '数据分割成功'
+                                                                    ? '数据学习中'
                                                                     : item.status === '51'
-                                                                    ? '正在创建索引'
+                                                                    ? '数据学习中'
                                                                     : item.status === '55'
-                                                                    ? '创建索引失败'
+                                                                    ? '数据学习失败'
                                                                     : item.status === '60'
-                                                                    ? '创建索引完成'
-                                                                    : item.status === '99'
-                                                                    ? '完成'
+                                                                    ? '数据学习中'
+                                                                    : item.status >= '90'
+                                                                    ? '数据学习完成'
                                                                     : null}
                                                             </Typography>
-                                                        </Box>
-                                                        <Box>
-                                                            <Typography variant="caption">2012-12-12 12:12:12</Typography>
-                                                            {/* <Typography ml={1} variant="caption">
-                                                                大小/字符
-                                                            </Typography> */}
                                                         </Box>
                                                     </Grid>
                                                 </Grid>
@@ -873,7 +1015,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
                     }
                 >
-                    文档式
+                    问答式
                 </span>
                 <Button
                     variant={'contained'}
@@ -884,7 +1026,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         setQaVisible(true);
                     }}
                 >
-                    添加文档
+                    添加问答
                 </Button>
             </Box>
             <Box display="flex" justifyContent="center" mt={3}>

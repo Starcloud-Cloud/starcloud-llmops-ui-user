@@ -305,17 +305,19 @@ const DocumentModal = ({
                         return item.response.data.errMsg;
                     }
                 });
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                );
+
+                errMsg.length > 0 &&
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
                 handleClose();
                 forceUpdate();
             }
@@ -359,23 +361,24 @@ const DocumentModal = ({
     const [url, setUrl] = useState<string>('');
     const saveUrl = () => {
         if (url && isValid) {
-            uploadUrls({ urls: url.split('\n'), batch: uuidv4(), datasetId }).then((res) => {
-                const errMsg = res.map((item: any) => {
+            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), datasetId }).then((res) => {
+                const errMsg = res.filter((item: any) => {
                     if (!item.status) {
                         return item.errMsg;
                     }
                 });
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                );
+                errMsg.length > 0 &&
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: errMsg.map((item: any) => <Typography key={item}>{item}</Typography>),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
                 handleClose();
                 forceUpdate();
             });
@@ -391,8 +394,7 @@ const DocumentModal = ({
                 .map((item) => item.trim());
             // 简单验证每个网站地址
             const isValidInput =
-                websites.every((website) => /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)) &&
-                websites.length <= 20;
+                websites.every((website) => /^(http:\/\/|https:\/\/|www\.)[^\s,，]*$/.test(website)) && websites.length <= 25;
             setIsValid(isValidInput);
             // 设置网站地址的数量
             setWebsiteCount(websites.length);
@@ -448,105 +450,111 @@ const DocumentModal = ({
                             <Tab component={Link} label="文本输入" {...a11yProps(1)} />
                             <Tab component={Link} label="网页抓取" {...a11yProps(2)} />
                         </Tabs>
-                        <TabPanel value={value} index={0}>
-                            <div className="text-sm text-[#9da3af]">
-                                格式支持 .pdf .docx .txt .pptx .epub .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
-                                文档中的表格和图片暂时无法学习。
-                            </div>
-                            <div className="mt-3">
-                                <Dragger {...props}>
-                                    <p className="ant-upload-drag-icon">
-                                        <AddIcon />
-                                    </p>
-                                    <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
-                                </Dragger>
-                            </div>
-                        </TabPanel>
-                        <TabPanel value={value} index={1}>
-                            <form onSubmit={formik.handleSubmit}>
-                                <TextField
-                                    label={'标题'}
-                                    fullWidth
-                                    id="title"
-                                    name="title"
-                                    color="secondary"
-                                    InputLabelProps={{ shrink: true }}
-                                    value={formik.values.title}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.title && Boolean(formik.errors.title)}
-                                    helperText={formik.touched.title && formik.errors.title}
-                                />
-                                <Box position="relative">
+                        {value === 0 && (
+                            <Box py={2}>
+                                <div className="text-sm text-[#9da3af]">
+                                    格式支持 .pdf .docx .txt .pptx .epub .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
+                                    文档中的表格和图片暂时无法学习。
+                                </div>
+                                <div className="mt-3">
+                                    <Dragger {...props}>
+                                        <p className="ant-upload-drag-icon">
+                                            <AddIcon />
+                                        </p>
+                                        <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
+                                    </Dragger>
+                                </div>
+                            </Box>
+                        )}
+                        {value === 1 && (
+                            <Box pt={2}>
+                                <form onSubmit={formik.handleSubmit}>
                                     <TextField
-                                        label={'内容'}
+                                        label={'标题'}
                                         fullWidth
-                                        id="context"
-                                        name="context"
+                                        id="title"
+                                        name="title"
                                         color="secondary"
-                                        placeholder="文本内容，请输入 150000 字符以内"
                                         InputLabelProps={{ shrink: true }}
-                                        value={formik.values.context}
+                                        value={formik.values.title}
                                         onChange={formik.handleChange}
-                                        error={formik.touched.context && Boolean(formik.errors.context)}
-                                        helperText={(formik.touched.context && formik.errors.context) || ' '}
-                                        className={'mt-3'}
-                                        multiline
-                                        minRows={6}
+                                        error={formik.touched.title && Boolean(formik.errors.title)}
+                                        helperText={formik.touched.title && formik.errors.title}
                                     />
-                                    <Box position="absolute" bottom="0px" right="5px" fontSize="0.75rem">
-                                        {formik.values.context.length}/150000个
+                                    <Box position="relative">
+                                        <TextField
+                                            label={'内容'}
+                                            fullWidth
+                                            id="context"
+                                            name="context"
+                                            color="secondary"
+                                            placeholder="文本内容，请输入 150000 字符以内"
+                                            InputLabelProps={{ shrink: true }}
+                                            value={formik.values.context}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.context && Boolean(formik.errors.context)}
+                                            helperText={(formik.touched.context && formik.errors.context) || ' '}
+                                            className={'mt-3'}
+                                            multiline
+                                            minRows={6}
+                                        />
+                                        <Box position="absolute" bottom="0px" right="5px" fontSize="0.75rem">
+                                            {formik.values.context.length}/150000个
+                                        </Box>
                                     </Box>
-                                </Box>
-                                <Divider />
-                                <CardActions>
+                                    <Divider sx={{ mt: 2 }} />
+                                    <CardActions sx={{ py: 2, px: 0 }}>
+                                        <Grid container justifyContent="flex-end">
+                                            <Button variant="contained" type="submit" color="secondary">
+                                                保存
+                                            </Button>
+                                        </Grid>
+                                    </CardActions>
+                                </form>
+                            </Box>
+                        )}
+                        {value === 2 && (
+                            <Box pt={2}>
+                                <div className="text-sm text-[#9da3af]">
+                                    请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
+                                </div>
+                                <TextField
+                                    label="网页地址"
+                                    fullWidth
+                                    focused
+                                    id="url"
+                                    name="url"
+                                    color="secondary"
+                                    value={url}
+                                    onChange={(e) => {
+                                        setUrl(e.target.value);
+                                    }}
+                                    error={!isValid}
+                                    placeholder="网站通过http://、https://、www.开头多个网站通过换行分割避免解析错误"
+                                    className={'mt-3'}
+                                    multiline
+                                    minRows={6}
+                                />
+                                <div className="flex justify-between">
+                                    {!isValid ? (
+                                        <div className="text-[#f44336] mt-1">
+                                            {websiteCount <= 25 ? '请输入正确的网络地址' : '网址不能超过20个'}
+                                        </div>
+                                    ) : (
+                                        <div className="mt-1">网站通过http://、https://、www.开头多个网站通过换行分割避免解析错误</div>
+                                    )}
+                                    <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/25个</div>
+                                </div>
+                                <Divider sx={{ mt: 2 }} />
+                                <CardActions sx={{ py: 2, px: 0 }}>
                                     <Grid container justifyContent="flex-end">
-                                        <Button variant="contained" type="submit" color="secondary">
+                                        <Button variant="contained" onClick={saveUrl} color="secondary">
                                             保存
                                         </Button>
                                     </Grid>
                                 </CardActions>
-                            </form>
-                        </TabPanel>
-                        <TabPanel value={value} index={2}>
-                            <div className="text-sm text-[#9da3af]">
-                                请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
-                            </div>
-                            <TextField
-                                label="网页地址"
-                                fullWidth
-                                focused
-                                id="url"
-                                name="url"
-                                color="secondary"
-                                value={url}
-                                onChange={(e) => {
-                                    setUrl(e.target.value);
-                                }}
-                                error={!isValid}
-                                placeholder="网站通过http或者https开头，多个网站通过换行或者,分割避免解析错误"
-                                className={'mt-3'}
-                                multiline
-                                minRows={6}
-                            />
-                            <div className="flex justify-between">
-                                {!isValid ? (
-                                    <div className="text-[#f44336] mt-1">
-                                        {websiteCount <= 20 ? '请输入正确的网络搜索范围' : '网址不能超过20个'}
-                                    </div>
-                                ) : (
-                                    <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
-                                )}
-                                <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/20个</div>
-                            </div>
-                            <Divider />
-                            <CardActions>
-                                <Grid container justifyContent="flex-end">
-                                    <Button variant="contained" onClick={saveUrl} color="secondary">
-                                        保存
-                                    </Button>
-                                </Grid>
-                            </CardActions>
-                        </TabPanel>
+                            </Box>
+                        )}
                     </>
                 </CardContent>
             </MainCard>

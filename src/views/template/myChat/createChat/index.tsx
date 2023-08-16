@@ -16,6 +16,7 @@ import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
 import Upload from '../../myTemplate/components/createTemplate/upLoad';
 import { appModify } from 'api/template';
+import ApplicationAnalysis from 'views/template/applicationAnalysis';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -271,8 +272,9 @@ function CreateDetail() {
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
                     <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(3)} />
-                    {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(4)} />}
-                    <Tab component={Link} label={'机器人发布'} {...a11yProps(5)} />
+                    <Tab component={Link} label={'应用分析'} {...a11yProps(4)} />
+                    {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
+                    <Tab component={Link} label={'机器人发布'} {...a11yProps(6)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -286,16 +288,19 @@ function CreateDetail() {
                 <TabPanel value={value} index={3}>
                     <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
+                <TabPanel value={value} index={4}>
+                    <ApplicationAnalysis appUid={detail?.uid} />
+                </TabPanel>
                 {width < 1280 && (
-                    <TabPanel value={value} index={4}>
+                    <TabPanel value={value} index={5}>
                         <Chat chatBotInfo={chatBotInfo} />
                     </TabPanel>
                 )}
-                <TabPanel value={value} index={5}>
+                <TabPanel value={value} index={6}>
                     {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} />}
                 </TabPanel>
             </Card>
-            {value !== 4 && (
+            {value !== 5 && (
                 <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
                     <Chat chatBotInfo={chatBotInfo} />
                 </Card>

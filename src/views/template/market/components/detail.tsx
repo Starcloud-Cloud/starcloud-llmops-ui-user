@@ -31,6 +31,7 @@ function Deatail() {
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     let isAllExecute = false;
+    let conversationUid: undefined | string = undefined;
     //执行
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -49,7 +50,8 @@ function Deatail() {
             let resp: any = await executeMarket({
                 appUid: uid,
                 stepId: stepId,
-                appReqVO: detailRef.current
+                appReqVO: detailRef.current,
+                conversationUid
             });
             const contentData = _.cloneDeep(detailRef.current);
             contentData.workflowConfig.steps[index].flowStep.response.answer = '';
@@ -116,6 +118,9 @@ function Deatail() {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        if (!conversationUid && index === 0 && isAllExecute) {
+                            conversationUid = bufferObj.conversationUid;
+                        }
                         const contentData1 = _.cloneDeep(contentData);
                         contentData.workflowConfig.steps[index].flowStep.response.answer =
                             contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;

@@ -633,7 +633,9 @@ const DetailModal = ({
                     width: '800px',
                     top: '10%',
                     left: '50%',
-                    transform: 'translate(-50%, 0)'
+                    transform: 'translate(-50%, 0)',
+                    maxHeight: '80%',
+                    overflow: 'auto'
                 }}
                 title="详情"
                 content={false}
@@ -677,7 +679,8 @@ const DetailModal = ({
                                                     const link = document.createElement('a');
                                                     link.href = url;
                                                     link.download =
-                                                        'tex.' +
+                                                        detaData.name +
+                                                        '.' +
                                                         detaData.cleanContent?.split('.')[detaData.cleanContent?.split('.').length - 1]; // 设置下载的文件名
                                                     link.click();
                                                     // 释放临时链接的资源

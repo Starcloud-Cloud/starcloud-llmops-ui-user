@@ -43,12 +43,14 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
+import useUserStore from 'store/user';
 interface LogStatistics {
     messageCount: string;
     createDate: string;
     elapsedAvg: number;
     userCount: string;
     tokens: string;
+    feedbackLikeCount: number;
 }
 interface Charts {
     title: string;
@@ -115,19 +117,21 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
             setTotal(res.total);
         });
     };
+    const permissions = useUserStore((state) => state.permissions);
     //获取标数据
     const getStatistic = () => {
         logStatistics({ ...queryParams, appUid }).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
-            // const userCount = res?.map((item: LogStatistics) => ({ y: item.userCount, x: item.createDate }));
+            const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            // const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
-            setGenerate([
-                { title: t('generateLog.messageTotal'), data: message },
-                // { title: t('generateLog.usertotal'), data: userCount },
-                // { title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg },
-                { title: t('generateLog.tokenTotal'), data: tokens }
-            ]);
+            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
+            const newList = [];
+            permissions.includes('log:app:analysis:usageCount') && newList.push({ title: t('generateLog.messageTotal'), data: message });
+            permissions.includes('log:app:analysis:usageToken') && newList.push({ title: t('generateLog.tokenTotal'), data: tokens });
+            permissions.includes('log:app:analysis:avgElapsed') &&
+                newList.push({ title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg });
+            permissions.includes('log:app:analysis:userLike') && newList.push({ title: t('generateLog.usertotal'), data: userCount });
+            setGenerate(newList);
         });
     };
     const [dateList, setDateList] = useState([] as Date[]);
@@ -554,7 +558,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                 <Drawer
                     anchor="right"
                     open={exeOpen}
-                    sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
+                    sx={{ '& .MuiDrawer-paper': { overflowY: 'auto' } }}
                     onClose={() => {
                         setExeOpen(false);
                         setExeDetail({});

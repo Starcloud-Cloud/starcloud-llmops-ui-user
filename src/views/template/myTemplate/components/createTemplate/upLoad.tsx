@@ -49,10 +49,12 @@ import { gridSpacing } from 'store/constant';
 import CreateSiteModal from './components/CreateSiteModal';
 import { openDrawer } from 'store/slices/menu';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
+import DomainModal from './components/DomainModal';
 function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
     const [openCreateSite, setOpenCreateSite] = useState(false);
     const [siteName, setSiteName] = useState('');
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [openDomain, setOpenDomain] = useState(false);
 
     const IconList: { [key: string]: any } = {
         monitor: <Monitor />,
@@ -71,7 +73,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             action: [
                 { title: '复制链接', icon: 'contentPaste', isCopy: true },
                 { title: '预览体验', icon: 'historyOutlined', onclick: () => window.open('/chat-bot') },
-                { title: '域名部署', icon: 'historyOutlined' }
+                { title: '域名部署', icon: 'historyOutlined', onclick: () => setOpenDomain(true) }
             ]
         },
         {
@@ -81,7 +83,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             comingSoon: false,
             action: [
                 { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
-                { title: '查看代码', icon: 'historyOutlined' }
+                { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
             ]
         },
         {
@@ -681,7 +683,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 setValue={setSiteName}
                 handleOk={() => {}}
             />
-            <SiteDrawerCode open={true} setOpen={setOpenDrawer} value={siteName} setValue={setSiteName} />
+            <SiteDrawerCode open={openDrawer} setOpen={setOpenDrawer} value={siteName} setValue={setSiteName} />
+            <DomainModal open={openDomain} setOpen={setOpenDomain} />
         </Box>
     );
 }

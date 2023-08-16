@@ -485,7 +485,7 @@ export const FashionStyling = ({
                 <div>
                     <span
                         className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
                         }
                     >
                         基本信息
@@ -494,6 +494,7 @@ export const FashionStyling = ({
                         <TextField
                             label={'名称'}
                             className={'mt-1'}
+                            inputProps={{ maxLength: 20 }}
                             value={chatBotInfo.name}
                             error={startCheck && !chatBotInfo.name}
                             helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
@@ -599,28 +600,30 @@ export const FashionStyling = ({
                                 />
                             </div>
                         </div>
-                        <div className={'mt-3'}>
-                            <Button
-                                variant={'contained'}
-                                startIcon={<GraphicEqIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                onClick={() => setVoiceOpen(true)}
-                            >
-                                选择声音
-                            </Button>
-                            {chatBotInfo.voiceName && (
+                        {chatBotInfo.enableVoice && (
+                            <div className={'mt-3'}>
                                 <Button
-                                    className={'ml-3'}
-                                    startIcon={<PlayCircleOutlineIcon />}
                                     variant={'contained'}
+                                    startIcon={<GraphicEqIcon />}
                                     color={'secondary'}
                                     size={'small'}
+                                    onClick={() => setVoiceOpen(true)}
                                 >
-                                    {chatBotInfo.voiceName}
+                                    选择声音
                                 </Button>
-                            )}
-                        </div>
+                                {chatBotInfo.voiceName && (
+                                    <Button
+                                        className={'ml-3'}
+                                        startIcon={<PlayCircleOutlineIcon />}
+                                        variant={'contained'}
+                                        color={'secondary'}
+                                        size={'small'}
+                                    >
+                                        {chatBotInfo.voiceName}
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className={'mt-10'}>
@@ -654,6 +657,7 @@ export const FashionStyling = ({
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"
+                            helperText={'打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#'}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.statement}
                             onChange={(e) => {

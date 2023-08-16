@@ -27,6 +27,7 @@ export default function FormDialog({
 
     const handleClose = () => {
         setOpen(false);
+        setChecked(false);
     };
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -52,6 +53,7 @@ export default function FormDialog({
                             <TextField
                                 error={checked && !value}
                                 autoFocus
+                                inputProps={{ maxLength: 20 }}
                                 size="small"
                                 id="name"
                                 label={t('chat.name')}

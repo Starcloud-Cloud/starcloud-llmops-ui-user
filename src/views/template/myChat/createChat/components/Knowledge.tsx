@@ -4,6 +4,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import EditIcon from '@mui/icons-material/EditTwoTone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -563,6 +564,8 @@ const DocumentModal = ({
 };
 interface DetaData {
     name?: string;
+    description?: string;
+    dataType?: string;
     cleanContent?: string;
     summary?: string | null;
     content?: string;
@@ -582,35 +585,45 @@ const DetailModal = ({
 }) => {
     const [detaData, setDetaData] = useState<DetaData>({});
     const [detaList, setDetaList] = useState<{ content: string }[]>([]);
+    const [detailPage, setDetailPage] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const [detaotal, setDetaotal] = useState(0);
     const getList = async () => {
         const result = await getDetails(uid as string);
         setDetaData(result);
-        const res = await detailsSplit({ datasetId, uid, pageNo: 1, pageSize: 1000 });
-        setDetaList(res.list);
     };
+    useEffect(() => {
+        const fn = async () => {
+            const res = await detailsSplit({ datasetId, uid, ...detailPage });
+            setDetaotal(res.total);
+            setDetaList([...detaList, ...res.list]);
+        };
+        fn();
+    }, [detailPage.pageNo]);
     useEffect(() => {
         getList();
     }, []);
-    //存储原始内容
-    const [oldValue, setOldValue] = useState<any>('');
-    //解析链接
-    useEffect(() => {
-        if (detaData.cleanContent) {
-            fetch(detaData.cleanContent)
-                .then((response) => {
-                    if (response.ok) {
-                        return response.text();
-                    }
-                })
-                .then((res) => {
-                    setOldValue(res);
-                });
-        }
-    }, [detaData]);
     //切换tabs
     const [value, setValue] = useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
+    };
+    //页面滚动
+    const goodsScroll = (event: any) => {
+        const container = event.target;
+        const scrollTop = container.scrollTop;
+        const clientHeight = container.clientHeight;
+        const scrollHeight = container.scrollHeight;
+        if (scrollTop + clientHeight >= scrollHeight - 20) {
+            if (Math.ceil(detaotal / detailPage.pageSize) > detailPage.pageNo) {
+                setDetailPage({
+                    ...detailPage,
+                    pageNo: detailPage.pageNo + 1
+                });
+            }
+        }
     };
     return (
         <Modal open={detailOpen} onClose={detailClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -622,7 +635,6 @@ const DetailModal = ({
                     left: '50%',
                     transform: 'translate(-50%, 0)'
                 }}
-                sx={{ maxHeight: '100vh', overflowY: 'auto' }}
                 title="详情"
                 content={false}
                 secondary={
@@ -631,59 +643,105 @@ const DetailModal = ({
                     </IconButton>
                 }
             >
-                <CardContent>
+                <CardContent sx={{ p: 2, pt: 0 }}>
                     <Tabs value={value} onChange={handleChange}>
                         <Tab label="内容" {...a11yProps(0)} />
                         <Tab label="详情" {...a11yProps(1)} />
                     </Tabs>
-                    <TabPanel value={value} index={0}>
-                        <Typography variant="h4">标题</Typography>
-                        <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
-                        <Typography mt={2} variant="h4">
-                            原始链接{' '}
-                            <Link color="secondary" sx={{ fontSize: '12px' }} href={detaData.content}>
-                                {detaData.content}
-                            </Link>
-                        </Typography>
-                        <Typography mt={2} mb={2} variant="h4">
-                            原始内容
-                        </Typography>
-                        <TextField
-                            multiline
-                            minRows={4}
-                            maxRows={4}
-                            disabled
-                            value={oldValue}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                        />
-                        <Typography mt={2} mb={2} variant="h4">
-                            总结
-                        </Typography>
-                        <TextField
-                            disabled
-                            value={detaData.summary}
-                            multiline
-                            minRows={6}
-                            maxRows={6}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </TabPanel>
-                    <TabPanel value={value} index={1}>
-                        {detaList.length > 0 && (
-                            <Typography mt={4} variant="h4">
-                                Content
+                    {value === 0 && (
+                        <Box pt={2}>
+                            <Typography variant="h4">标题</Typography>
+                            <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
+                            <Typography mt={2} mb={2} variant="h4">
+                                原始链接
                             </Typography>
-                        )}
-                        <Grid container spacing={2}>
-                            {detaList?.map((item) => (
-                                <Grid item md={6} xs={12}>
-                                    <TextField multiline minRows={4} maxRows={4} disabled value={item.content} sx={{ mt: 2 }} fullWidth />
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </TabPanel>
+                            <Box>
+                                {detaData.dataType === 'URL' && (
+                                    <Link color="secondary" target="_blank" sx={{ fontSize: '12px' }} href={detaData.content}>
+                                        {detaData.content}
+                                    </Link>
+                                )}
+                                {detaData.dataType !== 'URL' && (
+                                    <Button
+                                        onClick={() => {
+                                            fetch(detaData.cleanContent as string)
+                                                .then((response) => {
+                                                    if (response.ok) {
+                                                        return response.blob();
+                                                    }
+                                                })
+                                                .then((blob) => {
+                                                    // 创建一个临时链接
+                                                    const url = window.URL.createObjectURL(blob as Blob);
+                                                    // 创建一个临时链接的<a>标签
+                                                    const link = document.createElement('a');
+                                                    link.href = url;
+                                                    link.download =
+                                                        'tex.' +
+                                                        detaData.cleanContent?.split('.')[detaData.cleanContent?.split('.').length - 1]; // 设置下载的文件名
+                                                    link.click();
+                                                    // 释放临时链接的资源
+                                                    window.URL.revokeObjectURL(url);
+                                                })
+                                                .catch((error) => {
+                                                    console.error('下载文件时出错:', error);
+                                                });
+                                        }}
+                                        color="secondary"
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<SimCardDownloadIcon />}
+                                    >
+                                        下载
+                                    </Button>
+                                )}
+                            </Box>
+                            <Typography mt={2} mb={2} variant="h4">
+                                描述
+                            </Typography>
+                            <TextField
+                                multiline
+                                minRows={4}
+                                maxRows={4}
+                                disabled
+                                value={detaData.description}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <Typography mt={2} mb={2} variant="h4">
+                                总结
+                            </Typography>
+                            <TextField
+                                disabled
+                                value={detaData.summary}
+                                multiline
+                                minRows={6}
+                                maxRows={6}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Box>
+                    )}
+                    {value === 1 && (
+                        <Box sx={{ height: '640px', overflowY: 'auto' }} py={2} onScroll={goodsScroll}>
+                            {detaList.length > 0 && <Typography variant="h4">Content</Typography>}
+                            <Grid container spacing={2}>
+                                {detaList?.map((item) => (
+                                    <Grid item md={6} xs={12}>
+                                        <TextField
+                                            multiline
+                                            minRows={4}
+                                            maxRows={4}
+                                            disabled
+                                            value={item.content}
+                                            sx={{ mt: 2 }}
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    )}
                 </CardContent>
             </MainCard>
         </Modal>

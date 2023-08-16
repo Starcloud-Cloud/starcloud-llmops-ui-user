@@ -657,7 +657,6 @@ export const FashionStyling = ({
                             aria-valuemax={200}
                             label={'欢迎语'}
                             placeholder="打开聊天窗口后会主动发送"
-                            helperText={'打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#'}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.statement}
                             onChange={(e) => {
@@ -665,7 +664,12 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
-                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
+                            <div className="ml-1">
+                                打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
+                            </div>
+                            <div>{chatBotInfo?.statement?.length || 0}/300</div>
+                        </div>
                         {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (

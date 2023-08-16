@@ -21,7 +21,8 @@ import {
     CardContent,
     Divider,
     CardActions,
-    TextField
+    TextField,
+    Switch
 } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
@@ -41,7 +42,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest } from 'api/template';
+import { publishCreate, publishOperate, publishPage, getLatest, changeStatus } from 'api/template';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
@@ -69,6 +70,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             title: '网页',
             icon: 'monitor',
             desc: '用户在此链接可以直接和您的机器人聊天',
+            enable: true,
             comingSoon: false,
             action: [
                 { title: '复制链接', icon: 'contentPaste', isCopy: true },
@@ -80,9 +82,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             title: 'JS嵌入',
             icon: 'code',
             desc: '可添加到网站的任何位置，将此 iframe 添加到 html 代码中',
+            enable: true,
             comingSoon: false,
             action: [
-                { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
+                // { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
                 { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
             ]
         },
@@ -151,7 +154,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     useEffect(() => {
-        if (appUid && searchParams.get('uid')) {
+        if (appUid) {
             getUpdateBtn();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,6 +277,17 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             return newVal;
         });
     };
+
+    const handleSwitch = async (type: number) => {
+        await changeStatus({
+            uid: '',
+            appUid: '',
+            publishUid: '',
+            type,
+            status: 1
+        });
+    };
+
     return (
         <Box>
             <SubCard
@@ -471,11 +485,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     {IconList[item.icon]}
                                 </Box>
                             </Box>
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    {item.title}
-                                    {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
-                                </Typography>
+                            <Box ml={2} className="w-full">
+                                <div className="flex justify-between items-center">
+                                    <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                        {item.title}
+                                        {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                    </Typography>
+                                    <div>{item.enable && <Switch size={'small'} color={'secondary'} />}</div>
+                                </div>
                                 <Typography margin="10px 0 10px" height="32px" lineHeight="16px" color="#9da3af">
                                     {item.desc}
                                 </Typography>

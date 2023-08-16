@@ -103,3 +103,8 @@ export const pageAdmin = (params: { pageNo: number; pageSize: number; name?: str
 export const setAudit = (data: { uid: string; appUid: string; status: number }) => {
     return request.post({ url: `/llm/app/publish/audit`, data });
 };
+
+// 启用禁用状态
+export const changeStatus = (data: any) => {
+    return request.post({ url: `/llm/app/publish/channel/changeStatus`, data });
+};

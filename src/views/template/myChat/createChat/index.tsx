@@ -107,6 +107,21 @@ function CreateDetail() {
             );
             return;
         }
+        if (chatBotInfo.name?.length > 20) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '名称长度不能超过20个字',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+
         if (chatBotInfo.prePrompt === undefined || chatBotInfo.prePrompt === '') {
             dispatch(
                 openSnackbar({

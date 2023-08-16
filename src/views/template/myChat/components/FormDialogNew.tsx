@@ -32,6 +32,7 @@ export default function FormDialogNew({
     const handleClose = () => {
         setOpen(false);
         setChecked(false);
+        setValue('');
     };
 
     useEffect(() => {
@@ -77,12 +78,15 @@ export default function FormDialogNew({
                                 label={t('chat.name')}
                                 placeholder={t('chat.typeName')}
                                 fullWidth
-                                helperText={checked && !value && t('chat.createRobotRequire')}
                                 onChange={(e) => {
                                     setChecked(true);
                                     setValue(e.target.value);
                                 }}
                             />
+                            <div className="flex justify-between">
+                                {checked && !value ? <div className="text-[#f44336] mt-1">请填写名称</div> : <div className="h-[20px]" />}
+                                <div className="text-right text-stone-600 mr-1 mt-1">{value?.length || 0}/20</div>
+                            </div>
                         </div>
                         <div className="pt-[16px] w-full text-base">选择模版</div>
                         <div className="w-full mt-[8px] grid xs:grid-cols-1 gap-4 sm:grid-cols-3">

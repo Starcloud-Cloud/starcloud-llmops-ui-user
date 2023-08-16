@@ -494,10 +494,8 @@ export const FashionStyling = ({
                         <TextField
                             label={'名称'}
                             className={'mt-1'}
-                            inputProps={{ maxLength: 20 }}
                             value={chatBotInfo.name}
-                            error={startCheck && !chatBotInfo.name}
-                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
+                            error={(startCheck && !chatBotInfo.name) || (chatBotInfo.name?.length || 0) > 20}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             size={'small'}
@@ -507,6 +505,10 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, name: value });
                             }}
                         />
+                        <div className="flex justify-between">
+                            {!chatBotInfo.name ? <div className="text-[#f44336] mt-1">请填写名称</div> : <div className="h-[20px]" />}
+                            <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo.name?.length || 0}/20</div>
+                        </div>
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>

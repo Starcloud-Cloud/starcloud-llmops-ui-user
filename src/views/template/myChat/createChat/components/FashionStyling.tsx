@@ -485,7 +485,7 @@ export const FashionStyling = ({
                 <div>
                     <span
                         className={
-                            "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
                         }
                     >
                         基本信息
@@ -495,8 +495,7 @@ export const FashionStyling = ({
                             label={'名称'}
                             className={'mt-1'}
                             value={chatBotInfo.name}
-                            error={startCheck && !chatBotInfo.name}
-                            helperText={(!chatBotInfo.name && '请填写名称') || <div className="h-[20px]" />}
+                            error={(startCheck && !chatBotInfo.name) || (chatBotInfo.name?.length || 0) > 20}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             size={'small'}
@@ -506,6 +505,10 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, name: value });
                             }}
                         />
+                        <div className="flex justify-between">
+                            {!chatBotInfo.name ? <div className="text-[#f44336] mt-1">请填写名称</div> : <div className="h-[20px]" />}
+                            <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo.name?.length || 0}/20</div>
+                        </div>
                     </div>
                     <div className={'mt-3'}>
                         <span className={'text-base text-black'}>头像</span>
@@ -599,28 +602,30 @@ export const FashionStyling = ({
                                 />
                             </div>
                         </div>
-                        <div className={'mt-3'}>
-                            <Button
-                                variant={'contained'}
-                                startIcon={<GraphicEqIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                onClick={() => setVoiceOpen(true)}
-                            >
-                                选择声音
-                            </Button>
-                            {chatBotInfo.voiceName && (
+                        {chatBotInfo.enableVoice && (
+                            <div className={'mt-3'}>
                                 <Button
-                                    className={'ml-3'}
-                                    startIcon={<PlayCircleOutlineIcon />}
                                     variant={'contained'}
+                                    startIcon={<GraphicEqIcon />}
                                     color={'secondary'}
                                     size={'small'}
+                                    onClick={() => setVoiceOpen(true)}
                                 >
-                                    {chatBotInfo.voiceName}
+                                    选择声音
                                 </Button>
-                            )}
-                        </div>
+                                {chatBotInfo.voiceName && (
+                                    <Button
+                                        className={'ml-3'}
+                                        startIcon={<PlayCircleOutlineIcon />}
+                                        variant={'contained'}
+                                        color={'secondary'}
+                                        size={'small'}
+                                    >
+                                        {chatBotInfo.voiceName}
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className={'mt-10'}>
@@ -661,7 +666,12 @@ export const FashionStyling = ({
                                 setChatBotInfo({ ...chatBotInfo, statement: value });
                             }}
                         />
-                        <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo?.statement?.length || 0}/300</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
+                            <div className="ml-1">
+                                打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
+                            </div>
+                            <div>{chatBotInfo?.statement?.length || 0}/300</div>
+                        </div>
                         {/* <div className={'mt-5'}>
                             <span className={'text-base'}>设置常见问题引导用户如何使用</span>
                             {chatBotInfo.guideList?.map((item, index) => (

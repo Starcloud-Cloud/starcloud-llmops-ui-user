@@ -27,6 +27,8 @@ export default function FormDialog({
 
     const handleClose = () => {
         setOpen(false);
+        setChecked(false);
+        setValue('');
     };
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -52,17 +54,21 @@ export default function FormDialog({
                             <TextField
                                 error={checked && !value}
                                 autoFocus
+                                inputProps={{ maxLength: 20 }}
                                 size="small"
                                 id="name"
                                 label={t('chat.name')}
                                 placeholder={t('chat.typeName')}
                                 fullWidth
-                                helperText={checked && !value && t('chat.createRobotRequire')}
                                 onChange={(e) => {
                                     setChecked(true);
                                     setValue(e.target.value);
                                 }}
                             />
+                            <div className="flex justify-between">
+                                {checked && !value ? <div className="text-[#f44336] mt-1">请填写名称</div> : <div className="h-[20px]" />}
+                                <div className="text-right text-stone-600 mr-1 mt-1">{value?.length || 0}/20</div>
+                            </div>
                         </div>
                     </Grid>
                 </CardContent>

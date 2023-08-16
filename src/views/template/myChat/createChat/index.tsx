@@ -21,7 +21,7 @@ import ApplicationAnalysis from 'views/template/applicationAnalysis';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 2, display: value === index ? 'block' : 'none' }}>
                 <Box>{children}</Box>
             </Box>
         </div>
@@ -107,6 +107,21 @@ function CreateDetail() {
             );
             return;
         }
+        if (chatBotInfo.name?.length > 20) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '名称长度不能超过20个字',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
+
         if (chatBotInfo.prePrompt === undefined || chatBotInfo.prePrompt === '') {
             dispatch(
                 openSnackbar({
@@ -255,7 +270,7 @@ function CreateDetail() {
                     action={
                         (value === 0 || value === 1 || value === 3 || value === 5) && (
                             <Button
-                                className="right-[25px] top-[85px] absolute z-50"
+                                // className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"
                                 color="secondary"
                                 autoFocus
@@ -267,30 +282,7 @@ function CreateDetail() {
                     }
                 ></CardHeader>
                 <Divider />
-                <Tabs
-                    sx={{
-                        m: 3,
-                        mb: 0,
-                        '& a': {
-                            minHeight: 'auto',
-                            minWidth: 10,
-                            py: 1.5,
-                            px: 1,
-                            mr: 2.2,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        },
-                        '& a > svg': {
-                            mb: '0px !important',
-                            mr: 1.1
-                        }
-                    }}
-                    value={value}
-                    variant="scrollable"
-                    onChange={handleChange}
-                >
+                <Tabs value={value} variant="scrollable" onChange={handleChange}>
                     <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
                     <Tab component={Link} label={'应用分析'} {...a11yProps(2)} />

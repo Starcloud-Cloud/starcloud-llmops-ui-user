@@ -159,6 +159,24 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                 setIsFirst(false);
             })();
         }
+
+        if (mode === 'test' && !conversationUid && isFirst) {
+            if (chatBotInfo.enableStatement) {
+                const result = [
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
+            } else {
+                dataRef.current = [];
+                setData([]);
+            }
+        }
     }, [conversationUid, chatBotInfo, mode]);
 
     // 更新历史记录
@@ -175,13 +193,15 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
         if (mode === 'test' && !isFirst) {
             const copyData = [...dataRef.current];
             const index = copyData.findIndex((v) => v.isStatement);
-            if (chatBotInfo.enableStatement) {
-                copyData[index].answer = chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement);
-            } else {
-                copyData[index].answer = '';
+            if (index > -1) {
+                if (chatBotInfo.enableStatement) {
+                    copyData[index].answer = chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement);
+                } else {
+                    copyData[index].answer = '';
+                }
+                dataRef.current = copyData;
+                setData(copyData);
             }
-            dataRef.current = copyData;
-            setData(copyData);
         }
     }, [chatBotInfo.statement, chatBotInfo.enableStatement, mode]);
     // mode test end
@@ -301,6 +321,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                     query: message
                 });
             }
+            setIsFirst(false);
 
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
@@ -446,7 +467,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                         </CardContent>
                     </div>
                 </div>
-                <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
+                <Grid container spacing={1} alignItems="center" className="px-[24px] ">
                     <Grid item>
                         <Grid item>
                             <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -541,10 +562,13 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                                 </>
                             }
                             aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight' }}
+                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
                         />
                     </Grid>
                 </Grid>
+                <div className="flex justify-end px-[24px]">
+                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                </div>
             </div>
         </div>
     );

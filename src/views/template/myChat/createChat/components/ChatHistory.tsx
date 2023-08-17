@@ -179,7 +179,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                         }`}
                                                                     >
-                                                                        <ChatMarkdown textContent={history.answer} />
+                                                                        {/* <ChatMarkdown textContent={history.answer} /> */}
+                                                                        {history.answer}
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />

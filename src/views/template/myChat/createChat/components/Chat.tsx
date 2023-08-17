@@ -159,6 +159,24 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                 setIsFirst(false);
             })();
         }
+
+        if (mode === 'test' && !conversationUid && isFirst) {
+            if (chatBotInfo.enableStatement) {
+                const result = [
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
+            } else {
+                dataRef.current = [];
+                setData([]);
+            }
+        }
     }, [conversationUid, chatBotInfo, mode]);
 
     // 更新历史记录
@@ -175,13 +193,15 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
         if (mode === 'test' && !isFirst) {
             const copyData = [...dataRef.current];
             const index = copyData.findIndex((v) => v.isStatement);
-            if (chatBotInfo.enableStatement) {
-                copyData[index].answer = chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement);
-            } else {
-                copyData[index].answer = '';
+            if (index > -1) {
+                if (chatBotInfo.enableStatement) {
+                    copyData[index].answer = chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement);
+                } else {
+                    copyData[index].answer = '';
+                }
+                dataRef.current = copyData;
+                setData(copyData);
             }
-            dataRef.current = copyData;
-            setData(copyData);
         }
     }, [chatBotInfo.statement, chatBotInfo.enableStatement, mode]);
     // mode test end
@@ -301,6 +321,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                     query: message
                 });
             }
+            setIsFirst(false);
 
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();

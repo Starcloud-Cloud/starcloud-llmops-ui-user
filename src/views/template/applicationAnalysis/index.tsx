@@ -300,8 +300,8 @@ function ApplicationAnalysis({
     const [exeDetail, setExeDetail] = useState<any>({});
     //聊天
     const [chatVisible, setChatVisible] = useState(false);
-    //app
-
+    //绘话id
+    const [conversationUid, setConversationUid] = useState('');
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -428,6 +428,7 @@ function ApplicationAnalysis({
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
                                                     setExeDetail(res.appInfo);
+                                                    setConversationUid(res.conversationUid);
                                                     setExeOpen(true);
                                                 });
                                             } else if (row.appMode === 'CHAT') {
@@ -502,10 +503,7 @@ function ApplicationAnalysis({
                                                 color="secondary"
                                                 size="small"
                                                 onClick={() => {
-                                                    if (row.appMode === 'COMPLETION') {
-                                                        setExeDetail(row.appInfo);
-                                                        setExeOpen(true);
-                                                    } else {
+                                                    if (row.appMode === 'BASE_GENERATE_IMAGE') {
                                                         setImgDetail(row.imageInfo);
                                                         setPicOpen(true);
                                                     }
@@ -573,18 +571,26 @@ function ApplicationAnalysis({
                     onClose={() => {
                         setExeOpen(false);
                         setExeDetail({});
+                        setConversationUid('');
                     }}
                 >
                     <div className="bg-[#f4f6f8] w-[1000px] md:w-[800px] flex justify-center">
                         <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
                             <MainCard
-                                title="详情"
+                                title={
+                                    <Box display="flex" alignItems="end">
+                                        <Typography variant="h3">历史详情</Typography>
+                                        <Typography fontSize="12px" color="#697586" ml={1}>
+                                            (绘话id：{conversationUid})
+                                        </Typography>
+                                    </Box>
+                                }
                                 content={false}
                                 secondary={
                                     <IconButton
                                         onClick={() => {
                                             setExeOpen(false);
-                                            setExeDetail({});
+                                            setConversationUid('');
                                         }}
                                         size="large"
                                         aria-label="close modal"

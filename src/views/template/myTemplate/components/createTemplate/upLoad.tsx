@@ -29,7 +29,10 @@ import {
     HistoryOutlined,
     Error,
     Monitor,
-    Api
+    Api,
+    Close,
+    RemoveRedEyeOutlined,
+    AddCircleOutlineOutlined
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -507,78 +510,80 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                     </Box>
                 ))}
             </Box> */}
-            <Dialog
-                maxWidth="lg"
-                fullWidth
-                open={historyState}
-                onClose={() => {
-                    setHistorySate(false);
-                    setPageQuery({
-                        ...pageQuery,
-                        pageNo: 1
-                    });
-                }}
-            >
-                <DialogTitle>历史记录</DialogTitle>
-                <DialogContent>
-                    <TableContainer component={Paper}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>APP名称</TableCell>
-                                    <TableCell>版本号</TableCell>
-                                    <TableCell>状态</TableCell>
-                                    <TableCell>更新时间</TableCell>
-                                    <TableCell>创建时间</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {tableData.map((row: any, index) => (
-                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                        <TableCell component="th" scope="row">
-                                            {row.name}
-                                        </TableCell>
-                                        <TableCell>{row.version}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                size="small"
-                                                variant="outlined"
-                                                color={
-                                                    row.audit === 1
-                                                        ? 'primary'
-                                                        : row.audit === 2
-                                                        ? 'success'
-                                                        : row.audit === 3
-                                                        ? 'error'
-                                                        : 'default'
-                                                }
-                                                label={
-                                                    row.audit === 0
-                                                        ? '未发布'
-                                                        : row.audit === 1
-                                                        ? '待审核'
-                                                        : row.audit === 2
-                                                        ? '审核通过'
-                                                        : row.audit === 3
-                                                        ? '审核未通过'
-                                                        : row.audit === 4
-                                                        ? '用户已取消'
-                                                        : '已失效'
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>{formatDate(row.updateTime)}</TableCell>
-                                        <TableCell>{formatDate(row.createTime)}</TableCell>
+            {historyState && (
+                <Dialog
+                    maxWidth="lg"
+                    fullWidth
+                    open={historyState}
+                    onClose={() => {
+                        setHistorySate(false);
+                        setPageQuery({
+                            ...pageQuery,
+                            pageNo: 1
+                        });
+                    }}
+                >
+                    <DialogTitle>历史记录</DialogTitle>
+                    <DialogContent>
+                        <TableContainer component={Paper}>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>APP名称</TableCell>
+                                        <TableCell>版本号</TableCell>
+                                        <TableCell>状态</TableCell>
+                                        <TableCell>更新时间</TableCell>
+                                        <TableCell>创建时间</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Box my={2}>
-                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
-                    </Box>
-                </DialogContent>
-            </Dialog>
+                                </TableHead>
+                                <TableBody>
+                                    {tableData.map((row: any, index) => (
+                                        <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                            <TableCell component="th" scope="row">
+                                                {row.name}
+                                            </TableCell>
+                                            <TableCell>{row.version}</TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color={
+                                                        row.audit === 1
+                                                            ? 'primary'
+                                                            : row.audit === 2
+                                                            ? 'success'
+                                                            : row.audit === 3
+                                                            ? 'error'
+                                                            : 'default'
+                                                    }
+                                                    label={
+                                                        row.audit === 0
+                                                            ? '未发布'
+                                                            : row.audit === 1
+                                                            ? '待审核'
+                                                            : row.audit === 2
+                                                            ? '审核通过'
+                                                            : row.audit === 3
+                                                            ? '审核未通过'
+                                                            : row.audit === 4
+                                                            ? '用户已取消'
+                                                            : '已失效'
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>{formatDate(row.updateTime)}</TableCell>
+                                            <TableCell>{formatDate(row.createTime)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Box my={2}>
+                            <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+            )}
         </Box>
     );
 }

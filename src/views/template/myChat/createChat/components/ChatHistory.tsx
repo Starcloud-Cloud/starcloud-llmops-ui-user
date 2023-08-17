@@ -131,7 +131,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                         <div className="w-[50px] h-[50px] flex justify-center items-center  mr-2">
                                             <img className="w-[50px] h-[50px] rounded-xl" src={history.robotAvatar} alt="" />
                                         </div>
-                                        <div>
+                                        <div className="max-w-full overflow-x-auto">
                                             <Grid item xs={12} className="flex items-center">
                                                 <Typography align="left" variant="subtitle2" className="h-[19px]">
                                                     {history.robotName}
@@ -179,8 +179,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                         }`}
                                                                     >
-                                                                        {/* <ChatMarkdown textContent={history.answer} /> */}
-                                                                        {history.answer}
+                                                                        <ChatMarkdown textContent={history.answer} />
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />

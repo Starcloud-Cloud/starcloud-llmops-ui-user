@@ -32,7 +32,7 @@ import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
 import Arrange from './arrange';
 import Basis from './basis';
-import AppAnalysis from './appAnalysis';
+import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
@@ -565,7 +565,9 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                {detailRef.current?.uid && searchParams.get('uid') && <AppAnalysis appUid={detail?.uid} />}
+                {detailRef.current?.uid && searchParams.get('uid') && (
+                    <ApplicationAnalysis appUid={detail?.uid} value={value} type="APP_ANALYSIS" />
+                )}
             </TabPanel>
             <TabPanel value={value} index={3}>
                 <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />

@@ -41,8 +41,8 @@ export type IHistory = Partial<{
     message: string;
     messageTokens: number;
     messageUnitPrice: number;
-    answer: string;
     process: any;
+    answer: any;
     answerTokens: number;
     answerUnitPrice: number;
     elapsed: number;
@@ -141,10 +141,17 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
-                setData([
+                const result = [
                     ...list,
-                    { robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar, answer: chatBotInfo.statement, isStatement: true }
-                ]);
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
                 setIsFirst(false);
             })();
         }
@@ -153,7 +160,8 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     // 更新历史记录
     React.useEffect(() => {
         if (!isFirst) {
-            const list = data.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+            const list: any = dataRef.current.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+            dataRef.current = list;
             setData(list);
         }
     }, [chatBotInfo.avatar, chatBotInfo.name, chatBotInfo.statement]);
@@ -161,13 +169,14 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
     // 更新欢迎语
     React.useEffect(() => {
         if (!isFirst) {
-            const copyData = [...data];
+            const copyData = [...dataRef.current];
             const index = copyData.findIndex((v) => v.isStatement);
             if (chatBotInfo.enableStatement) {
-                copyData[index].answer = chatBotInfo.statement;
+                copyData[index].answer = chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement);
             } else {
                 copyData[index].answer = '';
             }
+            dataRef.current = copyData;
             setData(copyData);
         }
     }, [chatBotInfo.statement, chatBotInfo.enableStatement]);
@@ -179,6 +188,37 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             recognition.onresult = null;
         };
     }, []);
+
+    function convertTextWithLinks(text: string): JSX.Element {
+        const hashtagRegex = /#([^#]+)#/g;
+
+        const parts: (JSX.Element | string)[] = [];
+        let lastIndex = 0;
+
+        let match;
+        while ((match = hashtagRegex.exec(text)) !== null) {
+            parts.push(text.slice(lastIndex, match.index));
+            const hashtagContent = match[1];
+            parts.push(
+                <a
+                    key={match.index}
+                    className="text-[#7C5CFC] cursor-pointer"
+                    onClick={() => {
+                        doFetch(hashtagContent);
+                    }}
+                >
+                    {hashtagContent}
+                </a>
+            );
+            lastIndex = hashtagRegex.lastIndex;
+        }
+
+        if (lastIndex < text.length) {
+            parts.push(text.slice(lastIndex));
+        }
+
+        return <>{parts}</>;
+    }
 
     React.useEffect(() => {
         if (isFetch && scrollRef?.current) {
@@ -200,11 +240,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         }
     };
 
-    // handle new message form
-    const handleOnSend = async () => {
-        if (!message.trim()) {
-            return;
-        }
+    const doFetch = async (message: string) => {
         setMessage('');
         const newMessage: IHistory = {
             robotName: chatBotInfo.name,
@@ -214,10 +250,10 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             answer: '',
             isNew: true
         };
-        const newData = [...data, newMessage];
+        const newData = [...dataRef.current, newMessage];
         dataRef.current = newData;
         setData(newData);
-        data;
+
         setIsFetch(true);
         try {
             let resp: any = await messageSSE({
@@ -235,6 +271,7 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 if (done) {
                     const copyData = [...dataRef.current];
                     copyData[dataRef.current.length - 1].isNew = false;
+                    dataRef.current = copyData;
                     setData(copyData);
                     setIsFetch(false);
                     break;
@@ -306,9 +343,18 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         }
     };
 
+    // handle new message form
+    const handleOnSend = async () => {
+        if (!message.trim()) {
+            return;
+        }
+        doFetch(message);
+    };
+
     const handleClean = () => {
         setAnchorEl(null);
         setData([]);
+        dataRef.current = [];
         setConversationUid('');
     };
 

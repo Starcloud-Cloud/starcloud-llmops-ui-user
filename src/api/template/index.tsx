@@ -42,8 +42,8 @@ export const logStatistics = (data: any) => {
     return request.post({ url: '/llm/app/log/statistics', data });
 };
 //获取时间
-export const logTimeType = () => {
-    return request.get({ url: '/llm/app/log/timeType' });
+export const logMetaData = (data: string) => {
+    return request.get({ url: `/llm/app/log/logMetaData/${data}` });
 };
 //执行记录列表
 export const infoPage = (data: any) => {

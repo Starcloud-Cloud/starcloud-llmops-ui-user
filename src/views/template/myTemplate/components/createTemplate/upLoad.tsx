@@ -15,7 +15,8 @@ import {
     TableContainer,
     Paper,
     Pagination,
-    Tooltip
+    Tooltip,
+    Switch
 } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
@@ -29,16 +30,23 @@ import {
     HistoryOutlined,
     Error,
     Monitor,
-    Api,
-    Close,
-    RemoveRedEyeOutlined,
-    AddCircleOutlineOutlined
+    Api
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest } from 'api/template';
-function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: number; saveDetail: () => void }) {
+import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate } from 'api/template';
+import CopyToClipboard from 'react-copy-to-clipboard';
+import CreateSiteModal from './components/CreateSiteModal';
+import { SiteDrawerCode } from './components/SiteDrawerCode';
+import DomainModal from './components/DomainModal';
+import _ from 'lodash-es';
+function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
+    const [openCreateSite, setOpenCreateSite] = useState(false);
+    const [siteName, setSiteName] = useState('');
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const [openDomain, setOpenDomain] = useState(false);
+
     const IconList: { [key: string]: any } = {
         monitor: <Monitor />,
         code: <Code />,
@@ -52,21 +60,23 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
             title: '网页',
             icon: 'monitor',
             desc: '用户在此链接可以直接和您的机器人聊天',
-            comingSoon: true,
+            enable: true,
+            comingSoon: false,
             action: [
-                { title: '复制链接', icon: 'contentPaste' },
-                { title: '预览体验', icon: 'historyOutlined' },
-                { title: '域名部署', icon: 'historyOutlined' }
+                { title: '复制链接', icon: 'contentPaste', isCopy: true },
+                { title: '预览体验', icon: 'historyOutlined', onclick: () => window.open('/chat-bot') },
+                { title: '域名部署', icon: 'historyOutlined', onclick: () => setOpenDomain(true) }
             ]
         },
         {
             title: 'JS嵌入',
             icon: 'code',
             desc: '可添加到网站的任何位置，将此 iframe 添加到 html 代码中',
-            comingSoon: true,
+            enable: true,
+            comingSoon: false,
             action: [
-                { title: '创建站点', icon: 'cloudUploadOutlined' },
-                { title: '查看代码', icon: 'historyOutlined' }
+                { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
+                { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
             ]
         },
         {
@@ -132,9 +142,9 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
         }
     ];
     const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    // const searchParams = new URLSearchParams(location.search);
     useEffect(() => {
-        if (appUid && searchParams.get('uid')) {
+        if (appUid) {
             getUpdateBtn();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,8 +164,10 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
         enablePublish: boolean;
         showPublish?: boolean;
         uid: string;
+        appUid?: string;
         needTips: boolean;
         isFirstCreatePublishRecord: boolean;
+        channelMap?: any;
     }>({
         needUpdate: false,
         showPublish: true,
@@ -257,6 +269,44 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
             return newVal;
         });
     };
+    const handleSwitch = async (type: number) => {
+        await changeStatus({
+            uid: '',
+            appUid: '',
+            publishUid: '',
+            type,
+            status: 1
+        });
+    };
+    //创建站点确认
+    const createSite = async () => {
+        await channelCreate({
+            appUid: updateBtn.appUid,
+            name: siteName,
+            publishUid: updateBtn.uid,
+            type: 3,
+            status: 1
+        });
+        getUpdateBtn();
+        setOpenCreateSite(false);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '创建成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
+    //改变updateBtn的值
+    const setCodeValue = (data: any) => {
+        const newValue = _.cloneDeep(updateBtn);
+        newValue.channelMap[3] = data;
+        setUpdateBtn(newValue);
+    };
     return (
         <Box>
             <SubCard
@@ -321,87 +371,121 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                                 <Storefront color="secondary" />
                             </Box>
                         </Box>
-                        <Box ml={2}>
-                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                应用市场
-                                <Chip
-                                    sx={{ ml: 1.5 }}
-                                    size="small"
-                                    label={
-                                        releaseState === 0
-                                            ? '未发布'
-                                            : releaseState === 1
-                                            ? '待审核'
-                                            : releaseState === 2
-                                            ? '审核通过'
-                                            : releaseState === 3
-                                            ? '审核未通过'
-                                            : releaseState === 4
-                                            ? '用户已取消'
-                                            : '已失效'
-                                    }
-                                />
-                                {updateBtn?.needTips && (
+                        {mode === 'CHAT' ? (
+                            <Box ml={2}>
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                    应用市场
+                                    <Chip sx={{ ml: 1.5 }} size="small" label={'即将推出'} />
+                                </Typography>
+                                <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
+                                    用户可在模板市场中下载你上传的应用
+                                </Typography>
+                                <Box display="flex">
+                                    <Box
+                                        color="#b5bed0"
+                                        fontSize="12px"
+                                        display="flex"
+                                        alignItems="center"
+                                        mr={2}
+                                        sx={{
+                                            cursor:
+                                                !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                    ? 'pointer'
+                                                    : 'default'
+                                        }}
+                                    >
+                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
+                                        &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
+                                    </Box>
+                                    <Box color="#b5bed0" fontSize="12px" display="flex" alignItems="center" mr={2}>
+                                        <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                        &nbsp;&nbsp; 发布历史记录
+                                    </Box>
+                                </Box>
+                            </Box>
+                        ) : (
+                            <Box ml={2}>
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                    应用市场
                                     <Chip
                                         sx={{ ml: 1.5 }}
                                         size="small"
-                                        color="warning"
                                         label={
-                                            updateBtn.needTips && releaseState === 1
-                                                ? '检测到应用已经更新：建议更新重新发布'
-                                                : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
-                                                ? '需要更新后才能发布'
-                                                : '检测到应用已经更新：需要更新重新发布'
+                                            releaseState === 0
+                                                ? '未发布'
+                                                : releaseState === 1
+                                                ? '待审核'
+                                                : releaseState === 2
+                                                ? '审核通过'
+                                                : releaseState === 3
+                                                ? '审核未通过'
+                                                : releaseState === 4
+                                                ? '用户已取消'
+                                                : '已失效'
                                         }
-                                        variant="outlined"
                                     />
-                                )}
-                            </Typography>
-                            <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
-                                用户可在模板市场中下载你上传的应用
-                            </Typography>
-                            <Box display="flex">
-                                <Box
-                                    color="#b5bed0"
-                                    fontSize="12px"
-                                    display="flex"
-                                    alignItems="center"
-                                    mr={2}
-                                    sx={{
-                                        cursor:
-                                            !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                ? 'pointer'
-                                                : 'default',
-                                        '&:hover': {
-                                            color:
+                                    {updateBtn?.needTips && (
+                                        <Chip
+                                            sx={{ ml: 1.5 }}
+                                            size="small"
+                                            color="warning"
+                                            label={
+                                                updateBtn.needTips && releaseState === 1
+                                                    ? '检测到应用已经更新：建议更新重新发布'
+                                                    : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                                    ? '需要更新后才能发布'
+                                                    : '检测到应用已经更新：需要更新重新发布'
+                                            }
+                                            variant="outlined"
+                                        />
+                                    )}
+                                </Typography>
+                                <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
+                                    用户可在模板市场中下载你上传的应用
+                                </Typography>
+                                <Box display="flex">
+                                    <Box
+                                        color="#b5bed0"
+                                        fontSize="12px"
+                                        display="flex"
+                                        alignItems="center"
+                                        mr={2}
+                                        sx={{
+                                            cursor:
                                                 !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                    ? '#673ab7'
-                                                    : 'none'
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
-                                            uploadMarket();
-                                        }
-                                    }}
-                                >
-                                    <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                    &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
-                                </Box>
-                                <Box
-                                    color="#b5bed0"
-                                    fontSize="12px"
-                                    display="flex"
-                                    alignItems="center"
-                                    mr={2}
-                                    sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
-                                    onClick={marketRecord}
-                                >
-                                    <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                    &nbsp;&nbsp; 发布历史记录
+                                                    ? 'pointer'
+                                                    : 'default',
+                                            '&:hover': {
+                                                color:
+                                                    !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                        ? '#673ab7'
+                                                        : 'none'
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
+                                                uploadMarket();
+                                            }
+                                        }}
+                                    >
+                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
+                                        &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
+                                    </Box>
+                                    <Box
+                                        color="#b5bed0"
+                                        fontSize="12px"
+                                        display="flex"
+                                        alignItems="center"
+                                        mr={2}
+                                        sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
+                                        onClick={marketRecord}
+                                    >
+                                        <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                        &nbsp;&nbsp; 发布历史记录
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
+                        )}
                     </SubCard>
                 </Grid>
                 {upLoadList.map((item) => (
@@ -420,21 +504,67 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                                     {IconList[item.icon]}
                                 </Box>
                             </Box>
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    {item.title}
-                                    {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
-                                </Typography>
+                            <Box ml={2} className="w-full">
+                                <div className="flex justify-between items-center">
+                                    <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                        {item.title}
+                                        {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                    </Typography>
+                                    <div>{item.enable && <Switch size={'small'} color={'secondary'} />}</div>
+                                </div>
                                 <Typography margin="10px 0 10px" height="32px" lineHeight="16px" color="#9da3af">
                                     {item.desc}
                                 </Typography>
                                 <Box display="flex">
-                                    {item.action.map((el, i) => (
-                                        <Box key={i} color="#b5bed0" fontSize="12px" display="flex" alignItems="center" mr={2}>
-                                            {IconList[el.icon]}
-                                            &nbsp;&nbsp; {el.title}
-                                        </Box>
-                                    ))}
+                                    {item.action.map((el: any, i) =>
+                                        el?.isCopy ? (
+                                            <CopyToClipboard
+                                                text={`${window.location.origin}/chat-bot`}
+                                                onCopy={() =>
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    )
+                                                }
+                                            >
+                                                <Box
+                                                    key={i}
+                                                    color="#b5bed0"
+                                                    fontSize="12px"
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    mr={2}
+                                                    className={`${!item.comingSoon ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                >
+                                                    {IconList[el.icon]}
+                                                    &nbsp;&nbsp; {el.title}
+                                                </Box>
+                                            </CopyToClipboard>
+                                        ) : (
+                                            <Box
+                                                key={i}
+                                                color="#b5bed0"
+                                                fontSize="12px"
+                                                display="flex"
+                                                alignItems="center"
+                                                mr={2}
+                                                onClick={el.onclick}
+                                                className={`${!item.comingSoon ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                            >
+                                                {IconList[el.icon]}
+                                                &nbsp;&nbsp; {el.title}
+                                            </Box>
+                                        )
+                                    )}
                                 </Box>
                             </Box>
                         </SubCard>
@@ -536,46 +666,6 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                                         <TableCell>创建时间</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                <TableBody>
-                                    {tableData.map((row: any, index) => (
-                                        <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                            <TableCell component="th" scope="row">
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell>{row.version}</TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    size="small"
-                                                    variant="outlined"
-                                                    color={
-                                                        row.audit === 1
-                                                            ? 'primary'
-                                                            : row.audit === 2
-                                                            ? 'success'
-                                                            : row.audit === 3
-                                                            ? 'error'
-                                                            : 'default'
-                                                    }
-                                                    label={
-                                                        row.audit === 0
-                                                            ? '未发布'
-                                                            : row.audit === 1
-                                                            ? '待审核'
-                                                            : row.audit === 2
-                                                            ? '审核通过'
-                                                            : row.audit === 3
-                                                            ? '审核未通过'
-                                                            : row.audit === 4
-                                                            ? '用户已取消'
-                                                            : '已失效'
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>{formatDate(row.updateTime)}</TableCell>
-                                            <TableCell>{formatDate(row.createTime)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
                             </Table>
                         </TableContainer>
                         <Box my={2}>
@@ -584,6 +674,17 @@ function Upload({ appUid, saveState, saveDetail }: { appUid: string; saveState: 
                     </DialogContent>
                 </Dialog>
             )}
+            <CreateSiteModal
+                open={openCreateSite}
+                setOpen={setOpenCreateSite}
+                value={siteName}
+                setValue={setSiteName}
+                handleOk={createSite}
+            />
+            {openDrawer && (
+                <SiteDrawerCode codeList={updateBtn.channelMap[3]} open={openDrawer} setOpen={setOpenDrawer} setCodeValue={setCodeValue} />
+            )}
+            <DomainModal open={openDomain} setOpen={setOpenDomain} />
         </Box>
     );
 }

@@ -309,16 +309,16 @@ function CreateDetail() {
 
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
-                        <Chat chatBotInfo={chatBotInfo} />
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>
-                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} />}
+                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} mode={'CHAT'} />}
                 </TabPanel>
             </Card>
             {value !== 5 && (
                 <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
-                    <Chat chatBotInfo={chatBotInfo} />
+                    <Chat chatBotInfo={chatBotInfo} mode={'test'} />
                 </Card>
             )}
         </div>

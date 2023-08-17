@@ -12,6 +12,7 @@ import AuthenticationRoutes from './AuthenticationRoutes';
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
 const PagesPrice = Loadable(lazy(() => import('views/pages/pricing/member')));
+const PagesChatBot = Loadable(lazy(() => import('views/chat/bot')));
 const Execute = Loadable(lazy(() => import('views/iframeExecute')));
 
 // ==============================|| ROUTING RENDER ||============================== //
@@ -22,6 +23,7 @@ export default function ThemeRoutes() {
         { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/execute', element: <Execute /> },
+        { path: '/chat-bot/:mode/:mediumUid', element: <PagesChatBot /> },
         AuthenticationRoutes,
         LoginRoutes,
         MainRoutes,

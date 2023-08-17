@@ -108,3 +108,12 @@ export const setAudit = (data: { uid: string; appUid: string; status: number }) 
 export const changeStatus = (data: any) => {
     return request.post({ url: `/llm/app/publish/channel/changeStatus`, data });
 };
+
+// 创建站点
+export const channelCreate = (data: any) => {
+    return request.post({ url: `/llm/app/publish/channel/create`, data });
+};
+// 修改站点
+export const channelUpload = (data: any) => {
+    return request.post({ url: `/llm/app/publish/channel/modify`, data });
+};

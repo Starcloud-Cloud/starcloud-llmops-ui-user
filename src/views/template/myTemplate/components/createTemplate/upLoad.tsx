@@ -16,12 +16,6 @@ import {
     Paper,
     Pagination,
     Tooltip,
-    Modal,
-    IconButton,
-    CardContent,
-    Divider,
-    CardActions,
-    TextField,
     Switch
 } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
@@ -36,21 +30,17 @@ import {
     HistoryOutlined,
     Error,
     Monitor,
-    Api,
-    Create
+    Api
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest, changeStatus } from 'api/template';
+import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate } from 'api/template';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import CloseIcon from '@mui/icons-material/Close';
-import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
 import CreateSiteModal from './components/CreateSiteModal';
-import { openDrawer } from 'store/slices/menu';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
 import DomainModal from './components/DomainModal';
+import _ from 'lodash-es';
 function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
     const [openCreateSite, setOpenCreateSite] = useState(false);
     const [siteName, setSiteName] = useState('');
@@ -85,7 +75,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             enable: true,
             comingSoon: false,
             action: [
-                // { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
+                { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
                 { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
             ]
         },
@@ -152,7 +142,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         }
     ];
     const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    // const searchParams = new URLSearchParams(location.search);
     useEffect(() => {
         if (appUid) {
             getUpdateBtn();
@@ -174,8 +164,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         enablePublish: boolean;
         showPublish?: boolean;
         uid: string;
+        appUid?: string;
         needTips: boolean;
         isFirstCreatePublishRecord: boolean;
+        channelMap?: any;
     }>({
         needUpdate: false,
         showPublish: true,
@@ -277,7 +269,6 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             return newVal;
         });
     };
-
     const handleSwitch = async (type: number) => {
         await changeStatus({
             uid: '',
@@ -287,7 +278,35 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             status: 1
         });
     };
-
+    //创建站点确认
+    const createSite = async () => {
+        await channelCreate({
+            appUid: updateBtn.appUid,
+            name: siteName,
+            publishUid: updateBtn.uid,
+            type: 3,
+            status: 1
+        });
+        getUpdateBtn();
+        setOpenCreateSite(false);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '创建成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
+    //改变updateBtn的值
+    const setCodeValue = (data: any) => {
+        const newValue = _.cloneDeep(updateBtn);
+        newValue.channelMap[3] = data;
+        setUpdateBtn(newValue);
+    };
     return (
         <Box>
             <SubCard
@@ -621,86 +640,50 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     </Box>
                 ))}
             </Box> */}
-            <Dialog
-                maxWidth="lg"
-                fullWidth
-                open={historyState}
-                onClose={() => {
-                    setHistorySate(false);
-                    setPageQuery({
-                        ...pageQuery,
-                        pageNo: 1
-                    });
-                }}
-            >
-                <DialogTitle>历史记录</DialogTitle>
-                <DialogContent>
-                    <TableContainer component={Paper}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>APP名称</TableCell>
-                                    <TableCell>版本号</TableCell>
-                                    <TableCell>状态</TableCell>
-                                    <TableCell>更新时间</TableCell>
-                                    <TableCell>创建时间</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {tableData.map((row: any, index) => (
-                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                        <TableCell component="th" scope="row">
-                                            {row.name}
-                                        </TableCell>
-                                        <TableCell>{row.version}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                size="small"
-                                                variant="outlined"
-                                                color={
-                                                    row.audit === 1
-                                                        ? 'primary'
-                                                        : row.audit === 2
-                                                        ? 'success'
-                                                        : row.audit === 3
-                                                        ? 'error'
-                                                        : 'default'
-                                                }
-                                                label={
-                                                    row.audit === 0
-                                                        ? '未发布'
-                                                        : row.audit === 1
-                                                        ? '待审核'
-                                                        : row.audit === 2
-                                                        ? '审核通过'
-                                                        : row.audit === 3
-                                                        ? '审核未通过'
-                                                        : row.audit === 4
-                                                        ? '用户已取消'
-                                                        : '已失效'
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>{formatDate(row.updateTime)}</TableCell>
-                                        <TableCell>{formatDate(row.createTime)}</TableCell>
+            {historyState && (
+                <Dialog
+                    maxWidth="lg"
+                    fullWidth
+                    open={historyState}
+                    onClose={() => {
+                        setHistorySate(false);
+                        setPageQuery({
+                            ...pageQuery,
+                            pageNo: 1
+                        });
+                    }}
+                >
+                    <DialogTitle>历史记录</DialogTitle>
+                    <DialogContent>
+                        <TableContainer component={Paper}>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>APP名称</TableCell>
+                                        <TableCell>版本号</TableCell>
+                                        <TableCell>状态</TableCell>
+                                        <TableCell>更新时间</TableCell>
+                                        <TableCell>创建时间</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Box my={2}>
-                        <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
-                    </Box>
-                </DialogContent>
-            </Dialog>
+                                </TableHead>
+                            </Table>
+                        </TableContainer>
+                        <Box my={2}>
+                            <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+            )}
             <CreateSiteModal
                 open={openCreateSite}
                 setOpen={setOpenCreateSite}
                 value={siteName}
                 setValue={setSiteName}
-                handleOk={() => {}}
+                handleOk={createSite}
             />
-            <SiteDrawerCode open={openDrawer} setOpen={setOpenDrawer} value={siteName} setValue={setSiteName} />
+            {openDrawer && (
+                <SiteDrawerCode codeList={updateBtn.channelMap[3]} open={openDrawer} setOpen={setOpenDrawer} setCodeValue={setCodeValue} />
+            )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
         </Box>
     );

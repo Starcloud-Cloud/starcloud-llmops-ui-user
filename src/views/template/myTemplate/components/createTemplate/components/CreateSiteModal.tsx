@@ -2,7 +2,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { t } from 'hooks/web/useI18n';
 import { useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
@@ -49,8 +48,8 @@ export default function CreateSiteModal({
                         <div className={'w-full'}>
                             <TextField
                                 error={checked && !value}
-                                autoFocus
-                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                                color="secondary"
                                 id="name"
                                 label={'站点名称'}
                                 placeholder={'请输入站点名称'}
@@ -70,6 +69,7 @@ export default function CreateSiteModal({
                         <Button
                             variant="contained"
                             type="button"
+                            color="secondary"
                             onClick={() => {
                                 setChecked(true);
                                 if (!value) {

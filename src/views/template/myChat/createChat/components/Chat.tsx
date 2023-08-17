@@ -76,7 +76,6 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
-    const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
@@ -127,7 +126,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
         };
     }, []);
 
-    // mode 为test代码
+    // mode test start
     // 获取会话
     React.useEffect(() => {
         if (mode === 'test') {
@@ -185,8 +184,9 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
             setData(copyData);
         }
     }, [chatBotInfo.statement, chatBotInfo.enableStatement, mode]);
+    // mode test end
 
-    // mode为iframe代码
+    // mode iframe start
     // iframe 模式下获取历史记录
     React.useEffect(() => {
         if (mode === 'iframe') {
@@ -207,6 +207,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
             })();
         }
     }, [mode, chatBotInfo]);
+    // mode iframe end
 
     React.useEffect(() => {
         // 清理语音识别对象

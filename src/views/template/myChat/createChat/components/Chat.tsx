@@ -446,7 +446,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                         </CardContent>
                     </div>
                 </div>
-                <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
+                <Grid container spacing={1} alignItems="center" className="px-[24px] ">
                     <Grid item>
                         <Grid item>
                             <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -541,10 +541,13 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
                                 </>
                             }
                             aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight' }}
+                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
                         />
                     </Grid>
                 </Grid>
+                <div className="flex justify-end px-[24px]">
+                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                </div>
             </div>
         </div>
     );

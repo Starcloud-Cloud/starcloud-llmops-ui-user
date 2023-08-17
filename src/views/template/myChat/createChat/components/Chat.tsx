@@ -27,6 +27,7 @@ import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
 import { getShareChatHistory, shareMessageSSE } from 'api/chat/share';
+import jsCookie from 'js-cookie';
 
 export type IHistory = Partial<{
     uid: string;
@@ -71,7 +72,7 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
-export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'iframe' | 'test' }) => {
+export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo; mode?: 'iframe' | 'test'; mediumUid?: string }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -190,7 +191,7 @@ export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'if
     React.useEffect(() => {
         if (mode === 'iframe') {
             (async () => {
-                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid });
+                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid: jsCookie.get('conversationUid') });
                 const list = res.list?.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar })) || [];
                 const result = [
                     ...list,
@@ -287,10 +288,11 @@ export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'if
                 resp = await shareMessageSSE({
                     scene: 'SHARE_WEB',
                     query: message,
-                    mediumUid: 'dWOB2jRQSt_gmcTB',
-                    conversationUid
+                    mediumUid,
+                    conversationUid: jsCookie.get('conversationUid')
                 });
-            } else {
+            }
+            if (mode === 'test') {
                 resp = await messageSSE({
                     appUid: appId,
                     scene: 'CHAT_TEST',
@@ -331,6 +333,7 @@ export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'if
                         bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                     }
                     if (bufferObj?.code === 200) {
+                        jsCookie.set('conversationUid', bufferObj.conversationUid);
                         setConversationUid(bufferObj.conversationUid);
                         // 处理流程
                         if (bufferObj.type === 'i') {
@@ -393,6 +396,7 @@ export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'if
         setData([]);
         dataRef.current = [];
         setConversationUid('');
+        jsCookie.remove('conversationUid');
     };
 
     const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);

@@ -21,7 +21,7 @@ export default function ThemeRoutes() {
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
-        { path: '/chat-bot', element: <PagesChatBot /> },
+        { path: '/chat-bot/:mode/:mediumUid', element: <PagesChatBot /> },
         AuthenticationRoutes,
         LoginRoutes,
         MainRoutes,

@@ -506,7 +506,11 @@ export const FashionStyling = ({
                             }}
                         />
                         <div className="flex justify-between">
-                            {!chatBotInfo.name ? <div className="text-[#f44336] mt-1">请填写名称</div> : <div className="h-[20px]" />}
+                            {startCheck && !chatBotInfo.name ? (
+                                <div className="text-[#f44336] mt-1">请填写名称</div>
+                            ) : (
+                                <div className="h-[20px]" />
+                            )}
                             <div className="text-right text-stone-600 mr-1 mt-1">{chatBotInfo.name?.length || 0}/20</div>
                         </div>
                     </div>

@@ -309,7 +309,7 @@ function CreateDetail() {
 
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
-                        <Chat chatBotInfo={chatBotInfo} />
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>
@@ -318,7 +318,7 @@ function CreateDetail() {
             </Card>
             {value !== 5 && (
                 <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
-                    <Chat chatBotInfo={chatBotInfo} />
+                    <Chat chatBotInfo={chatBotInfo} mode={'test'} />
                 </Card>
             )}
         </div>

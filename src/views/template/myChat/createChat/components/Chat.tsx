@@ -26,6 +26,7 @@ import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
+import { getShareChatHistory, shareMessageSSE } from 'api/chat/share';
 
 export type IHistory = Partial<{
     uid: string;
@@ -70,7 +71,7 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
-export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
+export const Chat = ({ chatBotInfo, mode }: { chatBotInfo: IChatInfo; mode?: 'iframe' | 'test' }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -125,19 +126,22 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         };
     }, []);
 
+    // mode 为test代码
     // 获取会话
     React.useEffect(() => {
-        (async () => {
-            const res: IConversation[] = await getChat({ scene: 'CHAT_TEST', appUid: appId });
-            if (res && res.length) {
-                setConversationUid(res[0].uid);
-            }
-        })();
-    }, []);
+        if (mode === 'test') {
+            (async () => {
+                const res: IConversation[] = await getChat({ scene: 'CHAT_TEST', appUid: appId });
+                if (res && res.length) {
+                    setConversationUid(res[0].uid);
+                }
+            })();
+        }
+    }, [mode]);
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (conversationUid && isFirst) {
+        if (mode === 'test' && conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
@@ -155,20 +159,20 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 setIsFirst(false);
             })();
         }
-    }, [conversationUid, chatBotInfo]);
+    }, [conversationUid, chatBotInfo, mode]);
 
     // 更新历史记录
     React.useEffect(() => {
-        if (!isFirst) {
+        if (mode === 'test' && !isFirst) {
             const list: any = dataRef.current.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
             dataRef.current = list;
             setData(list);
         }
-    }, [chatBotInfo.avatar, chatBotInfo.name, chatBotInfo.statement]);
+    }, [chatBotInfo.avatar, chatBotInfo.name, chatBotInfo.statement, mode]);
 
     // 更新欢迎语
     React.useEffect(() => {
-        if (!isFirst) {
+        if (mode === 'test' && !isFirst) {
             const copyData = [...dataRef.current];
             const index = copyData.findIndex((v) => v.isStatement);
             if (chatBotInfo.enableStatement) {
@@ -179,7 +183,29 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
             dataRef.current = copyData;
             setData(copyData);
         }
-    }, [chatBotInfo.statement, chatBotInfo.enableStatement]);
+    }, [chatBotInfo.statement, chatBotInfo.enableStatement, mode]);
+
+    // mode为iframe代码
+    // iframe 模式下获取历史记录
+    React.useEffect(() => {
+        if (mode === 'iframe') {
+            (async () => {
+                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid });
+                const list = res.list?.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar })) || [];
+                const result = [
+                    ...list,
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
+            })();
+        }
+    }, [mode, chatBotInfo]);
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -256,12 +282,23 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
 
         setIsFetch(true);
         try {
-            let resp: any = await messageSSE({
-                appUid: appId,
-                scene: 'CHAT_TEST',
-                conversationUid,
-                query: message
-            });
+            let resp: any;
+            if (mode === 'iframe') {
+                resp = await shareMessageSSE({
+                    scene: 'SHARE_WEB',
+                    query: message,
+                    mediumUid: 'dWOB2jRQSt_gmcTB',
+                    conversationUid
+                });
+            } else {
+                resp = await messageSSE({
+                    appUid: appId,
+                    scene: 'CHAT_TEST',
+                    conversationUid,
+                    query: message
+                });
+            }
+
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
             let outerJoins: any;
@@ -367,17 +404,6 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
         setAnchorEl(null);
     };
 
-    // toggle sidebar
-    const [openChatDrawer, setOpenChatDrawer] = React.useState(true);
-    const handleDrawerOpen = () => {
-        setOpenChatDrawer((prevState) => !prevState);
-    };
-
-    // close sidebar when widow size below 'md' breakpoint
-    React.useEffect(() => {
-        setOpenChatDrawer(!matchDownSM);
-    }, [matchDownSM]);
-
     return (
         <div>
             <div className={'flex justify-center items-center py-[8px]'}>
@@ -387,121 +413,134 @@ export const Chat = ({ chatBotInfo }: { chatBotInfo: IChatInfo }) => {
                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
             </div>
             <Divider variant={'fullWidth'} />
-            <div style={{ width: '100%', height: 'calc(100vh - 298px)', overflowX: 'hidden' }} ref={scrollRef}>
-                <div ref={contentRef}>
-                    {chatBotInfo.enableIntroduction && (
-                        <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
-                            <div className="flex w-[56px] h-[56px] justify-center items-center">
-                                <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
-                            </div>
-                            <div className="flex flex-col ml-3">
-                                <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
-                                <Typography align="left" variant="subtitle2" color={'#000'}>
-                                    {chatBotInfo.introduction}
-                                </Typography>
-                            </div>
-                        </Card>
-                    )}
-                    <CardContent>
-                        <ChatHistory theme={theme} data={data} />
-                    </CardContent>
+            <div className={'max-w-[768px] m-auto'}>
+                <div
+                    style={{
+                        width: '100%',
+                        height: mode === 'iframe' ? 'calc(100vh - 180px)' : 'calc(100vh - 298px)',
+                        overflowX: 'hidden'
+                    }}
+                    ref={scrollRef}
+                >
+                    <div ref={contentRef}>
+                        {chatBotInfo.enableIntroduction && (
+                            <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
+                                <div className="flex w-[56px] h-[56px] justify-center items-center">
+                                    <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                                </div>
+                                <div className="flex flex-col ml-3">
+                                    <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
+                                    <Typography align="left" variant="subtitle2" color={'#000'}>
+                                        {chatBotInfo.introduction}
+                                    </Typography>
+                                </div>
+                            </Card>
+                        )}
+                        <CardContent>
+                            <ChatHistory theme={theme} data={data} />
+                        </CardContent>
+                    </div>
                 </div>
-            </div>
-            <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
-                <Grid item>
+                <Grid container spacing={1} alignItems="center" className="px-[24px] pb-[24px]">
                     <Grid item>
-                        <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                            <MoreHorizTwoToneIcon />
-                        </IconButton>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleCloseSort}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'right'
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right'
-                            }}
-                        >
-                            <MenuItem onClick={handleClean}>
-                                <CleaningServicesSharpIcon className="text-base" />
-                                <span className="text-base ml-3">清除</span>
-                            </MenuItem>
-                        </Menu>
+                        <Grid item>
+                            <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                                <MoreHorizTwoToneIcon />
+                            </IconButton>
+                            <Menu
+                                id="simple-menu"
+                                anchorEl={anchorEl}
+                                keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={handleCloseSort}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right'
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right'
+                                }}
+                            >
+                                <MenuItem onClick={handleClean}>
+                                    <CleaningServicesSharpIcon className="text-base" />
+                                    <span className="text-base ml-3">清除</span>
+                                </MenuItem>
+                            </Menu>
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} sm zeroMinWidth>
+                        <OutlinedInput
+                            id="message-send"
+                            fullWidth
+                            multiline
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="请输入(Shift+Enter换行)"
+                            className="!pt-0"
+                            onKeyDown={handleKeyDown}
+                            minRows={1}
+                            maxRows={3}
+                            endAdornment={
+                                <>
+                                    <InputAdornment position="end">
+                                        {!isListening ? (
+                                            <Tooltip arrow placement="top" title={'语音输入'}>
+                                                <IconButton
+                                                    disableRipple
+                                                    color={'default'}
+                                                    onClick={startListening}
+                                                    aria-label="voice"
+                                                    className="p-0"
+                                                >
+                                                    <KeyboardVoiceIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                <div
+                                                    onClick={stopListening}
+                                                    className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                >
+                                                    <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                        {time}
+                                                    </div>
+                                                </div>
+                                            </Tooltip>
+                                        )}
+                                    </InputAdornment>
+                                    <InputAdornment position="end" className="relative">
+                                        {isFetch ? (
+                                            <Tooltip placement="top" arrow title={'请求中'}>
+                                                <IconButton
+                                                    disableRipple
+                                                    color={message ? 'secondary' : 'default'}
+                                                    aria-label="send message"
+                                                >
+                                                    <PendingIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip placement="top" arrow title={'发送'}>
+                                                <IconButton
+                                                    disableRipple
+                                                    color={message ? 'secondary' : 'default'}
+                                                    onClick={handleOnSend}
+                                                    aria-label="send message"
+                                                >
+                                                    <SendIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                    </InputAdornment>
+                                </>
+                            }
+                            aria-describedby="search-helper-text"
+                            inputProps={{ 'aria-label': 'weight' }}
+                        />
                     </Grid>
                 </Grid>
-                <Grid item xs={12} sm zeroMinWidth>
-                    <OutlinedInput
-                        id="message-send"
-                        fullWidth
-                        multiline
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="请输入(Shift+Enter换行)"
-                        className="!pt-0"
-                        onKeyDown={handleKeyDown}
-                        minRows={1}
-                        maxRows={3}
-                        endAdornment={
-                            <>
-                                <InputAdornment position="end">
-                                    {!isListening ? (
-                                        <Tooltip arrow placement="top" title={'语音输入'}>
-                                            <IconButton
-                                                disableRipple
-                                                color={'default'}
-                                                onClick={startListening}
-                                                aria-label="voice"
-                                                className="p-0"
-                                            >
-                                                <KeyboardVoiceIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    ) : (
-                                        <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                            <div
-                                                onClick={stopListening}
-                                                className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                            >
-                                                <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                    {time}
-                                                </div>
-                                            </div>
-                                        </Tooltip>
-                                    )}
-                                </InputAdornment>
-                                <InputAdornment position="end" className="relative">
-                                    {isFetch ? (
-                                        <Tooltip placement="top" arrow title={'请求中'}>
-                                            <IconButton disableRipple color={message ? 'secondary' : 'default'} aria-label="send message">
-                                                <PendingIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    ) : (
-                                        <Tooltip placement="top" arrow title={'发送'}>
-                                            <IconButton
-                                                disableRipple
-                                                color={message ? 'secondary' : 'default'}
-                                                onClick={handleOnSend}
-                                                aria-label="send message"
-                                            >
-                                                <SendIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
-                                </InputAdornment>
-                            </>
-                        }
-                        aria-describedby="search-helper-text"
-                        inputProps={{ 'aria-label': 'weight' }}
-                    />
-                </Grid>
-            </Grid>
+            </div>
         </div>
     );
 };

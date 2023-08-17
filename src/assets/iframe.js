@@ -21,6 +21,7 @@ window.onload = function () {
 			height: 44px;
 			padding: 10px;
 			border-radius: 100%;
+            cursor: pointer;
 			background-color: ${window.tip_mofaai_bg || '4C83F3'};
 			color: ${window.tip_mofaai_color};
 		`

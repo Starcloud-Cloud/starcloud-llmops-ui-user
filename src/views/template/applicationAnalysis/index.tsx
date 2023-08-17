@@ -35,7 +35,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
-import { logStatistics, infoPage, logTimeType, detailImage, detailApp } from 'api/template';
+import { logStatistics, infoPage, logMetaData, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
@@ -99,7 +99,15 @@ interface Detail {
     appExecutor?: string;
     appInfo?: any;
 }
-function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
+function ApplicationAnalysis({
+    appUid = null,
+    value = 2,
+    type = 'GENERATE_RECORD'
+}: {
+    appUid: string | null;
+    value: number;
+    type: string;
+}) {
     const [queryParams, setQuery] = useState<Query>({
         timeType: 'LAST_7D'
     });
@@ -112,7 +120,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
     const infoList = (params: any) => {
-        infoPage({ ...params, ...queryParams, appUid }).then((res) => {
+        infoPage({ ...params, ...queryParams, appUid, type }).then((res) => {
             setTotalData(res.list);
             setTotal(res.total);
         });
@@ -120,7 +128,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     const permissions = useUserStore((state) => state.permissions);
     //获取标数据
     const getStatistic = () => {
-        logStatistics({ ...queryParams, appUid }).then((res) => {
+        logStatistics({ ...queryParams, appUid, type }).then((res) => {
             const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
             const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
             const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
@@ -134,25 +142,28 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
             setGenerate(newList);
         });
     };
+    //时间
     const [dateList, setDateList] = useState([] as Date[]);
-    const scenseList = [
-        { label: '创作中心', value: 'WEB_ADMIN' },
-        { label: '应用市场', value: 'WEB_MARKET' },
-        { label: 'AI作图', value: 'IMAGE' },
-        { label: '分享', value: 'SHARE_WEB' },
-        { label: '企业微信群聊', value: 'WECOM_GROUP' },
-        { label: '聊天测试', value: 'CHAT_TEST' },
-        { label: '聊天', value: 'CHAT' }
-    ];
+    //模式
+    const [appMode, setAppMode] = useState([] as Date[]);
+    //场景
+    const [appScene, setAppScene] = useState([] as Date[]);
+
     useEffect(() => {
-        //获取echarts
-        getStatistic();
-        infoList(page);
-        logTimeType().then((res) => {
-            setDateList(res);
+        logMetaData(type).then((res) => {
+            setDateList(res.timeType);
+            setAppMode(res.appMode);
+            setAppScene(res.appScene);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    useEffect(() => {
+        if (value === 2) {
+            //获取echarts
+            getStatistic();
+            infoList(page);
+        }
+    }, [value]);
     //输入框输入
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -243,10 +254,8 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
             return newValue;
         });
     };
-
     const categoryList = marketStore((state) => state.categoryList);
     const [open, setOpen] = useState(false);
-
     // 详情
     const [detailTotal, setDetailTotal] = useState(0);
     const [pageQuery, setPageQuery] = useState({
@@ -296,47 +305,51 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
-                <Grid item md={4} lg={3} xs={12}>
-                    <TextField
-                        label={t('generateLog.name')}
-                        value={queryParams.appName}
-                        name="appName"
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    {queryParams.appName && (
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                handleChange({ target: { name: 'appName', value: '' } });
-                                            }}
-                                        >
-                                            <ClearIcon fontSize="small" />
-                                        </IconButton>
-                                    )}
-                                </InputAdornment>
-                            )
-                        }}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-                </Grid>
-                <Grid item md={4} lg={3} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="appMode">模式</InputLabel>
-                        <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
-                            <MenuItem value="COMPLETION">生成</MenuItem>
-                            <MenuItem value="CHAT">聊天</MenuItem>
-                            <MenuItem value="BASE_GENERATE_IMAGE">图片</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Grid>
+                {!appUid && (
+                    <>
+                        <Grid item md={4} lg={3} xs={12}>
+                            <TextField
+                                label={t('generateLog.name')}
+                                value={queryParams.appName}
+                                name="appName"
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            {queryParams.appName && (
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => {
+                                                        handleChange({ target: { name: 'appName', value: '' } });
+                                                    }}
+                                                >
+                                                    <ClearIcon fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                        </InputAdornment>
+                                    )
+                                }}
+                                onChange={handleChange}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item md={4} lg={3} xs={12}>
+                            <FormControl fullWidth>
+                                <InputLabel id="appMode">模式</InputLabel>
+                                <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
+                                    {appMode.map((item) => (
+                                        <MenuItem value={item.value}>{item.label}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </>
+                )}
                 <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="fromScene">场景</InputLabel>
                         <Select labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
-                            {scenseList.map((item) => (
+                            {appScene.map((item) => (
                                 <MenuItem value={item.value}>{item.label}</MenuItem>
                             ))}
                         </Select>
@@ -398,7 +411,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{row.appName}</TableCell>
-                                <TableCell align="center">{scenseList.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.status}</TableCell>
@@ -473,9 +486,7 @@ function ApplicationAnalysis({ appUid = null }: { appUid: string | null }) {
                                     <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                         <TableCell align="center">{row.appName}</TableCell>
-                                        <TableCell align="center">
-                                            {scenseList.find((item) => item.value === row.fromScene)?.label}
-                                        </TableCell>
+                                        <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                         <TableCell align="center">{row.status}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title={row.errorMessage}>

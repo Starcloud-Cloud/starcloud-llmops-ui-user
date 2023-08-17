@@ -285,9 +285,9 @@ function CreateDetail() {
                 <Tabs value={value} variant="scrollable" onChange={handleChange}>
                     <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
-                    <Tab component={Link} label={'知识库'} {...a11yProps(2)} />
-                    <Tab component={Link} label={'技能'} {...a11yProps(3)} />
-                    <Tab component={Link} label={'应用分析'} {...a11yProps(4)} />
+                    <Tab component={Link} label={'应用分析'} {...a11yProps(2)} />
+                    <Tab component={Link} label={'知识库'} {...a11yProps(3)} />
+                    <Tab component={Link} label={'技能'} {...a11yProps(4)} />
                     {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
                     <Tab component={Link} label={'机器人发布'} {...a11yProps(6)} />
                 </Tabs>
@@ -298,14 +298,15 @@ function CreateDetail() {
                     <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
                 <TabPanel value={value} index={2}>
-                    {detail?.uid && <Knowledge datasetId={detail.uid} />}
+                    <ApplicationAnalysis appUid={detail?.uid} value={value} type="CHAT_ANALYSIS" />
                 </TabPanel>
                 <TabPanel value={value} index={3}>
-                    <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
+                    {detail?.uid && <Knowledge datasetId={detail.uid} />}
                 </TabPanel>
                 <TabPanel value={value} index={4}>
-                    <ApplicationAnalysis appUid={detail?.uid} />
+                    <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
+
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
                         <Chat chatBotInfo={chatBotInfo} />

@@ -32,7 +32,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
 import Chart, { Props } from 'react-apexcharts';
-import { logStatistics, infoPage, logMetaData, detailImage, detailApp } from 'api/template';
+import { logStatistics, statisticsByAppUid, infoPage, infoPageByAppUid, logMetaData, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
 import { t } from 'hooks/web/useI18n';
 import Perform from '../carryOut/perform';
@@ -117,27 +117,38 @@ function ApplicationAnalysis({
     const [totalData, setTotalData] = useState<TableData[]>([]);
     //获取表格数据
     const infoList = (params: any) => {
-        infoPage({ ...params, ...queryParams, appUid, type }).then((res) => {
-            setTotalData(res.list);
-            setTotal(res.total);
-        });
+        if (type === 'GENERATE_RECORD') {
+            infoPage({ ...params, ...queryParams, appUid }).then((res) => {
+                setTotalData(res.list);
+                setTotal(res.total);
+            });
+        } else {
+            infoPageByAppUid({ ...params, ...queryParams, appUid }).then((res) => {
+                setTotalData(res.list);
+                setTotal(res.total);
+            });
+        }
     };
     const permissions = useUserStore((state) => state.permissions);
     //获取标数据
-    const getStatistic = () => {
-        logStatistics({ ...queryParams, appUid, type }).then((res) => {
-            const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
-            const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
-            const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-            const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
-            const newList = [];
-            permissions.includes('log:app:analysis:usageCount') && newList.push({ title: t('generateLog.messageTotal'), data: message });
-            permissions.includes('log:app:analysis:usageToken') && newList.push({ title: t('generateLog.tokenTotal'), data: tokens });
-            permissions.includes('log:app:analysis:avgElapsed') &&
-                newList.push({ title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg });
-            permissions.includes('log:app:analysis:userLike') && newList.push({ title: t('generateLog.usertotal'), data: userCount });
-            setGenerate(newList);
-        });
+    const getStatistic = async () => {
+        let res: any;
+        if (type === 'GENERATE_RECORD') {
+            res = await logStatistics({ ...queryParams, appUid });
+        } else {
+            res = await statisticsByAppUid({ ...queryParams, appUid });
+        }
+        const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
+        const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
+        const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
+        const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
+        const newList = [];
+        permissions.includes('log:app:analysis:usageCount') && newList.push({ title: t('generateLog.messageTotal'), data: message });
+        permissions.includes('log:app:analysis:usageToken') && newList.push({ title: t('generateLog.tokenTotal'), data: tokens });
+        permissions.includes('log:app:analysis:avgElapsed') &&
+            newList.push({ title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg });
+        permissions.includes('log:app:analysis:userLike') && newList.push({ title: t('generateLog.usertotal'), data: userCount });
+        setGenerate(newList);
     };
     //时间
     const [dateList, setDateList] = useState([] as Date[]);
@@ -164,8 +175,6 @@ function ApplicationAnalysis({
     //输入框输入
     const handleChange = (e: any) => {
         const { name, value } = e.target;
-        console.log(name, value);
-
         setQuery({ ...queryParams, [name]: value });
     };
     //切换分页
@@ -288,23 +297,8 @@ function ApplicationAnalysis({
                                 label={t('generateLog.name')}
                                 value={queryParams.appName}
                                 name="appName"
+                                type="search"
                                 InputLabelProps={{ shrink: true }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            {queryParams.appName && (
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => {
-                                                        handleChange({ target: { name: 'appName', value: '' } });
-                                                    }}
-                                                >
-                                                    <ClearIcon fontSize="small" />
-                                                </IconButton>
-                                            )}
-                                        </InputAdornment>
-                                    )
-                                }}
                                 onChange={handleChange}
                                 fullWidth
                             />
@@ -312,7 +306,14 @@ function ApplicationAnalysis({
                         <Grid item md={4} lg={3} xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel id="appMode">模式</InputLabel>
-                                <Select labelId="appMode" name="appMode" label="模式" value={queryParams.appMode} onChange={handleChange}>
+                                <Select
+                                    type="search"
+                                    labelId="appMode"
+                                    name="appMode"
+                                    label="模式"
+                                    value={queryParams.appMode}
+                                    onChange={handleChange}
+                                >
                                     {appMode.map((item) => (
                                         <MenuItem value={item.value}>{item.label}</MenuItem>
                                     ))}

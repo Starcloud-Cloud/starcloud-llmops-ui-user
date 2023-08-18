@@ -19,15 +19,12 @@ import {
     Button,
     Drawer,
     Card,
-    Tooltip,
     Divider,
     Chip,
-    Modal,
     IconButton,
     CardContent
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
@@ -255,35 +252,14 @@ function ApplicationAnalysis({
         });
     };
     const categoryList = marketStore((state) => state.categoryList);
-    const [open, setOpen] = useState(false);
-    // 详情
-    const [detailTotal, setDetailTotal] = useState(0);
-    const [pageQuery, setPageQuery] = useState({
-        pageNo: 1,
-        pageSize: 10
-    });
-    const [row, setRow] = useState<{ appMode: string; uid: string }>({ appMode: '', uid: '' });
     const getDeList = (row: { appMode: string; uid: string }) => {
-        setRow(row);
         if (row.appMode === 'BASE_GENERATE_IMAGE') {
-            detailImage({ conversationUid: row.uid, ...pageQuery }).then((res) => {
-                setDetail(res.list);
-                setDetailTotal(res.total);
+            detailImage({ conversationUid: row.uid }).then((res) => {
+                setImgDetail(res.imageInfo);
+                setPicOpen(true);
             });
         }
-        setOpen(true);
     };
-    const paginationdeChange = (event: any, value: number) => {
-        setPageQuery({
-            ...pageQuery,
-            pageNo: value
-        });
-    };
-    useEffect(() => {
-        if (row.uid) {
-            getDeList(row);
-        }
-    }, [pageQuery.pageNo]);
     const [detail, setDetail] = useState<Detail[] | null>(null);
     //图片弹框
     const [picOpen, setPicOpen] = useState(false);
@@ -423,10 +399,9 @@ function ApplicationAnalysis({
                                         size="small"
                                         onClick={() => {
                                             if (row.appMode === 'BASE_GENERATE_IMAGE') {
-                                                setOpen(true);
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
-                                                detailApp({ conversationUid: row.uid, ...pageQuery }).then((res) => {
+                                                detailApp({ conversationUid: row.uid }).then((res) => {
                                                     setExeDetail(res.appInfo);
                                                     setConversationUid(res.conversationUid);
                                                     setExeOpen(true);
@@ -450,82 +425,6 @@ function ApplicationAnalysis({
             <Box my={2}>
                 <Pagination page={page.pageNo} count={Math.ceil(total / page.pageSize)} onChange={paginationChange} />
             </Box>
-            <Drawer
-                anchor="right"
-                open={open}
-                onClose={() => {
-                    setOpen(false);
-                    setDetail(null);
-                    setDetailTotal(0);
-                    setRow({
-                        uid: '',
-                        appMode: ''
-                    });
-                    setPageQuery({
-                        pageNo: 1,
-                        pageSize: 10
-                    });
-                }}
-            >
-                <Card elevation={2} sx={{ p: 2, width: { sm: '100%', md: '1000px' } }}>
-                    <Box>
-                        <Table aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center">{t('generate.mode')}</TableCell>
-                                    <TableCell align="center">{t('generate.name')}</TableCell>
-                                    <TableCell align="center">执行场景</TableCell>
-                                    <TableCell align="center">{t('generate.status')}</TableCell>
-                                    <TableCell align="center">错误消息</TableCell>
-                                    <TableCell align="center">用户</TableCell>
-                                    <TableCell align="center">{t('generate.createTime')}</TableCell>
-                                    <TableCell align="center"></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {detail?.map((row) => (
-                                    <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                        <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
-                                        <TableCell align="center">{row.appName}</TableCell>
-                                        <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
-                                        <TableCell align="center">{row.status}</TableCell>
-                                        <TableCell align="center">
-                                            <Tooltip title={row.errorMessage}>
-                                                <Typography width="200px" noWrap>
-                                                    {row.errorMessage}
-                                                </Typography>
-                                            </Tooltip>
-                                        </TableCell>
-                                        <TableCell align="center">{row.appExecutor}</TableCell>
-                                        <TableCell align="center">{formatDate(row.createTime as number)}</TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                color="secondary"
-                                                size="small"
-                                                onClick={() => {
-                                                    if (row.appMode === 'BASE_GENERATE_IMAGE') {
-                                                        setImgDetail(row.imageInfo);
-                                                        setPicOpen(true);
-                                                    }
-                                                }}
-                                            >
-                                                {t('generate.detail')}
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <Box my={2}>
-                            <Pagination
-                                page={pageQuery.pageNo}
-                                count={Math.ceil(detailTotal / pageQuery.pageSize)}
-                                onChange={paginationdeChange}
-                            />
-                        </Box>
-                    </Box>
-                </Card>
-            </Drawer>
             {picOpen && (
                 <PicModal
                     open={picOpen}

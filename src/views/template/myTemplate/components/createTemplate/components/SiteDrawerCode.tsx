@@ -83,16 +83,18 @@ export const SiteDrawerCode = ({
             );
         }
     };
-    const HTML_CODE = ` 
+    const HTML_CODE = (name: string) => {
+        return ` 
 \`\`\`
 <iframe
-src="https://chato.cn/b/p8eldrk02m95nky0?source=1234jh"
+src="https://chato.cn/b/p8eldrk02m95nky0?source=${name}"
 width="408px"
 height="594px"
 frameborder="0">
 </iframe>
 \`\`\`
 `;
+    };
 
     const JS_CODE = `
 \`\`\`
@@ -141,12 +143,11 @@ header.appendChild(st);
                                             setCodeValue(newValue);
                                         }}
                                     />
-                                    {item.status}
                                     <FormControlLabel
                                         control={
                                             <Switch
                                                 name="status"
-                                                checked={item.status}
+                                                checked={Boolean(item.status)}
                                                 onChange={(e) => {
                                                     const { name } = e.target;
                                                     const newValue = _.cloneDeep(codeRef.current);
@@ -163,7 +164,7 @@ header.appendChild(st);
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                         <span>javascript</span>
                                         <CopyToClipboard
-                                            text={HTML_CODE}
+                                            text={HTML_CODE(item.name)}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -223,7 +224,7 @@ header.appendChild(st);
                                                 }
                                             }}
                                         >
-                                            {HTML_CODE}
+                                            {HTML_CODE(item.name)}
                                         </ReactMarkdown>
                                     </div>
                                     <div className="text-sm mt-3 mb-1">添加聊天气泡，请复制添加到您的 html中</div>

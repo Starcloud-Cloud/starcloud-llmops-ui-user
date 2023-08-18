@@ -331,7 +331,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             name: siteName,
             publishUid: updateBtn.uid,
             type: 3,
-            status: 1
+            status: 0
         });
         getUpdateBtn();
         setOpenCreateSite(false);

@@ -174,7 +174,7 @@ header.appendChild(st);
                                         control={
                                             <Switch
                                                 name="status"
-                                                checked={Boolean(item.status)}
+                                                checked={!Boolean(item.status)}
                                                 onChange={(e) => {
                                                     const { name } = e.target;
                                                     const newValue = _.cloneDeep(codeRef.current);

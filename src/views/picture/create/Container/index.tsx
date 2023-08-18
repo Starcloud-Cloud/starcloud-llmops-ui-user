@@ -12,6 +12,7 @@ import { downloadFile } from 'utils/download';
 import PicModal from '../Modal';
 import { IImageListType, IImageListTypeChildImages } from '../index';
 import './index.scss';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export const PictureCreateContainer = ({
     menuVisible,
@@ -21,7 +22,9 @@ export const PictureCreateContainer = ({
     height,
     isFetch,
     setInputValue,
-    setInputValueTranslate
+    setInputValueTranslate,
+    fetchMoreData,
+    hasMore
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
@@ -31,6 +34,8 @@ export const PictureCreateContainer = ({
     isFetch: boolean;
     setInputValue: (value: string) => void;
     setInputValueTranslate: (flag: boolean) => void;
+    fetchMoreData: any;
+    hasMore: boolean;
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -85,127 +90,138 @@ export const PictureCreateContainer = ({
                     <MenuRoundedIcon />
                 </IconButton>
             </div>
-            <div className="h-full xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-                <div>
-                    {imgList.map((item, index) => (
-                        <div key={index}>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex justify-between w-full">
-                                    <div className="flex items-center w-4/5">
-                                        {!item.create && (
-                                            <div className="text-base text-zinc-500" style={{ flex: '0 0 170px' }}>
-                                                {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+            <div className="h-full">
+                <div
+                    id="scrollableDiv"
+                    className="h-[calc(100vh-208px)] xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto"
+                    style={{ scrollbarGutter: 'stable' }}
+                >
+                    <InfiniteScroll
+                        scrollableTarget="scrollableDiv"
+                        dataLength={imgList?.length || 0}
+                        next={fetchMoreData}
+                        hasMore={hasMore}
+                        loader={<h4>Loading...</h4>}
+                    >
+                        {imgList.map((item, index) => (
+                            <div key={index}>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex justify-between w-full">
+                                        <div className="flex items-center w-4/5">
+                                            {!item.create && (
+                                                <div className="text-base text-zinc-500" style={{ flex: '0 0 170px' }}>
+                                                    {dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                </div>
+                                            )}
+                                            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium min-h-[24px]">
+                                                {index > 0 ? (
+                                                    <MuiTooltip
+                                                        title={
+                                                            <div>
+                                                                <span>
+                                                                    {index === currentTranslateIndex ? currentTranslateText : item.prompt}
+                                                                </span>
+                                                            </div>
+                                                        }
+                                                        placement="top-start"
+                                                    >
+                                                        <span className="ml-1">
+                                                            {index === currentTranslateIndex ? currentTranslateText : item.prompt}
+                                                        </span>
+                                                    </MuiTooltip>
+                                                ) : (
+                                                    item.prompt
+                                                )}
                                             </div>
-                                        )}
-                                        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap  text-base font-medium min-h-[24px]">
-                                            {index > 0 ? (
-                                                <MuiTooltip
-                                                    title={
-                                                        <div>
-                                                            <span>
-                                                                {index === currentTranslateIndex ? currentTranslateText : item.prompt}
-                                                            </span>
-                                                        </div>
-                                                    }
-                                                    placement="top-start"
-                                                >
-                                                    <span className="ml-1">
-                                                        {index === currentTranslateIndex ? currentTranslateText : item.prompt}
-                                                    </span>
+                                            {!item.create && (
+                                                <MuiTooltip title="再次使用描述" arrow placement="top">
+                                                    <ArrowCircleLeftOutlinedIcon
+                                                        className="cursor-pointer"
+                                                        onClick={() => {
+                                                            setInputValue(item.prompt);
+                                                            setInputValueTranslate(true);
+                                                        }}
+                                                    />
                                                 </MuiTooltip>
-                                            ) : (
-                                                item.prompt
                                             )}
                                         </div>
                                         {!item.create && (
-                                            <MuiTooltip title="再次使用描述" arrow placement="top">
-                                                <ArrowCircleLeftOutlinedIcon
-                                                    className="cursor-pointer"
-                                                    onClick={() => {
-                                                        setInputValue(item.prompt);
-                                                        setInputValueTranslate(true);
-                                                    }}
-                                                />
-                                            </MuiTooltip>
+                                            <Space className="w-1/5 flex justify-end">
+                                                <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                    <MuiTooltip title="翻译成中文" arrow placement="top">
+                                                        <svg
+                                                            onClick={() => handleInputValueTranslate(item.prompt, index)}
+                                                            className="text-base cursor-pointer"
+                                                            viewBox="0 0 1024 1024"
+                                                            version="1.1"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            p-id="11576"
+                                                            width="16"
+                                                            height="16"
+                                                        >
+                                                            <path
+                                                                d="M160 144a32 32 0 0 0-32 32V864a32 32 0 0 0 32 32h688a32 32 0 0 0 32-32V176a32 32 0 0 0-32-32H160z m0-64h688a96 96 0 0 1 96 96V864a96 96 0 0 1-96 96H160a96 96 0 0 1-96-96V176a96 96 0 0 1 96-96z"
+                                                                fill="#ffffff"
+                                                                p-id="11577"
+                                                            ></path>
+                                                            <path
+                                                                d="M482.176 262.272h59.616v94.4h196v239.072h-196v184.416h-59.616v-184.416H286.72v-239.04h195.456V262.24z m-137.504 277.152h137.504v-126.4H344.64v126.4z m197.12 0h138.048v-126.4H541.76v126.4z"
+                                                                fill="#ffffff"
+                                                                p-id="11578"
+                                                            ></path>
+                                                        </svg>
+                                                    </MuiTooltip>
+                                                </div>
+                                                <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
+                                                    <MuiTooltip title="下载" arrow placement="top">
+                                                        <CloudDownloadIcon
+                                                            style={{ color: '#fff', height: '16px' }}
+                                                            onClick={() => batchHandle(item.images)}
+                                                        />
+                                                    </MuiTooltip>
+                                                </div>
+                                            </Space>
                                         )}
                                     </div>
-                                    {!item.create && (
-                                        <Space className="w-1/5 flex justify-end">
-                                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                <MuiTooltip title="翻译成中文" arrow placement="top">
-                                                    <svg
-                                                        onClick={() => handleInputValueTranslate(item.prompt, index)}
-                                                        className="text-base cursor-pointer"
-                                                        viewBox="0 0 1024 1024"
-                                                        version="1.1"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        p-id="11576"
-                                                        width="16"
-                                                        height="16"
-                                                    >
-                                                        <path
-                                                            d="M160 144a32 32 0 0 0-32 32V864a32 32 0 0 0 32 32h688a32 32 0 0 0 32-32V176a32 32 0 0 0-32-32H160z m0-64h688a96 96 0 0 1 96 96V864a96 96 0 0 1-96 96H160a96 96 0 0 1-96-96V176a96 96 0 0 1 96-96z"
-                                                            fill="#ffffff"
-                                                            p-id="11577"
-                                                        ></path>
-                                                        <path
-                                                            d="M482.176 262.272h59.616v94.4h196v239.072h-196v184.416h-59.616v-184.416H286.72v-239.04h195.456V262.24z m-137.504 277.152h137.504v-126.4H344.64v126.4z m197.12 0h138.048v-126.4H541.76v126.4z"
-                                                            fill="#ffffff"
-                                                            p-id="11578"
-                                                        ></path>
-                                                    </svg>
-                                                </MuiTooltip>
-                                            </div>
-                                            <div className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer">
-                                                <MuiTooltip title="下载" arrow placement="top">
-                                                    <CloudDownloadIcon
-                                                        style={{ color: '#fff', height: '16px' }}
-                                                        onClick={() => batchHandle(item.images)}
-                                                    />
-                                                </MuiTooltip>
-                                            </div>
-                                        </Space>
-                                    )}
-                                </div>
-                                <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                                    {item.images.map((img, imgIndex) =>
-                                        img.url === 'new_img' ? (
-                                            <div
-                                                className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
-                                                key={imgIndex}
-                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                onMouseLeave={handleMouseLeave}
-                                                onClick={() => {
-                                                    setCurrentIndex(imgIndex);
-                                                }}
-                                            >
+                                    <div className="w-[full] grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                                        {item.images.map((img, imgIndex) =>
+                                            img.url === 'new_img' ? (
                                                 <div
-                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center border-solid border-2 border-[#673ab7]"
-                                                    style={{ aspectRatio: width / height }}
+                                                    className="group relative shrink grow overflow-hidden rounded bg-zinc-900"
+                                                    key={imgIndex}
+                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                    onMouseLeave={handleMouseLeave}
+                                                    onClick={() => {
+                                                        setCurrentIndex(imgIndex);
+                                                    }}
                                                 >
-                                                    {isFetch ? (
-                                                        <img width={60} src={imgLoading} alt="loading" />
-                                                    ) : (
-                                                        <svg
-                                                            version="1.1"
-                                                            id="Layer_1"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                            x="0px"
-                                                            y="0px"
-                                                            width="48px"
-                                                            height="48px"
-                                                            viewBox="0 0 48 48"
-                                                            enableBackground="new 0 0 48 48"
-                                                            xmlSpace="preserve"
-                                                        >
-                                                            <image
-                                                                id="image0"
-                                                                width="48"
-                                                                height="48"
-                                                                x="0"
-                                                                y="0"
-                                                                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                    <div
+                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center border-solid border-2 border-[#673ab7]"
+                                                        style={{ aspectRatio: width / height }}
+                                                    >
+                                                        {isFetch ? (
+                                                            <img width={60} src={imgLoading} alt="loading" />
+                                                        ) : (
+                                                            <svg
+                                                                version="1.1"
+                                                                id="Layer_1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                                x="0px"
+                                                                y="0px"
+                                                                width="48px"
+                                                                height="48px"
+                                                                viewBox="0 0 48 48"
+                                                                enableBackground="new 0 0 48 48"
+                                                                xmlSpace="preserve"
+                                                            >
+                                                                <image
+                                                                    id="image0"
+                                                                    width="48"
+                                                                    height="48"
+                                                                    x="0"
+                                                                    y="0"
+                                                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -360,59 +376,60 @@ export const PictureCreateContainer = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                            />
-                                                        </svg>
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center"
+                                                    style={{ aspectRatio: item?.width / item?.height }}
+                                                    key={img.uuid}
+                                                    onMouseEnter={() => handleMouseEnter(img.uuid)}
+                                                    onMouseLeave={handleMouseLeave}
+                                                    onClick={() => {
+                                                        setCurrentIndex(imgIndex);
+                                                        setRecord({
+                                                            height: item.height,
+                                                            width: item.width,
+                                                            prompt: item.prompt,
+                                                            engine: item.engine
+                                                        });
+                                                    }}
+                                                >
+                                                    <img
+                                                        onClick={() => {
+                                                            handleOpen();
+                                                            setCurrentImageList(item.images);
+                                                        }}
+                                                        className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
+                                                        src={img.url}
+                                                        alt={img.uuid}
+                                                    />
+                                                    {hoveredIndex === img.uuid && (
+                                                        <Space className="absolute top-2 right-2">
+                                                            <div
+                                                                className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
+                                                                onClick={() =>
+                                                                    downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
+                                                                }
+                                                            >
+                                                                <MuiTooltip title="下载" arrow placement="top">
+                                                                    <CloudDownloadIcon style={{ color: '#fff', height: '16px' }} />
+                                                                </MuiTooltip>
+                                                            </div>
+                                                        </Space>
                                                     )}
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer bg-white flex justify-center items-center"
-                                                style={{ aspectRatio: item?.width / item?.height }}
-                                                key={img.uuid}
-                                                onMouseEnter={() => handleMouseEnter(img.uuid)}
-                                                onMouseLeave={handleMouseLeave}
-                                                onClick={() => {
-                                                    setCurrentIndex(imgIndex);
-                                                    setRecord({
-                                                        height: item.height,
-                                                        width: item.width,
-                                                        prompt: item.prompt,
-                                                        engine: item.engine
-                                                    });
-                                                }}
-                                            >
-                                                <img
-                                                    onClick={() => {
-                                                        handleOpen();
-                                                        setCurrentImageList(item.images);
-                                                    }}
-                                                    className="h-full w-full object-cover duration-500 opacity-100 rounded-md cursor-pointer"
-                                                    src={img.url}
-                                                    alt={img.uuid}
-                                                />
-                                                {hoveredIndex === img.uuid && (
-                                                    <Space className="absolute top-2 right-2">
-                                                        <div
-                                                            className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
-                                                            onClick={() =>
-                                                                downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
-                                                            }
-                                                        >
-                                                            <MuiTooltip title="下载" arrow placement="top">
-                                                                <CloudDownloadIcon style={{ color: '#fff', height: '16px' }} />
-                                                            </MuiTooltip>
-                                                        </div>
-                                                    </Space>
-                                                )}
-                                            </div>
-                                        )
-                                    )}
+                                            )
+                                        )}
+                                    </div>
                                 </div>
+                                <Divider type="horizontal" />
                             </div>
-                            <Divider type="horizontal" />
-                        </div>
-                    ))}
+                        ))}
+                    </InfiniteScroll>
                 </div>
                 {record && (
                     <PicModal

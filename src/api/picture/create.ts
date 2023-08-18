@@ -20,8 +20,8 @@ export const createText2Img = (data: any) => {
  * 获取图片列表
  * @returns
  */
-export const getImgList = () => {
-    return request.get({ url: '/llm/image/history' });
+export const getImgList = (data: any) => {
+    return request.get({ url: '/llm/image/history', params: data });
 };
 
 /**

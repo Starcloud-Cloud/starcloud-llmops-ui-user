@@ -74,7 +74,6 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             title: 'JS嵌入',
             icon: 'code',
             desc: '可添加到网站的任何位置，将此 iframe 添加到 html 代码中',
-            enable: true,
             comingSoon: false,
             action: [
                 { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },

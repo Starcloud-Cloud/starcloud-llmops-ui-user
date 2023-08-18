@@ -36,9 +36,11 @@ const PictureCreate = () => {
     const [height, setHeight] = useState(512);
     const [samples, setSamples] = useState(2);
     const [inputValue, setInputValue] = useState('');
-    const [conversationId, setConversationId] = useState('');
     const [isFirst, setIsFirst] = useState(true);
     const [isFetch, setIsFetch] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [pageNo, setPageNo] = useState(1);
+    const [total, setTotal] = useState(0);
     const [inputValueTranslate, setInputValueTranslate] = useState(false);
 
     const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
@@ -56,11 +58,22 @@ const PictureCreate = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await getImgList();
-            setConversationId(res.conversationUid);
-            setImgList(res.messages);
+            const res = await getImgList({ pageNo, pageSize: 10 });
+            setImgList(res.list || []);
+            setTotal(res.total || 0);
         })();
     }, []);
+
+    const fetchMoreData = async () => {
+        if (imgList.length >= total) {
+            setHasMore(false);
+            return;
+        }
+        const newPageNo = pageNo + 1;
+        setPageNo(newPageNo);
+        const res = await getImgList({ pageNo: newPageNo, pageSize: 10 });
+        setImgList([...imgList, ...(res.list || [])]);
+    };
 
     const images = useMemo(() => {
         if (isFirst) {
@@ -132,7 +145,6 @@ const PictureCreate = () => {
                         setSamples={setSamples}
                         inputValue={inputValue}
                         setInputValue={setInputValue}
-                        conversationId={conversationId}
                         setIsFirst={setIsFirst}
                         setIsFetch={setIsFetch}
                         inputValueTranslate={inputValueTranslate}
@@ -140,6 +152,8 @@ const PictureCreate = () => {
                     />
                 </Drawer>
                 <PictureCreateContainer
+                    fetchMoreData={fetchMoreData}
+                    hasMore={hasMore}
                     menuVisible={menuVisible}
                     imgList={images as any}
                     setMenuVisible={setMenuVisible}
@@ -168,13 +182,14 @@ const PictureCreate = () => {
                 setSamples={setSamples}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
-                conversationId={conversationId}
                 setIsFirst={setIsFirst}
                 setIsFetch={setIsFetch}
                 inputValueTranslate={inputValueTranslate}
                 setInputValueTranslate={setInputValueTranslate}
             />
             <PictureCreateContainer
+                fetchMoreData={fetchMoreData}
+                hasMore={hasMore}
                 menuVisible={menuVisible}
                 imgList={images as any}
                 setMenuVisible={setMenuVisible}

@@ -106,7 +106,7 @@ export const setAudit = (data: { uid: string; appUid: string; status: number }) 
 
 // 启用禁用状态
 export const changeStatus = (data: any) => {
-    return request.post({ url: `/llm/app/publish/channel/changeStatus`, data });
+    return request.post({ url: `/llm/app/publish/channel/operate`, data });
 };
 
 // 创建站点

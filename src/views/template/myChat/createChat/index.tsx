@@ -268,7 +268,7 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        (value === 0 || value === 1 || value === 3 || value === 5) && (
+                        (value === 0 || value === 1 || value === 4 || value === 6) && (
                             <Button
                                 // className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"

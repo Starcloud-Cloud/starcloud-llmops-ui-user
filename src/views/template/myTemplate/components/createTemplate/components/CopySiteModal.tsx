@@ -11,7 +11,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
-export default function CopySiteModal({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
+export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; setOpen: (open: boolean) => void; uid: string }) {
     const handleClose = () => {
         setOpen(false);
     };
@@ -51,11 +51,11 @@ export default function CopySiteModal({ open, setOpen }: { open: boolean; setOpe
                     <Grid container spacing={gridSpacing} className="w-full flex justify-center pt-[24px] ml-0">
                         <div className={'w-full flex flex-col'}>
                             <div>
-                                <div className="text-lg">url链接</div>
+                                <div className="text-lg">复制链接</div>
                                 <div className="text-base">
-                                    <span className="text-base">www.baidu.com</span>
+                                    <span className="text-base">{`${window.location.origin}/chat-bot/iframe/${uid}`}</span>
                                     <CopyToClipboard
-                                        text={`${window.location.origin}/chat-bot`}
+                                        text={`${window.location.origin}/chat-bot/iframe/${uid}`}
                                         onCopy={() =>
                                             dispatch(
                                                 openSnackbar({
@@ -80,7 +80,7 @@ export default function CopySiteModal({ open, setOpen }: { open: boolean; setOpe
                             <div id="qrCode">
                                 <div className="text-lg mt-1">二维码</div>
                                 <div className="text-base items-center flex">
-                                    <QRCode value={'www.baidu.com'} />
+                                    <QRCode value={`${window.location.origin}/chat-bot/iframe/${uid}`} />
                                     <span className="text-[#5e35b1] cursor-pointer text-base ml-3" onClick={downloadQRCode}>
                                         保存
                                     </span>

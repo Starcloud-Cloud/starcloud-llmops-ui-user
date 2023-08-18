@@ -42,28 +42,17 @@ import { SiteDrawerCode } from './components/SiteDrawerCode';
 import DomainModal from './components/DomainModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
-function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
-    const [openCreateSite, setOpenCreateSite] = useState(false);
-    const [siteName, setSiteName] = useState('');
-    const [openDrawer, setOpenDrawer] = useState(false);
-    const [openDomain, setOpenDomain] = useState(false);
-    const [openCopySite, setOpenCopySite] = useState(false);
 
-    const IconList: { [key: string]: any } = {
-        monitor: <Monitor color="secondary" />,
-        code: <Code color="secondary" />,
-        api: <Api />,
-        cloudUploadOutlined: <CloudUploadOutlined sx={{ fontSize: '12px' }} />,
-        historyOutlined: <HistoryOutlined sx={{ fontSize: '12px' }} />,
-        contentPaste: <ContentPaste sx={{ fontSize: '12px' }} />
-    };
-    const upLoadList = [
+function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
+    const defaultUpLoadList = [
         {
             title: '网页',
             icon: 'monitor',
             desc: '用户在此链接可以直接和您的机器人聊天',
             enable: true,
+            enableValue: false,
             comingSoon: false,
+            type: 2,
             action: [
                 { title: '复制链接', icon: 'contentPaste', onclick: () => setOpenCopySite(true) },
                 { title: '预览体验', icon: 'historyOutlined', onclick: () => window.open('/chat-bot') },
@@ -92,6 +81,23 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             ]
         }
     ];
+
+    const [openCreateSite, setOpenCreateSite] = useState(false);
+    const [siteName, setSiteName] = useState('');
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const [openDomain, setOpenDomain] = useState(false);
+    const [openCopySite, setOpenCopySite] = useState(false);
+    const [upLoadList, setUpLoadList] = useState(defaultUpLoadList);
+
+    const IconList: { [key: string]: any } = {
+        monitor: <Monitor color="secondary" />,
+        code: <Code color="secondary" />,
+        api: <Api />,
+        cloudUploadOutlined: <CloudUploadOutlined sx={{ fontSize: '12px' }} />,
+        historyOutlined: <HistoryOutlined sx={{ fontSize: '12px' }} />,
+        contentPaste: <ContentPaste sx={{ fontSize: '12px' }} />
+    };
+
     const wchatList = [
         {
             title: '微信群聊',
@@ -170,6 +176,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         needTips: boolean;
         isFirstCreatePublishRecord: boolean;
         channelMap?: any;
+        name?: string;
     }>({
         needUpdate: false,
         showPublish: true,
@@ -271,14 +278,48 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             return newVal;
         });
     };
-    const handleSwitch = async (type: number) => {
-        await changeStatus({
-            uid: '',
-            appUid: '',
-            publishUid: '',
-            type,
-            status: 1
-        });
+    const handleSwitch = async (record: any) => {
+        if (record.type === 2) {
+            if (updateBtn?.channelMap?.[2]?.length > 0) {
+                await changeStatus({
+                    uid: updateBtn?.channelMap?.[2]?.[0]?.uid,
+                    // 非常规0启用 1禁用
+                    status: updateBtn?.channelMap?.[2]?.[0]?.status ? 0 : 1
+                });
+                getUpdateBtn();
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '操作成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+            } else {
+                await channelCreate({
+                    appUid: updateBtn.appUid,
+                    name: `${updateBtn.name}-网页`,
+                    publishUid: updateBtn.uid,
+                    type: 2,
+                    status: 1
+                });
+                getUpdateBtn();
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '操作成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+            }
+        }
     };
     //创建站点确认
     const createSite = async () => {
@@ -309,6 +350,18 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         newValue.channelMap[3] = data;
         setUpdateBtn(newValue);
     };
+
+    // 修改启用禁用的值
+    useEffect(() => {
+        if (updateBtn?.channelMap?.[2]?.length > 0) {
+            const newValue = _.cloneDeep(upLoadList);
+            newValue[0].enableValue = updateBtn?.channelMap?.[2]?.[0]?.status === 1 ? false : true;
+            setUpLoadList(newValue);
+        }
+    }, [updateBtn]);
+
+    console.log(upLoadList, 'uploadList');
+
     return (
         <Box>
             <SubCard
@@ -512,7 +565,16 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         {item.title}
                                         {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
                                     </Typography>
-                                    <div>{item.enable && <Switch size={'small'} color={'secondary'} />}</div>
+                                    <div>
+                                        {item.enable && (
+                                            <Switch
+                                                size={'small'}
+                                                color={'secondary'}
+                                                checked={item.enableValue}
+                                                onChange={() => handleSwitch(item)}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                                 <Typography margin="10px 0 10px" height="32px" lineHeight="16px" color="#9da3af">
                                     {item.desc}
@@ -663,7 +725,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
-            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} />
+            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={updateBtn?.channelMap?.[2]?.[0].uid || ''} />
         </Box>
     );
 }

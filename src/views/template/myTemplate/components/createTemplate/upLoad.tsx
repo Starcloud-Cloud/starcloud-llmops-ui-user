@@ -41,15 +41,17 @@ import CreateSiteModal from './components/CreateSiteModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
 import DomainModal from './components/DomainModal';
 import _ from 'lodash-es';
+import CopySiteModal from './components/CopySiteModal';
 function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
     const [openCreateSite, setOpenCreateSite] = useState(false);
     const [siteName, setSiteName] = useState('');
     const [openDrawer, setOpenDrawer] = useState(false);
     const [openDomain, setOpenDomain] = useState(false);
+    const [openCopySite, setOpenCopySite] = useState(false);
 
     const IconList: { [key: string]: any } = {
-        monitor: <Monitor />,
-        code: <Code />,
+        monitor: <Monitor color="secondary" />,
+        code: <Code color="secondary" />,
         api: <Api />,
         cloudUploadOutlined: <CloudUploadOutlined sx={{ fontSize: '12px' }} />,
         historyOutlined: <HistoryOutlined sx={{ fontSize: '12px' }} />,
@@ -63,7 +65,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             enable: true,
             comingSoon: false,
             action: [
-                { title: '复制链接', icon: 'contentPaste', isCopy: true },
+                { title: '复制链接', icon: 'contentPaste', onclick: () => setOpenCopySite(true) },
                 { title: '预览体验', icon: 'historyOutlined', onclick: () => window.open('/chat-bot') },
                 { title: '域名部署', icon: 'historyOutlined', onclick: () => setOpenDomain(true) }
             ]
@@ -363,12 +365,12 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 width="40px"
                                 height="40px"
                                 borderRadius="50%"
-                                sx={{ background: '#673ab74f' }}
+                                sx={mode === 'CHAT' ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
                                 display="flex"
                                 alignItems="center"
                                 justifyContent="center"
                             >
-                                <Storefront color="secondary" />
+                                {mode === 'CHAT' ? <Storefront /> : <Storefront color={'secondary'} />}
                             </Box>
                         </Box>
                         {mode === 'CHAT' ? (
@@ -496,7 +498,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     width="40px"
                                     height="40px"
                                     borderRadius="50%"
-                                    sx={{ background: '#f2f3f5' }}
+                                    sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
                                     display="flex"
                                     alignItems="center"
                                     justifyContent="center"
@@ -516,59 +518,25 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     {item.desc}
                                 </Typography>
                                 <Box display="flex">
-                                    {item.action.map((el: any, i) =>
-                                        el?.isCopy ? (
-                                            <CopyToClipboard
-                                                text={`${window.location.origin}/chat-bot`}
-                                                onCopy={() =>
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '复制成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                            transition: 'SlideLeft'
-                                                        })
-                                                    )
-                                                }
-                                            >
-                                                <Box
-                                                    key={i}
-                                                    color="#b5bed0"
-                                                    fontSize="12px"
-                                                    display="flex"
-                                                    alignItems="center"
-                                                    mr={2}
-                                                    className={`${!item.comingSoon ? 'cursor-pointer hover:text-purple-500' : ''}`}
-                                                >
-                                                    {IconList[el.icon]}
-                                                    &nbsp;&nbsp; {el.title}
-                                                </Box>
-                                            </CopyToClipboard>
-                                        ) : (
-                                            <Box
-                                                key={i}
-                                                color="#b5bed0"
-                                                fontSize="12px"
-                                                display="flex"
-                                                alignItems="center"
-                                                mr={2}
-                                                onClick={() => {
-                                                    if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
-                                                }}
-                                                className={`${
-                                                    !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
-                                                }`}
-                                            >
-                                                {IconList[el.icon]}
-                                                &nbsp;&nbsp; {el.title}
-                                            </Box>
-                                        )
-                                    )}
+                                    {item.action.map((el: any, i) => (
+                                        <Box
+                                            key={i}
+                                            color="#b5bed0"
+                                            fontSize="12px"
+                                            display="flex"
+                                            alignItems="center"
+                                            mr={2}
+                                            onClick={() => {
+                                                if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
+                                            }}
+                                            className={`${
+                                                !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
+                                            }`}
+                                        >
+                                            {IconList[el.icon]}
+                                            &nbsp;&nbsp; {el.title}
+                                        </Box>
+                                    ))}
                                 </Box>
                             </Box>
                         </SubCard>
@@ -689,6 +657,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 <SiteDrawerCode codeList={updateBtn.channelMap[3]} open={openDrawer} setOpen={setOpenDrawer} setCodeValue={setCodeValue} />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
+            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} />
         </Box>
     );
 }

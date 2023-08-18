@@ -74,6 +74,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             title: 'API调用',
             icon: 'api',
             desc: '通过API，可直接进行调用或发出请求',
+            enable: false,
             comingSoon: true,
             action: [
                 { title: '接口秘钥', icon: 'cloudUploadOutlined' },
@@ -303,10 +304,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             } else {
                 await channelCreate({
                     appUid: updateBtn.appUid,
-                    name: `${updateBtn.name}-网页`,
+                    name: `${updateBtn.name}-网页分享`,
                     publishUid: updateBtn.uid,
                     type: 2,
-                    status: 1
+                    status: 0
                 });
                 getUpdateBtn();
                 dispatch(
@@ -574,6 +575,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     <div>
                                         {item.enable && (
                                             <Switch
+                                                disabled={updateBtn.isFirstCreatePublishRecord}
                                                 size={'small'}
                                                 color={'secondary'}
                                                 checked={item.enableValue}
@@ -586,25 +588,43 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     {item.desc}
                                 </Typography>
                                 <Box display="flex">
-                                    {item.action.map((el: any, i) => (
-                                        <Box
-                                            key={i}
-                                            color="#b5bed0"
-                                            fontSize="12px"
-                                            display="flex"
-                                            alignItems="center"
-                                            mr={2}
-                                            onClick={() => {
-                                                if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
-                                            }}
-                                            className={`${
-                                                !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
-                                            }`}
-                                        >
-                                            {IconList[el.icon]}
-                                            &nbsp;&nbsp; {el.title}
-                                        </Box>
-                                    ))}
+                                    {item.action.map((el: any, i) =>
+                                        item.type === 2 ? (
+                                            <Box
+                                                key={i}
+                                                color="#b5bed0"
+                                                fontSize="12px"
+                                                display="flex"
+                                                alignItems="center"
+                                                mr={2}
+                                                onClick={() => {
+                                                    if (item.enableValue) el.onclick();
+                                                }}
+                                                className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                            >
+                                                {IconList[el.icon]}
+                                                &nbsp;&nbsp; {el.title}
+                                            </Box>
+                                        ) : (
+                                            <Box
+                                                key={i}
+                                                color="#b5bed0"
+                                                fontSize="12px"
+                                                display="flex"
+                                                alignItems="center"
+                                                mr={2}
+                                                onClick={() => {
+                                                    if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
+                                                }}
+                                                className={`${
+                                                    !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
+                                                }`}
+                                            >
+                                                {IconList[el.icon]}
+                                                &nbsp;&nbsp; {el.title}
+                                            </Box>
+                                        )
+                                    )}
                                 </Box>
                             </Box>
                         </SubCard>

@@ -72,7 +72,17 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
-export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo; mode?: 'iframe' | 'test'; mediumUid?: string }) => {
+export const Chat = ({
+    chatBotInfo,
+    mode,
+    mediumUid,
+    statisticsMode
+}: {
+    chatBotInfo: IChatInfo;
+    mode?: 'iframe' | 'test';
+    mediumUid?: string;
+    statisticsMode?: string;
+}) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -307,7 +317,7 @@ export const Chat = ({ chatBotInfo, mode, mediumUid }: { chatBotInfo: IChatInfo;
             let resp: any;
             if (mode === 'iframe') {
                 resp = await shareMessageSSE({
-                    scene: 'SHARE_WEB',
+                    scene: statisticsMode,
                     query: message,
                     mediumUid,
                     conversationUid: jsCookie.get('conversationUid')

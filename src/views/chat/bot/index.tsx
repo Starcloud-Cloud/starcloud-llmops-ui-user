@@ -16,11 +16,11 @@ const chatBot = () => {
     const statisticsMode = useMemo(() => {
         switch (extractedPart) {
             case 'cb_i':
-                return 'chat';
+                return 'SHARE_IFRAME';
             case 'cb_js':
-                return 'chatbot';
+                return 'SHARE_JS';
             case 'cb_web':
-                return 'chatbot-iframe';
+                return 'SHARE_WEB';
             default:
                 return '';
         }
@@ -54,7 +54,7 @@ const chatBot = () => {
 
     return (
         <div className="h-[100vh]">
-            <Chat chatBotInfo={chatBotInfo} mode={'iframe'} mediumUid={mediumUid} />
+            <Chat chatBotInfo={chatBotInfo} mode={'iframe'} mediumUid={mediumUid} statisticsMode={statisticsMode} />
         </div>
     );
 };

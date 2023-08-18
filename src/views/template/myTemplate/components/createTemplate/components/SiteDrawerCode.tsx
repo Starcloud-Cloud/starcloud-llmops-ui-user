@@ -1,9 +1,10 @@
 import { Button, Divider, Drawer, TextField, Accordion, AccordionSummary, Typography, AccordionDetails } from '@mui/material';
+import { Popconfirm, ConfigProvider } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import ChatMarkdown from 'ui-component/Markdown';
 import cheerio from 'cheerio';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { channelUpload } from 'api/template';
+import { channelUpload, channelDelete } from 'api/template';
 import ReactMarkdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -33,6 +34,13 @@ export const SiteDrawerCode = ({
     useEffect(() => {
         codeRef.current = _.cloneDeep(codeList);
     }, [codeList]);
+    //删除
+    const handleDel = async (data: any) => {
+        if (data.name) {
+            const { name, uid } = data;
+            await channelDelete({ uid, name });
+        }
+    };
     //更新
     const handleUpload = async (data: any) => {
         if (data.name) {
@@ -71,8 +79,8 @@ header.appendChild(st);
             <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
                 <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg p-[20px]">
                     <div className="text-lg">我的站点</div>
-                    {codeRef.current?.map((item: any, index: number) => (
-                        <Accordion expanded={expanded === index} onChange={handleChange(index)}>
+                    {codeList?.map((item: any, index: number) => (
+                        <Accordion key={index} expanded={expanded === index} onChange={handleChange(index)}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                 <Typography fontSize="14px" fontWeight="500">
                                     站点{index + 1}：{item.name}
@@ -235,9 +243,30 @@ header.appendChild(st);
                                     </div>
                                     <Divider className="my-[20px]" />
                                     <div className="flex items-center justify-end">
-                                        <Button color={'error'} size={'small'} variant="contained">
-                                            删除
-                                        </Button>
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Popconfirm: {
+                                                        zIndexPopup: 9999
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Popconfirm
+                                                placement="top"
+                                                title="请再次确认是否通过这次审查"
+                                                onConfirm={(item) => {
+                                                    handleDel(item);
+                                                }}
+                                                okText="Yes"
+                                                cancelText="No"
+                                            >
+                                                <Button color={'error'} size={'small'} variant="contained">
+                                                    删除
+                                                </Button>
+                                            </Popconfirm>
+                                        </ConfigProvider>
+
                                         <Button
                                             onClick={() => {
                                                 handleUpload(item);

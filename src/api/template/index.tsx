@@ -117,3 +117,7 @@ export const channelCreate = (data: any) => {
 export const channelUpload = (data: any) => {
     return request.post({ url: `/llm/app/publish/channel/modify`, data });
 };
+// 删除站点
+export const channelDelete = (data: any) => {
+    return request.post({ url: `/llm/app/publish/channel/delete`, data });
+};

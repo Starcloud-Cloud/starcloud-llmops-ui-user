@@ -557,8 +557,12 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 display="flex"
                                                 alignItems="center"
                                                 mr={2}
-                                                onClick={el.onclick}
-                                                className={`${!item.comingSoon ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                onClick={() => {
+                                                    if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
+                                                }}
+                                                className={`${
+                                                    !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
+                                                }`}
                                             >
                                                 {IconList[el.icon]}
                                                 &nbsp;&nbsp; {el.title}
@@ -681,7 +685,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 setValue={setSiteName}
                 handleOk={createSite}
             />
-            {openDrawer && (
+            {openDrawer && updateBtn.channelMap && (
                 <SiteDrawerCode codeList={updateBtn.channelMap[3]} open={openDrawer} setOpen={setOpenDrawer} setCodeValue={setCodeValue} />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

@@ -94,7 +94,6 @@ type IPictureCreateMenuProps = {
     setSamples: (samples: number) => void;
     inputValue: string;
     setInputValue: (inputValue: string) => void;
-    conversationId: string;
     setIsFirst: (flag: boolean) => void;
     setIsFetch: (flag: boolean) => void;
     inputValueTranslate: boolean;
@@ -170,7 +169,6 @@ export const PictureCreateMenu = ({
     setSamples,
     inputValue,
     setInputValue,
-    conversationId,
     setIsFirst,
     setIsFetch,
     setInputValueTranslate,
@@ -335,8 +333,7 @@ export const PictureCreateMenu = ({
 
         try {
             const res = await createText2Img({
-                conversationUid: conversationId,
-                scene: 'IMAGE',
+                scene: 'WEB_IMAGE',
                 appUid: 'BASE_GENERATE_IMAGE',
                 imageRequest: removeFalseProperties(imageRequest)
             });

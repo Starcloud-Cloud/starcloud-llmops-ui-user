@@ -725,7 +725,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
-            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={updateBtn?.channelMap?.[2]?.[0].uid || ''} />
+            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={updateBtn?.channelMap?.[2]?.[0]?.uid || ''} />
         </Box>
     );
 }

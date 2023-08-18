@@ -1,4 +1,15 @@
-import { Button, Divider, Drawer, TextField, Accordion, AccordionSummary, Typography, AccordionDetails } from '@mui/material';
+import {
+    Button,
+    Divider,
+    Drawer,
+    TextField,
+    Accordion,
+    AccordionSummary,
+    Typography,
+    AccordionDetails,
+    FormControlLabel,
+    Switch
+} from '@mui/material';
 import { Popconfirm, ConfigProvider } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -18,12 +29,14 @@ export const SiteDrawerCode = ({
     open,
     codeList,
     setOpen,
-    setCodeValue
+    setCodeValue,
+    getUpdateBtn
 }: {
     open: boolean;
     codeList: any[];
     setOpen: (open: boolean) => void;
     setCodeValue: (data: any) => void;
+    getUpdateBtn: () => void;
 }) => {
     const onClose = () => setOpen(false);
     const [expanded, setExpanded] = React.useState<number | false>(false);
@@ -36,16 +49,38 @@ export const SiteDrawerCode = ({
     }, [codeList]);
     //删除
     const handleDel = async (data: any) => {
-        if (data.name) {
-            const { name, uid } = data;
-            await channelDelete({ uid, name });
-        }
+        const { uid } = data;
+        await channelDelete({ uid });
+        getUpdateBtn();
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '删除成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
     };
     //更新
     const handleUpload = async (data: any) => {
         if (data.name) {
-            const { name, uid } = data;
-            await channelUpload({ uid, name });
+            const { name, uid, status } = data;
+            await channelUpload({ uid, name, status });
+            getUpdateBtn();
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '更新成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
         }
     };
     const HTML_CODE = ` 
@@ -105,6 +140,23 @@ header.appendChild(st);
                                             codeRef.current = newValue;
                                             setCodeValue(newValue);
                                         }}
+                                    />
+                                    {item.status}
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                name="status"
+                                                checked={item.status}
+                                                onChange={(e) => {
+                                                    const { name } = e.target;
+                                                    const newValue = _.cloneDeep(codeRef.current);
+                                                    newValue[index][name] = !newValue[index][name];
+                                                    codeRef.current = newValue;
+                                                    setCodeValue(newValue);
+                                                }}
+                                            />
+                                        }
+                                        label="启用"
                                     />
                                     <div className="text-base mt-5">JS代码</div>
                                     <div className="text-sm mt-2 mb-1">机器人代码，请将此 iframe 添加到您的 html 代码中</div>
@@ -255,7 +307,7 @@ header.appendChild(st);
                                             <Popconfirm
                                                 placement="top"
                                                 title="请再次确认是否通过这次审查"
-                                                onConfirm={(item) => {
+                                                onConfirm={() => {
                                                     handleDel(item);
                                                 }}
                                                 okText="Yes"
@@ -266,7 +318,6 @@ header.appendChild(st);
                                                 </Button>
                                             </Popconfirm>
                                         </ConfigProvider>
-
                                         <Button
                                             onClick={() => {
                                                 handleUpload(item);

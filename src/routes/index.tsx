@@ -28,7 +28,7 @@ export default function ThemeRoutes() {
         { path: '/cb_web/:mediumUid', element: <PagesChatBot /> },
         AuthenticationRoutes,
         LoginRoutes,
-        MainRoutes,
-        { path: '*', element: <PageNotFound /> }
+        MainRoutes
+        // { path: '*', element: <PageNotFound /> }
     ]);
 }

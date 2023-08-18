@@ -99,12 +99,23 @@ frameborder="0">
 `;
     };
 
+    const HTML_CODE_COPY = (name: string, uid: string) => {
+        return ` 
+<iframe
+src="${window.location.origin}/cb_i/${uid}?source=${name}"
+width="408px"
+height="594px"
+frameborder="0">
+</iframe>
+`;
+    };
+
     const JS_CODE = (name: string, uid: string) => `
 \`\`\`
 <script>
-window.tip_chato_color="#fff";
-window.tip_chato_bg="#4C83F3";
-window.chato_iframe_src = "${window.location.origin}/cb_js/${uid}?source=${name}";
+window.tip_mofaai_color="#fff";
+window.tip_mofaai_bg="#4C83F3";
+window.mofaai_iframe_src = "${window.location.origin}/cb_js/${uid}?source=${name}";
 var st = document.createElement("script");
 st.type="text/javascript";
 st.async = true;st.src = "${insertScript}";
@@ -113,10 +124,24 @@ header.appendChild(st);
 </script>
 \`\`\`
 `;
+
+    const JS_CODE_COPY = (name: string, uid: string) => `
+<script>
+window.tip_mofaai_color="#fff";
+window.tip_mofaai_bg="#4C83F3";
+window.mofaai_iframe_src = "${window.location.origin}/cb_js/${uid}?source=${name}";
+var st = document.createElement("script");
+st.type="text/javascript";
+st.async = true;st.src = "${insertScript}";
+var header = document.getElementsByTagName("head")[0];
+header.appendChild(st);
+</script>
+`;
+
     return (
         <Drawer anchor="right" open={open} sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }} onClose={onClose}>
             <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
-                <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg p-[20px]">
+                <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg p-[20px] overflow-auto">
                     <div className="text-lg">我的站点</div>
                     {codeList?.map((item: any, index: number) => (
                         <Accordion key={index} expanded={expanded === index} onChange={handleChange(index)}>
@@ -164,9 +189,9 @@ header.appendChild(st);
                                     <div className="text-base mt-5">JS代码</div>
                                     <div className="text-sm mt-2 mb-1">机器人代码，请将此 iframe 添加到您的 html 代码中</div>
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                        <span>javascript</span>
+                                        <span>html</span>
                                         <CopyToClipboard
-                                            text={HTML_CODE(item.name, item.mediumUid)}
+                                            text={HTML_CODE_COPY(item.name, item.mediumUid)}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -233,7 +258,7 @@ header.appendChild(st);
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                         <span>javascript</span>
                                         <CopyToClipboard
-                                            text={JS_CODE(item.name, item.mediumUid)}
+                                            text={JS_CODE_COPY(item.name, item.mediumUid)}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({

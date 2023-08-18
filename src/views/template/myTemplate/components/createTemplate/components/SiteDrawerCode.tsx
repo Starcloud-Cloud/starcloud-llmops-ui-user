@@ -83,11 +83,14 @@ export const SiteDrawerCode = ({
             );
         }
     };
-    const HTML_CODE = (name: string) => {
+
+    const insertScript = `${window.location.origin}/iframe.js`;
+
+    const HTML_CODE = (name: string, uid: string) => {
         return ` 
 \`\`\`
 <iframe
-src="https://chato.cn/b/p8eldrk02m95nky0?source=${name}"
+src="${window.location.origin}/cb_i/${uid}?source=${name}"
 width="408px"
 height="594px"
 frameborder="0">
@@ -96,16 +99,15 @@ frameborder="0">
 `;
     };
 
-    const JS_CODE = `
+    const JS_CODE = (name: string, uid: string) => `
 \`\`\`
 <script>
 window.tip_chato_color="#fff";
 window.tip_chato_bg="#4C83F3";
-window.chato_iframe_src = "https://chato.cn/b/p8eldrk02m95nky0?source=1234jh";
-window.chato_script_checkDomain = "https://api.chato.cn/chato/api/v1/domains/p8eldrk02m95nky0/whitelist_sites/check";
+window.chato_iframe_src = "${window.location.origin}/cb_js/${uid}?source=${name}";
 var st = document.createElement("script");
 st.type="text/javascript";
-st.async = true;st.src = "https://chato.cn/assets/iframe.min.js";
+st.async = true;st.src = "${insertScript}";
 var header = document.getElementsByTagName("head")[0];
 header.appendChild(st);
 </script>
@@ -164,7 +166,7 @@ header.appendChild(st);
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                         <span>javascript</span>
                                         <CopyToClipboard
-                                            text={HTML_CODE(item.name)}
+                                            text={HTML_CODE(item.name, item.mediumUid)}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -224,14 +226,14 @@ header.appendChild(st);
                                                 }
                                             }}
                                         >
-                                            {HTML_CODE(item.name)}
+                                            {HTML_CODE(item.name, item.mediumUid)}
                                         </ReactMarkdown>
                                     </div>
                                     <div className="text-sm mt-3 mb-1">添加聊天气泡，请复制添加到您的 html中</div>
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                         <span>javascript</span>
                                         <CopyToClipboard
-                                            text={JS_CODE}
+                                            text={JS_CODE(item.name, item.mediumUid)}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -291,7 +293,7 @@ header.appendChild(st);
                                                 }
                                             }}
                                         >
-                                            {JS_CODE}
+                                            {JS_CODE(item.name, item.mediumUid)}
                                         </ReactMarkdown>
                                     </div>
                                     <Divider className="my-[20px]" />

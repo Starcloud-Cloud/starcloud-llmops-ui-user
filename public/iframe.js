@@ -1,7 +1,7 @@
 window.onload = function () {
-    if (window.location.href.includes('/chat-bot/iframe')) {
-        return; // Don't inject the widget
-    }
+    // if (window.location.href.includes('/chat-bot/iframe')) {
+    //     return; // Don't inject the widget
+    // }
 
     function init() {
         var e = document.createElement('div'),

@@ -1,11 +1,31 @@
 import { getChatDetail } from 'api/chat/share';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { IChatInfo } from 'views/template/myChat/createChat';
 import { Chat } from 'views/template/myChat/createChat/components/Chat';
 import { useParams } from 'react-router-dom';
 
 const chatBot = () => {
-    const { mode, mediumUid } = useParams(); // 获取
+    const { mediumUid } = useParams(); // 获取
+
+    const url = window.location.href;
+    const pattern = /\/([^/]+)\/[^/]+$/;
+    const match = url.match(pattern);
+
+    const extractedPart = (match && match[1]) || '';
+
+    const statisticsMode = useMemo(() => {
+        switch (extractedPart) {
+            case 'cb_i':
+                return 'chat';
+            case 'cb_js':
+                return 'chatbot';
+            case 'cb_web':
+                return 'chatbot-iframe';
+            default:
+                return '';
+        }
+    }, [extractedPart]);
+
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });

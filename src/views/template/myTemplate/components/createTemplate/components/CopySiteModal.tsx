@@ -29,6 +29,8 @@ export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; s
         }
     };
 
+    const URL = `${window.location.origin}/cb_web/${uid}`;
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -53,9 +55,9 @@ export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; s
                             <div>
                                 <div className="text-lg">复制链接</div>
                                 <div className="text-base">
-                                    <span className="text-base">{`${window.location.origin}/chat-bot/iframe/${uid}`}</span>
+                                    <span className="text-base">{URL}</span>
                                     <CopyToClipboard
-                                        text={`${window.location.origin}/chat-bot/iframe/${uid}`}
+                                        text={URL}
                                         onCopy={() =>
                                             dispatch(
                                                 openSnackbar({
@@ -80,7 +82,7 @@ export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; s
                             <div id="qrCode">
                                 <div className="text-lg mt-1">二维码</div>
                                 <div className="text-base items-center flex">
-                                    <QRCode value={`${window.location.origin}/chat-bot/iframe/${uid}`} />
+                                    <QRCode value={URL} />
                                     <span className="text-[#5e35b1] cursor-pointer text-base ml-3" onClick={downloadQRCode}>
                                         保存
                                     </span>

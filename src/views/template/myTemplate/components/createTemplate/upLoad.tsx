@@ -32,7 +32,7 @@ import {
     Monitor,
     Api
 } from '@mui/icons-material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
 import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate } from 'api/template';
@@ -55,7 +55,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             type: 2,
             action: [
                 { title: '复制链接', icon: 'contentPaste', onclick: () => setOpenCopySite(true) },
-                { title: '预览体验', icon: 'historyOutlined', onclick: () => window.open('/chat-bot') },
+                { title: '预览体验', icon: 'historyOutlined', onclick: () => handleOpenWeb() },
                 { title: '域名部署', icon: 'historyOutlined', onclick: () => setOpenDomain(true) }
             ]
         },
@@ -88,6 +88,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const [openDomain, setOpenDomain] = useState(false);
     const [openCopySite, setOpenCopySite] = useState(false);
     const [upLoadList, setUpLoadList] = useState(defaultUpLoadList);
+    const [webMediumUid, setWebMediumUid] = useState('');
+    const webMediumUidRef = useRef();
 
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
@@ -357,10 +359,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             const newValue = _.cloneDeep(upLoadList);
             newValue[0].enableValue = updateBtn?.channelMap?.[2]?.[0]?.status === 1 ? false : true;
             setUpLoadList(newValue);
+            setWebMediumUid(updateBtn?.channelMap?.[2]?.[0]?.mediumUid);
+            webMediumUidRef.current = updateBtn?.channelMap?.[2]?.[0]?.mediumUid;
         }
     }, [updateBtn]);
 
-    console.log(upLoadList, 'uploadList');
+    const handleOpenWeb = () => {
+        window.open(`/cb_web/${webMediumUidRef.current}`);
+    };
 
     return (
         <Box>
@@ -725,7 +731,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
-            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={updateBtn?.channelMap?.[2]?.[0]?.uid || ''} />
+            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} />
         </Box>
     );
 }

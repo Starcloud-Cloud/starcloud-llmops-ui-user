@@ -41,6 +41,10 @@ export const del = (uid: string) => {
 export const logStatistics = (data: any) => {
     return request.post({ url: '/llm/app/log/statistics', data });
 };
+//执行记录echart
+export const statisticsByAppUid = (data: any) => {
+    return request.post({ url: '/llm/app/log/statisticsByAppUid', data });
+};
 //获取时间
 export const logMetaData = (data: string) => {
     return request.get({ url: `/llm/app/log/logMetaData/${data}` });
@@ -49,10 +53,15 @@ export const logMetaData = (data: string) => {
 export const infoPage = (data: any) => {
     return request.post({ url: 'llm/app/log/infoPage', data });
 };
+//执行记录列表
+export const infoPageByAppUid = (data: any) => {
+    return request.post({ url: 'llm/app/log/infoPageByAppUid', data });
+};
 //执行记录图片详情
 export const detailImage = (data: any) => {
     return request.post({ url: 'llm/app/log/detail/image', data });
 };
+
 //执行记录执行详情
 export const detailApp = (data: any) => {
     return request.post({ url: 'llm/app/log/detail/app', data });

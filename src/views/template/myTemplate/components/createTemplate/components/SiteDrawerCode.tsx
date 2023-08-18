@@ -68,7 +68,7 @@ export const SiteDrawerCode = ({
     const handleUpload = async (data: any) => {
         if (data.name) {
             const { name, uid, status } = data;
-            await channelUpload({ uid, name, status });
+            await channelUpload({ uid, name, status: status ? 1 : 0 });
             getUpdateBtn();
             dispatch(
                 openSnackbar({

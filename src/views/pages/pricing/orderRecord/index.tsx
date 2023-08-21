@@ -248,6 +248,7 @@ const Record: React.FC = () => {
             getOrderIsPay({ orderId: id }).then((isPayRes) => {
                 if (isPayRes) {
                     handleClose();
+                    clearInterval(interval);
                     setOpenPayDialog(true);
                     setTimeout(() => {
                         setOpenPayDialog(false);
@@ -337,7 +338,7 @@ const Record: React.FC = () => {
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
                                 <Typography variant="h5" component="span">
-                                    支付成功，3S后跳转至订单记录页...
+                                    支付成功，3S后自动关闭弹窗...
                                 </Typography>
                             </DialogContentText>
                         </DialogContent>

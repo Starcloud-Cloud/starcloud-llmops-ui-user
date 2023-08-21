@@ -13,10 +13,13 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    OutlinedInput,
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Popover, Radio, Tag } from 'antd';
+import { Popover, Radio, Tag, Button as AntButton } from 'antd';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -39,8 +42,28 @@ import FooterSection from '../landing/FooterSection';
 import { SectionWrapper } from '../landing/index';
 import { PayModal } from './PayModal';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 
-const plans = [
+import 'swiper/css';
+import 'swiper/css/pagination';
+import AddIcon from '@mui/icons-material/Add';
+import copy from 'clipboard-copy';
+
+const recommendList = [
+    {
+        title: '跨境人'
+    },
+    {
+        title: '跨境人'
+    },
+    {
+        title: '跨境人'
+    },
+    { title: '跨境人' }
+];
+
+const plansDefault = [
     {
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
@@ -73,7 +96,8 @@ const plans = [
         permission: [0, 1, 2, 3, 4, 5, 6],
         btnText: '立即购买',
         monthCode: 'pro_month',
-        yearCode: 'pro_year'
+        yearCode: 'pro_year',
+        count: 5
     },
     {
         active: false,
@@ -137,6 +161,8 @@ const Price1 = () => {
 
     const [openDialog, setOpenDialog] = useState(false);
     const [openPayDialog, setOpenPayDialog] = useState(false);
+    const [swiperRef, setSwiperRef] = useState<any>(null);
+    const [plans, setPlans] = useState(plansDefault);
 
     const priceListDisable = {
         opacity: '0.4',
@@ -357,6 +383,43 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 <Typography variant="body2">{plan.description}</Typography>
                                             </Grid>
+                                            {index === 2 && (
+                                                <Grid xs={12}>
+                                                    <div className="flex justify-center items-center">
+                                                        <AntButton
+                                                            type="primary"
+                                                            icon={<HorizontalRuleIcon />}
+                                                            onClick={() => {
+                                                                const copyPlans = [...plans];
+                                                                if (copyPlans[index].count === 5) return;
+                                                                copyPlans[index].count = (plan.count || 0) - 1;
+                                                                setPlans(copyPlans);
+                                                            }}
+                                                        />
+                                                        <OutlinedInput
+                                                            className="mx-2"
+                                                            placeholder="Please enter text"
+                                                            size={'small'}
+                                                            type={'number'}
+                                                            value={plan.count}
+                                                            onChange={(e) => {
+                                                                const copyPlans = [...plans];
+                                                                copyPlans[index].count = Number(e.target.value);
+                                                                setPlans(copyPlans);
+                                                            }}
+                                                        />
+                                                        <AntButton
+                                                            type="primary"
+                                                            icon={<AddIcon />}
+                                                            onClick={() => {
+                                                                const copyPlans = [...plans];
+                                                                copyPlans[index].count = (plan.count || 0) + 1;
+                                                                setPlans(copyPlans);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </Grid>
+                                            )}
                                             <Grid item xs={12}>
                                                 <Typography
                                                     component="div"
@@ -441,6 +504,67 @@ const Price1 = () => {
                         })}
                     </Grid>
                     <div className="flex justify-center text-xs mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
+                    <div>
+                        <div className="text-2xl font-semibold w-full text-center my-[20px]">跨境人和团队选择 mofaai</div>
+                        <div className="flex justify-end">
+                            <AntButton
+                                icon={<KeyboardBackspaceIcon className="text-white" />}
+                                type="primary"
+                                shape="circle"
+                                onClick={() => {
+                                    swiperRef?.slidePrev();
+                                }}
+                            />
+                            <AntButton
+                                style={{ marginLeft: '10px' }}
+                                icon={<ArrowForwardIcon className="text-white" />}
+                                type="primary"
+                                shape="circle"
+                                onClick={() => {
+                                    swiperRef?.slideNext();
+                                }}
+                            />
+                        </div>
+                        <div className="mt-[20px]">
+                            <Swiper
+                                onSwiper={(swiper) => setSwiperRef(swiper)}
+                                slidesPerView={4}
+                                spaceBetween={30}
+                                centeredSlides={true}
+                                loop
+                                modules={[]}
+                                className="mySwiper"
+                                autoplay
+                            >
+                                <SwiperSlide>
+                                    <div className="!bg-white rounded-2xl p-5 space-y-2.5 border border-neutral-100">
+                                        <div className="flex items-center gap-2">
+                                            <div>
+                                                <img src="/assets/avatar-pricing-case-8-01b15496.png" className="rounded-full w-9 h-9" />
+                                            </div>
+                                            <div className="text-xs font-semibold">某精铺大卖CEO</div>
+                                        </div>
+                                        <div className="font-semibold leading-7">
+                                            “kua.ai 在选品方面跟传统选品工具是不一样的，传统选品是BI,
+                                            是纯粹的数据逻辑。AI则更多能贡献欧美当地的风土人情，用户习惯，习俗禁忌，更像是一个
+                                            <span className="text-violet-500">选品顾问</span>。kua.ai的一些选品功能我用过，还是能
+                                            <span className="text-carnation">拓宽思路</span>，很多
+                                            <span className="text-carnation">小众品选</span>
+                                            出来我们也觉得脑洞大开。有尝试乃至开模的价值的。”
+                                        </div>
+                                    </div>
+                                </SwiperSlide>
+                                <SwiperSlide>Slide 2</SwiperSlide>
+                                <SwiperSlide>Slide 3</SwiperSlide>
+                                <SwiperSlide>Slide 4</SwiperSlide>
+                                <SwiperSlide>Slide 5</SwiperSlide>
+                                <SwiperSlide>Slide 6</SwiperSlide>
+                                <SwiperSlide>Slide 7</SwiperSlide>
+                                <SwiperSlide>Slide 8</SwiperSlide>
+                                <SwiperSlide>Slide 9</SwiperSlide>
+                            </Swiper>
+                        </div>
+                    </div>
                 </div>
             </div>
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>

@@ -5,6 +5,7 @@ import redBook from 'assets/images/landing/red-book-qrcode.png';
 import MainCard from 'ui-component/cards/MainCard';
 import { Popover } from 'antd';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
+import sph from 'assets/images/pages/sph.jpg';
 
 interface ShareProps {
     open: boolean;
@@ -14,9 +15,10 @@ interface ShareProps {
 const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
     const socialPlatforms = [
         {
-            name: '官方小红书账号',
-            link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
-            image: redBook
+            name: '视频号',
+            // link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
+            link: '',
+            image: sph
         },
         {
             name: '官方抖音账号',

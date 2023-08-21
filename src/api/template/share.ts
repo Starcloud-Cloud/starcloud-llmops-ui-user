@@ -6,6 +6,6 @@ export const appDetail = (data: any) => {
     return request.get({ url: `/share/app/detail/${data}` });
 };
 //分享执行
-export const shareMessageSSE = (data: any) => {
-    return fetch('/share/chat/conversation', 'post', data);
+export const appExecute = (data: any) => {
+    return fetch('/share/app/execute', 'post', data);
 };

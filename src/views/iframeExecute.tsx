@@ -2,8 +2,7 @@ import Perform from './template/carryOut/perform';
 import { Card, Box, Chip, Divider, Typography } from '@mui/material';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
-import { executeApp } from 'api/template/fetch';
-import { appDetail } from 'api/template/share';
+import { appDetail, appExecute } from 'api/template/share';
 
 import _ from 'lodash-es';
 import { t } from 'hooks/web/useI18n';
@@ -118,7 +117,7 @@ const IframeExecute = () => {
             setLoadings(value);
         }
         const fetchData = async () => {
-            let resp: any = await executeApp({
+            let resp: any = await appExecute({
                 scene: statisticsMode,
                 mediumUid: params.mediumUid,
                 stepId: stepId,

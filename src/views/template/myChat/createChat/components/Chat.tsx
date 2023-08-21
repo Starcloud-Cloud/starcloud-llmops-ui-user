@@ -7,12 +7,15 @@ import {
     Card,
     CardContent,
     Divider,
+    FormControl,
     Grid,
     IconButton,
     InputAdornment,
+    InputLabel,
     Menu,
     MenuItem,
     OutlinedInput,
+    Select,
     Tooltip,
     Typography,
     useMediaQuery,
@@ -76,12 +79,14 @@ export const Chat = ({
     chatBotInfo,
     mode,
     mediumUid,
-    statisticsMode
+    statisticsMode,
+    showSelect
 }: {
     chatBotInfo: IChatInfo;
     mode?: 'iframe' | 'test';
     mediumUid?: string;
     statisticsMode?: string;
+    showSelect?: boolean;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -444,11 +449,47 @@ export const Chat = ({
 
     return (
         <div>
-            <div className={'flex justify-center items-center py-[8px]'}>
-                <div className="w-[28px] h-[28px] flex justify-center items-center">
-                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+            <div className={`flex items-center p-[8px] ${showSelect ? 'justify-between' : 'justify-center'}`}>
+                {showSelect && (
+                    <FormControl
+                        sx={{
+                            width: '150px',
+                            '& .Mui-focused': {
+                                background: '#f8fafc',
+                                paddingRight: '2px'
+                            },
+                            '& .MuiInputLabel-sizeSmall': {
+                                background: '#f8fafc',
+                                paddingRight: '2px'
+                            }
+                        }}
+                    >
+                        <InputLabel size="small" id="age-select">
+                            机器人
+                        </InputLabel>
+                        <Select
+                            style={{ width: '100px' }}
+                            size="small"
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={''}
+                            label="Age"
+                            onChange={(e) => {
+                                console.log(e.target.value);
+                            }}
+                        >
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                        </Select>
+                    </FormControl>
+                )}
+                <div className="flex items-center justify-center">
+                    <div className="w-[28px] h-[28px] flex justify-center items-center">
+                        <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                    </div>
+                    <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
                 </div>
-                <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                {showSelect && <div className={'w-[100px]'} />}
             </div>
             <Divider variant={'fullWidth'} />
             <div className={'max-w-[768px] m-auto'}>

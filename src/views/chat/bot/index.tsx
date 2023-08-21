@@ -29,6 +29,17 @@ const chatBot = () => {
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
+    const [mUid, setMUid] = useState('');
+    useEffect(() => {
+        if (mediumUid) {
+            const result = mediumUid?.split('|');
+            if (result.length > 1) {
+                setMUid(result[0]);
+            } else {
+                setMUid(mediumUid);
+            }
+        }
+    }, [mediumUid]);
 
     useEffect(() => {
         if (mediumUid) {
@@ -54,7 +65,7 @@ const chatBot = () => {
 
     return (
         <div className="h-[100vh]">
-            <Chat chatBotInfo={chatBotInfo} mode={'iframe'} mediumUid={mediumUid} statisticsMode={statisticsMode} />
+            <Chat chatBotInfo={chatBotInfo} mode={'iframe'} mediumUid={mediumUid} statisticsMode={statisticsMode} showSelect={true} />
         </div>
     );
 };

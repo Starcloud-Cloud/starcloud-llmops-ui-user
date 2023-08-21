@@ -3,6 +3,9 @@ import { CardContent, CardMedia, IconButton, Modal, Typography } from '@mui/mate
 import douyin from 'assets/images/landing/douyin.png';
 import redBook from 'assets/images/landing/red-book-qrcode.png';
 import MainCard from 'ui-component/cards/MainCard';
+import { Popover } from 'antd';
+import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
+import sph from 'assets/images/pages/sph.jpg';
 
 interface ShareProps {
     open: boolean;
@@ -12,9 +15,10 @@ interface ShareProps {
 const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
     const socialPlatforms = [
         {
-            name: '官方小红书账号',
-            link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
-            image: redBook
+            name: '视频号',
+            // link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
+            link: '',
+            image: sph
         },
         {
             name: '官方抖音账号',
@@ -71,7 +75,19 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                     >
                         <Typography id="modal-description" sx={{ mb: 1 }}>
                             关注魔法AI的官方抖音号、小红书号，后台私信发送 "mofaai"
-                            ，即可获取权益兑换码，可免费兑换基础权益5000字和2张图片。如有问题请加入魔法AI微信群联系运营人员。
+                            ，即可获取权益兑换码，可免费兑换基础权益5000字和2张图片。如有问题请加入魔法AI
+                            <Popover
+                                zIndex={9999}
+                                content={
+                                    <div className="flex justify-start items-center flex-col">
+                                        <img className="w-40" src={workWechatPay} alt="" />
+                                    </div>
+                                }
+                                trigger="hover"
+                            >
+                                <span className="text-[#1e88e5] cursor-pointer">微信群联系运营人员</span>
+                            </Popover>
+                            。
                         </Typography>
 
                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

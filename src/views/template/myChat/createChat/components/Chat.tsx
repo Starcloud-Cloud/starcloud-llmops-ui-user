@@ -101,6 +101,8 @@ export const Chat = ({
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
 
+    const conversationUniKey = `conversationUid-${mediumUid}`;
+
     // 创建语音识别对象
     const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
 
@@ -221,7 +223,7 @@ export const Chat = ({
     React.useEffect(() => {
         if (mode === 'iframe') {
             (async () => {
-                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid: jsCookie.get('conversationUid') });
+                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid: jsCookie.get(conversationUniKey) });
                 const list = res.list?.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar })) || [];
                 const result = [
                     ...list,
@@ -320,7 +322,7 @@ export const Chat = ({
                     scene: statisticsMode,
                     query: message,
                     mediumUid,
-                    conversationUid: jsCookie.get('conversationUid')
+                    conversationUid: jsCookie.get(conversationUniKey)
                 });
             }
             if (mode === 'test') {
@@ -365,7 +367,7 @@ export const Chat = ({
                         bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                     }
                     if (bufferObj?.code === 200) {
-                        jsCookie.set('conversationUid', bufferObj.conversationUid);
+                        jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                         setConversationUid(bufferObj.conversationUid);
                         // 处理流程
                         if (bufferObj.type === 'i') {
@@ -428,7 +430,7 @@ export const Chat = ({
         setData([]);
         dataRef.current = [];
         setConversationUid('');
-        jsCookie.remove('conversationUid');
+        jsCookie.remove(conversationUniKey);
     };
 
     const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);

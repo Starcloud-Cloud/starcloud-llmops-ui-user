@@ -22,7 +22,9 @@ export default function ThemeRoutes() {
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
-        { path: '/execute', element: <Execute /> },
+        { path: '/app_i/:mediumUid', element: <Execute /> },
+        { path: '/app_js/:mediumUid', element: <Execute /> },
+        { path: '/app_web/:mediumUid', element: <Execute /> },
         { path: '/cb_i/:mediumUid', element: <PagesChatBot /> },
         { path: '/cb_js/:mediumUid', element: <PagesChatBot /> },
         { path: '/cb_web/:mediumUid', element: <PagesChatBot /> },

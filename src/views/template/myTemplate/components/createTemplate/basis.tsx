@@ -25,11 +25,10 @@ const validationSchema = yup.object({
 
 const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
     const categoryList = marketStore((state) => state.categoryList);
-
     useImperativeHandle(ref, () => ({
         submit: () => {
             formik.handleSubmit();
-            return Object.values(formik.values).every((value) => value.length > 0);
+            return Object.values(formik.errors).length > 0;
         }
     }));
     const formik = useFormik({
@@ -65,8 +64,8 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                     multiline
                     minRows={6}
                     label={t('myApp.appDesc')}
-                    name="desc"
-                    value={formik.values.desc}
+                    name="description"
+                    value={formik.values.description}
                     onChange={(e) => {
                         formik.handleChange(e);
                         setValues({ name: e.target.name, value: e.target.value });

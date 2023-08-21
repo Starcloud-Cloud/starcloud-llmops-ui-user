@@ -82,7 +82,6 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             ]
         }
     ];
-
     const [openCreateSite, setOpenCreateSite] = useState(false);
     const [siteName, setSiteName] = useState('');
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -366,7 +365,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     }, [updateBtn]);
 
     const handleOpenWeb = () => {
-        window.open(`/cb_web/${webMediumUidRef.current}`);
+        window.open(`/${mode === 'CHAT' ? 'cb_web' : 'app_web'}/${webMediumUidRef.current}`);
     };
 
     return (
@@ -748,10 +747,11 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     setOpen={setOpenDrawer}
                     setCodeValue={setCodeValue}
                     getUpdateBtn={getUpdateBtn}
+                    mode={mode}
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
-            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} />
+            <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} mode={mode} />
         </Box>
     );
 }

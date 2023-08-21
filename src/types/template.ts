@@ -29,7 +29,7 @@ export interface Details {
 export interface Anyevent {
     initialValues: {
         name: string;
-        desc: string;
+        description: string;
         categories: string[];
         tags: string[];
     };

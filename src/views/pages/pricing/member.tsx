@@ -556,9 +556,15 @@ const Price1 = () => {
                             );
                         })}
                     </Grid>
-                    <div className="flex justify-center text-xs mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
+                    <div className="flex justify-center mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
+                    <div className="flex justify-center">
+                        <Divider className="py-3 w-[70%]" />
+                    </div>
                     <div>
-                        <div className="text-2xl font-semibold w-full text-center my-[20px]">跨境人和团队选择 mofaai</div>
+                        <div className="text-3xl font-semibold w-full text-center my-[20px]">
+                            跨境人都选择
+                            <span className="text-violet-500">魔法AI</span>
+                        </div>
                         <div className="flex justify-center">
                             <AntButton
                                 icon={<KeyboardBackspaceIcon className="text-white" />}

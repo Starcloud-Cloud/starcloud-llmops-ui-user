@@ -35,10 +35,12 @@ import {
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate } from 'api/template';
+import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate, addFriend } from 'api/template';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import CreateSiteModal from './components/CreateSiteModal';
+import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
+import WeChatDrawer from './components/WeChatDrawer';
 import DomainModal from './components/DomainModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
@@ -71,6 +73,19 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             ]
         },
         {
+            title: '微信群聊',
+            icon: 'qiyeweixin',
+            desc: '在微信群聊中提供机器人服务',
+            // enable: true,
+            enableValue: false,
+            comingSoon: false,
+            type: 5,
+            action: [
+                { title: '创建群聊', icon: 'contentPaste', onclick: () => setOpenWchat(true) },
+                { title: '查看群聊', icon: 'historyOutlined', onclick: () => setOpenWeDrawer(true) }
+            ]
+        },
+        {
             title: 'API调用',
             icon: 'api',
             desc: '通过API，可直接进行调用或发出请求',
@@ -90,6 +105,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const [upLoadList, setUpLoadList] = useState(defaultUpLoadList);
     const [webMediumUid, setWebMediumUid] = useState('');
     const webMediumUidRef = useRef();
+    const [openWchat, setOpenWchat] = useState(false);
+    const [openWeDrawer, setOpenWeDrawer] = useState(false);
 
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
@@ -321,6 +338,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     })
                 );
             }
+        } else if (record.type === 5) {
+            if (updateBtn?.channelMap?.[5]?.length > 0) {
+            } else {
+            }
         }
     };
     //创建站点确认
@@ -367,7 +388,33 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const handleOpenWeb = () => {
         window.open(`/${mode === 'CHAT' ? 'cb_web' : 'app_web'}/${webMediumUidRef.current}`);
     };
-
+    //企业微信群聊
+    const [phone, setPhone] = useState('');
+    const wechatOK = async () => {
+        const result = await addFriend({ mobile: phone });
+        if (result) {
+            await channelCreate({
+                appUid: updateBtn.appUid,
+                name: updateBtn.name + '_wecom_group',
+                publishUid: updateBtn.uid,
+                type: 7,
+                status: 0
+            });
+            getUpdateBtn();
+            setOpenWchat(false);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '创建成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+        }
+    };
     return (
         <Box>
             <SubCard
@@ -563,6 +610,13 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     justifyContent="center"
                                 >
                                     {IconList[item.icon]}
+                                    {!IconList[item.icon] && (
+                                        <img
+                                            style={{ width: '25px', height: '25px' }}
+                                            src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
+                                            alt=""
+                                        />
+                                    )}
                                 </Box>
                             </Box>
                             <Box ml={2} className="w-full">
@@ -630,7 +684,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     </Grid>
                 ))}
             </Grid>
-            {/* <Typography mt={4} mb={3}>
+
+            {/*
+             <Typography mt={4} mb={3}>
                 <span
                     className={
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
@@ -750,8 +806,17 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     mode={mode}
                 />
             )}
+            {openWeDrawer && (
+                <WeChatDrawer
+                    codeList={updateBtn.channelMap[7]}
+                    open={openWeDrawer}
+                    setOpen={setOpenWeDrawer}
+                    getUpdateBtn={getUpdateBtn}
+                />
+            )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
             <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} mode={mode} />
+            {openWchat && <WechatModal open={openWchat} setOpen={setOpenWchat} value={phone} setValue={setPhone} handleOk={wechatOK} />}
         </Box>
     );
 }

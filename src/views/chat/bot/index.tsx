@@ -29,9 +29,11 @@ const chatBot = () => {
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
-    const [mUid, setMUid] = useState('');
+    const [mUid, setMUid] = useState<any>('');
     const [showSelect, setShowSelect] = useState(false);
     const [list, setList] = useState<any[]>([]);
+
+    console.log(mUid, 'mUid');
 
     useEffect(() => {
         if (mediumUid) {
@@ -54,7 +56,7 @@ const chatBot = () => {
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 const value = data[key];
-                resultArray.push({ k: value.name, v: key });
+                resultArray.push({ name: value.name, avatar: value.images[0], des: value.description });
             }
         }
 
@@ -90,8 +92,7 @@ const chatBot = () => {
                 mediumUid={mUid}
                 setMUid={setMUid}
                 statisticsMode={statisticsMode}
-                // showSelect={showSelect}
-                showSelect={false}
+                showSelect={showSelect}
                 botList={list}
             />
         </div>

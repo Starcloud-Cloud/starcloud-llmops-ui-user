@@ -31,6 +31,9 @@ import { IChatInfo } from '../index';
 import ChatHistory from './ChatHistory';
 import { getShareChatHistory, shareMessageSSE } from 'api/chat/share';
 import jsCookie from 'js-cookie';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Popover } from 'antd';
 
 export type IHistory = Partial<{
     uid: string;
@@ -90,7 +93,7 @@ export const Chat = ({
     statisticsMode?: string;
     showSelect?: boolean;
     botList?: any[];
-    setMUid?: (mediumUid: string) => void;
+    setMUid?: (mediumUid: any) => void;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -478,24 +481,43 @@ export const Chat = ({
                                 labelId="demo-select-small-label"
                                 id="demo-select-small"
                                 onChange={(e) => {
-                                    console.log(e.target.value);
-                                    // setMUid(e?.target?.value || '');
+                                    setMUid && setMUid(e?.target?.value || '');
                                 }}
                             >
-                                {botList?.map((v, index) => (
+                                {/* {botList?.map((v, index) => (
                                     <MenuItem value={v.v} key={index}>
                                         {v.k}
                                     </MenuItem>
-                                ))}
+                                ))} */}
                             </Select>
                         </FormControl>
                     )}
-                    <div className="flex items-center justify-center">
-                        <div className="w-[28px] h-[28px] flex justify-center items-center">
-                            <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                    <Popover
+                        content={
+                            <div>
+                                {botList?.map((item, index) => (
+                                    <div className="flex items-center justify-center cursor-pointer">
+                                        <div className="">{item.avatar}</div>
+                                        <div className="">
+                                            <div>{item.name}</div>
+                                            <div>{item.des}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                        title="Title"
+                        placement="bottom"
+                        trigger="click"
+                    >
+                        <div className="flex items-center justify-center cursor-pointer">
+                            <div className="w-[28px] h-[28px] flex justify-center items-center">
+                                <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                            </div>
+                            <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                            <ExpandMoreIcon className="ml-1 " />
                         </div>
-                        <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-                    </div>
+                    </Popover>
                     {showSelect && <div className={'w-[100px]'} />}
                 </div>
                 <Divider variant={'fullWidth'} />

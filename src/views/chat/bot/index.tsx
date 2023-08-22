@@ -35,13 +35,12 @@ const chatBot = () => {
             (async () => {
                 const res = await getChatDetail(mediumUid);
                 setChatBotInfo({
-                    ...chatBotInfo,
-                    enableStatement: true,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
                     enableIntroduction: res.chatConfig?.description?.enabled,
                     statement: res.chatConfig?.openingStatement.statement,
+                    enableStatement: res.chatConfig?.openingStatement.enabled,
                     prePrompt: res.chatConfig.prePrompt,
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],

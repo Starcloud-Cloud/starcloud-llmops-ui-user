@@ -319,6 +319,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             id="columnId"
                             name="columnId"
                             label={'模型选择'}
+                            value={1}
                             fullWidth
                             // onChange={(e: any) => handleRuleValue(3, e.target.value)}
                         >

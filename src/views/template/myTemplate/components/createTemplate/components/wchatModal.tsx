@@ -51,7 +51,7 @@ export default function WechatModal({
                                 label={'手机号'}
                                 placeholder={'请输入手机号'}
                                 fullWidth
-                                helperText={checked && !value.match(/^\d{10,}$/) && '请输入正确的手机号'}
+                                helperText={checked && !value.match(/^1[3-9]\d{9}$/) && '请输入正确的手机号'}
                                 onChange={(e) => {
                                     setChecked(true);
                                     setValue(e.target.value);
@@ -69,7 +69,7 @@ export default function WechatModal({
                             color="secondary"
                             onClick={() => {
                                 setChecked(true);
-                                if (!value.match(/^\d{10,}$/)) {
+                                if (!value.match(/^1[3-9]\d{9}$/)) {
                                     return;
                                 }
                                 handleOk();

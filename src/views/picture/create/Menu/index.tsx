@@ -25,6 +25,8 @@ import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { IImageListType } from '../index';
 import './index.scss';
 
+import AppModal from './appModal';
+
 const { Dragger } = Upload;
 
 const marks = [
@@ -187,7 +189,11 @@ export const PictureCreateMenu = ({
     const [imageStrength, setImageStrength] = useState(45);
     const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
     const [voidInputValueTranslate, setVoidInputValueTranslate] = useState(true);
-
+    const [appOpen, setAppOpen] = useState(false);
+    const emits = (data: any) => {
+        setAppOpen(false);
+        setInputValue(data);
+    };
     const handleInputValueTranslate = (value: boolean) => {
         setInputValueTranslate(value);
         if (inputValue) {
@@ -435,7 +441,10 @@ export const PictureCreateMenu = ({
                             )}
                             {inputValueTranslate && <span className="text-xs ml-2">(只能输入英文字符)</span>}
                         </div>
-                        <div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Button color="secondary" size="small" variant="text" onClick={() => setAppOpen(true)}>
+                                一键优化
+                            </Button>
                             <MuiTooltip title="随机生成描述示例" arrow placement="top">
                                 <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
                             </MuiTooltip>
@@ -795,6 +804,7 @@ export const PictureCreateMenu = ({
                         </div>
                     )}
                 </Row>
+                {appOpen && <AppModal open={appOpen} emits={emits} tags={['Image', 'Optimize Prompt']} setOpen={setAppOpen} />}
             </div>
             <Row
                 style={{

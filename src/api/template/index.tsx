@@ -135,3 +135,8 @@ export const channelDelete = (data: any) => {
 export const addFriend = (data: any) => {
     return request.post({ url: `/llm/wecom/add/friend`, data });
 };
+
+// 创建微信群聊
+export const listMarketAppOption = (params: any) => {
+    return request.get({ url: `/llm/app/market/listMarketAppOption`, params });
+};

@@ -30,6 +30,7 @@ import { dispatch } from 'store';
 import { gridSpacing } from 'store/constant';
 import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
+import AppModal from 'views/picture/create/Menu/appModal';
 import { getAccessToken } from 'utils/auth';
 import { config } from 'utils/axios/config';
 import { v4 as uuidv4 } from 'uuid';
@@ -418,6 +419,17 @@ export const FashionStyling = ({
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
 
+    const [appOpen, setAppOpen] = useState(false);
+    const [tags, setTags] = useState<any[]>([]);
+    const emits = (data: any) => {
+        setAppOpen(false);
+        if (tags.includes('Desc')) {
+            setChatBotInfo({ ...chatBotInfo, introduction: data });
+        } else if (tags.includes('Welcome')) {
+            setChatBotInfo({ ...chatBotInfo, statement: data });
+        }
+    };
+
     const closeVoiceModal = () => {
         setVoiceOpen(false);
     };
@@ -555,6 +567,17 @@ export const FashionStyling = ({
                     </div>
                     <div className={'mt-1'}>
                         <div className="flex justify-end items-center">
+                            <Button
+                                color="secondary"
+                                size="small"
+                                variant="text"
+                                onClick={() => {
+                                    setTags(['Optimize Prompt', 'Chat', 'Desc']);
+                                    setAppOpen(true);
+                                }}
+                            >
+                                一键优化
+                            </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableIntroduction ? '展示' : '不展示'}</span>
                             <Switch
                                 color={'secondary'}
@@ -642,6 +665,17 @@ export const FashionStyling = ({
                     </span>
                     <div className={'mt-0'}>
                         <div className="flex justify-end items-center">
+                            <Button
+                                color="secondary"
+                                size="small"
+                                variant="text"
+                                onClick={() => {
+                                    setTags(['Optimize Prompt', 'Chat', 'Welcome']);
+                                    setAppOpen(true);
+                                }}
+                            >
+                                一键优化
+                            </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
                             <Switch
                                 color={'secondary'}
@@ -758,6 +792,7 @@ export const FashionStyling = ({
                 list={list}
             />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
+            {appOpen && <AppModal open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
         </>
     );
 };

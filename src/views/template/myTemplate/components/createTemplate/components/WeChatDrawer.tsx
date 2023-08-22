@@ -52,12 +52,12 @@ const WeChatDrawer = ({
         <Drawer anchor="right" open={open} sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }} onClose={onClose}>
             <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
                 <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg p-[20px] overflow-auto">
-                    <div className="text-lg">我的站点</div>
+                    <div className="text-lg">我的微信群</div>
                     {codeList?.map((item: any, index: number) => (
                         <Accordion key={index} expanded={expanded === index} onChange={handleChange(index)}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                 <Typography fontSize="14px" fontWeight="500">
-                                    站点{index + 1}：{item.name}
+                                    微信群{index + 1}：{item.name}
                                 </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
@@ -66,20 +66,19 @@ const WeChatDrawer = ({
                                         InputLabelProps={{ shrink: true }}
                                         color="secondary"
                                         name="name"
-                                        label={'站点名称'}
-                                        placeholder={'请输入站点名称'}
+                                        label={'微信群名称'}
+                                        placeholder={'请输入微信群名称'}
                                         disabled
                                         fullWidth
                                         value={item.name}
                                     />
                                     <div className="text-base mt-5" style={{ display: 'flex', alignItems: 'center' }}>
-                                        绑定应用
                                         <Tooltip placement="top" title="在企业微信群中@机器人 并回复复制的内容">
                                             <ErrorOutlineIcon fontSize="small" />
                                         </Tooltip>
-                                        :{item.mediumUid}
+                                        绑定应用:{item.mediumUid}
                                         <CopyToClipboard
-                                            text={item.mediumUid}
+                                            text={`绑定应用:${item.mediumUid}`}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({

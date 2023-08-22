@@ -29,6 +29,8 @@ const marks = [
 const TEXT = `- Identify what language users use in questions and use the same language in your answers. \n - Use English or 中文 to answer questions based on the language of the question.`;
 
 export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
+    console.log(chatBotInfo?.temperature, 'chatBotInfo');
+
     const [regulationText, setRegulationText] = useState('');
     const [startCheck, setStartCheck] = useState(false);
     const regulationTextRef = useRef(regulationText);
@@ -287,7 +289,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 valueLabelDisplay="auto"
                                 min={0}
                                 max={2}
-                                value={chatBotInfo?.temperature}
+                                value={chatBotInfo?.temperature || 0}
                                 marks={marks}
                                 onChange={(e, value) => {
                                     setChatBotInfo({
@@ -317,6 +319,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             id="columnId"
                             name="columnId"
                             label={'模型选择'}
+                            value={1}
                             fullWidth
                             // onChange={(e: any) => handleRuleValue(3, e.target.value)}
                         >

@@ -12,7 +12,7 @@ import PubSub from 'pubsub-js';
 // import { useCache } from "hooks/web/useCache";
 
 const tenantEnable = process.env.REACT_APP_TENANT_ENABLE;
-const { result_code, base_url, share_base_url,  request_timeout } = config;
+const { result_code, base_url, share_base_url, request_timeout } = config;
 
 // 需要忽略的提示。忽略后，自动 Promise.reject('error')
 const ignoreMsgs = [
@@ -29,7 +29,6 @@ let requestList: any[] = [];
 let isRefreshToken = false;
 // 请求白名单，无须token的接口
 const whiteList: string[] = ['/login', '/refresh-token'];
-
 
 // 创建axios实例
 const service: AxiosInstance = axios.create({
@@ -53,12 +52,7 @@ service.interceptors.request.use(
                 }
             }
         });
-       
-        // 设置租户
-        if (tenantEnable && tenantEnable === 'true') {
-            const tenantId = getTenantId();
-            if (tenantId) (config as Recordable).headers['tenant-id'] = tenantId;
-        }
+
         const params = config.params || {};
         const data = config.data || false;
         if (

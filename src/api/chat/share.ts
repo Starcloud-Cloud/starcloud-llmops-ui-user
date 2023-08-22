@@ -3,9 +3,9 @@ import fetch from 'utils/fetch/indexShare';
 
 /**
  * 获取聊天记录
- * @returns 
+ * @returns
  */
-export const getShareChatHistory= (data: any) => {
+export const getShareChatHistory = (data: any) => {
     return request.get({ url: '/share/chat/history', params: data });
 };
 
@@ -19,9 +19,17 @@ export const shareMessageSSE = (data: any) => {
 
 /**
  *  应用明细
- * @returns 
+ * @returns
  */
 export const getChatDetail = (id: string) => {
     return request.get({ url: `/share/chat/detail/${id}` });
 };
 
+/**
+ * 应用明细批量
+ * @param id
+ * @returns
+ */
+export const getChatDetailList = (data: any) => {
+    return request.post({ url: `/share/chat/detail`, data });
+};

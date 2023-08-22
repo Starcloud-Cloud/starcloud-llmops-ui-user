@@ -462,7 +462,7 @@ export const Chat = ({
                 >
                     <div ref={contentRef}>
                         {chatBotInfo.enableIntroduction && (
-                            <Card className="bg-[#f2f3f5] mx-[24px] mt-[12px] p-[16px] flex">
+                            <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[16px] flex">
                                 <div className="flex w-[56px] h-[56px] justify-center items-center">
                                     <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
                                 </div>

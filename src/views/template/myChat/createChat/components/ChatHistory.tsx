@@ -29,7 +29,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
 
     return (
-        <Grid item xs={12}>
+        <Grid item xs={12} className="p-[12px]">
             <Grid container spacing={gridSpacing}>
                 {data.map((history, index) => (
                     <React.Fragment key={index}>

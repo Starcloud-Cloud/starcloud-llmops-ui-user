@@ -75,12 +75,12 @@ function CreateDetail() {
                 setDetail(res);
                 setChatBotInfo({
                     ...chatBotInfo,
-                    enableStatement: true,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
                     enableIntroduction: res.chatConfig?.description?.enabled,
                     statement: res.chatConfig?.openingStatement.statement,
+                    enableStatement: res.chatConfig?.openingStatement.enabled,
                     prePrompt: res.chatConfig.prePrompt,
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
@@ -222,7 +222,7 @@ function CreateDetail() {
         data.images = [chatBotInfo.avatar];
         data.chatConfig.prePrompt = chatBotInfo.prePrompt;
         data.chatConfig.modelConfig.completionParams.temperature = chatBotInfo.temperature;
-        data.chatConfig.openingStatement.statement = chatBotInfo.statement;
+        data.chatConfig.openingStatement = { statement: chatBotInfo.statement, enabled: chatBotInfo.enableStatement };
         data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
         data.description = chatBotInfo.introduction;
         data.chatConfig.webSearchConfig = {

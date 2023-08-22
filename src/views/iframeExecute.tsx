@@ -1,14 +1,14 @@
 import Perform from './template/carryOut/perform';
 import { Card, Box, Chip, Divider, Typography } from '@mui/material';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
-import { executeApp } from 'api/template/fetch';
-import { getApp } from 'api/template/index';
+import { appDetail, appExecute } from 'api/template/share';
 
 import _ from 'lodash-es';
 import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { useLocation, useParams } from 'react-router-dom';
 interface Details {
     name?: string;
     description?: string;
@@ -30,6 +30,27 @@ interface Execute {
     steps: any;
 }
 const IframeExecute = () => {
+    const location = useLocation();
+    const params = useParams();
+    const searchParams = new URLSearchParams(location.search);
+    const url = window.location.href;
+    const pattern = /\/([^/]+)\/[^/]+$/;
+    const match = url.match(pattern);
+
+    const extractedPart = (match && match[1]) || '';
+
+    const statisticsMode = useMemo(() => {
+        switch (extractedPart) {
+            case 'app_i':
+                return 'SHARE_IFRAME';
+            case 'app_js':
+                return 'SHARE_JS';
+            case 'app_web':
+                return 'SHARE_WEB';
+            default:
+                return '';
+        }
+    }, [extractedPart]);
     const [detail, setDetail] = useState<Details>({
         workflowConfig: {
             steps: []
@@ -43,7 +64,7 @@ const IframeExecute = () => {
         getList();
     }, []);
     const getList = () => {
-        getApp({ uid: 'bda74700793b4a0faddc5df215ed1027' }).then((res: any) => {
+        appDetail(params.mediumUid).then((res: any) => {
             detailRef.current = _.cloneDeep(res);
             setDetail(res);
         });
@@ -96,8 +117,9 @@ const IframeExecute = () => {
             setLoadings(value);
         }
         const fetchData = async () => {
-            let resp: any = await executeApp({
-                appUid: 'bda74700793b4a0faddc5df215ed1027',
+            let resp: any = await appExecute({
+                scene: statisticsMode,
+                mediumUid: params.mediumUid,
                 stepId: stepId,
                 appReqVO: detailRef.current,
                 conversationUid

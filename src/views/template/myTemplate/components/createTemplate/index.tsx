@@ -312,7 +312,7 @@ function CreateDetail() {
     };
     //保存更改
     const saveDetail = () => {
-        if (basis?.current?.submit()) {
+        if (!basis?.current?.submit()) {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
@@ -433,7 +433,7 @@ function CreateDetail() {
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
                 {searchParams.get('uid') && <Tab label="应用分析" {...a11yProps(2)} />}
-                <Tab label={t('myApp.upload')} {...a11yProps(3)} />
+                {searchParams.get('uid') && <Tab label={t('myApp.upload')} {...a11yProps(3)} />}
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -443,7 +443,7 @@ function CreateDetail() {
                                 ref={basis}
                                 initialValues={{
                                     name: detail?.name,
-                                    desc: detail?.description,
+                                    description: detail?.description,
                                     categories: detail?.categories,
                                     tags: detail?.tags
                                 }}
@@ -570,7 +570,9 @@ function CreateDetail() {
                 )}
             </TabPanel>
             <TabPanel value={value} index={3}>
-                <Upload appUid={detail?.uid} saveState={saveState} saveDetail={saveDetail} />
+                {searchParams.get('uid') && (
+                    <Upload appUid={searchParams.get('uid') as string} saveState={saveState} saveDetail={saveDetail} />
+                )}
             </TabPanel>
         </Card>
     );

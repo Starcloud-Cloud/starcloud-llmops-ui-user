@@ -27,12 +27,14 @@ import _ from 'lodash-es';
 
 export const SiteDrawerCode = ({
     open,
+    mode,
     codeList,
     setOpen,
     setCodeValue,
     getUpdateBtn
 }: {
     open: boolean;
+    mode: undefined | string;
     codeList: any[];
     setOpen: (open: boolean) => void;
     setCodeValue: (data: any) => void;
@@ -90,7 +92,7 @@ export const SiteDrawerCode = ({
         return ` 
 \`\`\`
 <iframe
-src="${window.location.origin}/cb_i/${uid}?source=${name}"
+src="${window.location.origin}/${mode === 'CHAT' ? 'cb_i' : 'app_i'}/${uid}?source=${name}"
 width="408px"
 height="594px"
 frameborder="0">
@@ -102,7 +104,7 @@ frameborder="0">
     const HTML_CODE_COPY = (name: string, uid: string) => {
         return ` 
 <iframe
-src="${window.location.origin}/cb_i/${uid}?source=${name}"
+src="${window.location.origin}/${mode === 'CHAT' ? 'cb_i' : 'app_i'}/${uid}?source=${name}"
 width="408px"
 height="594px"
 frameborder="0">
@@ -115,7 +117,7 @@ frameborder="0">
 <script>
 window.tip_mofaai_color="#fff";
 window.tip_mofaai_bg="#4C83F3";
-window.mofaai_iframe_src = "${window.location.origin}/cb_js/${uid}?source=${name}";
+window.mofaai_iframe_src = "${window.location.origin}/${mode === 'CHAT' ? 'cb_js' : 'app_js'}/${uid}?source=${name}";
 var st = document.createElement("script");
 st.type="text/javascript";
 st.async = true;st.src = "${insertScript}";

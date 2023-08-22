@@ -11,7 +11,17 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
-export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; setOpen: (open: boolean) => void; uid: string }) {
+export default function CopySiteModal({
+    open,
+    setOpen,
+    uid,
+    mode
+}: {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    uid: string;
+    mode: undefined | string;
+}) {
     const handleClose = () => {
         setOpen(false);
     };
@@ -29,7 +39,7 @@ export default function CopySiteModal({ open, setOpen, uid }: { open: boolean; s
         }
     };
 
-    const URL = `${window.location.origin}/cb_web/${uid}`;
+    const URL = `${window.location.origin}/${mode === 'CHAT' ? 'cb_web' : 'app_web'}/${uid}`;
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">

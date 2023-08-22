@@ -101,7 +101,7 @@ export const publishPage = (params: { appUid: string }) => {
     return request.get({ url: `/llm/app/publish/page`, params });
 };
 //是否可更新发布
-export const getLatest = (appUid: string) => {
+export const getLatest = (appUid: string | undefined) => {
     return request.get({ url: `/llm/app/publish/getLatest/${appUid}` });
 };
 //管理员审核发布
@@ -129,4 +129,9 @@ export const channelUpload = (data: any) => {
 // 删除站点
 export const channelDelete = (data: any) => {
     return request.post({ url: `/llm/app/publish/channel/delete`, data });
+};
+
+// 创建微信群聊
+export const addFriend = (data: any) => {
+    return request.post({ url: `/llm/wecom/add/friend`, data });
 };

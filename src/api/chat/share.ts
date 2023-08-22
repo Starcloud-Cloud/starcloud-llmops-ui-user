@@ -26,10 +26,10 @@ export const getChatDetail = (id: string) => {
 };
 
 /**
- *
+ * 应用明细批量
  * @param id
  * @returns
  */
 export const getChatDetailList = (data: any) => {
-    return request.post({ url: `/app-api/share/chat/detail`, data });
+    return request.post({ url: `/share/chat/detail`, data });
 };

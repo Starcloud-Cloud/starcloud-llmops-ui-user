@@ -1,4 +1,4 @@
-import { getChatDetail } from 'api/chat/share';
+import { getChatDetail, getChatDetailList } from 'api/chat/share';
 import { useEffect, useMemo, useState } from 'react';
 import { IChatInfo } from 'views/template/myChat/createChat';
 import { Chat } from 'views/template/myChat/createChat/components/Chat';
@@ -29,11 +29,42 @@ const chatBot = () => {
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
+    const [mUid, setMUid] = useState('');
+    const [showSelect, setShowSelect] = useState(false);
+    const [list, setList] = useState<any[]>([]);
 
     useEffect(() => {
         if (mediumUid) {
+            const result = mediumUid?.split('|');
+            if (result.length > 1) {
+                setMUid(result[0]);
+                doFetchDetailList(result);
+                setShowSelect(true);
+            } else {
+                setMUid(mediumUid);
+                setShowSelect(false);
+            }
+        }
+    }, [mediumUid]);
+
+    const doFetchDetailList = async (mediumUids: any) => {
+        const data = await getChatDetailList({ mediumUids: mediumUids });
+        const resultArray = [];
+
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                const value = data[key];
+                resultArray.push({ k: value.name, v: key });
+            }
+        }
+
+        setList(resultArray);
+    };
+
+    useEffect(() => {
+        if (mUid) {
             (async () => {
-                const res = await getChatDetail(mediumUid);
+                const res = await getChatDetail(mUid);
                 setChatBotInfo({
                     name: res.name,
                     avatar: res?.images?.[0],
@@ -49,11 +80,20 @@ const chatBot = () => {
                 });
             })();
         }
-    }, []);
+    }, [mUid]);
 
     return (
         <div className="h-[100vh]">
-            <Chat chatBotInfo={chatBotInfo} mode={'iframe'} mediumUid={mediumUid} statisticsMode={statisticsMode} />
+            <Chat
+                chatBotInfo={chatBotInfo}
+                mode={'iframe'}
+                mediumUid={mUid}
+                setMUid={setMUid}
+                statisticsMode={statisticsMode}
+                // showSelect={showSelect}
+                showSelect={false}
+                botList={list}
+            />
         </div>
     );
 };

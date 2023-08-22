@@ -7,12 +7,15 @@ import {
     Card,
     CardContent,
     Divider,
+    FormControl,
     Grid,
     IconButton,
     InputAdornment,
+    InputLabel,
     Menu,
     MenuItem,
     OutlinedInput,
+    Select,
     Tooltip,
     Typography,
     useMediaQuery,
@@ -76,12 +79,18 @@ export const Chat = ({
     chatBotInfo,
     mode,
     mediumUid,
-    statisticsMode
+    statisticsMode,
+    showSelect,
+    botList,
+    setMUid
 }: {
     chatBotInfo: IChatInfo;
     mode?: 'iframe' | 'test';
     mediumUid?: string;
     statisticsMode?: string;
+    showSelect?: boolean;
+    botList?: any[];
+    setMUid?: (mediumUid: string) => void;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -443,164 +452,207 @@ export const Chat = ({
     };
 
     return (
-        <div className="relative">
-            <div className={'flex justify-center items-center py-[8px]'}>
-                <div className="w-[28px] h-[28px] flex justify-center items-center">
-                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
-                </div>
-                <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-            </div>
-            <Divider variant={'fullWidth'} />
-            <div className={'max-w-[768px] m-auto'}>
-                <div
-                    style={{
-                        width: '100%',
-                        height: mode === 'iframe' ? 'calc(100vh - 180px)' : 'calc(100vh - 298px)',
-                        overflowX: 'hidden'
-                    }}
-                    ref={scrollRef}
-                >
-                    <div ref={contentRef}>
-                        {chatBotInfo.enableIntroduction && (
-                            <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[12px] flex">
-                                <div className="flex w-[56px] h-[56px] justify-center items-center">
-                                    <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
-                                </div>
-                                <div className="flex flex-col ml-3">
-                                    <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
-                                    <Typography align="left" variant="subtitle2" color={'#000'}>
-                                        {chatBotInfo.introduction}
-                                    </Typography>
-                                </div>
-                            </Card>
-                        )}
-                        <CardContent className="!p-0">
-                            <ChatHistory theme={theme} data={data} />
-                        </CardContent>
-                    </div>
-                </div>
-                <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap ">
-                    <Grid item className="!pl-0">
-                        <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                            <MoreHorizTwoToneIcon />
-                        </IconButton>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleCloseSort}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'right'
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right'
+        <div className="h-full">
+            <div className="h-[calc(100%-25px)]">
+                <div className={`flex items-center p-[8px] ${showSelect ? 'justify-between' : 'justify-center'}`}>
+                    {showSelect && (
+                        <FormControl
+                            sx={{
+                                width: '150px',
+                                '& .Mui-focused': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                },
+                                '& .MuiInputLabel-sizeSmall': {
+                                    background: '#f8fafc',
+                                    paddingRight: '2px'
+                                }
                             }}
                         >
-                            <MenuItem onClick={handleClean}>
-                                <CleaningServicesSharpIcon className="text-base" />
-                                <span className="text-base ml-3">清除</span>
-                            </MenuItem>
-                        </Menu>
-                    </Grid>
-                    <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                        <OutlinedInput
-                            id="message-send"
-                            fullWidth
-                            multiline
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="请输入(Shift+Enter换行)"
-                            className="!pt-0"
-                            onKeyDown={handleKeyDown}
-                            minRows={1}
-                            maxRows={3}
-                            endAdornment={
-                                <>
-                                    <InputAdornment position="end">
-                                        {!isListening ? (
-                                            <Tooltip arrow placement="top" title={'语音输入'}>
-                                                <IconButton
-                                                    disableRipple
-                                                    color={'default'}
-                                                    onClick={startListening}
-                                                    aria-label="voice"
-                                                    className="p-0"
-                                                >
-                                                    <KeyboardVoiceIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        ) : (
-                                            <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                <div
-                                                    onClick={stopListening}
-                                                    className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                >
-                                                    <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                        {time}
+                            <InputLabel size="small" id="age-select">
+                                机器人
+                            </InputLabel>
+                            <Select
+                                style={{ width: '100px' }}
+                                size="small"
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
+                                onChange={(e) => {
+                                    console.log(e.target.value);
+                                    // setMUid(e?.target?.value || '');
+                                }}
+                            >
+                                {botList?.map((v, index) => (
+                                    <MenuItem value={v.v} key={index}>
+                                        {v.k}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+                    <div className="flex items-center justify-center">
+                        <div className="w-[28px] h-[28px] flex justify-center items-center">
+                            <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                        </div>
+                        <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                    </div>
+                    {showSelect && <div className={'w-[100px]'} />}
+                </div>
+                <Divider variant={'fullWidth'} />
+                <div className={'max-w-[768px] m-auto'}>
+                    <div
+                        style={{
+                            width: '100%',
+                            height: mode === 'iframe' ? 'calc(100vh - 180px)' : 'calc(100vh - 298px)',
+                            overflowX: 'hidden'
+                        }}
+                        ref={scrollRef}
+                    >
+                        <div ref={contentRef}>
+                            {chatBotInfo.enableIntroduction && (
+                                <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[12px] flex">
+                                    <div className="flex w-[56px] h-[56px] justify-center items-center">
+                                        <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                                    </div>
+                                    <div className="flex flex-col ml-3">
+                                        <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
+                                        <Typography align="left" variant="subtitle2" color={'#000'}>
+                                            {chatBotInfo.introduction}
+                                        </Typography>
+                                    </div>
+                                </Card>
+                            )}
+                            <CardContent className="!p-0">
+                                <ChatHistory theme={theme} data={data} />
+                            </CardContent>
+                        </div>
+                    </div>
+                    <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap ">
+                        <Grid item className="!pl-0">
+                            <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                                <MoreHorizTwoToneIcon />
+                            </IconButton>
+                            <Menu
+                                id="simple-menu"
+                                anchorEl={anchorEl}
+                                keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={handleCloseSort}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right'
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right'
+                                }}
+                            >
+                                <MenuItem onClick={handleClean}>
+                                    <CleaningServicesSharpIcon className="text-base" />
+                                    <span className="text-base ml-3">清除</span>
+                                </MenuItem>
+                            </Menu>
+                        </Grid>
+                        <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                            <OutlinedInput
+                                id="message-send"
+                                fullWidth
+                                multiline
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="请输入(Shift+Enter换行)"
+                                className="!pt-0"
+                                onKeyDown={handleKeyDown}
+                                minRows={1}
+                                maxRows={3}
+                                endAdornment={
+                                    <>
+                                        <InputAdornment position="end">
+                                            {!isListening ? (
+                                                <Tooltip arrow placement="top" title={'语音输入'}>
+                                                    <IconButton
+                                                        disableRipple
+                                                        color={'default'}
+                                                        onClick={startListening}
+                                                        aria-label="voice"
+                                                        className="p-0"
+                                                    >
+                                                        <KeyboardVoiceIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ) : (
+                                                <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                    <div
+                                                        onClick={stopListening}
+                                                        className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                    >
+                                                        <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                            {time}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </Tooltip>
-                                        )}
-                                    </InputAdornment>
-                                    <InputAdornment position="end" className="relative">
-                                        {isFetch ? (
-                                            <Tooltip placement="top" arrow title={'请求中'}>
-                                                <IconButton
-                                                    disableRipple
-                                                    color={message ? 'secondary' : 'default'}
-                                                    aria-label="send message"
-                                                >
-                                                    <PendingIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        ) : (
-                                            <Tooltip placement="top" arrow title={'发送'}>
-                                                <IconButton
-                                                    disableRipple
-                                                    color={message ? 'secondary' : 'default'}
-                                                    onClick={handleOnSend}
-                                                    aria-label="send message"
-                                                >
-                                                    <SendIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        )}
-                                    </InputAdornment>
-                                </>
-                            }
-                            aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
-                        />
+                                                </Tooltip>
+                                            )}
+                                        </InputAdornment>
+                                        <InputAdornment position="end" className="relative">
+                                            {isFetch ? (
+                                                <Tooltip placement="top" arrow title={'请求中'}>
+                                                    <IconButton
+                                                        disableRipple
+                                                        color={message ? 'secondary' : 'default'}
+                                                        aria-label="send message"
+                                                    >
+                                                        <PendingIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            ) : (
+                                                <Tooltip placement="top" arrow title={'发送'}>
+                                                    <IconButton
+                                                        disableRipple
+                                                        color={message ? 'secondary' : 'default'}
+                                                        onClick={handleOnSend}
+                                                        aria-label="send message"
+                                                    >
+                                                        <SendIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </InputAdornment>
+                                    </>
+                                }
+                                aria-describedby="search-helper-text"
+                                inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                            />
+                        </Grid>
                     </Grid>
-                </Grid>
-                <div>
-                    <div className="flex justify-end px-[24px]">
-                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                    <div>
+                        <div className="flex justify-end px-[24px]">
+                            <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                        </div>
                     </div>
-                    <div className="flex justify-center items-center absolute left-[50%] translate-x-[-50%] bottom-[-8px]">
-                        <svg
-                            version="1.1"
-                            id="Layer_1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlnsXlink="http://www.w3.org/1999/xlink"
-                            x="0px"
-                            y="0px"
-                            width="18px"
-                            height="18px"
-                            viewBox="0 0 18 18"
-                            enableBackground="new 0 0 24 24"
-                            xmlSpace="preserve"
-                        >
-                            <image
-                                id="image0"
-                                width="18"
-                                height="18"
-                                x="0"
-                                y="0"
-                                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                </div>
+            </div>
+            <div>
+                <div className="flex justify-center items-center">
+                    <svg
+                        version="1.1"
+                        id="Layer_1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        width="18px"
+                        height="18px"
+                        viewBox="0 0 18 18"
+                        enableBackground="new 0 0 24 24"
+                        xmlSpace="preserve"
+                    >
+                        <image
+                            id="image0"
+                            width="18"
+                            height="18"
+                            x="0"
+                            y="0"
+                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -755,10 +807,9 @@ export const Chat = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                            />
-                        </svg>
-                        <span className="text-[#596780] text-xs truncate leading-5 ml-1">Powered by 魔法AI</span>
-                    </div>
+                        />
+                    </svg>
+                    <span className="text-[#596780] text-xs truncate leading-5 ml-1">Powered by 魔法AI</span>
                 </div>
             </div>
         </div>

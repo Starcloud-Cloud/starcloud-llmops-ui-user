@@ -74,7 +74,7 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                         }}
                     >
                         <Typography id="modal-description" sx={{ mb: 1 }}>
-                            关注魔法AI的官方抖音号、小红书号，后台私信发送 "mofaai"
+                            关注魔法AI的官方抖音号、视屏号，后台私信发送 "mofaai"
                             ，即可获取权益兑换码，可免费兑换基础权益5000字和2张图片。如有问题请加入魔法AI
                             <Popover
                                 zIndex={9999}

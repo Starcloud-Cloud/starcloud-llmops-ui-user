@@ -317,9 +317,12 @@ function CreateDetail() {
                 </TabPanel>
             </Card>
             {value !== 5 && (
-                <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
-                    <Chat chatBotInfo={chatBotInfo} mode={'test'} />
-                </Card>
+                <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
+                    <div className="text-base color-[#121926]">预览与调试</div>
+                    <Card className="h-full">
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                    </Card>
+                </div>
             )}
         </div>
     );

@@ -295,7 +295,9 @@ const Record: React.FC = () => {
                                         <TableCell align="center">{row.body}</TableCell>
                                         <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>
-                                        <TableCell align="center">{dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+                                        <TableCell align="center">
+                                            {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        </TableCell>
                                         <TableCell align="center">
                                             <Button
                                                 variant="text"

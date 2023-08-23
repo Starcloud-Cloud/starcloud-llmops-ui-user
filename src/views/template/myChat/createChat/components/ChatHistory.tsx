@@ -18,6 +18,8 @@ import { openSnackbar } from 'store/slices/snackbar';
 import ChatMarkdown from 'ui-component/Markdown';
 import { LoadingSpin } from 'ui-component/LoadingSpin';
 import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -152,27 +154,50 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     <CardContent sx={{ p: 2, pb: '16px !important' }}>
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
-                                                                {history.process && (
+                                                                {/* 思考中 */}
+                                                                {/* {history.process && ( */}
+                                                                {true && (
                                                                     <div className="flex flex-col">
-                                                                        <div className="flex justify-between items-center">
-                                                                            <div>
-                                                                                <span>正在生成</span>
-                                                                                <LoadingSpin />
-                                                                            </div>
-                                                                            <div>
-                                                                                <span>展示</span>
-                                                                            </div>
+                                                                        <div className="items-center px-[4px] py-[8px] bg-[#a8ed97e0] w-[110px] inline-flex justify-center rounded-md cursor-pointer">
+                                                                            <LoadingSpin />
+                                                                            <span className="ml-1">正在生成</span>
+                                                                            <ExpandLessIcon className="w-[18px] h-[18px]" />
+                                                                            {/* <ExpandMoreIcon /> */}
                                                                         </div>
                                                                         <div>
+                                                                            <div>抓取百度内容</div>
+                                                                            <WebPageInfo
+                                                                                tips={'为你搜索新闻'}
+                                                                                urlList={[
+                                                                                    {
+                                                                                        title: '百度一下，你就知道',
+                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
+                                                                                        des: '百度一下，你就知道'
+                                                                                    },
+                                                                                    {
+                                                                                        title: '百度一下，你就知道',
+                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
+                                                                                        des: '百度一下，你就知道'
+                                                                                    },
+                                                                                    {
+                                                                                        title: '百度一下，你就知道',
+                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
+                                                                                        des: '百度一下，你就知道'
+                                                                                    }
+                                                                                ]}
+                                                                            />
+                                                                        </div>
+                                                                        {/* <div>
                                                                             {history.process.showType === 'url' && (
                                                                                 <div>
                                                                                     <div>{history.process.tips}</div>
                                                                                     <WebPageInfo url={history.process.url} />
                                                                                 </div>
                                                                             )}
-                                                                        </div>
+                                                                        </div> */}
                                                                     </div>
                                                                 )}
+                                                                {/* 文本回答 */}
                                                                 {history.answer ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${

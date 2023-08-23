@@ -549,7 +549,7 @@ export const Chat = ({
                             </CardContent>
                         </div>
                     </div>
-                    <div className="absolute w-full bottom-[-10px] max-w-[768px] px-[12px]">
+                    <div className="absolute w-full bottom-[-18px] max-w-[768px] px-[12px]">
                         <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
                             <Grid item className="!pl-0">
                                 <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -833,7 +833,11 @@ export const Chat = ({
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
                         />
                     </svg>
-                    <span className="text-[#596780] text-xs truncate leading-5 ml-1">Powered by 魔法AI</span>
+                    <span className="text-[#596780] text-xs truncate leading-5 ml-1">
+                        <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
+                            Powered by 魔法AI
+                        </a>
+                    </span>
                 </div>
             </div>
         </div>

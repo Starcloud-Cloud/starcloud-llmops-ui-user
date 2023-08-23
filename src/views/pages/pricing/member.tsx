@@ -61,7 +61,7 @@ const recommendList = [
         content: (
             <span>
                 我们通过魔法AI的独立站应用模块，辅助我们完成了独立站的搭建，它可以给我们写网站slogan，产品描述，做市场调研，我们通过他们的产品调研应用在一周之内开发出了好几个流量款，既
-                <span className="text-violet-500">提高了我们网站的流量</span>也降低了我们的试错成本。
+                <span className="text-red-600">提高了我们网站的流量</span>也降低了我们的试错成本。
             </span>
         )
     },
@@ -71,7 +71,7 @@ const recommendList = [
         content: (
             <span>
                 我是自己创业做亚马逊的，目前团队有5个人，一个财务，一个美工，三个运营。我是偶然在网上看到魔法AI这个工具的，好奇的试了一个月，
-                <span className="text-violet-500">效率真的惊人</span>,
+                <span className="text-red-600">效率真的惊人</span>,
                 以前我们打造一款产品需要一个月，现在一周就可以搞定了。本来打算扩招业务，再招几个员工的，现在都不需要扩招，给我节省了好几个员工的成本，我也鼓励我的团队使用它，大家反馈都不错～
             </span>
         )
@@ -82,7 +82,7 @@ const recommendList = [
         content: (
             <span>
                 chatgpt一出来，我们公司就一直在尝试寻找适合跨境电商运营的AI工具，但很多反馈的结果都不好。魔法AI是在朋友圈看到朋友推荐的，抱着试试的心态试用了几天，效果出乎意料。
-                <span className="text-violet-500"> 不仅可以生成高质量文案，还可以选品，选关键词，回邮件</span>,
+                <span className="text-red-600"> 不仅可以生成高质量文案，还可以选品，选关键词，回邮件</span>,
                 我让我们运营团队的小伙伴试用了一个月，工作效率比平时提高了3倍!
             </span>
         )
@@ -93,7 +93,7 @@ const recommendList = [
         content: (
             <span>
                 我们公司是做红人营销的，需要给公司签约的红人运营社交账号，接产品推广，拍视频等等，魔法AI可以完全满足我们的需求。几秒钟就可以给我们写好几帖子，还可以提供Youtube的脚本，生成图片等，再也不怕想不出好的点子了。
-                <span className="text-violet-500"> 同时运营十几个账号都没问题，简直太方便了！</span>
+                <span className="text-red-600"> 同时运营十几个账号都没问题，简直太方便了！</span>
             </span>
         )
     },
@@ -103,7 +103,7 @@ const recommendList = [
         content: (
             <span>
                 魔法AI的一系列选品应用模板，给了我很多选品思路和灵感。选品不仅需要调研产品是否符合需求，还需要了解当地的生活和消费习惯，这对于我们跨境电商来说尤为重要。
-                <span className="text-violet-500">
+                <span className="text-red-600">
                     使用AI工具可以快速了解一个市场的消费模式和习惯，从而更快地节约我的时间成本，并且让我对开发的产品更有信心。
                 </span>
             </span>
@@ -115,9 +115,9 @@ const recommendList = [
         content: (
             <span>
                 写产品开发信一直是我们这类外贸公司营销的重点，魔法AI很好的解决了我们如何写好开发信的难题，它可以提供各种场景的开发信应用模板，让我们轻松完成客户开发的目标。并且回复率比之前高了
-                <span className="text-violet-500"> 50%</span>
+                <span className="text-red-600"> 50%</span>
                 ，给我们的业绩带来了
-                <span className="text-violet-500">5倍</span>
+                <span className="text-red-600">5倍</span>
                 的增长。
             </span>
         )
@@ -128,8 +128,8 @@ const recommendList = [
         content: (
             <span>
                 我是用魔法AI来写SEO文章的，以前一周最多写三篇文章的，现在一周可以写10篇，还可以避免查重和过于AI风格，文章看起来就像一个资深的SEO专家写的，用魔法AI写文章的收录率比我之前人工写的高了
-                <span className="text-violet-500">50%</span>, 网站流量增长了
-                <span className="text-violet-500">20%</span>。 价格也很实惠， 只要99一个月，与其他写作工具相比真的太划算了！
+                <span className="text-red-600">50%</span>, 网站流量增长了
+                <span className="text-red-600">20%</span>。 价格也很实惠， 只要99一个月，与其他写作工具相比真的太划算了！
             </span>
         )
     },
@@ -139,7 +139,7 @@ const recommendList = [
         content: (
             <span>
                 之前一直在用chatgpt，复杂的prompt让我一度怀疑AI是否真的能提高我的工作效率。偶然发现了魔法AI这个工具，只需要使用预设好的应用模板，就可以生成高质量的文案，让我们团队的工作流程更顺畅。与其他类似产品相比，魔法AI只需要99元每月，而ChatGPT需要20美金，Jasper需要39美金，
-                <span className="text-violet-500">团队版还更加优惠</span>。
+                <span className="text-red-600">团队版还更加优惠</span>。
             </span>
         )
     }
@@ -563,7 +563,7 @@ const Price1 = () => {
                     <div>
                         <div className="text-3xl font-semibold w-full text-center my-[20px]">
                             跨境人都选择
-                            <span className="text-violet-500">魔法AI</span>
+                            <span className="text-violet-500">“魔法AI”</span>
                         </div>
                         <div className="flex justify-center">
                             <AntButton

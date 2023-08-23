@@ -167,17 +167,18 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
-            {totals > 0 && (
-                <Box>
-                    <Typography variant="h3" my={2}>
-                        {t('chat.myRobot')}
-                    </Typography>
-                    <MyselfTemplate appList={newAppList} setUpdate={setUpdate} />
+            {/* {totals > 0 && ( */}
+            <Box>
+                <Typography variant="h3" my={2}>
+                    {t('chat.myRobot')}
+                </Typography>
+                <MyselfTemplate appList={newAppList} setUpdate={setUpdate} />
+                {totals > 0 && (
                     <Box my={2}>
                         <Pagination page={pageQuery.pageNo} count={Math.ceil(totals / pageQuery.pageSize)} onChange={paginationChange} />
                     </Box>
-                </Box>
-            )}
+                )}
+            </Box>
             <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} value={robotName} />
         </Box>
     );

@@ -85,7 +85,8 @@ export const Chat = ({
     statisticsMode,
     showSelect,
     botList,
-    setMUid
+    setMUid,
+    isMin
 }: {
     chatBotInfo: IChatInfo;
     mode?: 'iframe' | 'test';
@@ -94,6 +95,7 @@ export const Chat = ({
     showSelect?: boolean;
     botList?: any[];
     setMUid?: (mediumUid: any) => void;
+    isMin?: boolean;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -530,7 +532,7 @@ export const Chat = ({
                     <div
                         style={{
                             width: '100%',
-                            height: mode === 'iframe' ? 'calc(100vh - 180px)' : 'calc(100vh - 298px)',
+                            height: mode === 'iframe' ? 'calc(100vh - 180px)' : 'calc(100vh - 322px)',
                             overflowX: 'hidden'
                         }}
                         ref={scrollRef}

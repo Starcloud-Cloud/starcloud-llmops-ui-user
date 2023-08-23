@@ -66,7 +66,6 @@ const WeChatDrawer = ({
                                 <div>
                                     <div className="text-base" style={{ display: 'flex', alignItems: 'center' }}>
                                         机器人微信号：{item.config?.robotName}
-                                        <Typography color="error">{item.config?.robotName}</Typography>
                                         <Typography color="error">（同意帐号的好友申请，并增加为好友）</Typography>
                                     </div>
                                     <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>
@@ -75,7 +74,7 @@ const WeChatDrawer = ({
                                     </div>
                                     <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>
                                         绑定状态：
-                                        {item.config?.isBind && <span>{item.config?.isBind}</span>}
+                                        {item.config?.isBind && <span>已绑定</span>}
                                         {!item.config?.isBind && <span style={{ color: '#9da3af' }}>未绑定</span>}
                                     </div>
                                     <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>

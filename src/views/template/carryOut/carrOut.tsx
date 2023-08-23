@@ -152,7 +152,7 @@ const CarrOut = forwardRef(
                         {config?.steps.length > 1 || source === 'myApp' ? (
                             <Box>
                                 <Typography variant="h4">{item.name}</Typography>
-                                <Typography variant="caption" display="block">
+                                <Typography variant="caption" display="block" mt={1}>
                                     {item.description}
                                 </Typography>
                             </Box>

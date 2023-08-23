@@ -88,10 +88,15 @@ const AppModal = ({
         detailRef.current = _.cloneDeep(res);
         const newValue = _.cloneDeep(res);
         newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
+            if (item.defaultValue && !item.value) {
+                item.value = item.defaultValue;
+            }
             if (item.field === 'CONTENT') {
                 item.value = value;
             }
         });
+        console.log(newValue.workflowConfig.steps[0].variable.variables);
+
         detailRef.current = newValue;
         setDetail(newValue);
     };

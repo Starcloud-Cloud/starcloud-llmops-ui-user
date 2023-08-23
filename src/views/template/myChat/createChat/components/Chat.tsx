@@ -109,6 +109,7 @@ export const Chat = ({
     const [time, setTime] = React.useState(1);
     const [isFirst, setIsFirst] = React.useState(true);
     const [isFetch, setIsFetch] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
@@ -168,7 +169,11 @@ export const Chat = ({
         if (mode === 'test' && conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
-                const list = res.list.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+                const list = res.list.map((v: any) => ({
+                    ...v,
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar
+                }));
                 const result = [
                     ...list,
                     {
@@ -206,7 +211,11 @@ export const Chat = ({
     // 更新历史记录
     React.useEffect(() => {
         if (mode === 'test' && !isFirst) {
-            const list: any = dataRef.current.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar }));
+            const list: any = dataRef.current.map((v: any) => ({
+                ...v,
+                robotName: chatBotInfo.name,
+                robotAvatar: chatBotInfo.avatar
+            }));
             dataRef.current = list;
             setData(list);
         }
@@ -235,8 +244,17 @@ export const Chat = ({
     React.useEffect(() => {
         if (mode === 'iframe') {
             (async () => {
-                const res = await getShareChatHistory({ pageNo: 1, pageSize: 10000, conversationUid: jsCookie.get(conversationUniKey) });
-                const list = res.list?.map((v: any) => ({ ...v, robotName: chatBotInfo.name, robotAvatar: chatBotInfo.avatar })) || [];
+                const res = await getShareChatHistory({
+                    pageNo: 1,
+                    pageSize: 10000,
+                    conversationUid: jsCookie.get(conversationUniKey)
+                });
+                const list =
+                    res.list?.map((v: any) => ({
+                        ...v,
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar
+                    })) || [];
                 const result = [
                     ...list,
                     {
@@ -457,68 +475,45 @@ export const Chat = ({
     return (
         <div className="h-full">
             <div className="h-[calc(100%-25px)] relative">
-                <div className={`flex items-center p-[8px] ${showSelect ? 'justify-between' : 'justify-center'}`}>
-                    {showSelect && (
-                        <FormControl
-                            sx={{
-                                width: '150px',
-                                '& .Mui-focused': {
-                                    background: '#f8fafc',
-                                    paddingRight: '2px'
-                                },
-                                '& .MuiInputLabel-sizeSmall': {
-                                    background: '#f8fafc',
-                                    paddingRight: '2px'
-                                }
-                            }}
-                        >
-                            <InputLabel size="small" id="age-select">
-                                机器人
-                            </InputLabel>
-                            <Select
-                                style={{ width: '100px' }}
-                                size="small"
-                                labelId="demo-select-small-label"
-                                id="demo-select-small"
-                                onChange={(e) => {
-                                    setMUid && setMUid(e?.target?.value || '');
-                                }}
-                            >
-                                {/* {botList?.map((v, index) => (
-                                    <MenuItem value={v.v} key={index}>
-                                        {v.k}
-                                    </MenuItem>
-                                ))} */}
-                            </Select>
-                        </FormControl>
-                    )}
+                <div className={`flex items-center p-[8px] justify-center`}>
                     <Popover
                         content={
                             <div>
+                                <div className="flex justify-center">切换机器人</div>
                                 {botList?.map((item, index) => (
-                                    <div className="flex items-center justify-center cursor-pointer">
-                                        <div className="">{item.avatar}</div>
-                                        <div className="">
-                                            <div>{item.name}</div>
-                                            <div>{item.des}</div>
+                                    <div
+                                        key={index}
+                                        className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
+                                            mediumUid === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                        }`}
+                                        onClick={() => {
+                                            setMUid && setMUid(item.value);
+                                        }}
+                                    >
+                                        <div className="w-[40px] h-[40px]">
+                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                        </div>
+                                        <div className="ml-2">
+                                            <div className="text-lg">{item.name}</div>
+                                            <div className="text-sm w-[320px] text-[#9da3af] mt-1">{item.des}</div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         }
-                        title="Title"
                         placement="bottom"
                         trigger="click"
+                        open={open}
+                        onOpenChange={setOpen}
                     >
                         <div className="flex items-center justify-center cursor-pointer">
                             <div className="w-[28px] h-[28px] flex justify-center items-center">
                                 <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                             </div>
                             <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-                            <ExpandMoreIcon className="ml-1 " />
+                            {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                         </div>
                     </Popover>
-                    {showSelect && <div className={'w-[100px]'} />}
                 </div>
                 <Divider variant={'fullWidth'} />
                 <div className={'max-w-[768px] m-auto'}>
@@ -655,8 +650,8 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            <div>
-                <div className="flex justify-center items-center">
+            <div className="relative w-full flex justify-center">
+                <div className="flex justify-center items-center fixed z-10">
                     <svg
                         version="1.1"
                         id="Layer_1"

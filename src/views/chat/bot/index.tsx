@@ -56,7 +56,7 @@ const chatBot = () => {
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 const value = data[key];
-                resultArray.push({ name: value.name, avatar: value.images[0], des: value.description });
+                resultArray.push({ name: value.name, avatar: value.images[0], des: value.description, value: key });
             }
         }
 

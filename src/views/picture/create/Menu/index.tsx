@@ -804,7 +804,16 @@ export const PictureCreateMenu = ({
                         </div>
                     )}
                 </Row>
-                {appOpen && <AppModal open={appOpen} emits={emits} tags={['Image', 'Optimize Prompt']} setOpen={setAppOpen} />}
+                {appOpen && (
+                    <AppModal
+                        title="创意描述优化"
+                        value={inputValue}
+                        open={appOpen}
+                        emits={emits}
+                        tags={['Image', 'Optimize Prompt']}
+                        setOpen={setAppOpen}
+                    />
+                )}
             </div>
             <Row
                 style={{

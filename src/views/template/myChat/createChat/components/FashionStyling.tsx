@@ -416,7 +416,8 @@ export const FashionStyling = ({
     const [list, setList] = useState<IVoiceType[]>([]);
     const [isValid, setIsValid] = useState(true);
     const [websiteCount, setWebsiteCount] = useState(0);
-
+    const [title, setTitle] = useState('');
+    const [appValues, setAppValues] = useState<any>('');
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
 
@@ -575,6 +576,8 @@ export const FashionStyling = ({
                                 onClick={() => {
                                     setTags(['Optimize Prompt', 'Chat', 'Desc']);
                                     setAppOpen(true);
+                                    setTitle('简介优化');
+                                    setAppValues(chatBotInfo.introduction);
                                 }}
                             >
                                 一键优化
@@ -673,6 +676,8 @@ export const FashionStyling = ({
                                 onClick={() => {
                                     setTags(['Optimize Prompt', 'Chat', 'Welcome']);
                                     setAppOpen(true);
+                                    setTitle('描述语优化');
+                                    setAppValues(chatBotInfo.statement);
                                 }}
                             >
                                 一键优化
@@ -1021,7 +1026,7 @@ export const FashionStyling = ({
                 list={list}
             />
             <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
-            {appOpen && <AppModal open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
+            {appOpen && <AppModal title={title} value={appValues} open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
         </>
     );
 };

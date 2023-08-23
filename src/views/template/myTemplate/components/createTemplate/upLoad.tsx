@@ -355,6 +355,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         });
         getUpdateBtn();
         setOpenCreateSite(false);
+        setOpenDrawer(true);
         dispatch(
             openSnackbar({
                 open: true,
@@ -402,6 +403,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             });
             getUpdateBtn();
             setOpenWchat(false);
+            setOpenWeDrawer(true);
             dispatch(
                 openSnackbar({
                     open: true,
@@ -419,7 +421,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         <Box>
             <SubCard
                 sx={{ p: 2, mb: 4 }}
-                contentSX={{ height: '50px', p: '0 !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                contentSX={{ minHeight: '50px', p: '0 !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
                 <Box>
                     <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
@@ -465,7 +467,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             </Typography> */}
             <Grid container spacing={2}>
                 <Grid item md={6} xs={12}>
-                    <SubCard contentSX={{ height: '120px', p: '20px', display: 'flex' }}>
+                    <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
                         <Box>
                             <Box
                                 width="40px"
@@ -485,7 +487,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     应用市场
                                     <Chip sx={{ ml: 1.5 }} size="small" label={'即将推出'} />
                                 </Typography>
-                                <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
+                                <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
                                     用户可在模板市场中下载你上传的应用
                                 </Typography>
                                 <Box display="flex">
@@ -503,11 +505,11 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         }}
                                     >
                                         <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                        &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
+                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
                                     </Box>
                                     <Box color="#b5bed0" fontSize="12px" display="flex" alignItems="center" mr={2}>
                                         <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                        &nbsp;&nbsp; 发布历史记录
+                                        <span style={{ marginLeft: '8px' }}>发布历史记录</span>
                                     </Box>
                                 </Box>
                             </Box>
@@ -548,7 +550,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         />
                                     )}
                                 </Typography>
-                                <Typography margin="10px 0 24px" lineHeight="16px" color="#9da3af">
+                                <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
                                     用户可在模板市场中下载你上传的应用
                                 </Typography>
                                 <Box display="flex">
@@ -577,7 +579,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         }}
                                     >
                                         <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                        &nbsp;&nbsp; {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
+                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
                                     </Box>
                                     <Box
                                         color="#b5bed0"
@@ -589,7 +591,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         onClick={marketRecord}
                                     >
                                         <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                        &nbsp;&nbsp; 发布历史记录
+                                        <span style={{ marginLeft: '8px' }}>发布历史记录</span>
                                     </Box>
                                 </Box>
                             </Box>
@@ -598,7 +600,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 </Grid>
                 {upLoadList.map((item) => (
                     <Grid key={item.title} item md={6} xs={12}>
-                        <SubCard contentSX={{ height: '120px', p: '20px', display: 'flex' }}>
+                        <SubCard contentSX={{ minHeight: '140px', p: '20px', display: 'flex' }}>
                             <Box>
                                 <Box
                                     width="40px"
@@ -627,17 +629,20 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     </Typography>
                                     <div>
                                         {item.enable && (
-                                            <Switch
-                                                disabled={updateBtn.isFirstCreatePublishRecord}
-                                                size={'small'}
-                                                color={'secondary'}
-                                                checked={item.enableValue}
-                                                onChange={() => handleSwitch(item)}
-                                            />
+                                            <>
+                                                <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
+                                                <Switch
+                                                    disabled={updateBtn.isFirstCreatePublishRecord}
+                                                    size={'small'}
+                                                    color={'secondary'}
+                                                    checked={item.enableValue}
+                                                    onChange={() => handleSwitch(item)}
+                                                />
+                                            </>
                                         )}
                                     </div>
                                 </div>
-                                <Typography margin="10px 0 10px" height="32px" lineHeight="16px" color="#9da3af">
+                                <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
                                     {item.desc}
                                 </Typography>
                                 <Box display="flex">
@@ -656,7 +661,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
                                             >
                                                 {IconList[el.icon]}
-                                                &nbsp;&nbsp; {el.title}
+                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
                                             </Box>
                                         ) : (
                                             <Box
@@ -674,7 +679,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 }`}
                                             >
                                                 {IconList[el.icon]}
-                                                &nbsp;&nbsp; {el.title}
+                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
                                             </Box>
                                         )
                                     )}

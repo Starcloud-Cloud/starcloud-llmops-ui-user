@@ -2,7 +2,7 @@ import React from 'react';
 
 // material-ui
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Card, CardContent, Grid, Theme, Tooltip, Typography } from '@mui/material';
+import { Card, CardContent, Divider, Grid, Theme, Tooltip, Typography } from '@mui/material';
 
 // project imports
 import dayjs from 'dayjs';
@@ -20,6 +20,7 @@ import { LoadingSpin } from 'ui-component/LoadingSpin';
 import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Popover, Tag } from 'antd';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -156,7 +157,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                             <Grid item xs={12}>
                                                                 {/* 思考中 */}
                                                                 {/* {history.process && ( */}
-                                                                {true && (
+                                                                {false && (
                                                                     <div className="flex flex-col">
                                                                         <div className="items-center px-[4px] py-[8px] bg-[#a8ed97e0] w-[110px] inline-flex justify-center rounded-md cursor-pointer">
                                                                             <LoadingSpin />
@@ -197,8 +198,44 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                         </div> */}
                                                                     </div>
                                                                 )}
+
+                                                                {true && (
+                                                                    <div>
+                                                                        <div
+                                                                            className={`text-sm whitespace-pre-line  ${
+                                                                                history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
+                                                                            }`}
+                                                                        >
+                                                                            <ChatMarkdown textContent={history.answer} />
+                                                                        </div>
+                                                                        <div className="py-1">
+                                                                            <Divider />
+                                                                        </div>
+                                                                        <div className="flex items-center mt-1">
+                                                                            <div className="text-sm">知识来源：</div>
+                                                                            <div className="ml-1">
+                                                                                <Popover content={<div>12</div>} trigger="hover">
+                                                                                    <Tag
+                                                                                        color="#55acee"
+                                                                                        className="cursor-pointer"
+                                                                                        onClick={() => window.open('http://www.baidu.com')}
+                                                                                    >
+                                                                                        1.百度
+                                                                                    </Tag>
+                                                                                </Popover>
+                                                                                <Tag color="#55acee" className="cursor-pointer">
+                                                                                    2.谷歌
+                                                                                </Tag>
+                                                                                <Tag color="#55acee" className="cursor-pointer">
+                                                                                    3.亚马逊
+                                                                                </Tag>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
                                                                 {/* 文本回答 */}
-                                                                {history.answer ? (
+                                                                {/* {history.answer ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
@@ -208,7 +245,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />
-                                                                )}
+                                                                )} */}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

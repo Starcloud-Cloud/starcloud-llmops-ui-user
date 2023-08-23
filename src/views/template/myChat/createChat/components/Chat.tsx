@@ -661,7 +661,7 @@ export const Chat = ({
                 </div>
             </div>
             <div className="relative w-full flex justify-center">
-                <div className="flex justify-center items-center fixed z-10">
+                <div className="flex justify-center items-center z-10 absolute">
                     <svg
                         version="1.1"
                         id="Layer_1"

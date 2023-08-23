@@ -287,6 +287,7 @@ function ApplicationAnalysis({
     const [chatVisible, setChatVisible] = useState(false);
     //绘话id
     const [conversationUid, setConversationUid] = useState('');
+
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -409,6 +410,7 @@ function ApplicationAnalysis({
                                                 });
                                             } else if (row.appMode === 'CHAT') {
                                                 setChatVisible(true);
+                                                setConversationUid(row.uid);
                                                 getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 100 }).then((res) => {
                                                     setDetail(res.list);
                                                 });
@@ -451,13 +453,14 @@ function ApplicationAnalysis({
                     sx={{ '& .MuiDrawer-paper': { overflow: 'hidden' } }}
                     onClose={() => {
                         setChatVisible(false);
+                        setConversationUid('');
                         setDetail(null);
                     }}
                 >
                     <div className="bg-[#f4f6f8] w-[350px] md:w-[600px] flex items-center justify-center">
                         <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
                             <Card>
-                                <ChatRecord list={detail} />
+                                <ChatRecord list={detail} conversationUid={conversationUid} />
                             </Card>
                         </div>
                     </div>

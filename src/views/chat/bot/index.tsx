@@ -84,6 +84,22 @@ const chatBot = () => {
         }
     }, [mUid]);
 
+    useEffect(() => {
+        // 创建一个新的meta标签
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+
+        // 查找页面的头部并将新的meta标签添加进去
+        const head: any = document.querySelector('head');
+        head.appendChild(meta);
+
+        // 在组件卸载时，删除这个meta标签以还原原始设置
+        return () => {
+            head.removeChild(meta);
+        };
+    }, []);
+
     return (
         <div className="h-[100vh]">
             <Chat

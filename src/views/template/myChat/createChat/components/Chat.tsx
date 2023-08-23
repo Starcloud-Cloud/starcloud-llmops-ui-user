@@ -476,44 +476,54 @@ export const Chat = ({
         <div className="h-full">
             <div className="h-[calc(100%-25px)] relative">
                 <div className={`flex items-center p-[8px] justify-center`}>
-                    <Popover
-                        content={
-                            <div>
-                                <div className="flex justify-center">切换机器人</div>
-                                {botList?.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
-                                            mediumUid === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
-                                        }`}
-                                        onClick={() => {
-                                            setMUid && setMUid(item.value);
-                                        }}
-                                    >
-                                        <div className="w-[40px] h-[40px]">
-                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                    {showSelect ? (
+                        <Popover
+                            content={
+                                <div>
+                                    <div className="flex justify-center">切换机器人</div>
+                                    {botList?.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
+                                                mediumUid === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                            }`}
+                                            onClick={() => {
+                                                setMUid && setMUid(item.value);
+                                            }}
+                                        >
+                                            <div className="w-[40px] h-[40px]">
+                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                            </div>
+                                            <div className="ml-2">
+                                                <div className="text-lg">{item.name}</div>
+                                                <div className="text-sm w-[320px] text-[#9da3af] mt-1">{item.des}</div>
+                                            </div>
                                         </div>
-                                        <div className="ml-2">
-                                            <div className="text-lg">{item.name}</div>
-                                            <div className="text-sm w-[320px] text-[#9da3af] mt-1">{item.des}</div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            }
+                            placement="bottom"
+                            trigger="click"
+                            open={open}
+                            onOpenChange={setOpen}
+                        >
+                            <div className="flex items-center justify-center cursor-pointer">
+                                <div className="w-[28px] h-[28px] flex justify-center items-center">
+                                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                                </div>
+                                <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+
+                                {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                             </div>
-                        }
-                        placement="bottom"
-                        trigger="click"
-                        open={open}
-                        onOpenChange={setOpen}
-                    >
+                        </Popover>
+                    ) : (
                         <div className="flex items-center justify-center cursor-pointer">
                             <div className="w-[28px] h-[28px] flex justify-center items-center">
                                 <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                             </div>
                             <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-                            {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                         </div>
-                    </Popover>
+                    )}
                 </div>
                 <Divider variant={'fullWidth'} />
                 <div className={'max-w-[768px] m-auto'}>

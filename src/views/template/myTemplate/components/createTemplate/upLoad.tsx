@@ -355,6 +355,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         });
         getUpdateBtn();
         setOpenCreateSite(false);
+        setOpenDrawer(true);
         dispatch(
             openSnackbar({
                 open: true,
@@ -402,6 +403,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             });
             getUpdateBtn();
             setOpenWchat(false);
+            setOpenWeDrawer(true);
             dispatch(
                 openSnackbar({
                     open: true,

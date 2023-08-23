@@ -1,4 +1,4 @@
-import { Button, Drawer, TextField, Accordion, AccordionSummary, Typography, AccordionDetails, Tooltip } from '@mui/material';
+import { Button, Box, Drawer, TextField, Accordion, AccordionSummary, Typography, AccordionDetails, Tooltip } from '@mui/material';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Popconfirm, ConfigProvider } from 'antd';
 import React, { useEffect, useRef } from 'react';
@@ -22,7 +22,7 @@ const WeChatDrawer = ({
     getUpdateBtn: () => void;
 }) => {
     const onClose = () => setOpen(false);
-    const [expanded, setExpanded] = React.useState<number | false>(false);
+    const [expanded, setExpanded] = React.useState<number | false>(0);
     const handleChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);
     };
@@ -56,29 +56,33 @@ const WeChatDrawer = ({
                     {codeList?.map((item: any, index: number) => (
                         <Accordion key={index} expanded={expanded === index} onChange={handleChange(index)}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography fontSize="14px" fontWeight="500">
-                                    微信群{index + 1}：{item.name}
+                                <Typography fontSize="16px" fontWeight="500">
+                                    微信群
+                                    {index + 1}：{item.config?.groupName && <span>{item.config?.groupName}</span>}
+                                    {!item.config?.groupName && <span style={{ color: '#9da3af' }}>未绑定</span>}
                                 </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <div className="mt-5">
-                                    <TextField
-                                        InputLabelProps={{ shrink: true }}
-                                        color="secondary"
-                                        name="name"
-                                        label={'微信群名称'}
-                                        placeholder={'请输入微信群名称'}
-                                        disabled
-                                        fullWidth
-                                        value={item.name}
-                                    />
-                                    <div className="text-base mt-5" style={{ display: 'flex', alignItems: 'center' }}>
-                                        <Tooltip placement="top" title="在企业微信群中@机器人 并回复复制的内容">
-                                            <ErrorOutlineIcon fontSize="small" />
-                                        </Tooltip>
-                                        绑定应用:{item.mediumUid}
+                                <div>
+                                    <div className="text-base" style={{ display: 'flex', alignItems: 'center' }}>
+                                        机器人微信号：{item.config?.robotName}
+                                        <Typography color="error">{item.config?.robotName}</Typography>
+                                        <Typography color="error">（同意帐号的好友申请，并增加为好友）</Typography>
+                                    </div>
+                                    <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>
+                                        群名称：
+                                        <Typography>{item.config?.groupName}</Typography>
+                                    </div>
+                                    <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>
+                                        绑定状态：
+                                        {item.config?.isBind && <span>{item.config?.isBind}</span>}
+                                        {!item.config?.isBind && <span style={{ color: '#9da3af' }}>未绑定</span>}
+                                    </div>
+                                    <div className="text-base mt-2" style={{ display: 'flex', alignItems: 'center' }}>
+                                        绑定码：
+                                        <Typography>{item.config?.groupRemark}</Typography>
                                         <CopyToClipboard
-                                            text={`绑定应用:${item.mediumUid}`}
+                                            text={item.config?.groupRemark}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -98,7 +102,18 @@ const WeChatDrawer = ({
                                             <span className="text-[#5e35b1] cursor-pointer text-base ml-3">复制</span>
                                         </CopyToClipboard>
                                     </div>
-                                    <div className="flex items-center justify-end">
+                                    <div className="text-base mt-5" style={{ display: 'flex', alignItems: 'center', fontWeight: 500 }}>
+                                        邀请机器人
+                                        <Typography fontSize="1rem" fontWeight={500} color="error">
+                                            {item.config?.robotName}
+                                        </Typography>
+                                        进群，并@机器人输入
+                                        <Typography fontSize="1rem" fontWeight={500} color="error">
+                                            {item.config?.groupRemark}
+                                        </Typography>
+                                        并发送。
+                                    </div>
+                                    <div className="flex items-center mt-5 justify-end">
                                         <ConfigProvider
                                             theme={{
                                                 components: {

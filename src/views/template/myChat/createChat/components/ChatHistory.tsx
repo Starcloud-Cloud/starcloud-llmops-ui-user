@@ -224,9 +224,11 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             <div className=" max-w-[325px]">
                                                                                                 <span>{item?.desc}</span>
                                                                                                 {isMobile && (
-                                                                                                    <a target="_blank" href={item.url}>
-                                                                                                        点击查看
-                                                                                                    </a>
+                                                                                                    <div>
+                                                                                                        <a target="_blank" href={item.url}>
+                                                                                                            点击查看
+                                                                                                        </a>
+                                                                                                    </div>
                                                                                                 )}
                                                                                             </div>
                                                                                         }
@@ -249,7 +251,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 )}
                                                                 {/* 文本回答 */}
-                                                                {history.answer ? (
+                                                                {/* {history.answer && !history?.process ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
@@ -259,7 +261,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />
-                                                                )}
+                                                                )} */}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

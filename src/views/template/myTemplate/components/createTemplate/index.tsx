@@ -219,16 +219,14 @@ function CreateDetail() {
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
-        detailRef.current = _.cloneDeep({
-            ...detail,
+        detailRef.current = {
+            ..._.cloneDeep(detail),
+            [data.name]: data.value
+        };
+        setDetail({
+            ..._.cloneDeep(detailRef.current),
             [data.name]: data.value
         });
-        setDetail(
-            _.cloneDeep({
-                ...detail,
-                [data.name]: data.value
-            })
-        );
     };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
@@ -278,7 +276,7 @@ function CreateDetail() {
     );
     //提示词更改
     const basisChange = ({ e, index, i, flag = false, values = false }: any) => {
-        const oldValue = _.cloneDeep(detail);
+        const oldValue = _.cloneDeep(detailRef.current);
         if (flag) {
             oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow =
                 !oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].isShow;

@@ -309,7 +309,9 @@ function CreateDetail() {
 
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                        <div className="h-screen">
+                            <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                        </div>
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>
@@ -317,9 +319,12 @@ function CreateDetail() {
                 </TabPanel>
             </Card>
             {value !== 5 && (
-                <Card className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-130px)]">
-                    <Chat chatBotInfo={chatBotInfo} mode={'test'} />
-                </Card>
+                <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
+                    <div className="text-base color-[#121926]">预览与调试</div>
+                    <Card className="h-full">
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                    </Card>
+                </div>
             )}
         </div>
     );

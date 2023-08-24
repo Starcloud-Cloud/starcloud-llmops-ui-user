@@ -1078,7 +1078,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                 >
                     问答式
                 </span>
-                <Button
+                {/* <Button
                     variant={'contained'}
                     startIcon={<AddIcon />}
                     color={'secondary'}
@@ -1088,7 +1088,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     }}
                 >
                     添加问答
-                </Button>
+                </Button> */}
             </Box>
             <Box display="flex" justifyContent="center" mt={3}>
                 <div className={'mt-3'} style={{ margin: '0 auto', textAlign: 'center' }}>

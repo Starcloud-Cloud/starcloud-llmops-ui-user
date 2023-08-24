@@ -1,6 +1,6 @@
 // material-ui
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField } from '@mui/material';
+import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
@@ -42,6 +42,9 @@ export default function WechatModal({
             >
                 <CardContent>
                     <Grid container spacing={gridSpacing} className="w-full flex justify-center pt-[24px] ml-0">
+                        <Typography mb={2}>
+                            输入微信帐号对应的手机号，会主动申请增加我们的机器人微信号。 把机器人微信号放到自己的企业微信就可以对话啦。
+                        </Typography>
                         <div className={'w-full'}>
                             <TextField
                                 error={checked && !value.match(/^1[3-9]\d{9}$/)}

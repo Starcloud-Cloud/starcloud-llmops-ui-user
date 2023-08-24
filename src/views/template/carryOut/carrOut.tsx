@@ -56,7 +56,7 @@ const CarrOut = forwardRef(
         }));
         const fn = (data: any[]) => {
             const Data: Record<string, any> = {};
-            data.forEach((variable: { isShow: boolean; field: string; value: string }) => {
+            data.map((variable: { isShow: boolean; field: string; value: string }) => {
                 const { field, isShow, value } = variable;
                 if (isShow) {
                     Data[field] = value !== null && value !== undefined ? value : '';
@@ -152,7 +152,7 @@ const CarrOut = forwardRef(
                         {config?.steps.length > 1 || source === 'myApp' ? (
                             <Box>
                                 <Typography variant="h4">{item.name}</Typography>
-                                <Typography variant="caption" display="block">
+                                <Typography variant="caption" display="block" mt={1}>
                                     {item.description}
                                 </Typography>
                             </Box>

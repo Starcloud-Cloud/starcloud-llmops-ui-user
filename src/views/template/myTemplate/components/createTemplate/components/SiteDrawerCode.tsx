@@ -41,7 +41,7 @@ export const SiteDrawerCode = ({
     getUpdateBtn: () => void;
 }) => {
     const onClose = () => setOpen(false);
-    const [expanded, setExpanded] = React.useState<number | false>(false);
+    const [expanded, setExpanded] = React.useState<number | false>(0);
     const handleChange = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);
     };

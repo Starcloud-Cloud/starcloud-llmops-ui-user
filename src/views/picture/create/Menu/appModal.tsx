@@ -9,7 +9,8 @@ import {
     Select,
     MenuItem,
     Grid,
-    Button
+    Button,
+    Typography
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
@@ -44,11 +45,15 @@ interface Execute {
 const AppModal = ({
     open,
     tags,
+    title,
+    value,
     setOpen,
     emits
 }: {
     open: boolean;
     tags: string[];
+    title: string;
+    value: string | undefined;
     setOpen: (data: boolean) => void;
     emits: (data: any) => void;
 }) => {
@@ -61,7 +66,6 @@ const AppModal = ({
             fn();
         }
     }, [open, tags]);
-
     const [appValue, setAppValue] = useState('');
     const [appList, setAppList] = useState<any[]>([]);
     const [detail, setDetail] = useState<Details>({
@@ -69,24 +73,32 @@ const AppModal = ({
             steps: []
         }
     });
+    const [perform, setPerform] = useState(0);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
-    //类别列表
-    // const [categoryList, setCategoryList] = useState<any[]>([]);
-    // useEffect(() => {
-    //     getList();
-    // }, []);
-    // const getList = () => {
-    //     appDetail(params.mediumUid).then((res: any) => {
-    //         detailRef.current = _.cloneDeep(res);
-    //         setDetail(res);
-    //     });
-    // };
+    const [error, setError] = useState(false);
+    useEffect(() => {
+        if (appList.length > 0) {
+            setAppValue(appList[0].value);
+            getDetail(appList[0].value);
+        }
+    }, [appList]);
     //点击获取执行详情
     const getDetail = async (data: string) => {
         const res = await marketDeatail({ uid: data });
         detailRef.current = _.cloneDeep(res);
-        setDetail(res);
+        const newValue = _.cloneDeep(res);
+        newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
+            if (item.defaultValue && !item.value) {
+                item.value = item.defaultValue;
+            }
+            if (item.field === 'CONTENT') {
+                item.value = value;
+            }
+        });
+        detailRef.current = newValue;
+        setPerform(perform + 1);
+        setDetail(newValue);
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
@@ -254,7 +266,7 @@ const AppModal = ({
                     overflowY: 'auto',
                     maxHeight: '80%'
                 }}
-                title="优化选择"
+                title={title}
                 content={false}
                 secondary={
                     <IconButton
@@ -289,31 +301,49 @@ const AppModal = ({
                             ))}
                         </Select>
                     </FormControl>
-                    <Perform
-                        config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                        changeSon={changeData}
-                        changeanswer={changeanswer}
-                        loadings={loadings}
-                        variableChange={exeChange}
-                        promptChange={promptChange}
-                        isallExecute={(flag: boolean) => {
-                            isAllExecute = flag;
-                        }}
-                        source="myApp"
-                    />
+                    {perform > 0 && (
+                        <Perform
+                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                            changeSon={changeData}
+                            changeanswer={changeanswer}
+                            loadings={loadings}
+                            variableChange={exeChange}
+                            promptChange={promptChange}
+                            key={perform}
+                            isallExecute={(flag: boolean) => {
+                                isAllExecute = flag;
+                            }}
+                            source="myApp"
+                        />
+                    )}
                 </CardContent>
                 <Divider />
                 <CardActions>
-                    <Grid container justifyContent="flex-end">
+                    <Grid container justifyContent="flex-end" alignItems="center">
+                        {error && (
+                            <Typography color="error" mr={1}>
+                                (无AI结果，无法插入)
+                            </Typography>
+                        )}
                         <Button
                             type="submit"
                             variant="contained"
                             color="secondary"
                             onClick={() => {
-                                emits(detail.workflowConfig.steps[0]?.flowStep.response.answer);
+                                if (
+                                    !detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
+                                        .response.answer
+                                ) {
+                                    setError(true);
+                                } else {
+                                    emits(
+                                        detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
+                                            .response.answer
+                                    );
+                                }
                             }}
                         >
-                            保存
+                            确认
                         </Button>
                     </Grid>
                 </CardActions>

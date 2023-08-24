@@ -89,7 +89,7 @@ export const Chat = ({
     setMUid
 }: {
     chatBotInfo: IChatInfo;
-    mode?: 'iframe' | 'test';
+    mode?: 'iframe' | 'test' | 'individual';
     mediumUid?: string;
     statisticsMode?: string;
     showSelect?: boolean;
@@ -557,132 +557,240 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            <div className="flex-shrink-0 flex justify-center w-full">
-                <div className="w-full max-w-[768px] p-[8px] ">
-                    <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
-                        <Grid item className="!pl-0">
-                            <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                                <MoreHorizTwoToneIcon />
-                            </IconButton>
-                            <Menu
-                                id="simple-menu"
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={Boolean(anchorEl)}
-                                onClose={handleCloseSort}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right'
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right'
-                                }}
-                            >
-                                <MenuItem onClick={handleClean}>
-                                    <CleaningServicesSharpIcon className="text-base" />
-                                    <span className="text-base ml-3">清除</span>
-                                </MenuItem>
-                            </Menu>
-                        </Grid>
-                        <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                            <OutlinedInput
-                                id="message-send"
-                                fullWidth
-                                multiline
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                placeholder="请输入(Shift+Enter换行)"
-                                className="!pt-0"
-                                onKeyDown={handleKeyDown}
-                                minRows={1}
-                                maxRows={3}
-                                endAdornment={
-                                    <>
-                                        <InputAdornment position="end">
-                                            {!isListening ? (
-                                                <Tooltip arrow placement="top" title={'语音输入'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={'default'}
-                                                        onClick={startListening}
-                                                        aria-label="voice"
-                                                        className="p-0"
-                                                    >
-                                                        <KeyboardVoiceIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                    <div
-                                                        onClick={stopListening}
-                                                        className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                    >
-                                                        <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                            {time}
+            {mode === 'individual' ? (
+                <div className="flex-shrink-0 flex justify-center w-full ">
+                    <div className="w-full max-w-[768px]  relative text-sm rounded-lg bg-white shadow-lg p-3 border border-[#E3E4E5]">
+                        <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
+                            <Grid item className="!pl-0">
+                                <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                                    <MoreHorizTwoToneIcon />
+                                </IconButton>
+                                <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleCloseSort}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right'
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right'
+                                    }}
+                                >
+                                    <MenuItem onClick={handleClean}>
+                                        <CleaningServicesSharpIcon className="text-base" />
+                                        <span className="text-base ml-3">清除</span>
+                                    </MenuItem>
+                                </Menu>
+                            </Grid>
+                            <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                                <OutlinedInput
+                                    id="message-send"
+                                    fullWidth
+                                    multiline
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="请输入(Shift+Enter换行)"
+                                    className="!pt-0"
+                                    onKeyDown={handleKeyDown}
+                                    minRows={1}
+                                    maxRows={3}
+                                    endAdornment={
+                                        <>
+                                            <InputAdornment position="end">
+                                                {!isListening ? (
+                                                    <Tooltip arrow placement="top" title={'语音输入'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={'default'}
+                                                            onClick={startListening}
+                                                            aria-label="voice"
+                                                            className="p-0"
+                                                        >
+                                                            <KeyboardVoiceIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                        <div
+                                                            onClick={stopListening}
+                                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                        >
+                                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                                {time}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </Tooltip>
-                                            )}
-                                        </InputAdornment>
-                                        <InputAdornment position="end" className="relative">
-                                            {isFetch ? (
-                                                <Tooltip placement="top" arrow title={'请求中'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={message ? 'secondary' : 'default'}
-                                                        aria-label="send message"
-                                                    >
-                                                        <PendingIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip placement="top" arrow title={'发送'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={message ? 'secondary' : 'default'}
-                                                        onClick={handleOnSend}
-                                                        aria-label="send message"
-                                                    >
-                                                        <SendIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            )}
-                                        </InputAdornment>
-                                    </>
-                                }
-                                aria-describedby="search-helper-text"
-                                inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
-                            />
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                            <InputAdornment position="end" className="relative">
+                                                {isFetch ? (
+                                                    <Tooltip placement="top" arrow title={'请求中'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            aria-label="send message"
+                                                        >
+                                                            <PendingIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'发送'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            onClick={handleOnSend}
+                                                            aria-label="send message"
+                                                        >
+                                                            <SendIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                        </>
+                                    }
+                                    aria-describedby="search-helper-text"
+                                    inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                />
+                            </Grid>
                         </Grid>
-                    </Grid>
-                    <div>
-                        <div className="flex justify-end px-[24px]">
-                            <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                        <div>
+                            <div className="flex justify-end px-[24px]">
+                                <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="w-full flex justify-center">
-                        <div className="flex justify-center items-center">
-                            <svg
-                                version="1.1"
-                                id="Layer_1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                x="0px"
-                                y="0px"
-                                width="18px"
-                                height="18px"
-                                viewBox="0 0 18 18"
-                                enableBackground="new 0 0 24 24"
-                                xmlSpace="preserve"
-                            >
-                                <image
-                                    id="image0"
-                                    width="18"
-                                    height="18"
-                                    x="0"
-                                    y="0"
-                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                </div>
+            ) : (
+                <div className="flex-shrink-0 flex justify-center w-full">
+                    <div className="w-full max-w-[768px] p-[8px] ">
+                        <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
+                            <Grid item className="!pl-0">
+                                <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                                    <MoreHorizTwoToneIcon />
+                                </IconButton>
+                                <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleCloseSort}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right'
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right'
+                                    }}
+                                >
+                                    <MenuItem onClick={handleClean}>
+                                        <CleaningServicesSharpIcon className="text-base" />
+                                        <span className="text-base ml-3">清除</span>
+                                    </MenuItem>
+                                </Menu>
+                            </Grid>
+                            <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                                <OutlinedInput
+                                    id="message-send"
+                                    fullWidth
+                                    multiline
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="请输入(Shift+Enter换行)"
+                                    className="!pt-0"
+                                    onKeyDown={handleKeyDown}
+                                    minRows={1}
+                                    maxRows={3}
+                                    endAdornment={
+                                        <>
+                                            <InputAdornment position="end">
+                                                {!isListening ? (
+                                                    <Tooltip arrow placement="top" title={'语音输入'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={'default'}
+                                                            onClick={startListening}
+                                                            aria-label="voice"
+                                                            className="p-0"
+                                                        >
+                                                            <KeyboardVoiceIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                        <div
+                                                            onClick={stopListening}
+                                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                        >
+                                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                                {time}
+                                                            </div>
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                            <InputAdornment position="end" className="relative">
+                                                {isFetch ? (
+                                                    <Tooltip placement="top" arrow title={'请求中'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            aria-label="send message"
+                                                        >
+                                                            <PendingIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'发送'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            onClick={handleOnSend}
+                                                            aria-label="send message"
+                                                        >
+                                                            <SendIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                        </>
+                                    }
+                                    aria-describedby="search-helper-text"
+                                    inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                />
+                            </Grid>
+                        </Grid>
+                        <div>
+                            <div className="flex justify-end px-[24px]">
+                                <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                            </div>
+                        </div>
+                        <div className="w-full flex justify-center">
+                            <div className="flex justify-center items-center">
+                                <svg
+                                    version="1.1"
+                                    id="Layer_1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                    x="0px"
+                                    y="0px"
+                                    width="18px"
+                                    height="18px"
+                                    viewBox="0 0 18 18"
+                                    enableBackground="new 0 0 24 24"
+                                    xmlSpace="preserve"
+                                >
+                                    <image
+                                        id="image0"
+                                        width="18"
+                                        height="18"
+                                        x="0"
+                                        y="0"
+                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -837,17 +945,18 @@ export const Chat = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                />
-                            </svg>
-                            <span className="text-[#596780] text-xs truncate leading-5 ml-1">
-                                <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
-                                    Powered by 魔法AI
-                                </a>
-                            </span>
+                                    />
+                                </svg>
+                                <span className="text-[#596780] text-xs truncate leading-5 ml-1">
+                                    <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
+                                        Powered by 魔法AI
+                                    </a>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

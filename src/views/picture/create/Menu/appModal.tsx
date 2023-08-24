@@ -73,6 +73,7 @@ const AppModal = ({
             steps: []
         }
     });
+    const [perform, setPerform] = useState(0);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
     const [error, setError] = useState(false);
@@ -95,9 +96,8 @@ const AppModal = ({
                 item.value = value;
             }
         });
-        console.log(newValue.workflowConfig.steps[0].variable.variables);
-
         detailRef.current = newValue;
+        setPerform(perform + 1);
         setDetail(newValue);
     };
     //更改answer
@@ -301,18 +301,21 @@ const AppModal = ({
                             ))}
                         </Select>
                     </FormControl>
-                    <Perform
-                        config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                        changeSon={changeData}
-                        changeanswer={changeanswer}
-                        loadings={loadings}
-                        variableChange={exeChange}
-                        promptChange={promptChange}
-                        isallExecute={(flag: boolean) => {
-                            isAllExecute = flag;
-                        }}
-                        source="myApp"
-                    />
+                    {perform > 0 && (
+                        <Perform
+                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                            changeSon={changeData}
+                            changeanswer={changeanswer}
+                            loadings={loadings}
+                            variableChange={exeChange}
+                            promptChange={promptChange}
+                            key={perform}
+                            isallExecute={(flag: boolean) => {
+                                isAllExecute = flag;
+                            }}
+                            source="myApp"
+                        />
+                    )}
                 </CardContent>
                 <Divider />
                 <CardActions>
@@ -328,13 +331,13 @@ const AppModal = ({
                             color="secondary"
                             onClick={() => {
                                 if (
-                                    !detailRef.current.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
+                                    !detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
                                         .response.answer
                                 ) {
                                     setError(true);
                                 } else {
                                     emits(
-                                        detailRef.current.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
+                                        detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
                                             .response.answer
                                     );
                                 }

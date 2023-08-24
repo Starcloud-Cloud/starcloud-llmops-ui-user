@@ -11,7 +11,6 @@ import {
     TableHead,
     TableRow,
     TableCell,
-    TableBody,
     TableContainer,
     Paper,
     Pagination,
@@ -36,7 +35,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
 import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate, addFriend } from 'api/template';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import CreateSiteModal from './components/CreateSiteModal';
 import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
@@ -392,15 +390,13 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     //企业微信群聊
     const [phone, setPhone] = useState('');
     const wechatOK = async () => {
-        const result = await addFriend({ mobile: phone });
+        const result = await addFriend({
+            mobile: phone,
+            appUid: updateBtn.appUid,
+            name: updateBtn.name + '_wecom_group',
+            publishUid: updateBtn.uid
+        });
         if (result) {
-            await channelCreate({
-                appUid: updateBtn.appUid,
-                name: updateBtn.name + '_wecom_group',
-                publishUid: updateBtn.uid,
-                type: 7,
-                status: 0
-            });
             getUpdateBtn();
             setOpenWchat(false);
             setOpenWeDrawer(true);
@@ -473,129 +469,95 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 width="40px"
                                 height="40px"
                                 borderRadius="50%"
-                                sx={mode === 'CHAT' ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
+                                sx={{ background: '#673ab74f' }}
                                 display="flex"
                                 alignItems="center"
                                 justifyContent="center"
                             >
-                                {mode === 'CHAT' ? <Storefront /> : <Storefront color={'secondary'} />}
+                                <Storefront color={'secondary'} />
                             </Box>
                         </Box>
-                        {mode === 'CHAT' ? (
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    应用市场
-                                    <Chip sx={{ ml: 1.5 }} size="small" label={'即将推出'} />
-                                </Typography>
-                                <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
-                                    用户可在模板市场中下载你上传的应用
-                                </Typography>
-                                <Box display="flex">
-                                    <Box
-                                        color="#b5bed0"
-                                        fontSize="12px"
-                                        display="flex"
-                                        alignItems="center"
-                                        mr={2}
-                                        sx={{
-                                            cursor:
-                                                !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                    ? 'pointer'
-                                                    : 'default'
-                                        }}
-                                    >
-                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
-                                    </Box>
-                                    <Box color="#b5bed0" fontSize="12px" display="flex" alignItems="center" mr={2}>
-                                        <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                        <span style={{ marginLeft: '8px' }}>发布历史记录</span>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        ) : (
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    应用市场
+                        <Box ml={2}>
+                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                应用市场
+                                <Chip
+                                    sx={{ ml: 1.5 }}
+                                    size="small"
+                                    label={
+                                        releaseState === 0
+                                            ? '未发布'
+                                            : releaseState === 1
+                                            ? '待审核'
+                                            : releaseState === 2
+                                            ? '审核通过'
+                                            : releaseState === 3
+                                            ? '审核未通过'
+                                            : releaseState === 4
+                                            ? '用户已取消'
+                                            : '已失效'
+                                    }
+                                />
+                                {updateBtn?.needTips && (
                                     <Chip
                                         sx={{ ml: 1.5 }}
                                         size="small"
+                                        color="warning"
                                         label={
-                                            releaseState === 0
-                                                ? '未发布'
-                                                : releaseState === 1
-                                                ? '待审核'
-                                                : releaseState === 2
-                                                ? '审核通过'
-                                                : releaseState === 3
-                                                ? '审核未通过'
-                                                : releaseState === 4
-                                                ? '用户已取消'
-                                                : '已失效'
+                                            updateBtn.needTips && releaseState === 1
+                                                ? '检测到应用已经更新：建议更新重新发布'
+                                                : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                                ? '需要更新后才能发布'
+                                                : '检测到应用已经更新：需要更新重新发布'
                                         }
+                                        variant="outlined"
                                     />
-                                    {updateBtn?.needTips && (
-                                        <Chip
-                                            sx={{ ml: 1.5 }}
-                                            size="small"
-                                            color="warning"
-                                            label={
-                                                updateBtn.needTips && releaseState === 1
-                                                    ? '检测到应用已经更新：建议更新重新发布'
-                                                    : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
-                                                    ? '需要更新后才能发布'
-                                                    : '检测到应用已经更新：需要更新重新发布'
-                                            }
-                                            variant="outlined"
-                                        />
-                                    )}
-                                </Typography>
-                                <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
-                                    用户可在模板市场中下载你上传的应用
-                                </Typography>
-                                <Box display="flex">
-                                    <Box
-                                        color="#b5bed0"
-                                        fontSize="12px"
-                                        display="flex"
-                                        alignItems="center"
-                                        mr={2}
-                                        sx={{
-                                            cursor:
+                                )}
+                            </Typography>
+                            <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
+                                用户可在模板市场中下载你上传的应用
+                            </Typography>
+                            <Box display="flex">
+                                <Box
+                                    color="#b5bed0"
+                                    fontSize="12px"
+                                    display="flex"
+                                    alignItems="center"
+                                    mr={2}
+                                    sx={{
+                                        cursor:
+                                            !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                ? 'pointer'
+                                                : 'default',
+                                        '&:hover': {
+                                            color:
                                                 !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                    ? 'pointer'
-                                                    : 'default',
-                                            '&:hover': {
-                                                color:
-                                                    !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                        ? '#673ab7'
-                                                        : 'none'
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
-                                                uploadMarket();
-                                            }
-                                        }}
-                                    >
-                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
-                                    </Box>
-                                    <Box
-                                        color="#b5bed0"
-                                        fontSize="12px"
-                                        display="flex"
-                                        alignItems="center"
-                                        mr={2}
-                                        sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
-                                        onClick={marketRecord}
-                                    >
-                                        <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                        <span style={{ marginLeft: '8px' }}>发布历史记录</span>
-                                    </Box>
+                                                    ? '#673ab7'
+                                                    : 'none'
+                                        }
+                                    }}
+                                    onClick={() => {
+                                        if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
+                                            uploadMarket();
+                                        }
+                                    }}
+                                >
+                                    <CloudUploadOutlined sx={{ fontSize: '12px' }} />
+                                    <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
+                                </Box>
+                                <Box
+                                    color="#b5bed0"
+                                    fontSize="12px"
+                                    display="flex"
+                                    alignItems="center"
+                                    mr={2}
+                                    sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
+                                    onClick={marketRecord}
+                                >
+                                    <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                    <span style={{ marginLeft: '8px' }}>发布历史记录</span>
                                 </Box>
                             </Box>
-                        )}
+                        </Box>
                     </SubCard>
                 </Grid>
                 {upLoadList.map((item) => (
@@ -779,13 +741,34 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                             <Table size="small">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>APP名称</TableCell>
-                                        <TableCell>版本号</TableCell>
-                                        <TableCell>状态</TableCell>
-                                        <TableCell>更新时间</TableCell>
-                                        <TableCell>创建时间</TableCell>
+                                        <TableCell align="center">APP名称</TableCell>
+                                        <TableCell align="center">版本号</TableCell>
+                                        <TableCell align="center">状态</TableCell>
+                                        <TableCell align="center">更新时间</TableCell>
+                                        <TableCell align="center">创建时间</TableCell>
                                     </TableRow>
                                 </TableHead>
+                                {tableData.map((row: any) => (
+                                    <TableRow>
+                                        <TableCell align="center">{row.name}</TableCell>
+                                        <TableCell align="center">{row.version}</TableCell>
+                                        <TableCell align="center">
+                                            {row.audit === 0
+                                                ? '未发布'
+                                                : row.audit === 1
+                                                ? '待审核'
+                                                : row.audit === 2
+                                                ? '审核通过'
+                                                : row.audit === 3
+                                                ? '审核未通过'
+                                                : row.audit === 4
+                                                ? '用户已取消'
+                                                : '已失效'}
+                                        </TableCell>
+                                        <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
+                                        <TableCell align="center">{formatDate(row.createTime)}</TableCell>
+                                    </TableRow>
+                                ))}
                             </Table>
                         </TableContainer>
                         <Box my={2}>

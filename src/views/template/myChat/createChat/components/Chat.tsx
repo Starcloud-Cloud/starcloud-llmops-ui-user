@@ -34,7 +34,6 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
-import { height } from '@mui/system';
 
 export type IHistory = Partial<{
     uid: string;

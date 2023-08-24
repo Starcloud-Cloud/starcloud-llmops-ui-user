@@ -309,7 +309,9 @@ function CreateDetail() {
 
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} isMin={true} />
+                        <div className="h-screen">
+                            <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                        </div>
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>

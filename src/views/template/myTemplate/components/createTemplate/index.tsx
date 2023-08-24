@@ -219,7 +219,6 @@ function CreateDetail() {
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
-        console.log(data);
         detailRef.current = {
             ..._.cloneDeep(detail),
             [data.name]: data.value

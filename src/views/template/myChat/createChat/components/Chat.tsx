@@ -34,6 +34,7 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
+import { uniqBy } from 'lodash-es';
 
 export type IHistory = Partial<{
     uid: string;
@@ -399,10 +400,13 @@ export const Chat = ({
                     if (bufferObj?.code === 200) {
                         jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                         setConversationUid(bufferObj.conversationUid);
+                        console.log(bufferObj.content);
                         // 处理流程
                         if (bufferObj.type === 'i') {
                             const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].process = bufferObj.content;
+                            const process = JSON.parse(bufferObj.content);
+                            process.data = uniqBy(process.data, 'id');
+                            copyData[copyData.length - 1].process = process;
                             dataRef.current = copyData;
                             setData(copyData);
                         }
@@ -537,7 +541,7 @@ export const Chat = ({
                     >
                         <div ref={contentRef}>
                             {chatBotInfo.enableIntroduction && (
-                                <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[12px] flex">
+                                <Card className="bg-[#f2f3f5] mx-[8px] my-[12px] p-[12px] flex">
                                     <div className="flex w-[56px] h-[56px] justify-center items-center">
                                         <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
                                     </div>
@@ -554,7 +558,7 @@ export const Chat = ({
                             </CardContent>
                         </div>
                     </div>
-                    <div className="absolute w-full bottom-[-18px] max-w-[768px] px-[12px]">
+                    <div className="absolute w-full bottom-[-18px] max-w-[768px] px-[8px]">
                         <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
                             <Grid item className="!pl-0">
                                 <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">

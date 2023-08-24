@@ -9,7 +9,7 @@ export const WebPageInfo = ({ urlList, tips }: { urlList: any; tips: string }) =
                 <div>正在为你搜索新闻</div>
                 <div>{urlList.length}条</div>
             </div>
-            <div className="grid gap-4 grid-cols-3 mt-2">
+            <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 mt-2">
                 {urlList.map((item: any, index: number) => (
                     <div key={index} className="flex rounded-md bg-[#fff] p-[12px]">
                         <img src={item.logo} alt="" className="w-[36px] h-[36px]" />

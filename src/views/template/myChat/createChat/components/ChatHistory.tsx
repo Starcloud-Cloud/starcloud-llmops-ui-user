@@ -21,6 +21,8 @@ import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover, Tag } from 'antd';
+import { isMobile } from 'react-device-detect';
+
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -66,7 +68,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
                                                     }}
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important', width: 'fit-content', ml: 'auto' }}>
+                                                    <CardContent sx={{ width: 'fit-content', ml: 'auto' }} className="p-[12px] !pb-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 <div className="text-sm whitespace-pre-line text-[#364152]">
@@ -78,7 +80,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                 </Card>
                                             </Grid>
                                         </div>
-                                        <img className="w-[50px] h-[50px] rounded-xl ml-2" src={User} alt="" />
+                                        <img className="w-[35px] h-[35px] rounded-xl ml-1" src={User} alt="" />
                                     </div>
                                 </Grid>
                             </Grid>
@@ -102,7 +104,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                    <CardContent className="p-[12px] !pb-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
@@ -131,15 +133,15 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                         onMouseEnter={() => setCurrentChat(`${index}-answer`)}
                                         onMouseLeave={() => setCurrentChat('')}
                                     >
-                                        <div className="w-[50px] h-[50px] flex justify-center items-center  mr-2">
-                                            <img className="w-[50px] h-[50px] rounded-xl" src={history.robotAvatar} alt="" />
+                                        <div className="w-[35px] h-[35px] flex justify-center items-center  mr-2">
+                                            <img className="w-[35px] h-[35px] rounded-xl" src={history.robotAvatar} alt="" />
                                         </div>
                                         <div className="max-w-full overflow-x-auto">
                                             <Grid item xs={12} className="flex items-center">
                                                 <Typography align="left" variant="subtitle2" className="h-[19px]">
                                                     {history.robotName}
                                                 </Typography>
-                                                <Typography align="left" variant="subtitle2" className="ml-2">
+                                                <Typography align="left" variant="subtitle2" className="ml-1">
                                                     {currentChat === `${index}-answer` &&
                                                         dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                                 </Typography>
@@ -152,14 +154,14 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                    <CardContent className="p-[12px] !pb-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {/* 思考中 */}
                                                                 {/* {history.process && ( */}
                                                                 {false && (
-                                                                    <div className="flex flex-col">
-                                                                        <div className="items-center px-[4px] py-[8px] bg-[#a8ed97e0] w-[110px] inline-flex justify-center rounded-md cursor-pointer">
+                                                                    <div className="flex flex-col bg-[#e3f2fd] p-[8px] rounded-md">
+                                                                        <div className="items-center px-[4px] py-[8px] bg-[#e3f2fd] w-[110px] inline-flex justify-center rounded-md cursor-pointer">
                                                                             <LoadingSpin />
                                                                             <span className="ml-1">正在生成</span>
                                                                             <ExpandLessIcon className="w-[18px] h-[18px]" />
@@ -198,44 +200,56 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                         </div> */}
                                                                     </div>
                                                                 )}
-
-                                                                {true && (
+                                                                {history?.process?.showType === 'docs' && history?.answer && (
                                                                     <div>
                                                                         <div
                                                                             className={`text-sm whitespace-pre-line  ${
                                                                                 history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                             }`}
                                                                         >
-                                                                            <ChatMarkdown textContent={history.answer} />
+                                                                            <ChatMarkdown textContent={history?.answer} />
                                                                         </div>
                                                                         <div className="py-1">
                                                                             <Divider />
                                                                         </div>
                                                                         <div className="flex items-center mt-1">
-                                                                            <div className="text-sm">知识来源：</div>
-                                                                            <div className="ml-1">
-                                                                                <Popover content={<div>12</div>} trigger="hover">
-                                                                                    <Tag
-                                                                                        color="#55acee"
-                                                                                        className="cursor-pointer"
-                                                                                        onClick={() => window.open('http://www.baidu.com')}
+                                                                            <div className="text-xs" style={{ flex: '0 0 37px' }}>
+                                                                                来源：
+                                                                            </div>
+                                                                            <div className="grid grid-cols-2 gap-1 flex: 1">
+                                                                                {history?.process?.data?.map((item: any, index: number) => (
+                                                                                    <Popover
+                                                                                        key={index}
+                                                                                        content={
+                                                                                            <div className=" max-w-[325px]">
+                                                                                                <span>{item?.desc}</span>
+                                                                                                {isMobile && (
+                                                                                                    <a target="_blank" href={item.url}>
+                                                                                                        点击查看
+                                                                                                    </a>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        }
+                                                                                        trigger={isMobile ? 'click' : 'hover'}
+                                                                                        title={item.name}
                                                                                     >
-                                                                                        1.百度
-                                                                                    </Tag>
-                                                                                </Popover>
-                                                                                <Tag color="#55acee" className="cursor-pointer">
-                                                                                    2.谷歌
-                                                                                </Tag>
-                                                                                <Tag color="#55acee" className="cursor-pointer">
-                                                                                    3.亚马逊
-                                                                                </Tag>
+                                                                                        <Tag
+                                                                                            color="#673ab7"
+                                                                                            className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
+                                                                                            onClick={() =>
+                                                                                                !isMobile && window.open(item?.url)
+                                                                                            }
+                                                                                        >
+                                                                                            {item?.name}
+                                                                                        </Tag>
+                                                                                    </Popover>
+                                                                                ))}
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 )}
-
                                                                 {/* 文本回答 */}
-                                                                {/* {history.answer ? (
+                                                                {history.answer ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
@@ -245,7 +259,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />
-                                                                )} */}
+                                                                )}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

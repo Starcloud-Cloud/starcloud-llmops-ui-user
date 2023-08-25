@@ -2,9 +2,9 @@ import { Button, Box, Drawer, TextField, Accordion, AccordionSummary, Typography
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Popconfirm, ConfigProvider } from 'antd';
 import React, { useEffect, useRef } from 'react';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { channelUpload, channelDelete } from 'api/template';
+import { channelDelete } from 'api/template';
+import SubCard from 'ui-component/cards/SubCard';
 import './SiteDrawerCode.scss';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
@@ -56,14 +56,21 @@ const WeChatDrawer = ({
                     {codeList?.map((item: any, index: number) => (
                         <Accordion key={index} expanded={expanded === index} onChange={handleChange(index)}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography fontSize="16px" fontWeight="500">
-                                    微信群
-                                    {index + 1}：{item.config?.groupName && <span>{item.config?.groupName}</span>}
-                                    {!item.config?.groupName && <span style={{ color: '#9da3af' }}>未绑定</span>}
-                                </Typography>
+                                <Box width="100%" display="flex" justifyContent="space-between" alignItems="end">
+                                    <Typography fontSize="16px" fontWeight="500">
+                                        微信群
+                                        {index + 1}：{item.config?.groupName && <span>{item.config?.groupName}</span>}
+                                        {!item.config?.groupName && <span style={{ color: '#9da3af' }}>未绑定</span>}
+                                    </Typography>
+                                    {item.config?.bindTime && (
+                                        <Typography fontSize="12px" color="#9da3af">
+                                            绑定时间:{item.config?.bindTime}
+                                        </Typography>
+                                    )}
+                                </Box>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <div>
+                                <SubCard>
                                     <div className="text-base" style={{ display: 'flex', alignItems: 'center' }}>
                                         机器人微信号：{item.config?.robotName}
                                         <Typography color="error">（同意帐号的好友申请，并增加为好友）</Typography>
@@ -137,7 +144,7 @@ const WeChatDrawer = ({
                                             </Popconfirm>
                                         </ConfigProvider>
                                     </div>
-                                </div>
+                                </SubCard>
                             </AccordionDetails>
                         </Accordion>
                     ))}

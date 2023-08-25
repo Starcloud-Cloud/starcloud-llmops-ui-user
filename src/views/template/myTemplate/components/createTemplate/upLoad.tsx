@@ -793,8 +793,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         <TableCell align="center">创建时间</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {tableData.map((row: any) => (
-                                    <TableRow>
+                                {tableData.map((row: any, index: number) => (
+                                    <TableRow key={index}>
                                         <TableCell align="center">{row.name}</TableCell>
                                         <TableCell align="center">{row.version}</TableCell>
                                         <TableCell align="center">

@@ -872,7 +872,6 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         <Box>
                             <Button
                                 variant={'contained'}
-                                startIcon={<AddIcon />}
                                 color={'secondary'}
                                 size={'small'}
                                 sx={{ mr: 1 }}
@@ -880,7 +879,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                     setRuleOpen(true);
                                 }}
                             >
-                                添加规则
+                                规则设定
                             </Button>
                             <Button
                                 variant={'contained'}
@@ -1239,7 +1238,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     detailClose={() => setDetailOpen(false)}
                 />
             )}
-            <AddRuleModal open={ruleOpen} handleClose={setRuleOpen} />
+            {ruleOpen && <AddRuleModal open={ruleOpen} datasetUid={datasetId} handleClose={setRuleOpen} />}
         </div>
     );
 };

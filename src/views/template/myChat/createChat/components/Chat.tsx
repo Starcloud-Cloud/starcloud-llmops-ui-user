@@ -526,7 +526,7 @@ export const Chat = ({
             </div>
             <Divider variant={'fullWidth'} />
             <div className="flex-grow flex justify-center  overflow-y-auto w-full">
-                <div className={'max-w-[768px]'}>
+                <div className={'max-w-[768px] w-full'}>
                     <div
                         style={{
                             width: '100%',

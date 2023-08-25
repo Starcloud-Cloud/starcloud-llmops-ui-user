@@ -50,7 +50,7 @@ export type IHistory = Partial<{
     message: string;
     messageTokens: number;
     messageUnitPrice: number;
-    process: any;
+    process: any[];
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -319,6 +319,8 @@ export const Chat = ({
         }
     });
 
+    console.log(dataRef.current, 'current');
+
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
@@ -371,67 +373,95 @@ export const Chat = ({
             let outerJoins: any;
             while (1) {
                 let joins = outerJoins;
-                const { done, value } = await reader.read();
-                if (done) {
-                    const copyData = [...dataRef.current];
-                    copyData[dataRef.current.length - 1].isNew = false;
-                    dataRef.current = copyData;
-                    setData(copyData);
-                    setIsFetch(false);
-                    break;
+                try {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        const copyData = [...dataRef.current];
+                        copyData[dataRef.current.length - 1].isNew = false;
+                        dataRef.current = copyData;
+                        setData(copyData);
+                        setIsFetch(false);
+                        break;
+                    }
+                    let str = textDecoder.decode(value);
+                    const lines = str.split('\n');
+                    lines.forEach((messages, i: number) => {
+                        if (i === 0 && joins) {
+                            messages = joins + messages;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (messages && messages.indexOf('}') === -1) {
+                                joins = messages;
+                                return;
+                            }
+                        }
+                        let bufferObj;
+                        if (messages?.startsWith('data:')) {
+                            bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                        }
+                        if (bufferObj?.code === 200) {
+                            jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                            setConversationUid(bufferObj.conversationUid);
+                            console.log(bufferObj.content);
+
+                            // 处理流程
+                            if (bufferObj.type === 'i') {
+                                const copyData = [...dataRef.current];
+                                const process = copyData[copyData.length - 1].process || [];
+                                const content = JSON.parse(bufferObj.content);
+                                if (content.showType === 'docs') {
+                                    content.data = uniqBy(content.data, 'id');
+                                    copyData[copyData.length - 1].process = [...process, content];
+                                    dataRef.current = copyData;
+                                    console.log(copyData, 'copyData');
+                                    setData(copyData);
+                                }
+                                if (content.showType === 'url') {
+                                    //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+                                    const index = copyData[copyData.length - 1].process
+                                        ?.filter((v: any) => v.showType === 'url')
+                                        ?.findIndex((v: any) => v.id === content.id);
+
+                                    if (index > -1) {
+                                    } else {
+                                        copyData[copyData.length - 1].process = [...process, content];
+                                        dataRef.current = copyData;
+                                        setData(copyData);
+                                    }
+                                }
+
+                                // process.data = uniqBy(process.data, 'id');
+                                // copyData[copyData.length - 1].process = ;
+                                // dataRef.current = copyData;
+                                // setData(copyData);
+                            }
+                            if (bufferObj.type === 'm') {
+                                // 处理结论
+                                const copyData = [...dataRef.current];
+                                copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+                                copyData[copyData.length - 1].isNew = true;
+                                dataRef.current = copyData;
+                                setData(copyData);
+                            }
+                        } else if (bufferObj && bufferObj.code !== 200) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: t('market.warning'),
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                })
+                            );
+                        }
+                    });
+                } catch (e) {
+                    console.log(e, 'e');
                 }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((messages, i: number) => {
-                    if (i === 0 && joins) {
-                        messages = joins + messages;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (messages && messages.indexOf('}') === -1) {
-                            joins = messages;
-                            return;
-                        }
-                    }
-                    let bufferObj;
-                    if (messages?.startsWith('data:')) {
-                        bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                    }
-                    if (bufferObj?.code === 200) {
-                        jsCookie.set(conversationUniKey, bufferObj.conversationUid);
-                        setConversationUid(bufferObj.conversationUid);
-                        console.log(bufferObj.content);
-                        // 处理流程
-                        if (bufferObj.type === 'i') {
-                            const copyData = [...dataRef.current];
-                            const process = JSON.parse(bufferObj.content);
-                            process.data = uniqBy(process.data, 'id');
-                            copyData[copyData.length - 1].process = process;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                        if (bufferObj.type === 'm') {
-                            // 处理结论
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                            copyData[copyData.length - 1].isNew = true;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                    } else if (bufferObj && bufferObj.code !== 200) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                });
+
                 outerJoins = joins;
             }
         } catch (e: any) {

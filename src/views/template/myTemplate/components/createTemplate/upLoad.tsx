@@ -67,7 +67,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             comingSoon: false,
             action: [
                 { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
-                { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
+                {
+                    title: '查看代码',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        getUpdateBtn();
+                        setOpenDrawer(true);
+                    }
+                }
             ]
         },
         {
@@ -80,7 +87,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             type: 5,
             action: [
                 { title: '创建群聊', icon: 'contentPaste', onclick: () => setOpenWchat(true) },
-                { title: '查看群聊', icon: 'historyOutlined', onclick: () => setOpenWeDrawer(true) }
+                {
+                    title: '查看群聊',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        getUpdateBtn();
+                        setOpenWeDrawer(true);
+                    }
+                }
             ]
         },
         {
@@ -499,7 +513,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 />
                                 {updateBtn?.needTips && (
                                     <Chip
-                                        sx={{ ml: 1.5 }}
+                                        sx={{ ml: 1.5, display: { lg: 'block', md: 'none', xs: 'none' } }}
                                         size="small"
                                         color="warning"
                                         label={
@@ -513,6 +527,21 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     />
                                 )}
                             </Typography>
+                            {updateBtn?.needTips && (
+                                <Chip
+                                    sx={{ mt: '10px', display: { lg: 'none', md: 'block' } }}
+                                    size="small"
+                                    color="warning"
+                                    label={
+                                        updateBtn.needTips && releaseState === 1
+                                            ? '检测到应用已经更新：建议更新重新发布'
+                                            : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                            ? '需要更新后才能发布'
+                                            : '检测到应用已经更新：需要更新重新发布'
+                                    }
+                                    variant="outlined"
+                                />
+                            )}
                             <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
                                 用户可在模板市场中下载你上传的应用
                             </Typography>
@@ -549,12 +578,15 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     fontSize="12px"
                                     display="flex"
                                     alignItems="center"
+                                    flexWrap="wrap"
                                     mr={2}
                                     sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
                                     onClick={marketRecord}
                                 >
-                                    <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                    <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                    <Box whiteSpace="nowrap">
+                                        <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                        <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                    </Box>
                                 </Box>
                             </Box>
                         </Box>
@@ -615,6 +647,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 color="#b5bed0"
                                                 fontSize="12px"
                                                 display="flex"
+                                                flexWrap="wrap"
                                                 alignItems="center"
                                                 mr={2}
                                                 onClick={() => {
@@ -622,8 +655,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 }}
                                                 className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
                                             >
-                                                {IconList[el.icon]}
-                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                <Box whiteSpace="nowrap">
+                                                    {IconList[el.icon]}
+                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                </Box>
                                             </Box>
                                         ) : (
                                             <Box
@@ -631,17 +666,27 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 color="#b5bed0"
                                                 fontSize="12px"
                                                 display="flex"
+                                                flexWrap="wrap"
                                                 alignItems="center"
                                                 mr={2}
                                                 onClick={() => {
-                                                    if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
+                                                    if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                        el.onclick();
+                                                    } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                        el.onclick();
+                                                    }
                                                 }}
                                                 className={`${
-                                                    !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
+                                                    (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                    (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                        ? 'cursor-pointer hover:text-purple-500'
+                                                        : ''
                                                 }`}
                                             >
-                                                {IconList[el.icon]}
-                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                <Box whiteSpace="nowrap">
+                                                    {IconList[el.icon]}
+                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                </Box>
                                             </Box>
                                         )
                                     )}

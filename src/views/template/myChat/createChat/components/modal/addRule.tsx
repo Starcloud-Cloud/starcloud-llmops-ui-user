@@ -189,7 +189,7 @@ const AddRuleModal = ({
             ...Object.values(splitRule)
         ];
         const res = newArr.every((item: any) => {
-            return item === true || item === false || item.length > 0;
+            return item === true || item === false || item.length > 0 || typeof item === 'number';
         });
         if (res) {
             if (!editData.id) {

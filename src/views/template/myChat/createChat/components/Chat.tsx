@@ -22,7 +22,7 @@ import {
     useTheme
 } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
 import { t } from '../../../../../hooks/web/useI18n';
 import { dispatch } from '../../../../../store';
@@ -35,6 +35,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
 import { conversation, marketMessageSSE } from 'api/chat/mark';
+import { useChatMessage } from 'store/chatMessage';
 
 export type IHistory = Partial<{
     uid: string;
@@ -79,6 +80,183 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
+
+export const ChatBtn = () => {
+    const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);
+    const [isListening, setIsListening] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+    const [time, setTime] = React.useState(1);
+    const { setMessageData } = useChatMessage();
+    const navigate = useNavigate();
+
+    const timeOutRef: any = useRef(null);
+
+    const handleClean = () => {
+        setAnchorEl(null);
+        // setData([]);
+        // dataRef.current = [];
+        // setConversationUid('');
+        // jsCookie.remove(conversationUniKey);
+    };
+
+    const handleClickSort = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
+        setAnchorEl(event?.currentTarget);
+    };
+
+    const handleCloseSort = () => {
+        setAnchorEl(null);
+    };
+
+    // 创建语音识别对象
+    const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
+
+    // 设置语言为中文
+    recognition.lang = navigator.language;
+
+    // 语音识别结果事件处理函数
+    recognition.onresult = (event: any) => {
+        const result = event.results[event.resultIndex][0].transcript;
+        setMessage(`${message}${result}`);
+    };
+
+    // 开始语音识别
+    const startListening = () => {
+        timeOutRef.current = setInterval(() => {
+            setTime((time) => time + 1);
+        }, 1000);
+        setIsListening(true);
+        recognition.start();
+    };
+
+    // 停止语音识别
+    const stopListening = () => {
+        timeOutRef.current && clearInterval(timeOutRef.current);
+        setTime(1);
+        setIsListening(false);
+        recognition.stop();
+    };
+
+    useEffect(() => {
+        return () => {
+            timeOutRef.current && clearInterval(timeOutRef.current);
+        };
+    }, []);
+
+    const handleKeyDown = async (event: any) => {
+        // 按下 Shift + Enter 换行
+        if (event.shiftKey && event.keyCode === 13) {
+            event.preventDefault();
+            setMessage(message + '\n');
+        } else if (!event.shiftKey && event.keyCode === 13) {
+            event.preventDefault();
+            // 单独按回车键提交表单
+            await handleOnSend();
+        }
+    };
+
+    const handleOnSend = async () => {
+        setMessageData(message);
+        navigate('/chat/my');
+    };
+
+    return (
+        <div className="flex-shrink-0 flex justify-center w-full ">
+            <div className="w-full max-w-[768px]  relative text-sm rounded-lg bg-white shadow-lg p-3 border border-[#E3E4E5]">
+                <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
+                    <Grid item className="!pl-0">
+                        <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                            <MoreHorizTwoToneIcon />
+                        </IconButton>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleCloseSort}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right'
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right'
+                            }}
+                        >
+                            <MenuItem onClick={handleClean}>
+                                <CleaningServicesSharpIcon className="text-base" />
+                                <span className="text-base ml-3">清除</span>
+                            </MenuItem>
+                        </Menu>
+                    </Grid>
+                    <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                        <OutlinedInput
+                            id="message-send"
+                            fullWidth
+                            multiline
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="请输入(Shift+Enter换行)"
+                            className="!pt-0"
+                            onKeyDown={handleKeyDown}
+                            minRows={1}
+                            maxRows={3}
+                            endAdornment={
+                                <>
+                                    <InputAdornment position="end">
+                                        {!isListening ? (
+                                            <Tooltip arrow placement="top" title={'语音输入'}>
+                                                <IconButton
+                                                    disableRipple
+                                                    color={'default'}
+                                                    onClick={startListening}
+                                                    aria-label="voice"
+                                                    className="p-0"
+                                                >
+                                                    <KeyboardVoiceIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                <div
+                                                    onClick={stopListening}
+                                                    className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                >
+                                                    <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                        {time}
+                                                    </div>
+                                                </div>
+                                            </Tooltip>
+                                        )}
+                                    </InputAdornment>
+                                    <InputAdornment position="end" className="relative">
+                                        <Tooltip placement="top" arrow title={'发送'}>
+                                            <IconButton
+                                                disableRipple
+                                                color={message ? 'secondary' : 'default'}
+                                                onClick={handleOnSend}
+                                                aria-label="send message"
+                                            >
+                                                <SendIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </InputAdornment>
+                                </>
+                            }
+                            aria-describedby="search-helper-text"
+                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                        />
+                    </Grid>
+                </Grid>
+                <div>
+                    <div className="flex justify-end px-[24px]">
+                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export const Chat = ({
     chatBotInfo,
     mode,
@@ -115,7 +293,9 @@ export const Chat = ({
     const [isFirst, setIsFirst] = React.useState(true);
     const [isFetch, setIsFetch] = useState(false);
     const [open, setOpen] = useState(false);
+    const [isFinish, setIsFinish] = useState(false);
 
+    const { messageData, setMessageData } = useChatMessage();
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
 
@@ -284,6 +464,7 @@ export const Chat = ({
                 if (res) {
                     setConversationUid(res.uid);
                 } else {
+                    setIsFinish(true);
                     setData([]);
                     dataRef.current = [];
                 }
@@ -311,9 +492,17 @@ export const Chat = ({
                 ];
                 dataRef.current = result;
                 setData(result);
+                setIsFinish(true);
             })();
         }
     }, [mode, chatBotInfo]);
+
+    // 加载完历史再请求
+    useEffect(() => {
+        if (mode === 'individual' && messageData && chatBotInfo && uid && isFinish) {
+            doFetch(messageData);
+        }
+    }, [mode, messageData, chatBotInfo, uid, isFinish]);
     // mode individual end
 
     React.useEffect(() => {
@@ -377,6 +566,7 @@ export const Chat = ({
 
     const doFetch = async (message: string) => {
         setMessage('');
+        setMessageData('');
         const newMessage: IHistory = {
             robotName: chatBotInfo.name,
             robotAvatar: chatBotInfo.avatar,

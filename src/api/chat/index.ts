@@ -218,3 +218,11 @@ export const ruleRuleType = () => {
 export const ruleDel = (data: any) => {
     return request.post({ url: '/llm/dataset/rule/delete?ruleId=' + data.ruleId });
 };
+
+/**
+ * 规则调试
+ * @returns
+ */
+export const ruleDebugRule = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/debugRule', data });
+};

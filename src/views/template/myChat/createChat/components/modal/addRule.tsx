@@ -32,12 +32,13 @@ import MainCard from 'ui-component/cards/MainCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
+import DeBug from './debug';
 import { useEffect, useState } from 'react';
 import { rulePage, ruleFormatType, ruleCreateRule, ruleUpdateRule, ruleRuleType, ruleDel } from 'api/chat';
 interface Basis {
     ruleName?: string;
     ruleType?: string;
-    enable?: boolean;
+    enable: boolean;
     ruleFilter?: string[];
 }
 type CleanRule = {
@@ -63,28 +64,8 @@ const AddRuleModal = ({
     });
     const [tableData, setTableData] = useState([]);
     const [total, setTotal] = useState(0);
-    // const formik = useFormik({
-    //     initialValues: {
-    //         title: '',
-    //         context: ''
-    //     },
-    //     validationSchema,
-    //     onSubmit: (values) => {
-    //         dispatch(
-    //             openSnackbar({
-    //                 open: true,
-    //                 message: 'Submit Success',
-    //                 variant: 'alert',
-    //                 alert: {
-    //                     color: 'success'
-    //                 },
-    //                 close: false
-    //             })
-    //         );
-    //     }
-    // })
     const getList = async () => {
-        const res = await rulePage({ ...queryParams, datasetUid });
+        const res = await rulePage({ ...queryParams, appId: datasetUid });
         setTableData(res.list);
         setTotal(res.total);
     };
@@ -111,6 +92,7 @@ const AddRuleModal = ({
     useEffect(() => {
         if (!addOpen) {
             setBasis({
+                enable: true,
                 ruleFilter: []
             });
             setCleanRule({
@@ -135,6 +117,7 @@ const AddRuleModal = ({
     }, [addOpen]);
     //基础规则
     const [basis, setBasis] = useState<Basis>({
+        enable: true,
         ruleFilter: []
     });
     const handleBasis = (e: any) => {
@@ -195,7 +178,7 @@ const AddRuleModal = ({
             if (!editData.id) {
                 const result = await ruleCreateRule({
                     ...basis,
-                    datasetUid,
+                    appId: datasetUid,
                     cleanRule: {
                         htmlCleanRule: cleanRule,
                         commonCleanRule
@@ -221,7 +204,7 @@ const AddRuleModal = ({
                 const result = await ruleUpdateRule({
                     ...editData,
                     ...basis,
-                    datasetUid,
+                    appId: datasetUid,
                     cleanRule: {
                         ..._.cloneDeep(editData),
                         htmlCleanRule: cleanRule,
@@ -263,6 +246,9 @@ const AddRuleModal = ({
             })
         );
     };
+
+    //规则调试
+    const [deBugOpen, setDeBugOpen] = useState(false);
     return (
         <Modal open={open} onClose={() => handleClose(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -285,6 +271,17 @@ const AddRuleModal = ({
             >
                 <CardContent sx={{ p: '16px !important' }}>
                     <Box my={2} display="flex" justifyContent="right">
+                        <Button
+                            onClick={() => {
+                                setDeBugOpen(true);
+                            }}
+                            sx={{ mr: 1 }}
+                            size="small"
+                            color="secondary"
+                            variant="contained"
+                        >
+                            规则调试
+                        </Button>
                         <Button
                             startIcon={<AddIcon />}
                             onClick={() => {
@@ -391,6 +388,8 @@ const AddRuleModal = ({
                                     width: '60%',
                                     top: '10%',
                                     left: '50%',
+                                    maxHeight: '80%',
+                                    overflowY: 'auto',
                                     transform: 'translate(-50%, 0)'
                                 }}
                                 headerSX={{ p: '16px !important' }}
@@ -747,6 +746,7 @@ const AddRuleModal = ({
                             </MainCard>
                         </Modal>
                     )}
+                    {deBugOpen && <DeBug deBugOpen={deBugOpen} typeList={typeList} datasetUid={datasetUid} setDeBugOpen={setDeBugOpen} />}
                 </CardContent>
             </MainCard>
         </Modal>

@@ -34,7 +34,6 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
-import { height } from '@mui/system';
 
 export type IHistory = Partial<{
     uid: string;
@@ -527,7 +526,7 @@ export const Chat = ({
             </div>
             <Divider variant={'fullWidth'} />
             <div className="flex-grow flex justify-center  overflow-y-auto w-full">
-                <div className={'max-w-[768px]'}>
+                <div className={'max-w-[768px] w-full'}>
                     <div
                         style={{
                             width: '100%',

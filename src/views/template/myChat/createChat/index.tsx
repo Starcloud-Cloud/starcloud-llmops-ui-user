@@ -55,6 +55,8 @@ export type IChatInfo = {
     voiceSpeed?: number;
     enableSearchInWeb?: boolean;
     searchInWeb?: string;
+    dialogueBubblesBgColor?: string;
+    popupBubblesColorBgColor?: string;
 };
 
 function CreateDetail() {
@@ -85,7 +87,9 @@ function CreateDetail() {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    dialogueBubblesBgColor: '#e3f2fd',
+                    popupBubblesColorBgColor: '#4C83F3'
                 });
             });
         }
@@ -321,8 +325,8 @@ function CreateDetail() {
             {value !== 5 && (
                 <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
                     <div className="text-base color-[#121926]">预览与调试</div>
-                    <Card className="h-full">
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                    <Card className="h-full" sx={{ overflow: 'inherit' }}>
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} showChatTips={value === 0} />
                     </Card>
                 </div>
             )}

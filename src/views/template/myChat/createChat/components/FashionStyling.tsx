@@ -21,7 +21,7 @@ import {
     Switch,
     TextField
 } from '@mui/material';
-import { Popover, Upload, UploadFile, UploadProps } from 'antd';
+import { ColorPicker, Popover, Upload, UploadFile, UploadProps } from 'antd';
 import { getAvatarList, getVoiceList } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import React, { useEffect, useState } from 'react';
@@ -788,6 +788,19 @@ export const FashionStyling = ({
                             <ShortcutRecord />
                         </div>
                     </div> */}
+                    <div className={'mt-5'}>
+                        <span className={'text-base text-black'}>气泡设置</span>
+                        <div className={'mt-3 flex items-center'}>
+                            <div className="flex items-center">
+                                <span className="mr-2">对话气泡</span>
+                                <ColorPicker defaultValue={'#e3f2fd'} />
+                            </div>
+                            <div className="flex items-center ml-5">
+                                <span className="mr-2">悬浮气泡</span>
+                                <ColorPicker defaultValue={'#4C83F3'} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className={'mt-10'}>
                     <span

@@ -135,13 +135,18 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
     return (
         <div>
             <div>
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                    }
-                >
-                    基础规则
-                </span>
+                <div className="flex items-center">
+                    <span
+                        className={
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        }
+                    >
+                        基础规则
+                    </span>
+                    <Tooltip title="机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。" placement="top">
+                        <HelpOutlineIcon className="text-lg ml-1 cursor-pointer" />
+                    </Tooltip>
+                </div>
                 <div className={'mt-5'}>
                     <TextField
                         value={regulationText}
@@ -160,11 +165,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         error={(regulationText?.length || 0) > 1000 || (startCheck && !regulationText)}
                     />
                     <div className="flex justify-between">
-                        {startCheck && !regulationText ? (
-                            <div className="text-[#f44336] mt-1">请输入角色描述</div>
-                        ) : (
-                            <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
-                        )}
+                        {startCheck && !regulationText ? <div className="text-[#f44336] mt-1">请输入角色描述</div> : <div />}
                         <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/1000</div>
                     </div>
 

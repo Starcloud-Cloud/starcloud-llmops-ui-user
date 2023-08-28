@@ -50,7 +50,7 @@ export type IHistory = Partial<{
     message: string;
     messageTokens: number;
     messageUnitPrice: number;
-    process: any[];
+    process: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -459,7 +459,7 @@ export const Chat = ({
                         }
                     });
                 } catch (e) {
-                    console.log(e, 'e');
+                    // console.log(e, 'e');
                 }
 
                 outerJoins = joins;

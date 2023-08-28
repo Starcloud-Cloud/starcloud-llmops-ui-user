@@ -2,71 +2,31 @@ import { getChatDetail, getChatDetailList } from 'api/chat/share';
 import { useEffect, useMemo, useState } from 'react';
 import { IChatInfo } from 'views/template/myChat/createChat';
 import { Chat } from 'views/template/myChat/createChat/components/Chat';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import { getChatInfo, marketPage } from 'api/chat/mark';
 
 const ChatMy = () => {
-    const { mediumUid } = useParams(); // 获取
-
-    const url = window.location.href;
-    const pattern = /\/([^/]+)\/[^/]+$/;
-    const match = url.match(pattern);
-
-    const extractedPart = (match && match[1]) || '';
-
-    const statisticsMode = useMemo(() => {
-        switch (extractedPart) {
-            case 'cb_i':
-                return 'SHARE_IFRAME';
-            case 'cb_js':
-                return 'SHARE_JS';
-            case 'cb_web':
-                return 'SHARE_WEB';
-            default:
-                return '';
-        }
-    }, [extractedPart]);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appUid = searchParams.get('appUid') as string;
 
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
-    const [mUid, setMUid] = useState<any>('');
+    const [uid, setUid] = useState<any>('');
     const [showSelect, setShowSelect] = useState(false);
     const [list, setList] = useState<any[]>([]);
 
-    console.log(mUid, 'mUid');
+    useEffect(() => {
+        if (appUid) {
+            setUid(appUid);
+        }
+    }, [appUid]);
 
     useEffect(() => {
-        if (mediumUid) {
-            const result = mediumUid?.split('|');
-            if (result.length > 1) {
-                setMUid(result[0]);
-                doFetchDetailList(result);
-                setShowSelect(true);
-            } else {
-                setMUid(mediumUid);
-                setShowSelect(false);
-            }
-        }
-    }, [mediumUid]);
-
-    const doFetchDetailList = async (mediumUids: any) => {
-        const data = await getChatDetailList({ mediumUids: mediumUids });
-        const resultArray = [];
-
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                const value = data[key];
-                resultArray.push({ name: value.name, avatar: value.images[0], des: value.description, value: key });
-            }
-        }
-
-        setList(resultArray);
-    };
-
-    useEffect(() => {
-        if (mUid) {
+        if (uid) {
             (async () => {
-                const res = await getChatDetail(mUid);
+                const res = await getChatInfo(uid);
                 setChatBotInfo({
                     name: res.name,
                     avatar: res?.images?.[0],
@@ -82,7 +42,7 @@ const ChatMy = () => {
                 });
             })();
         }
-    }, [mUid]);
+    }, [uid]);
 
     useEffect(() => {
         // 创建一个新的meta标签
@@ -100,17 +60,31 @@ const ChatMy = () => {
         };
     }, []);
 
+    useEffect(() => {
+        marketPage({
+            model: 'CHAT',
+            pageNo: 1,
+            pageSize: 1000
+        }).then((res) => {
+            const r = res?.list?.map((item: any) => ({
+                value: item.uid,
+                name: item.name,
+                des: item.description,
+                avatar: item.images?.[0]
+            }));
+            setList(r);
+            if (r.length > 1) {
+                setShowSelect(true);
+            }
+            if (!appUid) {
+                setUid(r[0]?.value);
+            }
+        });
+    }, [appUid]);
+
     return (
         <div className="h-[calc(100vh-130px)]">
-            <Chat
-                chatBotInfo={chatBotInfo}
-                mode={'individual'}
-                mediumUid={mUid}
-                setMUid={setMUid}
-                statisticsMode={statisticsMode}
-                showSelect={showSelect}
-                botList={list}
-            />
+            <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={showSelect} botList={list} />
         </div>
     );
 };

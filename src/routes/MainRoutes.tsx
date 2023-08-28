@@ -88,7 +88,7 @@ const MainRoutes = {
             element: <CreateChat />
         },
         {
-            path: '/chat-my/:mediumUid',
+            path: '/chat/my',
             element: <ChatMy />
         }
     ]

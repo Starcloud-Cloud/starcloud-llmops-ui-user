@@ -34,6 +34,7 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
+import { conversation, marketMessageSSE } from 'api/chat/mark';
 
 export type IHistory = Partial<{
     uid: string;
@@ -81,19 +82,23 @@ export type IConversation = {
 export const Chat = ({
     chatBotInfo,
     mode,
-    mediumUid,
     statisticsMode,
     showSelect,
     botList,
-    setMUid
+    mediumUid,
+    setMUid,
+    uid,
+    setUid
 }: {
     chatBotInfo: IChatInfo;
     mode?: 'iframe' | 'test' | 'individual';
-    mediumUid?: string;
     statisticsMode?: string;
     showSelect?: boolean;
     botList?: any[];
+    mediumUid?: string;
     setMUid?: (mediumUid: any) => void;
+    uid?: string;
+    setUid?: (uid: string) => void;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -271,6 +276,46 @@ export const Chat = ({
     }, [mode, chatBotInfo]);
     // mode iframe end
 
+    // mode individual start
+    React.useEffect(() => {
+        if (mode === 'individual' && uid) {
+            (async () => {
+                const res: IConversation = await conversation({ appUid: uid });
+                if (res) {
+                    setConversationUid(res.uid);
+                } else {
+                    setData([]);
+                    dataRef.current = [];
+                }
+            })();
+        }
+    }, [mode, uid]);
+
+    React.useEffect(() => {
+        if (mode === 'individual' && conversationUid) {
+            (async () => {
+                const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
+                const list = res.list.map((v: any) => ({
+                    ...v,
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar
+                }));
+                const result = [
+                    ...list,
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
+            })();
+        }
+    }, [mode, chatBotInfo]);
+    // mode individual end
+
     React.useEffect(() => {
         // 清理语音识别对象
         return () => {
@@ -359,6 +404,13 @@ export const Chat = ({
                 resp = await messageSSE({
                     appUid: appId,
                     scene: 'CHAT_TEST',
+                    conversationUid,
+                    query: message
+                });
+            }
+            if (mode === 'individual') {
+                resp = await marketMessageSSE({
+                    appUid: uid,
                     conversationUid,
                     query: message
                 });
@@ -484,10 +536,15 @@ export const Chat = ({
                                     <div
                                         key={index}
                                         className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
-                                            mediumUid === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                            (mediumUid || uid) === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
                                         }`}
                                         onClick={() => {
-                                            setMUid && setMUid(item.value);
+                                            if (mode === 'iframe') {
+                                                setMUid && setMUid(item.value);
+                                            }
+                                            if (mode === 'individual') {
+                                                setUid && setUid(item.value);
+                                            }
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">

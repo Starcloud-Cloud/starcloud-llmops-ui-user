@@ -15,6 +15,7 @@ import BackgroundPattern2 from 'ui-component/cards/BackgroundPattern2';
 import AuthCardWrapper from '../AuthCardWrapper';
 import AuthWrapper2 from '../AuthWrapper2';
 import AuthRegister from '../auth-forms/AuthRegister';
+import AuthLoginRegister from '../auth-forms/AuthLoginRegister';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
@@ -104,11 +105,51 @@ const Register = () => {
                                         <div className="right-[0] top-[0]  absolute cursor-pointer" onClick={() => setOpen(!open)}>
                                             {!open ? (
                                                 <MuiTooltip title="邮箱注册~" arrow placement="top">
-                                                    <img src={youxiang} alt="emall" className="w-[100px]" />
+                                                    <Box
+                                                        position="relative"
+                                                        width="52px"
+                                                        height="52px"
+                                                        overflow="hidden"
+                                                        sx={{
+                                                            '&::before': {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                bottom: 0,
+                                                                left: 0,
+                                                                width: 0,
+                                                                height: 0,
+                                                                borderStyle: 'solid',
+                                                                borderWidth: '17px',
+                                                                borderColor: 'transparent transparent #fff #fff'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <img src={youxiang} alt="emall" className="w-[52px]" style={{ display: 'block' }} />
+                                                    </Box>
                                                 </MuiTooltip>
                                             ) : (
                                                 <MuiTooltip title="手机号注册~" arrow placement="top">
-                                                    <img src={shouji} alt="phone" className="w-[100px]" />
+                                                    <Box
+                                                        position="relative"
+                                                        width="52px"
+                                                        height="52px"
+                                                        overflow="hidden"
+                                                        sx={{
+                                                            '&::before': {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                bottom: 0,
+                                                                left: 0,
+                                                                width: 0,
+                                                                height: 0,
+                                                                borderStyle: 'solid',
+                                                                borderWidth: '17px',
+                                                                borderColor: 'transparent transparent #fff #fff'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <img src={shouji} alt="phone" className="w-[52px]" />
+                                                    </Box>
                                                 </MuiTooltip>
                                             )}
                                         </div>
@@ -132,7 +173,8 @@ const Register = () => {
                                                 </Stack>
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <AuthRegister inviteCode={inviteCode} />
+                                                {open && <AuthRegister inviteCode={inviteCode} />}
+                                                {!open && <AuthLoginRegister inviteCode={inviteCode} />}
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <Divider />

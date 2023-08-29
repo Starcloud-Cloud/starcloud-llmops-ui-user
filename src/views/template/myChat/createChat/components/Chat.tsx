@@ -720,28 +720,31 @@ export const Chat = ({
     return (
         <div className="h-full relative flex justify-center">
             {mode === 'individual' && width > 1300 && (
-                <div className="h-full p-5 mr-5" style={{ borderRight: '1px solid rgba(230,230,231,1)' }}>
-                    <div className="bg-white rounded-md h-full overflow-auto">
-                        {botList?.map((item, index) => (
-                            <>
-                                <div
-                                    key={index}
-                                    className={`w-[220px] flex items-center justify-start cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg relative hover:border-[#673ab7] ${
-                                        (mediumUid || uid) === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
-                                    }`}
-                                    onClick={() => {
-                                        setUid && setUid(item.value);
-                                    }}
-                                >
-                                    <div className="w-[40px] h-[40px]">
-                                        <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                <div className="h-full mr-3 min-w-[221px] overflow-y-auto" style={{ borderRight: '1px solid rgba(230,230,231,1)' }}>
+                    <div className="h-full">
+                        <div className="h-[44px] flex items-center justify-center text-lg">员工广场</div>
+                        <div className="bg-white rounded-md">
+                            {botList?.map((item, index) => (
+                                <>
+                                    <div
+                                        key={index}
+                                        className={`w-[220px] flex items-center justify-start cursor-pointer p-[8px] border-b-[1px] border-solid border-[rgba(230,230,231,1)] ${
+                                            (mediumUid || uid) === item.value ? 'shadow-lg' : ''
+                                        }`}
+                                        onClick={() => {
+                                            setUid && setUid(item.value);
+                                        }}
+                                    >
+                                        <div className="w-[40px] h-[40px]">
+                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                        </div>
+                                        <div className="ml-2">
+                                            <div className="text-lg">{item.name}</div>
+                                        </div>
                                     </div>
-                                    <div className="ml-2">
-                                        <div className="text-lg">{item.name}</div>
-                                    </div>
-                                </div>
-                            </>
-                        ))}
+                                </>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
@@ -802,7 +805,7 @@ export const Chat = ({
                     )}
                 </div>
                 <Divider variant={'fullWidth'} />
-                <div className="flex-grow flex justify-center  overflow-y-auto w-full">
+                <div className="flex-grow flex justify-center overflow-y-auto w-full">
                     <div className={'max-w-[768px] w-full'}>
                         <div
                             style={{
@@ -835,7 +838,7 @@ export const Chat = ({
                 </div>
                 {mode === 'individual' ? (
                     <div className="flex-shrink-0 flex justify-center w-full mb-1 ">
-                        <div className="w-full max-w-[768px]  relative text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 border border-[#E3E4E5] border-solid">
+                        <div className="w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 border border-[#E3E4E5] border-solid relative top-[20px]">
                             <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
                                 <Grid item className="!pl-0">
                                     <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -935,7 +938,7 @@ export const Chat = ({
                             </Grid>
                             <div>
                                 <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/100</div>
                                 </div>
                             </div>
                         </div>
@@ -1234,7 +1237,7 @@ export const Chat = ({
                     </div>
                 )}
             </div>
-            {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full] p-5 ml-5" />}
+            {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full ml-3" />}
         </div>
     );
 };

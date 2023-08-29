@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 // material-ui
 import { Box, Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import MuiTooltip from '@mui/material/Tooltip';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -17,6 +18,8 @@ import AuthRegister from '../auth-forms/AuthRegister';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
+import shouji from 'assets/images/register/shouji.svg';
+import youxiang from 'assets/images/register/youxiang.svg';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 
@@ -67,6 +70,8 @@ const Register = () => {
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
+    //手机号或者邮箱注册
+    const [open, setOpen] = useState(false);
     return (
         <AuthWrapper2>
             <Grid container justifyContent={matchDownSM ? 'center' : 'space-between'} alignItems="center">
@@ -95,44 +100,57 @@ const Register = () => {
                                     <Logo />
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>
-                                    <Grid container spacing={2} justifyContent="center">
-                                        <Grid item xs={12}>
-                                            <Stack alignItems="center" justifyContent="center" spacing={1}>
-                                                <Typography
-                                                    color={theme.palette.secondary.main}
-                                                    gutterBottom
-                                                    variant={matchDownSM ? 'h3' : 'h2'}
-                                                >
-                                                    {t('auth.register.signup')}
-                                                </Typography>
-                                                <Typography
-                                                    variant="caption"
-                                                    fontSize="16px"
-                                                    textAlign={matchDownSM ? 'center' : 'inherit'}
-                                                >
-                                                    {t('auth.login.credentials')}
-                                                </Typography>
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <AuthRegister inviteCode={inviteCode} />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Divider />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Grid item container direction="column" alignItems="center" xs={12}>
-                                                <Typography
-                                                    component={Link}
-                                                    to={inviteCode ? `/login?q=${inviteCode}` : '/login'}
-                                                    variant="subtitle1"
-                                                    sx={{ textDecoration: 'none' }}
-                                                >
-                                                    {t('auth.register.tologin')}
-                                                </Typography>
+                                    <Box position="relative">
+                                        <div className="right-[0] top-[0]  absolute cursor-pointer" onClick={() => setOpen(!open)}>
+                                            {!open ? (
+                                                <MuiTooltip title="邮箱注册~" arrow placement="top">
+                                                    <img src={youxiang} alt="emall" className="w-[100px]" />
+                                                </MuiTooltip>
+                                            ) : (
+                                                <MuiTooltip title="手机号注册~" arrow placement="top">
+                                                    <img src={shouji} alt="phone" className="w-[100px]" />
+                                                </MuiTooltip>
+                                            )}
+                                        </div>
+                                        <Grid container spacing={2} justifyContent="center">
+                                            <Grid item xs={12}>
+                                                <Stack alignItems="center" justifyContent="center" spacing={1}>
+                                                    <Typography
+                                                        color={theme.palette.secondary.main}
+                                                        gutterBottom
+                                                        variant={matchDownSM ? 'h3' : 'h2'}
+                                                    >
+                                                        {t('auth.register.signup')}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="caption"
+                                                        fontSize="16px"
+                                                        textAlign={matchDownSM ? 'center' : 'inherit'}
+                                                    >
+                                                        {t('auth.login.credentials')}
+                                                    </Typography>
+                                                </Stack>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <AuthRegister inviteCode={inviteCode} />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Divider />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Grid item container direction="column" alignItems="center" xs={12}>
+                                                    <Typography
+                                                        component={Link}
+                                                        to={inviteCode ? `/login?q=${inviteCode}` : '/login'}
+                                                        variant="subtitle1"
+                                                        sx={{ textDecoration: 'none' }}
+                                                    >
+                                                        {t('auth.register.tologin')}
+                                                    </Typography>
+                                                </Grid>
                                             </Grid>
                                         </Grid>
-                                    </Grid>
+                                    </Box>
                                 </AuthCardWrapper>
                             </Stack>
                         </Grid>

@@ -369,14 +369,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Grid item container direction="column" alignItems="center" xs={12}>
-                            <Typography
-                                component={Link}
-                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
-                                variant="subtitle1"
-                                sx={{ textDecoration: 'none' }}
-                            >
-                                {t('auth.login.account')}
-                            </Typography>
+                            <Box display="flex">
+                                <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                                    {t('auth.login.account')}
+                                </Typography>
+                                <Typography
+                                    component={Link}
+                                    color="secondary"
+                                    to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
+                                    variant="subtitle1"
+                                    sx={{ textDecoration: 'none' }}
+                                >
+                                    {t('auth.login.account1')}
+                                </Typography>
+                            </Box>
                         </Grid>
                     </Grid>
                 </div>
@@ -441,14 +447,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Grid item container direction="column" alignItems="center" xs={12}>
-                            <Typography
-                                component={Link}
-                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
-                                variant="subtitle1"
-                                sx={{ textDecoration: 'none' }}
-                            >
-                                {t('auth.login.account')}
-                            </Typography>
+                            <Box display="flex">
+                                <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                                    {t('auth.login.account')}
+                                </Typography>
+                                <Typography
+                                    component={Link}
+                                    color="secondary"
+                                    to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
+                                    variant="subtitle1"
+                                    sx={{ textDecoration: 'none' }}
+                                >
+                                    {t('auth.login.account1')}
+                                </Typography>
+                            </Box>
                         </Grid>
                     </Grid>
                 </div>

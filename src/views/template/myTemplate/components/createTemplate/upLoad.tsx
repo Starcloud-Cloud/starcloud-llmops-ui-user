@@ -40,6 +40,7 @@ import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
 import WeChatDrawer from './components/WeChatDrawer';
 import DomainModal from './components/DomainModal';
+import WPAccountModal from './components/WPAccountModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
 import useUserStore from 'store/user';
@@ -98,6 +99,23 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             ]
         },
         {
+            title: '微信公众号',
+            icon: 'weixingongzhonghao',
+            desc: '可在微信公众号后台配置，提供机器人服务',
+            enableValue: false,
+            comingSoon: false,
+            type: 5,
+            action: [
+                {
+                    title: '配置公众号',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        setOpenWPAccount(true);
+                    }
+                }
+            ]
+        },
+        {
             title: 'API调用',
             icon: 'api',
             desc: '通过API，可直接进行调用或发出请求',
@@ -119,6 +137,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const webMediumUidRef = useRef();
     const [openWchat, setOpenWchat] = useState(false);
     const [openWeDrawer, setOpenWeDrawer] = useState(false);
+    const [openWPAccount, setOpenWPAccount] = useState(false);
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
         code: <Code color="secondary" />,
@@ -853,6 +872,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
             <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} mode={mode} />
             {openWchat && <WechatModal open={openWchat} setOpen={setOpenWchat} value={phone} setValue={setPhone} handleOk={wechatOK} />}
+            {openWPAccount && <WPAccountModal open={openWPAccount} setOpen={setOpenWPAccount} />}
         </Box>
     );
 }

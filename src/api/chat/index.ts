@@ -165,8 +165,64 @@ export const deleteApp = (appUid: string) => {
 
 /**
  * 聊天记录
- * @returns 
+ * @returns
  */
 export const getChatRecord = (data: any) => {
     return request.post({ url: '/llm/app/log/detail/chat', data });
+};
+
+/**
+ * 规则设定列表
+ * @returns
+ */
+export const rulePage = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/page', data });
+};
+
+/**
+ * 转化格式列表
+ * @returns
+ */
+export const ruleFormatType = () => {
+    return request.post({ url: '/llm/dataset/rule/formatType' });
+};
+
+/**
+ * 新增数据集规则
+ * @returns
+ */
+export const ruleCreateRule = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/createRule', data });
+};
+
+/**
+ * 编辑数据集规则
+ * @returns
+ */
+export const ruleUpdateRule = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/update', data });
+};
+
+/**
+ * 规则类型
+ * @returns
+ */
+export const ruleRuleType = () => {
+    return request.post({ url: '/llm/dataset/rule/ruleType' });
+};
+
+/**
+ * 规则类型
+ * @returns
+ */
+export const ruleDel = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/delete?ruleId=' + data.ruleId });
+};
+
+/**
+ * 规则调试
+ * @returns
+ */
+export const ruleDebugRule = (data: any) => {
+    return request.post({ url: '/llm/dataset/rule/debugRule', data });
 };

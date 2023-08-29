@@ -127,7 +127,6 @@ const Valida = ({
         const part1 = newVal[i].value.slice(0, iptRef.current?.selectionStart);
         const part2 = newVal[i].value.slice(iptRef.current?.selectionStart);
         newVal[i].value = `${part1}{STEP.标题.${field}}${part2}`;
-        console.log(newVal[i]);
         formik.setFieldValue('prompt', newVal[i].value);
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };

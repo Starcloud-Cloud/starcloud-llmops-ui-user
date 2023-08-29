@@ -13,7 +13,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import formatDate from 'hooks/useDate';
+import formatDate, { formatYear } from 'hooks/useDate';
 // import fetch from 'utils/fetch';
 import {
     Box,
@@ -75,7 +75,7 @@ const validationSchema = yup.object({
     context: yup.string().required('')
 });
 
-const transformDataType = (dataType: string, type: string) => {
+const transformDataType = (dataType: string, type: string | undefined) => {
     switch (dataType) {
         case 'DOCUMENT':
             return (
@@ -83,7 +83,7 @@ const transformDataType = (dataType: string, type: string) => {
                     <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
-        case 'URL':
+        case 'HTML':
             return (
                 <Tooltip title={type}>
                     <LinkIcon className="text-[#5e35b1] text-base mr-2" />
@@ -288,7 +288,7 @@ const DocumentModal = ({
         multiple: true,
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
         data: {
-            datasetId,
+            appId: datasetId,
             batch: uuidv4()
         },
         headers: {
@@ -307,8 +307,7 @@ const DocumentModal = ({
                         return item.response.data.errMsg;
                     }
                 });
-
-                errMsg.length > 0 &&
+                if (errMsg.length > 0 && errMsg[0] !== undefined) {
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -320,6 +319,7 @@ const DocumentModal = ({
                             close: false
                         })
                     );
+                }
                 handleClose();
                 forceUpdate();
             }
@@ -341,7 +341,7 @@ const DocumentModal = ({
             context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {
-            uploadCharacters([{ ...values, datasetId, batch: uuidv4() }]).then((res) => {
+            uploadCharacters([{ ...values, appId: datasetId, batch: uuidv4() }]).then((res) => {
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -363,7 +363,7 @@ const DocumentModal = ({
     const [url, setUrl] = useState<string>('');
     const saveUrl = () => {
         if (url && isValid) {
-            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), datasetId }).then((res) => {
+            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), appId: datasetId }).then((res) => {
                 const errMsg = res.filter((item: any) => {
                     if (!item.status) {
                         return item.errMsg;
@@ -569,7 +569,12 @@ interface DetaData {
     dataType?: string;
     cleanContent?: string;
     summary?: string | null;
-    content?: string;
+    dataSourceInfo?: {
+        initAddress?: string;
+    };
+    storageVO?: {
+        storageKey?: string;
+    };
 }
 const DetailModal = ({
     detailOpen,
@@ -659,15 +664,22 @@ const DetailModal = ({
                                 原始链接
                             </Typography>
                             <Box>
-                                {detaData.dataType === 'URL' && (
-                                    <Link color="secondary" target="_blank" sx={{ fontSize: '12px' }} href={detaData.content}>
-                                        {detaData.content}
-                                    </Link>
+                                {detaData.dataType === 'HTML' && (
+                                    <Button
+                                        color="secondary"
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => {
+                                            window.open(detaData.dataSourceInfo?.initAddress);
+                                        }}
+                                    >
+                                        点击跳转
+                                    </Button>
                                 )}
-                                {detaData.dataType !== 'URL' && (
+                                {detaData.dataType !== 'HTML' && (
                                     <Button
                                         onClick={() => {
-                                            fetch(detaData.cleanContent as string)
+                                            fetch(detaData.storageVO?.storageKey as string)
                                                 .then((response) => {
                                                     if (response.ok) {
                                                         return response.blob();
@@ -679,10 +691,7 @@ const DetailModal = ({
                                                     // 创建一个临时链接的<a>标签
                                                     const link = document.createElement('a');
                                                     link.href = url;
-                                                    link.download =
-                                                        detaData.name +
-                                                        '.' +
-                                                        detaData.cleanContent?.split('.')[detaData.cleanContent?.split('.').length - 1]; // 设置下载的文件名
+                                                    link.download = detaData.name as string; // 设置下载的文件名
                                                     link.click();
                                                     // 释放临时链接的资源
                                                     window.URL.revokeObjectURL(url);
@@ -762,6 +771,11 @@ export type typeDocumentChild = {
     position: number;
     dataSourceInfo?: any;
     batch?: any;
+    storageVO?: {
+        type: string;
+        size?: number;
+    };
+    errorMessage?: string;
     status?: any;
     tokens?: any;
     summaryContent?: string;
@@ -793,14 +807,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
             const res = await getDatasetSource({ datasetId });
             if (
                 !res.every(
-                    (value: { status: string }) =>
-                        value.status >= '90' ||
-                        value.status === '0' ||
-                        value.status === '15' ||
-                        value.status === '25' ||
-                        value.status === '35' ||
-                        value.status === '45' ||
-                        value.status === '55'
+                    (value: { status: number }) =>
+                        value.status >= 90 ||
+                        value.status === 0 ||
+                        value.status === 15 ||
+                        value.status === 25 ||
+                        value.status === 35 ||
+                        value.status === 45 ||
+                        value.status === 55
                 )
             ) {
                 InterRef.current = setInterval(() => {
@@ -808,14 +822,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         setDocumentList(response);
                         if (
                             response.every(
-                                (value: { status: string }) =>
-                                    value.status >= '90' ||
-                                    value.status === '0' ||
-                                    value.status === '15' ||
-                                    value.status === '25' ||
-                                    value.status === '35' ||
-                                    value.status === '45' ||
-                                    value.status === '55'
+                                (value: { status: number }) =>
+                                    value.status >= 90 ||
+                                    value.status === 0 ||
+                                    value.status === 15 ||
+                                    value.status === 25 ||
+                                    value.status === 35 ||
+                                    value.status === 45 ||
+                                    value.status === 55
                             )
                         ) {
                             clearInterval(timeoutRef.current);
@@ -886,7 +900,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         style={{
                             margin: '0 auto',
                             textAlign: 'center',
-                            height: '650px',
+                            height: '350px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
@@ -944,7 +958,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         <Grid container spacing={gridSpacing}>
                                                             <Grid item xs zeroMinWidth>
                                                                 <div className="flex items-center">
-                                                                    {transformDataType(item.dataType, item.type)}
+                                                                    {transformDataType(item.dataType, item.storageVO?.type)}
                                                                     <Tooltip title={item.name}>
                                                                         <Typography
                                                                             variant="h4"
@@ -1021,9 +1035,16 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                                         className="!pt-[10px]"
                                                     >
-                                                        <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        <Tooltip
+                                                            placement="top"
+                                                            title={((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                        >
+                                                            <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        </Tooltip>
                                                         <Box>
-                                                            <Typography variant="caption">{formatDate(item.updateTime)}</Typography>
+                                                            <Tooltip placement="top" title={formatDate(item.updateTime)}>
+                                                                <Typography variant="caption">{formatYear(item.updateTime)}</Typography>
+                                                            </Tooltip>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item xs={12} className="!pt-[5px]">
@@ -1036,20 +1057,22 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}
                                                     >
                                                         <Box display="flex" alignItems="center">
-                                                            {item.status === '0' ||
-                                                            item.status === '15' ||
-                                                            item.status === '25' ||
-                                                            item.status === '35' ||
-                                                            item.status === '45' ||
-                                                            item.status === '55' ? (
-                                                                <HighlightOffIcon
-                                                                    sx={{
-                                                                        color: 'error.dark',
-                                                                        width: 14,
-                                                                        height: 14
-                                                                    }}
-                                                                />
-                                                            ) : item.status >= '90' ? (
+                                                            {item.status === 0 ||
+                                                            item.status === 15 ||
+                                                            item.status === 25 ||
+                                                            item.status === 35 ||
+                                                            item.status === 45 ||
+                                                            item.status === 55 ? (
+                                                                <Tooltip title={item.errorMessage}>
+                                                                    <HighlightOffIcon
+                                                                        sx={{
+                                                                            color: 'error.dark',
+                                                                            width: 14,
+                                                                            height: 14
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            ) : item.status >= 90 ? (
                                                                 <CheckCircleIcon
                                                                     sx={{
                                                                         color: 'success.dark',
@@ -1064,37 +1087,37 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 />
                                                             )}
                                                             <Typography ml={0.5} variant="caption">
-                                                                {item.status === '0'
+                                                                {item.status === 0
                                                                     ? '数据上传失败'
-                                                                    : item.status === '15'
+                                                                    : item.status === 15
                                                                     ? '数据上传失败'
-                                                                    : item.status === '20'
+                                                                    : item.status === 20
                                                                     ? '数据上传成功'
-                                                                    : item.status === '21'
+                                                                    : item.status === 21
                                                                     ? '数据同步中'
-                                                                    : item.status === '25'
+                                                                    : item.status === 25
                                                                     ? '数据同步失败'
-                                                                    : item.status === '30'
+                                                                    : item.status === 30
                                                                     ? '数据同步完成'
-                                                                    : item.status === '31'
+                                                                    : item.status === 31
                                                                     ? '数据学习中'
-                                                                    : item.status === '35'
+                                                                    : item.status === 35
                                                                     ? '数据学习失败'
-                                                                    : item.status === '40'
+                                                                    : item.status === 40
                                                                     ? '数据学习中'
-                                                                    : item.status === '41'
+                                                                    : item.status === 41
                                                                     ? '数据学习中'
-                                                                    : item.status === '45'
+                                                                    : item.status === 45
                                                                     ? '数据学习失败'
-                                                                    : item.status === '50'
+                                                                    : item.status === 50
                                                                     ? '数据学习中'
-                                                                    : item.status === '51'
+                                                                    : item.status === 51
                                                                     ? '数据学习中'
-                                                                    : item.status === '55'
+                                                                    : item.status === 55
                                                                     ? '数据学习失败'
-                                                                    : item.status === '60'
+                                                                    : item.status === 60
                                                                     ? '数据学习中'
-                                                                    : item.status >= '90'
+                                                                    : item.status >= 90
                                                                     ? '数据学习完成'
                                                                     : null}
                                                             </Typography>
@@ -1262,7 +1285,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     detailClose={() => setDetailOpen(false)}
                 />
             )}
-            <AddRuleModal open={ruleOpen} handleClose={setRuleOpen} />
+            {ruleOpen && <AddRuleModal open={ruleOpen} datasetUid={datasetId} handleClose={setRuleOpen} />}
         </div>
     );
 };

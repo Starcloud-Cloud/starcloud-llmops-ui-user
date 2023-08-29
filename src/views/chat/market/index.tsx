@@ -1,9 +1,9 @@
-import { getChatDetail, getChatDetailList } from 'api/chat/share';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IChatInfo } from 'views/template/myChat/createChat';
 import { Chat } from 'views/template/myChat/createChat/components/Chat';
 import { useLocation, useParams } from 'react-router-dom';
 import { getChatInfo, marketPage } from 'api/chat/mark';
+import { useWindowSize } from 'hooks/useWindowSize';
 
 const ChatMy = () => {
     const location = useLocation();
@@ -14,7 +14,6 @@ const ChatMy = () => {
         guideList: ['', '']
     });
     const [uid, setUid] = useState<any>('');
-    const [showSelect, setShowSelect] = useState(false);
     const [list, setList] = useState<any[]>([]);
 
     useEffect(() => {
@@ -45,22 +44,6 @@ const ChatMy = () => {
     }, [uid]);
 
     useEffect(() => {
-        // 创建一个新的meta标签
-        const meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
-
-        // 查找页面的头部并将新的meta标签添加进去
-        const head: any = document.querySelector('head');
-        head.appendChild(meta);
-
-        // 在组件卸载时，删除这个meta标签以还原原始设置
-        return () => {
-            head.removeChild(meta);
-        };
-    }, []);
-
-    useEffect(() => {
         marketPage({
             model: 'CHAT',
             pageNo: 1,
@@ -73,18 +56,16 @@ const ChatMy = () => {
                 avatar: item.images?.[0]
             }));
             setList(r);
-            if (r.length > 1) {
-                setShowSelect(true);
-            }
             if (!appUid) {
                 setUid(r[0]?.value);
             }
         });
     }, [appUid]);
+    const { width } = useWindowSize();
 
     return (
-        <div className="h-[calc(100vh-130px)]">
-            <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={showSelect} botList={list} />
+        <div className="h-[calc(100vh-130px)] bg-white">
+            <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={width <= 1300} botList={list} />
         </div>
     );
 };

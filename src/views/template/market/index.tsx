@@ -194,9 +194,9 @@ function TemplateMarket() {
                 </Box>
                 <Outlet />
             </Box>
-            <div className="w-full bottom-5 absolute">
+            {/* <div className="w-full bottom-5 absolute">
                 <ChatBtn />
-            </div>
+            </div> */}
         </Box>
     );
 }

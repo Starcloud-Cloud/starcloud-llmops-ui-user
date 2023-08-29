@@ -109,7 +109,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                         {formik?.touched.categories && formik?.errors.categories ? formik?.errors.categories : ' '}
                     </FormHelperText>
                 </FormControl>
-                <Stack sx={{ mt: 4 }}>
+                <Stack sx={{ mt: 2 }}>
                     <Autocomplete
                         multiple
                         id="tags-filled"

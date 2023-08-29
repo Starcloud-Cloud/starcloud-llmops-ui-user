@@ -49,6 +49,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import * as yup from 'yup';
 import { delDataset, getDetails, detailsSplit, getDatasetSource, uploadCharacters, uploadUrls } from '../../../../../api/chat';
 import { getAccessToken } from '../../../../../utils/auth';
+import AddRuleModal from './modal/addRule';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -854,6 +855,8 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
         setOpenConfirm(false);
     };
 
+    //增加规则弹窗
+    const [ruleOpen, setRuleOpen] = useState(false);
     return (
         <div>
             <div>
@@ -866,6 +869,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
+<<<<<<< HEAD
                         {/* <Button
                             variant={'contained'}
                             startIcon={<AddIcon />}
@@ -877,6 +881,32 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             添加文档
                         </Button> */}
+=======
+                        <Box>
+                            <Button
+                                variant={'contained'}
+                                color={'secondary'}
+                                size={'small'}
+                                sx={{ mr: 1 }}
+                                onClick={() => {
+                                    setRuleOpen(true);
+                                }}
+                            >
+                                规则设定
+                            </Button>
+                            <Button
+                                variant={'contained'}
+                                startIcon={<AddIcon />}
+                                color={'secondary'}
+                                size={'small'}
+                                onClick={() => {
+                                    setDocumentVisible(true);
+                                }}
+                            >
+                                添加文档
+                            </Button>
+                        </Box>
+>>>>>>> 6bc0c056a25044e2b9328b5998399171ad3e74d1
                     </Box>
                     <div
                         className={'mt-3'}
@@ -1259,6 +1289,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     detailClose={() => setDetailOpen(false)}
                 />
             )}
+            {ruleOpen && <AddRuleModal open={ruleOpen} datasetUid={datasetId} handleClose={setRuleOpen} />}
         </div>
     );
 };

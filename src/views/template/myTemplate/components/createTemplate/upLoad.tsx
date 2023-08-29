@@ -42,7 +42,7 @@ import WeChatDrawer from './components/WeChatDrawer';
 import DomainModal from './components/DomainModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
-
+import useUserStore from 'store/user';
 function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
     const defaultUpLoadList = [
         {
@@ -67,7 +67,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             comingSoon: false,
             action: [
                 { title: '创建站点', icon: 'cloudUploadOutlined', onclick: () => setOpenCreateSite(true) },
-                { title: '查看代码', icon: 'historyOutlined', onclick: () => setOpenDrawer(true) }
+                {
+                    title: '查看代码',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        getUpdateBtn();
+                        setOpenDrawer(true);
+                    }
+                }
             ]
         },
         {
@@ -80,7 +87,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             type: 5,
             action: [
                 { title: '创建群聊', icon: 'contentPaste', onclick: () => setOpenWchat(true) },
-                { title: '查看群聊', icon: 'historyOutlined', onclick: () => setOpenWeDrawer(true) }
+                {
+                    title: '查看群聊',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        getUpdateBtn();
+                        setOpenWeDrawer(true);
+                    }
+                }
             ]
         },
         {
@@ -105,7 +119,6 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const webMediumUidRef = useRef();
     const [openWchat, setOpenWchat] = useState(false);
     const [openWeDrawer, setOpenWeDrawer] = useState(false);
-
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
         code: <Code color="secondary" />,
@@ -413,6 +426,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             );
         }
     };
+
+    const permissions = useUserStore((state) => state.permissions);
     return (
         <Box>
             <SubCard
@@ -462,44 +477,61 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 </span>
             </Typography> */}
             <Grid container spacing={2}>
-                <Grid item md={6} xs={12}>
-                    <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
-                        <Box>
-                            <Box
-                                width="40px"
-                                height="40px"
-                                borderRadius="50%"
-                                sx={{ background: '#673ab74f' }}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                            >
-                                <Storefront color={'secondary'} />
+                {permissions.includes('chat.publish.market') && (
+                    <Grid item md={6} xs={12}>
+                        <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
+                            <Box>
+                                <Box
+                                    width="40px"
+                                    height="40px"
+                                    borderRadius="50%"
+                                    sx={{ background: '#673ab74f' }}
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    <Storefront color={'secondary'} />
+                                </Box>
                             </Box>
-                        </Box>
-                        <Box ml={2}>
-                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                应用市场
-                                <Chip
-                                    sx={{ ml: 1.5 }}
-                                    size="small"
-                                    label={
-                                        releaseState === 0
-                                            ? '未发布'
-                                            : releaseState === 1
-                                            ? '待审核'
-                                            : releaseState === 2
-                                            ? '审核通过'
-                                            : releaseState === 3
-                                            ? '审核未通过'
-                                            : releaseState === 4
-                                            ? '用户已取消'
-                                            : '已失效'
-                                    }
-                                />
-                                {updateBtn?.needTips && (
+                            <Box ml={2}>
+                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                    应用市场
                                     <Chip
                                         sx={{ ml: 1.5 }}
+                                        size="small"
+                                        label={
+                                            releaseState === 0
+                                                ? '未发布'
+                                                : releaseState === 1
+                                                ? '待审核'
+                                                : releaseState === 2
+                                                ? '审核通过'
+                                                : releaseState === 3
+                                                ? '审核未通过'
+                                                : releaseState === 4
+                                                ? '用户已取消'
+                                                : '已失效'
+                                        }
+                                    />
+                                    {updateBtn?.needTips && (
+                                        <Chip
+                                            sx={{ ml: 1.5, display: { lg: 'block', md: 'none', xs: 'none' } }}
+                                            size="small"
+                                            color="warning"
+                                            label={
+                                                updateBtn.needTips && releaseState === 1
+                                                    ? '检测到应用已经更新：建议更新重新发布'
+                                                    : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                                    ? '需要更新后才能发布'
+                                                    : '检测到应用已经更新：需要更新重新发布'
+                                            }
+                                            variant="outlined"
+                                        />
+                                    )}
+                                </Typography>
+                                {updateBtn?.needTips && (
+                                    <Chip
+                                        sx={{ mt: '10px', display: { lg: 'none', md: 'block' } }}
                                         size="small"
                                         color="warning"
                                         label={
@@ -512,54 +544,57 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         variant="outlined"
                                     />
                                 )}
-                            </Typography>
-                            <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
-                                用户可在模板市场中下载你上传的应用
-                            </Typography>
-                            <Box display="flex">
-                                <Box
-                                    color="#b5bed0"
-                                    fontSize="12px"
-                                    display="flex"
-                                    alignItems="center"
-                                    mr={2}
-                                    sx={{
-                                        cursor:
-                                            !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                ? 'pointer'
-                                                : 'default',
-                                        '&:hover': {
-                                            color:
+                                <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
+                                    用户可在模板市场中下载你上传的应用
+                                </Typography>
+                                <Box display="flex">
+                                    <Box
+                                        color="#b5bed0"
+                                        fontSize="12px"
+                                        display="flex"
+                                        alignItems="center"
+                                        mr={2}
+                                        sx={{
+                                            cursor:
                                                 !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                    ? '#673ab7'
-                                                    : 'none'
-                                        }
-                                    }}
-                                    onClick={() => {
-                                        if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
-                                            uploadMarket();
-                                        }
-                                    }}
-                                >
-                                    <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                    <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
-                                </Box>
-                                <Box
-                                    color="#b5bed0"
-                                    fontSize="12px"
-                                    display="flex"
-                                    alignItems="center"
-                                    mr={2}
-                                    sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
-                                    onClick={marketRecord}
-                                >
-                                    <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                    <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                                    ? 'pointer'
+                                                    : 'default',
+                                            '&:hover': {
+                                                color:
+                                                    !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                        ? '#673ab7'
+                                                        : 'none'
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
+                                                uploadMarket();
+                                            }
+                                        }}
+                                    >
+                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
+                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
+                                    </Box>
+                                    <Box
+                                        color="#b5bed0"
+                                        fontSize="12px"
+                                        display="flex"
+                                        alignItems="center"
+                                        flexWrap="wrap"
+                                        mr={2}
+                                        sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
+                                        onClick={marketRecord}
+                                    >
+                                        <Box whiteSpace="nowrap">
+                                            <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                            <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                        </Box>
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
-                    </SubCard>
-                </Grid>
+                        </SubCard>
+                    </Grid>
+                )}
                 {upLoadList.map((item) => (
                     <Grid key={item.title} item md={6} xs={12}>
                         <SubCard contentSX={{ minHeight: '140px', p: '20px', display: 'flex' }}>
@@ -615,6 +650,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 color="#b5bed0"
                                                 fontSize="12px"
                                                 display="flex"
+                                                flexWrap="wrap"
                                                 alignItems="center"
                                                 mr={2}
                                                 onClick={() => {
@@ -622,8 +658,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 }}
                                                 className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
                                             >
-                                                {IconList[el.icon]}
-                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                <Box whiteSpace="nowrap">
+                                                    {IconList[el.icon]}
+                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                </Box>
                                             </Box>
                                         ) : (
                                             <Box
@@ -631,17 +669,27 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                                 color="#b5bed0"
                                                 fontSize="12px"
                                                 display="flex"
+                                                flexWrap="wrap"
                                                 alignItems="center"
                                                 mr={2}
                                                 onClick={() => {
-                                                    if (!updateBtn.isFirstCreatePublishRecord) el.onclick();
+                                                    if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                        el.onclick();
+                                                    } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                        el.onclick();
+                                                    }
                                                 }}
                                                 className={`${
-                                                    !updateBtn.isFirstCreatePublishRecord ? 'cursor-pointer hover:text-purple-500' : ''
+                                                    (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                    (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                        ? 'cursor-pointer hover:text-purple-500'
+                                                        : ''
                                                 }`}
                                             >
-                                                {IconList[el.icon]}
-                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                <Box whiteSpace="nowrap">
+                                                    {IconList[el.icon]}
+                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                </Box>
                                             </Box>
                                         )
                                     )}
@@ -748,8 +796,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         <TableCell align="center">创建时间</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {tableData.map((row: any) => (
-                                    <TableRow>
+                                {tableData.map((row: any, index: number) => (
+                                    <TableRow key={index}>
                                         <TableCell align="center">{row.name}</TableCell>
                                         <TableCell align="center">{row.version}</TableCell>
                                         <TableCell align="center">

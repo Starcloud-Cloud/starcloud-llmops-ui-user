@@ -13,6 +13,7 @@ function FormExecute({ formik, item, onChange }: any) {
             {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
+                    size="small"
                     color="secondary"
                     label={item.label}
                     value={formik.values[item.field]}
@@ -37,6 +38,7 @@ function FormExecute({ formik, item, onChange }: any) {
             ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     sx={mt}
+                    size="small"
                     color="secondary"
                     label={item.label === 'Prompt' ? t('market.' + item.field) : item.label}
                     value={formik.values[item.field]}
@@ -44,7 +46,8 @@ function FormExecute({ formik, item, onChange }: any) {
                     required
                     name={item.field}
                     multiline
-                    minRows={6}
+                    minRows={3}
+                    maxRows={3}
                     InputLabelProps={{ shrink: true }}
                     placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
                     error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
@@ -63,6 +66,7 @@ function FormExecute({ formik, item, onChange }: any) {
             ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
+                    size="small"
                     color="secondary"
                     value={formik.values[item.field]}
                     InputLabelProps={{ shrink: true }}

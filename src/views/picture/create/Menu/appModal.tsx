@@ -284,6 +284,7 @@ const AppModal = ({
                     <FormControl color="secondary" fullWidth sx={{ my: 2 }}>
                         <InputLabel id="appList">优化选择</InputLabel>
                         <Select
+                            size="small"
                             color="secondary"
                             labelId="appList"
                             name="appValue"
@@ -320,11 +321,14 @@ const AppModal = ({
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end" alignItems="center">
-                        {error && (
+                        {/* {error && (
                             <Typography color="error" mr={1}>
                                 (无AI结果，无法插入)
                             </Typography>
-                        )}
+                        )} */}
+                        <Typography sx={{ color: '#697586', fontSize: '0.75rem' }} mr={1}>
+                            (如果觉的AI生存的内容不错，可点击确定将自动把内容复制到页面对应的位置)
+                        </Typography>
                         <Button
                             type="submit"
                             variant="contained"
@@ -334,7 +338,19 @@ const AppModal = ({
                                     !detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
                                         .response.answer
                                 ) {
-                                    setError(true);
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '无AI结果，无法插入',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            close: false,
+                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                            transition: 'SlideLeft'
+                                        })
+                                    );
                                 } else {
                                     emits(
                                         detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
@@ -343,7 +359,7 @@ const AppModal = ({
                                 }
                             }}
                         >
-                            确认
+                            确定
                         </Button>
                     </Grid>
                 </CardActions>

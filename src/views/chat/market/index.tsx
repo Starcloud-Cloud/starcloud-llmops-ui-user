@@ -4,6 +4,8 @@ import { Chat } from 'views/template/myChat/createChat/components/Chat';
 import { useLocation, useParams } from 'react-router-dom';
 import { getChatInfo, marketPage } from 'api/chat/mark';
 import { useWindowSize } from 'hooks/useWindowSize';
+import { Card } from '@mui/material';
+import { cards } from '../../pages/landing/CardData';
 
 const ChatMy = () => {
     const location = useLocation();
@@ -64,9 +66,17 @@ const ChatMy = () => {
     const { width } = useWindowSize();
 
     return (
-        <div className="h-[calc(100vh-130px)] bg-white">
+        <Card
+            sx={{
+                overflow: 'visible',
+                background: 'inherit'
+            }}
+            className="h-[calc(100vh-130px)]"
+        >
+            {/* <div className="rounded-lg h-full"> */}
             <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={width <= 1300} botList={list} />
-        </div>
+            {/* </div> */}
+        </Card>
     );
 };
 

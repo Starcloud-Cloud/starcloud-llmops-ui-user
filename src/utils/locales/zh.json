@@ -767,8 +767,8 @@
     }
   },
   "generate": {
-    "mode": "App模式",
-    "name": "App名称",
+    "mode": "模式",
+    "name": "名称",
     "fromScene": "执行场景",
     "totalAnswerTokens": "总消耗令牌数",
     "messageCount": "消息总数",

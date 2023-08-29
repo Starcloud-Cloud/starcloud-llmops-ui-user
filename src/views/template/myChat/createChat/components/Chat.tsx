@@ -467,6 +467,7 @@ export const Chat = ({
                 if (res) {
                     setConversationUid(res.uid);
                 } else {
+                    setConversationUid('');
                     setIsFinish(true);
                     setData([]);
                     dataRef.current = [];

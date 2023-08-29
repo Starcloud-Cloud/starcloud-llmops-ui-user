@@ -119,7 +119,7 @@ const Register = () => {
                                                                 width: 0,
                                                                 height: 0,
                                                                 borderStyle: 'solid',
-                                                                borderWidth: '17px',
+                                                                borderWidth: '20px',
                                                                 borderColor: 'transparent transparent #fff #fff'
                                                             }
                                                         }}
@@ -143,7 +143,7 @@ const Register = () => {
                                                                 width: 0,
                                                                 height: 0,
                                                                 borderStyle: 'solid',
-                                                                borderWidth: '17px',
+                                                                borderWidth: '20px',
                                                                 borderColor: 'transparent transparent #fff #fff'
                                                             }
                                                         }}

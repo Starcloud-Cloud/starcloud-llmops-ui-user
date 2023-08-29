@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 import { openSnackbar } from 'store/slices/snackbar';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 
+import { sendCode, registerCode } from 'api/login';
 // assets
 import { t } from 'hooks/web/useI18n';
 
@@ -49,8 +50,17 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
             }, 1000);
         }
     }, [vcodeOpen]);
-    const getvCode = () => {
-        setVCodeOpen(false);
+    const getvCode = async (values: any, validateField: (data: any) => void) => {
+        if (!/^1[3-9]\d{9}$/.test(values.phone)) {
+            validateField('phone');
+        } else {
+            setVCodeOpen(false);
+            const res = await sendCode({
+                tool: 2,
+                scene: 21,
+                account: values.phone
+            });
+        }
     };
     return (
         <>
@@ -73,9 +83,7 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                         .matches(/^1[3-9]\d{9}$/, '请输入有效的手机号'),
                     vcode: Yup.string().max(4, '验证码格式错误').required('请输入验证码')
                 })}
-                onSubmit={(values, { setErrors, setStatus }) => {
-                    console.log(22222);
-
+                onSubmit={async (values, { setErrors, setStatus }) => {
                     if (!checked) {
                         dispatch(
                             openSnackbar({
@@ -90,52 +98,15 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                         );
                         return;
                     }
-                    console.log(111111);
-
-                    // try {
-                    //     const res = await register(values.email, values.password, values.userName, inviteCode);
-                    //     if (res?.data) {
-                    //         if (scriptedRef.current) {
-                    //             setStatus({ success: true });
-                    //             dispatch(
-                    //                 openSnackbar({
-                    //                     open: true,
-                    //                     message: t('auth.register.successful'),
-                    //                     variant: 'alert',
-                    //                     alert: {
-                    //                         color: 'success'
-                    //                     },
-                    //                     close: false
-                    //                 })
-                    //             );
-
-                    //             setTimeout(() => {
-                    //                 navigate('/login', { replace: true });
-                    //             }, 1500);
-                    //         }
-                    //     } else {
-                    //         dispatch(
-                    //             openSnackbar({
-                    //                 open: true,
-                    //                 message: `${res?.msg}`,
-                    //                 variant: 'alert',
-                    //                 alert: {
-                    //                     color: 'error'
-                    //                 },
-                    //                 close: false
-                    //             })
-                    //         );
-                    //     }
-                    // } catch (err: any) {
-                    //     console.error(err);
-                    //     if (scriptedRef.current) {
-                    //         setStatus({ success: false });
-                    //         setErrors({ submit: err.message });
-                    //     }
-                    // }
+                    const res = await registerCode({
+                        sence: 22,
+                        tool: 2,
+                        account: values.phone,
+                        code: values.vcode
+                    });
                 }}
             >
-                {({ errors, handleBlur, handleChange, handleSubmit, touched, values }) => (
+                {({ errors, handleBlur, handleChange, validateField, handleSubmit, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
                         <Grid container spacing={matchDownSM ? 0 : 2}>
                             <Grid item xs={12}>
@@ -172,7 +143,9 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                 />
                                 <Button
                                     disabled={!vcodeOpen}
-                                    onClick={getvCode}
+                                    onClick={() => {
+                                        getvCode(values, validateField);
+                                    }}
                                     color="secondary"
                                     variant="outlined"
                                     sx={{ whiteSpace: 'nowrap', ml: 1, width: '90px' }}

@@ -22,6 +22,7 @@ const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
 // 聊天
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
 const CreateChat = Loadable(lazy(() => import('views/template/myChat/createChat')));
+const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
@@ -85,6 +86,10 @@ const MainRoutes = {
         {
             path: '/createChat',
             element: <CreateChat />
+        },
+        {
+            path: '/chatMarket',
+            element: <ChatMarket />
         }
     ]
 };

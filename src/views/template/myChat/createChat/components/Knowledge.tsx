@@ -13,7 +13,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import formatDate from 'hooks/useDate';
+import formatDate, { formatYear } from 'hooks/useDate';
 // import fetch from 'utils/fetch';
 import {
     Box,
@@ -288,7 +288,7 @@ const DocumentModal = ({
         multiple: true,
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
         data: {
-            datasetId,
+            appId: datasetId,
             batch: uuidv4()
         },
         headers: {
@@ -307,8 +307,7 @@ const DocumentModal = ({
                         return item.response.data.errMsg;
                     }
                 });
-
-                errMsg.length > 0 &&
+                if (errMsg.length > 0 && errMsg[0] !== undefined) {
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -320,6 +319,7 @@ const DocumentModal = ({
                             close: false
                         })
                     );
+                }
                 handleClose();
                 forceUpdate();
             }
@@ -341,7 +341,7 @@ const DocumentModal = ({
             context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {
-            uploadCharacters([{ ...values, datasetId, batch: uuidv4() }]).then((res) => {
+            uploadCharacters([{ ...values, appId: datasetId, batch: uuidv4() }]).then((res) => {
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -363,7 +363,7 @@ const DocumentModal = ({
     const [url, setUrl] = useState<string>('');
     const saveUrl = () => {
         if (url && isValid) {
-            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), datasetId }).then((res) => {
+            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), appId: datasetId }).then((res) => {
                 const errMsg = res.filter((item: any) => {
                     if (!item.status) {
                         return item.errMsg;
@@ -1048,14 +1048,16 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                                         className="!pt-[10px]"
                                                     >
-                                                        {item.wordCount < 2000 && (
+                                                        <Tooltip
+                                                            placement="top"
+                                                            title={((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                        >
                                                             <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
-                                                        )}
-                                                        {item.wordCount >= 2000 && (
-                                                            <Typography variant="caption">{item.storageVO?.size}&nbsp;KB</Typography>
-                                                        )}
+                                                        </Tooltip>
                                                         <Box>
-                                                            <Typography variant="caption">{formatDate(item.updateTime)}</Typography>
+                                                            <Tooltip placement="top" title={formatDate(item.updateTime)}>
+                                                                <Typography variant="caption">{formatYear(item.updateTime)}</Typography>
+                                                            </Tooltip>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item xs={12} className="!pt-[5px]">

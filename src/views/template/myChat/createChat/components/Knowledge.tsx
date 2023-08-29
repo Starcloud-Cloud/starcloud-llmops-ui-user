@@ -75,7 +75,7 @@ const validationSchema = yup.object({
     context: yup.string().required('')
 });
 
-const transformDataType = (dataType: string, type: string) => {
+const transformDataType = (dataType: string, type: string | undefined) => {
     switch (dataType) {
         case 'DOCUMENT':
             return (
@@ -83,7 +83,7 @@ const transformDataType = (dataType: string, type: string) => {
                     <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
-        case 'URL':
+        case 'HTML':
             return (
                 <Tooltip title={type}>
                     <LinkIcon className="text-[#5e35b1] text-base mr-2" />
@@ -569,7 +569,12 @@ interface DetaData {
     dataType?: string;
     cleanContent?: string;
     summary?: string | null;
-    content?: string;
+    dataSourceInfo?: {
+        initAddress?: string;
+    };
+    storageVO?: {
+        storageKey?: string;
+    };
 }
 const DetailModal = ({
     detailOpen,
@@ -659,15 +664,22 @@ const DetailModal = ({
                                 原始链接
                             </Typography>
                             <Box>
-                                {detaData.dataType === 'URL' && (
-                                    <Link color="secondary" target="_blank" sx={{ fontSize: '12px' }} href={detaData.content}>
-                                        {detaData.content}
-                                    </Link>
+                                {detaData.dataType === 'HTML' && (
+                                    <Button
+                                        color="secondary"
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => {
+                                            window.open(detaData.dataSourceInfo?.initAddress);
+                                        }}
+                                    >
+                                        点击跳转
+                                    </Button>
                                 )}
-                                {detaData.dataType !== 'URL' && (
+                                {detaData.dataType !== 'HTML' && (
                                     <Button
                                         onClick={() => {
-                                            fetch(detaData.cleanContent as string)
+                                            fetch(detaData.storageVO?.storageKey as string)
                                                 .then((response) => {
                                                     if (response.ok) {
                                                         return response.blob();
@@ -679,10 +691,7 @@ const DetailModal = ({
                                                     // 创建一个临时链接的<a>标签
                                                     const link = document.createElement('a');
                                                     link.href = url;
-                                                    link.download =
-                                                        detaData.name +
-                                                        '.' +
-                                                        detaData.cleanContent?.split('.')[detaData.cleanContent?.split('.').length - 1]; // 设置下载的文件名
+                                                    link.download = detaData.name as string; // 设置下载的文件名
                                                     link.click();
                                                     // 释放临时链接的资源
                                                     window.URL.revokeObjectURL(url);
@@ -762,6 +771,11 @@ export type typeDocumentChild = {
     position: number;
     dataSourceInfo?: any;
     batch?: any;
+    storageVO?: {
+        type: string;
+        size?: number;
+    };
+    errorMessage?: string;
     status?: any;
     tokens?: any;
     summaryContent?: string;
@@ -793,14 +807,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
             const res = await getDatasetSource({ datasetId });
             if (
                 !res.every(
-                    (value: { status: string }) =>
-                        value.status >= '90' ||
-                        value.status === '0' ||
-                        value.status === '15' ||
-                        value.status === '25' ||
-                        value.status === '35' ||
-                        value.status === '45' ||
-                        value.status === '55'
+                    (value: { status: number }) =>
+                        value.status >= 90 ||
+                        value.status === 0 ||
+                        value.status === 15 ||
+                        value.status === 25 ||
+                        value.status === 35 ||
+                        value.status === 45 ||
+                        value.status === 55
                 )
             ) {
                 InterRef.current = setInterval(() => {
@@ -808,14 +822,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         setDocumentList(response);
                         if (
                             response.every(
-                                (value: { status: string }) =>
-                                    value.status >= '90' ||
-                                    value.status === '0' ||
-                                    value.status === '15' ||
-                                    value.status === '25' ||
-                                    value.status === '35' ||
-                                    value.status === '45' ||
-                                    value.status === '55'
+                                (value: { status: number }) =>
+                                    value.status >= 90 ||
+                                    value.status === 0 ||
+                                    value.status === 15 ||
+                                    value.status === 25 ||
+                                    value.status === 35 ||
+                                    value.status === 45 ||
+                                    value.status === 55
                             )
                         ) {
                             clearInterval(timeoutRef.current);
@@ -894,7 +908,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             </Button>
                         </Box>
                     </Box>
-                    <div
+                    {/* <div
                         className={'mt-3'}
                         style={{
                             margin: '0 auto',
@@ -929,9 +943,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             </Popover>
                             <div className="text-base">即将推出</div>
                         </Box>
-                    </div>
+                    </div> */}
 
-                    {/* <div className={'mt-3'}>
+                    <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
                             <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
@@ -957,7 +971,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         <Grid container spacing={gridSpacing}>
                                                             <Grid item xs zeroMinWidth>
                                                                 <div className="flex items-center">
-                                                                    {transformDataType(item.dataType, item.type)}
+                                                                    {transformDataType(item.dataType, item.storageVO?.type)}
                                                                     <Tooltip title={item.name}>
                                                                         <Typography
                                                                             variant="h4"
@@ -1034,7 +1048,12 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                                         className="!pt-[10px]"
                                                     >
-                                                        <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        {item.wordCount < 2000 && (
+                                                            <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        )}
+                                                        {item.wordCount >= 2000 && (
+                                                            <Typography variant="caption">{item.storageVO?.size}&nbsp;KB</Typography>
+                                                        )}
                                                         <Box>
                                                             <Typography variant="caption">{formatDate(item.updateTime)}</Typography>
                                                         </Box>
@@ -1049,20 +1068,22 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}
                                                     >
                                                         <Box display="flex" alignItems="center">
-                                                            {item.status === '0' ||
-                                                            item.status === '15' ||
-                                                            item.status === '25' ||
-                                                            item.status === '35' ||
-                                                            item.status === '45' ||
-                                                            item.status === '55' ? (
-                                                                <HighlightOffIcon
-                                                                    sx={{
-                                                                        color: 'error.dark',
-                                                                        width: 14,
-                                                                        height: 14
-                                                                    }}
-                                                                />
-                                                            ) : item.status >= '90' ? (
+                                                            {item.status === 0 ||
+                                                            item.status === 15 ||
+                                                            item.status === 25 ||
+                                                            item.status === 35 ||
+                                                            item.status === 45 ||
+                                                            item.status === 55 ? (
+                                                                <Tooltip title={item.errorMessage}>
+                                                                    <HighlightOffIcon
+                                                                        sx={{
+                                                                            color: 'error.dark',
+                                                                            width: 14,
+                                                                            height: 14
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            ) : item.status >= 90 ? (
                                                                 <CheckCircleIcon
                                                                     sx={{
                                                                         color: 'success.dark',
@@ -1077,37 +1098,37 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 />
                                                             )}
                                                             <Typography ml={0.5} variant="caption">
-                                                                {item.status === '0'
+                                                                {item.status === 0
                                                                     ? '数据上传失败'
-                                                                    : item.status === '15'
+                                                                    : item.status === 15
                                                                     ? '数据上传失败'
-                                                                    : item.status === '20'
+                                                                    : item.status === 20
                                                                     ? '数据上传成功'
-                                                                    : item.status === '21'
+                                                                    : item.status === 21
                                                                     ? '数据同步中'
-                                                                    : item.status === '25'
+                                                                    : item.status === 25
                                                                     ? '数据同步失败'
-                                                                    : item.status === '30'
+                                                                    : item.status === 30
                                                                     ? '数据同步完成'
-                                                                    : item.status === '31'
+                                                                    : item.status === 31
                                                                     ? '数据学习中'
-                                                                    : item.status === '35'
+                                                                    : item.status === 35
                                                                     ? '数据学习失败'
-                                                                    : item.status === '40'
+                                                                    : item.status === 40
                                                                     ? '数据学习中'
-                                                                    : item.status === '41'
+                                                                    : item.status === 41
                                                                     ? '数据学习中'
-                                                                    : item.status === '45'
+                                                                    : item.status === 45
                                                                     ? '数据学习失败'
-                                                                    : item.status === '50'
+                                                                    : item.status === 50
                                                                     ? '数据学习中'
-                                                                    : item.status === '51'
+                                                                    : item.status === 51
                                                                     ? '数据学习中'
-                                                                    : item.status === '55'
+                                                                    : item.status === 55
                                                                     ? '数据学习失败'
-                                                                    : item.status === '60'
+                                                                    : item.status === 60
                                                                     ? '数据学习中'
-                                                                    : item.status >= '90'
+                                                                    : item.status >= 90
                                                                     ? '数据学习完成'
                                                                     : null}
                                                             </Typography>
@@ -1120,7 +1141,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 })}
                             </Grid>
                         </MainCard>
-                    </div> */}
+                    </div>
                 </div>
             </div>
             <Box mt={3} display="flex" justifyContent="space-between" alignContent="center">

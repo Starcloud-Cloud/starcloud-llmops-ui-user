@@ -883,7 +883,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
-                        <Box>
+                        {/* <Box>
                             <Button
                                 variant={'contained'}
                                 color={'secondary'}
@@ -906,14 +906,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             >
                                 添加文档
                             </Button>
-                        </Box>
+                        </Box> */}
                     </Box>
-                    {/* <div
+                    <div
                         className={'mt-3'}
                         style={{
                             margin: '0 auto',
                             textAlign: 'center',
-                            height: '650px',
+                            height: '350px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
@@ -943,9 +943,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             </Popover>
                             <div className="text-base">即将推出</div>
                         </Box>
-                    </div> */}
+                    </div>
 
-                    <div className={'mt-3'}>
+                    {/* <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
                             <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
@@ -1141,7 +1141,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 })}
                             </Grid>
                         </MainCard>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <Box mt={3} display="flex" justifyContent="space-between" alignContent="center">

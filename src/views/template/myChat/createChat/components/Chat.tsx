@@ -319,8 +319,6 @@ export const Chat = ({
         }
     });
 
-    console.log(dataRef.current, 'current');
-
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
@@ -400,10 +398,10 @@ export const Chat = ({
                         if (messages?.startsWith('data:')) {
                             bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                         }
+                        console.log(bufferObj, 'bufferObj');
                         if (bufferObj?.code === 200) {
                             jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                             setConversationUid(bufferObj.conversationUid);
-                            console.log(bufferObj.content);
 
                             // 处理流程
                             if (bufferObj.type === 'i') {
@@ -414,7 +412,6 @@ export const Chat = ({
                                     content.data = uniqBy(content.data, 'id');
                                     copyData[copyData.length - 1].process = [...process, content];
                                     dataRef.current = copyData;
-                                    console.log(copyData, 'copyData');
                                     setData(copyData);
                                 }
                                 if (content.showType === 'url') {
@@ -448,7 +445,7 @@ export const Chat = ({
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: t('market.warning'),
+                                    message: `[${bufferObj.code}]-${bufferObj.error}`,
                                     variant: 'alert',
                                     alert: {
                                         color: 'error'

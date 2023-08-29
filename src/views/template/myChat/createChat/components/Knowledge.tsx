@@ -869,19 +869,6 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
-<<<<<<< HEAD
-                        {/* <Button
-                            variant={'contained'}
-                            startIcon={<AddIcon />}
-                            color={'secondary'}
-                            size={'small'}
-                            onClick={() => {
-                                setDocumentVisible(true);
-                            }}
-                        >
-                            添加文档
-                        </Button> */}
-=======
                         <Box>
                             <Button
                                 variant={'contained'}
@@ -906,7 +893,6 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 添加文档
                             </Button>
                         </Box>
->>>>>>> 6bc0c056a25044e2b9328b5998399171ad3e74d1
                     </Box>
                     <div
                         className={'mt-3'}

@@ -124,11 +124,11 @@ const Valida = ({
     const iptRef = useRef<any | null>(null);
     const changePrompt = (field: string, i: number) => {
         const newVal = _.cloneDeep(variables);
-        const part1 = newVal[i].defaultValue.slice(0, iptRef.current?.selectionStart);
-        const part2 = newVal[i].defaultValue.slice(iptRef.current?.selectionStart);
-        newVal[i].defaultValue = `${part1}{STEP.标题.${field}}${part2}`;
-        formik.setFieldValue('prompt', newVal[i].defaultValue);
-        basisChange({ e: { name: 'prompt', value: newVal[i].defaultValue }, index, i, flag: false });
+        const part1 = newVal[i].value.slice(0, iptRef.current?.selectionStart);
+        const part2 = newVal[i].value.slice(iptRef.current?.selectionStart);
+        newVal[i].value = `${part1}{STEP.标题.${field}}${part2}`;
+        formik.setFieldValue('prompt', newVal[i].value);
+        basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };
     return (
         <Box py={1}>

@@ -196,7 +196,7 @@ export const ChatBtn = () => {
                             multiline
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
-                            placeholder="请输入(Shift+Enter换行)"
+                            placeholder="请输入想咨询的问题"
                             className="!pt-0"
                             onKeyDown={handleKeyDown}
                             minRows={1}
@@ -721,15 +721,18 @@ export const Chat = ({
     return (
         <div className="h-full relative flex justify-center">
             {mode === 'individual' && width > 1300 && (
-                <div className="h-full mr-3 min-w-[221px] overflow-y-auto" style={{ borderRight: '1px solid rgba(230,230,231,1)' }}>
-                    <div className="h-full">
-                        <div className="h-[44px] flex items-center justify-center text-lg">员工广场</div>
+                <div
+                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
+                    style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
+                >
+                    <div className="h-full  px-[8px]">
+                        <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
                         <div className="bg-white rounded-md">
                             {botList?.map((item, index) => (
                                 <>
                                     <div
                                         key={index}
-                                        className={`w-[220px] flex items-center justify-start cursor-pointer p-[8px] border-b-[1px] border-solid border-[rgba(230,230,231,1)] ${
+                                        className={`w-[220px] h-[75px] flex items-center justify-start cursor-pointer p-[8px] border-b-[1px] border-solid border-[rgba(230,230,231,1)] ${
                                             (mediumUid || uid) === item.value ? 'shadow-lg' : ''
                                         }`}
                                         onClick={() => {
@@ -739,8 +742,8 @@ export const Chat = ({
                                         <div className="w-[40px] h-[40px]">
                                             <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
                                         </div>
-                                        <div className="ml-2">
-                                            <div className="text-lg">{item.name}</div>
+                                        <div className="ml-2 h-full">
+                                            <div className="text-lg line-clamp-2">{item.name}</div>
                                         </div>
                                     </div>
                                 </>
@@ -749,13 +752,17 @@ export const Chat = ({
                     </div>
                 </div>
             )}
-            <div className="h-full flex flex-col max-w-[768px] w-full">
+            <div
+                className={`h-full flex flex-col max-w-[768px] ${
+                    mode === 'individual' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''
+                }   w-full`}
+            >
                 <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0`}>
                     {showSelect ? (
                         <Popover
                             content={
                                 <div>
-                                    <div className="flex justify-center">切换机器人</div>
+                                    <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div
                                             key={index}
@@ -776,7 +783,9 @@ export const Chat = ({
                                             </div>
                                             <div className="ml-2">
                                                 <div className="text-lg">{item.name}</div>
-                                                <div className="text-sm w-[320px] text-[#9da3af] mt-1">{item.des}</div>
+                                                <div className="text-sm w-[320px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
+                                                    {item.des || '无'}
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -794,6 +803,7 @@ export const Chat = ({
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
 
                                 {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
+                                <span className="text-xs ml-1 text-[#697586]">可切换员工</span>
                             </div>
                         </Popover>
                     ) : (
@@ -806,7 +816,7 @@ export const Chat = ({
                     )}
                 </div>
                 <Divider variant={'fullWidth'} />
-                <div className="flex-grow flex justify-center overflow-y-auto w-full">
+                <div className="flex-grow flex justify-center overflow-y-auto w-full" style={{ scrollbarGutter: 'stable' }}>
                     <div className={'max-w-[768px] w-full'}>
                         <div
                             style={{
@@ -873,7 +883,7 @@ export const Chat = ({
                                         multiline
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="请输入(Shift+Enter换行)"
+                                        placeholder="请输入想咨询的问题"
                                         className="!pt-0"
                                         onKeyDown={handleKeyDown}
                                         minRows={1}
@@ -980,7 +990,7 @@ export const Chat = ({
                                         multiline
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="请输入(Shift+Enter换行)"
+                                        placeholder="请输入想咨询的问题"
                                         className="!pt-0"
                                         onKeyDown={handleKeyDown}
                                         minRows={1}
@@ -1238,7 +1248,7 @@ export const Chat = ({
                     </div>
                 )}
             </div>
-            {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full ml-3" />}
+            {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
         </div>
     );
 };

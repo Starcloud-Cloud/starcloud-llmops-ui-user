@@ -17,6 +17,7 @@ import {
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 // third party
 import pcLogin from 'assets/images/auth/pc_login.png';
@@ -367,23 +368,30 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     <Grid item xs={12} className="pt-3 pb-3">
                         <Divider />
                     </Grid>
-                    <Grid item xs={12}>
-                        <Grid item container direction="column" alignItems="center" xs={12}>
-                            <Box display="flex">
-                                <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                                    {t('auth.login.account')}
-                                </Typography>
-                                <Typography
-                                    component={Link}
-                                    color="secondary"
-                                    to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
-                                    variant="subtitle1"
-                                    sx={{ textDecoration: 'none' }}
-                                >
-                                    {t('auth.login.account1')}
-                                </Typography>
-                            </Box>
-                        </Grid>
+                    <Grid item display="flex" justifyContent="space-between" alignItems="center" xs={12}>
+                        <Box display="flex" alignItems="center">
+                            <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                                {t('auth.login.account')}
+                            </Typography>
+                            <Typography
+                                component={Link}
+                                color="secondary"
+                                to={inviteCode ? `/register?q=${inviteCode}` : '/register'}
+                                variant="subtitle1"
+                                sx={{ textDecoration: 'none' }}
+                            >
+                                {t('auth.login.account1')}
+                            </Typography>
+                        </Box>
+                        <Button
+                            startIcon={<PhoneAndroidIcon fontSize="small" />}
+                            sx={{ ml: 1 }}
+                            variant="outlined"
+                            size="small"
+                            color="secondary"
+                        >
+                            使用手机号登录
+                        </Button>
                     </Grid>
                 </div>
             ) : (
@@ -446,7 +454,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        <Grid item container direction="column" alignItems="center" xs={12}>
+                        <Grid item display="flex" justifyContent="space-between" alignItems="center" xs={12}>
                             <Box display="flex">
                                 <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
                                     {t('auth.login.account')}
@@ -461,6 +469,15 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                     {t('auth.login.account1')}
                                 </Typography>
                             </Box>
+                            <Button
+                                startIcon={<PhoneAndroidIcon fontSize="small" />}
+                                sx={{ ml: 1 }}
+                                variant="outlined"
+                                size="small"
+                                color="secondary"
+                            >
+                                使用手机号登录
+                            </Button>
                         </Grid>
                     </Grid>
                 </div>

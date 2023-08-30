@@ -341,7 +341,7 @@ const DocumentModal = ({
             context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {
-            uploadCharacters([{ ...values, appId: datasetId, batch: uuidv4() }]).then((res) => {
+            uploadCharacters({ characterVOS: [values], appId: datasetId, batch: uuidv4() }).then((res) => {
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -883,7 +883,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
-                        {/* <Button
+                        <Button
                             variant={'contained'}
                             startIcon={<AddIcon />}
                             color={'secondary'}
@@ -893,9 +893,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             }}
                         >
                             添加文档
-                        </Button> */}
+                        </Button>
                     </Box>
-                    <div
+                    {/* <div
                         className={'mt-3'}
                         style={{
                             margin: '0 auto',
@@ -930,9 +930,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             </Popover>
                             <div className="text-base">即将推出</div>
                         </Box>
-                    </div>
+                    </div> */}
 
-                    {/* <div className={'mt-3'}>
+                    <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
                             <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
@@ -1130,7 +1130,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 })}
                             </Grid>
                         </MainCard>
-                    </div> */}
+                    </div>
                 </div>
             </div>
             <Box mt={3} display="flex" justifyContent="space-between" alignContent="center">

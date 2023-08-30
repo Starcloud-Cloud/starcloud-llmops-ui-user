@@ -411,7 +411,12 @@ function ApplicationAnalysis({
                                             } else if (row.appMode === 'CHAT') {
                                                 setChatVisible(true);
                                                 setConversationUid(row.uid);
-                                                getChatRecord({ conversationUid: row.uid, pageNo: 1, pageSize: 100 }).then((res) => {
+                                                getChatRecord({
+                                                    conversationUid: row.uid,
+                                                    pageNo: 1,
+                                                    pageSize: 100,
+                                                    fromScene: row.fromScene
+                                                }).then((res) => {
                                                     setDetail(res.list);
                                                 });
                                             }

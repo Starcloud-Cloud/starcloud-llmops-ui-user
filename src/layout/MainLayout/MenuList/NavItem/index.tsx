@@ -11,6 +11,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
 import ChatIcon from '@mui/icons-material/Chat';
+import Groups2Icon from '@mui/icons-material/Groups2';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -51,7 +52,8 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         UpgradeIcon,
         ImageIcon,
         SmartToyIcon,
-        ChatIcon
+        ChatIcon,
+        Groups2Icon
     };
     const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
 

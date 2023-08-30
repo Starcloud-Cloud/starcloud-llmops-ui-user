@@ -774,7 +774,7 @@ export const Chat = ({
                     {showSelect ? (
                         <Popover
                             content={
-                                <div>
+                                <div className="h-[600px] overflow-y-auto">
                                     <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div

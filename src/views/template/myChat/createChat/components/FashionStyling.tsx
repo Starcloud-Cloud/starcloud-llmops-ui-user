@@ -580,7 +580,7 @@ export const FashionStyling = ({
                                     setAppValues(chatBotInfo.introduction);
                                 }}
                             >
-                                一键优化
+                                一键AI生成
                             </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableIntroduction ? '展示' : '不展示'}</span>
                             <Switch
@@ -676,11 +676,11 @@ export const FashionStyling = ({
                                 onClick={() => {
                                     setTags(['Optimize Prompt', 'Chat', 'Welcome']);
                                     setAppOpen(true);
-                                    setTitle('描述语优化');
-                                    setAppValues(chatBotInfo.statement);
+                                    setTitle('欢迎语优化');
+                                    setAppValues(chatBotInfo.introduction);
                                 }}
                             >
-                                一键优化
+                                一键AI生成
                             </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
                             <Switch

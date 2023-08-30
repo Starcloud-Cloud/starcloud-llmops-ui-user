@@ -1,7 +1,8 @@
-import { FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Slider, TextField, Tooltip } from '@mui/material';
+import { FormControl, Grid, Button, Box, InputLabel, MenuItem, Select, Slider, TextField, Tooltip } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import AppModal from 'views/picture/create/Menu/appModal';
 
 const marks = [
     {
@@ -132,6 +133,11 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
         }
     }, [regulationText]);
 
+    const [appOpen, setAppOpen] = useState(false);
+    const emits = (data: any) => {
+        setAppOpen(false);
+        setRegulationText(data);
+    };
     return (
         <div>
             <div>
@@ -142,7 +148,19 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 >
                     基础规则
                 </span>
-                <div className={'mt-5'}>
+                <Box className={'mt-5'} display="flex" justifyContent="right">
+                    <Button
+                        color="secondary"
+                        size="small"
+                        variant="text"
+                        onClick={() => {
+                            setAppOpen(true);
+                        }}
+                    >
+                        一键AI生成
+                    </Button>
+                </Box>
+                <div>
                     <TextField
                         value={regulationText}
                         label={'角色描述'}
@@ -337,6 +355,16 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </FormControl>
                 </div>
             </div>
+            {appOpen && (
+                <AppModal
+                    title={'角色描述优化'}
+                    value={regulationText}
+                    open={appOpen}
+                    emits={emits}
+                    tags={['Chat', 'Optimize Prompt', 'Role']}
+                    setOpen={setAppOpen}
+                />
+            )}
         </div>
     );
 };

@@ -443,7 +443,7 @@ export const PictureCreateMenu = ({
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Button color="secondary" size="small" variant="text" onClick={() => setAppOpen(true)}>
-                                一键优化
+                                一键AI生成
                             </Button>
                             <MuiTooltip title="随机生成描述示例" arrow placement="top">
                                 <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />

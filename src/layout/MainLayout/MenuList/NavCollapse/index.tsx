@@ -290,7 +290,6 @@ const NavCollapse = ({ menu, level, parentId }: NavCollapseProps) => {
                                 primary={
                                     <Typography variant={isSelected ? 'h5' : 'body1'} color="inherit" sx={{ my: 'auto' }}>
                                         {menu.title}
-                                        555555555555555
                                     </Typography>
                                 }
                                 secondary={
@@ -307,13 +306,11 @@ const NavCollapse = ({ menu, level, parentId }: NavCollapseProps) => {
                                 }
                             />
                         )}
-
                         {openMini || open ? (
                             collapseIcon
                         ) : (
                             <IconChevronDown stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
                         )}
-
                         {!drawerOpen && (
                             <PopperStyledMini
                                 open={openMini}
@@ -399,7 +396,6 @@ const NavCollapse = ({ menu, level, parentId }: NavCollapseProps) => {
                             }
                         />
                         {openMini ? <IconChevronRight stroke={1.5} size="16px" /> : <IconChevronDown stroke={1.5} size="16px" />}
-
                         {anchorEl && (
                             <PopperStyled
                                 id={popperId}

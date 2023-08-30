@@ -46,7 +46,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                 </Box>
                                 <Box fontSize={14} mt={0.5}>
                                     {data?.tags.map((el) => (
-                                        <Chip key={el} label={el} size="small" variant="outlined" />
+                                        <Chip sx={{ mr: 0.5 }} key={el} label={el} size="small" variant="outlined" />
                                     ))}
                                 </Box>
                             </Box>

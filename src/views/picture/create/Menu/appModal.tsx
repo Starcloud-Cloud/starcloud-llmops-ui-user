@@ -327,7 +327,7 @@ const AppModal = ({
                             </Typography>
                         )} */}
                         <Typography sx={{ color: '#697586', fontSize: '0.75rem' }} mr={1}>
-                            (如果觉的AI生存的内容不错，可点击确定将自动把内容复制到页面对应的位置)
+                            (如果觉得AI生成的内容不错，可点击确定将自动把内容复制到页面对应的位置)
                         </Typography>
                         <Button
                             type="submit"

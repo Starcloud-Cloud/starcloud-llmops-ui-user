@@ -784,7 +784,7 @@ export const Chat = ({
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">
-                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
                                         </div>
                                         <div className="ml-2 h-full">
                                             <div className="text-lg line-clamp-2">{item.name}</div>
@@ -805,7 +805,7 @@ export const Chat = ({
                     {showSelect ? (
                         <Popover
                             content={
-                                <div>
+                                <div className="h-[600px] overflow-y-auto">
                                     <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div
@@ -823,7 +823,7 @@ export const Chat = ({
                                             }}
                                         >
                                             <div className="w-[40px] h-[40px]">
-                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
                                             </div>
                                             <div className="ml-2">
                                                 <div className="text-lg">{item.name}</div>

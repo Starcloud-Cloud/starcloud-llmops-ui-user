@@ -709,8 +709,8 @@
     }
   },
   "generate": {
-    "mode": "App Mode",
-    "name": "App Name",
+    "mode": "Mode",
+    "name": "Name",
     "fromScene": "From Scene",
     "totalAnswerTokens": "Total Answer Tokens",
     "messageCount": "Message Count",

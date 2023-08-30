@@ -373,8 +373,8 @@ function ApplicationAnalysis({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">{t('generate.mode')}</TableCell>
                             <TableCell align="center">{t('generate.name')}</TableCell>
+                            <TableCell align="center">{t('generate.mode')}</TableCell>
                             <TableCell align="center">执行场景</TableCell>
                             <TableCell align="center">{t('generate.totalAnswerTokens')}</TableCell>
                             <TableCell align="center">{t('generate.totalElapsed')} (s)</TableCell>
@@ -387,8 +387,8 @@ function ApplicationAnalysis({
                     <TableBody>
                         {totalData?.map((row) => (
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{row.appName}</TableCell>
+                                <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>

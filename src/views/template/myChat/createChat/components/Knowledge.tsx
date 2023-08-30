@@ -13,7 +13,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import formatDate from 'hooks/useDate';
+import formatDate, { formatYear } from 'hooks/useDate';
 // import fetch from 'utils/fetch';
 import {
     Box,
@@ -49,6 +49,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import * as yup from 'yup';
 import { delDataset, getDetails, detailsSplit, getDatasetSource, uploadCharacters, uploadUrls } from '../../../../../api/chat';
 import { getAccessToken } from '../../../../../utils/auth';
+import AddRuleModal from './modal/addRule';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -74,7 +75,7 @@ const validationSchema = yup.object({
     context: yup.string().required('')
 });
 
-const transformDataType = (dataType: string, type: string) => {
+const transformDataType = (dataType: string, type: string | undefined) => {
     switch (dataType) {
         case 'DOCUMENT':
             return (
@@ -82,7 +83,7 @@ const transformDataType = (dataType: string, type: string) => {
                     <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
                 </Tooltip>
             );
-        case 'URL':
+        case 'HTML':
             return (
                 <Tooltip title={type}>
                     <LinkIcon className="text-[#5e35b1] text-base mr-2" />
@@ -287,7 +288,7 @@ const DocumentModal = ({
         multiple: true,
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
         data: {
-            datasetId,
+            appId: datasetId,
             batch: uuidv4()
         },
         headers: {
@@ -306,8 +307,7 @@ const DocumentModal = ({
                         return item.response.data.errMsg;
                     }
                 });
-
-                errMsg.length > 0 &&
+                if (errMsg.length > 0 && errMsg[0] !== undefined) {
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -319,6 +319,7 @@ const DocumentModal = ({
                             close: false
                         })
                     );
+                }
                 handleClose();
                 forceUpdate();
             }
@@ -340,7 +341,7 @@ const DocumentModal = ({
             context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {
-            uploadCharacters([{ ...values, datasetId, batch: uuidv4() }]).then((res) => {
+            uploadCharacters([{ ...values, appId: datasetId, batch: uuidv4() }]).then((res) => {
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -362,7 +363,7 @@ const DocumentModal = ({
     const [url, setUrl] = useState<string>('');
     const saveUrl = () => {
         if (url && isValid) {
-            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), datasetId }).then((res) => {
+            uploadUrls({ urls: url.split('\n').filter((value) => value !== ''), batch: uuidv4(), appId: datasetId }).then((res) => {
                 const errMsg = res.filter((item: any) => {
                     if (!item.status) {
                         return item.errMsg;
@@ -568,7 +569,12 @@ interface DetaData {
     dataType?: string;
     cleanContent?: string;
     summary?: string | null;
-    content?: string;
+    dataSourceInfo?: {
+        initAddress?: string;
+    };
+    storageVO?: {
+        storageKey?: string;
+    };
 }
 const DetailModal = ({
     detailOpen,
@@ -658,15 +664,22 @@ const DetailModal = ({
                                 原始链接
                             </Typography>
                             <Box>
-                                {detaData.dataType === 'URL' && (
-                                    <Link color="secondary" target="_blank" sx={{ fontSize: '12px' }} href={detaData.content}>
-                                        {detaData.content}
-                                    </Link>
+                                {detaData.dataType === 'HTML' && (
+                                    <Button
+                                        color="secondary"
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => {
+                                            window.open(detaData.dataSourceInfo?.initAddress);
+                                        }}
+                                    >
+                                        点击跳转
+                                    </Button>
                                 )}
-                                {detaData.dataType !== 'URL' && (
+                                {detaData.dataType !== 'HTML' && (
                                     <Button
                                         onClick={() => {
-                                            fetch(detaData.cleanContent as string)
+                                            fetch(detaData.storageVO?.storageKey as string)
                                                 .then((response) => {
                                                     if (response.ok) {
                                                         return response.blob();
@@ -678,10 +691,7 @@ const DetailModal = ({
                                                     // 创建一个临时链接的<a>标签
                                                     const link = document.createElement('a');
                                                     link.href = url;
-                                                    link.download =
-                                                        detaData.name +
-                                                        '.' +
-                                                        detaData.cleanContent?.split('.')[detaData.cleanContent?.split('.').length - 1]; // 设置下载的文件名
+                                                    link.download = detaData.name as string; // 设置下载的文件名
                                                     link.click();
                                                     // 释放临时链接的资源
                                                     window.URL.revokeObjectURL(url);
@@ -761,6 +771,11 @@ export type typeDocumentChild = {
     position: number;
     dataSourceInfo?: any;
     batch?: any;
+    storageVO?: {
+        type: string;
+        size?: number;
+    };
+    errorMessage?: string;
     status?: any;
     tokens?: any;
     summaryContent?: string;
@@ -792,14 +807,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
             const res = await getDatasetSource({ datasetId });
             if (
                 !res.every(
-                    (value: { status: string }) =>
-                        value.status >= '90' ||
-                        value.status === '0' ||
-                        value.status === '15' ||
-                        value.status === '25' ||
-                        value.status === '35' ||
-                        value.status === '45' ||
-                        value.status === '55'
+                    (value: { status: number }) =>
+                        value.status >= 90 ||
+                        value.status === 0 ||
+                        value.status === 15 ||
+                        value.status === 25 ||
+                        value.status === 35 ||
+                        value.status === 45 ||
+                        value.status === 55
                 )
             ) {
                 InterRef.current = setInterval(() => {
@@ -807,14 +822,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         setDocumentList(response);
                         if (
                             response.every(
-                                (value: { status: string }) =>
-                                    value.status >= '90' ||
-                                    value.status === '0' ||
-                                    value.status === '15' ||
-                                    value.status === '25' ||
-                                    value.status === '35' ||
-                                    value.status === '45' ||
-                                    value.status === '55'
+                                (value: { status: number }) =>
+                                    value.status >= 90 ||
+                                    value.status === 0 ||
+                                    value.status === 15 ||
+                                    value.status === 25 ||
+                                    value.status === 35 ||
+                                    value.status === 45 ||
+                                    value.status === 55
                             )
                         ) {
                             clearInterval(timeoutRef.current);
@@ -854,6 +869,8 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
         setOpenConfirm(false);
     };
 
+    //增加规则弹窗
+    const [ruleOpen, setRuleOpen] = useState(false);
     return (
         <div>
             <div>
@@ -866,7 +883,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
-                        <Button
+                        {/* <Button
                             variant={'contained'}
                             startIcon={<AddIcon />}
                             color={'secondary'}
@@ -876,9 +893,46 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             }}
                         >
                             添加文档
-                        </Button>
+                        </Button> */}
                     </Box>
-                    <div className={'mt-3'}>
+                    <div
+                        className={'mt-3'}
+                        style={{
+                            margin: '0 auto',
+                            textAlign: 'center',
+                            height: '350px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Box>
+                            <Popover
+                                content={
+                                    <div className="flex justify-start items-center flex-col">
+                                        <div className="text-sm text-center w-[330px]">
+                                            <div>功能正在封闭测试中。</div>
+                                            <div>可联系我们产品顾问进一步了解，</div>
+                                            <div>并获得提前免费使用的权利。</div>
+                                        </div>
+                                        <img className="w-40" src={workWechatPay} alt="" />
+                                    </div>
+                                }
+                                trigger="hover"
+                            >
+                                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+                                    <path
+                                        d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
+                                        fill="#515151"
+                                        p-id="6181"
+                                    ></path>
+                                </svg>
+                            </Popover>
+                            <div className="text-base">即将推出</div>
+                        </Box>
+                    </div>
+
+                    {/* <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
                             <Grid container spacing={2}>
                                 {documentList.map((item, index) => {
@@ -904,7 +958,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         <Grid container spacing={gridSpacing}>
                                                             <Grid item xs zeroMinWidth>
                                                                 <div className="flex items-center">
-                                                                    {transformDataType(item.dataType, item.type)}
+                                                                    {transformDataType(item.dataType, item.storageVO?.type)}
                                                                     <Tooltip title={item.name}>
                                                                         <Typography
                                                                             variant="h4"
@@ -981,9 +1035,16 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                                         className="!pt-[10px]"
                                                     >
-                                                        <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        <Tooltip
+                                                            placement="top"
+                                                            title={((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                        >
+                                                            <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                                        </Tooltip>
                                                         <Box>
-                                                            <Typography variant="caption">{formatDate(item.updateTime)}</Typography>
+                                                            <Tooltip placement="top" title={formatDate(item.updateTime)}>
+                                                                <Typography variant="caption">{formatYear(item.updateTime)}</Typography>
+                                                            </Tooltip>
                                                         </Box>
                                                     </Grid>
                                                     <Grid item xs={12} className="!pt-[5px]">
@@ -996,20 +1057,22 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         sx={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}
                                                     >
                                                         <Box display="flex" alignItems="center">
-                                                            {item.status === '0' ||
-                                                            item.status === '15' ||
-                                                            item.status === '25' ||
-                                                            item.status === '35' ||
-                                                            item.status === '45' ||
-                                                            item.status === '55' ? (
-                                                                <HighlightOffIcon
-                                                                    sx={{
-                                                                        color: 'error.dark',
-                                                                        width: 14,
-                                                                        height: 14
-                                                                    }}
-                                                                />
-                                                            ) : item.status >= '90' ? (
+                                                            {item.status === 0 ||
+                                                            item.status === 15 ||
+                                                            item.status === 25 ||
+                                                            item.status === 35 ||
+                                                            item.status === 45 ||
+                                                            item.status === 55 ? (
+                                                                <Tooltip title={item.errorMessage}>
+                                                                    <HighlightOffIcon
+                                                                        sx={{
+                                                                            color: 'error.dark',
+                                                                            width: 14,
+                                                                            height: 14
+                                                                        }}
+                                                                    />
+                                                                </Tooltip>
+                                                            ) : item.status >= 90 ? (
                                                                 <CheckCircleIcon
                                                                     sx={{
                                                                         color: 'success.dark',
@@ -1024,37 +1087,37 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 />
                                                             )}
                                                             <Typography ml={0.5} variant="caption">
-                                                                {item.status === '0'
+                                                                {item.status === 0
                                                                     ? '数据上传失败'
-                                                                    : item.status === '15'
+                                                                    : item.status === 15
                                                                     ? '数据上传失败'
-                                                                    : item.status === '20'
+                                                                    : item.status === 20
                                                                     ? '数据上传成功'
-                                                                    : item.status === '21'
+                                                                    : item.status === 21
                                                                     ? '数据同步中'
-                                                                    : item.status === '25'
+                                                                    : item.status === 25
                                                                     ? '数据同步失败'
-                                                                    : item.status === '30'
+                                                                    : item.status === 30
                                                                     ? '数据同步完成'
-                                                                    : item.status === '31'
+                                                                    : item.status === 31
                                                                     ? '数据学习中'
-                                                                    : item.status === '35'
+                                                                    : item.status === 35
                                                                     ? '数据学习失败'
-                                                                    : item.status === '40'
+                                                                    : item.status === 40
                                                                     ? '数据学习中'
-                                                                    : item.status === '41'
+                                                                    : item.status === 41
                                                                     ? '数据学习中'
-                                                                    : item.status === '45'
+                                                                    : item.status === 45
                                                                     ? '数据学习失败'
-                                                                    : item.status === '50'
+                                                                    : item.status === 50
                                                                     ? '数据学习中'
-                                                                    : item.status === '51'
+                                                                    : item.status === 51
                                                                     ? '数据学习中'
-                                                                    : item.status === '55'
+                                                                    : item.status === 55
                                                                     ? '数据学习失败'
-                                                                    : item.status === '60'
+                                                                    : item.status === 60
                                                                     ? '数据学习中'
-                                                                    : item.status >= '90'
+                                                                    : item.status >= 90
                                                                     ? '数据学习完成'
                                                                     : null}
                                                             </Typography>
@@ -1067,7 +1130,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 })}
                             </Grid>
                         </MainCard>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <Box mt={3} display="flex" justifyContent="space-between" alignContent="center">
@@ -1222,6 +1285,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     detailClose={() => setDetailOpen(false)}
                 />
             )}
+            {ruleOpen && <AddRuleModal open={ruleOpen} datasetUid={datasetId} handleClose={setRuleOpen} />}
         </div>
     );
 };

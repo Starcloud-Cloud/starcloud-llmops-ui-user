@@ -180,7 +180,7 @@ const CarrOut = forwardRef(
                         <Grid container spacing={1}>
                             {item.variable?.variables?.map((el: any, i: number) =>
                                 el.isShow ? (
-                                    <Grid item key={i} md={el.style === 'TEXTAREA' ? 6 : 4} xs={12}>
+                                    <Grid item key={i} md={el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
                                         <FormExecute formik={formik} item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
                                     </Grid>
                                 ) : null
@@ -190,8 +190,8 @@ const CarrOut = forwardRef(
                                     el.isShow ? (
                                         <Grid
                                             item
-                                            lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
-                                            md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 4}
+                                            lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
+                                            md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
                                             xs={12}
                                             key={i}
                                         >
@@ -285,8 +285,8 @@ const CarrOut = forwardRef(
                                 }}
                                 value={item.flowStep.response.answer}
                                 multiline
-                                minRows={item.flowStep.response.style === 'TEXTAREA' ? 8 : 1}
-                                maxRows={item.flowStep.response.style === 'TEXTAREA' ? 16 : 3}
+                                minRows={item.flowStep.response.style === 'TEXTAREA' ? 5 : 1}
+                                maxRows={item.flowStep.response.style === 'TEXTAREA' ? 7 : 2}
                             />
                         ) : (
                             <Card

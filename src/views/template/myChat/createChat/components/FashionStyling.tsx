@@ -1018,14 +1018,16 @@ export const FashionStyling = ({
                     </Popover>
                 </div>
             </div>
-            <VoiceModal
-                open={voiceOpen}
-                handleClose={closeVoiceModal}
-                chatBotInfo={chatBotInfo}
-                setChatBotInfo={setChatBotInfo}
-                list={list}
-            />
-            <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
+            {voiceOpen && (
+                <VoiceModal
+                    open={voiceOpen}
+                    handleClose={closeVoiceModal}
+                    chatBotInfo={chatBotInfo}
+                    setChatBotInfo={setChatBotInfo}
+                    list={list}
+                />
+            )}
+            {shortcutOpen && <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />}
             {appOpen && <AppModal title={title} value={appValues} open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
         </>
     );

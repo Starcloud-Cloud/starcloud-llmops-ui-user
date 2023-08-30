@@ -667,30 +667,31 @@ export const Chat = ({
                                 const copyData = [...dataRef.current];
                                 const process = copyData[copyData.length - 1].process || [];
                                 const content = JSON.parse(bufferObj.content);
+                                // 处理文档（文档状态默认不更新）
                                 if (content.showType === 'docs') {
                                     content.data = uniqBy(content.data, 'id');
                                     copyData[copyData.length - 1].process = [...process, content];
                                     dataRef.current = copyData;
                                     setData(copyData);
                                 }
-                                if (content.showType === 'url') {
+                                // 处理链接
+                                if (content.showType === 'url' || content.showType === 'tips') {
                                     //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
                                     const index = copyData[copyData.length - 1].process
-                                        ?.filter((v: any) => v.showType === 'url')
+                                        ?.filter((v: any) => v.showType === 'tips')
                                         ?.findIndex((v: any) => v.id === content.id);
 
                                     if (index > -1) {
+                                        // 替换
+                                        copyData[copyData.length - 1].process[index] = content;
+                                        dataRef.current = copyData;
+                                        setData(copyData);
                                     } else {
                                         copyData[copyData.length - 1].process = [...process, content];
                                         dataRef.current = copyData;
                                         setData(copyData);
                                     }
                                 }
-
-                                // process.data = uniqBy(process.data, 'id');
-                                // copyData[copyData.length - 1].process = ;
-                                // dataRef.current = copyData;
-                                // setData(copyData);
                             }
                             if (bufferObj.type === 'm') {
                                 // 处理结论
@@ -715,7 +716,7 @@ export const Chat = ({
                         }
                     });
                 } catch (e) {
-                    // console.log(e, 'e');
+                    break;
                 }
 
                 outerJoins = joins;

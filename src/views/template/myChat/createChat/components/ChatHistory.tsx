@@ -22,6 +22,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover, Tag } from 'antd';
 import { isMobile } from 'react-device-detect';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -32,6 +34,19 @@ interface ChartHistoryProps {
 
 const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
+    const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
+
+    const toggleItem = (item: any) => {
+        if (expandedItems.includes(item)) {
+            // 如果项目已展开，则收起它
+            setExpandedItems(expandedItems.filter((i) => i !== item));
+        } else {
+            // 如果项目未展开，则展开它
+            setExpandedItems([...expandedItems, item]);
+        }
+    };
+
+    console.log(data, 'data');
 
     return (
         <Grid item xs={12} className="p-[12px]">
@@ -157,11 +172,97 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     <CardContent className="p-[12px] !pb-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
+                                                                {history.process &&
+                                                                    history.process.map((item: any, index: number) => {
+                                                                        if (item.showType === 'tips') {
+                                                                            return (
+                                                                                <div className="flex flex-col p-[8px] rounded-md">
+                                                                                    <div
+                                                                                        className={`flex items-center px-[8px] py-[8px] ${
+                                                                                            item.status === 0
+                                                                                                ? 'bg-[#6aed99]'
+                                                                                                : item.status && item.success
+                                                                                                ? 'bg-stone-200'
+                                                                                                : item.status && !item.success
+                                                                                                ? 'bg-red-500'
+                                                                                                : ''
+                                                                                        }  w-[200px] justify-between rounded-md cursor-pointer`}
+                                                                                    >
+                                                                                        <div className="flex justify-center">
+                                                                                            {item.status === 0 && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <LoadingSpin />
+                                                                                                    <div className="text-sm pl-1">
+                                                                                                        {/* 工作中 */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.status === 1 && item.success && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <CheckCircleIcon className="text-base" />
+                                                                                                    <div className="text-sm pl-1">
+                                                                                                        {/* 完成 */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.status === 1 && !item.success && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <Popover content={item.errorMsg}>
+                                                                                                        <ErrorIcon className="text-base text-red-500" />
+                                                                                                    </Popover>
+                                                                                                    <div className="text-sm pl-1">
+                                                                                                        {/* {item.errorMsg} */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <div
+                                                                                            className="flex items-center justify-center"
+                                                                                            onClick={() => toggleItem(item.id)}
+                                                                                        >
+                                                                                            {expandedItems.includes(item.id) ? (
+                                                                                                <ExpandLessIcon className="w-[18px] h-[18px]" />
+                                                                                            ) : (
+                                                                                                <ExpandMoreIcon className="w-[18px] h-[18px]" />
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    {expandedItems.includes(item.id) && (
+                                                                                        <div>
+                                                                                            <WebPageInfo
+                                                                                                tips={item.tips}
+                                                                                                urlList={[
+                                                                                                    {
+                                                                                                        title: '百度一下，你就知道',
+                                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
+                                                                                                        des: '百度一下，你就知道'
+                                                                                                    }
+                                                                                                ]}
+                                                                                            />
+                                                                                        </div>
+                                                                                    )}
+                                                                                    {/* <div>
+                                                                                {history.process.showType === 'url' && (
+                                                                                    <div>
+                                                                                        <div>{history.process.tips}</div>
+                                                                                        <WebPageInfo url={history.process.url} />
+                                                                                    </div>
+                                                                                )}
+                                                                            </div> */}
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                        if (item.showType === 'docs') {
+                                                                        }
+                                                                    })}
                                                                 {/* 思考中 */}
                                                                 {/* {history.process && ( */}
                                                                 {false && (
                                                                     <div className="flex flex-col bg-[#e3f2fd] p-[8px] rounded-md">
-                                                                        <div className="items-center px-[4px] py-[8px] bg-[#e3f2fd] w-[110px] inline-flex justify-center rounded-md cursor-pointer">
+                                                                        <div className="items-center px-[4px] py-[8px] bg-[#e3f2fd] inline-flex justify-center rounded-md cursor-pointer">
                                                                             <LoadingSpin />
                                                                             <span className="ml-1">正在生成</span>
                                                                             <ExpandLessIcon className="w-[18px] h-[18px]" />
@@ -251,17 +352,18 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 )}
                                                                 {/* 文本回答 */}
-                                                                {history.answer && !history?.process ? (
-                                                                    <div
-                                                                        className={`text-sm whitespace-pre-line  ${
-                                                                            history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
-                                                                        }`}
-                                                                    >
-                                                                        <ChatMarkdown textContent={history.answer} />
-                                                                    </div>
-                                                                ) : (
-                                                                    <LoadingDot />
-                                                                )}
+                                                                {
+                                                                    !history?.process ? (
+                                                                        <div
+                                                                            className={`text-sm whitespace-pre-line  ${
+                                                                                history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
+                                                                            }`}
+                                                                        >
+                                                                            <ChatMarkdown textContent={history.answer} />
+                                                                        </div>
+                                                                    ) : null
+                                                                    // <LoadingDot />
+                                                                }
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

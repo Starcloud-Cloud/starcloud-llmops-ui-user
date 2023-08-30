@@ -6,7 +6,7 @@ export const WebPageInfo = ({ urlList, tips }: { urlList: any; tips: string }) =
     return (
         <div className="mt-2">
             <div className="flex justify-between">
-                <div>正在为你搜索新闻</div>
+                <div>{tips}</div>
                 <div>{urlList.length}条</div>
             </div>
             <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 mt-2">

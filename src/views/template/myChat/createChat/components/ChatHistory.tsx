@@ -251,7 +251,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 )}
                                                                 {/* 文本回答 */}
-                                                                {/* {history.answer && !history?.process ? (
+                                                                {history.answer && !history?.process ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
@@ -261,7 +261,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 ) : (
                                                                     <LoadingDot />
-                                                                )} */}
+                                                                )}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

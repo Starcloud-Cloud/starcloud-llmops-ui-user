@@ -1,7 +1,8 @@
 // material-ui
-import { Avatar, Box, Button, FormControlLabel, Switch, useMediaQuery } from '@mui/material';
+import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia } from '@mui/material';
+import { Popover } from 'antd';
 import { useTheme } from '@mui/material/styles';
-
+import { useState } from 'react';
 // project imports
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
@@ -12,10 +13,14 @@ import ProfileSection from './ProfileSection';
 import SearchSection from './SearchSection';
 // import MegaMenuSection from './MegaMenuSection';
 // import NotificationSection from './NotificationSection';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { useDispatch, useSelector } from 'store';
 import { openDrawer } from 'store/slices/menu';
 
+import wechat1 from 'assets/images/landing/wechat.png';
+import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 // assets
 import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
@@ -33,6 +38,14 @@ const Header = () => {
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const { layout } = useConfig();
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     // @ts-ignore
     return (
         <>
@@ -41,6 +54,7 @@ const Header = () => {
                 sx={{
                     width: 208,
                     display: 'flex',
+                    alignItems: 'center',
                     [theme.breakpoints.down('md')]: {
                         width: 'auto'
                     }
@@ -71,7 +85,49 @@ const Header = () => {
                     </Avatar>
                 )}
             </Box>
-
+            <Popover
+                zIndex={9999}
+                placement="bottom"
+                content={
+                    <Box display="flex" textAlign="center">
+                        <Box width="200px">
+                            <Typography mt={2} variant="h3">
+                                微信扫码入群
+                            </Typography>
+                            <Typography my={1} fontSize="12px" color="#697586">
+                                AIGC跨境电商卖家讨论群
+                            </Typography>
+                            <Box display="flex" justifyContent="center">
+                                <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: '50%' }} />
+                            </Box>
+                            <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
+                                讨论如何使用、使用技巧、新场景开发、亚马逊，独立者，外贸B2B成功案例、以及跨境相关运营、热点、技能、经营技巧等。
+                            </Typography>
+                        </Box>
+                        <Box width="200px" ml={3}>
+                            <Typography mt={2} variant="h3">
+                                产品经理企微
+                            </Typography>
+                            <Typography my={1} fontSize="12px" color="#697586">
+                                产品经理
+                            </Typography>
+                            <Box display="flex" justifyContent="center">
+                                <CardMedia component="img" image={workWechatPay} alt="img1" sx={{ width: '50%' }} />
+                            </Box>
+                            <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
+                                产品功能吐槽、改进建议、跨境AI合作等， 不定期有折扣码发放哦~
+                            </Typography>
+                        </Box>
+                    </Box>
+                }
+                arrow={false}
+            >
+                <Box display="flex" alignItems="center" sx={{ cursor: 'pointer', ml: '47px' }} onClick={handleClick}>
+                    <QrCode2Icon />
+                    <Typography ml={1}>跨境卖家AI工具群</Typography>
+                    <KeyboardArrowDownIcon />
+                </Box>
+            </Popover>
             {/* header search */}
             <SearchSection />
             <Box sx={{ flexGrow: 1 }} />
@@ -86,14 +142,13 @@ const Header = () => {
                 color={'secondary'}
                 size={'small'}
                 variant="contained"
-                sx={{ boxShadow: 'none' }}
+                sx={{ display: { xs: 'none', md: 'block' }, boxShadow: 'none' }}
                 onClick={() => {
                     navigate('/exchange');
                 }}
             >
                 {t('EntitlementCard.ppFreegrades')}
             </Button>
-
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <FormControlLabel
                     value={navType === 'light'}

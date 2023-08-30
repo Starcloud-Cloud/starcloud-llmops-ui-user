@@ -281,10 +281,9 @@ const AppModal = ({
                 }
             >
                 <CardContent sx={{ p: '0 16px !important' }}>
-                    <FormControl color="secondary" fullWidth sx={{ my: 2 }}>
+                    <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
                         <InputLabel id="appList">优化选择</InputLabel>
                         <Select
-                            size="small"
                             color="secondary"
                             labelId="appList"
                             name="appValue"

@@ -263,13 +263,14 @@ function CreateDetail() {
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
         ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
-            const oldvalue = _.cloneDeep(detail);
+            const oldvalue = _.cloneDeep(detailRef.current);
             if (flag) {
                 const changeValue = value;
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
             }
             oldvalue.workflowConfig.steps[num][label] = value;
             detailRef.current = oldvalue;
+
             setDetail(oldvalue);
         },
         [detail]

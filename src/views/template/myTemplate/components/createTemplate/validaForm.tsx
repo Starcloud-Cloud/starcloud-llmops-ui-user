@@ -79,6 +79,7 @@ const Valida = ({
     variables,
     responent,
     buttonLabel,
+    fields,
     basisChange,
     index,
     allvalida,
@@ -126,7 +127,7 @@ const Valida = ({
         const newVal = _.cloneDeep(variables);
         const part1 = newVal[i].value.slice(0, iptRef.current?.selectionStart);
         const part2 = newVal[i].value.slice(iptRef.current?.selectionStart);
-        newVal[i].value = `${part1}{STEP.标题.${field}}${part2}`;
+        newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
         formik.setFieldValue('prompt', newVal[i].value);
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };

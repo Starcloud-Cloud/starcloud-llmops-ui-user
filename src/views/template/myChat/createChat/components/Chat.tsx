@@ -499,6 +499,19 @@ export const Chat = ({
                 setIsFinish(true);
             })();
         }
+        if (mode === 'individual' && !conversationUid) {
+            const result = [
+                {
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar,
+                    answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                    isStatement: true
+                }
+            ];
+            dataRef.current = result;
+            setData(result);
+            setIsFinish(true);
+        }
     }, [mode, chatBotInfo]);
 
     // 加载完历史再请求

@@ -883,30 +883,17 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         >
                             文档式
                         </span>
-                        {/* <Box>
-                            <Button
-                                variant={'contained'}
-                                color={'secondary'}
-                                size={'small'}
-                                sx={{ mr: 1 }}
-                                onClick={() => {
-                                    setRuleOpen(true);
-                                }}
-                            >
-                                规则设定
-                            </Button>
-                            <Button
-                                variant={'contained'}
-                                startIcon={<AddIcon />}
-                                color={'secondary'}
-                                size={'small'}
-                                onClick={() => {
-                                    setDocumentVisible(true);
-                                }}
-                            >
-                                添加文档
-                            </Button>
-                        </Box> */}
+                        {/* <Button
+                            variant={'contained'}
+                            startIcon={<AddIcon />}
+                            color={'secondary'}
+                            size={'small'}
+                            onClick={() => {
+                                setDocumentVisible(true);
+                            }}
+                        >
+                            添加文档
+                        </Button> */}
                     </Box>
                     <div
                         className={'mt-3'}

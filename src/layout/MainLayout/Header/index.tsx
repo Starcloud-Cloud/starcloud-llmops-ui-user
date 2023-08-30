@@ -95,7 +95,7 @@ const Header = () => {
                                 微信扫码入群
                             </Typography>
                             <Typography my={1} fontSize="12px" color="#697586">
-                                AIGC跨境电商卖家讨论群
+                                魔法AI跨境交流群
                             </Typography>
                             <Box display="flex" justifyContent="center">
                                 <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: '50%' }} />
@@ -106,10 +106,10 @@ const Header = () => {
                         </Box>
                         <Box width="200px" ml={3}>
                             <Typography mt={2} variant="h3">
-                                产品经理企微
+                                专属客服企微
                             </Typography>
                             <Typography my={1} fontSize="12px" color="#697586">
-                                产品经理
+                                专属客服
                             </Typography>
                             <Box display="flex" justifyContent="center">
                                 <CardMedia component="img" image={workWechatPay} alt="img1" sx={{ width: '50%' }} />

@@ -98,3 +98,8 @@ export const sendCode = (data: any) => {
 export const registerCode = (data: any) => {
     return request.postOriginal({ url: 'llm/Communication/code/register', data });
 };
+
+//手机号登录
+export const LoginCode = (data: any) => {
+    return request.postOriginal({ url: 'llm/Communication/code/login', data });
+};

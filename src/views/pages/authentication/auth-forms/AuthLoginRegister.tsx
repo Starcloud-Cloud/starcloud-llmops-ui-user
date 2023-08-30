@@ -34,7 +34,7 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
     const [vcodeOpen, setVCodeOpen] = useState(true);
     const [vcode, setVCode] = useState('获取验证码');
     const [vTime, setVTime] = useState(59);
-    const timeRef: any = useRef(50);
+    const timeRef: any = useRef(60);
     useEffect(() => {
         if (!vcodeOpen) {
             timer.current = setInterval(() => {
@@ -135,7 +135,7 @@ const PhoneRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                     value={values.vcode}
                                     onBlur={handleBlur}
                                     onChange={(e: any) => {
-                                        if (/^\d+$/.test(e.target.value)) {
+                                        if (/^\d+$/.test(e.target.value) || e.target.value === '') {
                                             handleChange(e);
                                         }
                                     }}

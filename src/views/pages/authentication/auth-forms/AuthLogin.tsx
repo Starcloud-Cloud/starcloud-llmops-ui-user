@@ -9,6 +9,7 @@ import {
     FormControl,
     FormControlLabel,
     FormHelperText,
+    TextField,
     Grid,
     IconButton,
     InputAdornment,
@@ -35,6 +36,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 //Ruoyi API
 import * as LoginApi from 'api/login';
+import { LoginCode, sendCode } from 'api/login';
 import { t } from 'hooks/web/useI18n';
 import * as authUtil from 'utils/auth';
 // import { TrendingUp } from '@mui/icons-material';
@@ -167,9 +169,49 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
         };
     }, [ticket, isLoggedIn, login, inviteCode, open]);
 
+    //手机号登录
+    const [phoneOpne, setPhoneOpen] = useState(false);
+    const timer: any = useRef(null);
+    const [vcodeOpen, setVCodeOpen] = useState(true);
+    const [vcode, setVCode] = useState('获取验证码');
+    const [vTime, setVTime] = useState(59);
+    const timeRef: any = useRef(60);
+    useEffect(() => {
+        if (!vcodeOpen) {
+            timer.current = setInterval(() => {
+                if (timeRef.current === 0) {
+                    setVCode('重新获取');
+                    setVCodeOpen(true);
+                    clearInterval(timer.current);
+                    setVTime(60);
+                    timeRef.current = 60;
+                }
+                setVTime(timeRef.current - 1);
+                timeRef.current = timeRef.current - 1;
+            }, 1000);
+        }
+    }, [vcodeOpen]);
+    const getvCode = async (values: any, validateField: (data: any) => void) => {
+        if (!/^1[3-9]\d{9}$/.test(values.phone)) {
+            validateField('phone');
+        } else {
+            setVCodeOpen(false);
+            const res = await sendCode({
+                tool: 2,
+                scene: 21,
+                account: values.phone
+            });
+        }
+    };
     return (
         <div className="relative">
-            <div className="right-[0] top-[0]  absolute cursor-pointer" onClick={() => setOpen(!open)}>
+            <div
+                className="right-[0] top-[0]  absolute cursor-pointer"
+                onClick={() => {
+                    setOpen(!open);
+                    setPhoneOpen(false);
+                }}
+            >
                 {!open ? (
                     <MuiTooltip title="扫码登录更安全~" arrow placement="top">
                         <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4759" width="52" height="52">
@@ -198,173 +240,259 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                             </Typography>
                         </Stack>
                     </Grid>
-                    <Formik
-                        initialValues={{
-                            email: '',
-                            password: '',
-                            captchaVerification: '', // Add this line
-                            submit: null
-                        }}
-                        validationSchema={Yup.object().shape({
-                            // email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                            password: Yup.string().max(255).required('Password is required'),
-                            captchaVerification: Yup.string() // And this line (optional, if you want validation for captchaVerification)
-                        })}
-                        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-                            try {
-                                // await getTenantId();
-                                const updatedLoginForm = {
-                                    ...loginData.loginForm,
-                                    username: values.email,
-                                    password: values.password,
-                                    captchaVerification: values?.captchaVerification
-                                };
-                                const res = await LoginApi.login(updatedLoginForm);
-                                if (!res) {
-                                    return;
+                    {!phoneOpne && (
+                        <Formik
+                            initialValues={{
+                                email: '',
+                                password: '',
+                                captchaVerification: '', // Add this line
+                                submit: null
+                            }}
+                            validationSchema={Yup.object().shape({
+                                // email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                                password: Yup.string().max(255).required('Password is required'),
+                                captchaVerification: Yup.string() // And this line (optional, if you want validation for captchaVerification)
+                            })}
+                            onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                                try {
+                                    // await getTenantId();
+                                    const updatedLoginForm = {
+                                        ...loginData.loginForm,
+                                        username: values.email,
+                                        password: values.password,
+                                        captchaVerification: values?.captchaVerification
+                                    };
+                                    const res = await LoginApi.login(updatedLoginForm);
+                                    if (!res) {
+                                        return;
+                                    }
+                                    setLoginData((prevState) => ({
+                                        ...prevState,
+                                        loginForm: updatedLoginForm
+                                    }));
+                                    if (loginData.loginForm.rememberMe) {
+                                        authUtil.setLoginForm(updatedLoginForm);
+                                    } else {
+                                        authUtil.removeLoginForm();
+                                    }
+                                    authUtil.setToken(res);
+                                    await login();
+                                    if (scriptedRef.current) {
+                                        setStatus({ success: true });
+                                        setSubmitting(false);
+                                    }
+                                } catch (err: any) {
+                                    console.error(err);
+                                    if (scriptedRef.current) {
+                                        setStatus({ success: false });
+                                        setErrors({ submit: err.message });
+                                        setSubmitting(false);
+                                    }
                                 }
-                                setLoginData((prevState) => ({
-                                    ...prevState,
-                                    loginForm: updatedLoginForm
-                                }));
-                                if (loginData.loginForm.rememberMe) {
-                                    authUtil.setLoginForm(updatedLoginForm);
-                                } else {
-                                    authUtil.removeLoginForm();
-                                }
-                                authUtil.setToken(res);
-                                await login();
-                                if (scriptedRef.current) {
-                                    setStatus({ success: true });
-                                    setSubmitting(false);
-                                }
-                            } catch (err: any) {
-                                console.error(err);
-                                if (scriptedRef.current) {
-                                    setStatus({ success: false });
-                                    setErrors({ submit: err.message });
-                                    setSubmitting(false);
-                                }
-                            }
-                        }}
-                    >
-                        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-                            <form noValidate onSubmit={handleSubmit} {...others}>
-                                <FormControl
-                                    fullWidth
-                                    error={Boolean(touched.email && errors.email)}
-                                    sx={{ ...theme.typography.customInput }}
-                                >
-                                    <InputLabel htmlFor="outlined-adornment-email-login">{t('user.username')}</InputLabel>
-                                    <OutlinedInput
-                                        id="outlined-adornment-email-login"
-                                        type="email"
-                                        value={values.email}
-                                        name="email"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        inputProps={{}}
-                                    />
-                                    {touched.email && errors.email && (
-                                        <FormHelperText error id="standard-weight-helper-text-email-login">
-                                            {errors.email}
-                                        </FormHelperText>
-                                    )}
-                                </FormControl>
-
-                                <FormControl
-                                    fullWidth
-                                    error={Boolean(touched.password && errors.password)}
-                                    sx={{ ...theme.typography.customInput }}
-                                >
-                                    <InputLabel htmlFor="outlined-adornment-password-login">{t('user.password')}</InputLabel>
-                                    <OutlinedInput
-                                        id="outlined-adornment-password-login"
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={values.password}
-                                        name="password"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        endAdornment={
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={handleClickShowPassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    edge="end"
-                                                    size="large"
-                                                >
-                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        }
-                                        inputProps={{}}
-                                        label="Password"
-                                    />
-                                    {touched.password && errors.password && (
-                                        <FormHelperText error id="standard-weight-helper-text-password-login">
-                                            {errors.password}
-                                        </FormHelperText>
-                                    )}
-                                </FormControl>
-
-                                <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={loginData.loginForm.rememberMe}
-                                                    onChange={(event) =>
-                                                        setLoginData({
-                                                            ...loginData,
-                                                            loginForm: {
-                                                                ...loginData.loginForm,
-                                                                rememberMe: event.target.checked
-                                                            }
-                                                        })
-                                                    }
-                                                    name="rememberMe"
-                                                    color="primary"
-                                                />
-                                            }
-                                            label={t('sys.login.rememberMe')}
+                            }}
+                        >
+                            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+                                <form noValidate onSubmit={handleSubmit} {...others}>
+                                    <FormControl
+                                        fullWidth
+                                        error={Boolean(touched.email && errors.email)}
+                                        sx={{ ...theme.typography.customInput }}
+                                    >
+                                        <InputLabel htmlFor="outlined-adornment-email-login">{t('user.username')}</InputLabel>
+                                        <OutlinedInput
+                                            id="outlined-adornment-email-login"
+                                            type="email"
+                                            value={values.email}
+                                            name="email"
+                                            onBlur={handleBlur}
+                                            onChange={handleChange}
+                                            inputProps={{}}
                                         />
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography
-                                            variant="subtitle1"
-                                            component={Link}
-                                            to={loginProp ? `/pages/forgot-password/forgot-password${loginProp}` : '/forgot'}
-                                            color="secondary"
-                                            sx={{ textDecoration: 'none' }}
-                                        >
-                                            {t('auth.login.forgotpassword')}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
+                                        {touched.email && errors.email && (
+                                            <FormHelperText error id="standard-weight-helper-text-email-login">
+                                                {errors.email}
+                                            </FormHelperText>
+                                        )}
+                                    </FormControl>
 
-                                {errors.submit && (
-                                    <Box sx={{ mt: 3 }}>
-                                        <FormHelperText error>{errors.submit}</FormHelperText>
+                                    <FormControl
+                                        fullWidth
+                                        error={Boolean(touched.password && errors.password)}
+                                        sx={{ ...theme.typography.customInput }}
+                                    >
+                                        <InputLabel htmlFor="outlined-adornment-password-login">{t('user.password')}</InputLabel>
+                                        <OutlinedInput
+                                            id="outlined-adornment-password-login"
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={values.password}
+                                            name="password"
+                                            onBlur={handleBlur}
+                                            onChange={handleChange}
+                                            endAdornment={
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={handleClickShowPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        edge="end"
+                                                        size="large"
+                                                    >
+                                                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            }
+                                            inputProps={{}}
+                                            label="Password"
+                                        />
+                                        {touched.password && errors.password && (
+                                            <FormHelperText error id="standard-weight-helper-text-password-login">
+                                                {errors.password}
+                                            </FormHelperText>
+                                        )}
+                                    </FormControl>
+
+                                    <Grid container alignItems="center" justifyContent="space-between">
+                                        <Grid item>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={loginData.loginForm.rememberMe}
+                                                        onChange={(event) =>
+                                                            setLoginData({
+                                                                ...loginData,
+                                                                loginForm: {
+                                                                    ...loginData.loginForm,
+                                                                    rememberMe: event.target.checked
+                                                                }
+                                                            })
+                                                        }
+                                                        name="rememberMe"
+                                                        color="primary"
+                                                    />
+                                                }
+                                                label={t('sys.login.rememberMe')}
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography
+                                                variant="subtitle1"
+                                                component={Link}
+                                                to={loginProp ? `/pages/forgot-password/forgot-password${loginProp}` : '/forgot'}
+                                                color="secondary"
+                                                sx={{ textDecoration: 'none' }}
+                                            >
+                                                {t('auth.login.forgotpassword')}
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+
+                                    {errors.submit && (
+                                        <Box sx={{ mt: 3 }}>
+                                            <FormHelperText error>{errors.submit}</FormHelperText>
+                                        </Box>
+                                    )}
+                                    <Box sx={{ mt: 2 }}>
+                                        <AnimateButton>
+                                            <Button
+                                                color="secondary"
+                                                disabled={isSubmitting}
+                                                fullWidth
+                                                size="large"
+                                                type="submit"
+                                                variant="contained"
+                                            >
+                                                {t('auth.login.signin')}
+                                            </Button>
+                                        </AnimateButton>
                                     </Box>
-                                )}
-                                <Box sx={{ mt: 2 }}>
-                                    <AnimateButton>
-                                        <Button
-                                            color="secondary"
-                                            disabled={isSubmitting}
+                                </form>
+                            )}
+                        </Formik>
+                    )}
+                    {phoneOpne && (
+                        <Formik
+                            initialValues={{
+                                phone: '',
+                                vcode: ''
+                            }}
+                            validationSchema={Yup.object().shape({
+                                phone: Yup.string()
+                                    .required('手机号必填')
+                                    .matches(/^1[3-9]\d{9}$/, '请输入有效的手机号'),
+                                vcode: Yup.string().max(4, '验证码格式错误').required('请输入验证码')
+                            })}
+                            onSubmit={async (values, { setErrors, setStatus }) => {
+                                //手机号登录
+                                const res = await LoginCode({
+                                    sence: 21,
+                                    tool: 2,
+                                    account: values.phone,
+                                    code: values.vcode
+                                });
+                            }}
+                        >
+                            {({ errors, handleBlur, handleChange, validateField, handleSubmit, touched, values }) => (
+                                <form noValidate onSubmit={handleSubmit} {...others}>
+                                    <TextField
+                                        fullWidth
+                                        label="手机号"
+                                        margin="normal"
+                                        name="phone"
+                                        type="text"
+                                        value={values.phone}
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={touched.phone && Boolean(errors.phone)}
+                                        helperText={touched.phone && errors.phone && String(errors.phone)}
+                                        sx={{ ...theme.typography.customInput }}
+                                    />
+                                    <Box display="flex" alignItems="center">
+                                        <TextField
                                             fullWidth
-                                            size="large"
-                                            type="submit"
-                                            variant="contained"
+                                            label="验证码"
+                                            margin="normal"
+                                            name="vcode"
+                                            error={touched.vcode && Boolean(errors.vcode)}
+                                            helperText={touched.vcode && errors.vcode && String(errors.vcode)}
+                                            value={values.vcode}
+                                            onBlur={handleBlur}
+                                            onChange={(e: any) => {
+                                                if (/^\d+$/.test(e.target.value) || e.target.value === '') {
+                                                    handleChange(e);
+                                                }
+                                            }}
+                                            sx={{ ...theme.typography.customInput }}
+                                        />
+                                        <Button
+                                            disabled={!vcodeOpen}
+                                            onClick={() => {
+                                                getvCode(values, validateField);
+                                            }}
+                                            color="secondary"
+                                            variant="outlined"
+                                            sx={{ whiteSpace: 'nowrap', ml: 1, width: '90px' }}
                                         >
-                                            {t('auth.login.signin')}
+                                            {vcodeOpen ? vcode : vTime + 'S'}
                                         </Button>
-                                    </AnimateButton>
-                                </Box>
-                            </form>
-                        )}
-                    </Formik>
+                                    </Box>
+                                    <Box sx={{ mt: 2 }}>
+                                        <AnimateButton>
+                                            <Button
+                                                disableElevation
+                                                fullWidth
+                                                size="large"
+                                                variant="contained"
+                                                color="secondary"
+                                                type="submit"
+                                            >
+                                                {t('auth.login.signin')}
+                                            </Button>
+                                        </AnimateButton>
+                                    </Box>
+                                </form>
+                            )}
+                        </Formik>
+                    )}
                     <Grid item xs={12} className="pt-3 pb-3">
                         <Divider />
                     </Grid>
@@ -383,15 +511,33 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 {t('auth.login.account1')}
                             </Typography>
                         </Box>
-                        <Button
-                            startIcon={<PhoneAndroidIcon fontSize="small" />}
-                            sx={{ ml: 1 }}
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                        >
-                            使用手机号登录
-                        </Button>
+                        {!phoneOpne && (
+                            <Button
+                                startIcon={<PhoneAndroidIcon fontSize="small" />}
+                                sx={{ ml: 1 }}
+                                variant="outlined"
+                                size="small"
+                                color="secondary"
+                                onClick={() => {
+                                    setPhoneOpen(true);
+                                }}
+                            >
+                                使用手机号登录
+                            </Button>
+                        )}
+                        {phoneOpne && (
+                            <Button
+                                sx={{ ml: 1 }}
+                                variant="outlined"
+                                size="small"
+                                color="secondary"
+                                onClick={() => {
+                                    setPhoneOpen(false);
+                                }}
+                            >
+                                账号密码登录
+                            </Button>
+                        )}
                     </Grid>
                 </div>
             ) : (
@@ -454,8 +600,8 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        <Grid item display="flex" justifyContent="space-between" alignItems="center" xs={12}>
-                            <Box display="flex">
+                        <Grid item xs={12}>
+                            <Box display="flex" justifyContent="center">
                                 <Typography variant="subtitle1" sx={{ textDecoration: 'none' }}>
                                     {t('auth.login.account')}
                                 </Typography>
@@ -469,15 +615,6 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                     {t('auth.login.account1')}
                                 </Typography>
                             </Box>
-                            <Button
-                                startIcon={<PhoneAndroidIcon fontSize="small" />}
-                                sx={{ ml: 1 }}
-                                variant="outlined"
-                                size="small"
-                                color="secondary"
-                            >
-                                使用手机号登录
-                            </Button>
                         </Grid>
                     </Grid>
                 </div>

@@ -39,7 +39,18 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate, addFriend } from 'api/template';
+import {
+    publishCreate,
+    publishOperate,
+    publishPage,
+    getLatest,
+    changeStatus,
+    channelCreate,
+    addFriend,
+    getLimit,
+    createLimit,
+    modifyLimit
+} from 'api/template';
 import CreateSiteModal from './components/CreateSiteModal';
 import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
@@ -54,14 +65,21 @@ interface TabPanelProps {
     value: number;
 }
 type FrequencyData = {
-    timeout?: number | null;
+    timeInterval?: number | null;
     limit?: number | null;
     message?: string;
     enable?: boolean;
 };
 type Account = {
+    timeInterval?: number | null;
     limit?: number | null;
     message?: string;
+    enable?: boolean;
+};
+type AdvertisingConfig = {
+    limit?: number | null;
+    message?: string;
+    enable?: boolean;
 };
 function CustomTabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
@@ -166,10 +184,39 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         setTabValue(newValue);
     };
     //Limit
+    const [allData, setAllData] = useState<any>({});
     const [frequencyData, setFrequencyData] = useState<FrequencyData>({});
     const [account, setAccount] = useState<Account>({});
+    const [advertisingConfig, setAdvertisingConfig] = useState<AdvertisingConfig>({});
+    //获取发布设置
+    const getLimitList = async (data: any) => {
+        const { appUid, uid } = data;
+        const res = await getLimit({ appUid, publishUid: uid });
+        setAllData(res);
+        setFrequencyData(res.rateConfig);
+        setAccount(res.userRateConfig);
+        setAdvertisingConfig(res.advertisingConfig);
+    };
     //保存发布设置
-    const saveSetting = () => {};
+    const saveSetting = async () => {
+        if (allData.uid) {
+            const res = await modifyLimit({
+                ..._.cloneDeep(allData),
+                advertisingConfig: { ...advertisingConfig },
+                rateConfig: { ...frequencyData },
+                userRateConfig: { ...account }
+            });
+            getLimitList(updateBtn);
+        } else {
+            const res = await createLimit({
+                ..._.cloneDeep(allData),
+                advertisingConfig: { ...advertisingConfig },
+                rateConfig: { ...frequencyData },
+                userRateConfig: { ...account }
+            });
+            getLimitList(updateBtn);
+        }
+    };
 
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
@@ -241,6 +288,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     }, [appUid]);
     const getUpdateBtn = () => {
         getLatest(appUid).then((res) => {
+            getLimitList(res);
             setUpdateBtn(res);
             setReleaseState(res.auditTag);
         });
@@ -506,9 +554,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     min={0}
                                     max={60}
                                     controls={true}
-                                    value={frequencyData.timeout}
+                                    value={frequencyData.timeInterval}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, timeout: value })}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, timeInterval: value })}
                                 />
                                 秒， 只能发送
                                 <InputNumber
@@ -529,13 +577,14 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     size="small"
                                     defaultValue="当前咨询用户过多，请排队等候"
                                     value={frequencyData.message}
+                                    onChange={(e) => setFrequencyData({ ...frequencyData, message: e.target.value })}
                                     color="secondary"
                                     fullWidth
                                 />
                             </Box>
                             <Box position="absolute" top="9px" right="8px">
                                 <Switch
-                                    value={frequencyData.enable}
+                                    checked={frequencyData.enable}
                                     onChange={() => {
                                         setFrequencyData({
                                             ...frequencyData,
@@ -549,14 +598,24 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     <Grid item md={6} xs={12}>
                         <SubCard sx={{ position: 'relative' }} title="按使用量">
                             <Box>
-                                每个用户总共可回复
+                                每隔
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    controls={true}
+                                    value={account.timeInterval}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setAccount({ ...account, timeInterval: value })}
+                                />
+                                秒， 只能发送
                                 <InputNumber
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
                                     value={account.limit}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...account, limit: value })}
+                                    onChange={(value: number | null) => setAccount({ ...account, limit: value })}
                                 />
                                 条
                             </Box>
@@ -567,6 +626,12 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 <TextField
                                     size="small"
                                     defaultValue="抱歉，您已经达到最大对话上限"
+                                    onChange={(e) => {
+                                        setAccount({
+                                            ...account,
+                                            message: e.target.value
+                                        });
+                                    }}
                                     value={account.message}
                                     color="secondary"
                                     fullWidth
@@ -574,11 +639,11 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                             </Box>
                             <Box position="absolute" top="9px" right="8px">
                                 <Switch
-                                    value={frequencyData.enable}
+                                    checked={account.enable}
                                     onChange={() => {
-                                        setFrequencyData({
-                                            ...frequencyData,
-                                            enable: !frequencyData.enable
+                                        setAccount({
+                                            ...account,
+                                            enable: !account.enable
                                         });
                                     }}
                                 />
@@ -592,36 +657,57 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     }
                     style={{ display: 'flex', alignItems: 'center' }}
                 >
-                    文档来源
+                    对话广告
                     <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
                 </span>
-                <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography>
-                        当回答引用了文档后，可查看回答对应的文档来源。
-                        <Typography display="inline-block" ml={1} color="secondary" fontSize="12px">
-                            查看示例
-                        </Typography>
-                    </Typography>
-                    <Switch />
-                </Box>
-                <span
-                    className={
-                        "!mt-[30px] before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                    }
-                    style={{ display: 'flex', alignItems: 'center' }}
-                >
-                    回答修正
-                    <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
-                </span>
-                <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography>
-                        当你的用户对话时，提供可修正的功能
-                        <Typography display="inline-block" ml={1} color="secondary" fontSize="12px">
-                            查看示例
-                        </Typography>
-                    </Typography>
-                    <Switch />
-                </Box>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <SubCard sx={{ position: 'relative' }} title="按使用量">
+                            <Box>
+                                每个用户每隔
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    value={advertisingConfig.limit}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setAdvertisingConfig({ ...advertisingConfig, limit: value })}
+                                />
+                                条
+                            </Box>
+                            <Box mt={3} mb={2}>
+                                超出默认回复
+                            </Box>
+                            <Box>
+                                <TextField
+                                    multiline
+                                    minRows={2}
+                                    size="small"
+                                    value={advertisingConfig.message}
+                                    onChange={(e) => {
+                                        setAdvertisingConfig({
+                                            ...advertisingConfig,
+                                            message: e.target.value
+                                        });
+                                    }}
+                                    color="secondary"
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="9px" right="8px">
+                                <Switch
+                                    checked={advertisingConfig.enable}
+                                    onChange={() => {
+                                        setAdvertisingConfig({
+                                            ...advertisingConfig,
+                                            enable: !advertisingConfig.enable
+                                        });
+                                    }}
+                                />
+                            </Box>
+                        </SubCard>
+                    </Grid>
+                </Grid>
                 <Button onClick={saveSetting} sx={{ mt: 3 }} color="secondary" variant="outlined">
                     保存设置
                 </Button>

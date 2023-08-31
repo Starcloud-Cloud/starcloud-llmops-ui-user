@@ -222,10 +222,8 @@ const AppModal = ({
                             conversationUid = bufferObj.conversationUid;
                         }
                         const contentData1 = _.cloneDeep(contentData);
-                        contentData.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {

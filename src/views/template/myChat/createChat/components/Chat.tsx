@@ -296,6 +296,7 @@ export const Chat = ({
     const [isFetch, setIsFetch] = useState(false);
     const [open, setOpen] = useState(false);
     const [isFinish, setIsFinish] = useState(false);
+    const navigate = useNavigate();
 
     const { messageData, setMessageData } = useChatMessage();
     const { width } = useWindowSize();
@@ -770,9 +771,9 @@ export const Chat = ({
                     className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
-                    <div className="h-full px-[8px]">
+                    <div className="h-full  px-[8px] flex flex-col">
                         <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
-                        <div className="bg-white rounded-md">
+                        <div className="bg-white rounded-md flex-1">
                             {botList?.map((item, index) => (
                                 <>
                                     <div
@@ -794,6 +795,14 @@ export const Chat = ({
                                 </>
                             ))}
                         </div>
+                        <div
+                            className="h-[28px] flex items-center justify-center text-[#673ab7] cursor-pointer"
+                            onClick={() => {
+                                navigate('/my-chat');
+                            }}
+                        >
+                            创作属于自己的数字员工
+                        </div>
                     </div>
                 </div>
             )}
@@ -806,7 +815,7 @@ export const Chat = ({
                     {showSelect ? (
                         <Popover
                             content={
-                                <div className="h-[600px] overflow-y-auto">
+                                <div className="h-[380px] overflow-y-auto">
                                     <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div
@@ -817,9 +826,11 @@ export const Chat = ({
                                             onClick={() => {
                                                 if (mode === 'iframe') {
                                                     setMUid && setMUid(item.value);
+                                                    setOpen(false);
                                                 }
                                                 if (mode === 'individual') {
                                                     setUid && setUid(item.value);
+                                                    setOpen(false);
                                                 }
                                             }}
                                         >
@@ -828,7 +839,7 @@ export const Chat = ({
                                             </div>
                                             <div className="ml-2">
                                                 <div className="text-lg">{item.name}</div>
-                                                <div className="text-sm w-[320px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
+                                                <div className="text-sm w-[260px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
                                                     {item.des || '无'}
                                                 </div>
                                             </div>
@@ -848,7 +859,7 @@ export const Chat = ({
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
 
                                 {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
-                                <span className="text-xs ml-1 text-[#697586]">可切换员工</span>
+                                <span className="text-xs ml-1 text-[#697586]">切换员工</span>
                             </div>
                         </Popover>
                     ) : (

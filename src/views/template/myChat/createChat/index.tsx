@@ -285,11 +285,11 @@ function CreateDetail() {
                 <Tabs value={value} variant="scrollable" onChange={handleChange}>
                     <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
-                    <Tab component={Link} label={'应用分析'} {...a11yProps(2)} />
                     <Tab component={Link} label={'知识库'} {...a11yProps(3)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(4)} />
                     {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
                     <Tab component={Link} label={'机器人发布'} {...a11yProps(6)} />
+                    <Tab component={Link} label={'应用分析'} {...a11yProps(7)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
@@ -297,7 +297,7 @@ function CreateDetail() {
                 <TabPanel value={value} index={1}>
                     <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
-                <TabPanel value={value} index={2}>
+                <TabPanel value={value} index={7}>
                     <ApplicationAnalysis appUid={detail?.uid} value={value} type="CHAT_ANALYSIS" />
                 </TabPanel>
                 <TabPanel value={value} index={3}>

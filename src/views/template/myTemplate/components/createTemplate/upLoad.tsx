@@ -533,7 +533,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     fullWidth
                                 />
                             </Box>
-                            <Box position="absolute" top="8px" right="8px">
+                            <Box position="absolute" top="9px" right="8px">
                                 <Switch
                                     value={frequencyData.enable}
                                     onChange={() => {
@@ -547,10 +547,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                         </SubCard>
                     </Grid>
                     <Grid item md={6} xs={12}>
-                        <SubCard
-                            title="按使用量
-"
-                        >
+                        <SubCard sx={{ position: 'relative' }} title="按使用量">
                             <Box>
                                 每个用户总共可回复
                                 <InputNumber
@@ -573,6 +570,17 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     value={account.message}
                                     color="secondary"
                                     fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="9px" right="8px">
+                                <Switch
+                                    value={frequencyData.enable}
+                                    onChange={() => {
+                                        setFrequencyData({
+                                            ...frequencyData,
+                                            enable: !frequencyData.enable
+                                        });
+                                    }}
                                 />
                             </Box>
                         </SubCard>

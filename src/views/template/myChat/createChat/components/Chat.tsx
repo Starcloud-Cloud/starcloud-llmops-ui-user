@@ -818,7 +818,7 @@ export const Chat = ({
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
 
                                 {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
-                                <span className="text-xs ml-1 text-[#697586]">可切换员工</span>
+                                <span className="text-xs ml-1 text-[#697586]">切换员工</span>
                             </div>
                         </Popover>
                     ) : (

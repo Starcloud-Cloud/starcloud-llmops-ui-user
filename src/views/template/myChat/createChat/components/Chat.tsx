@@ -295,6 +295,7 @@ export const Chat = ({
     const [isFetch, setIsFetch] = useState(false);
     const [open, setOpen] = useState(false);
     const [isFinish, setIsFinish] = useState(false);
+    const navigate = useNavigate();
 
     const { messageData, setMessageData } = useChatMessage();
     const { width } = useWindowSize();
@@ -738,9 +739,9 @@ export const Chat = ({
                     className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
-                    <div className="h-full  px-[8px]">
+                    <div className="h-full  px-[8px] flex flex-col">
                         <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
-                        <div className="bg-white rounded-md">
+                        <div className="bg-white rounded-md flex-1">
                             {botList?.map((item, index) => (
                                 <>
                                     <div
@@ -761,6 +762,14 @@ export const Chat = ({
                                     </div>
                                 </>
                             ))}
+                        </div>
+                        <div
+                            className="h-[28px] flex items-center justify-center text-[#673ab7] cursor-pointer"
+                            onClick={() => {
+                                navigate('/my-chat');
+                            }}
+                        >
+                            创作属于自己的数字员工
                         </div>
                     </div>
                 </div>

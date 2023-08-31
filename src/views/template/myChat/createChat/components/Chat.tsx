@@ -770,7 +770,7 @@ export const Chat = ({
                     className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
-                    <div className="h-full  px-[8px]">
+                    <div className="h-full px-[8px]">
                         <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
                         <div className="bg-white rounded-md">
                             {botList?.map((item, index) => (

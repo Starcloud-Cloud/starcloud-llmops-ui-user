@@ -406,6 +406,7 @@ const AddRuleModal = ({
                                     <Grid container spacing={2}>
                                         <Grid item md={4}>
                                             <TextField
+                                                size="small"
                                                 label="规划名称"
                                                 name="ruleName"
                                                 color="secondary"
@@ -418,7 +419,7 @@ const AddRuleModal = ({
                                             />
                                         </Grid>
                                         <Grid item md={4}>
-                                            <FormControl error={!basis.ruleType} fullWidth>
+                                            <FormControl size="small" error={!basis.ruleType} fullWidth>
                                                 <InputLabel color="secondary" id="type">
                                                     类型
                                                 </InputLabel>
@@ -445,12 +446,18 @@ const AddRuleModal = ({
                                             <Stack>
                                                 <Autocomplete
                                                     multiple
+                                                    size="small"
                                                     options={[]}
                                                     defaultValue={basis.ruleFilter}
                                                     freeSolo
                                                     renderTags={(value: readonly string[], getTagProps) =>
                                                         value.map((option: string, index: number) => (
-                                                            <Chip key={index} label={option} onDelete={getTagProps({ index }).onDelete} />
+                                                            <Chip
+                                                                size="small"
+                                                                key={index}
+                                                                label={option}
+                                                                onDelete={getTagProps({ index }).onDelete}
+                                                            />
                                                         ))
                                                     }
                                                     onChange={(e: any, newValue) => {
@@ -461,6 +468,7 @@ const AddRuleModal = ({
                                                     }}
                                                     renderInput={(params: any) => (
                                                         <TextField
+                                                            size="small"
                                                             error={basis.ruleFilter && basis.ruleFilter.length === 0}
                                                             helperText={
                                                                 basis.ruleFilter && basis.ruleFilter.length === 0 ? '过滤项必填' : ' '
@@ -500,13 +508,19 @@ const AddRuleModal = ({
                                         <Grid item md={4}>
                                             <Stack>
                                                 <Autocomplete
+                                                    size="small"
                                                     multiple
                                                     options={[]}
                                                     defaultValue={cleanRule.whiteList}
                                                     freeSolo
                                                     renderTags={(value: readonly string[], getTagProps) =>
                                                         value.map((option: string, index: number) => (
-                                                            <Chip key={index} label={option} onDelete={getTagProps({ index }).onDelete} />
+                                                            <Chip
+                                                                size="small"
+                                                                key={index}
+                                                                label={option}
+                                                                onDelete={getTagProps({ index }).onDelete}
+                                                            />
                                                         ))
                                                     }
                                                     onChange={(e: any, newValue) => {
@@ -517,6 +531,7 @@ const AddRuleModal = ({
                                                     }}
                                                     renderInput={(params: any) => (
                                                         <TextField
+                                                            size="small"
                                                             error={cleanRule.whiteList && cleanRule.whiteList.length === 0}
                                                             helperText={
                                                                 cleanRule.whiteList && cleanRule.whiteList.length === 0 ? '白名单必填' : ' '
@@ -533,13 +548,19 @@ const AddRuleModal = ({
                                         <Grid item md={4}>
                                             <Stack>
                                                 <Autocomplete
+                                                    size="small"
                                                     multiple
                                                     options={[]}
                                                     defaultValue={cleanRule.blackList}
                                                     freeSolo
                                                     renderTags={(value: readonly string[], getTagProps) =>
                                                         value.map((option: string, index: number) => (
-                                                            <Chip key={index} label={option} onDelete={getTagProps({ index }).onDelete} />
+                                                            <Chip
+                                                                size="small"
+                                                                key={index}
+                                                                label={option}
+                                                                onDelete={getTagProps({ index }).onDelete}
+                                                            />
                                                         ))
                                                     }
                                                     onChange={(e: any, newValue) => {
@@ -550,6 +571,7 @@ const AddRuleModal = ({
                                                     }}
                                                     renderInput={(params: any) => (
                                                         <TextField
+                                                            size="small"
                                                             error={cleanRule.blackList && cleanRule.blackList.length === 0}
                                                             helperText={
                                                                 cleanRule.blackList && cleanRule.blackList.length === 0 ? '黑名单必填' : ' '
@@ -564,7 +586,7 @@ const AddRuleModal = ({
                                             </Stack>
                                         </Grid>
                                         <Grid item md={4}>
-                                            <FormControl error={!cleanRule.convertFormat} fullWidth>
+                                            <FormControl size="small" error={!cleanRule.convertFormat} fullWidth>
                                                 <InputLabel color="secondary" id="type">
                                                     转化格式
                                                 </InputLabel>
@@ -588,7 +610,7 @@ const AddRuleModal = ({
                                             </FormControl>
                                         </Grid>
                                         <Grid item md={4}>
-                                            <FormControl error={!cleanRule.acceptLanguage} fullWidth>
+                                            <FormControl size="small" error={!cleanRule.acceptLanguage} fullWidth>
                                                 <InputLabel color="secondary" id="type">
                                                     网页语言
                                                 </InputLabel>
@@ -682,6 +704,7 @@ const AddRuleModal = ({
                                     <Grid container spacing={2}>
                                         <Grid item md={4}>
                                             <TextField
+                                                size="small"
                                                 label="分段大小"
                                                 name="chunkSize"
                                                 color="secondary"
@@ -703,13 +726,19 @@ const AddRuleModal = ({
                                         <Grid item md={4}>
                                             <Stack>
                                                 <Autocomplete
+                                                    size="small"
                                                     multiple
                                                     options={[]}
                                                     defaultValue={splitRule.separator}
                                                     freeSolo
                                                     renderTags={(value: readonly string[], getTagProps) =>
                                                         value.map((option: string, index: number) => (
-                                                            <Chip key={index} label={option} onDelete={getTagProps({ index }).onDelete} />
+                                                            <Chip
+                                                                size="small"
+                                                                key={index}
+                                                                label={option}
+                                                                onDelete={getTagProps({ index }).onDelete}
+                                                            />
                                                         ))
                                                     }
                                                     onChange={(e: any, newValue) => {
@@ -720,6 +749,7 @@ const AddRuleModal = ({
                                                     }}
                                                     renderInput={(params: any) => (
                                                         <TextField
+                                                            size="small"
                                                             error={splitRule.separator && splitRule.separator.length === 0}
                                                             helperText={
                                                                 splitRule.separator && splitRule.separator.length === 0 ? '白名单必填' : ' '

@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import remarkGfm from 'remark-gfm';
 type tProps = {
     textContent: string;

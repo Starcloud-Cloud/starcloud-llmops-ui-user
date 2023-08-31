@@ -182,9 +182,10 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     history.process.map((item: any, index: number) => {
                                                                         if (item.showType === 'tips') {
                                                                             return (
-                                                                                <div className="flex flex-col p-[8px] rounded-md">
+                                                                                <div className="flex flex-col p-[4px] pb-3 rounded-md">
                                                                                     <div
-                                                                                        className={`flex items-center px-[8px] py-[8px] ${
+                                                                                        onClick={() => toggleItem(item.id)}
+                                                                                        className={`flex items-center px-[8px] py-[16px] ${
                                                                                             item.status === 0
                                                                                                 ? 'bg-[#6aed99]'
                                                                                                 : item.status && item.success
@@ -192,13 +193,13 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                 : item.status && !item.success
                                                                                                 ? 'bg-red-500'
                                                                                                 : ''
-                                                                                        }  min-w-[200px] justify-between rounded-md cursor-pointer`}
+                                                                                        }  w-[300px] justify-between rounded-md cursor-pointer`}
                                                                                     >
                                                                                         <div className="flex justify-center">
                                                                                             {item.status === 0 && (
                                                                                                 <div className="flex items-center">
                                                                                                     <LoadingSpin />
-                                                                                                    <div className="text-sm pl-1">
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
                                                                                                         {/* 工作中 */}
                                                                                                         {item.tips}
                                                                                                     </div>
@@ -207,7 +208,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             {item.status === 1 && item.success && (
                                                                                                 <div className="flex items-center">
                                                                                                     <CheckCircleIcon className="text-base" />
-                                                                                                    <div className="text-sm pl-1">
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
                                                                                                         {/* 完成 */}
                                                                                                         {item.tips}
                                                                                                     </div>
@@ -218,17 +219,14 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                     <Popover content={item.errorMsg}>
                                                                                                         <ErrorIcon className="text-base text-red-500" />
                                                                                                     </Popover>
-                                                                                                    <div className="text-sm pl-1">
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
                                                                                                         {/* {item.errorMsg} */}
                                                                                                         {item.tips}
                                                                                                     </div>
                                                                                                 </div>
                                                                                             )}
                                                                                         </div>
-                                                                                        <div
-                                                                                            className="flex items-center justify-center"
-                                                                                            onClick={() => toggleItem(item.id)}
-                                                                                        >
+                                                                                        <div className="flex items-center justify-center">
                                                                                             {expandedItems.includes(item.id) ? (
                                                                                                 <ExpandLessIcon className="w-[18px] h-[18px]" />
                                                                                             ) : (
@@ -237,7 +235,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                         </div>
                                                                                     </div>
                                                                                     {expandedItems.includes(item.id) && (
-                                                                                        <div>
+                                                                                        <div className="pt-[.5em]">
                                                                                             <div>
                                                                                                 <ChatMarkdown
                                                                                                     textContent={value2JsonMd(

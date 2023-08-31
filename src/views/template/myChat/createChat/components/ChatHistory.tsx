@@ -186,7 +186,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                 : item.status && !item.success
                                                                                                 ? 'bg-red-500'
                                                                                                 : ''
-                                                                                        }  w-[200px] justify-between rounded-md cursor-pointer`}
+                                                                                        }  min-w-[200px] justify-between rounded-md cursor-pointer`}
                                                                                     >
                                                                                         <div className="flex justify-center">
                                                                                             {item.status === 0 && (
@@ -230,6 +230,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             )}
                                                                                         </div>
                                                                                     </div>
+                                                                                    <div className=""></div>
                                                                                     {expandedItems.includes(item.id) && (
                                                                                         <div>
                                                                                             <WebPageInfo
@@ -244,14 +245,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             />
                                                                                         </div>
                                                                                     )}
-                                                                                    {/* <div>
-                                                                                {history.process.showType === 'url' && (
-                                                                                    <div>
-                                                                                        <div>{history.process.tips}</div>
-                                                                                        <WebPageInfo url={history.process.url} />
-                                                                                    </div>
-                                                                                )}
-                                                                            </div> */}
                                                                                 </div>
                                                                             );
                                                                         }
@@ -291,14 +284,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                 ]}
                                                                             />
                                                                         </div>
-                                                                        {/* <div>
-                                                                            {history.process.showType === 'url' && (
-                                                                                <div>
-                                                                                    <div>{history.process.tips}</div>
-                                                                                    <WebPageInfo url={history.process.url} />
-                                                                                </div>
-                                                                            )}
-                                                                        </div> */}
                                                                     </div>
                                                                 )}
                                                                 {history?.process?.showType === 'docs' && history?.answer && (

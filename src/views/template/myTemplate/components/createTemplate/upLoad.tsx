@@ -54,13 +54,14 @@ interface TabPanelProps {
     value: number;
 }
 type FrequencyData = {
-    timer?: number | null;
-    strip?: number | null;
-    content?: string;
+    timeout?: number | null;
+    limit?: number | null;
+    message?: string;
+    enable?: boolean;
 };
 type Account = {
-    strip?: number | null;
-    content?: string;
+    limit?: number | null;
+    message?: string;
 };
 function CustomTabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
@@ -167,6 +168,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     //Limit
     const [frequencyData, setFrequencyData] = useState<FrequencyData>({});
     const [account, setAccount] = useState<Account>({});
+    //保存发布设置
+    const saveSetting = () => {};
 
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
@@ -495,7 +498,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 </span>
                 <Grid container spacing={2}>
                     <Grid item md={6} xs={12}>
-                        <SubCard title="按使用频率">
+                        <SubCard sx={{ position: 'relative' }} title="按使用频率">
                             <Box>
                                 每隔
                                 <InputNumber
@@ -503,18 +506,18 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     min={0}
                                     max={60}
                                     controls={true}
-                                    value={frequencyData.timer}
+                                    value={frequencyData.timeout}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, timer: value })}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, timeout: value })}
                                 />
                                 秒， 只能发送
                                 <InputNumber
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
-                                    value={frequencyData.strip}
+                                    value={frequencyData.limit}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, strip: value })}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, limit: value })}
                                 />
                                 条
                             </Box>
@@ -525,9 +528,20 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 <TextField
                                     size="small"
                                     defaultValue="当前咨询用户过多，请排队等候"
-                                    value={frequencyData.content}
+                                    value={frequencyData.message}
                                     color="secondary"
                                     fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="8px" right="8px">
+                                <Switch
+                                    value={frequencyData.enable}
+                                    onChange={() => {
+                                        setFrequencyData({
+                                            ...frequencyData,
+                                            enable: !frequencyData.enable
+                                        });
+                                    }}
                                 />
                             </Box>
                         </SubCard>
@@ -543,9 +557,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
-                                    value={account.strip}
+                                    value={account.limit}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...account, strip: value })}
+                                    onChange={(value: number | null) => setFrequencyData({ ...account, limit: value })}
                                 />
                                 条
                             </Box>
@@ -556,7 +570,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                 <TextField
                                     size="small"
                                     defaultValue="抱歉，您已经达到最大对话上限"
-                                    value={account.content}
+                                    value={account.message}
                                     color="secondary"
                                     fullWidth
                                 />
@@ -600,6 +614,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     </Typography>
                     <Switch />
                 </Box>
+                <Button onClick={saveSetting} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                    保存设置
+                </Button>
             </CustomTabPanel>
             <CustomTabPanel value={tabValue} index={1}>
                 <SubCard

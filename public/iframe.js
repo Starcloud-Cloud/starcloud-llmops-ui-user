@@ -23,12 +23,13 @@ window.onload = function () {
 			box-sizing: border-box;
 			position: fixed;
 			right: 22px;
-			bottom: 44px;
+			bottom: 22px;
 			z-index: 99999;
 			width: 44px;
 			height: 44px;
 			padding: 10px;
 			border-radius: 100%;
+            cursor: pointer;
 			background-color: ${window.tip_mofaai_bg || '4C83F3'};
 			color: ${window.tip_mofaai_color};
 		`
@@ -43,10 +44,10 @@ window.onload = function () {
 			display: none;
 			position: fixed;
 			right: 44px;
-			bottom: 66px;
+			bottom: 44px;
 			z-index: 999999;
 			width: 408px;
-			height: 594px;
+			height: 600px;
 			border: 1px solid #DCDFE6;
             border-radius: 8px; 
             overflow: hidden;
@@ -81,10 +82,10 @@ window.onload = function () {
                     `
                 	position: fixed;
 			right: 44px;
-			bottom: 66px;
+			bottom: 44px;
 			z-index: 999999;
 			width: 408px;
-			height: 594px;
+			height: 600px;
 			border: 1px solid #DCDFE6;
             border-radius: 8px; 
             overflow: hidden;
@@ -119,10 +120,10 @@ window.onload = function () {
                     `
                     position: fixed;
                     right: 44px;
-                    bottom: 66px;
+                    bottom: 44px;
                     z-index: 999999;
                     width: 408px;
-                    height: 594px;
+                    height: 600px;
                     border: 1px solid #DCDFE6;
                     border-radius: 8px; 
                     overflow: hidden;

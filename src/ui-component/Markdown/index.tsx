@@ -8,6 +8,13 @@ type tProps = {
     darkMode?: boolean; // markdown文本
 };
 
+const text = `Here is some JavaScript code:
+
+~~~json
+{"input": "fasfasd"}
+~~~
+`;
+
 const ChatMarkdown = (props: tProps) => {
     const { textContent } = props;
     return (
@@ -16,6 +23,7 @@ const ChatMarkdown = (props: tProps) => {
             components={{
                 code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
+                    console.log(inline, className, children, props, 'asda');
                     return !inline && match ? (
                         <SyntaxHighlighter showLineNumbers={true} style={vscDarkPlus as any} language={match[1]} PreTag="div" {...props}>
                             {String(children).replace(/\n$/, '')}
@@ -29,6 +37,7 @@ const ChatMarkdown = (props: tProps) => {
             }}
         >
             {textContent}
+            {/* {text} */}
         </ReactMarkdown>
     );
 };

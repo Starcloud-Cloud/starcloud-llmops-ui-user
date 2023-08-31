@@ -24,6 +24,7 @@ import { Popover, Tag } from 'antd';
 import { isMobile } from 'react-device-detect';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import { MarkdownWithJSON } from 'ui-component/Markdown/json';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -31,6 +32,13 @@ interface ChartHistoryProps {
     data: IHistory[];
     theme: Theme;
 }
+
+const value2JsonMd = (value: any, type: number) => `这里是${type === 1 ? '输入信息' : '输出信息'} :
+
+~~~json
+${JSON.stringify(value)}
+~~~
+`;
 
 const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
@@ -45,8 +53,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
             setExpandedItems([...expandedItems, item]);
         }
     };
-
-    console.log(data, 'data');
 
     return (
         <Grid item xs={12} className="p-[12px]">
@@ -230,19 +236,21 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             )}
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div className=""></div>
                                                                                     {expandedItems.includes(item.id) && (
                                                                                         <div>
-                                                                                            <WebPageInfo
-                                                                                                tips={item.tips}
-                                                                                                urlList={[
-                                                                                                    {
-                                                                                                        title: '百度一下，你就知道',
-                                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
-                                                                                                        des: '百度一下，你就知道'
-                                                                                                    }
-                                                                                                ]}
-                                                                                            />
+                                                                                            <div>
+                                                                                                <ChatMarkdown
+                                                                                                    textContent={value2JsonMd(
+                                                                                                        item.input,
+                                                                                                        1
+                                                                                                    )}
+                                                                                                />
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <ChatMarkdown
+                                                                                                    textContent={value2JsonMd(item.data, 2)}
+                                                                                                />
+                                                                                            </div>
                                                                                         </div>
                                                                                     )}
                                                                                 </div>
@@ -338,7 +346,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                 )}
                                                                 {/* 文本回答 */}
                                                                 {
-                                                                    !history?.process ? (
+                                                                    history?.answer ? (
                                                                         <div
                                                                             className={`text-sm whitespace-pre-line  ${
                                                                                 history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'

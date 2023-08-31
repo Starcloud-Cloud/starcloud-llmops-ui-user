@@ -632,7 +632,6 @@ export const Chat = ({
                 let joins = outerJoins;
                 try {
                     const { done, value } = await reader.read();
-                    console.log(value, 'value');
                     if (done) {
                         const copyData = [...dataRef.current];
                         copyData[dataRef.current.length - 1].isNew = false;

@@ -159,10 +159,8 @@ function CreateDetail() {
                             conversationUid = bufferObj.conversationUid;
                         }
                         const contentData1 = _.cloneDeep(contentData);
-                        contentData.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
@@ -263,13 +261,14 @@ function CreateDetail() {
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
         ({ num, label, value, flag }: { num: number; label: string; value: string; flag: boolean | undefined }) => {
-            const oldvalue = _.cloneDeep(detail);
+            const oldvalue = _.cloneDeep(detailRef.current);
             if (flag) {
                 const changeValue = value;
                 oldvalue.workflowConfig.steps[num].field = changeValue.replace(/\s+/g, '_').toUpperCase();
             }
             oldvalue.workflowConfig.steps[num][label] = value;
             detailRef.current = oldvalue;
+
             setDetail(oldvalue);
         },
         [detail]

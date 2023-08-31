@@ -222,10 +222,8 @@ const AppModal = ({
                             conversationUid = bufferObj.conversationUid;
                         }
                         const contentData1 = _.cloneDeep(contentData);
-                        contentData.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {
@@ -281,10 +279,9 @@ const AppModal = ({
                 }
             >
                 <CardContent sx={{ p: '0 16px !important' }}>
-                    <FormControl color="secondary" fullWidth sx={{ my: 2 }}>
+                    <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
                         <InputLabel id="appList">优化选择</InputLabel>
                         <Select
-                            size="small"
                             color="secondary"
                             labelId="appList"
                             name="appValue"

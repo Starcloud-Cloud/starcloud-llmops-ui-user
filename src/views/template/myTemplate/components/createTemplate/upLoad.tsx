@@ -477,7 +477,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 </span>
             </Typography> */}
             <Grid container spacing={2}>
-                {permissions.includes('chat.publish.market') && (
+                {(permissions.includes('chat.publish.market') || mode !== 'CHAT') && (
                     <Grid item md={6} xs={12}>
                         <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
                             <Box>

@@ -774,7 +774,7 @@ export const Chat = ({
                     {showSelect ? (
                         <Popover
                             content={
-                                <div className="h-[600px] overflow-y-auto">
+                                <div className="h-[380px] overflow-y-auto">
                                     <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div
@@ -785,9 +785,11 @@ export const Chat = ({
                                             onClick={() => {
                                                 if (mode === 'iframe') {
                                                     setMUid && setMUid(item.value);
+                                                    setOpen(false);
                                                 }
                                                 if (mode === 'individual') {
                                                     setUid && setUid(item.value);
+                                                    setOpen(false);
                                                 }
                                             }}
                                         >
@@ -796,7 +798,7 @@ export const Chat = ({
                                             </div>
                                             <div className="ml-2">
                                                 <div className="text-lg">{item.name}</div>
-                                                <div className="text-sm w-[320px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
+                                                <div className="text-sm w-[260px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
                                                     {item.des || '无'}
                                                 </div>
                                             </div>

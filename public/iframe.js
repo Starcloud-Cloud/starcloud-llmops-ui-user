@@ -1,7 +1,7 @@
 window.onload = function () {
-    // if (window.location.href.includes('/chat-bot/iframe')) {
-    //     return; // Don't inject the widget
-    // }
+    if (window.location.href.includes('/cb_js') || window.location.href.includes('/cb_i')) {
+        return;
+    }
 
     function init() {
         var e = document.createElement('div'),
@@ -22,13 +22,14 @@ window.onload = function () {
                 `
 			box-sizing: border-box;
 			position: fixed;
-			right: 44px;
-			bottom: 44px;
+			right: 22px;
+			bottom: 22px;
 			z-index: 99999;
 			width: 44px;
 			height: 44px;
 			padding: 10px;
 			border-radius: 100%;
+            cursor: pointer;
 			background-color: ${window.tip_mofaai_bg || '4C83F3'};
 			color: ${window.tip_mofaai_color};
 		`
@@ -46,8 +47,11 @@ window.onload = function () {
 			bottom: 44px;
 			z-index: 999999;
 			width: 408px;
-			height: 594px;
+			height: 600px;
 			border: 1px solid #DCDFE6;
+            border-radius: 8px; 
+            overflow: hidden;
+            box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
 		`
             ),
             o.setAttribute(
@@ -77,12 +81,15 @@ window.onload = function () {
                     'style',
                     `
                 	position: fixed;
-                	right: 44px;
-                	bottom: 44px;
-                	z-index: 999999;
-                	width: 408px;
-                	height: 594px;
-                	border: 1px solid #DCDFE6;
+			right: 44px;
+			bottom: 44px;
+			z-index: 999999;
+			width: 408px;
+			height: 600px;
+			border: 1px solid #DCDFE6;
+            border-radius: 8px; 
+            overflow: hidden;
+            box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
                 `
                 );
                 document.getElementById('iframe_container').style.display = 'none';
@@ -111,13 +118,16 @@ window.onload = function () {
                 iframeContainer.setAttribute(
                     'style',
                     `
-			position: fixed;
-			right: 44px;
-			bottom: 44px;
-			z-index: 999999;
-			width: 408px;
-			height: 594px;
-			border: 1px solid #DCDFE6;
+                    position: fixed;
+                    right: 44px;
+                    bottom: 44px;
+                    z-index: 999999;
+                    width: 408px;
+                    height: 600px;
+                    border: 1px solid #DCDFE6;
+                    border-radius: 8px; 
+                    overflow: hidden;
+                    box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
 		`
                 );
                 document.getElementById('min_mofaai').style.display = 'none';

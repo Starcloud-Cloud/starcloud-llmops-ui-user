@@ -34,6 +34,7 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
+import { uniqBy } from 'lodash-es';
 import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
@@ -629,64 +630,95 @@ export const Chat = ({
             let outerJoins: any;
             while (1) {
                 let joins = outerJoins;
-                const { done, value } = await reader.read();
-                if (done) {
-                    const copyData = [...dataRef.current];
-                    copyData[dataRef.current.length - 1].isNew = false;
-                    dataRef.current = copyData;
-                    setData(copyData);
-                    setIsFetch(false);
+                try {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        const copyData = [...dataRef.current];
+                        copyData[dataRef.current.length - 1].isNew = false;
+                        dataRef.current = copyData;
+                        setData(copyData);
+                        setIsFetch(false);
+                        break;
+                    }
+                    let str = textDecoder.decode(value);
+                    const lines = str.split('\n');
+                    lines.forEach((messages, i: number) => {
+                        if (i === 0 && joins) {
+                            messages = joins + messages;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (messages && messages.indexOf('}') === -1) {
+                                joins = messages;
+                                return;
+                            }
+                        }
+                        let bufferObj;
+                        if (messages?.startsWith('data:')) {
+                            bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                        }
+                        console.log(bufferObj, 'bufferObj');
+                        if (bufferObj?.code === 200) {
+                            jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                            setConversationUid(bufferObj.conversationUid);
+
+                            // 处理流程
+                            if (bufferObj.type === 'i') {
+                                const copyData = [...dataRef.current];
+                                const process = copyData[copyData.length - 1].process || [];
+                                const content = JSON.parse(bufferObj.content);
+                                // 处理文档（文档状态默认不更新）
+                                if (content.showType === 'docs') {
+                                    content.data = uniqBy(content.data, 'id');
+                                    copyData[copyData.length - 1].process = [...process, content];
+                                    dataRef.current = copyData;
+                                    setData(copyData);
+                                }
+                                // 处理链接
+                                if (content.showType === 'url' || content.showType === 'tips') {
+                                    //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+                                    const index = copyData[copyData.length - 1].process
+                                        ?.filter((v: any) => v.showType === 'tips')
+                                        ?.findIndex((v: any) => v.id === content.id);
+
+                                    if (index > -1) {
+                                        // 替换
+                                        copyData[copyData.length - 1].process[index] = content;
+                                        dataRef.current = copyData;
+                                        setData(copyData);
+                                    } else {
+                                        copyData[copyData.length - 1].process = [...process, content];
+                                        dataRef.current = copyData;
+                                        setData(copyData);
+                                    }
+                                }
+                            }
+                            if (bufferObj.type === 'm') {
+                                // 处理结论
+                                const copyData = [...dataRef.current];
+                                copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+                                copyData[copyData.length - 1].isNew = true;
+                                dataRef.current = copyData;
+                                setData(copyData);
+                            }
+                        } else if (bufferObj && bufferObj.code !== 200) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: `[${bufferObj.code}]-${bufferObj.error}`,
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                })
+                            );
+                        }
+                    });
+                } catch (e) {
                     break;
                 }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((messages, i: number) => {
-                    if (i === 0 && joins) {
-                        messages = joins + messages;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (messages && messages.indexOf('}') === -1) {
-                            joins = messages;
-                            return;
-                        }
-                    }
-                    let bufferObj;
-                    if (messages?.startsWith('data:')) {
-                        bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                    }
-                    if (bufferObj?.code === 200) {
-                        jsCookie.set(conversationUniKey, bufferObj.conversationUid);
-                        setConversationUid(bufferObj.conversationUid);
-                        // 处理流程
-                        if (bufferObj.type === 'i') {
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].process = bufferObj.content;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                        if (bufferObj.type === 'm') {
-                            // 处理结论
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                            copyData[copyData.length - 1].isNew = true;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                    } else if (bufferObj && bufferObj.code !== 200) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                });
+
                 outerJoins = joins;
             }
         } catch (e: any) {
@@ -753,7 +785,7 @@ export const Chat = ({
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">
-                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
                                         </div>
                                         <div className="ml-2 h-full">
                                             <div className="text-lg line-clamp-2">{item.name}</div>
@@ -774,7 +806,7 @@ export const Chat = ({
                     {showSelect ? (
                         <Popover
                             content={
-                                <div>
+                                <div className="h-[600px] overflow-y-auto">
                                     <div className="flex justify-center">切换员工</div>
                                     {botList?.map((item, index) => (
                                         <div
@@ -792,7 +824,7 @@ export const Chat = ({
                                             }}
                                         >
                                             <div className="w-[40px] h-[40px]">
-                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
                                             </div>
                                             <div className="ml-2">
                                                 <div className="text-lg">{item.name}</div>

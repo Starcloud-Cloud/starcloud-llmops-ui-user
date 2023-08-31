@@ -2,41 +2,24 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-export const WebPageInfo = ({ url }: { url: string }) => {
-    const [iconUrl, setIconUrl] = useState<string | undefined>('');
-    const [pageTitle, setPageTitle] = useState<string | undefined>('');
-    const [pageDescription, setPageDescription] = useState<string | undefined>('');
-
-    useEffect(() => {
-        // 发起 HTTP 请求获取网页内容
-        axios
-            .get(url)
-            .then((response) => {
-                const html = response.data;
-                const $ = cheerio.load(html);
-
-                // 提取图标地址
-                const iconLink = $('link[rel*="icon"], link[rel*="shortcut icon"]');
-                setIconUrl(iconLink.attr('href'));
-
-                // 提取标题
-                setPageTitle($('title').text());
-
-                // 提取简介
-                const descriptionMeta = $('meta[name="description"]');
-                setPageDescription(descriptionMeta.attr('content'));
-            })
-            .catch((error) => {
-                console.error('获取信息失败:', error);
-            });
-    }, [url]);
-
+export const WebPageInfo = ({ urlList, tips }: { urlList: any; tips: string }) => {
     return (
-        <div>
-            <h2>页面信息</h2>
-            {iconUrl && <img src={iconUrl} alt="网页图标" />}
-            {pageTitle && <h3>标题: {pageTitle}</h3>}
-            {pageDescription && <p>简介: {pageDescription}</p>}
+        <div className="mt-2">
+            <div className="flex justify-between">
+                <div>{tips}</div>
+                <div>{urlList.length}条</div>
+            </div>
+            <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 mt-2">
+                {urlList.map((item: any, index: number) => (
+                    <div key={index} className="flex rounded-md bg-[#fff] p-[12px]">
+                        <img src={item.logo} alt="" className="w-[36px] h-[36px]" />
+                        <div>
+                            <div>{item.title}</div>
+                            <div className="mt-1">{item.des}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

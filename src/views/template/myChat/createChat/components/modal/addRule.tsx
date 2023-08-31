@@ -23,15 +23,22 @@ import {
     Switch,
     Typography,
     Pagination,
-    FormHelperText
+    FormHelperText,
+    Stepper,
+    Step,
+    StepButton
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { Popconfirm, ConfigProvider } from 'antd';
+import formatDate from 'hooks/useDate';
+import { ruleDebugRule } from 'api/chat';
 import AddIcon from '@mui/icons-material/Add';
 import MainCard from 'ui-component/cards/MainCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import DeBug from './debug';
 import { useEffect, useState } from 'react';
 import { rulePage, ruleFormatType, ruleCreateRule, ruleUpdateRule, ruleRuleType, ruleDel } from 'api/chat';
@@ -165,12 +172,10 @@ const AddRuleModal = ({
     const [editData, setEditData] = useState<any>({});
     //新增编辑
     const addSave = async () => {
-        const newArr = [
-            ...Object.values(basis),
-            ...Object.values(cleanRule),
-            ...Object.values(commonCleanRule),
-            ...Object.values(splitRule)
-        ];
+        const newArr = [...Object.values(basis), ...Object.values(commonCleanRule), ...Object.values(splitRule)];
+        if (basis.ruleType === 'HTML') {
+            newArr.push(...Object.values(cleanRule));
+        }
         const res = newArr.every((item: any) => {
             return item === true || item === false || item.length > 0 || typeof item === 'number';
         });
@@ -248,7 +253,72 @@ const AddRuleModal = ({
     };
 
     //规则调试
-    const [deBugOpen, setDeBugOpen] = useState(false);
+    const steps = ['清洗', '分段', '调试与保存'];
+    const [activeStep, setActiveStep] = useState(0);
+    const [completed, setCompleted] = useState<{
+        [k: number]: boolean;
+    }>({});
+    const handleStep = (step: number) => () => {
+        setActiveStep(step);
+        // setCompleted({
+        //     ...completed,
+        //     [step]: true
+        // });
+    };
+    //调试
+    const [deBugData, setDeBugData] = useState<{ ruleType: string }>({
+        ruleType: 'HTML'
+    });
+    //文本
+    const formik = useFormik({
+        initialValues: {
+            title: `文本：${formatDate(new Date().getTime())}`,
+            context: ''
+        },
+        validationSchema: yup.object({
+            title: yup.string().required('标题是必填的'),
+            context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
+        }),
+        onSubmit: async (values) => {
+            const res = await ruleDebugRule({
+                appId: datasetUid,
+                url: '',
+                title: values.title,
+                context: values.context,
+                dataType: 'CHARACTERS'
+            });
+            setRuleName(res.ruleName);
+            setResult(res.data);
+        }
+    });
+    //网页
+    const [isValid, setIsValid] = useState(true);
+    const [url, setUrl] = useState('');
+    const saveUrl = async () => {
+        if (url && isValid) {
+            const res = await ruleDebugRule({
+                appId: datasetUid,
+                url,
+                title: '',
+                context: '',
+                dataType: 'HTML'
+            });
+            setRuleName(res.ruleName);
+            setResult(res.data);
+        } else {
+            setIsValid(false);
+        }
+    };
+    useEffect(() => {
+        if (url) {
+            const isValidInput = /^(http:\/\/|https:\/\/|www\.)[^\s,，]*$/.test(url);
+            setIsValid(isValidInput);
+        }
+    }, [url]);
+    //规则名称
+    const [ruleName, setRuleName] = useState('');
+    //调试结果
+    const [result, setResult] = useState('');
     return (
         <Modal open={open} onClose={() => handleClose(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -271,17 +341,6 @@ const AddRuleModal = ({
             >
                 <CardContent sx={{ p: '16px !important' }}>
                     <Box my={2} display="flex" justifyContent="right">
-                        <Button
-                            onClick={() => {
-                                setDeBugOpen(true);
-                            }}
-                            sx={{ mr: 1 }}
-                            size="small"
-                            color="secondary"
-                            variant="contained"
-                        >
-                            规则调试
-                        </Button>
                         <Button
                             startIcon={<AddIcon />}
                             onClick={() => {
@@ -403,367 +462,566 @@ const AddRuleModal = ({
                                 }
                             >
                                 <CardContent sx={{ p: '16px !important' }}>
-                                    <Grid container spacing={2}>
-                                        <Grid item md={4}>
-                                            <TextField
-                                                size="small"
-                                                label="规划名称"
-                                                name="ruleName"
-                                                color="secondary"
-                                                fullWidth
-                                                error={!basis.ruleName}
-                                                helperText={!basis.ruleName ? '规划名称必填' : ' '}
-                                                value={basis.ruleName}
-                                                onChange={handleBasis}
-                                                InputLabelProps={{ shrink: true }}
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <FormControl size="small" error={!basis.ruleType} fullWidth>
-                                                <InputLabel color="secondary" id="type">
-                                                    类型
-                                                </InputLabel>
-                                                <Select
-                                                    fullWidth
-                                                    name="ruleType"
-                                                    value={basis.ruleType}
-                                                    onChange={handleBasis}
-                                                    color="secondary"
-                                                    labelId="type"
-                                                    label="类型"
-                                                >
-                                                    {typeList.map((item: any) => (
-                                                        <MenuItem key={item.type} value={item.type}>
-                                                            {item.typeName}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                                {!basis.ruleType && <FormHelperText>类型必填</FormHelperText>}
-                                                {basis.ruleType && <FormHelperText> </FormHelperText>}
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <Stack>
-                                                <Autocomplete
-                                                    multiple
-                                                    size="small"
-                                                    options={[]}
-                                                    defaultValue={basis.ruleFilter}
-                                                    freeSolo
-                                                    renderTags={(value: readonly string[], getTagProps) =>
-                                                        value.map((option: string, index: number) => (
-                                                            <Chip
-                                                                size="small"
-                                                                key={index}
-                                                                label={option}
-                                                                onDelete={getTagProps({ index }).onDelete}
-                                                            />
-                                                        ))
-                                                    }
-                                                    onChange={(e: any, newValue) => {
-                                                        setBasis({
-                                                            ...basis,
-                                                            ruleFilter: newValue
-                                                        });
-                                                    }}
-                                                    renderInput={(params: any) => (
-                                                        <TextField
-                                                            size="small"
-                                                            error={basis.ruleFilter && basis.ruleFilter.length === 0}
-                                                            helperText={
-                                                                basis.ruleFilter && basis.ruleFilter.length === 0 ? '过滤项必填' : ' '
-                                                            }
-                                                            name="ruleFilter"
+                                    <Stepper nonLinear activeStep={activeStep}>
+                                        {steps.map((label, index) => (
+                                            <Step color="secondary" key={label} completed={completed[index]}>
+                                                <StepButton color="inherit" onClick={handleStep(index)}>
+                                                    {label}
+                                                </StepButton>
+                                            </Step>
+                                        ))}
+                                    </Stepper>
+                                    {activeStep === 0 && (
+                                        <Box mt={2}>
+                                            <Grid container spacing={2}>
+                                                <Grid item md={4}>
+                                                    <TextField
+                                                        size="small"
+                                                        label="规划名称"
+                                                        name="ruleName"
+                                                        color="secondary"
+                                                        fullWidth
+                                                        error={!basis.ruleName}
+                                                        helperText={!basis.ruleName ? '规划名称必填' : ' '}
+                                                        value={basis.ruleName}
+                                                        onChange={handleBasis}
+                                                        InputLabelProps={{ shrink: true }}
+                                                    />
+                                                </Grid>
+                                                <Grid item md={4}>
+                                                    <FormControl size="small" error={!basis.ruleType} fullWidth>
+                                                        <InputLabel color="secondary" id="type">
+                                                            类型
+                                                        </InputLabel>
+                                                        <Select
+                                                            fullWidth
+                                                            name="ruleType"
+                                                            value={basis.ruleType}
+                                                            onChange={handleBasis}
                                                             color="secondary"
-                                                            {...params}
-                                                            label="过滤项"
-                                                        />
-                                                    )}
-                                                />
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>规则状态</span>
-                                            <Switch
-                                                name="removeAllHtmlTags"
-                                                checked={basis.enable}
-                                                onChange={() => {
-                                                    setBasis({
-                                                        ...basis,
-                                                        enable: !basis.enable
-                                                    });
-                                                }}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                    <span
-                                        className={
-                                            "!mb-[16px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                                        }
-                                    >
-                                        网页规则
-                                    </span>
-                                    <Grid container spacing={2}>
-                                        <Grid item md={4}>
-                                            <Stack>
-                                                <Autocomplete
-                                                    size="small"
-                                                    multiple
-                                                    options={[]}
-                                                    defaultValue={cleanRule.whiteList}
-                                                    freeSolo
-                                                    renderTags={(value: readonly string[], getTagProps) =>
-                                                        value.map((option: string, index: number) => (
-                                                            <Chip
-                                                                size="small"
-                                                                key={index}
-                                                                label={option}
-                                                                onDelete={getTagProps({ index }).onDelete}
-                                                            />
-                                                        ))
-                                                    }
-                                                    onChange={(e: any, newValue) => {
-                                                        setCleanRule({
-                                                            ...cleanRule,
-                                                            whiteList: newValue
-                                                        });
-                                                    }}
-                                                    renderInput={(params: any) => (
-                                                        <TextField
+                                                            labelId="type"
+                                                            label="类型"
+                                                        >
+                                                            {typeList.map((item: any) => (
+                                                                <MenuItem key={item.type} value={item.type}>
+                                                                    {item.typeName}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                        {!basis.ruleType && <FormHelperText>类型必填</FormHelperText>}
+                                                        {basis.ruleType && <FormHelperText> </FormHelperText>}
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid item md={4}>
+                                                    <Stack>
+                                                        <Autocomplete
+                                                            multiple
                                                             size="small"
-                                                            error={cleanRule.whiteList && cleanRule.whiteList.length === 0}
-                                                            helperText={
-                                                                cleanRule.whiteList && cleanRule.whiteList.length === 0 ? '白名单必填' : ' '
+                                                            options={[]}
+                                                            defaultValue={basis.ruleFilter}
+                                                            freeSolo
+                                                            renderTags={(value: readonly string[], getTagProps) =>
+                                                                value.map((option: string, index: number) => (
+                                                                    <Chip
+                                                                        size="small"
+                                                                        key={index}
+                                                                        label={option}
+                                                                        onDelete={getTagProps({ index }).onDelete}
+                                                                    />
+                                                                ))
                                                             }
-                                                            name="whiteList"
-                                                            color="secondary"
-                                                            {...params}
-                                                            label="白名单"
+                                                            onChange={(e: any, newValue) => {
+                                                                setBasis({
+                                                                    ...basis,
+                                                                    ruleFilter: newValue
+                                                                });
+                                                            }}
+                                                            renderInput={(params: any) => (
+                                                                <TextField
+                                                                    InputLabelProps={{ shrink: true }}
+                                                                    size="small"
+                                                                    error={basis.ruleFilter && basis.ruleFilter.length === 0}
+                                                                    helperText={
+                                                                        basis.ruleFilter && basis.ruleFilter.length === 0
+                                                                            ? '过滤项必填'
+                                                                            : ' '
+                                                                    }
+                                                                    name="ruleFilter"
+                                                                    color="secondary"
+                                                                    {...params}
+                                                                    label="过滤项"
+                                                                />
+                                                            )}
                                                         />
-                                                    )}
-                                                />
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <Stack>
-                                                <Autocomplete
-                                                    size="small"
-                                                    multiple
-                                                    options={[]}
-                                                    defaultValue={cleanRule.blackList}
-                                                    freeSolo
-                                                    renderTags={(value: readonly string[], getTagProps) =>
-                                                        value.map((option: string, index: number) => (
-                                                            <Chip
-                                                                size="small"
-                                                                key={index}
-                                                                label={option}
-                                                                onDelete={getTagProps({ index }).onDelete}
+                                                    </Stack>
+                                                </Grid>
+                                                <Grid item md={4}>
+                                                    <span className={'text-#697586'}>规则状态</span>
+                                                    <Switch
+                                                        name="removeAllHtmlTags"
+                                                        checked={basis.enable}
+                                                        onChange={() => {
+                                                            setBasis({
+                                                                ...basis,
+                                                                enable: !basis.enable
+                                                            });
+                                                        }}
+                                                        color="secondary"
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                            {basis.ruleType === 'HTML' && (
+                                                <>
+                                                    <span
+                                                        className={
+                                                            "!mb-[16px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                                                        }
+                                                    >
+                                                        网页规则
+                                                    </span>
+                                                    <Grid container spacing={2}>
+                                                        <Grid item md={12}>
+                                                            <Stack>
+                                                                <Autocomplete
+                                                                    size="small"
+                                                                    multiple
+                                                                    options={[]}
+                                                                    defaultValue={cleanRule.whiteList}
+                                                                    freeSolo
+                                                                    renderTags={(value: readonly string[], getTagProps) =>
+                                                                        value.map((option: string, index: number) => (
+                                                                            <Chip
+                                                                                size="small"
+                                                                                key={index}
+                                                                                label={option}
+                                                                                onDelete={getTagProps({ index }).onDelete}
+                                                                            />
+                                                                        ))
+                                                                    }
+                                                                    onChange={(e: any, newValue) => {
+                                                                        setCleanRule({
+                                                                            ...cleanRule,
+                                                                            whiteList: newValue
+                                                                        });
+                                                                    }}
+                                                                    renderInput={(params: any) => (
+                                                                        <TextField
+                                                                            size="small"
+                                                                            error={cleanRule.whiteList && cleanRule.whiteList.length === 0}
+                                                                            helperText={
+                                                                                cleanRule.whiteList && cleanRule.whiteList.length === 0
+                                                                                    ? '白名单必填'
+                                                                                    : ' '
+                                                                            }
+                                                                            name="whiteList"
+                                                                            color="secondary"
+                                                                            {...params}
+                                                                            label="白名单"
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </Stack>
+                                                        </Grid>
+                                                        <Grid item md={12}>
+                                                            <Stack>
+                                                                <Autocomplete
+                                                                    size="small"
+                                                                    multiple
+                                                                    options={[]}
+                                                                    defaultValue={cleanRule.blackList}
+                                                                    freeSolo
+                                                                    renderTags={(value: readonly string[], getTagProps) =>
+                                                                        value.map((option: string, index: number) => (
+                                                                            <Chip
+                                                                                size="small"
+                                                                                key={index}
+                                                                                label={option}
+                                                                                onDelete={getTagProps({ index }).onDelete}
+                                                                            />
+                                                                        ))
+                                                                    }
+                                                                    onChange={(e: any, newValue) => {
+                                                                        setCleanRule({
+                                                                            ...cleanRule,
+                                                                            blackList: newValue
+                                                                        });
+                                                                    }}
+                                                                    renderInput={(params: any) => (
+                                                                        <TextField
+                                                                            size="small"
+                                                                            error={cleanRule.blackList && cleanRule.blackList.length === 0}
+                                                                            helperText={
+                                                                                cleanRule.blackList && cleanRule.blackList.length === 0
+                                                                                    ? '黑名单必填'
+                                                                                    : ' '
+                                                                            }
+                                                                            name="blackList"
+                                                                            color="secondary"
+                                                                            {...params}
+                                                                            label="黑名单"
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </Stack>
+                                                        </Grid>
+                                                        <Grid item md={4}>
+                                                            <FormControl size="small" error={!cleanRule.convertFormat} fullWidth>
+                                                                <InputLabel color="secondary" id="type">
+                                                                    转化格式
+                                                                </InputLabel>
+                                                                <Select
+                                                                    name="convertFormat"
+                                                                    value={cleanRule.convertFormat}
+                                                                    onChange={handleCleanRule}
+                                                                    fullWidth
+                                                                    color="secondary"
+                                                                    labelId="type"
+                                                                    label="转化格式"
+                                                                >
+                                                                    {ruleFormatList.map((item: any) => (
+                                                                        <MenuItem key={item.type} value={item.type}>
+                                                                            {item.typeName}
+                                                                        </MenuItem>
+                                                                    ))}
+                                                                </Select>
+                                                                {!cleanRule.convertFormat && <FormHelperText>转化格式必填</FormHelperText>}
+                                                                {cleanRule.convertFormat && <FormHelperText> </FormHelperText>}
+                                                            </FormControl>
+                                                        </Grid>
+                                                        <Grid item md={4}>
+                                                            <FormControl size="small" error={!cleanRule.acceptLanguage} fullWidth>
+                                                                <InputLabel color="secondary" id="type">
+                                                                    网页语言
+                                                                </InputLabel>
+                                                                <Select
+                                                                    fullWidth
+                                                                    name="acceptLanguage"
+                                                                    value={cleanRule.acceptLanguage}
+                                                                    onChange={handleCleanRule}
+                                                                    color="secondary"
+                                                                    labelId="type"
+                                                                    label="网页语言"
+                                                                >
+                                                                    <MenuItem value="Chinese">中文</MenuItem>
+                                                                    <MenuItem value="English">英文</MenuItem>
+                                                                </Select>
+                                                                {!cleanRule.acceptLanguage && <FormHelperText>转化格式必填</FormHelperText>}
+                                                                {cleanRule.acceptLanguage && <FormHelperText> </FormHelperText>}
+                                                            </FormControl>
+                                                        </Grid>
+                                                    </Grid>
+                                                </>
+                                            )}
+                                            <span
+                                                className={
+                                                    "!mt-[24px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                                                }
+                                            >
+                                                通用规则
+                                            </span>
+                                            <Grid container spacing={2}>
+                                                <Grid item md={4}>
+                                                    <span className={'text-#697586'}>清除html标签</span>
+                                                    <Switch
+                                                        name="removeAllHtmlTags"
+                                                        checked={commonCleanRule.removeAllHtmlTags}
+                                                        onChange={handleCommonCleanRule}
+                                                        color="secondary"
+                                                    />
+                                                </Grid>
+                                                <Grid item md={4}>
+                                                    <span className={'text-#697586'}>清除所有图片</span>
+                                                    <Switch
+                                                        name="removeAllImage"
+                                                        checked={commonCleanRule.removeAllImage}
+                                                        onChange={handleCommonCleanRule}
+                                                        color="secondary"
+                                                    />
+                                                </Grid>
+                                                {/* <Grid item md={4}>
+                                                            <span className={'text-#697586'}>清除连续换行符</span>
+                                                            <Switch
+                                                                name="removeConsecutiveNewlines"
+                                                                checked={commonCleanRule.removeConsecutiveNewlines}
+                                                                onChange={handleCommonCleanRule}
+                                                                color="secondary"
                                                             />
-                                                        ))
-                                                    }
-                                                    onChange={(e: any, newValue) => {
-                                                        setCleanRule({
-                                                            ...cleanRule,
-                                                            blackList: newValue
-                                                        });
-                                                    }}
-                                                    renderInput={(params: any) => (
-                                                        <TextField
-                                                            size="small"
-                                                            error={cleanRule.blackList && cleanRule.blackList.length === 0}
-                                                            helperText={
-                                                                cleanRule.blackList && cleanRule.blackList.length === 0 ? '黑名单必填' : ' '
-                                                            }
-                                                            name="blackList"
-                                                            color="secondary"
-                                                            {...params}
-                                                            label="黑名单"
-                                                        />
-                                                    )}
-                                                />
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <FormControl size="small" error={!cleanRule.convertFormat} fullWidth>
-                                                <InputLabel color="secondary" id="type">
-                                                    转化格式
-                                                </InputLabel>
-                                                <Select
-                                                    name="convertFormat"
-                                                    value={cleanRule.convertFormat}
-                                                    onChange={handleCleanRule}
-                                                    fullWidth
-                                                    color="secondary"
-                                                    labelId="type"
-                                                    label="转化格式"
-                                                >
-                                                    {ruleFormatList.map((item: any) => (
-                                                        <MenuItem key={item.type} value={item.type}>
-                                                            {item.typeName}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                                {!cleanRule.convertFormat && <FormHelperText>转化格式必填</FormHelperText>}
-                                                {cleanRule.convertFormat && <FormHelperText> </FormHelperText>}
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <FormControl size="small" error={!cleanRule.acceptLanguage} fullWidth>
-                                                <InputLabel color="secondary" id="type">
-                                                    网页语言
-                                                </InputLabel>
-                                                <Select
-                                                    fullWidth
-                                                    name="acceptLanguage"
-                                                    value={cleanRule.acceptLanguage}
-                                                    onChange={handleCleanRule}
-                                                    color="secondary"
-                                                    labelId="type"
-                                                    label="网页语言"
-                                                >
-                                                    <MenuItem value="Chinese">中文</MenuItem>
-                                                    <MenuItem value="English">英文</MenuItem>
-                                                </Select>
-                                                {!cleanRule.acceptLanguage && <FormHelperText>转化格式必填</FormHelperText>}
-                                                {cleanRule.acceptLanguage && <FormHelperText> </FormHelperText>}
-                                            </FormControl>
-                                        </Grid>
-                                    </Grid>
-                                    <span
-                                        className={
-                                            "!mt-[24px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                                        }
-                                    >
-                                        通用规则
-                                    </span>
-                                    <Grid container spacing={2}>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除html标签</span>
-                                            <Switch
-                                                name="removeAllHtmlTags"
-                                                checked={commonCleanRule.removeAllHtmlTags}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除所有图片</span>
-                                            <Switch
-                                                name="removeAllImage"
-                                                checked={commonCleanRule.removeAllImage}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除连续空格</span>
-                                            <Switch
-                                                name="removeConsecutiveSpaces"
-                                                checked={commonCleanRule.removeConsecutiveSpaces}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除连续换行符</span>
-                                            <Switch
-                                                name="removeConsecutiveNewlines"
-                                                checked={commonCleanRule.removeConsecutiveNewlines}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除制表符</span>
-                                            <Switch
-                                                name="removeConsecutiveTabs"
-                                                checked={commonCleanRule.removeConsecutiveTabs}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <span className={'text-#697586'}>清除电子邮箱地址</span>
-                                            <Switch
-                                                name="removeUrlsEmails"
-                                                checked={commonCleanRule.removeUrlsEmails}
-                                                onChange={handleCommonCleanRule}
-                                                color="secondary"
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                    <span
-                                        className={
-                                            "!mt-[24px] !mb-[16px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                                        }
-                                    >
-                                        分段规则
-                                    </span>
-                                    <Grid container spacing={2}>
-                                        <Grid item md={4}>
-                                            <TextField
-                                                size="small"
-                                                label="分段大小"
-                                                name="chunkSize"
-                                                color="secondary"
-                                                fullWidth
-                                                error={!splitRule.chunkSize}
-                                                helperText={!splitRule.chunkSize ? '规划名称必填' : ' '}
-                                                value={splitRule.chunkSize}
-                                                type="number"
-                                                onChange={(e: any) => {
-                                                    const { name, value } = e.target;
-                                                    setSplitRule({
-                                                        ...splitRule,
-                                                        [name]: value
-                                                    });
-                                                }}
-                                                InputLabelProps={{ shrink: true }}
-                                            />
-                                        </Grid>
-                                        <Grid item md={4}>
-                                            <Stack>
-                                                <Autocomplete
-                                                    size="small"
-                                                    multiple
-                                                    options={[]}
-                                                    defaultValue={splitRule.separator}
-                                                    freeSolo
-                                                    renderTags={(value: readonly string[], getTagProps) =>
-                                                        value.map((option: string, index: number) => (
-                                                            <Chip
-                                                                size="small"
-                                                                key={index}
-                                                                label={option}
-                                                                onDelete={getTagProps({ index }).onDelete}
+                                                        </Grid>
+                                                        <Grid item md={4}>
+                                                            <span className={'text-#697586'}>清除制表符</span>
+                                                            <Switch
+                                                                name="removeConsecutiveTabs"
+                                                                checked={commonCleanRule.removeConsecutiveTabs}
+                                                                onChange={handleCommonCleanRule}
+                                                                color="secondary"
                                                             />
-                                                        ))
-                                                    }
-                                                    onChange={(e: any, newValue) => {
-                                                        setSplitRule({
-                                                            ...splitRule,
-                                                            separator: newValue
-                                                        });
-                                                    }}
-                                                    renderInput={(params: any) => (
-                                                        <TextField
+                                                        </Grid> */}
+                                                <Grid item md={4}>
+                                                    <span className={'text-#697586'}>清除电子邮箱地址</span>
+                                                    <Switch
+                                                        name="removeUrlsEmails"
+                                                        checked={commonCleanRule.removeUrlsEmails}
+                                                        onChange={handleCommonCleanRule}
+                                                        color="secondary"
+                                                    />
+                                                </Grid>
+                                                <Grid item md={12}>
+                                                    <span className={'text-#697586'}>替换掉连续的空格、换行符和制表符</span>
+                                                    <Switch
+                                                        name="removeConsecutiveSpaces"
+                                                        checked={commonCleanRule.removeConsecutiveSpaces}
+                                                        onChange={() => {
+                                                            setCommonCleanRule({
+                                                                ...commonCleanRule,
+                                                                removeConsecutiveSpaces: !commonCleanRule.removeConsecutiveSpaces,
+                                                                removeConsecutiveNewlines: !commonCleanRule.removeConsecutiveNewlines,
+                                                                removeConsecutiveTabs: !commonCleanRule.removeConsecutiveTabs
+                                                            });
+                                                        }}
+                                                        color="secondary"
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    )}
+                                    {activeStep === 1 && (
+                                        <Box mt={2}>
+                                            <span
+                                                className={
+                                                    "!mt-[24px] !mb-[16px] before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                                                }
+                                            >
+                                                分段规则
+                                            </span>
+                                            <Grid container spacing={2}>
+                                                <Grid item md={4}>
+                                                    <TextField
+                                                        size="small"
+                                                        label="分段大小"
+                                                        name="chunkSize"
+                                                        color="secondary"
+                                                        fullWidth
+                                                        error={!splitRule.chunkSize}
+                                                        helperText={!splitRule.chunkSize ? '规划名称必填' : ' '}
+                                                        value={splitRule.chunkSize}
+                                                        type="number"
+                                                        onChange={(e: any) => {
+                                                            const { name, value } = e.target;
+                                                            setSplitRule({
+                                                                ...splitRule,
+                                                                [name]: value
+                                                            });
+                                                        }}
+                                                        InputLabelProps={{ shrink: true }}
+                                                    />
+                                                </Grid>
+                                                <Grid item md={12}>
+                                                    <Stack>
+                                                        <Autocomplete
                                                             size="small"
-                                                            error={splitRule.separator && splitRule.separator.length === 0}
-                                                            helperText={
-                                                                splitRule.separator && splitRule.separator.length === 0 ? '白名单必填' : ' '
+                                                            multiple
+                                                            options={[]}
+                                                            defaultValue={splitRule.separator}
+                                                            freeSolo
+                                                            renderTags={(value: readonly string[], getTagProps) =>
+                                                                value.map((option: string, index: number) => (
+                                                                    <Chip
+                                                                        size="small"
+                                                                        key={index}
+                                                                        label={option}
+                                                                        onDelete={getTagProps({ index }).onDelete}
+                                                                    />
+                                                                ))
                                                             }
-                                                            name="whiteList"
-                                                            color="secondary"
-                                                            {...params}
-                                                            label="分隔符"
+                                                            onChange={(e: any, newValue) => {
+                                                                setSplitRule({
+                                                                    ...splitRule,
+                                                                    separator: newValue
+                                                                });
+                                                            }}
+                                                            renderInput={(params: any) => (
+                                                                <TextField
+                                                                    size="small"
+                                                                    error={splitRule.separator && splitRule.separator.length === 0}
+                                                                    helperText={
+                                                                        splitRule.separator && splitRule.separator.length === 0
+                                                                            ? '白名单必填'
+                                                                            : ' '
+                                                                    }
+                                                                    name="whiteList"
+                                                                    color="secondary"
+                                                                    {...params}
+                                                                    label="分隔符"
+                                                                />
+                                                            )}
                                                         />
-                                                    )}
-                                                />
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
+                                                    </Stack>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    )}
+                                    {activeStep === 2 && (
+                                        <>
+                                            <CardContent sx={{ p: '16px !important' }}>
+                                                <Grid container spacing={6}>
+                                                    <Grid item md={6} xs={12}>
+                                                        <FormControl fullWidth>
+                                                            <InputLabel color="secondary" id="type">
+                                                                选择类型
+                                                            </InputLabel>
+                                                            <Select
+                                                                fullWidth
+                                                                name="ruleType"
+                                                                value={deBugData.ruleType}
+                                                                onChange={(e) => {
+                                                                    setDeBugData({
+                                                                        ...deBugData,
+                                                                        ruleType: e.target.value
+                                                                    });
+                                                                }}
+                                                                color="secondary"
+                                                                labelId="type"
+                                                                label="选择类型"
+                                                            >
+                                                                {typeList.map((item: any) => (
+                                                                    <MenuItem
+                                                                        disabled={item.type === 'DOCUMENT'}
+                                                                        key={item.type}
+                                                                        value={item.type}
+                                                                    >
+                                                                        {item.typeName}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item md={6} xs={12}>
+                                                        <TextField
+                                                            fullWidth
+                                                            value={ruleName}
+                                                            InputLabelProps={{ shrink: true }}
+                                                            disabled
+                                                            label="规则名称"
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid sx={{ mt: 2 }} flexWrap="nowrap" container spacing={2}>
+                                                    <Grid item md={6} xs={12}>
+                                                        {deBugData.ruleType === 'CHARACTERS' && (
+                                                            <Box>
+                                                                <form onSubmit={formik.handleSubmit}>
+                                                                    <TextField
+                                                                        label={'标题'}
+                                                                        fullWidth
+                                                                        id="title"
+                                                                        name="title"
+                                                                        color="secondary"
+                                                                        InputLabelProps={{ shrink: true }}
+                                                                        value={formik.values.title}
+                                                                        onChange={formik.handleChange}
+                                                                        error={formik.touched.title && Boolean(formik.errors.title)}
+                                                                        helperText={formik.touched.title && formik.errors.title}
+                                                                    />
+                                                                    <Box position="relative">
+                                                                        <TextField
+                                                                            label={'内容'}
+                                                                            fullWidth
+                                                                            id="context"
+                                                                            name="context"
+                                                                            color="secondary"
+                                                                            placeholder="文本内容，请输入 150000 字符以内"
+                                                                            InputLabelProps={{ shrink: true }}
+                                                                            value={formik.values.context}
+                                                                            onChange={formik.handleChange}
+                                                                            error={formik.touched.context && Boolean(formik.errors.context)}
+                                                                            helperText={
+                                                                                (formik.touched.context && formik.errors.context) || ' '
+                                                                            }
+                                                                            className={'mt-3'}
+                                                                            multiline
+                                                                            minRows={6}
+                                                                            maxRows={6}
+                                                                        />
+                                                                        <Box
+                                                                            position="absolute"
+                                                                            bottom="0px"
+                                                                            right="5px"
+                                                                            fontSize="0.75rem"
+                                                                        >
+                                                                            {formik.values.context.length}/150000个
+                                                                        </Box>
+                                                                    </Box>
+                                                                </form>
+                                                            </Box>
+                                                        )}
+                                                        {deBugData.ruleType === 'HTML' && (
+                                                            <Box>
+                                                                <div className="text-sm text-[#9da3af]">
+                                                                    请避免非法抓取他人网站的侵权行为，保证链接可公开访问，且网站内容可复制
+                                                                </div>
+                                                                <TextField
+                                                                    label="网页地址"
+                                                                    fullWidth
+                                                                    focused
+                                                                    id="url"
+                                                                    name="url"
+                                                                    color="secondary"
+                                                                    value={url}
+                                                                    onChange={(e) => {
+                                                                        setUrl(e.target.value);
+                                                                    }}
+                                                                    error={!isValid}
+                                                                    placeholder="网站通过http://、https://、www.开头多个网站通过换行分割避免解析错误"
+                                                                    className={'mt-3'}
+                                                                    multiline
+                                                                    minRows={6}
+                                                                    maxRows={6}
+                                                                />
+                                                                {!isValid && (
+                                                                    <div className="text-[#f44336] mt-1">{'请输入正确的网络地址'}</div>
+                                                                )}
+                                                            </Box>
+                                                        )}
+                                                    </Grid>
+                                                    <Divider
+                                                        sx={{ ml: 2, display: { md: 'block', xs: 'none' } }}
+                                                        orientation="vertical"
+                                                        flexItem
+                                                    />
+                                                    <Grid item md={6} xs={12}>
+                                                        <TextField
+                                                            multiline
+                                                            minRows={8}
+                                                            maxRows={8}
+                                                            fullWidth
+                                                            color="secondary"
+                                                            value={result}
+                                                            label="调试结果"
+                                                            InputLabelProps={{ shrink: true }}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </CardContent>
+                                            <Divider />
+                                            <CardActions sx={{ p: 2 }}>
+                                                <Grid container justifyContent="flex-end">
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => {
+                                                            if (deBugData.ruleType === 'HTML') {
+                                                                saveUrl();
+                                                            } else {
+                                                                formik.handleSubmit();
+                                                            }
+                                                        }}
+                                                        color="secondary"
+                                                    >
+                                                        调试
+                                                    </Button>
+                                                </Grid>
+                                            </CardActions>
+                                        </>
+                                    )}
                                 </CardContent>
                                 <Divider sx={{ mt: 2 }} />
                                 <CardActions sx={{ p: 2 }}>
@@ -776,7 +1034,6 @@ const AddRuleModal = ({
                             </MainCard>
                         </Modal>
                     )}
-                    {deBugOpen && <DeBug deBugOpen={deBugOpen} typeList={typeList} datasetUid={datasetUid} setDeBugOpen={setDeBugOpen} />}
                 </CardContent>
             </MainCard>
         </Modal>

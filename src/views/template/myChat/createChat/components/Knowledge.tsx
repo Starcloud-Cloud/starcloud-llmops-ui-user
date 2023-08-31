@@ -895,7 +895,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                     setRuleOpen(true);
                                 }}
                             >
-                                规则设定
+                                清洗和分段规则设定
                             </Button>
                             <Button
                                 variant={'contained'}
@@ -1154,22 +1154,22 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 <Box height="626px" display="flex" justifyContent="center" alignItems="center">
                                     <Box position="relative" display="flex" flexDirection="column" alignItems="center">
                                         <img src={documnt} alt="" />
-                                        <Typography color="#9da3af" my={3}>
+                                        <Typography color="#9da3af" mb={1}>
                                             您还没有增加文档，快去添加吧！
                                         </Typography>
                                         <Button
-                                            variant={'contained'}
+                                            variant={'outlined'}
                                             startIcon={<AddIcon />}
                                             color={'secondary'}
                                             onClick={() => {
                                                 setDocumentVisible(true);
                                             }}
                                         >
-                                            录入文档
+                                            添加文档
                                         </Button>
                                         <Chip
                                             size="small"
-                                            color="success"
+                                            color="info"
                                             sx={{ position: 'absolute', left: '-70px', top: '20px' }}
                                             label="无限次上传"
                                         />
@@ -1177,19 +1177,19 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             size="small"
                                             color="secondary"
                                             sx={{ position: 'absolute', right: '-70px', top: '20px' }}
-                                            label="5-10分钟完成学习"
+                                            label="2-5分钟完成学习"
                                         />
                                         <Chip
                                             size="small"
                                             color="secondary"
-                                            sx={{ position: 'absolute', left: '-30px', bottom: '130px' }}
-                                            label="AI自主智能学习"
+                                            sx={{ position: 'absolute', left: '-30px', bottom: '90px' }}
+                                            label="AI自动优化学习"
                                         />
                                         <Chip
                                             size="small"
-                                            color="success"
-                                            sx={{ position: 'absolute', right: '-30px', bottom: '130px' }}
-                                            label="灵活便利"
+                                            color="info"
+                                            sx={{ position: 'absolute', right: '-30px', bottom: '90px' }}
+                                            label="支持多种格式"
                                         />
                                     </Box>
                                 </Box>

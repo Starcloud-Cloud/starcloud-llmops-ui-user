@@ -122,10 +122,8 @@ function Deatail() {
                             conversationUid = bufferObj.conversationUid;
                         }
                         const contentData1 = _.cloneDeep(contentData);
-                        contentData.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = contentData1;
                         setDetailData(contentData1);
                     } else if (bufferObj && bufferObj.code !== 200) {

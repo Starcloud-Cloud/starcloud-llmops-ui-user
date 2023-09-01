@@ -44,6 +44,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
     const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
 
+    console.log('data', data);
+
     const toggleItem = (item: any) => {
         if (expandedItems.includes(item)) {
             // 如果项目已展开，则收起它
@@ -182,12 +184,12 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     history.process.map((item: any, index: number) => {
                                                                         if (item.showType === 'tips') {
                                                                             return (
-                                                                                <div className="flex flex-col p-[4px] pb-3 rounded-md">
+                                                                                <div className="flex flex-col pb-3 rounded-md">
                                                                                     <div
                                                                                         onClick={() => toggleItem(item.id)}
                                                                                         className={`flex items-center px-[8px] py-[16px] ${
                                                                                             item.status === 0
-                                                                                                ? 'bg-[#6aed99]'
+                                                                                                ? 'bg-[#dbf3d9]'
                                                                                                 : item.status && item.success
                                                                                                 ? 'bg-stone-200'
                                                                                                 : item.status && !item.success
@@ -207,7 +209,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                             )}
                                                                                             {item.status === 1 && item.success && (
                                                                                                 <div className="flex items-center">
-                                                                                                    <CheckCircleIcon className="text-base" />
+                                                                                                    <CheckCircleIcon className="text-base text-green-500" />
                                                                                                     <div className="text-sm pl-1 w-[200px] line-clamp-1">
                                                                                                         {/* 完成 */}
                                                                                                         {item.tips}
@@ -343,18 +345,19 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                     </div>
                                                                 )}
                                                                 {/* 文本回答 */}
-                                                                {
-                                                                    history?.answer ? (
-                                                                        <div
-                                                                            className={`text-sm whitespace-pre-line  ${
-                                                                                history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
-                                                                            }`}
-                                                                        >
-                                                                            <ChatMarkdown textContent={history.answer} />
-                                                                        </div>
-                                                                    ) : null
-                                                                    // <LoadingDot />
-                                                                }
+                                                                {history?.answer ? (
+                                                                    <div
+                                                                        className={`text-sm whitespace-pre-line  ${
+                                                                            history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
+                                                                        }`}
+                                                                    >
+                                                                        <ChatMarkdown textContent={history.answer} />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex justify-start">
+                                                                        <LoadingDot />
+                                                                    </div>
+                                                                )}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

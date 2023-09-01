@@ -38,6 +38,7 @@ import { uniqBy } from 'lodash-es';
 import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
+import { v4 as uuidv4 } from 'uuid';
 
 export type IHistory = Partial<{
     uid: string;
@@ -397,9 +398,10 @@ export const Chat = ({
                         tips: '查询完成',
                         showType: 'tips',
                         input: JSON.parse(item[0].answer).arguments,
-                        data: JSON.parse(item[1].answer).content,
+                        data: JSON.parse(item[1].answer),
                         success: true,
-                        status: 1
+                        status: 1,
+                        id: uuidv4()
                     };
                 });
 

@@ -5,11 +5,17 @@ import {
     Button,
     CardActions,
     CardContent,
+    Chip,
     Divider,
+    FormControl,
     Grid,
     IconButton,
+    InputLabel,
     Link,
+    MenuItem,
     Modal,
+    Select,
+    Stack,
     Switch,
     Tab,
     Tabs,
@@ -26,6 +32,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { IChatInfo } from '../index';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { getAppList, getSkillList, getSysList } from 'api/chat';
+import Template from '../../components/template';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -164,12 +172,14 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
 const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
     const formik = useFormik({
         initialValues: {
-            title: '',
-            context: ''
+            name: '',
+            des: '',
+            tips: '',
+            type: ''
         },
         validationSchema: yup.object({
-            title: yup.string().required('标题是必填的'),
-            context: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
+            name: yup.string().required('标题是必填的'),
+            des: yup.string().max(150000, '文本过长、请减少到150000字以内').required('内容是必填的')
         }),
         onSubmit: (values) => {}
     });
@@ -184,7 +194,7 @@ const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => voi
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="添加文档"
+                title="编辑技能"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">
@@ -194,19 +204,133 @@ const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => voi
             >
                 <CardContent>
                     <form onSubmit={formik.handleSubmit}>
-                        <TextField
-                            label={'标题'}
-                            fullWidth
-                            id="title"
-                            name="title"
-                            color="secondary"
-                            InputLabelProps={{ shrink: true }}
-                            value={formik.values.title}
-                            onChange={formik.handleChange}
-                            error={formik.touched.title && Boolean(formik.errors.title)}
-                            helperText={formik.touched.title && formik.errors.title}
-                        />
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} md={12}>
+                                <TextField
+                                    label={'技能名称'}
+                                    fullWidth
+                                    id="name"
+                                    name="name"
+                                    color="secondary"
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.name && Boolean(formik.errors.name)}
+                                    helperText={formik.touched.name && formik.errors.name}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={12}>
+                                <TextField
+                                    label={'技能描述'}
+                                    fullWidth
+                                    id="des"
+                                    name="des"
+                                    color="secondary"
+                                    value={formik.values.des}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.des && Boolean(formik.errors.des)}
+                                    helperText={formik.touched.des && formik.errors.des}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={12}>
+                                <TextField
+                                    label={'提示文案'}
+                                    fullWidth
+                                    id="tips"
+                                    name="tips"
+                                    color="secondary"
+                                    value={formik.values.tips}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.tips && Boolean(formik.errors.tips)}
+                                    helperText={formik.touched.tips && formik.errors.tips}
+                                />
+                            </Grid>
+                        </Grid>
+                        <FormControl fullWidth sx={{ mt: 4 }}>
+                            <InputLabel color="secondary" id="type">
+                                技能类型
+                            </InputLabel>
+                            <Select
+                                labelId="type"
+                                name="type"
+                                color="secondary"
+                                value={''}
+                                onChange={formik.handleChange}
+                                label={'技能类型'}
+                            >
+                                <MenuItem key={1} value={1}>
+                                    系统
+                                </MenuItem>
+                                <MenuItem key={2} value={2}>
+                                    应用
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
                     </form>
+                </CardContent>
+                <Divider />
+                <CardActions>
+                    <Grid container justifyContent="flex-end">
+                        <Button variant="contained" type="button" color="secondary">
+                            保存
+                        </Button>
+                    </Grid>
+                </CardActions>
+            </MainCard>
+        </Modal>
+    );
+};
+
+const ApiListModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+    const [list, setList] = useState<any[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const sysList = await getSysList();
+            const myAppList = await getAppList();
+            const data = sysList?.map((item: any) => ({
+                name: item.name,
+                description: item.desc,
+                images: item.icon,
+                code: item.code,
+                type: item.type
+            }));
+            setList([...data, ...myAppList.list]);
+        })();
+    }, []);
+
+    console.log(list, 'list');
+
+    return (
+        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+            <MainCard
+                style={{
+                    position: 'absolute',
+                    width: '800px',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                }}
+                title="编辑技能"
+                content={false}
+                secondary={
+                    <IconButton onClick={handleClose} size="large" aria-label="close modal">
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                }
+            >
+                <CardContent>
+                    <Stack direction="row" spacing={1}>
+                        <Chip label="全部" color="primary" variant="outlined" />
+                        <Chip label="系统" color="success" variant="outlined" />
+                        <Chip label="系统" color="success" variant="outlined" />
+                    </Stack>
+                    <div className="grid gap-4 grid-cols-3 h-[400px] overflow-y-auto">
+                        {list.map((item: any, index: number) => (
+                            <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
+                                <Template data={item} handleDetail={() => null} />
+                            </Box>
+                        ))}
+                    </div>
                 </CardContent>
                 <Divider />
                 <CardActions>
@@ -223,20 +347,18 @@ const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => voi
 
 export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo; setChatBotInfo: (chatInfo: IChatInfo) => void }) => {
     const theme = useTheme();
-    const [anchorEl, setAnchorEl] = useState<Element | ((element: Element) => Element) | null | undefined>(null);
     const [qaVisible, setQaVisible] = useState(false);
     const [apiVisible, setApiVisible] = useState(false);
 
     const [isValid, setIsValid] = useState(true);
     const [websiteCount, setWebsiteCount] = useState(0);
+    const [apiListVisible, setApiListVisible] = useState(false);
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
-        setAnchorEl(event?.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    useEffect(() => {
+        getSkillList('appConfigId').then((res) => {
+            console.log(res);
+        });
+    }, []);
 
     useEffect(() => {
         if (chatBotInfo.searchInWeb) {
@@ -320,7 +442,13 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                                 direction="row"
                                 spacing={gridSpacing}
                                 className={'h-[220px] flex justify-center items-center flex-col cursor-pointer'}
-                            ></Grid>
+                            >
+                                <div>
+                                    <Button variant="contained" type="button" color="secondary" onClick={() => setApiListVisible(true)}>
+                                        添加技能
+                                    </Button>
+                                </div>
+                            </Grid>
                         </MainCard>
                     </div>
                 </div>
@@ -385,6 +513,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
             </div>
             <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />
             <ApiModal open={apiVisible} handleClose={() => setApiVisible(false)} />
+            {apiListVisible && <ApiListModal open={apiListVisible} handleClose={() => setApiListVisible(false)} />}
         </div>
     );
 };

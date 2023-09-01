@@ -44,6 +44,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
     const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
 
+    console.log('data', data);
+
     const toggleItem = (item: any) => {
         if (expandedItems.includes(item)) {
             // 如果项目已展开，则收起它

@@ -353,6 +353,72 @@ export const Chat = ({
         }
     }, [mode]);
 
+    function extractChatBlocks(data: any) {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
+
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
+                } else {
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: '查询完成',
+                        showType: 'tips',
+                        input: JSON.parse(item[0].answer).arguments,
+                        data: JSON.parse(item[1].answer).content,
+                        success: true,
+                        status: 1
+                    };
+                });
+
+                console.log(currentData, 'currentData');
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
+                }
+            }
+        }
+        console.log(chatBlocks, 'chatBlocks');
+
+        return chatBlocks;
+    }
+
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
         if (mode === 'test' && conversationUid && isFirst) {
@@ -363,8 +429,12 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+
+                const chatBlocks = extractChatBlocks(list);
+                console.log(chatBlocks, 'chatBlocks');
+
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -372,6 +442,7 @@ export const Chat = ({
                         isStatement: true
                     }
                 ];
+                console.log(result, 'result');
                 dataRef.current = result;
                 setData(result);
                 setIsFirst(false);

@@ -17,7 +17,7 @@ import {
     ListItemButton,
     ListItemText
 } from '@mui/material';
-import { infoPageByAppUid, detailApp } from 'api/template';
+import { infoPageByMarketUid, detailApp } from 'api/template';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useState, useRef } from 'react';
@@ -29,6 +29,7 @@ import { listMarketAppOption, marketDeatail } from 'api/template';
 import Perform from 'views/template/carryOut/perform';
 import nothing from 'assets/images/upLoad/nothing.svg';
 import _ from 'lodash-es';
+import formatDate from 'hooks/useDate';
 interface Details {
     name?: string;
     description?: string;
@@ -86,18 +87,17 @@ const AppModal = ({
     //历史记录
     const [historyList, setHistoryList] = useState<any[]>([]);
     //点击历史记录填入数据
-    const setPreForm = (row: { uid: string }) => {
-        detailApp({ conversationUid: row.uid }).then((res) => {
-            detailRef.current = _.cloneDeep(res);
-            const newValue = _.cloneDeep(res);
-            newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
-                if (item.defaultValue && !item.value) {
-                    item.value = item.defaultValue;
-                }
-                if (item.field === 'CONTENT') {
-                    item.value = value;
-                }
-            });
+    const setPreForm = (row: { appInfo: any }) => {
+        const res = _.cloneDeep(row.appInfo);
+        detailRef.current = _.cloneDeep(res);
+        const newValue = _.cloneDeep(res);
+        newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
+            if (item.defaultValue && !item.value) {
+                item.value = item.defaultValue;
+            }
+            if (item.field === 'CONTENT') {
+                item.value = value;
+            }
             detailRef.current = newValue;
             setPerform(perform + 1);
             setDetail(newValue);
@@ -113,8 +113,8 @@ const AppModal = ({
     //点击获取执行详情
     const getDetail = async (data: string) => {
         const res = await marketDeatail({ uid: data });
-        // const result = await infoPageByAppUid({ timeType: 'LAST_3M', pageNo: 1, pageSize: 100, appUid: res.uid });
-        // setHistoryList(result);
+        const result = await infoPageByMarketUid({ timeType: 'LAST_3M', pageNo: 1, pageSize: 20, marketUid: res.uid });
+        setHistoryList(result.list);
         detailRef.current = _.cloneDeep(res);
         const newValue = _.cloneDeep(res);
         newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
@@ -348,18 +348,25 @@ const AppModal = ({
                         </Grid>
                         <Grid item md={6}>
                             {historyList.length > 0 && (
-                                <Box height="100%" sx={{ overflowY: 'auto' }}>
-                                    <List sx={{ width: '100%', bgcolor: 'background.paper' }} aria-label="contacts">
+                                <Box height="100%">
+                                    <List sx={{ ml: 4, overflowY: 'auto' }}>
                                         {historyList.map((item) => (
-                                            <ListItem disablePadding>
-                                                <ListItemButton
-                                                    onClick={() => {
-                                                        setPreForm(item);
-                                                    }}
-                                                >
-                                                    <ListItemText inset primary="Eric Hoffman" />
-                                                </ListItemButton>
-                                            </ListItem>
+                                            <>
+                                                <ListItem>
+                                                    <ListItemButton
+                                                        sx={{ display: 'flex', width: '100%' }}
+                                                        onClick={() => {
+                                                            setPreForm(item);
+                                                        }}
+                                                    >
+                                                        <Box width="150px" whiteSpace="nowrap" mr={2}>
+                                                            {formatDate(item.createTime)}
+                                                        </Box>
+                                                        <Box className="line-clamp-2">{item.answer}</Box>
+                                                    </ListItemButton>
+                                                </ListItem>
+                                                <Divider />
+                                            </>
                                         ))}
                                     </List>
                                 </Box>

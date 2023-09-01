@@ -57,6 +57,10 @@ export const infoPage = (data: any) => {
 export const infoPageByAppUid = (data: any) => {
     return request.post({ url: 'llm/app/log/infoPageByAppUid', data });
 };
+//弹窗执行记录列表
+export const infoPageByMarketUid = (data: any) => {
+    return request.post({ url: 'llm/app/log/infoPageByMarketUid', data });
+};
 //执行记录图片详情
 export const detailImage = (data: any) => {
     return request.post({ url: 'llm/app/log/detail/image', data });

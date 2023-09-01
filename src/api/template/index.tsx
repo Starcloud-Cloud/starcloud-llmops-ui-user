@@ -140,3 +140,18 @@ export const addFriend = (data: any) => {
 export const listMarketAppOption = (params: any) => {
     return request.get({ url: `/llm/app/market/listMarketAppOption`, params });
 };
+
+// 获取应用限制
+export const getLimit = (params: any) => {
+    return request.get({ url: `/llm/app/publish/limit/get`, params });
+};
+
+// 创建应用限制
+export const createLimit = (data: any) => {
+    return request.post({ url: `/llm/app/publish/limit/create`, data });
+};
+
+// 修改应用限制
+export const modifyLimit = (data: any) => {
+    return request.post({ url: `/llm/app/publish/limit/modify`, data });
+};

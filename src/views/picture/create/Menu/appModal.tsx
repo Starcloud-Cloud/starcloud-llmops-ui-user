@@ -9,9 +9,15 @@ import {
     Select,
     MenuItem,
     Grid,
+    Box,
     Button,
-    Typography
+    Typography,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText
 } from '@mui/material';
+import { infoPageByAppUid, detailApp } from 'api/template';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useEffect, useState, useRef } from 'react';
@@ -21,6 +27,7 @@ import { t } from 'hooks/web/useI18n';
 import { executeMarket } from 'api/template/fetch';
 import { listMarketAppOption, marketDeatail } from 'api/template';
 import Perform from 'views/template/carryOut/perform';
+import nothing from 'assets/images/upLoad/nothing.svg';
 import _ from 'lodash-es';
 interface Details {
     name?: string;
@@ -76,7 +83,27 @@ const AppModal = ({
     const [perform, setPerform] = useState(0);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
-    const [error, setError] = useState(false);
+    //历史记录
+    const [historyList, setHistoryList] = useState<any[]>([]);
+    //点击历史记录填入数据
+    const setPreForm = (row: { uid: string }) => {
+        detailApp({ conversationUid: row.uid }).then((res) => {
+            detailRef.current = _.cloneDeep(res);
+            const newValue = _.cloneDeep(res);
+            newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
+                if (item.defaultValue && !item.value) {
+                    item.value = item.defaultValue;
+                }
+                if (item.field === 'CONTENT') {
+                    item.value = value;
+                }
+            });
+            detailRef.current = newValue;
+            setPerform(perform + 1);
+            setDetail(newValue);
+        });
+    };
+
     useEffect(() => {
         if (appList.length > 0) {
             setAppValue(appList[0].value);
@@ -86,6 +113,8 @@ const AppModal = ({
     //点击获取执行详情
     const getDetail = async (data: string) => {
         const res = await marketDeatail({ uid: data });
+        // const result = await infoPageByAppUid({ timeType: 'LAST_3M', pageNo: 1, pageSize: 100, appUid: res.uid });
+        // setHistoryList(result);
         detailRef.current = _.cloneDeep(res);
         const newValue = _.cloneDeep(res);
         newValue.workflowConfig.steps[newValue.workflowConfig.steps.length - 1].variable.variables.forEach((item: any) => {
@@ -255,13 +284,13 @@ const AppModal = ({
             aria-describedby="modal-description"
         >
             <MainCard
-                sx={{ width: { md: '800px', xs: '90%' } }}
                 style={{
                     position: 'absolute',
                     top: '10%',
                     left: '50%',
                     transform: 'translate(-50%, 0)',
                     overflowY: 'auto',
+                    width: '80%',
                     maxHeight: '80%'
                 }}
                 title={title}
@@ -279,41 +308,72 @@ const AppModal = ({
                 }
             >
                 <CardContent sx={{ p: '0 16px !important' }}>
-                    <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
-                        <InputLabel id="appList">优化选择</InputLabel>
-                        <Select
-                            color="secondary"
-                            labelId="appList"
-                            name="appValue"
-                            value={appValue}
-                            label="优化选择"
-                            onChange={(e) => {
-                                setAppValue(e.target.value);
-                                getDetail(e.target.value);
-                            }}
-                        >
-                            {appList.map((item) => (
-                                <MenuItem key={item.value} value={item.value}>
-                                    {item.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    {perform > 0 && (
-                        <Perform
-                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                            changeSon={changeData}
-                            changeanswer={changeanswer}
-                            loadings={loadings}
-                            variableChange={exeChange}
-                            promptChange={promptChange}
-                            key={perform}
-                            isallExecute={(flag: boolean) => {
-                                isAllExecute = flag;
-                            }}
-                            source="myApp"
-                        />
-                    )}
+                    <Grid container spacing={2}>
+                        <Grid item md={6}>
+                            <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
+                                <InputLabel id="appList">优化选择</InputLabel>
+                                <Select
+                                    color="secondary"
+                                    labelId="appList"
+                                    name="appValue"
+                                    value={appValue}
+                                    label="优化选择"
+                                    onChange={(e) => {
+                                        setAppValue(e.target.value);
+                                        getDetail(e.target.value);
+                                    }}
+                                >
+                                    {appList.map((item) => (
+                                        <MenuItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {perform > 0 && (
+                                <Perform
+                                    config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                    changeSon={changeData}
+                                    changeanswer={changeanswer}
+                                    loadings={loadings}
+                                    variableChange={exeChange}
+                                    promptChange={promptChange}
+                                    key={perform}
+                                    isallExecute={(flag: boolean) => {
+                                        isAllExecute = flag;
+                                    }}
+                                    source="myApp"
+                                />
+                            )}
+                        </Grid>
+                        <Grid item md={6}>
+                            {historyList.length > 0 && (
+                                <Box height="100%" sx={{ overflowY: 'auto' }}>
+                                    <List sx={{ width: '100%', bgcolor: 'background.paper' }} aria-label="contacts">
+                                        {historyList.map((item) => (
+                                            <ListItem disablePadding>
+                                                <ListItemButton
+                                                    onClick={() => {
+                                                        setPreForm(item);
+                                                    }}
+                                                >
+                                                    <ListItemText inset primary="Eric Hoffman" />
+                                                </ListItemButton>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            )}
+                            {historyList.length === 0 && (
+                                <Box height="100%" textAlign="center" display="flex" justifyContent="center" alignItems="center">
+                                    <Box>
+                                        <img width="100px" src={nothing} alt="" />
+                                        <Typography color="#697586">暂无历史记录</Typography>
+                                    </Box>
+                                </Box>
+                            )}
+                        </Grid>
+                    </Grid>
                 </CardContent>
                 <Divider />
                 <CardActions>

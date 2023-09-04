@@ -417,63 +417,6 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                 </div>
             </div>
 
-            <div className="mt-5">
-                <div>
-                    <div className="flex items-center justify-between">
-                        <span
-                            className={
-                                "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                            }
-                        >
-                            从网络搜索中学习
-                        </span>
-                        <div className="flex justify-end items-center">
-                            <span className={'text-#697586'}>{chatBotInfo.enableSearchInWeb ? '启用' : '不启用'}</span>
-                            <Switch
-                                checked={chatBotInfo.enableSearchInWeb}
-                                onChange={() =>
-                                    setChatBotInfo({
-                                        ...chatBotInfo,
-                                        enableSearchInWeb: !chatBotInfo.enableSearchInWeb
-                                    })
-                                }
-                                color="secondary"
-                            />
-                        </div>
-                    </div>
-                    <div className="text-sm text-[#9da3af] ml-3">能够从互联网上收集实时信息，你可以问机器人最新最近的信息。 </div>
-                </div>
-                {chatBotInfo.enableSearchInWeb && (
-                    <>
-                        <TextField
-                            label={'设置网络搜索范围'}
-                            className={'mt-3'}
-                            fullWidth
-                            error={!isValid}
-                            onChange={(e) => {
-                                setChatBotInfo({
-                                    ...chatBotInfo,
-                                    searchInWeb: e.target.value
-                                });
-                            }}
-                            multiline
-                            value={chatBotInfo.searchInWeb}
-                            minRows={3}
-                            size="small"
-                        />
-                        <div className="flex justify-between">
-                            {!isValid ? (
-                                <div className="text-[#f44336] mt-1">
-                                    {websiteCount <= 10 ? '请输入正确的网络搜索范围' : '网址不能超过10个'}
-                                </div>
-                            ) : (
-                                <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
-                            )}
-                            <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/10个</div>
-                        </div>
-                    </>
-                )}
-            </div>
             <QAModal open={qaVisible} handleClose={() => setQaVisible(false)} />
             <DocumentModal open={documentVisible} handleClose={() => setDocumentVisible(false)} />
         </div>

@@ -246,13 +246,13 @@ export const ChatBtn = () => {
                                 </>
                             }
                             aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                            inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                         />
                     </Grid>
                 </Grid>
                 <div>
                     <div className="flex justify-end px-[24px]">
-                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
                     </div>
                 </div>
             </div>
@@ -1061,13 +1061,13 @@ export const Chat = ({
                                             </>
                                         }
                                         aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                                     />
                                 </Grid>
                             </Grid>
                             <div>
                                 <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/100</div>
+                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/200</div>
                                 </div>
                             </div>
                         </div>
@@ -1168,13 +1168,13 @@ export const Chat = ({
                                             </>
                                         }
                                         aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                                     />
                                 </Grid>
                             </Grid>
                             <div>
                                 <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
                                 </div>
                             </div>
                             <div className="w-full flex justify-center">

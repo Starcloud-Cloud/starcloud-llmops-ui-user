@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import cheerio from 'cheerio';
 
-export const WebPageInfo = ({ urlList, tips }: { urlList: any; tips: string }) => {
+export const WebPageInfo = ({ data }: { data: any[] }) => {
     return (
         <div className="mt-2">
-            <div className="flex justify-between">
-                <div>{tips}</div>
-                <div>{urlList.length}条</div>
-            </div>
-            <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 mt-2">
-                {urlList.map((item: any, index: number) => (
-                    <div key={index} className="flex rounded-md bg-[#fff] p-[12px]">
-                        <img src={item.logo} alt="" className="w-[36px] h-[36px]" />
-                        <div>
-                            <div>{item.title}</div>
-                            <div className="mt-1">{item.des}</div>
+            <div className="grid gap-1 grid-cols-2 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-2">
+                {data.map((item: any, index: number) => (
+                    <div key={index} className="flex rounded-md bg-[#fff] p-[12px] flex-col">
+                        <div className="text-lg line-clamp-1 text-[#666]">{item.title}</div>
+                        <div className="mt-1 text-sm line-clamp-2 text-[#666]">{item.content}</div>
+                        <div className="flex">
+                            {item.img && <img className="mr-1" src={item.img} />}
+                            <div className="line-clamp-1 text-xs text-[#d9d9d9]">{item.url}</div>
                         </div>
                     </div>
                 ))}

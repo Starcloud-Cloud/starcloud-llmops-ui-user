@@ -405,8 +405,6 @@ export const Chat = ({
                     };
                 });
 
-                console.log(currentData, 'currentData');
-
                 chatBlocks.push(currentData);
                 currentData = {};
                 currentBlock = [];
@@ -416,8 +414,6 @@ export const Chat = ({
                 }
             }
         }
-        console.log(chatBlocks, 'chatBlocks');
-
         return chatBlocks;
     }
 
@@ -444,7 +440,6 @@ export const Chat = ({
                         isStatement: true
                     }
                 ];
-                console.log(result, 'result');
                 dataRef.current = result;
                 setData(result);
                 setIsFirst(false);
@@ -727,10 +722,13 @@ export const Chat = ({
                             }
                         }
                         let bufferObj;
-                        if (messages?.startsWith('data:')) {
-                            bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                        if (messages?.startsWith('data:{')) {
+                            try {
+                                bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                            } catch (e) {
+                                console.log(e, 'error-JSON.parse异常');
+                            }
                         }
-                        console.log(bufferObj, 'bufferObj');
                         if (bufferObj?.code === 200) {
                             jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                             setConversationUid(bufferObj.conversationUid);
@@ -748,10 +746,10 @@ export const Chat = ({
                                     setData(copyData);
                                 }
                                 // 处理链接
-                                if (content.showType === 'url' || content.showType === 'tips') {
+                                if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                                     //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
                                     const index = copyData[copyData.length - 1].process
-                                        ?.filter((v: any) => v.showType === 'tips')
+                                        // ?.filter((v: any) => v.showType === 'tips')
                                         ?.findIndex((v: any) => v.id === content.id);
 
                                     if (index > -1) {
@@ -774,6 +772,8 @@ export const Chat = ({
                                 dataRef.current = copyData;
                                 setData(copyData);
                             }
+                        } else if (bufferObj && bufferObj.code === 300900002) {
+                            return;
                         } else if (bufferObj && bufferObj.code !== 200) {
                             dispatch(
                                 openSnackbar({

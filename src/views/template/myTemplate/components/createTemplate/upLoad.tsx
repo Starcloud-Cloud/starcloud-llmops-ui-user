@@ -20,6 +20,8 @@ import {
     Tab,
     TextField
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { InputNumber } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
@@ -101,7 +103,11 @@ function a11yProps(index: number) {
         'aria-controls': `simple-tabpanel-${index}`
     };
 }
-
+const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)({
+    [`& .${tooltipClasses.tooltip}`]: {
+        maxWidth: 500
+    }
+});
 function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
     const defaultUpLoadList = [
         {
@@ -531,10 +537,10 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     return (
         <Box>
             <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
-                <Tab label="发布设置" {...a11yProps(0)} />
-                <Tab label="发布渠道" {...a11yProps(1)} />
+                <Tab label="发布渠道" {...a11yProps(0)} />
+                <Tab label="发布设置" {...a11yProps(1)} />
             </Tabs>
-            <CustomTabPanel value={tabValue} index={0}>
+            <CustomTabPanel value={tabValue} index={1}>
                 <span
                     className={
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
@@ -542,7 +548,23 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     style={{ display: 'flex', alignItems: 'center' }}
                 >
                     用量限制
-                    <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    <CustomWidthTooltip
+                        sx={{
+                            [`& .${tooltipClasses.tooltip}`]: {
+                                maxWidth: 500
+                            }
+                        }}
+                        placement="top"
+                        title={
+                            <>
+                                <Typography>限制将作用于当前机器人，同一设备同一浏览器访问时识别为一名用户</Typography>
+                                <Typography>在后台测试时的对话量不在限制范围内</Typography>
+                                <Typography>超出后的回复不扣权益</Typography>
+                            </>
+                        }
+                    >
+                        <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    </CustomWidthTooltip>
                 </span>
                 <Grid container spacing={2}>
                     <Grid item md={6} xs={12}>
@@ -658,7 +680,22 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     style={{ display: 'flex', alignItems: 'center' }}
                 >
                     对话广告
-                    <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    <CustomWidthTooltip
+                        sx={{
+                            [`& .${tooltipClasses.tooltip}`]: {
+                                maxWidth: 500
+                            }
+                        }}
+                        placement="top"
+                        title={
+                            <>
+                                <Typography>广告将作用于当前机器人，同一设备同一浏览器访问时识别为一名用户</Typography>
+                                <Typography>当用户进行对话时，可插入自己的品牌和内容</Typography>
+                            </>
+                        }
+                    >
+                        <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    </CustomWidthTooltip>
                 </span>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
@@ -673,7 +710,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     defaultValue={60}
                                     onChange={(value: number | null) => setAdvertisingConfig({ ...advertisingConfig, limit: value })}
                                 />
-                                条
+                                条，展示一次广告
                             </Box>
                             <Box mt={3} mb={2}>
                                 超出默认回复
@@ -712,7 +749,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     保存设置
                 </Button>
             </CustomTabPanel>
-            <CustomTabPanel value={tabValue} index={1}>
+            <CustomTabPanel value={tabValue} index={0}>
                 <SubCard
                     sx={{ p: 2, mb: 4 }}
                     contentSX={{
@@ -725,7 +762,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                 >
                     <Box>
                         <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                            点击[更新]按钮保存设置以便发布。
+                            点击[更新渠道]按钮保存当前设置，以便同步修改到各个渠道。
                             <Tooltip title="每次编辑后，可先验证结果满足需求后，再点击更新。点击更新后，会把修改的配置同步到不同的发布渠道上">
                                 <Error fontSize="small" />
                             </Tooltip>
@@ -737,7 +774,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                         )}
                         {updateBtn.needUpdate && (
                             <Box fontSize={12} mt="12px" display="flex" alignItems="center">
-                                <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未保存的设置。最后更新日期:
+                                <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未更新渠道的设置。配置最后更新日期::
                                 <Typography color="secondary">
                                     {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
                                 </Typography>
@@ -774,10 +811,17 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     </Box>
                                 </Box>
                                 <Box ml={2}>
-                                    <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                        应用市场
+                                    <Typography
+                                        component="div"
+                                        fontSize={16}
+                                        fontWeight={500}
+                                        display="flex"
+                                        alignItems="center"
+                                        flexWrap="wrap"
+                                    >
+                                        员工广场
                                         <Chip
-                                            sx={{ ml: 1.5 }}
+                                            sx={{ mx: 1.5 }}
                                             size="small"
                                             label={
                                                 releaseState === 0
@@ -795,7 +839,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         />
                                         {updateBtn?.needTips && (
                                             <Chip
-                                                sx={{ ml: 1.5, display: { lg: 'block', md: 'none', xs: 'none' } }}
+                                                sx={{ mt: 1, display: { lg: 'block', md: 'none', xs: 'none' } }}
                                                 size="small"
                                                 color="warning"
                                                 label={
@@ -825,7 +869,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         />
                                     )}
                                     <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
-                                        用户可在模板市场中下载你上传的应用
+                                        {mode === 'CHAT' ? '用户可在员工广场中使用你发布的机器人' : '用户可在员工广场中使用你发布的应用'}
                                     </Typography>
                                     <Box display="flex">
                                         <Box

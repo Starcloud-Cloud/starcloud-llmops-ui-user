@@ -24,7 +24,7 @@ import { Popover, Tag } from 'antd';
 import { isMobile } from 'react-device-detect';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { MarkdownWithJSON } from 'ui-component/Markdown/json';
+import { ImageCard } from 'ui-component/imageCard';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -91,7 +91,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
                                                     }}
                                                 >
-                                                    <CardContent sx={{ width: 'fit-content', ml: 'auto' }} className="p-[12px] !pb-[12px]">
+                                                    <CardContent sx={{ width: '100%', ml: 'auto' }} className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 <div className="text-sm whitespace-pre-line text-[#364152]">
@@ -127,7 +127,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent className="p-[12px] !pb-[12px]">
+                                                    <CardContent className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
@@ -159,7 +159,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                         <div className="w-[35px] h-[35px] flex justify-center items-center  mr-2">
                                             <img className="w-[35px] h-[35px] rounded-xl" src={history.robotAvatar} alt="" />
                                         </div>
-                                        <div className="max-w-full overflow-x-auto">
+                                        <div className="max-w-[calc(100%-43px)]">
                                             <Grid item xs={12} className="flex items-center">
                                                 <Typography align="left" variant="subtitle2" className="h-[19px]">
                                                     {history.robotName}
@@ -173,16 +173,20 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                 <Card
                                                     sx={{
                                                         display: 'inline-block',
-                                                        width: 'fit-content'
+                                                        width: '100%'
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent className="p-[12px] !pb-[12px]">
+                                                    <CardContent className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.process &&
                                                                     history.process.map((item: any, index: number) => {
-                                                                        if (item.showType === 'tips') {
+                                                                        if (
+                                                                            item.showType === 'tips' ||
+                                                                            item.showType == 'url' ||
+                                                                            item.showType == 'img'
+                                                                        ) {
                                                                             return (
                                                                                 <div className="flex flex-col pb-3 rounded-md">
                                                                                     <div
@@ -195,7 +199,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                 : item.status && !item.success
                                                                                                 ? 'bg-red-500'
                                                                                                 : ''
-                                                                                        }  w-[300px] justify-between rounded-md cursor-pointer`}
+                                                                                        }  w-[250px] justify-between rounded-md cursor-pointer`}
                                                                                     >
                                                                                         <div className="flex justify-center">
                                                                                             {item.status === 0 && (
@@ -237,21 +241,47 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                         </div>
                                                                                     </div>
                                                                                     {expandedItems.includes(item.id) && (
-                                                                                        <div className="pt-[.5em]">
-                                                                                            <div>
-                                                                                                <ChatMarkdown
-                                                                                                    textContent={value2JsonMd(
-                                                                                                        item.input,
-                                                                                                        1
-                                                                                                    )}
+                                                                                        <>
+                                                                                            {false && (
+                                                                                                <div className="pt-[.5em]">
+                                                                                                    <div>
+                                                                                                        <ChatMarkdown
+                                                                                                            textContent={value2JsonMd(
+                                                                                                                item.input,
+                                                                                                                1
+                                                                                                            )}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <ChatMarkdown
+                                                                                                            textContent={value2JsonMd(
+                                                                                                                item.data,
+                                                                                                                2
+                                                                                                            )}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.showType === 'url' ||
+                                                                                                (item.showType === 'tips' && (
+                                                                                                    <WebPageInfo
+                                                                                                        data={
+                                                                                                            item.data?.response ||
+                                                                                                            item.data ||
+                                                                                                            []
+                                                                                                        }
+                                                                                                    />
+                                                                                                ))}
+                                                                                            {item.showType === 'img' && (
+                                                                                                <ImageCard
+                                                                                                    data={
+                                                                                                        item.data?.response ||
+                                                                                                        item.data ||
+                                                                                                        []
+                                                                                                    }
                                                                                                 />
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                <ChatMarkdown
-                                                                                                    textContent={value2JsonMd(item.data, 2)}
-                                                                                                />
-                                                                                            </div>
-                                                                                        </div>
+                                                                                            )}
+                                                                                        </>
                                                                                     )}
                                                                                 </div>
                                                                             );
@@ -268,29 +298,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                             <span className="ml-1">正在生成</span>
                                                                             <ExpandLessIcon className="w-[18px] h-[18px]" />
                                                                             {/* <ExpandMoreIcon /> */}
-                                                                        </div>
-                                                                        <div>
-                                                                            <div>抓取百度内容</div>
-                                                                            <WebPageInfo
-                                                                                tips={'为你搜索新闻'}
-                                                                                urlList={[
-                                                                                    {
-                                                                                        title: '百度一下，你就知道',
-                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
-                                                                                        des: '百度一下，你就知道'
-                                                                                    },
-                                                                                    {
-                                                                                        title: '百度一下，你就知道',
-                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
-                                                                                        des: '百度一下，你就知道'
-                                                                                    },
-                                                                                    {
-                                                                                        title: '百度一下，你就知道',
-                                                                                        logo: 'http://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png',
-                                                                                        des: '百度一下，你就知道'
-                                                                                    }
-                                                                                ]}
-                                                                            />
                                                                         </div>
                                                                     </div>
                                                                 )}

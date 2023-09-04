@@ -5,6 +5,8 @@ import remarkGfm from 'remark-gfm';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import './index.scss';
+
 type tProps = {
     textContent: string;
     darkMode?: boolean; // markdown文本

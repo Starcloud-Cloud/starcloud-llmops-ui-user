@@ -15,11 +15,9 @@ export const WebPageInfo = ({ data }: { data: any[] }) => {
                         </Tooltip>
                         <div className="flex">
                             {item.img && <img className="mr-1" src={item.img} />}
-                            <Tooltip title={item.title} placement="top" arrow>
-                                <a className="mt-1 text-sm line-clamp-1 text-[#999] no-underline" href={item.url} target={'_blank'}>
-                                    {item.title}
-                                </a>
-                            </Tooltip>
+                            <a className="mt-1 text-sm line-clamp-1 text-[#999] no-underline" href={item.url} target={'_blank'}>
+                                {item.url}
+                            </a>
                         </div>
                     </div>
                 ))}

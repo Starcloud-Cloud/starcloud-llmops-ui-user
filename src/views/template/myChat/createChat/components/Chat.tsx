@@ -360,6 +360,8 @@ export const Chat = ({
         switch (key) {
             case 'news':
                 return 'url';
+            case 'content':
+                return 'url';
             case 'image':
                 return 'img';
             default:

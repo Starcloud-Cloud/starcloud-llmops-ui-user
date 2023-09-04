@@ -355,6 +355,18 @@ export const Chat = ({
         }
     }, [mode]);
 
+    // 转换type
+    const transformType = (key: string) => {
+        switch (key) {
+            case 'news':
+                return 'url';
+            case 'image':
+                return 'img';
+            default:
+                break;
+        }
+    };
+
     function extractChatBlocks(data: any) {
         const chatBlocks: any[] = [];
         let currentBlock: any[] = [];
@@ -397,7 +409,7 @@ export const Chat = ({
                 loop.forEach((item: { answer: string }[], index: string | number) => {
                     currentData.process[index] = {
                         tips: '查询完成',
-                        showType: 'tips',
+                        showType: transformType(JSON.parse(item[0].answer).arguments.type),
                         input: JSON.parse(item[0].answer).arguments,
                         data: JSON.parse(item[1].answer),
                         success: true,
@@ -773,13 +785,14 @@ export const Chat = ({
                                 dataRef.current = copyData;
                                 setData(copyData);
                             }
-                        } else if (bufferObj && bufferObj.code === 300900002) {
+                        } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
                             return;
-                        } else if (bufferObj && bufferObj.code !== 200) {
+                        } else {
+                            setIsFetch(false);
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: `[${bufferObj.code}]-${bufferObj.error}`,
+                                    message: `[${bufferObj?.code}]-${bufferObj.content}`,
                                     variant: 'alert',
                                     alert: {
                                         color: 'error'
@@ -790,6 +803,7 @@ export const Chat = ({
                         }
                     });
                 } catch (e) {
+                    setIsFetch(false);
                     break;
                 }
 

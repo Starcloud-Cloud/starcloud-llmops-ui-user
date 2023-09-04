@@ -348,8 +348,8 @@ const AppModal = ({
                         </Grid>
                         <Grid item md={6}>
                             {historyList.length > 0 && (
-                                <Box height="100%">
-                                    <List sx={{ ml: 4, overflowY: 'auto' }}>
+                                <Box>
+                                    <List sx={{ ml: 4, overflowY: 'auto', height: '80%' }}>
                                         {historyList.map((item) => (
                                             <>
                                                 <ListItem>

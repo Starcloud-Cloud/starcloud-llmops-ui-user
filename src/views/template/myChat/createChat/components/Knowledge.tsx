@@ -1108,37 +1108,37 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 )}
                                                                 <Typography ml={0.5} variant="caption">
                                                                     {item.status === 0
-                                                                        ? '数据上传失败'
+                                                                        ? '上传失败'
                                                                         : item.status === 15
-                                                                        ? '数据上传失败'
+                                                                        ? '上传失败'
                                                                         : item.status === 20
-                                                                        ? '数据上传成功'
+                                                                        ? '上传成功'
                                                                         : item.status === 21
-                                                                        ? '数据同步中'
+                                                                        ? '同步中'
                                                                         : item.status === 25
-                                                                        ? '数据同步失败'
+                                                                        ? '同步失败'
                                                                         : item.status === 30
-                                                                        ? '数据同步完成'
+                                                                        ? '同步完成'
                                                                         : item.status === 31
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status === 35
-                                                                        ? '数据学习失败'
+                                                                        ? '学习失败'
                                                                         : item.status === 40
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status === 41
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status === 45
-                                                                        ? '数据学习失败'
+                                                                        ? '学习失败'
                                                                         : item.status === 50
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status === 51
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status === 55
-                                                                        ? '数据学习失败'
+                                                                        ? '学习失败'
                                                                         : item.status === 60
-                                                                        ? '数据学习中'
+                                                                        ? '学习中'
                                                                         : item.status >= 90
-                                                                        ? '数据学习完成'
+                                                                        ? '学习完成'
                                                                         : null}
                                                                 </Typography>
                                                             </Box>
@@ -1154,13 +1154,12 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 <Box height="626px" display="flex" justifyContent="center" alignItems="center">
                                     <Box position="relative" display="flex" flexDirection="column" alignItems="center">
                                         <img src={documnt} alt="" />
-                                        <Typography color="#9da3af" mb={1}>
-                                            您还没有增加文档，快去添加吧！
-                                        </Typography>
+                                        <Typography color="#9da3af">您还没有增加文档，快去添加吧！</Typography>
                                         <Button
                                             variant={'outlined'}
                                             startIcon={<AddIcon />}
                                             color={'secondary'}
+                                            sx={{ mt: 3 }}
                                             onClick={() => {
                                                 setDocumentVisible(true);
                                             }}
@@ -1182,13 +1181,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                         <Chip
                                             size="small"
                                             color="secondary"
-                                            sx={{ position: 'absolute', left: '-30px', bottom: '90px' }}
+                                            sx={{ position: 'absolute', left: '-30px', bottom: '106px' }}
                                             label="AI自动优化学习"
                                         />
                                         <Chip
                                             size="small"
                                             color="info"
-                                            sx={{ position: 'absolute', right: '-30px', bottom: '90px' }}
+                                            sx={{ position: 'absolute', right: '-30px', bottom: '106px' }}
                                             label="支持多种格式"
                                         />
                                     </Box>

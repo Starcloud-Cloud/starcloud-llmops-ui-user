@@ -2,7 +2,7 @@ import React from 'react';
 
 // material-ui
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Card, CardContent, Grid, Theme, Tooltip, Typography } from '@mui/material';
+import { Card, CardContent, Divider, Grid, Theme, Tooltip, Typography } from '@mui/material';
 
 // project imports
 import dayjs from 'dayjs';
@@ -18,6 +18,14 @@ import { openSnackbar } from 'store/slices/snackbar';
 import ChatMarkdown from 'ui-component/Markdown';
 import { LoadingSpin } from 'ui-component/LoadingSpin';
 import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Popover, Tag } from 'antd';
+import { isMobile } from 'react-device-detect';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { ImageCard } from 'ui-component/imageCard';
+
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 interface ChartHistoryProps {
@@ -25,8 +33,28 @@ interface ChartHistoryProps {
     theme: Theme;
 }
 
+const value2JsonMd = (value: any, type: number) => `这里是${type === 1 ? '输入信息' : '输出信息'} :
+
+~~~json
+${JSON.stringify(value)}
+~~~
+`;
+
 const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
+    const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
+
+    console.log('data', data);
+
+    const toggleItem = (item: any) => {
+        if (expandedItems.includes(item)) {
+            // 如果项目已展开，则收起它
+            setExpandedItems(expandedItems.filter((i) => i !== item));
+        } else {
+            // 如果项目未展开，则展开它
+            setExpandedItems([...expandedItems, item]);
+        }
+    };
 
     return (
         <Grid item xs={12} className="p-[12px]">
@@ -63,7 +91,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
                                                     }}
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important', width: 'fit-content', ml: 'auto' }}>
+                                                    <CardContent sx={{ width: '100%', ml: 'auto' }} className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 <div className="text-sm whitespace-pre-line text-[#364152]">
@@ -75,7 +103,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                 </Card>
                                             </Grid>
                                         </div>
-                                        <img className="w-[50px] h-[50px] rounded-xl ml-2" src={User} alt="" />
+                                        <img className="w-[35px] h-[35px] rounded-xl ml-1" src={User} alt="" />
                                     </div>
                                 </Grid>
                             </Grid>
@@ -99,7 +127,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                    <CardContent className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
@@ -128,15 +156,15 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                         onMouseEnter={() => setCurrentChat(`${index}-answer`)}
                                         onMouseLeave={() => setCurrentChat('')}
                                     >
-                                        <div className="w-[50px] h-[50px] flex justify-center items-center  mr-2">
-                                            <img className="w-[50px] h-[50px] rounded-xl" src={history.robotAvatar} alt="" />
+                                        <div className="w-[35px] h-[35px] flex justify-center items-center  mr-2">
+                                            <img className="w-[35px] h-[35px] rounded-xl" src={history.robotAvatar} alt="" />
                                         </div>
-                                        <div className="max-w-full overflow-x-auto">
+                                        <div className="max-w-[calc(100%-43px)]">
                                             <Grid item xs={12} className="flex items-center">
                                                 <Typography align="left" variant="subtitle2" className="h-[19px]">
                                                     {history.robotName}
                                                 </Typography>
-                                                <Typography align="left" variant="subtitle2" className="ml-2">
+                                                <Typography align="left" variant="subtitle2" className="ml-1">
                                                     {currentChat === `${index}-answer` &&
                                                         dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                                 </Typography>
@@ -145,35 +173,186 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                 <Card
                                                     sx={{
                                                         display: 'inline-block',
-                                                        width: 'fit-content'
+                                                        width: '100%'
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent sx={{ p: 2, pb: '16px !important' }}>
+                                                    <CardContent className="px-[18px] py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
-                                                                {history.process && (
-                                                                    <div className="flex flex-col">
-                                                                        <div className="flex justify-between items-center">
-                                                                            <div>
-                                                                                <span>正在生成</span>
-                                                                                <LoadingSpin />
-                                                                            </div>
-                                                                            <div>
-                                                                                <span>展示</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div>
-                                                                            {history.process.showType === 'url' && (
-                                                                                <div>
-                                                                                    <div>{history.process.tips}</div>
-                                                                                    <WebPageInfo url={history.process.url} />
+                                                                {history.process &&
+                                                                    history.process.map((item: any, index: number) => {
+                                                                        if (
+                                                                            item.showType === 'tips' ||
+                                                                            item.showType == 'url' ||
+                                                                            item.showType == 'img'
+                                                                        ) {
+                                                                            return (
+                                                                                <div className="flex flex-col pb-3 rounded-md">
+                                                                                    <div
+                                                                                        onClick={() => toggleItem(item.id)}
+                                                                                        className={`flex items-center px-[8px] py-[16px] ${
+                                                                                            item.status === 0
+                                                                                                ? 'bg-[#dbf3d9]'
+                                                                                                : item.status && item.success
+                                                                                                ? 'bg-stone-200'
+                                                                                                : item.status && !item.success
+                                                                                                ? 'bg-red-500'
+                                                                                                : ''
+                                                                                        }  w-[250px] justify-between rounded-md cursor-pointer`}
+                                                                                    >
+                                                                                        <div className="flex justify-center">
+                                                                                            {item.status === 0 && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <LoadingSpin />
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
+                                                                                                        {/* 工作中 */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.status === 1 && item.success && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <CheckCircleIcon className="text-base text-green-500" />
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
+                                                                                                        {/* 完成 */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.status === 1 && !item.success && (
+                                                                                                <div className="flex items-center">
+                                                                                                    <Popover content={item.errorMsg}>
+                                                                                                        <ErrorIcon className="text-base text-red-500" />
+                                                                                                    </Popover>
+                                                                                                    <div className="text-sm pl-1 w-[200px] line-clamp-1">
+                                                                                                        {/* {item.errorMsg} */}
+                                                                                                        {item.tips}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <div className="flex items-center justify-center">
+                                                                                            {expandedItems.includes(item.id) ? (
+                                                                                                <ExpandLessIcon className="w-[18px] h-[18px]" />
+                                                                                            ) : (
+                                                                                                <ExpandMoreIcon className="w-[18px] h-[18px]" />
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    {expandedItems.includes(item.id) && (
+                                                                                        <>
+                                                                                            {false && (
+                                                                                                <div className="pt-[.5em]">
+                                                                                                    <div>
+                                                                                                        <ChatMarkdown
+                                                                                                            textContent={value2JsonMd(
+                                                                                                                item.input,
+                                                                                                                1
+                                                                                                            )}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <ChatMarkdown
+                                                                                                            textContent={value2JsonMd(
+                                                                                                                item.data,
+                                                                                                                2
+                                                                                                            )}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {item.showType === 'url' ||
+                                                                                                (item.showType === 'tips' && (
+                                                                                                    <WebPageInfo
+                                                                                                        data={
+                                                                                                            item.data?.response ||
+                                                                                                            item.data ||
+                                                                                                            []
+                                                                                                        }
+                                                                                                    />
+                                                                                                ))}
+                                                                                            {item.showType === 'img' && (
+                                                                                                <ImageCard
+                                                                                                    data={
+                                                                                                        item.data?.response ||
+                                                                                                        item.data ||
+                                                                                                        []
+                                                                                                    }
+                                                                                                />
+                                                                                            )}
+                                                                                        </>
+                                                                                    )}
                                                                                 </div>
-                                                                            )}
+                                                                            );
+                                                                        }
+                                                                        if (item.showType === 'docs') {
+                                                                        }
+                                                                    })}
+                                                                {/* 思考中 */}
+                                                                {/* {history.process && ( */}
+                                                                {false && (
+                                                                    <div className="flex flex-col bg-[#e3f2fd] p-[8px] rounded-md">
+                                                                        <div className="items-center px-[4px] py-[8px] bg-[#e3f2fd] inline-flex justify-center rounded-md cursor-pointer">
+                                                                            <LoadingSpin />
+                                                                            <span className="ml-1">正在生成</span>
+                                                                            <ExpandLessIcon className="w-[18px] h-[18px]" />
+                                                                            {/* <ExpandMoreIcon /> */}
                                                                         </div>
                                                                     </div>
                                                                 )}
-                                                                {history.answer ? (
+                                                                {history?.process?.showType === 'docs' && history?.answer && (
+                                                                    <div>
+                                                                        <div
+                                                                            className={`text-sm whitespace-pre-line  ${
+                                                                                history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
+                                                                            }`}
+                                                                        >
+                                                                            <ChatMarkdown textContent={history?.answer} />
+                                                                        </div>
+                                                                        <div className="py-1">
+                                                                            <Divider />
+                                                                        </div>
+                                                                        <div className="flex items-center mt-1">
+                                                                            <div className="text-xs" style={{ flex: '0 0 37px' }}>
+                                                                                来源：
+                                                                            </div>
+                                                                            <div className="grid grid-cols-2 gap-1 flex: 1">
+                                                                                {history?.process?.data?.map((item: any, index: number) => (
+                                                                                    <Popover
+                                                                                        key={index}
+                                                                                        content={
+                                                                                            <div className=" max-w-[325px]">
+                                                                                                <span>{item?.desc}</span>
+                                                                                                {isMobile && (
+                                                                                                    <div>
+                                                                                                        <a target="_blank" href={item.url}>
+                                                                                                            点击查看
+                                                                                                        </a>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        }
+                                                                                        trigger={isMobile ? 'click' : 'hover'}
+                                                                                        title={item.name}
+                                                                                    >
+                                                                                        <Tag
+                                                                                            color="#673ab7"
+                                                                                            className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
+                                                                                            onClick={() =>
+                                                                                                !isMobile && window.open(item?.url)
+                                                                                            }
+                                                                                        >
+                                                                                            {item?.name}
+                                                                                        </Tag>
+                                                                                    </Popover>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {/* 文本回答 */}
+                                                                {history?.answer ? (
                                                                     <div
                                                                         className={`text-sm whitespace-pre-line  ${
                                                                             history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
@@ -182,7 +361,9 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                         <ChatMarkdown textContent={history.answer} />
                                                                     </div>
                                                                 ) : (
-                                                                    <LoadingDot />
+                                                                    <div className="flex justify-start">
+                                                                        <LoadingDot />
+                                                                    </div>
                                                                 )}
                                                             </Grid>
                                                         </Grid>

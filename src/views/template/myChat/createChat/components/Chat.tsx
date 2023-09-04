@@ -34,9 +34,11 @@ import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Popover } from 'antd';
+import { uniqBy } from 'lodash-es';
 import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
+import { v4 as uuidv4 } from 'uuid';
 
 export type IHistory = Partial<{
     uid: string;
@@ -244,13 +246,13 @@ export const ChatBtn = () => {
                                 </>
                             }
                             aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                            inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                         />
                     </Grid>
                 </Grid>
                 <div>
                     <div className="flex justify-end px-[24px]">
-                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
                     </div>
                 </div>
             </div>
@@ -295,6 +297,7 @@ export const Chat = ({
     const [isFetch, setIsFetch] = useState(false);
     const [open, setOpen] = useState(false);
     const [isFinish, setIsFinish] = useState(false);
+    const navigate = useNavigate();
 
     const { messageData, setMessageData } = useChatMessage();
     const { width } = useWindowSize();
@@ -352,6 +355,69 @@ export const Chat = ({
         }
     }, [mode]);
 
+    function extractChatBlocks(data: any) {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
+
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
+                } else {
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: '查询完成',
+                        showType: 'tips',
+                        input: JSON.parse(item[0].answer).arguments,
+                        data: JSON.parse(item[1].answer),
+                        success: true,
+                        status: 1,
+                        id: uuidv4()
+                    };
+                });
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
+                }
+            }
+        }
+        return chatBlocks;
+    }
+
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
         if (mode === 'test' && conversationUid && isFirst) {
@@ -362,8 +428,12 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+
+                const chatBlocks = extractChatBlocks(list);
+                console.log(chatBlocks, 'chatBlocks');
+
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -629,64 +699,100 @@ export const Chat = ({
             let outerJoins: any;
             while (1) {
                 let joins = outerJoins;
-                const { done, value } = await reader.read();
-                if (done) {
-                    const copyData = [...dataRef.current];
-                    copyData[dataRef.current.length - 1].isNew = false;
-                    dataRef.current = copyData;
-                    setData(copyData);
-                    setIsFetch(false);
+                try {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        const copyData = [...dataRef.current];
+                        copyData[dataRef.current.length - 1].isNew = false;
+                        dataRef.current = copyData;
+                        setData(copyData);
+                        setIsFetch(false);
+                        break;
+                    }
+                    let str = textDecoder.decode(value);
+                    const lines = str.split('\n');
+                    lines.forEach((messages, i: number) => {
+                        if (i === 0 && joins) {
+                            messages = joins + messages;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (messages && messages.indexOf('}') === -1) {
+                                joins = messages;
+                                return;
+                            }
+                        }
+                        let bufferObj;
+                        if (messages?.startsWith('data:{')) {
+                            try {
+                                bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+                            } catch (e) {
+                                console.log(e, 'error-JSON.parse异常');
+                            }
+                        }
+                        if (bufferObj?.code === 200) {
+                            jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                            setConversationUid(bufferObj.conversationUid);
+
+                            // 处理流程
+                            if (bufferObj.type === 'i') {
+                                const copyData = [...dataRef.current];
+                                const process = copyData[copyData.length - 1].process || [];
+                                const content = JSON.parse(bufferObj.content);
+                                // 处理文档（文档状态默认不更新）
+                                if (content.showType === 'docs') {
+                                    content.data = uniqBy(content.data, 'id');
+                                    copyData[copyData.length - 1].process = [...process, content];
+                                    dataRef.current = copyData;
+                                    setData(copyData);
+                                }
+                                // 处理链接
+                                if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
+                                    //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+                                    const index = copyData[copyData.length - 1].process
+                                        // ?.filter((v: any) => v.showType === 'tips')
+                                        ?.findIndex((v: any) => v.id === content.id);
+
+                                    if (index > -1) {
+                                        // 替换
+                                        copyData[copyData.length - 1].process[index] = content;
+                                        dataRef.current = copyData;
+                                        setData(copyData);
+                                    } else {
+                                        copyData[copyData.length - 1].process = [...process, content];
+                                        dataRef.current = copyData;
+                                        setData(copyData);
+                                    }
+                                }
+                            }
+                            if (bufferObj.type === 'm') {
+                                // 处理结论
+                                const copyData = [...dataRef.current];
+                                copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+                                copyData[copyData.length - 1].isNew = true;
+                                dataRef.current = copyData;
+                                setData(copyData);
+                            }
+                        } else if (bufferObj && bufferObj.code === 300900002) {
+                            return;
+                        } else if (bufferObj && bufferObj.code !== 200) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: `[${bufferObj.code}]-${bufferObj.error}`,
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                })
+                            );
+                        }
+                    });
+                } catch (e) {
                     break;
                 }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((messages, i: number) => {
-                    if (i === 0 && joins) {
-                        messages = joins + messages;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (messages && messages.indexOf('}') === -1) {
-                            joins = messages;
-                            return;
-                        }
-                    }
-                    let bufferObj;
-                    if (messages?.startsWith('data:')) {
-                        bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                    }
-                    if (bufferObj?.code === 200) {
-                        jsCookie.set(conversationUniKey, bufferObj.conversationUid);
-                        setConversationUid(bufferObj.conversationUid);
-                        // 处理流程
-                        if (bufferObj.type === 'i') {
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].process = bufferObj.content;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                        if (bufferObj.type === 'm') {
-                            // 处理结论
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                            copyData[copyData.length - 1].isNew = true;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                    } else if (bufferObj && bufferObj.code !== 200) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                });
+
                 outerJoins = joins;
             }
         } catch (e: any) {
@@ -738,9 +844,9 @@ export const Chat = ({
                     className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
-                    <div className="h-full  px-[8px]">
+                    <div className="h-full  px-[8px] flex flex-col">
                         <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
-                        <div className="bg-white rounded-md">
+                        <div className="bg-white rounded-md flex-1">
                             {botList?.map((item, index) => (
                                 <>
                                     <div
@@ -761,6 +867,14 @@ export const Chat = ({
                                     </div>
                                 </>
                             ))}
+                        </div>
+                        <div
+                            className="h-[28px] flex items-center justify-center text-[#673ab7] cursor-pointer"
+                            onClick={() => {
+                                navigate('/my-chat');
+                            }}
+                        >
+                            创作属于自己的数字员工
                         </div>
                     </div>
                 </div>
@@ -818,7 +932,7 @@ export const Chat = ({
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
 
                                 {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
-                                <span className="text-xs ml-1 text-[#697586]">可切换员工</span>
+                                <span className="text-xs ml-1 text-[#697586]">切换员工</span>
                             </div>
                         </Popover>
                     ) : (
@@ -958,13 +1072,13 @@ export const Chat = ({
                                             </>
                                         }
                                         aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                                     />
                                 </Grid>
                             </Grid>
                             <div>
                                 <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/100</div>
+                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/200</div>
                                 </div>
                             </div>
                         </div>
@@ -1065,13 +1179,13 @@ export const Chat = ({
                                             </>
                                         }
                                         aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
+                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                                     />
                                 </Grid>
                             </Grid>
                             <div>
                                 <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
                                 </div>
                             </div>
                             <div className="w-full flex justify-center">

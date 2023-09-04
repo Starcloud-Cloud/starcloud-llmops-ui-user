@@ -32,8 +32,9 @@ import MainCard from 'ui-component/cards/MainCard';
 import { IChatInfo } from '../index';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { getAppList, getSkillList, getSysList } from 'api/chat';
+import { getAppList, getSkillList, getSysList, skillCreate } from 'api/chat';
 import Template from '../../components/template';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -170,6 +171,8 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
 };
 
 const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+    const [selectType, setSelectType] = useState(1);
+
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -281,7 +284,14 @@ const ApiModal = ({ open, handleClose }: { open: boolean; handleClose: () => voi
 };
 
 const ApiListModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+
+    const appId = searchParams.get('appId');
+
     const [list, setList] = useState<any[]>([]);
+    const [selectType, setSelectType] = useState(1);
 
     useEffect(() => {
         (async () => {
@@ -298,14 +308,50 @@ const ApiListModal = ({ open, handleClose }: { open: boolean; handleClose: () =>
         })();
     }, []);
 
-    console.log(list, 'list');
+    const filterList = React.useMemo(() => {
+        if (list.length) {
+            if (selectType === 1) {
+                return list;
+            }
+            if (selectType === 2) {
+                return list.filter((item) => item.type === 'system');
+            }
+            if (selectType === 3) {
+                return list.filter((item) => item.type === 'MYSELF');
+            }
+        }
+    }, [selectType, list]);
+
+    const handleCreate = async (item: any) => {
+        let data: any = {};
+        data.appConfigId = appId;
+        data.type = item.type === 'system' ? 5 : 3;
+        data.disabled = true;
+        if (data.type === 5) {
+            data.systemHandlerSkillDTO = {
+                name: item.name,
+                desc: item.description,
+                code: item.code
+            };
+        }
+        if (data.type === 3) {
+            data.appWorkflowSkillDTO = {
+                name: item.name,
+                desc: item.description,
+                defaultPromptDesc: '',
+                skillAppUid: item.uid
+            };
+        }
+
+        await skillCreate(data);
+    };
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '800px',
+                    width: '750px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
@@ -319,27 +365,53 @@ const ApiListModal = ({ open, handleClose }: { open: boolean; handleClose: () =>
                 }
             >
                 <CardContent>
-                    <Stack direction="row" spacing={1}>
-                        <Chip label="全部" color="primary" variant="outlined" />
-                        <Chip label="系统" color="success" variant="outlined" />
-                        <Chip label="系统" color="success" variant="outlined" />
+                    <Stack direction="row" spacing={1} className="mb-3">
+                        <Chip
+                            label="全部"
+                            color={selectType === 1 ? 'secondary' : 'default'}
+                            variant="filled"
+                            className="w-[80px] cursor-pointer"
+                            onClick={() => setSelectType(1)}
+                        />
+                        <Chip
+                            label="系统"
+                            color={selectType === 2 ? 'secondary' : 'default'}
+                            variant="filled"
+                            className="w-[80px] cursor-pointer"
+                            onClick={() => setSelectType(2)}
+                        />
+                        <Chip
+                            label="我的应用"
+                            color={selectType === 3 ? 'secondary' : 'default'}
+                            variant="filled"
+                            className="w-[80px] cursor-pointer"
+                            onClick={() => setSelectType(3)}
+                        />
                     </Stack>
                     <div className="grid gap-4 grid-cols-3 h-[400px] overflow-y-auto">
-                        {list.map((item: any, index: number) => (
-                            <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
+                        {filterList?.map((item: any, index: number) => (
+                            <Box key={index} className="w-full relative">
                                 <Template data={item} handleDetail={() => null} />
+                                <Button
+                                    size={'small'}
+                                    color="secondary"
+                                    className="absolute bottom-2 right-2"
+                                    onClick={() => handleCreate(item)}
+                                >
+                                    添加
+                                </Button>
                             </Box>
                         ))}
                     </div>
                 </CardContent>
                 <Divider />
-                <CardActions>
+                {/* <CardActions>
                     <Grid container justifyContent="flex-end">
                         <Button variant="contained" type="button" color="secondary">
                             保存
                         </Button>
                     </Grid>
-                </CardActions>
+                </CardActions> */}
             </MainCard>
         </Modal>
     );
@@ -347,6 +419,11 @@ const ApiListModal = ({ open, handleClose }: { open: boolean; handleClose: () =>
 
 export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo; setChatBotInfo: (chatInfo: IChatInfo) => void }) => {
     const theme = useTheme();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appId = searchParams.get('appId');
+
     const [qaVisible, setQaVisible] = useState(false);
     const [apiVisible, setApiVisible] = useState(false);
 
@@ -354,11 +431,15 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const [websiteCount, setWebsiteCount] = useState(0);
     const [apiListVisible, setApiListVisible] = useState(false);
 
+    const [apiList, setApiList] = useState<any[]>([]);
+
     useEffect(() => {
-        getSkillList('appConfigId').then((res) => {
-            console.log(res);
+        getSkillList(appId || '').then((res) => {
+            const mergedArray = [...res['3'], ...res['5']];
+            setApiList(mergedArray);
         });
     }, []);
+    console.log(apiList, 'apiList');
 
     useEffect(() => {
         if (chatBotInfo.searchInWeb) {

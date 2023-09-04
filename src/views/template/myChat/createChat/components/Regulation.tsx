@@ -1,4 +1,17 @@
-import { FormControl, Grid, Button, Box, InputLabel, MenuItem, Select, Slider, TextField, Tooltip } from '@mui/material';
+import {
+    FormControl,
+    Grid,
+    Box,
+    Button,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
+    Slider,
+    Switch,
+    TextField,
+    Tooltip
+} from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -148,7 +161,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 >
                     基础规则
                 </span>
-                <Box className={'mt-5'} display="flex" justifyContent="right">
+                <Box className={'mt-0'} display="flex" justifyContent="right">
                     <Button
                         color="secondary"
                         size="small"
@@ -320,7 +333,73 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </Grid>
                 </div>
             </div>
-            <div className={'mt-10'}>
+            <div className="mt-5">
+                <div>
+                    <div className="flex items-start flex-col ">
+                        <div className="flex items-center">
+                            <span className={'text-md text-black'}>从网络搜索中学习</span>
+                            <Tooltip
+                                title={
+                                    <div>
+                                        能够从互联网上收集实时信息，你可以问机器人最新的信息。如：
+                                        <p>今天杭州天气怎么样？</p>
+                                        <p>帮我搜下今天苹果的新闻。</p>
+                                        <p>帮我搜索下关于亚运会的照片。</p>
+                                    </div>
+                                }
+                                placement="top"
+                            >
+                                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                            </Tooltip>
+                        </div>
+                        <div className="flex justify-end items-center">
+                            <span className={'text-#697586'}>{chatBotInfo.enableSearchInWeb ? '启用' : '不启用'}</span>
+                            <Switch
+                                checked={chatBotInfo.enableSearchInWeb}
+                                onChange={() =>
+                                    setChatBotInfo({
+                                        ...chatBotInfo,
+                                        enableSearchInWeb: !chatBotInfo.enableSearchInWeb
+                                    })
+                                }
+                                color="secondary"
+                            />
+                        </div>
+                    </div>
+                    {/* <div className="text-sm text-[#9da3af] ml-3">能够从互联网上收集实时信息，你可以问机器人最新最近的信息。 </div> */}
+                </div>
+                {/* {chatBotInfo.enableSearchInWeb && (
+                    <>
+                        <TextField
+                            label={'设置网络搜索范围'}
+                            className={'mt-3'}
+                            fullWidth
+                            error={!isValid}
+                            onChange={(e) => {
+                                setChatBotInfo({
+                                    ...chatBotInfo,
+                                    searchInWeb: e.target.value
+                                });
+                            }}
+                            multiline
+                            value={chatBotInfo.searchInWeb}
+                            minRows={3}
+                            size="small"
+                        />
+                        <div className="flex justify-between">
+                            {!isValid ? (
+                                <div className="text-[#f44336] mt-1">
+                                    {websiteCount <= 10 ? '请输入正确的网络搜索范围' : '网址不能超过10个'}
+                                </div>
+                            ) : (
+                                <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
+                            )}
+                            <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/10个</div>
+                        </div>
+                    </>
+                )} */}
+            </div>
+            <div className={'mt-3'}>
                 <div className="flex items-center">
                     <span className={'text-md text-black'}>首选模型</span>
                     <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">

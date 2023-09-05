@@ -68,18 +68,18 @@ interface TabPanelProps {
 }
 type FrequencyData = {
     timeInterval?: number | null;
-    limit?: number | null;
+    threshold?: number | null;
     message?: string;
     enable?: boolean;
 };
 type Account = {
     timeInterval?: number | null;
-    limit?: number | null;
+    threshold?: number | null;
     message?: string;
     enable?: boolean;
 };
 type AdvertisingConfig = {
-    limit?: number | null;
+    threshold?: number | null;
     message?: string;
     enable?: boolean;
 };
@@ -585,9 +585,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
-                                    value={frequencyData.limit}
+                                    value={frequencyData.threshold}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, limit: value })}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, threshold: value })}
                                 />
                                 条
                             </Box>
@@ -635,9 +635,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
-                                    value={account.limit}
+                                    value={account.threshold}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setAccount({ ...account, limit: value })}
+                                    onChange={(value: number | null) => setAccount({ ...account, threshold: value })}
                                 />
                                 条
                             </Box>
@@ -706,9 +706,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                     style={{ margin: '0 10px' }}
                                     min={0}
                                     max={60}
-                                    value={advertisingConfig.limit}
+                                    value={advertisingConfig.threshold}
                                     defaultValue={60}
-                                    onChange={(value: number | null) => setAdvertisingConfig({ ...advertisingConfig, limit: value })}
+                                    onChange={(value: number | null) => setAdvertisingConfig({ ...advertisingConfig, threshold: value })}
                                 />
                                 条，展示一次广告
                             </Box>

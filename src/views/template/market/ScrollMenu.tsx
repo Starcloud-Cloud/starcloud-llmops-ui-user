@@ -18,7 +18,7 @@ interface MenuList {
 function ScrollMenus({ change }: { change: any }) {
     const theme = useTheme();
     const [menuList, setMenuList] = useState<MenuList[]>([]);
-    const [active, setActive] = useState<number | string>(0);
+    const [active, setActive] = useState<number | string>(1);
     const setCategoryList = marketStore((state) => state.setCategoryList);
     useEffect(() => {
         categories().then((res) => {

@@ -26,6 +26,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { ImageCard } from 'ui-component/imageCard';
 import imgError from 'assets/images/img_error.svg';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -123,8 +124,45 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                 </Grid>
                             </Grid>
                         )}
-                        {/* 欢迎语 */}
-                        {history.isStatement ? (
+                        {history.isAds ? (
+                            history.ads && (
+                                <Grid item xs={12}>
+                                    <Grid container spacing={gridSpacing}>
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            className="flex"
+                                            onMouseEnter={() => setCurrentChat(`${index}-answer`)}
+                                            onMouseLeave={() => setCurrentChat('')}
+                                        >
+                                            <div className="flex flex-col w-full">
+                                                <Card
+                                                    sx={{
+                                                        display: 'inline-block'
+                                                    }}
+                                                    className="bg-[#f2f3f5] w-[70%] m-[auto]"
+                                                >
+                                                    <CardContent className="px-[18px] !py-[12px]">
+                                                        <Grid container spacing={1}>
+                                                            <Grid item xs={12}>
+                                                                <div className="relative">
+                                                                    <div className="text-sm whitespace-pre-line text-[#364152] flex justify-center items-center">
+                                                                        {history.ads}
+                                                                    </div>
+                                                                    <Tooltip title={'这是一条广告'} placement="top" arrow>
+                                                                        <HelpOutlineIcon className="text-base ml-1 cursor-pointer absolute top-[-5px] right-[-10px]" />
+                                                                    </Tooltip>
+                                                                </div>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            )
+                        ) : history.isStatement ? (
                             history.answer && (
                                 <Grid item xs={12}>
                                     <Grid container spacing={gridSpacing}>

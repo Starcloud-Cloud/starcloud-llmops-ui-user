@@ -1,6 +1,7 @@
 import {
     Modal,
     IconButton,
+    CardHeader,
     CardContent,
     Box,
     Divider,
@@ -26,7 +27,10 @@ import {
     Stepper,
     Step,
     Tooltip,
-    StepLabel
+    StepLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio
 } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 import Tips from 'assets/images/icons/tips.svg';
@@ -120,11 +124,12 @@ const AddRuleModal = ({
                 removeUrlsEmails: false
             });
             setSplitRule({
-                separator: ['\\n', '。', '\\.', '！', '!', ' '],
+                separator: ['\\n', '。', '\\\\.', '！', '!', ' '],
                 chunkSize: 500
             });
             setEditData({});
             setActive(0);
+            setSplitValue(false);
             setNameOpen(false);
             setCondOpen(false);
             setSizeOpen(false);
@@ -177,15 +182,20 @@ const AddRuleModal = ({
     };
     //分段规则
     const [splitRule, setSplitRule] = useState<any>({
-        separator: ['\\n', '。', '\\.', '！', '!', ' '],
+        separator: ['\\n', '。', '\\\\.', '！', '!', ' '],
         chunkSize: 500
     });
+    const [splitValue, setSplitValue] = useState(false);
     const [sizeOpen, setSizeOpen] = useState(false);
     //编辑保存的数据
     const [editData, setEditData] = useState<any>({});
     //新增编辑
     const addSave = async (e: any) => {
-        const newArr = [...Object.values(basis), ...Object.values(commonCleanRule), ...Object.values(splitRule)];
+        const newArr = [
+            ...Object.values(basis),
+            ...Object.values(commonCleanRule),
+            ...Object.values(!splitValue ? { chunkSize: splitRule.chunkSize } : splitRule)
+        ];
         if (basis.ruleType === 'HTML') {
             newArr.push(cleanRule.convertFormat);
             newArr.push(cleanRule.acceptLanguage);
@@ -202,7 +212,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule
+                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: [] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -234,7 +244,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule
+                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: [] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -284,7 +294,7 @@ const AddRuleModal = ({
                 if (index === 0) {
                     setNameOpen(true);
                     setCondOpen(true);
-                } else if (index === 1) {
+                } else if (index === 1 && splitValue) {
                     setSizeOpen(true);
                 }
             }
@@ -297,8 +307,12 @@ const AddRuleModal = ({
         if (step === 'next') {
             if (activeStep === 0 && publishStep(basis, 0)) {
                 setActiveStep(activeStep + 1);
-            } else if (activeStep === 1 && publishStep(splitRule, 1)) {
-                setActiveStep(activeStep + 1);
+            } else if (activeStep === 1) {
+                if (!splitValue && publishStep({ chunkSize: splitRule.chunkSize }, 1)) {
+                    setActiveStep(activeStep + 1);
+                } else if (splitValue && publishStep(splitRule, 1)) {
+                    setActiveStep(activeStep + 1);
+                }
             } else {
                 dispatch(
                     openSnackbar({
@@ -461,6 +475,12 @@ const AddRuleModal = ({
                                                     ruleFilter: row.ruleFilter,
                                                     enable: row.enable
                                                 });
+                                                if (row.ruleType === 'HTML') {
+                                                    setActive(1);
+                                                } else if (row.ruleType === 'CHARACTERS') {
+                                                    setActive(2);
+                                                }
+                                                if (row.splitRule.separator.length > 0) setSplitValue(true);
                                                 setCleanRule(row.cleanRule.htmlCleanRule);
                                                 setCommonCleanRule(row.cleanRule.commonCleanRule);
                                                 setSplitRule(row.splitRule);
@@ -1165,7 +1185,38 @@ const AddRuleModal = ({
                                                     </FormControl>
                                                 </Grid>
                                                 <Grid item md={12}>
+                                                    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                                                        <Typography width="120px" display="flex" alignItems="center" fontWeight={500}>
+                                                            分割符
+                                                            <Tooltip
+                                                                title="支持逗号、句号、换行等分隔符，对数据进行分块，有助于更准确的分析文件"
+                                                                placement="top"
+                                                            >
+                                                                <HelpOutline sx={{ fontSize: '15px' }} />
+                                                            </Tooltip>
+                                                        </Typography>
+                                                        <RadioGroup
+                                                            onChange={() => {
+                                                                setSplitValue(!splitValue);
+                                                            }}
+                                                            value={splitValue}
+                                                            sx={{ width: '300px' }}
+                                                            row
+                                                        >
+                                                            <FormControlLabel
+                                                                value={false}
+                                                                control={<Radio color="secondary" />}
+                                                                label="系统默认"
+                                                            />
+                                                            <FormControlLabel
+                                                                value={true}
+                                                                control={<Radio color="secondary" />}
+                                                                label="自定义"
+                                                            />
+                                                        </RadioGroup>
+                                                    </Box>
                                                     <FormControl
+                                                        sx={{ display: splitValue ? 'block' : 'none' }}
                                                         error={splitRule.separator && splitRule.separator.length === 0}
                                                         size="small"
                                                         fullWidth
@@ -1185,12 +1236,6 @@ const AddRuleModal = ({
                                                             id="splitRule"
                                                         >
                                                             分隔符
-                                                            <Tooltip
-                                                                title="支持逗号、句号、换行等分隔符，对数据进行分块，有助于更准确的分析文件"
-                                                                placement="top"
-                                                            >
-                                                                <HelpOutline fontSize="small" />
-                                                            </Tooltip>
                                                         </InputLabel>
                                                         <Autocomplete
                                                             size="small"

@@ -187,7 +187,8 @@ const AddRuleModal = ({
     const addSave = async (e: any) => {
         const newArr = [...Object.values(basis), ...Object.values(commonCleanRule), ...Object.values(splitRule)];
         if (basis.ruleType === 'HTML') {
-            newArr.push(...Object.values(cleanRule));
+            newArr.push(cleanRule.convertFormat);
+            newArr.push(cleanRule.acceptLanguage);
         }
         const res = newArr.every((item: any) => {
             return item === true || item === false || item.length > 0 || typeof item === 'number';

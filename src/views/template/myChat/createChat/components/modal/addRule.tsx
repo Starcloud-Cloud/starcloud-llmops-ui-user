@@ -120,7 +120,7 @@ const AddRuleModal = ({
                 removeUrlsEmails: false
             });
             setSplitRule({
-                separator: ['\\n'],
+                separator: ['\\n', '。', '\\.', '！', '!', ' '],
                 chunkSize: 500
             });
             setEditData({});
@@ -177,7 +177,7 @@ const AddRuleModal = ({
     };
     //分段规则
     const [splitRule, setSplitRule] = useState<any>({
-        separator: ['\\n'],
+        separator: ['\\n', '。', '\\.', '！', '!', ' '],
         chunkSize: 500
     });
     const [sizeOpen, setSizeOpen] = useState(false);

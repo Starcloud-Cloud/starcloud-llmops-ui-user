@@ -28,12 +28,12 @@ function TemplateMarket() {
     const [queryParams, setQueryParams] = useState({
         name: '',
         sort: '',
-        category: ''
+        category: 'AMAZON'
     });
     useEffect(() => {
         handleSearch();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [queryParams]);
+    }, [queryParams, templateList]);
     const sortList = [
         { text: t('market.new'), key: 'gmt_create' },
         { text: t('market.popular'), key: 'like' },

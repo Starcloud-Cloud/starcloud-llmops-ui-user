@@ -103,7 +103,6 @@ const AppModal = ({
             setDetail(newValue);
         });
     };
-
     useEffect(() => {
         if (appList.length > 0) {
             setAppValue(appList[0].value);
@@ -126,8 +125,8 @@ const AppModal = ({
             }
         });
         detailRef.current = newValue;
-        setPerform(perform + 1);
         setDetail(newValue);
+        setPerform(perform + 1);
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
@@ -286,6 +285,11 @@ const AppModal = ({
         };
         fetchData();
     };
+    const leftRef: any = useRef(null);
+    const [leftHeight, setLeftHeight] = useState(0);
+    useEffect(() => {
+        console.log(leftRef.current?.clientHeight);
+    }, [leftRef.current?.clientHeight]);
     return (
         <Modal
             open={open}
@@ -301,9 +305,9 @@ const AppModal = ({
                     top: '10%',
                     left: '50%',
                     transform: 'translate(-50%, 0)',
-                    overflowY: 'auto',
                     width: '80%',
-                    maxHeight: '80%'
+                    maxHeight: '80%',
+                    overflowY: 'auto'
                 }}
                 title={title}
                 content={false}
@@ -319,49 +323,54 @@ const AppModal = ({
                     </IconButton>
                 }
             >
-                <CardContent sx={{ p: '0 16px !important' }}>
+                <CardContent sx={{ p: '0 16px !important', height: '100%', overflowY: 'auto' }}>
                     <Grid container spacing={2}>
                         <Grid item md={6}>
-                            <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
-                                <InputLabel id="appList">优化选择</InputLabel>
-                                <Select
-                                    color="secondary"
-                                    labelId="appList"
-                                    name="appValue"
-                                    value={appValue}
-                                    label="优化选择"
-                                    onChange={(e) => {
-                                        setAppValue(e.target.value);
-                                        getDetail(e.target.value);
-                                    }}
-                                >
-                                    {appList.map((item) => (
-                                        <MenuItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {perform > 0 && (
-                                <Perform
-                                    config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                                    changeSon={changeData}
-                                    changeanswer={changeanswer}
-                                    loadings={loadings}
-                                    variableChange={exeChange}
-                                    promptChange={promptChange}
-                                    key={perform}
-                                    isallExecute={(flag: boolean) => {
-                                        isAllExecute = flag;
-                                    }}
-                                    source="myApp"
-                                />
-                            )}
+                            <Box ref={leftRef}>
+                                <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
+                                    <InputLabel id="appList">优化选择</InputLabel>
+                                    <Select
+                                        color="secondary"
+                                        labelId="appList"
+                                        name="appValue"
+                                        value={appValue}
+                                        label="优化选择"
+                                        onChange={(e) => {
+                                            setAppValue(e.target.value);
+                                            getDetail(e.target.value);
+                                        }}
+                                    >
+                                        {appList.map((item) => (
+                                            <MenuItem key={item.value} value={item.value}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                {perform > 0 && (
+                                    <Perform
+                                        config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                        changeSon={changeData}
+                                        changeanswer={changeanswer}
+                                        loadings={loadings}
+                                        variableChange={exeChange}
+                                        promptChange={promptChange}
+                                        key={perform}
+                                        isallExecute={(flag: boolean) => {
+                                            isAllExecute = flag;
+                                        }}
+                                        source="myApp"
+                                    />
+                                )}
+                            </Box>
                         </Grid>
                         <Grid item md={6}>
-                            {historyList.length > 0 && (
+                            {historyList.length > 0 && perform > 0 && (
                                 <Box>
-                                    <List sx={{ ml: 4, overflowY: 'auto', height: '80%' }}>
+                                    <List
+                                        key={leftRef.current.clientHeight}
+                                        sx={{ ml: 4, overflowY: 'auto', height: leftRef.current?.clientHeight, minHeight: '500px' }}
+                                    >
                                         {historyList.map((item) => (
                                             <>
                                                 <ListItem>

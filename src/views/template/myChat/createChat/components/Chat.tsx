@@ -654,7 +654,7 @@ export const Chat = ({
             const contentElement = contentRef.current;
             scrollContainer.scrollTop = contentElement.scrollHeight;
         }
-    });
+    }, [isFetch]);
 
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
@@ -746,6 +746,7 @@ export const Chat = ({
                                 bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                             } catch (e) {
                                 console.log(e, 'error-JSON.parse异常');
+                                return;
                             }
                         }
                         if (bufferObj?.code === 200) {

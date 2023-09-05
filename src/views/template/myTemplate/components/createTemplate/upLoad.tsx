@@ -790,7 +790,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                         )}
                     </Box>
                     <Button disabled={!updateBtn?.needUpdate} color="secondary" variant="outlined" onClick={handleUpdate}>
-                        更新
+                        更新渠道
                     </Button>
                 </SubCard>
                 <Grid container spacing={2}>
@@ -819,7 +819,8 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         alignItems="center"
                                         flexWrap="wrap"
                                     >
-                                        员工广场
+                                        {mode === 'CHAT' ? '员工广场' : '应用市场'}
+
                                         <Chip
                                             sx={{ mx: 1.5 }}
                                             size="small"
@@ -898,7 +899,11 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                         >
                                             <CloudUploadOutlined sx={{ fontSize: '12px' }} />
                                             <span style={{ marginLeft: '8px' }}>
-                                                {!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}
+                                                {!updateBtn?.showPublish
+                                                    ? '取消发布'
+                                                    : mode === 'CHAT'
+                                                    ? '发布到员工广场'
+                                                    : '发布到模板市场'}
                                             </span>
                                         </Box>
                                         <Box

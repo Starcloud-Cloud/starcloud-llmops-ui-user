@@ -109,7 +109,7 @@ const AddRuleModal = ({
                 whiteList: [],
                 blackList: [],
                 convertFormat: 'TXT',
-                acceptLanguage: 'Chinese'
+                acceptLanguage: 'zh-CN'
             });
             setCommonCleanRule({
                 removeAllHtmlTags: false,
@@ -150,7 +150,7 @@ const AddRuleModal = ({
         whiteList: [],
         blackList: [],
         convertFormat: 'TXT',
-        acceptLanguage: 'Chinese'
+        acceptLanguage: 'zh-CN'
     });
     const handleCleanRule = (e: any) => {
         const { name, value } = e.target;
@@ -551,8 +551,8 @@ const AddRuleModal = ({
                             >
                                 <CardContent sx={{ p: '16px !important' }}>
                                     {activeStep === 0 && (
-                                        <Grid container spacing={2}>
-                                            <Grid item md={8}>
+                                        <Grid container justifyContent="space-between" spacing={2}>
+                                            <Grid item md={6}>
                                                 <TextField
                                                     size="small"
                                                     label="规划名称"
@@ -647,7 +647,7 @@ const AddRuleModal = ({
                                     </Stepper>
                                     {activeStep === 0 && (
                                         <Box>
-                                            <Grid container alignItems="center" spacing={2}>
+                                            <Grid container spacing={2}>
                                                 <Grid item md={6}>
                                                     <FormControl
                                                         error={basis.ruleFilter && basis.ruleFilter.length === 0 && condOpen}
@@ -702,7 +702,7 @@ const AddRuleModal = ({
                                                                     helperText={
                                                                         basis.ruleFilter && basis.ruleFilter.length === 0 && condOpen
                                                                             ? '命中条件必填'
-                                                                            : ' '
+                                                                            : '命中条件可以输入多个，输入之后回车完成输入'
                                                                     }
                                                                     name="ruleFilter"
                                                                     color="secondary"
@@ -719,9 +719,6 @@ const AddRuleModal = ({
                                                     >
                                                         <Typography mb={1} variant="h5">
                                                             说明 <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
-                                                        </Typography>
-                                                        <Typography color="secondary" fontSize="12px">
-                                                            命中条件可以输入多个，输入之后回车完成输入
                                                         </Typography>
                                                         {basis.ruleType === 'HTML' && (
                                                             <Box>
@@ -772,7 +769,7 @@ const AddRuleModal = ({
                                                     >
                                                         网页清洗规则
                                                     </span>
-                                                    <Grid container alignItems="center" spacing={2}>
+                                                    <Grid container spacing={2}>
                                                         <Grid item md={6}>
                                                             <FormControl size="small" fullWidth>
                                                                 <InputLabel
@@ -814,6 +811,7 @@ const AddRuleModal = ({
                                                                     renderInput={(params: any) => (
                                                                         <TextField
                                                                             size="small"
+                                                                            helperText="白名单可以输入多个，输入之后回车完成输入"
                                                                             labelId="whiteList"
                                                                             name="whiteList"
                                                                             color="secondary"
@@ -831,9 +829,6 @@ const AddRuleModal = ({
                                                                 <Typography mb={1} variant="h5">
                                                                     说明
                                                                     <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
-                                                                </Typography>
-                                                                <Typography color="secondary" fontSize="12px">
-                                                                    可以输入多个，输入之后回车完成输入
                                                                 </Typography>
                                                                 <Typography fontSize="12px">
                                                                     白名单：获取指定标签或ID下的网页数据
@@ -883,6 +878,7 @@ const AddRuleModal = ({
                                                                     renderInput={(params: any) => (
                                                                         <TextField
                                                                             size="small"
+                                                                            helperText="黑名单可以输入多个，输入之后回车完成输入"
                                                                             labelId="blackList"
                                                                             name="blackList"
                                                                             color="secondary"
@@ -900,9 +896,6 @@ const AddRuleModal = ({
                                                                 <Typography mb={1} variant="h5">
                                                                     说明
                                                                     <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
-                                                                </Typography>
-                                                                <Typography color="secondary" fontSize="12px">
-                                                                    可以输入多个，输入之后回车完成输入
                                                                 </Typography>
                                                                 <Typography fontSize="12px">
                                                                     黑名单：清除指定标签或ID下的网页数据
@@ -1001,8 +994,8 @@ const AddRuleModal = ({
                                                                     labelId="type"
                                                                     label="网页语言"
                                                                 >
-                                                                    <MenuItem value="Chinese">中文</MenuItem>
-                                                                    <MenuItem value="English">英文</MenuItem>
+                                                                    <MenuItem value="zh-CN">中文</MenuItem>
+                                                                    <MenuItem value="en-US">英文</MenuItem>
                                                                 </Select>
                                                                 {!cleanRule.acceptLanguage && <FormHelperText>转化格式必填</FormHelperText>}
                                                                 {cleanRule.acceptLanguage && <FormHelperText> </FormHelperText>}

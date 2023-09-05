@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 export const WebPageInfo = ({ data }: { data: any[] }) => {
     return (
         <div className="mt-2">
-            <div className="grid gap-1 grid-cols-2 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-2">
+            <div className="flex mt-2  w-full overflow-x-auto">
                 {data?.map((item: any, index: number) => (
-                    <div key={index} className="flex rounded-md bg-[#fff] p-[12px] flex-col">
+                    <div key={index} className="flex rounded-md bg-[#fff] p-[12px] flex-col min-w-[210px] mr-1">
                         <Tooltip title={item.title} placement="top" arrow>
                             <div className="text-lg line-clamp-1 text-[#666]">{item.title}</div>
                         </Tooltip>

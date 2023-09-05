@@ -61,7 +61,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
             if (target instanceof HTMLImageElement) {
                 target.src = imgError;
                 target.alt = '图片加载异常';
-                console.log('图片加载异常', target);
             }
         };
 

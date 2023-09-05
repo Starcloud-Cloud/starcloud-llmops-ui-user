@@ -336,7 +336,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                                         "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
                                     }
                                 >
-                                    学习工作流程
+                                    从网络搜索中学习
                                 </span>
                                 <Tooltip
                                     title={

@@ -20,6 +20,14 @@ const ChatMarkdown = (props: tProps) => {
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
+                        // 自定义链接组件
+                        a({ node, href, children, ...props }) {
+                            return (
+                                <a href={href} target="_blank" {...props}>
+                                    {children}
+                                </a>
+                            );
+                        },
                         code({ node, inline, className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || '');
                             return !inline && match ? (

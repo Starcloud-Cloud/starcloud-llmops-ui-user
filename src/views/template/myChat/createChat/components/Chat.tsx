@@ -24,7 +24,6 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
-import { t } from '../../../../../hooks/web/useI18n';
 import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
@@ -39,6 +38,7 @@ import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { v4 as uuidv4 } from 'uuid';
+import _ from 'lodash';
 
 export type IHistory = Partial<{
     uid: string;
@@ -382,6 +382,8 @@ export const Chat = ({
                 } else {
                     currentBlock.push(item);
                 }
+            } else if (item.msgType === 'CHAT') {
+                chatBlocks.push(item);
             } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
                 let currentData: any = {};
                 let loop: any = [];
@@ -444,7 +446,6 @@ export const Chat = ({
                 }));
 
                 const chatBlocks = extractChatBlocks(list);
-                console.log(chatBlocks, 'chatBlocks');
 
                 const result = [
                     ...chatBlocks,
@@ -527,8 +528,9 @@ export const Chat = ({
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar
                     })) || [];
+                const chatBlocks = extractChatBlocks(list);
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -569,8 +571,9 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+                const chatBlocks = extractChatBlocks(list);
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -651,7 +654,7 @@ export const Chat = ({
             const contentElement = contentRef.current;
             scrollContainer.scrollTop = contentElement.scrollHeight;
         }
-    });
+    }, [isFetch]);
 
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
@@ -724,6 +727,7 @@ export const Chat = ({
                         break;
                     }
                     let str = textDecoder.decode(value);
+                    console.log(str, 'sse res');
                     const lines = str.split('\n');
                     lines.forEach((messages, i: number) => {
                         if (i === 0 && joins) {
@@ -742,6 +746,7 @@ export const Chat = ({
                                 bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
                             } catch (e) {
                                 console.log(e, 'error-JSON.parse异常');
+                                return;
                             }
                         }
                         if (bufferObj?.code === 200) {
@@ -838,8 +843,11 @@ export const Chat = ({
 
     const handleClean = () => {
         setAnchorEl(null);
-        setData([]);
-        dataRef.current = [];
+
+        const copyData = _.cloneDeep(dataRef.current);
+        const newData = copyData.filter((v: any) => v.isStatement);
+        setData(newData);
+        dataRef.current = newData;
         setConversationUid('');
         jsCookie.remove(conversationUniKey);
     };

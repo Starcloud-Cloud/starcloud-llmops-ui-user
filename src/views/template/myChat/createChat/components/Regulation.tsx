@@ -43,11 +43,12 @@ const marks = [
 const TEXT = `- Identify what language users use in questions and use the same language in your answers. \n - Use English or 中文 to answer questions based on the language of the question.`;
 
 export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
-    console.log(chatBotInfo?.temperature, 'chatBotInfo');
-
     const [regulationText, setRegulationText] = useState('');
     const [startCheck, setStartCheck] = useState(false);
     const regulationTextRef = useRef(regulationText);
+    const [appOpen, setAppOpen] = useState(false);
+    const [isValid, setIsValid] = useState(true);
+    const [websiteCount, setWebsiteCount] = useState(0);
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
@@ -146,11 +147,27 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
         }
     }, [regulationText]);
 
-    const [appOpen, setAppOpen] = useState(false);
     const emits = (data: any) => {
         setAppOpen(false);
         setRegulationText(data);
     };
+
+    // useEffect(() => {
+    //     if (chatBotInfo.searchInWeb) {
+    //         const websites = chatBotInfo.searchInWeb
+    //             .trim()
+    //             .split('\n')
+    //             .map((item) => item.trim());
+    //         // 简单验证每个网站地址
+    //         const isValidInput =
+    //             websites.every((website) => /^(https?:\/\/)?([\w.-]+\.[a-z]{2,6})(:[0-9]{1,5})?([/\w.-]*)*\/?$/.test(website)) &&
+    //             websites.length < 11;
+    //         setIsValid(isValidInput);
+    //         // 设置网站地址的数量
+    //         setWebsiteCount(websites.length);
+    //     }
+    // }, [chatBotInfo.searchInWeb]);
+
     return (
         <div>
             <div>
@@ -194,7 +211,7 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         {startCheck && !regulationText ? (
                             <div className="text-[#f44336] mt-1">请输入角色描述</div>
                         ) : (
-                            <div className="mt-1">机器人将根据以上内容，明确自己的具体职责，请尽量输入重要且精准的要求。</div>
+                            <div className="mt-1">机器人将根据以上内容，明确具体的职责进行回答。请尽量输入重要且精准的要求。</div>
                         )}
                         <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/1000</div>
                     </div>
@@ -298,7 +315,82 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </div>
                 </div>
             </div>
-            <div className={'mt-10'}>
+            <div>
+                <div className="mt-10">
+                    <div>
+                        <div className="flex items-start flex-col ">
+                            <div className="flex items-center">
+                                <span
+                                    className={
+                                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                                    }
+                                >
+                                    从互联网中学习
+                                </span>
+                                <Tooltip
+                                    title={
+                                        <div>
+                                            可智能利用互联网，实时获取全网最新数据，提高精度和速度。
+                                            <p> 你可以问机器人最新的信息如：</p>
+                                            <p>1.今天杭州天气怎么样？</p>
+                                            <p>2.帮我搜下今天苹果的新闻。</p>
+                                            <p>3.帮我搜索下关于亚运会的照片。</p>
+                                        </div>
+                                    }
+                                    placement="top"
+                                >
+                                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                                </Tooltip>
+                            </div>
+                            <div className="flex justify-end items-center">
+                                <span className={'text-#697586'}>{chatBotInfo.enableSearchInWeb ? '启用' : '不启用'}</span>
+                                <Switch
+                                    checked={chatBotInfo.enableSearchInWeb}
+                                    onChange={() =>
+                                        setChatBotInfo({
+                                            ...chatBotInfo,
+                                            enableSearchInWeb: !chatBotInfo.enableSearchInWeb
+                                        })
+                                    }
+                                    color="secondary"
+                                />
+                            </div>
+                        </div>
+                        {/* <div className="text-sm text-[#9da3af] ml-3">能够从互联网上收集实时信息，你可以问机器人最新最近的信息。 </div> */}
+                    </div>
+                    {/* {chatBotInfo.enableSearchInWeb && (
+                    <>
+                        <TextField
+                            label={'设置网络搜索范围'}
+                            className={'mt-3'}
+                            fullWidth
+                            error={!isValid}
+                            onChange={(e) => {
+                                setChatBotInfo({
+                                    ...chatBotInfo,
+                                    searchInWeb: e.target.value
+                                });
+                            }}
+                            multiline
+                            value={chatBotInfo.searchInWeb}
+                            minRows={3}
+                            size="small"
+                        />
+                        <div className="flex justify-between">
+                            {!isValid ? (
+                                <div className="text-[#f44336] mt-1">
+                                    {websiteCount <= 10 ? '请输入正确的网络搜索范围' : '网址不能超过10个'}
+                                </div>
+                            ) : (
+                                <div className="mt-1">您可以通过下面的输入框指定具体的搜索网页范围，每行一个URL，例如mofaai.com.cn</div>
+                            )}
+                            <div className="text-right text-stone-600 mr-1 mt-1">{websiteCount || 0}/10个</div>
+                        </div>
+                    </>
+                )} */}
+                </div>
+            </div>
+            <div className={'mt-5'}>
                 <span
                     className={
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
@@ -333,39 +425,48 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </Grid>
                 </div>
             </div>
-            <div className={'mt-3'}>
-                <div className="flex items-center">
-                    <span className={'text-md text-black'}>首选模型</span>
-                    <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
-                        <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                    </Tooltip>
-                </div>
+            <div className="mt-10">
+                <span
+                    className={
+                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
+                    }
+                >
+                    模型规则
+                </span>
                 <div className={'mt-3'}>
-                    <FormControl className="w-[280px] md:w-[310px]">
-                        <InputLabel size={'small'} id="age-select">
-                            选择模型
-                        </InputLabel>
-                        <Select
-                            size={'small'}
-                            id="columnId"
-                            name="columnId"
-                            label={'模型选择'}
-                            value={1}
-                            fullWidth
-                            // onChange={(e: any) => handleRuleValue(3, e.target.value)}
-                        >
-                            <MenuItem value={1}>默认模型3.5</MenuItem>
-                            <MenuItem value={2} disabled>
-                                默认模型4.0(测试中)
-                            </MenuItem>
-                            <MenuItem value={3} disabled>
-                                文心一言(测试中)
-                            </MenuItem>
-                            <MenuItem value={4} disabled>
-                                Llama2(测试中)
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
+                    <div className="flex items-center">
+                        <span className={'text-md text-black'}>首选模型</span>
+                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
+                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                        </Tooltip>
+                    </div>
+                    <div className={'mt-3'}>
+                        <FormControl className="w-[280px] md:w-[310px]">
+                            <InputLabel size={'small'} id="age-select">
+                                选择模型
+                            </InputLabel>
+                            <Select
+                                size={'small'}
+                                id="columnId"
+                                name="columnId"
+                                label={'模型选择'}
+                                value={1}
+                                fullWidth
+                                // onChange={(e: any) => handleRuleValue(3, e.target.value)}
+                            >
+                                <MenuItem value={1}>默认模型3.5</MenuItem>
+                                <MenuItem value={2} disabled>
+                                    默认模型4.0(测试中)
+                                </MenuItem>
+                                <MenuItem value={3} disabled>
+                                    文心一言(测试中)
+                                </MenuItem>
+                                <MenuItem value={4} disabled>
+                                    Llama2(测试中)
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                 </div>
             </div>
             {appOpen && (

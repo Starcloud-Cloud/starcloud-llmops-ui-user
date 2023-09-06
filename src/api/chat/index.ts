@@ -228,19 +228,11 @@ export const ruleDebugRule = (data: any) => {
 };
 
 /**
- * 获取系统技能
+ * 获取所有技能
  * @returns
  */
-export const getSysList = () => {
-    return request.get({ url: '/llm/chatskill/list' });
-};
-
-/**
- * 我的应用
- * @returns
- */
-export const getAppList = () => {
-    return request.get({ url: '/llm/app/page?pageNo=1&pageSize=1000' });
+export const getListAll = () => {
+    return request.get({ url: '/llm/chatskill/all' });
 };
 
 /**
@@ -275,5 +267,5 @@ export const modifySkill = (data: any) => {
  * @returns
  */
 export const delSkill = (uid: string) => {
-    return request.post({ url: `/llm/chat/config/delete/${uid}` });
+    return request.delete({ url: `/llm/chat/config/delete/${uid}` });
 };

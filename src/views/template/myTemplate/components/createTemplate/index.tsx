@@ -18,6 +18,7 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/ErrorOutline';
 import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
@@ -371,6 +372,11 @@ function CreateDetail() {
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
     const [saveState, setSaveState] = useState<number>(0);
+    const [flag, setflag] = useState(false);
+    //获取状态
+    const getStatus = (data: boolean) => {
+        setflag(data);
+    };
     return (
         <Card>
             <CardHeader
@@ -442,7 +448,17 @@ function CreateDetail() {
                 <Tab label={t('myApp.basis')} {...a11yProps(0)} />
                 <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
                 {searchParams.get('uid') && <Tab label="应用分析" {...a11yProps(2)} />}
-                {searchParams.get('uid') && <Tab label={t('myApp.upload')} {...a11yProps(3)} />}
+                {searchParams.get('uid') && (
+                    <Tab
+                        label={
+                            <Box display="flex" alignItems="center">
+                                {t('myApp.upload')}
+                                {flag && <ErrorIcon color="warning" sx={{ fontSize: '14px' }} />}
+                            </Box>
+                        }
+                        {...a11yProps(3)}
+                    />
+                )}
             </Tabs>
             <TabPanel value={value} index={0}>
                 <Grid container spacing={2}>
@@ -580,7 +596,12 @@ function CreateDetail() {
             </TabPanel>
             <TabPanel value={value} index={3}>
                 {searchParams.get('uid') && (
-                    <Upload appUid={searchParams.get('uid') as string} saveState={saveState} saveDetail={saveDetail} />
+                    <Upload
+                        appUid={searchParams.get('uid') as string}
+                        saveState={saveState}
+                        saveDetail={saveDetail}
+                        getStatus={getStatus}
+                    />
                 )}
             </TabPanel>
         </Card>

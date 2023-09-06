@@ -1206,7 +1206,7 @@ const AddRuleModal = ({
                                                             <FormControlLabel
                                                                 value={false}
                                                                 control={<Radio color="secondary" />}
-                                                                label="系统默认"
+                                                                label="系统推荐"
                                                             />
                                                             <FormControlLabel
                                                                 value={true}

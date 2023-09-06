@@ -108,7 +108,19 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => <To
         maxWidth: 500
     }
 });
-function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
+function Upload({
+    appUid,
+    saveState,
+    saveDetail,
+    mode,
+    getStatus
+}: {
+    appUid: string;
+    saveState: number;
+    saveDetail: () => void;
+    mode?: 'CHAT';
+    getStatus: (data: boolean) => void;
+}) {
     const defaultUpLoadList = [
         {
             title: '网页',
@@ -296,6 +308,7 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         getLatest(appUid).then((res) => {
             getLimitList(res);
             setUpdateBtn(res);
+            getStatus(res.needUpdate);
             setReleaseState(res.auditTag);
         });
     };
@@ -565,6 +578,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     >
                         <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
                     </CustomWidthTooltip>
+                    <Typography ml={1} fontSize="12px" color="#697586">
+                        调试模式下不生效
+                    </Typography>
                 </span>
                 <Grid container spacing={2}>
                     <Grid item md={6} xs={12}>
@@ -696,6 +712,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     >
                         <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
                     </CustomWidthTooltip>
+                    <Typography ml={1} fontSize="12px" color="#697586">
+                        调试模式下不生效
+                    </Typography>
                 </span>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>

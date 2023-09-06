@@ -245,7 +245,7 @@ function CreateDetail() {
     };
 
     //tabs
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(1);
     const [saveState, setSaveState] = useState(0);
     const handleChange = (event: any, newValue: number) => {
         setValue(newValue);

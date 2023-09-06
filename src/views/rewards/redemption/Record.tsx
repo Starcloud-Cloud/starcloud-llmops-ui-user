@@ -269,8 +269,8 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                     >
                         <CloseIcon />
                     </IconButton>
-                    <TableContainer>
-                        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                    <TableContainer sx={{ maxHeight: 500 }}>
+                        <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                             <EnhancedTableHead
                                 numSelected={selected.length}
                                 order={order}

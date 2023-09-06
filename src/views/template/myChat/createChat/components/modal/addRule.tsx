@@ -572,7 +572,7 @@ const AddRuleModal = ({
                             >
                                 <CardContent sx={{ p: '16px !important' }}>
                                     {activeStep === 0 && (
-                                        <Grid container justifyContent="space-between" spacing={2}>
+                                        <Grid container spacing={2}>
                                             <Grid item md={6}>
                                                 <TextField
                                                     size="small"
@@ -733,7 +733,7 @@ const AddRuleModal = ({
                                                         />
                                                     </FormControl>
                                                 </Grid>
-                                                <Grid item md={6}>
+                                                <Grid item md={4}>
                                                     <SubCard
                                                         sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
                                                         contentSX={{ p: '10px !important' }}
@@ -842,7 +842,7 @@ const AddRuleModal = ({
                                                                 />
                                                             </FormControl>
                                                         </Grid>
-                                                        <Grid item md={6}>
+                                                        <Grid item md={4}>
                                                             <SubCard
                                                                 sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
                                                                 contentSX={{ p: '10px !important' }}
@@ -909,7 +909,7 @@ const AddRuleModal = ({
                                                                 />
                                                             </FormControl>
                                                         </Grid>
-                                                        <Grid item md={6}>
+                                                        <Grid item md={4}>
                                                             <SubCard
                                                                 sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
                                                                 contentSX={{ p: '10px !important' }}
@@ -925,7 +925,7 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">ID格式：#＋具体ID，例：#dda23</Typography>
                                                             </SubCard>
                                                         </Grid>
-                                                        <Grid item md={4}>
+                                                        <Grid item md={6}>
                                                             <FormControl size="small" error={!cleanRule.convertFormat} fullWidth>
                                                                 <InputLabel
                                                                     sx={{
@@ -975,7 +975,8 @@ const AddRuleModal = ({
                                                                 {cleanRule.convertFormat && <FormHelperText> </FormHelperText>}
                                                             </FormControl>
                                                         </Grid>
-                                                        <Grid item md={4}>
+                                                        <Grid item md={6}></Grid>
+                                                        <Grid item md={6}>
                                                             <FormControl size="small" error={!cleanRule.acceptLanguage} fullWidth>
                                                                 <InputLabel
                                                                     sx={{
@@ -1033,7 +1034,7 @@ const AddRuleModal = ({
                                                 通用清洗规则
                                             </span>
                                             <Grid container spacing={2}>
-                                                <Grid item md={4}>
+                                                <Grid item md={3}>
                                                     <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
                                                         清除html标签
                                                     </span>
@@ -1050,7 +1051,7 @@ const AddRuleModal = ({
                                                         color="secondary"
                                                     />
                                                 </Grid>
-                                                <Grid item md={4}>
+                                                <Grid item md={3}>
                                                     <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
                                                         清除所有图片
                                                     </span>
@@ -1085,7 +1086,8 @@ const AddRuleModal = ({
                                                                 color="secondary"
                                                             />
                                                         </Grid> */}
-                                                <Grid item md={4}>
+                                                <Grid item md={6}></Grid>
+                                                <Grid item md={3}>
                                                     <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
                                                         清除电子邮箱地址
                                                     </span>
@@ -1102,7 +1104,8 @@ const AddRuleModal = ({
                                                         color="secondary"
                                                     />
                                                 </Grid>
-                                                <Grid item md={12}>
+                                                <Grid item md={9}></Grid>
+                                                <Grid item md={6}>
                                                     <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
                                                         替换掉连续的空格、换行符和制表符
                                                     </span>
@@ -1184,9 +1187,10 @@ const AddRuleModal = ({
                                                         />
                                                     </FormControl>
                                                 </Grid>
-                                                <Grid item md={12}>
+                                                <Grid item md={8}></Grid>
+                                                <Grid item md={6}>
                                                     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                                                        <Typography width="120px" display="flex" alignItems="center" fontWeight={500}>
+                                                        <Typography width="80px" display="flex" alignItems="center" fontWeight={500}>
                                                             分割符
                                                             <Tooltip
                                                                 title="支持逗号、句号、换行等分隔符，对数据进行分块，有助于更准确的分析文件"

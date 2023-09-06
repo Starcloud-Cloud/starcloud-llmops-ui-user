@@ -91,15 +91,20 @@ export const qRcodeLogin = (data: any) => {
 
 //获取验证码
 export const sendCode = (data: any) => {
-    return request.postOriginal({ url: 'llm/Communication/code/send', data });
+    return request.postOriginal({ url: 'llm/communication/code/send', data });
 };
 
 //手机号注册
 export const registerCode = (data: any) => {
-    return request.postOriginal({ url: 'llm/Communication/code/register', data });
+    return request.postOriginal({ url: 'llm/communication/code/register', data });
 };
 
 //手机号登录
 export const LoginCode = (data: any) => {
-    return request.postOriginal({ url: 'llm/Communication/code/login', data });
+    return request.postOriginal({ url: 'llm/communication/code/login', data });
+};
+
+//手机号注册
+export const validateCode = (data: any) => {
+    return request.postOriginal({ url: 'llm/communication/validate/code', data });
 };

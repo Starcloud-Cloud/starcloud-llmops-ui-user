@@ -134,9 +134,6 @@ function CreateDetail() {
                     }
                     break;
                 }
-                const newValue1 = [...loadings];
-                newValue1[index] = false;
-                setLoadings(newValue1);
                 let str = textDecoder.decode(value);
                 const lines = str.split('\n');
                 lines.forEach((message, i: number) => {
@@ -154,7 +151,10 @@ function CreateDetail() {
                     if (message?.startsWith('data:')) {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
-                    if (bufferObj?.code === 200) {
+                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
                         if (!conversationUid && index === 0 && isAllExecute) {
                             conversationUid = bufferObj.conversationUid;
                         }
@@ -163,7 +163,19 @@ function CreateDetail() {
                             detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
-                    } else if (bufferObj && bufferObj.code !== 200) {
+                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: bufferObj.content,
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
                                 open: true,

@@ -24,7 +24,6 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
-import { t } from '../../../../../hooks/web/useI18n';
 import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
@@ -39,6 +38,7 @@ import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { v4 as uuidv4 } from 'uuid';
+import _ from 'lodash';
 
 export type IHistory = Partial<{
     uid: string;
@@ -69,6 +69,8 @@ export type IHistory = Partial<{
     robotAvatar: string;
     isNew: boolean;
     isStatement?: boolean;
+    isAds?: boolean;
+    ads?: string;
 }>;
 
 export type IConversation = {
@@ -260,6 +262,84 @@ export const ChatBtn = () => {
     );
 };
 
+// 转换type
+const transformType = (key: string) => {
+    switch (key) {
+        case 'news':
+            return 'url';
+        case 'content':
+            return 'url';
+        case 'image':
+            return 'img';
+        default:
+            break;
+    }
+};
+export function extractChatBlocks(data: any) {
+    const chatBlocks: any[] = [];
+    let currentBlock: any[] = [];
+    let insideBlock = false;
+
+    for (const item of data) {
+        if (item.msgType === 'CHAT_FUN') {
+            if (!insideBlock) {
+                insideBlock = true;
+                currentBlock.push(item);
+            } else {
+                currentBlock.push(item);
+            }
+        } else if (item.msgType === 'CHAT') {
+            chatBlocks.push(item);
+        } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+            let currentData: any = {};
+            let loop: any = [];
+            let currentLoop: any = [];
+            currentBlock.push(item);
+            insideBlock = false;
+            currentData.robotName = currentBlock[0].robotName;
+            currentData.robotAvatar = currentBlock[0].robotAvatar;
+            currentData.message = currentBlock[0].message;
+            currentData.createTime = currentBlock[0].createTime;
+            currentData.isNew = false;
+            currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+            currentData.process = [];
+
+            for (const block of currentBlock) {
+                if (block.msgType === 'CHAT_FUN') {
+                    currentLoop.push(block);
+                } else if (block.msgType === 'FUN_CALL') {
+                    currentLoop.push(block);
+                    loop.push(currentLoop);
+                    currentLoop = [];
+                } else {
+                    currentLoop = [];
+                }
+            }
+
+            loop.forEach((item: { answer: string }[], index: string | number) => {
+                currentData.process[index] = {
+                    tips: '查询完成',
+                    showType: transformType(JSON.parse(item[0].answer).arguments.type),
+                    input: JSON.parse(item[0].answer).arguments,
+                    data: JSON.parse(item[1].answer),
+                    success: true,
+                    status: 1,
+                    id: uuidv4()
+                };
+            });
+
+            chatBlocks.push(currentData);
+            currentData = {};
+            currentBlock = [];
+        } else {
+            if (insideBlock) {
+                currentBlock.push(item);
+            }
+        }
+    }
+    return chatBlocks;
+}
+
 export const Chat = ({
     chatBotInfo,
     mode,
@@ -355,69 +435,6 @@ export const Chat = ({
         }
     }, [mode]);
 
-    function extractChatBlocks(data: any) {
-        const chatBlocks: any[] = [];
-        let currentBlock: any[] = [];
-        let insideBlock = false;
-
-        for (const item of data) {
-            if (item.msgType === 'CHAT_FUN') {
-                if (!insideBlock) {
-                    insideBlock = true;
-                    currentBlock.push(item);
-                } else {
-                    currentBlock.push(item);
-                }
-            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
-                let currentData: any = {};
-                let loop: any = [];
-                let currentLoop: any = [];
-                currentBlock.push(item);
-                insideBlock = false;
-                currentData.robotName = currentBlock[0].robotName;
-                currentData.robotAvatar = currentBlock[0].robotAvatar;
-                currentData.message = currentBlock[0].message;
-                currentData.createTime = currentBlock[0].createTime;
-                currentData.isNew = false;
-                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
-                currentData.process = [];
-
-                for (const block of currentBlock) {
-                    if (block.msgType === 'CHAT_FUN') {
-                        currentLoop.push(block);
-                    } else if (block.msgType === 'FUN_CALL') {
-                        currentLoop.push(block);
-                        loop.push(currentLoop);
-                        currentLoop = [];
-                    } else {
-                        currentLoop = [];
-                    }
-                }
-
-                loop.forEach((item: { answer: string }[], index: string | number) => {
-                    currentData.process[index] = {
-                        tips: '查询完成',
-                        showType: 'tips',
-                        input: JSON.parse(item[0].answer).arguments,
-                        data: JSON.parse(item[1].answer),
-                        success: true,
-                        status: 1,
-                        id: uuidv4()
-                    };
-                });
-
-                chatBlocks.push(currentData);
-                currentData = {};
-                currentBlock = [];
-            } else {
-                if (insideBlock) {
-                    currentBlock.push(item);
-                }
-            }
-        }
-        return chatBlocks;
-    }
-
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
         if (mode === 'test' && conversationUid && isFirst) {
@@ -430,7 +447,6 @@ export const Chat = ({
                 }));
 
                 const chatBlocks = extractChatBlocks(list);
-                console.log(chatBlocks, 'chatBlocks');
 
                 const result = [
                     ...chatBlocks,
@@ -513,8 +529,9 @@ export const Chat = ({
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar
                     })) || [];
+                const chatBlocks = extractChatBlocks(list);
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -555,8 +572,9 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+                const chatBlocks = extractChatBlocks(list);
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
@@ -637,7 +655,7 @@ export const Chat = ({
             const contentElement = contentRef.current;
             scrollContainer.scrollTop = contentElement.scrollHeight;
         }
-    });
+    }, [isFetch]);
 
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
@@ -648,6 +666,101 @@ export const Chat = ({
             event.preventDefault();
             // 单独按回车键提交表单
             await handleOnSend();
+        }
+    };
+
+    const handleSSEData = (eventData: any) => {
+        try {
+            const subString = eventData.substring(5);
+            console.log(subString, 'subString');
+            const bufferObj = JSON.parse(subString);
+            if (bufferObj?.code === 200) {
+                jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                setConversationUid(bufferObj.conversationUid);
+
+                // 处理流程
+                if (bufferObj.type === 'i') {
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const process = copyData[copyData.length - 1].process || [];
+                    const content = JSON.parse(bufferObj.content);
+                    // 处理文档（文档状态默认不更新）
+                    if (content.showType === 'docs') {
+                        content.data = uniqBy(content.data, 'id');
+                        copyData[copyData.length - 1].process = [...process, content];
+                        dataRef.current = copyData;
+                        setData(copyData);
+                    }
+                    // 处理链接
+                    if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
+                        //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+                        const index = copyData[copyData.length - 1].process
+                            // ?.filter((v: any) => v.showType === 'tips')
+                            ?.findIndex((v: any) => v.id === content.id);
+
+                        if (index > -1) {
+                            // 替换
+                            if (copyData[copyData.length - 1].isAds) {
+                                copyData[copyData.length - 2].process[index] = content;
+                            } else {
+                                copyData[copyData.length - 1].process[index] = content;
+                            }
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        } else {
+                            if (copyData[copyData.length - 1].isAds) {
+                                copyData[copyData.length - 2].process = [...process, content];
+                            } else {
+                                copyData[copyData.length - 1].process = [...process, content];
+                            }
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        }
+                    }
+                }
+                if (bufferObj.type === 'm') {
+                    debugger;
+                    // 处理结论
+                    const copyData = [...dataRef.current];
+                    if (copyData[copyData.length - 1].isAds) {
+                        copyData[copyData.length - 2].answer = copyData[copyData.length - 2].answer + bufferObj.content;
+                        copyData[copyData.length - 2].isNew = true;
+                    } else {
+                        copyData[copyData.length - 1].answer = copyData[copyData.length - 1].answer + bufferObj.content;
+                        copyData[copyData.length - 1].isNew = true;
+                    }
+
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+                if (bufferObj.type === 'ads-msg') {
+                    const newMessage: IHistory = {
+                        isAds: true,
+                        ads: bufferObj.content
+                    };
+                    const copyData = dataRef.current;
+                    copyData.push(newMessage);
+                    setData([...copyData]);
+                }
+            } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
+                return;
+            } else {
+                const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+                if (copyData[copyData.length - 1].isAds) {
+                    copyData[copyData.length - 2].answer = bufferObj.content || '未知异常';
+                    copyData[copyData.length - 2].status = 'ERROR';
+                    copyData[copyData.length - 2].isNew = false;
+                } else {
+                    copyData[copyData.length - 1].answer = bufferObj.content || '未知异常';
+                    copyData[copyData.length - 1].status = 'ERROR';
+                    copyData[copyData.length - 1].isNew = false;
+                }
+
+                dataRef.current = copyData;
+                setData(copyData);
+                setIsFetch(false);
+            }
+        } catch (e) {
+            console.error(e, 'error-JSON.parse异常');
         }
     };
 
@@ -696,104 +809,136 @@ export const Chat = ({
 
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
-            let outerJoins: any;
-            while (1) {
-                let joins = outerJoins;
-                try {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        const copyData = [...dataRef.current];
+            let outerJoins = '';
+            // while (1) {
+            //     let joins = outerJoins;
+            //     try {
+            //         const { done, value } = await reader.read();
+            //         if (done) {
+            //             const copyData = [...dataRef.current];
+            //             copyData[dataRef.current.length - 1].isNew = false;
+            //             dataRef.current = copyData;
+            //             setData(copyData);
+            //             setIsFetch(false);
+            //             break;
+            //         }
+            //         let str = textDecoder.decode(value);
+            //         console.log(str, 'sse res');
+            //         const lines = str.split('\n');
+            //         lines.forEach((messages, i: number) => {
+            //             if (i === 0 && joins) {
+            //                 messages = joins + messages;
+            //                 joins = undefined;
+            //             }
+            //             if (i === lines.length - 1) {
+            //                 if (messages && messages.indexOf('}') === -1) {
+            //                     joins = messages;
+            //                     return;
+            //                 }
+            //             }
+            //             let bufferObj;
+            //             if (messages?.startsWith('data:{')) {
+            //                 try {
+            //                     bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
+            //                 } catch (e) {
+            //                     console.log(e, 'error-JSON.parse异常');
+            //                     return;
+            //                 }
+            //             }
+            //             if (bufferObj?.code === 200) {
+            //                 jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+            //                 setConversationUid(bufferObj.conversationUid);
+
+            //                 // 处理流程
+            //                 if (bufferObj.type === 'i') {
+            //                     const copyData = [...dataRef.current];
+            //                     const process = copyData[copyData.length - 1].process || [];
+            //                     const content = JSON.parse(bufferObj.content);
+            //                     // 处理文档（文档状态默认不更新）
+            //                     if (content.showType === 'docs') {
+            //                         content.data = uniqBy(content.data, 'id');
+            //                         copyData[copyData.length - 1].process = [...process, content];
+            //                         dataRef.current = copyData;
+            //                         setData(copyData);
+            //                     }
+            //                     // 处理链接
+            //                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
+            //                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+            //                         const index = copyData[copyData.length - 1].process
+            //                             // ?.filter((v: any) => v.showType === 'tips')
+            //                             ?.findIndex((v: any) => v.id === content.id);
+
+            //                         if (index > -1) {
+            //                             // 替换
+            //                             copyData[copyData.length - 1].process[index] = content;
+            //                             dataRef.current = copyData;
+            //                             setData(copyData);
+            //                         } else {
+            //                             copyData[copyData.length - 1].process = [...process, content];
+            //                             dataRef.current = copyData;
+            //                             setData(copyData);
+            //                         }
+            //                     }
+            //                 }
+            //                 if (bufferObj.type === 'm') {
+            //                     // 处理结论
+            //                     const copyData = [...dataRef.current];
+            //                     copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
+            //                     copyData[copyData.length - 1].isNew = true;
+            //                     dataRef.current = copyData;
+            //                     setData(copyData);
+            //                 }
+            //             } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
+            //                 return;
+            //             } else {
+            //                 setIsFetch(false);
+            //                 dispatch(
+            //                     openSnackbar({
+            //                         open: true,
+            //                         message: `[${bufferObj?.code}]-${bufferObj.content}`,
+            //                         variant: 'alert',
+            //                         alert: {
+            //                             color: 'error'
+            //                         },
+            //                         close: false
+            //                     })
+            //                 );
+            //             }
+            //         });
+            //     } catch (e) {
+            //         setIsFetch(false);
+            //         break;
+            //     }
+
+            //     outerJoins = joins;
+            // }
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    const copyData = [...dataRef.current];
+                    if (copyData[copyData.length - 1].isAds) {
+                        copyData[dataRef.current.length - 2].isNew = false;
+                    } else {
                         copyData[dataRef.current.length - 1].isNew = false;
-                        dataRef.current = copyData;
-                        setData(copyData);
-                        setIsFetch(false);
-                        break;
                     }
-                    let str = textDecoder.decode(value);
-                    const lines = str.split('\n');
-                    lines.forEach((messages, i: number) => {
-                        if (i === 0 && joins) {
-                            messages = joins + messages;
-                            joins = undefined;
-                        }
-                        if (i === lines.length - 1) {
-                            if (messages && messages.indexOf('}') === -1) {
-                                joins = messages;
-                                return;
-                            }
-                        }
-                        let bufferObj;
-                        if (messages?.startsWith('data:{')) {
-                            try {
-                                bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                            } catch (e) {
-                                console.log(e, 'error-JSON.parse异常');
-                            }
-                        }
-                        if (bufferObj?.code === 200) {
-                            jsCookie.set(conversationUniKey, bufferObj.conversationUid);
-                            setConversationUid(bufferObj.conversationUid);
-
-                            // 处理流程
-                            if (bufferObj.type === 'i') {
-                                const copyData = [...dataRef.current];
-                                const process = copyData[copyData.length - 1].process || [];
-                                const content = JSON.parse(bufferObj.content);
-                                // 处理文档（文档状态默认不更新）
-                                if (content.showType === 'docs') {
-                                    content.data = uniqBy(content.data, 'id');
-                                    copyData[copyData.length - 1].process = [...process, content];
-                                    dataRef.current = copyData;
-                                    setData(copyData);
-                                }
-                                // 处理链接
-                                if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
-                                    //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
-                                    const index = copyData[copyData.length - 1].process
-                                        // ?.filter((v: any) => v.showType === 'tips')
-                                        ?.findIndex((v: any) => v.id === content.id);
-
-                                    if (index > -1) {
-                                        // 替换
-                                        copyData[copyData.length - 1].process[index] = content;
-                                        dataRef.current = copyData;
-                                        setData(copyData);
-                                    } else {
-                                        copyData[copyData.length - 1].process = [...process, content];
-                                        dataRef.current = copyData;
-                                        setData(copyData);
-                                    }
-                                }
-                            }
-                            if (bufferObj.type === 'm') {
-                                // 处理结论
-                                const copyData = [...dataRef.current];
-                                copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                                copyData[copyData.length - 1].isNew = true;
-                                dataRef.current = copyData;
-                                setData(copyData);
-                            }
-                        } else if (bufferObj && bufferObj.code === 300900002) {
-                            return;
-                        } else if (bufferObj && bufferObj.code !== 200) {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: `[${bufferObj.code}]-${bufferObj.error}`,
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    close: false
-                                })
-                            );
-                        }
-                    });
-                } catch (e) {
+                    dataRef.current = copyData;
+                    setData(copyData);
+                    setIsFetch(false);
                     break;
                 }
 
-                outerJoins = joins;
+                const str = textDecoder.decode(value);
+                outerJoins += str;
+
+                // 查找事件结束标志，例如"}\n"
+                let eventEndIndex = outerJoins.indexOf('}\n');
+
+                while (eventEndIndex !== -1) {
+                    const eventData = outerJoins.slice(0, eventEndIndex + 1);
+                    handleSSEData(eventData);
+                    outerJoins = outerJoins.slice(eventEndIndex + 3);
+                    eventEndIndex = outerJoins.indexOf('}\n');
+                }
             }
         } catch (e: any) {
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
@@ -822,8 +967,11 @@ export const Chat = ({
 
     const handleClean = () => {
         setAnchorEl(null);
-        setData([]);
-        dataRef.current = [];
+
+        const copyData = _.cloneDeep(dataRef.current);
+        const newData = copyData.filter((v: any) => v.isStatement);
+        setData(newData);
+        dataRef.current = newData;
         setConversationUid('');
         jsCookie.remove(conversationUniKey);
     };
@@ -845,7 +993,7 @@ export const Chat = ({
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
                     <div className="h-full  px-[8px] flex flex-col">
-                        <div className="h-[44px] flex items-center justify-center text-lg">AI员工</div>
+                        <div className="h-[44px] flex items-center text-lg font-bold">AI员工</div>
                         <div className="bg-white rounded-md flex-1">
                             {botList?.map((item, index) => (
                                 <>

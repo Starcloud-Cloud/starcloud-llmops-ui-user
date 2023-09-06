@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // material-ui
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -25,6 +25,8 @@ import { isMobile } from 'react-device-detect';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { ImageCard } from 'ui-component/imageCard';
+import imgError from 'assets/images/img_error.svg';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -44,8 +46,6 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
     const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
 
-    console.log('data', data);
-
     const toggleItem = (item: any) => {
         if (expandedItems.includes(item)) {
             // 如果项目已展开，则收起它
@@ -55,6 +55,22 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
             setExpandedItems([...expandedItems, item]);
         }
     };
+
+    useEffect(() => {
+        const handleError = (event: any) => {
+            const target = event.target;
+            if (target instanceof HTMLImageElement) {
+                target.src = imgError;
+                target.alt = '图片加载异常';
+            }
+        };
+
+        window.addEventListener('error', handleError, true);
+
+        return () => {
+            window.removeEventListener('error', handleError, true);
+        };
+    }, []);
 
     return (
         <Grid item xs={12} className="p-[12px]">
@@ -91,7 +107,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         bgcolor: theme.palette.mode === 'dark' ? 'grey.600' : theme.palette.primary.light
                                                     }}
                                                 >
-                                                    <CardContent sx={{ width: '100%', ml: 'auto' }} className="px-[18px] py-[12px]">
+                                                    <CardContent sx={{ width: '100%', ml: 'auto' }} className="px-[18px] !py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 <div className="text-sm whitespace-pre-line text-[#364152]">
@@ -108,8 +124,45 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                 </Grid>
                             </Grid>
                         )}
-                        {/* 欢迎语 */}
-                        {history.isStatement ? (
+                        {history.isAds ? (
+                            history.ads && (
+                                <Grid item xs={12}>
+                                    <Grid container spacing={gridSpacing}>
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            className="flex"
+                                            onMouseEnter={() => setCurrentChat(`${index}-answer`)}
+                                            onMouseLeave={() => setCurrentChat('')}
+                                        >
+                                            <div className="flex flex-col w-full">
+                                                <Card
+                                                    sx={{
+                                                        display: 'inline-block'
+                                                    }}
+                                                    className="bg-[#f2f3f5] w-[70%] m-[auto]"
+                                                >
+                                                    <CardContent className="px-[18px] !py-[12px]">
+                                                        <Grid container spacing={1}>
+                                                            <Grid item xs={12}>
+                                                                <div className="relative">
+                                                                    <div className="text-sm whitespace-pre-line text-[#364152] flex justify-center items-center">
+                                                                        {history.ads}
+                                                                    </div>
+                                                                    <Tooltip title={'这是一条广告'} placement="top" arrow>
+                                                                        <HelpOutlineIcon className="text-base ml-1 cursor-pointer absolute top-[-5px] right-[-10px]" />
+                                                                    </Tooltip>
+                                                                </div>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            )
+                        ) : history.isStatement ? (
                             history.answer && (
                                 <Grid item xs={12}>
                                     <Grid container spacing={gridSpacing}>
@@ -127,7 +180,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent className="px-[18px] py-[12px]">
+                                                    <CardContent className="px-[18px] !py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.answer ? (
@@ -177,7 +230,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent className="px-[18px] py-[12px]">
+                                                    <CardContent className="px-[18px] !py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.process &&
@@ -262,16 +315,15 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                     </div>
                                                                                                 </div>
                                                                                             )}
-                                                                                            {item.showType === 'url' ||
-                                                                                                (item.showType === 'tips' && (
-                                                                                                    <WebPageInfo
-                                                                                                        data={
-                                                                                                            item.data?.response ||
-                                                                                                            item.data ||
-                                                                                                            []
-                                                                                                        }
-                                                                                                    />
-                                                                                                ))}
+                                                                                            {item.showType === 'url' && (
+                                                                                                <WebPageInfo
+                                                                                                    data={
+                                                                                                        item.data?.response ||
+                                                                                                        item.data ||
+                                                                                                        []
+                                                                                                    }
+                                                                                                />
+                                                                                            )}
                                                                                             {item.showType === 'img' && (
                                                                                                 <ImageCard
                                                                                                     data={

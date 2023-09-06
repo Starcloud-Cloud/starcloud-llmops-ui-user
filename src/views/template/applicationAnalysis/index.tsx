@@ -166,7 +166,7 @@ function ApplicationAnalysis({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     useEffect(() => {
-        if (value === 2) {
+        if (value === 2 || value === 7) {
             //获取echarts
             getStatistic();
             infoList(page);

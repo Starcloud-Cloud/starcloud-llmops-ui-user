@@ -960,14 +960,23 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                 <TableRow key={item.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                                     <TableCell component="th" width="200px" scope="row">
                                                         <Tooltip placement="top" title={<Typography>{item.name}</Typography>}>
-                                                            <Typography width="200px" noWrap>
+                                                            <Typography textAlign="center" width="200px" noWrap>
                                                                 {item.name}
                                                             </Typography>
                                                         </Tooltip>
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                        <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                                                            {transformDataType(item.dataType)}&nbsp;{item.storageVO?.type}
+                                                        <Typography
+                                                            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                        >
+                                                            {transformDataType(item.dataType)}&nbsp;
+                                                            {item.dataType === 'HTML'
+                                                                ? '网页'
+                                                                : item.dataType === 'DOCUMENT'
+                                                                ? '文档'
+                                                                : item.dataType === 'CHARACTERS'
+                                                                ? '文本'
+                                                                : null}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell align="center">

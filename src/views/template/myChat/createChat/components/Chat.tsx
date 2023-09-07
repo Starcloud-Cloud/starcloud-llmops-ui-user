@@ -1174,6 +1174,49 @@ export const Chat = ({
                 {mode === 'individual' ? (
                     <div className="flex-shrink-0 flex justify-center w-full mb-1 ">
                         <div className="w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 border border-[#E3E4E5] border-solid relative top-[20px]">
+                            {skillWorkflowList && skillWorkflowList?.length > 0 && (
+                                <Popover
+                                    placement="topLeft"
+                                    content={
+                                        <div className="max-h-[220px] overflow-y-auto">
+                                            {skillWorkflowList.map((v: any, index: number) => (
+                                                <>
+                                                    <div className="flex flex-col w-[220px]">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center">
+                                                                <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                <span className="line-clamp-1 text-base ml-1">{v.name}</span>
+                                                            </div>
+                                                            <BpCheckbox size="small" checked />
+                                                        </div>
+                                                        <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">{v.description}</div>
+                                                    </div>
+                                                    {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
+                                                </>
+                                            ))}
+                                        </div>
+                                    }
+                                    trigger="click"
+                                >
+                                    <div className="flex items-center mb-1 cursor-pointer px-[8px]">
+                                        <span className="text-sm">技能:</span>
+                                        <div className="flex items-center justify-start">
+                                            {skillWorkflowList &&
+                                                skillWorkflowList
+                                                    .slice(0, 5)
+                                                    .map((item: any, index: number) => (
+                                                        <img
+                                                            className="rounded ml-1"
+                                                            key={index}
+                                                            src={item.images}
+                                                            width={18}
+                                                            height={18}
+                                                        />
+                                                    ))}
+                                        </div>
+                                    </div>
+                                </Popover>
+                            )}
                             <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
                                 <Grid item className="!pl-0">
                                     <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -1310,7 +1353,7 @@ export const Chat = ({
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
                                                 skillWorkflowList
-                                                    .slice(0, 3)
+                                                    .slice(0, 5)
                                                     .map((item: any, index: number) => (
                                                         <img
                                                             className="rounded ml-1"

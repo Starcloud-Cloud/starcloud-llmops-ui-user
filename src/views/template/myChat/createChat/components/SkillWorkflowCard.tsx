@@ -114,16 +114,11 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
 
     return (
         <Card
-            onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(data);
-            }}
             sx={{
                 aspectRatio: '186 / 235',
                 overflow: 'hidden',
                 border: '1px solid',
                 position: 'relative',
-                cursor: 'pointer',
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
@@ -150,7 +145,17 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                         src={data.images}
                     />
                     <Tooltip disableInteractive title={data.name}>
-                        <Typography className="line-clamp-1" gutterBottom variant="h3" sx={{ fontSize: '1.1rem' }} component="div" my={1}>
+                        <Typography
+                            className="line-clamp-1 cursor-pointer"
+                            gutterBottom
+                            variant="h3"
+                            sx={{ fontSize: '1.1rem' }}
+                            component="div"
+                            my={1}
+                            onClick={() => {
+                                handleEdit(data);
+                            }}
+                        >
                             {data.name}
                         </Typography>
                     </Tooltip>
@@ -204,9 +209,17 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     position: 'relative',
                     overflow: 'hidden'
                 }}
+                onClick={() => {
+                    handleEdit(data);
+                }}
             >
                 <Tooltip disableInteractive title={data.description}>
-                    <Typography sx={{ fontSize: '.8rem', height: '52px' }} className="line-clamp-3" variant="body2" lineHeight="1.1rem">
+                    <Typography
+                        sx={{ fontSize: '.8rem', height: '52px' }}
+                        className="line-clamp-3 cursor-pointer"
+                        variant="body2"
+                        lineHeight="1.1rem"
+                    >
                         {data.description}
                     </Typography>
                 </Tooltip>

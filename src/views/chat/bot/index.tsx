@@ -33,8 +33,6 @@ const chatBot = () => {
     const [showSelect, setShowSelect] = useState(false);
     const [list, setList] = useState<any[]>([]);
 
-    console.log(mUid, 'mUid');
-
     useEffect(() => {
         if (mediumUid) {
             const result = mediumUid?.split('|');
@@ -78,7 +76,8 @@ const chatBot = () => {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    uid: res.uid
                 });
             })();
         }

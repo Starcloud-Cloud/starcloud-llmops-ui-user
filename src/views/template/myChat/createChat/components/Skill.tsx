@@ -44,6 +44,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import SearchIcon from '@mui/icons-material/Search';
 import SkillWorkflowCard from './SkillWorkflowCard';
+import imgLoading from 'assets/images/picture/loading.gif';
 
 const WorkflowEditModal = ({
     open,
@@ -139,7 +140,7 @@ const WorkflowEditModal = ({
                 }
             >
                 <CardContent>
-                    <form onSubmit={formik.handleSubmit}>
+                    <form>
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={12}>
                                 <TextField
@@ -193,7 +194,13 @@ const WorkflowEditModal = ({
                         <Button variant="outlined" onClick={() => handleClose()} className="mr-2">
                             取消
                         </Button>
-                        <Button variant="contained" color="secondary" type={'submit'} disabled={workflowCurrentRecord.type === 5}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            type={'submit'}
+                            disabled={workflowCurrentRecord.type === 5}
+                            onClick={() => formik.handleSubmit()}
+                        >
                             保存
                         </Button>
                     </Grid>
@@ -212,6 +219,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
     const [list, setList] = useState<any[]>([]);
     const [selectType, setSelectType] = useState(1);
     const [searchValue, setSearchValue] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -230,6 +238,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
     }, []);
 
     const filterList = React.useMemo(() => {
+        setLoading(true);
         if (list.length) {
             let data = [];
             if (selectType === 1) {
@@ -244,10 +253,12 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
             if (selectType === 4) {
                 data = list.filter((item) => item.type === 'MYSELF');
             }
+            setLoading(false);
             return data.filter((item) => item.name.includes(searchValue));
         }
-    }, [selectType, list, searchValue]);
+    }, [selectType, list, searchValue, setLoading]);
 
+    console.log(filterList, 'filterList');
     const handleCreate = async (item: any) => {
         let data: any = {};
         data.appConfigId = appId;
@@ -355,13 +366,20 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                             }}
                         />
                     </div>
-                    <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[400px] overflow-y-auto">
-                        {filterList?.map((item: any, index: number) => (
-                            <Box key={index} className="w-full relative">
-                                <SkillCard data={item} handleCreate={handleCreate} />
-                            </Box>
-                        ))}
-                    </div>
+                    {loading && (
+                        <div className="flex justify-center items-center w-full h-[545px]">
+                            <img width={60} src={imgLoading} alt="loading" />
+                        </div>
+                    )}
+                    {!loading && (
+                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto">
+                            {filterList?.map((item: any, index: number) => (
+                                <Box key={index} className="w-full relative">
+                                    <SkillCard data={item} handleCreate={handleCreate} />
+                                </Box>
+                            ))}
+                        </div>
+                    )}
                 </CardContent>
             </MainCard>
         </Modal>
@@ -451,7 +469,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                         </Box>
                     </Box>
                     <div className={'mt-3'}>
-                        {workflowList.length === 0 && (
+                        {workflowList.length === 0 ? (
                             <Box height="626px" display="flex" justifyContent="center" alignItems="center">
                                 <Box position="relative" display="flex" flexDirection="column" alignItems="center">
                                     <img src={document} alt="" />
@@ -493,23 +511,24 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                                     />
                                 </Box>
                             </Box>
+                        ) : (
+                            <MainCard>
+                                <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
+                                    {workflowList?.map((item, index) => (
+                                        <Grid lg={3} md={4} sm={6} xs={6} key={item.uid + index} item>
+                                            <SkillWorkflowCard
+                                                data={item}
+                                                forceUpdate={forceUpdate}
+                                                handleEdit={() => {
+                                                    setWorkflowEditVisible(true);
+                                                    setWorkflowCurrentRecord(item);
+                                                }}
+                                            />
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </MainCard>
                         )}
-                        <MainCard>
-                            <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
-                                {workflowList?.map((item, index) => (
-                                    <Grid lg={3} md={4} sm={6} xs={6} key={item.uid + index} item>
-                                        <SkillWorkflowCard
-                                            data={item}
-                                            forceUpdate={forceUpdate}
-                                            handleEdit={() => {
-                                                setWorkflowEditVisible(true);
-                                                setWorkflowCurrentRecord(item);
-                                            }}
-                                        />
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        </MainCard>
                     </div>
                 </div>
             </div>

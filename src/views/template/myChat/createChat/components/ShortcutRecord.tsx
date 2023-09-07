@@ -63,8 +63,8 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '类型' },
-    { id: 'subject', numeric: false, disablePadding: false, label: '名称' },
+    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '关键词' },
+    { id: 'subject', numeric: false, disablePadding: false, label: '回复内容' },
     { id: 'status', numeric: false, disablePadding: false, label: '状态' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '编辑' }
 ];
@@ -110,7 +110,6 @@ const Record: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
-    const [dense] = useState(false);
 
     useEffect(() => {
         const fetchPageData = async () => {
@@ -154,8 +153,8 @@ const Record: React.FC = () => {
 
     return (
         <MainCard content={false}>
-            <TableContainer>
-                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+            <TableContainer sx={{ maxHeight: 300 }}>
+                <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'small'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}

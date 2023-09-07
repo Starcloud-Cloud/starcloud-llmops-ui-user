@@ -380,6 +380,7 @@ export const Chat = ({
     const [open, setOpen] = useState(false);
     const [isFinish, setIsFinish] = useState(false);
     const [skillWorkflowList, setSkillWorkflowList] = useState<any[]>([]);
+    const [skillOpen, setSkillOpen] = useState(false);
     const navigate = useNavigate();
 
     const { messageData, setMessageData } = useChatMessage();
@@ -1199,7 +1200,7 @@ export const Chat = ({
                                     trigger="click"
                                 >
                                     <div className="flex items-center mb-1 cursor-pointer px-[8px]">
-                                        <span className="text-sm">技能:</span>
+                                        <span className="text-sm ml-[40px]">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
                                                 skillWorkflowList
@@ -1327,6 +1328,8 @@ export const Chat = ({
                             {skillWorkflowList && skillWorkflowList?.length > 0 && (
                                 <Popover
                                     placement="topLeft"
+                                    arrow={false}
+                                    open={skillOpen}
                                     content={
                                         <div className="max-h-[220px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
@@ -1349,7 +1352,7 @@ export const Chat = ({
                                     trigger="click"
                                 >
                                     <div className="flex items-center mb-1 cursor-pointer px-[8px]">
-                                        <span className="text-sm">技能:</span>
+                                        <span className="text-sm ml-[40px]">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
                                                 skillWorkflowList
@@ -1363,6 +1366,10 @@ export const Chat = ({
                                                             height={18}
                                                         />
                                                     ))}
+                                        </div>
+                                        {skillWorkflowList.length > 5 && <span>...</span>}
+                                        <div onClick={() => setSkillOpen(!skillOpen)}>
+                                            {skillOpen ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                                         </div>
                                     </div>
                                 </Popover>

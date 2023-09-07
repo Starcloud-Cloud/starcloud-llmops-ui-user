@@ -36,6 +36,9 @@ import { config } from 'utils/axios/config';
 import { v4 as uuidv4 } from 'uuid';
 import { IChatInfo } from '../index';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
+import ShortcutRecord from './ShortcutRecord';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
 const { base_url } = config;
 
@@ -330,7 +333,27 @@ const VoiceModal = ({
 };
 
 const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
-    const [type, setType] = useState('0');
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const uploadButton = (
+        <div>
+            <AddIcon />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+    const formik = useFormik({
+        initialValues: {
+            key: '',
+            value: ''
+        },
+        validationSchema: yup.object({
+            name: yup.string().required('关键词是必填的'),
+            desc: yup.string().required('回复内容是必填的')
+        }),
+        onSubmit: (values: any) => {}
+    });
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -350,16 +373,16 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                 }
             >
                 <div className={'w-full p-[24px] '}>
-                    <FormControl sx={{ width: '100%' }}>
-                        <InputLabel id="age-select">类型</InputLabel>
-                        <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
-                            <MenuItem value="0">文本内容</MenuItem>
-                            <MenuItem value="1">执行AI流程</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    <TextField className={'mt-2'} fullWidth label={'关键字'} />
-                    {type === '0' ? (
+                    <form>
+                        <TextField
+                            className={'mt-2'}
+                            fullWidth
+                            label={'关键词'}
+                            value={formik.values.key}
+                            onChange={formik.handleChange}
+                            error={formik.touched.key && Boolean(formik.errors.key)}
+                            helperText={formik.touched.key && (formik.errors.key as string)}
+                        />
                         <TextField
                             className={'mt-2'}
                             fullWidth
@@ -368,25 +391,27 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                             minRows={3}
                             aria-valuemax={200}
                             label={'回复内容'}
+                            value={formik.values.value}
+                            onChange={formik.handleChange}
+                            error={formik.touched.value && Boolean(formik.errors.value)}
+                            helperText={formik.touched.value && (formik.errors.value as string)}
                         />
-                    ) : (
-                        <FormControl sx={{ width: '100%' }} className={'mt-2'}>
-                            <InputLabel id="age-select">选择应用</InputLabel>
-                            <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
-                                <MenuItem value="0">
-                                    <em>文本内容</em>
-                                </MenuItem>
-                                <MenuItem value="1">
-                                    <em>执行AI流程</em>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    )}
+                    </form>
+                    <div className="text-sm mt-2">图片（最多上传9张）</div>
+                    <Upload
+                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleChange}
+                        className="mt-1"
+                    >
+                        {fileList.length >= 9 ? null : uploadButton}
+                    </Upload>
                 </div>
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button">
+                        <Button variant="contained" type="submit">
                             保存
                         </Button>
                     </Grid>
@@ -773,8 +798,8 @@ export const FashionStyling = ({
                             ))}
                         </div> */}
                     </div>
-                    {/* <div className={'mt-5'}>
-                        <span className={'text-base'}>快捷方式</span>
+                    <div className={'mt-5'}>
+                        <span className={'text-base text-black'}>快捷方式</span>
                         <div className={'mt-3'}>
                             <Button
                                 variant={'contained'}
@@ -787,7 +812,7 @@ export const FashionStyling = ({
                             </Button>
                             <ShortcutRecord />
                         </div>
-                    </div> */}
+                    </div>
                 </div>
                 <div className={'mt-10'}>
                     <span

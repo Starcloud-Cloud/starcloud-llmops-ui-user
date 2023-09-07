@@ -117,20 +117,6 @@ export default function FormDialogNew({
                                 if (!value) {
                                     return;
                                 }
-                                if (!uid) {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '请选择模版',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            close: false
-                                        })
-                                    );
-                                    return;
-                                }
                                 handleOk(uid);
                             }}
                         >

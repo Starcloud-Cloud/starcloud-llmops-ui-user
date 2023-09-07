@@ -249,7 +249,7 @@ export const skillCreate = (data: any) => {
  * @returns
  */
 export const getSkillList = (appConfigId: string) => {
-    return request.get({ url: `/llm/chat/config/${appConfigId}` });
+    return request.get({ url: `/llm/chat/config/detail/${appConfigId}` });
 };
 
 /**

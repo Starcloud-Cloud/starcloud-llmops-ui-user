@@ -43,6 +43,7 @@ import SkillCard from './SkillCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import SearchIcon from '@mui/icons-material/Search';
+import SkillWorkflowCard from './SkillWorkflowCard';
 
 const WorkflowEditModal = ({
     open,
@@ -151,6 +152,7 @@ const WorkflowEditModal = ({
                                     onChange={formik.handleChange}
                                     error={formik.touched.name && Boolean(formik.errors.name)}
                                     helperText={formik.touched.name && (formik.errors.name as string)}
+                                    disabled={workflowCurrentRecord.type === 5}
                                 />
                             </Grid>
                             <Grid item xs={12} md={12}>
@@ -165,6 +167,7 @@ const WorkflowEditModal = ({
                                     onChange={formik.handleChange}
                                     error={formik.touched.desc && Boolean(formik.errors.desc)}
                                     helperText={formik.touched.desc && (formik.errors.desc as string)}
+                                    disabled={workflowCurrentRecord.type === 5}
                                 />
                             </Grid>
                             <Grid item xs={12} md={12}>
@@ -178,6 +181,7 @@ const WorkflowEditModal = ({
                                     onChange={formik.handleChange}
                                     error={formik.touched.copyWriting && Boolean(formik.errors.copyWriting)}
                                     helperText={formik.touched.copyWriting && (formik.errors.copyWriting as string)}
+                                    disabled={workflowCurrentRecord.type === 5}
                                 />
                             </Grid>
                         </Grid>
@@ -186,7 +190,10 @@ const WorkflowEditModal = ({
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" color="secondary" type={'submit'}>
+                        <Button variant="outlined" onClick={() => handleClose()} className="mr-2">
+                            取消
+                        </Button>
+                        <Button variant="contained" color="secondary" type={'submit'} disabled={workflowCurrentRecord.type === 5}>
                             保存
                         </Button>
                     </Grid>
@@ -251,7 +258,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                 name: item.name,
                 desc: item.description,
                 code: item.code,
-                icon: item.images && item.images[0]
+                icon: item.images
             };
         }
         if (data.type === 3) {
@@ -259,7 +266,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                 name: item.name,
                 desc: item.description,
                 skillAppUid: item.uid,
-                icon: item.images && item.images[0],
+                icon: item.images,
                 defaultPromptDesc: '',
                 appType: item.type === 'market' ? 1 : 0 //"appType": 0 我的应用 1：应用市场 -> type 3
             };
@@ -405,6 +412,9 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                 })) || [];
 
             const mergedArray = [...appWorkFlowList, ...systemList];
+            const enableList = mergedArray.filter((v) => !v.disabled);
+            setChatBotInfo({ ...chatBotInfo, skillWorkflowList: enableList });
+
             setWorkflowList(mergedArray);
         });
     }, [count]);
@@ -485,18 +495,20 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                             </Box>
                         )}
                         <MainCard>
-                            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                            <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
                                 {workflowList?.map((item, index) => (
-                                    <SkillCard
-                                        data={item}
-                                        forceUpdate={forceUpdate}
-                                        handleEdit={() => {
-                                            setWorkflowEditVisible(true);
-                                            setWorkflowCurrentRecord(item);
-                                        }}
-                                    />
+                                    <Grid lg={3} md={4} sm={6} xs={6} key={item.uid + index} item>
+                                        <SkillWorkflowCard
+                                            data={item}
+                                            forceUpdate={forceUpdate}
+                                            handleEdit={() => {
+                                                setWorkflowEditVisible(true);
+                                                setWorkflowCurrentRecord(item);
+                                            }}
+                                        />
+                                    </Grid>
                                 ))}
-                            </div>
+                            </Grid>
                         </MainCard>
                     </div>
                 </div>

@@ -8,7 +8,6 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
 function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
-    console.log(data, ' data');
     const theme = useTheme();
     const [open, setOpen] = useState(false);
 
@@ -88,7 +87,6 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
     return (
         <Card
             sx={{
-                width: '201px',
                 aspectRatio: '186 / 235',
                 overflow: 'hidden',
                 border: '1px solid',
@@ -148,8 +146,8 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             </CardContent>
             <Divider />
             {handleCreate && (
-                <div className="mt-[7px] px-1 flex justify-end items-center">
-                    <Button size={'small'} color="secondary" onClick={() => handleCreate(data)}>
+                <div className="mt-[10px] px-1 flex justify-end items-center">
+                    <Button variant="contained" size={'small'} color="secondary" onClick={() => handleCreate(data)}>
                         添加
                     </Button>
                 </div>

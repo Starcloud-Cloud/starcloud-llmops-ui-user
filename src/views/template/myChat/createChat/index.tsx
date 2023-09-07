@@ -55,6 +55,7 @@ export type IChatInfo = {
     voiceSpeed?: number;
     enableSearchInWeb?: boolean;
     searchInWeb?: string;
+    skillWorkflowList?: any[];
 };
 
 function CreateDetail() {

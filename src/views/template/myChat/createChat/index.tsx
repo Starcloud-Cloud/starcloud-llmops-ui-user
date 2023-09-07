@@ -1,5 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button, Card, CardHeader, Divider, Link, Tab, Tabs } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 import { chatSave, getChatInfo } from 'api/chat';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { t } from 'hooks/web/useI18n';
@@ -256,7 +257,11 @@ function CreateDetail() {
         await saveDetail();
         setSaveState(saveState + 1);
     };
-
+    //获取状态
+    const [flag, setflag] = useState<boolean>(false);
+    const getStatus = (data: boolean) => {
+        setflag(data);
+    };
     return (
         <div className="grid grid-cols-12 gap-4">
             <Card className="xl:col-span-8 xs:col-span-12 relative">
@@ -289,7 +294,16 @@ function CreateDetail() {
                     <Tab component={Link} label={'知识库'} {...a11yProps(3)} />
                     <Tab component={Link} label={'技能'} {...a11yProps(4)} />
                     {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
-                    <Tab component={Link} label={'机器人发布'} {...a11yProps(6)} />
+                    <Tab
+                        component={Link}
+                        label={
+                            <Box display="flex" alignItems="center">
+                                机器人发布
+                                {flag && <ErrorIcon color="warning" sx={{ fontSize: '14px' }} />}
+                            </Box>
+                        }
+                        {...a11yProps(6)}
+                    />
                     <Tab component={Link} label={'应用分析'} {...a11yProps(7)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
@@ -316,7 +330,9 @@ function CreateDetail() {
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>
-                    {detail?.uid && <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} mode={'CHAT'} />}
+                    {detail?.uid && (
+                        <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} getStatus={getStatus} mode={'CHAT'} />
+                    )}
                 </TabPanel>
             </Card>
             {value !== 5 && (

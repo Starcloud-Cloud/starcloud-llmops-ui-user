@@ -299,156 +299,158 @@ const AppModal = ({
             aria-labelledby="modal-title"
             aria-describedby="modal-description"
         >
-            <MainCard
-                style={{
-                    position: 'absolute',
+            <Box
+                sx={{
+                    position: 'fixed',
                     top: '10%',
                     left: '50%',
                     transform: 'translate(-50%, 0)',
                     width: '80%',
-                    maxHeight: '80%',
-                    overflowY: 'auto'
+                    maxHeight: '80%'
                 }}
-                title={title}
-                content={false}
-                secondary={
-                    <IconButton
-                        onClick={() => {
-                            setOpen(false);
-                        }}
-                        size="large"
-                        aria-label="close modal"
-                    >
-                        <CloseIcon fontSize="small" />
-                    </IconButton>
-                }
             >
-                <CardContent sx={{ p: '0 16px !important', height: '100%', overflowY: 'auto' }}>
-                    <Grid container spacing={2}>
-                        <Grid item md={6}>
-                            <Box ref={leftRef}>
-                                <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
-                                    <InputLabel id="appList">优化选择</InputLabel>
-                                    <Select
-                                        color="secondary"
-                                        labelId="appList"
-                                        name="appValue"
-                                        value={appValue}
-                                        label="优化选择"
-                                        onChange={(e) => {
-                                            setAppValue(e.target.value);
-                                            getDetail(e.target.value);
-                                        }}
-                                    >
-                                        {appList.map((item) => (
-                                            <MenuItem key={item.value} value={item.value}>
-                                                {item.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                {perform > 0 && (
-                                    <Perform
-                                        config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                                        changeSon={changeData}
-                                        changeanswer={changeanswer}
-                                        loadings={loadings}
-                                        variableChange={exeChange}
-                                        promptChange={promptChange}
-                                        key={perform}
-                                        isallExecute={(flag: boolean) => {
-                                            isAllExecute = flag;
-                                        }}
-                                        source="myApp"
-                                    />
-                                )}
-                            </Box>
-                        </Grid>
-                        <Grid item md={6}>
-                            {historyList.length > 0 && perform > 0 && (
-                                <Box>
-                                    <List
-                                        key={leftRef.current.clientHeight}
-                                        sx={{ ml: 4, overflowY: 'auto', height: leftRef.current?.clientHeight, minHeight: '500px' }}
-                                    >
-                                        {historyList.map((item) => (
-                                            <>
-                                                <ListItem>
-                                                    <ListItemButton
-                                                        sx={{ display: 'flex', width: '100%' }}
-                                                        onClick={() => {
-                                                            setPreForm(item);
-                                                        }}
-                                                    >
-                                                        <Box width="150px" whiteSpace="nowrap" mr={2}>
-                                                            {formatDate(item.createTime)}
-                                                        </Box>
-                                                        <Box className="line-clamp-2">{item.answer}</Box>
-                                                    </ListItemButton>
-                                                </ListItem>
-                                                <Divider />
-                                            </>
-                                        ))}
-                                    </List>
-                                </Box>
-                            )}
-                            {historyList.length === 0 && (
-                                <Box height="100%" textAlign="center" display="flex" justifyContent="center" alignItems="center">
-                                    <Box>
-                                        <img width="100px" src={nothing} alt="" />
-                                        <Typography color="#697586">暂无历史记录</Typography>
-                                    </Box>
-                                </Box>
-                            )}
-                        </Grid>
-                    </Grid>
-                </CardContent>
-                <Divider />
-                <CardActions>
-                    <Grid container justifyContent="flex-end" alignItems="center">
-                        {/* {error && (
-                            <Typography color="error" mr={1}>
-                                (无AI结果，无法插入)
-                            </Typography>
-                        )} */}
-                        <Typography sx={{ color: '#697586', fontSize: '0.75rem' }} mr={1}>
-                            (如果觉得AI生成的内容不错，可点击确定将自动把内容复制到页面对应的位置)
-                        </Typography>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="secondary"
+                <MainCard
+                    sx={{ position: 'relative' }}
+                    title={title}
+                    content={false}
+                    secondary={
+                        <IconButton
                             onClick={() => {
-                                if (
-                                    !detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
-                                        .response.answer
-                                ) {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '无AI结果，无法插入',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            close: false,
-                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                            transition: 'SlideLeft'
-                                        })
-                                    );
-                                } else {
-                                    emits(
-                                        detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]?.flowStep
-                                            .response.answer
-                                    );
-                                }
+                                setOpen(false);
                             }}
+                            size="large"
+                            aria-label="close modal"
                         >
-                            确定
-                        </Button>
-                    </Grid>
-                </CardActions>
-            </MainCard>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    }
+                >
+                    <CardContent sx={{ p: '0 16px !important', maxHeight: 'calc(80vh - 85px)', overflowY: 'auto' }}>
+                        <Grid container spacing={2}>
+                            <Grid item md={6}>
+                                <Box ref={leftRef}>
+                                    <FormControl size="small" color="secondary" fullWidth sx={{ my: 2 }}>
+                                        <InputLabel id="appList">优化选择</InputLabel>
+                                        <Select
+                                            color="secondary"
+                                            labelId="appList"
+                                            name="appValue"
+                                            value={appValue}
+                                            label="优化选择"
+                                            onChange={(e) => {
+                                                setAppValue(e.target.value);
+                                                getDetail(e.target.value);
+                                            }}
+                                        >
+                                            {appList.map((item) => (
+                                                <MenuItem key={item.value} value={item.value}>
+                                                    {item.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    {perform > 0 && (
+                                        <Perform
+                                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                            changeSon={changeData}
+                                            changeanswer={changeanswer}
+                                            loadings={loadings}
+                                            variableChange={exeChange}
+                                            promptChange={promptChange}
+                                            key={perform}
+                                            isallExecute={(flag: boolean) => {
+                                                isAllExecute = flag;
+                                            }}
+                                            source="myApp"
+                                        />
+                                    )}
+                                </Box>
+                            </Grid>
+                            <Grid item md={6}>
+                                {historyList.length > 0 && perform > 0 && (
+                                    <Box>
+                                        <List
+                                            key={leftRef.current.clientHeight}
+                                            sx={{ ml: 4, overflowY: 'auto', height: leftRef.current?.clientHeight, minHeight: '500px' }}
+                                        >
+                                            {historyList.map((item) => (
+                                                <>
+                                                    <ListItem>
+                                                        <ListItemButton
+                                                            sx={{ display: 'flex', width: '100%' }}
+                                                            onClick={() => {
+                                                                setPreForm(item);
+                                                            }}
+                                                        >
+                                                            <Box width="150px" whiteSpace="nowrap" mr={2}>
+                                                                {formatDate(item.createTime)}
+                                                            </Box>
+                                                            <Box className="line-clamp-2">{item.answer}</Box>
+                                                        </ListItemButton>
+                                                    </ListItem>
+                                                    <Divider />
+                                                </>
+                                            ))}
+                                        </List>
+                                    </Box>
+                                )}
+                                {historyList.length === 0 && (
+                                    <Box height="100%" textAlign="center" display="flex" justifyContent="center" alignItems="center">
+                                        <Box>
+                                            <img width="100px" src={nothing} alt="" />
+                                            <Typography color="#697586">暂无历史记录</Typography>
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Grid>
+                        </Grid>
+                        <Box height="85px"></Box>
+                        <Box sx={{ background: '#fff' }} position="absolute" bottom="0" right="0" width="100%">
+                            <Divider />
+                            <CardActions>
+                                <Grid container justifyContent="flex-end" alignItems="center">
+                                    <Typography sx={{ color: '#697586', fontSize: '0.75rem' }} mr={1}>
+                                        (如果觉得AI生成的内容不错，可点击确定将自动把内容复制到页面对应的位置)
+                                    </Typography>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => {
+                                            if (
+                                                !detailRef.current?.workflowConfig.steps[detailRef.current.workflowConfig.steps.length - 1]
+                                                    ?.flowStep.response.answer
+                                            ) {
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '无AI结果，无法插入',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false,
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        transition: 'SlideLeft'
+                                                    })
+                                                );
+                                            } else {
+                                                emits(
+                                                    detailRef.current?.workflowConfig.steps[
+                                                        detailRef.current.workflowConfig.steps.length - 1
+                                                    ]?.flowStep.response.answer
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        确定
+                                    </Button>
+                                </Grid>
+                            </CardActions>
+                        </Box>
+                    </CardContent>
+                </MainCard>
+            </Box>
         </Modal>
     );
 };

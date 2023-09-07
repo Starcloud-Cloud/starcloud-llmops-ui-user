@@ -19,7 +19,6 @@ import formatDate, { formatYear } from 'hooks/useDate';
 import {
     Box,
     Button,
-    Card,
     CardActions,
     CardContent,
     Chip,
@@ -27,15 +26,19 @@ import {
     Grid,
     IconButton,
     Link,
-    Menu,
-    MenuItem,
     Modal,
     Tab,
     Tabs,
     TextField,
     Tooltip,
     Typography,
-    useTheme
+    useTheme,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    TableContainer
 } from '@mui/material';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { Upload, UploadProps, Popover } from 'antd';
@@ -77,26 +80,14 @@ const validationSchema = yup.object({
     context: yup.string().required('')
 });
 
-const transformDataType = (dataType: string, type: string | undefined) => {
+const transformDataType = (dataType: string) => {
     switch (dataType) {
         case 'DOCUMENT':
-            return (
-                <Tooltip title={type}>
-                    <ArticleIcon className="text-[#5e35b1] text-base mr-2" />
-                </Tooltip>
-            );
+            return <ArticleIcon className="text-[#5e35b1] text-base mr-2" />;
         case 'HTML':
-            return (
-                <Tooltip title={type}>
-                    <LinkIcon className="text-[#5e35b1] text-base mr-2" />
-                </Tooltip>
-            );
+            return <LinkIcon className="text-[#5e35b1] text-base mr-2" />;
         case 'CHARACTERS':
-            return (
-                <Tooltip title={type}>
-                    <EditIcon className="text-[#5e35b1] text-base mr-2" />
-                </Tooltip>
-            );
+            return <EditIcon className="text-[#5e35b1] text-base mr-2" />;
     }
 };
 
@@ -410,6 +401,8 @@ const DocumentModal = ({
                 style={{
                     position: 'absolute',
                     width: '800px',
+                    maxHeight: '80%',
+                    overflowY: 'auto',
                     top: '10%',
                     left: '50%',
                     transform: 'translate(-50%, 0)'
@@ -457,7 +450,7 @@ const DocumentModal = ({
                         {value === 0 && (
                             <Box py={2}>
                                 <div className="text-sm text-[#9da3af]">
-                                    格式支持 .pdf .docx .txt .pptx .epub .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
+                                    格式支持 .pdf .docx .txt .md .csv，请确保内容可复制，每个30MB以内，单次最多上传20个。
                                     文档中的表格和图片暂时无法学习。
                                 </div>
                                 <div className="mt-3">
@@ -948,208 +941,303 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     </div> */}
 
                     <div className={'mt-3'}>
-                        <MainCard contentSX={{ p: 0 }} sx={{ height: '650px', overflowY: 'auto' }}>
+                        <MainCard contentSX={{ p: 0 }}>
                             {documentList.length > 0 && (
-                                <Grid container spacing={2}>
-                                    {documentList.map((item, index) => {
-                                        return (
-                                            <Grid item xs={12} sm={6} md={6} xl={4} key={index}>
-                                                <SubCard
-                                                    sx={{
-                                                        cursor: 'pointer',
-                                                        background:
-                                                            theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50]
-                                                    }}
-                                                    contentSX={{ p: '10px !important' }}
-                                                >
-                                                    <Grid
-                                                        onClick={() => {
-                                                            setCurrent(item);
-                                                            setDetailOpen(true);
-                                                        }}
-                                                        container
-                                                        spacing={gridSpacing}
-                                                    >
-                                                        <Grid item xs={12}>
-                                                            <Grid container spacing={gridSpacing}>
-                                                                <Grid item xs zeroMinWidth>
-                                                                    <div className="flex items-center">
-                                                                        {transformDataType(item.dataType, item.storageVO?.type)}
-                                                                        <Tooltip title={item.name}>
-                                                                            <Typography
-                                                                                variant="h4"
-                                                                                component="div"
-                                                                                color={'#0009'}
-                                                                                className={
-                                                                                    'overflow-ellipsis whitespace-nowrap w-full overflow-hidden'
-                                                                                }
-                                                                            >
-                                                                                {item?.name}
-                                                                            </Typography>
-                                                                        </Tooltip>
-                                                                    </div>
-                                                                </Grid>
-
-                                                                <Grid item>
-                                                                    <Dropdown
-                                                                        trigger={['click']}
-                                                                        menu={{
-                                                                            items: [
-                                                                                {
-                                                                                    key: '1',
-                                                                                    label: (
-                                                                                        <Box
-                                                                                            onClick={(event) => {
-                                                                                                event.stopPropagation();
-                                                                                                setOpenConfirm(true);
-                                                                                                setCurrent(item);
-                                                                                            }}
-                                                                                            color="error"
-                                                                                            display="flex"
-                                                                                            alignItems="center"
-                                                                                        >
-                                                                                            <DeleteIcon color="error" /> 删除
-                                                                                        </Box>
-                                                                                    )
-                                                                                }
-                                                                            ]
-                                                                        }}
-                                                                        placement="bottom"
-                                                                        arrow={{ pointAtCenter: true }}
-                                                                    >
-                                                                        <IconButton
-                                                                            size="small"
-                                                                            sx={{ mt: -0.75, mr: -0.75 }}
-                                                                            onClick={(event) => {
-                                                                                event.stopPropagation();
-                                                                            }}
-                                                                        >
-                                                                            <MoreHorizIcon />
-                                                                        </IconButton>
-                                                                    </Dropdown>
-                                                                </Grid>
-                                                            </Grid>
-                                                        </Grid>
-                                                        <Grid item xs={12} className="!pt-[10px]">
-                                                            <Typography
-                                                                fontSize="12px"
-                                                                height="48px"
-                                                                white-space="nowrap"
-                                                                overflow="hidden"
-                                                                text-overflow="ellipsis"
-                                                                display="-webkit-box"
-                                                                sx={{ '-webkit-line-clamp': '3', '-webkit-box-orient': 'vertical' }}
-                                                                component="div"
-                                                                color={'#0006'}
-                                                            >
-                                                                {item?.description}
+                                <TableContainer sx={{ maxHeight: '650px' }}>
+                                    <Table stickyHeader aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align="center">文件名</TableCell>
+                                                <TableCell align="center">类型</TableCell>
+                                                <TableCell align="center">大小/字符</TableCell>
+                                                <TableCell align="center">全部状态</TableCell>
+                                                <TableCell align="center">创建时间</TableCell>
+                                                <TableCell align="center">操作</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {documentList.map((item) => (
+                                                <TableRow key={item.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                                    <TableCell component="th" width="200px" scope="row">
+                                                        <Tooltip placement="top" title={<Typography>{item.name}</Typography>}>
+                                                            <Typography width="200px" noWrap>
+                                                                {item.name}
                                                             </Typography>
-                                                        </Grid>
-                                                        <Grid
-                                                            item
-                                                            xs={12}
-                                                            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                                            className="!pt-[10px]"
-                                                        >
-                                                            <Tooltip
-                                                                placement="top"
-                                                                title={((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
-                                                            >
-                                                                <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
-                                                            </Tooltip>
-                                                            <Box>
-                                                                <Tooltip placement="top" title={formatDate(item.updateTime)}>
-                                                                    <Typography variant="caption">{formatYear(item.updateTime)}</Typography>
-                                                                </Tooltip>
-                                                            </Box>
-                                                        </Grid>
-                                                        <Grid item xs={12} className="!pt-[5px]">
-                                                            <Divider variant="fullWidth" />
-                                                        </Grid>
-                                                        <Grid
-                                                            item
-                                                            xs={12}
-                                                            className="!pt-[10px] flex items-center"
-                                                            sx={{
-                                                                display: 'flex',
-                                                                alignContent: 'center',
-                                                                justifyContent: 'space-between'
+                                                        </Tooltip>
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                                                            {transformDataType(item.dataType)}&nbsp;{item.storageVO?.type}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {item.wordCount}&nbsp;字符/
+                                                        {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {item.status === 0
+                                                            ? '上传失败'
+                                                            : item.status === 15
+                                                            ? '上传失败'
+                                                            : item.status === 20
+                                                            ? '上传成功'
+                                                            : item.status === 21
+                                                            ? '同步中'
+                                                            : item.status === 25
+                                                            ? '同步失败'
+                                                            : item.status === 30
+                                                            ? '同步完成'
+                                                            : item.status === 31
+                                                            ? '学习中'
+                                                            : item.status === 35
+                                                            ? '学习失败'
+                                                            : item.status === 40
+                                                            ? '学习中'
+                                                            : item.status === 41
+                                                            ? '学习中'
+                                                            : item.status === 45
+                                                            ? '学习失败'
+                                                            : item.status === 50
+                                                            ? '学习中'
+                                                            : item.status === 51
+                                                            ? '学习中'
+                                                            : item.status === 55
+                                                            ? '学习失败'
+                                                            : item.status === 60
+                                                            ? '学习中'
+                                                            : item.status >= 90
+                                                            ? '学习完成'
+                                                            : null}
+                                                    </TableCell>
+                                                    <TableCell align="center">{formatDate(item.updateTime)}</TableCell>
+                                                    <TableCell align="center">
+                                                        <Button
+                                                            onClick={() => {
+                                                                setCurrent(item);
+                                                                setDetailOpen(true);
                                                             }}
+                                                            color="secondary"
+                                                            size="small"
                                                         >
-                                                            <Box display="flex" alignItems="center">
-                                                                {item.status === 0 ||
-                                                                item.status === 15 ||
-                                                                item.status === 25 ||
-                                                                item.status === 35 ||
-                                                                item.status === 45 ||
-                                                                item.status === 55 ? (
-                                                                    <Tooltip title={item.errorMessage}>
-                                                                        <HighlightOffIcon
-                                                                            sx={{
-                                                                                color: 'error.dark',
-                                                                                width: 14,
-                                                                                height: 14
-                                                                            }}
-                                                                        />
-                                                                    </Tooltip>
-                                                                ) : item.status >= 90 ? (
-                                                                    <CheckCircleIcon
-                                                                        sx={{
-                                                                            color: 'success.dark',
-                                                                            width: 14,
-                                                                            height: 14
-                                                                        }}
-                                                                    />
-                                                                ) : (
-                                                                    <LoadingOutlined
-                                                                        style={{ fontSize: '14px', color: '#673ab7' }}
-                                                                        rev={undefined}
-                                                                    />
-                                                                )}
-                                                                <Typography ml={0.5} variant="caption">
-                                                                    {item.status === 0
-                                                                        ? '上传失败'
-                                                                        : item.status === 15
-                                                                        ? '上传失败'
-                                                                        : item.status === 20
-                                                                        ? '上传成功'
-                                                                        : item.status === 21
-                                                                        ? '同步中'
-                                                                        : item.status === 25
-                                                                        ? '同步失败'
-                                                                        : item.status === 30
-                                                                        ? '同步完成'
-                                                                        : item.status === 31
-                                                                        ? '学习中'
-                                                                        : item.status === 35
-                                                                        ? '学习失败'
-                                                                        : item.status === 40
-                                                                        ? '学习中'
-                                                                        : item.status === 41
-                                                                        ? '学习中'
-                                                                        : item.status === 45
-                                                                        ? '学习失败'
-                                                                        : item.status === 50
-                                                                        ? '学习中'
-                                                                        : item.status === 51
-                                                                        ? '学习中'
-                                                                        : item.status === 55
-                                                                        ? '学习失败'
-                                                                        : item.status === 60
-                                                                        ? '学习中'
-                                                                        : item.status >= 90
-                                                                        ? '学习完成'
-                                                                        : null}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Grid>
-                                                    </Grid>
-                                                </SubCard>
-                                            </Grid>
-                                        );
-                                    })}
-                                </Grid>
+                                                            详情
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => {
+                                                                setOpenConfirm(true);
+                                                                setCurrent(item);
+                                                            }}
+                                                            color="error"
+                                                            size="small"
+                                                        >
+                                                            删除
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                // <Grid container spacing={2}>
+                                //     {documentList.map((item, index) => {
+                                //         return (
+                                //             <Grid item xs={12} sm={6} md={6} xl={4} key={index}>
+                                //                 <SubCard
+                                //                     sx={{
+                                //                         cursor: 'pointer',
+                                //                         background:
+                                //                             theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50]
+                                //                     }}
+                                //                     contentSX={{ p: '10px !important' }}
+                                //                 >
+                                //                     <Grid
+                                //                         onClick={() => {
+                                //                             setCurrent(item);
+                                //                             setDetailOpen(true);
+                                //                         }}
+                                //                         container
+                                //                         spacing={gridSpacing}
+                                //                     >
+                                //                         <Grid item xs={12}>
+                                //                             <Grid container spacing={gridSpacing}>
+                                //                                 <Grid item xs zeroMinWidth>
+                                //                                     <div className="flex items-center">
+                                //                                         {transformDataType(item.dataType)}
+                                //                                         <Tooltip title={item.name}>
+                                //                                             <Typography
+                                //                                                 variant="h4"
+                                //                                                 component="div"
+                                //                                                 color={'#0009'}
+                                //                                                 className={
+                                //                                                     'overflow-ellipsis whitespace-nowrap w-full overflow-hidden'
+                                //                                                 }
+                                //                                             >
+                                //                                                 {item?.name}
+                                //                                             </Typography>
+                                //                                         </Tooltip>
+                                //                                     </div>
+                                //                                 </Grid>
+
+                                //                                 <Grid item>
+                                //                                     <Dropdown
+                                //                                         trigger={['click']}
+                                //                                         menu={{
+                                //                                             items: [
+                                //                                                 {
+                                //                                                     key: '1',
+                                //                                                     label: (
+                                //                                                         <Box
+                                //                                                             onClick={(event) => {
+                                //                                                                 event.stopPropagation();
+                                //                                                                 setOpenConfirm(true);
+                                //                                                                 setCurrent(item);
+                                //                                                             }}
+                                //                                                             color="error"
+                                //                                                             display="flex"
+                                //                                                             alignItems="center"
+                                //                                                         >
+                                //                                                             <DeleteIcon color="error" /> 删除
+                                //                                                         </Box>
+                                //                                                     )
+                                //                                                 }
+                                //                                             ]
+                                //                                         }}
+                                //                                         placement="bottom"
+                                //                                         arrow={{ pointAtCenter: true }}
+                                //                                     >
+                                //                                         <IconButton
+                                //                                             size="small"
+                                //                                             sx={{ mt: -0.75, mr: -0.75 }}
+                                //                                             onClick={(event) => {
+                                //                                                 event.stopPropagation();
+                                //                                             }}
+                                //                                         >
+                                //                                             <MoreHorizIcon />
+                                //                                         </IconButton>
+                                //                                     </Dropdown>
+                                //                                 </Grid>
+                                //                             </Grid>
+                                //                         </Grid>
+                                //                         <Grid item xs={12} className="!pt-[10px]">
+                                //                             <Typography
+                                //                                 fontSize="12px"
+                                //                                 height="48px"
+                                //                                 white-space="nowrap"
+                                //                                 overflow="hidden"
+                                //                                 text-overflow="ellipsis"
+                                //                                 display="-webkit-box"
+                                //                                 sx={{ '-webkit-line-clamp': '3', '-webkit-box-orient': 'vertical' }}
+                                //                                 component="div"
+                                //                                 color={'#0006'}
+                                //                             >
+                                //                                 {item?.description}
+                                //                             </Typography>
+                                //                         </Grid>
+                                //                         <Grid
+                                //                             item
+                                //                             xs={12}
+                                //                             sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                //                             className="!pt-[10px]"
+                                //                         >
+                                //                             <Tooltip
+                                //                                 placement="top"
+                                //                                 title={((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                //                             >
+                                //                                 <Typography variant="caption">{item.wordCount}&nbsp;字符</Typography>
+                                //                             </Tooltip>
+                                //                             <Box>
+                                //                                 <Tooltip placement="top" title={formatDate(item.updateTime)}>
+                                //                                     <Typography variant="caption">{formatYear(item.updateTime)}</Typography>
+                                //                                 </Tooltip>
+                                //                             </Box>
+                                //                         </Grid>
+                                //                         <Grid item xs={12} className="!pt-[5px]">
+                                //                             <Divider variant="fullWidth" />
+                                //                         </Grid>
+                                //                         <Grid
+                                //                             item
+                                //                             xs={12}
+                                //                             className="!pt-[10px] flex items-center"
+                                //                             sx={{
+                                //                                 display: 'flex',
+                                //                                 alignContent: 'center',
+                                //                                 justifyContent: 'space-between'
+                                //                             }}
+                                //                         >
+                                //                             <Box display="flex" alignItems="center">
+                                //                                 {item.status === 0 ||
+                                //                                 item.status === 15 ||
+                                //                                 item.status === 25 ||
+                                //                                 item.status === 35 ||
+                                //                                 item.status === 45 ||
+                                //                                 item.status === 55 ? (
+                                //                                     <Tooltip title={item.errorMessage}>
+                                //                                         <HighlightOffIcon
+                                //                                             sx={{
+                                //                                                 color: 'error.dark',
+                                //                                                 width: 14,
+                                //                                                 height: 14
+                                //                                             }}
+                                //                                         />
+                                //                                     </Tooltip>
+                                //                                 ) : item.status >= 90 ? (
+                                //                                     <CheckCircleIcon
+                                //                                         sx={{
+                                //                                             color: 'success.dark',
+                                //                                             width: 14,
+                                //                                             height: 14
+                                //                                         }}
+                                //                                     />
+                                //                                 ) : (
+                                //                                     <LoadingOutlined
+                                //                                         style={{ fontSize: '14px', color: '#673ab7' }}
+                                //                                         rev={undefined}
+                                //                                     />
+                                //                                 )}
+                                //                                 <Typography ml={0.5} variant="caption">
+                                //                                     {item.status === 0
+                                //                                         ? '上传失败'
+                                //                                         : item.status === 15
+                                //                                         ? '上传失败'
+                                //                                         : item.status === 20
+                                //                                         ? '上传成功'
+                                //                                         : item.status === 21
+                                //                                         ? '同步中'
+                                //                                         : item.status === 25
+                                //                                         ? '同步失败'
+                                //                                         : item.status === 30
+                                //                                         ? '同步完成'
+                                //                                         : item.status === 31
+                                //                                         ? '学习中'
+                                //                                         : item.status === 35
+                                //                                         ? '学习失败'
+                                //                                         : item.status === 40
+                                //                                         ? '学习中'
+                                //                                         : item.status === 41
+                                //                                         ? '学习中'
+                                //                                         : item.status === 45
+                                //                                         ? '学习失败'
+                                //                                         : item.status === 50
+                                //                                         ? '学习中'
+                                //                                         : item.status === 51
+                                //                                         ? '学习中'
+                                //                                         : item.status === 55
+                                //                                         ? '学习失败'
+                                //                                         : item.status === 60
+                                //                                         ? '学习中'
+                                //                                         : item.status >= 90
+                                //                                         ? '学习完成'
+                                //                                         : null}
+                                //                                 </Typography>
+                                //                             </Box>
+                                //                         </Grid>
+                                //                     </Grid>
+                                //                 </SubCard>
+                                //             </Grid>
+                                //         );
+                                //     })}
+                                // </Grid>
                             )}
+
                             {documentList.length === 0 && (
                                 <Box height="626px" display="flex" justifyContent="center" alignItems="center">
                                     <Box position="relative" display="flex" flexDirection="column" alignItems="center">

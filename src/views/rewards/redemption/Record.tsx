@@ -250,102 +250,98 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                 '& > div:focus-visible': { outline: 'none' }
             }}
         >
-            <div
-                style={{
+            <MainCard
+                content={false}
+                title="权益记录"
+                sx={{
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    width: { lg: '60%', md: '70%', xs: '80%' }
                 }}
-            >
-                <MainCard content={false} title="权益记录" style={{ width: '1200px' }}>
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{ position: 'absolute', right: 15, top: 15, bgcolor: '#ffffff' }}
-                    >
-                        <CloseIcon />
+                secondary={
+                    <IconButton onClick={handleClose}>
+                        <CloseIcon fontSize="small" />
                     </IconButton>
-                    <TableContainer sx={{ maxHeight: 500 }}>
-                        <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-                            <EnhancedTableHead
-                                numSelected={selected.length}
-                                order={order}
-                                orderBy={orderBy}
-                                onSelectAllClick={handleSelectAllClick}
-                                onRequestSort={handleRequestSort}
-                                rowCount={rows.length}
-                            />
-                            <TableBody>
-                                {stableSort(
-                                    rows.filter((row) => typeof row !== 'number'),
-                                    getComparator(order, orderBy)
-                                ).map((row, index) => {
-                                    if (typeof row === 'number') {
-                                        return null; // 忽略数字类型的行
-                                    }
+                }
+            >
+                <TableContainer>
+                    <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                        <EnhancedTableHead
+                            numSelected={selected.length}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                            rowCount={rows.length}
+                        />
+                        <TableBody>
+                            {stableSort(
+                                rows.filter((row) => typeof row !== 'number'),
+                                getComparator(order, orderBy)
+                            ).map((row, index) => {
+                                if (typeof row === 'number') {
+                                    return null; // 忽略数字类型的行
+                                }
 
-                                    const isItemSelected = isSelected(row.benefitsName);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
+                                const isItemSelected = isSelected(row.benefitsName);
+                                const labelId = `enhanced-table-checkbox-${index}`;
 
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={(event) => handleClick(event, row.benefitsName)}
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.id}
-                                            selected={isItemSelected}
-                                        >
-                                            <TableCell sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
-                                                {row.benefitsName}
-                                            </TableCell>
-                                            <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
-                                            <TableCell align="center">
-                                                {row.benefitsList.map((benefit, id) => (
-                                                    <Fragment key={id}>
-                                                        {benefit}
-                                                        <br />
-                                                    </Fragment>
-                                                ))}
-                                            </TableCell>
-                                            <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
-                                            <TableCell align="right">
-                                                {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
-                                            </TableCell>
-                                            <TableCell sx={{ pr: 3 }} align="right">
-                                                {formatTime(row.expirationTime)}
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-
-                                {emptyRows > 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={7} />
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={(event) => handleClick(event, row.benefitsName)}
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={row.id}
+                                        selected={isItemSelected}
+                                    >
+                                        <TableCell sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
+                                            {row.benefitsName}
+                                        </TableCell>
+                                        <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
+                                        <TableCell align="center">
+                                            {row.benefitsList.map((benefit, id) => (
+                                                <Fragment key={id}>
+                                                    {benefit}
+                                                    <br />
+                                                </Fragment>
+                                            ))}
+                                        </TableCell>
+                                        <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
+                                        <TableCell align="right">
+                                            {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
+                                        </TableCell>
+                                        <TableCell sx={{ pr: 3 }} align="right">
+                                            {formatTime(row.expirationTime)}
+                                        </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                );
+                            })}
 
-                    {/* table pagination */}
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10]}
-                        component="div"
-                        count={total}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage="每页行数"
-                    />
-                </MainCard>
-            </div>
+                            {emptyRows > 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={7} />
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* table pagination */}
+                <TablePagination
+                    rowsPerPageOptions={[5, 10]}
+                    component="div"
+                    count={total}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="每页行数"
+                />
+            </MainCard>
         </Modal>
     );
 };

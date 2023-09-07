@@ -56,6 +56,7 @@ export type IChatInfo = {
     voiceSpeed?: number;
     enableSearchInWeb?: boolean;
     searchInWeb?: string;
+    skillWorkflowList?: any[];
 };
 
 function CreateDetail() {
@@ -246,7 +247,7 @@ function CreateDetail() {
     };
 
     //tabs
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(1);
     const [saveState, setSaveState] = useState(0);
     const handleChange = (event: any, newValue: number) => {
         setValue(newValue);
@@ -273,7 +274,7 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        (value === 0 || value === 1 || value === 4 || value === 6) && (
+                        (value === 0 || value === 1 || value === 6) && (
                             <Button
                                 // className="right-[25px] top-[85px] absolute z-50"
                                 variant="contained"

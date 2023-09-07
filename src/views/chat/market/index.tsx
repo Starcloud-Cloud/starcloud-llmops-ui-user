@@ -29,6 +29,7 @@ const ChatMy = () => {
             (async () => {
                 const res = await getChatInfo(uid);
                 setChatBotInfo({
+                    uid: res.uid,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介

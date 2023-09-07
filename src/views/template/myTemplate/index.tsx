@@ -121,6 +121,7 @@ function MyTemplate() {
     };
     useEffect(() => {
         recommends().then((res) => {
+            console.log(res, 'res');
             setRecommends(res);
         });
         appPage({ pageNo: 1, pageSize: 1000 }).then((res) => {

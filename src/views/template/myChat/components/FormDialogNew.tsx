@@ -52,7 +52,7 @@ export default function FormDialogNew({
                 }}
                 title={t('chat.createRobot')}
                 content={false}
-                className="sm:w-[800px] xs:w-[300px]"
+                className="sm:w-[700px] xs:w-[300px]"
                 secondary={
                     <IconButton
                         onClick={() => {
@@ -89,7 +89,7 @@ export default function FormDialogNew({
                             </div>
                         </div>
                         <div className="pt-[16px] w-full text-base">选择模版</div>
-                        <div className="w-full mt-[8px] grid xs:grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div className="w-full mt-[8px] grid xs:grid-cols-1 gap-4 sm:grid-cols-3 h-[530px] overflow-y-auto">
                             {recommendList.map((item: any, index) => (
                                 <Box
                                     key={index}
@@ -115,20 +115,6 @@ export default function FormDialogNew({
                             onClick={() => {
                                 setChecked(true);
                                 if (!value) {
-                                    return;
-                                }
-                                if (!uid) {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '请选择模版',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            close: false
-                                        })
-                                    );
                                     return;
                                 }
                                 handleOk(uid);

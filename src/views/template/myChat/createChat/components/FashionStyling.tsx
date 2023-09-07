@@ -599,8 +599,8 @@ export const FashionStyling = ({
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={5}
-                            minRows={5}
+                            maxRows={3}
+                            minRows={3}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
                             error={(chatBotInfo?.introduction?.length || 0) > 300}
@@ -711,7 +711,7 @@ export const FashionStyling = ({
                             }}
                         />
                         <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
-                            <div className="ml-1">
+                            <div className="ml-1 text-left">
                                 打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
                             </div>
                             <div>{chatBotInfo?.statement?.length || 0}/300</div>

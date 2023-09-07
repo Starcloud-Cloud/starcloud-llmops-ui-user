@@ -226,3 +226,46 @@ export const ruleDel = (data: any) => {
 export const ruleDebugRule = (data: any) => {
     return request.post({ url: '/llm/dataset/rule/debugRule', data });
 };
+
+/**
+ * 获取所有技能
+ * @returns
+ */
+export const getListAll = () => {
+    return request.get({ url: '/llm/chatskill/all' });
+};
+
+/**
+ * 创建
+ * @returns
+ */
+export const skillCreate = (data: any) => {
+    return request.post({ url: '/llm/chat/config/create', data });
+};
+
+/**
+ * 获取所有技能
+ * @param appConfigId
+ * @returns
+ */
+export const getSkillList = (appConfigId: string) => {
+    return request.get({ url: `/llm/chat/config/detail/${appConfigId}` });
+};
+
+/**
+ * 修改/编辑
+ * @param data
+ * @returns
+ */
+export const modifySkill = (data: any) => {
+    return request.post({ url: '/llm/chat/config/modify', data });
+};
+
+/**
+ * 删除技能
+ * @param uid
+ * @returns
+ */
+export const delSkill = (uid: string) => {
+    return request.delete({ url: `/llm/chat/config/delete/${uid}` });
+};

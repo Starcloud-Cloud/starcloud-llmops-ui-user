@@ -45,6 +45,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import SearchIcon from '@mui/icons-material/Search';
 import SkillWorkflowCard from './SkillWorkflowCard';
 import imgLoading from 'assets/images/picture/loading.gif';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const WorkflowEditModal = ({
     open,
@@ -220,6 +221,9 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
     const [selectType, setSelectType] = useState(1);
     const [searchValue, setSearchValue] = useState('');
     const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [pageData, setPageData] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
         (async () => {
@@ -254,9 +258,25 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                 data = list.filter((item) => item.type === 'MYSELF');
             }
             setLoading(false);
-            return data.filter((item) => item.name.includes(searchValue));
+            return data.filter((item) => item.name.includes(searchValue)) || [];
         }
     }, [selectType, list, searchValue, setLoading]);
+
+    useEffect(() => {
+        setPageData(filterList?.slice(0, 20) || []);
+        setPage(2);
+    }, [filterList]);
+
+    const fetchMoreData = () => {
+        if (setPageData.length >= filterList!.length) {
+            setHasMore(false);
+            return;
+        }
+        setTimeout(() => {
+            setPageData(filterList?.slice(0, 20 * page) || []);
+            setPage(page + 1);
+        }, 100);
+    };
 
     console.log(filterList, 'filterList');
     const handleCreate = async (item: any) => {
@@ -372,13 +392,20 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                         </div>
                     )}
                     {!loading && (
-                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto">
-                            {filterList?.map((item: any, index: number) => (
+                        <InfiniteScroll
+                            dataLength={pageData.length}
+                            next={fetchMoreData}
+                            hasMore={hasMore}
+                            loader={<></>}
+                            height={545}
+                            className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto"
+                        >
+                            {pageData?.map((item: any, index: number) => (
                                 <Box key={index} className="w-full relative">
                                     <SkillCard data={item} handleCreate={handleCreate} />
                                 </Box>
                             ))}
-                        </div>
+                        </InfiniteScroll>
                     )}
                 </CardContent>
             </MainCard>

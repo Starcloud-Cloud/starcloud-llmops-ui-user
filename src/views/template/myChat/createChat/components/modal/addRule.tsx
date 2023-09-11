@@ -745,7 +745,7 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">
                                                                     单个匹配：直接输入要过滤的 URL 地址即可，例如：http://www.baidu.com
                                                                 </Typography>
-                                                                <Typography fontSize="12px">
+                                                                <Typography fontSize="12px" my={1}>
                                                                     多个匹配：在 URL 后面增加/*，即可匹配以该 URL 开头的所有 URL
                                                                     地址，例如：http://www.baidu.com/*
                                                                 </Typography>
@@ -756,13 +756,13 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">
                                                                     单个匹配：输入文件名及其后缀即可，例如：测试.doc
                                                                 </Typography>
-                                                                <Typography fontSize="12px">
+                                                                <Typography fontSize="12px" my={1}>
                                                                     多个匹配：支持根据文件名或后缀进行匹配
                                                                 </Typography>
                                                                 <Typography fontSize="12px">
                                                                     文件名匹配：例如测试.*，会匹配以测试为文件名的任意格式文件
                                                                 </Typography>
-                                                                <Typography fontSize="12px">
+                                                                <Typography fontSize="12px" my={1}>
                                                                     文件后缀匹配：例如*.doc，会匹配以.doc为后缀的任意文件名文件
                                                                 </Typography>
                                                             </>
@@ -772,7 +772,7 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">
                                                                     单个匹配：直接输入完整的文本标题即可
                                                                 </Typography>
-                                                                <Typography fontSize="12px">
+                                                                <Typography mt={1} fontSize="12px">
                                                                     多个匹配：在文本标题后面加上_*，即可匹配到以该文件标题开头的
                                                                 </Typography>
                                                             </>
@@ -853,7 +853,9 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">
                                                                     白名单：获取指定标签或ID下的网页数据
                                                                 </Typography>
-                                                                <Typography fontSize="12px">标签格式：.＋具体标签，例：.body</Typography>
+                                                                <Typography my={1} fontSize="12px">
+                                                                    标签格式：.＋具体标签，例：.body
+                                                                </Typography>
                                                                 <Typography fontSize="12px">ID格式：#＋具体ID，例：#dda21</Typography>
                                                             </SubCard>
                                                         </Grid>
@@ -920,7 +922,9 @@ const AddRuleModal = ({
                                                                 <Typography fontSize="12px">
                                                                     黑名单：清除指定标签或ID下的网页数据
                                                                 </Typography>
-                                                                <Typography fontSize="12px">标签格式：.＋具体标签，例：.a</Typography>
+                                                                <Typography my={1} fontSize="12px">
+                                                                    标签格式：.＋具体标签，例：.a
+                                                                </Typography>
                                                                 <Typography fontSize="12px">ID格式：#＋具体ID，例：#dda23</Typography>
                                                             </SubCard>
                                                         </Grid>

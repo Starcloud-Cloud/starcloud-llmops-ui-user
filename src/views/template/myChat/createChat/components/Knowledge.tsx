@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/Article';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
@@ -9,7 +10,6 @@ import EditIcon from '@mui/icons-material/EditTwoTone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LinkIcon from '@mui/icons-material/Link';
-import { LoadingOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
@@ -40,6 +40,8 @@ import {
     TableBody,
     TableContainer
 } from '@mui/material';
+import { Tag } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { Upload, UploadProps, Popover } from 'antd';
 import { useFormik } from 'formik';
@@ -943,16 +945,34 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }}>
                             {documentList.length > 0 && (
-                                <TableContainer sx={{ maxHeight: '650px' }}>
+                                <TableContainer sx={{ height: '650px' }}>
                                     <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell align="center">文件名</TableCell>
-                                                <TableCell align="center">类型</TableCell>
-                                                <TableCell align="center">大小/字符</TableCell>
-                                                <TableCell align="center">全部状态</TableCell>
-                                                <TableCell align="center">创建时间</TableCell>
-                                                <TableCell align="center">操作</TableCell>
+                                                <TableCell>文件名</TableCell>
+                                                <TableCell>类型</TableCell>
+                                                <TableCell>大小/字符</TableCell>
+                                                <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    全部状态{' '}
+                                                    <Tooltip
+                                                        title={
+                                                            <>
+                                                                <Typography>上传失败</Typography>
+                                                                <Typography my={0.5}>上传成功</Typography>
+                                                                <Typography>同步中</Typography>
+                                                                <Typography my={0.5}>同步失败</Typography>
+                                                                <Typography>同步完成</Typography>
+                                                                <Typography my={0.5}>学习中</Typography>
+                                                                <Typography>学习失败</Typography>
+                                                                <Typography my={0.5}>学习完成</Typography>
+                                                            </>
+                                                        }
+                                                    >
+                                                        <HelpOutlineOutlinedIcon fontSize="small" />
+                                                    </Tooltip>
+                                                </TableCell>
+                                                <TableCell>创建时间</TableCell>
+                                                <TableCell>操作</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -960,16 +980,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                 <TableRow key={item.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                                     <TableCell component="th" width="200px" scope="row">
                                                         <Tooltip placement="top" title={<Typography>{item.name}</Typography>}>
-                                                            <Typography textAlign="center" width="200px" noWrap>
-                                                                {item.name}
+                                                            <Typography width="200px" noWrap>
+                                                                {transformDataType(item.dataType)}&nbsp;{item.name}
                                                             </Typography>
                                                         </Tooltip>
                                                     </TableCell>
-                                                    <TableCell align="center">
-                                                        <Typography
-                                                            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                                        >
-                                                            {transformDataType(item.dataType)}&nbsp;
+                                                    <TableCell>
+                                                        <Typography sx={{ display: 'flex', alignItems: 'center' }}>
                                                             {item.dataType === 'HTML'
                                                                 ? '网页'
                                                                 : item.dataType === 'DOCUMENT'
@@ -979,47 +996,79 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 : null}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell align="center">
+                                                    <TableCell>
                                                         {item.wordCount}&nbsp;字符/
                                                         {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
                                                     </TableCell>
-                                                    <TableCell align="center">
-                                                        {item.status === 0
-                                                            ? '上传失败'
-                                                            : item.status === 15
-                                                            ? '上传失败'
-                                                            : item.status === 20
-                                                            ? '上传成功'
-                                                            : item.status === 21
-                                                            ? '同步中'
-                                                            : item.status === 25
-                                                            ? '同步失败'
-                                                            : item.status === 30
-                                                            ? '同步完成'
-                                                            : item.status === 31
-                                                            ? '学习中'
-                                                            : item.status === 35
-                                                            ? '学习失败'
-                                                            : item.status === 40
-                                                            ? '学习中'
-                                                            : item.status === 41
-                                                            ? '学习中'
-                                                            : item.status === 45
-                                                            ? '学习失败'
-                                                            : item.status === 50
-                                                            ? '学习中'
-                                                            : item.status === 51
-                                                            ? '学习中'
-                                                            : item.status === 55
-                                                            ? '学习失败'
-                                                            : item.status === 60
-                                                            ? '学习中'
-                                                            : item.status >= 90
-                                                            ? '学习完成'
-                                                            : null}
+                                                    <TableCell>
+                                                        {item.status === 0 ? (
+                                                            <Tag icon={<CloseCircleOutlined rev={undefined} />} color="error">
+                                                                上传失败
+                                                            </Tag>
+                                                        ) : item.status === 15 ? (
+                                                            <Tag icon={<CloseCircleOutlined rev={undefined} />} color="error">
+                                                                上传失败
+                                                            </Tag>
+                                                        ) : item.status === 20 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                上传成功
+                                                            </Tag>
+                                                        ) : item.status === 21 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                同步中
+                                                            </Tag>
+                                                        ) : item.status === 25 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                同步失败
+                                                            </Tag>
+                                                        ) : item.status === 30 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                同步完成
+                                                            </Tag>
+                                                        ) : item.status === 31 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status === 35 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                学习失败
+                                                            </Tag>
+                                                        ) : item.status === 40 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status === 41 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status === 45 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                学习失败
+                                                            </Tag>
+                                                        ) : item.status === 50 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status === 51 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status === 55 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                学习失败
+                                                            </Tag>
+                                                        ) : item.status === 60 ? (
+                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
+                                                                学习中
+                                                            </Tag>
+                                                        ) : item.status >= 90 ? (
+                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
+                                                                学习完成
+                                                            </Tag>
+                                                        ) : null}
                                                     </TableCell>
-                                                    <TableCell align="center">{formatDate(item.updateTime)}</TableCell>
-                                                    <TableCell align="center">
+                                                    <TableCell>{formatDate(item.updateTime)}</TableCell>
+                                                    <TableCell>
                                                         <Button
                                                             onClick={() => {
                                                                 setCurrent(item);

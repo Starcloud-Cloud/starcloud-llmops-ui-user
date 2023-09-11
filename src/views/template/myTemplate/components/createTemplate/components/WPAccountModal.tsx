@@ -133,7 +133,13 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                 }
             >
                 <CardContent sx={{ p: '0 !important' }}>
-                    <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tabs
+                        indicatorColor="secondary"
+                        textColor="secondary"
+                        value={value}
+                        onChange={handleChange}
+                        aria-label="basic tabs example"
+                    >
                         <Tab label="添加菜单" {...a11yProps(0)} />
                         <Tab label="自动回复" {...a11yProps(1)} />
                     </Tabs>

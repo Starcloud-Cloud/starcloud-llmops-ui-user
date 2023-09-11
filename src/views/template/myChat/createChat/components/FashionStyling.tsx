@@ -22,7 +22,7 @@ import {
     TextField
 } from '@mui/material';
 import { Popover, Upload, UploadFile, UploadProps } from 'antd';
-import { getAvatarList, getVoiceList } from 'api/chat';
+import { getAvatarList, getVoiceList, skillCreate } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -333,7 +333,12 @@ const VoiceModal = ({
 };
 
 const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appId = searchParams.get('appId');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    console.log(fileList, 'fileList');
+
     const uploadButton = (
         <div>
             <AddIcon />
@@ -344,14 +349,41 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
     const formik = useFormik({
         initialValues: {
+            type: 1,
             key: '',
             value: ''
         },
         validationSchema: yup.object({
-            name: yup.string().required('关键词是必填的'),
-            desc: yup.string().required('回复内容是必填的')
+            type: yup.string().required('请选择类型'),
+            key: yup.string().required('关键词是必填的'),
+            value: yup.string().required('回复内容是必填的')
         }),
-        onSubmit: (values: any) => {}
+        onSubmit: (values: any) => {
+            const data: any = {};
+            data.appConfigId = appId;
+            data.type = 1;
+            data.disabled = true;
+            data.chatMenuConfigDTO = {
+                key: values.key,
+                value: values.value,
+                isButton: true,
+                picture: []
+            };
+
+            skillCreate(data).then((res) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '添加成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+            });
+        }
     });
 
     return (
@@ -372,11 +404,35 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                     </IconButton>
                 }
             >
-                <div className={'w-full p-[24px] '}>
+                <div className={'w-full px-[24px] '}>
                     <form>
+                        <FormControl fullWidth sx={{ mt: 4 }}>
+                            <InputLabel color="secondary" id="type">
+                                类型
+                            </InputLabel>
+                            <Select
+                                labelId="type"
+                                name="type"
+                                color="secondary"
+                                value={formik.values.type}
+                                onChange={formik.handleChange}
+                                label={'类型'}
+                                error={formik.touched.type && Boolean(formik.errors.type)}
+                            >
+                                <MenuItem key={1} value={1}>
+                                    菜单栏回复
+                                </MenuItem>
+                                <MenuItem key={2} value={2}>
+                                    关键字回复
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
+
                         <TextField
                             className={'mt-2'}
                             fullWidth
+                            id="key"
+                            name="key"
                             label={'关键词'}
                             value={formik.values.key}
                             onChange={formik.handleChange}
@@ -389,6 +445,8 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                             multiline={true}
                             maxRows={3}
                             minRows={3}
+                            id="value"
+                            name="value"
                             aria-valuemax={200}
                             label={'回复内容'}
                             value={formik.values.value}
@@ -399,7 +457,13 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                     </form>
                     <div className="text-sm mt-2">图片（最多上传9张）</div>
                     <Upload
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                        maxCount={1}
+                        action={`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/infra/file/upload`}
+                        headers={{
+                            Authorization: 'Bearer ' + getAccessToken()
+                        }}
+                        accept=".png, .jpg, .jpeg"
+                        name="file"
                         listType="picture-card"
                         fileList={fileList}
                         onChange={handleChange}
@@ -411,7 +475,7 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="submit">
+                        <Button variant="contained" type="submit" onClick={() => formik.handleSubmit()}>
                             保存
                         </Button>
                     </Grid>
@@ -798,7 +862,7 @@ export const FashionStyling = ({
                             ))}
                         </div> */}
                     </div>
-                    <div className={'mt-5'}>
+                    {/* <div className={'mt-5'}>
                         <span className={'text-base text-black'}>快捷方式</span>
                         <div className={'mt-3'}>
                             <Button
@@ -812,7 +876,7 @@ export const FashionStyling = ({
                             </Button>
                             <ShortcutRecord />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className={'mt-10'}>
                     <span

@@ -75,7 +75,15 @@ const ChatMy = () => {
             className="h-[calc(100vh-130px)]"
         >
             {/* <div className="rounded-lg h-full"> */}
-            <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={width <= 1300} botList={list} />
+            <Chat
+                chatBotInfo={chatBotInfo}
+                mode={'individual'}
+                uid={uid}
+                setUid={setUid}
+                showSelect={width <= 1300}
+                botList={list}
+                setChatBotInfo={setChatBotInfo}
+            />
             {/* </div> */}
         </Card>
     );

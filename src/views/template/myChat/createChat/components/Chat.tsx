@@ -15,7 +15,6 @@ import {
     Menu,
     MenuItem,
     OutlinedInput,
-    Select,
     Tooltip,
     Typography,
     useMediaQuery,
@@ -32,15 +31,19 @@ import { getShareChatHistory, shareMessageSSE } from 'api/chat/share';
 import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Popover } from 'antd';
+import { Popover, Select, Switch, Tag } from 'antd';
 import { uniqBy } from 'lodash-es';
 import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
-import Checkbox from '@mui/material/Checkbox';
 import { BpCheckbox } from 'ui-component/BpCheckbox';
+import useUserStore from 'store/user';
+import { UpgradeModelModal } from './modal/upgradeModel';
+import { UpgradeOnlineModal } from './modal/upgradeOnline';
+
+const { Option } = Select;
 
 export type IHistory = Partial<{
     uid: string;
@@ -351,7 +354,8 @@ export const Chat = ({
     mediumUid,
     setMUid,
     uid,
-    setUid
+    setUid,
+    setChatBotInfo
 }: {
     chatBotInfo: IChatInfo;
     mode?: 'iframe' | 'test' | 'individual';
@@ -362,6 +366,7 @@ export const Chat = ({
     setMUid?: (mediumUid: any) => void;
     uid?: string;
     setUid?: (uid: string) => void;
+    setChatBotInfo: (chatBotInfo: IChatInfo) => void;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -369,6 +374,7 @@ export const Chat = ({
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
+    const permissions = useUserStore((state) => state.permissions);
 
     const [isListening, setIsListening] = React.useState(false);
     const [message, setMessage] = React.useState('');
@@ -381,9 +387,12 @@ export const Chat = ({
     const [isFinish, setIsFinish] = useState(false);
     const [skillWorkflowList, setSkillWorkflowList] = useState<any[]>([]);
     const [skillOpen, setSkillOpen] = useState(false);
-    const navigate = useNavigate();
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+    const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
+    const navigate = useNavigate();
+
     const { width } = useWindowSize();
 
     const dataRef: any = useRef(data);
@@ -1325,55 +1334,34 @@ export const Chat = ({
                 ) : (
                     <div className="flex-shrink-0 flex justify-center w-full">
                         <div className="w-full max-w-[768px] p-[8px] ">
-                            {skillWorkflowList && skillWorkflowList?.length > 0 && (
-                                <Popover
-                                    placement="topLeft"
-                                    arrow={false}
-                                    open={skillOpen}
-                                    content={
-                                        <div className="max-h-[220px] overflow-y-auto">
-                                            {skillWorkflowList.map((v: any, index: number) => (
-                                                <>
-                                                    <div className="flex flex-col w-[220px]">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center">
-                                                                <img className="rounded w-[18px] h-[18px]" src={v.images} />
-                                                                <span className="line-clamp-1 text-base ml-1">{v.name}</span>
-                                                            </div>
-                                                            <BpCheckbox size="small" checked />
-                                                        </div>
-                                                        <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">{v.description}</div>
-                                                    </div>
-                                                    {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
-                                                </>
-                                            ))}
-                                        </div>
-                                    }
-                                    trigger="click"
-                                >
-                                    <div className="flex items-center mb-1 cursor-pointer px-[8px]">
-                                        <span className="text-sm ml-[40px]">技能:</span>
-                                        <div className="flex items-center justify-start">
-                                            {skillWorkflowList &&
-                                                skillWorkflowList
-                                                    .slice(0, 5)
-                                                    .map((item: any, index: number) => (
-                                                        <img
-                                                            className="rounded ml-1"
-                                                            key={index}
-                                                            src={item.images}
-                                                            width={18}
-                                                            height={18}
-                                                        />
-                                                    ))}
-                                        </div>
-                                        {skillWorkflowList.length > 5 && <span>...</span>}
-                                        <div onClick={() => setSkillOpen(!skillOpen)}>
-                                            {skillOpen ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
-                                        </div>
-                                    </div>
-                                </Popover>
-                            )}
+                            <div className="flex justify-between">
+                                <div className="ml-[48px] flex items-center">
+                                    {/* <Tag className="cursor-pointer">Tag 1</Tag>
+                                    <Tag className="cursor-pointer">Tag 2</Tag> */}
+                                </div>
+                                <div>
+                                    <Select
+                                        style={{ width: 110 }}
+                                        bordered={false}
+                                        className="rounded-2xl border-[1px] border-[#673ab7] border-solid  mr-[19px] mb-1"
+                                        value={chatBotInfo.modelProvider || 'GPT35'}
+                                        disabled={mode === 'iframe'}
+                                        onChange={(value) => {
+                                            if (value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                                setOpenUpgradeModel(true);
+                                                return;
+                                            }
+                                            setChatBotInfo({ ...chatBotInfo, modelProvider: value });
+                                        }}
+                                    >
+                                        <Option value={'GPT35'}>大模型3.5</Option>
+                                        <Option value={'GPT4'}>大模型4.0</Option>
+                                        <Option value={'QWEN'} disabled>
+                                            通义千问(开发中)
+                                        </Option>
+                                    </Select>
+                                </div>
+                            </div>
                             <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
                                 <Grid item className="!pl-0">
                                     <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
@@ -1471,9 +1459,87 @@ export const Chat = ({
                                     />
                                 </Grid>
                             </Grid>
-                            <div>
-                                <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
+                            <div className="flex justify-between mt-1">
+                                {skillWorkflowList && skillWorkflowList?.length > 0 ? (
+                                    <Popover
+                                        placement="topLeft"
+                                        arrow={false}
+                                        open={skillOpen}
+                                        content={
+                                            <div className="max-h-[220px] overflow-y-auto">
+                                                {skillWorkflowList.map((v: any, index: number) => (
+                                                    <>
+                                                        <div className="flex flex-col w-[220px]">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center">
+                                                                    <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    <span className="line-clamp-1 text-base ml-1">{v.name}</span>
+                                                                </div>
+                                                                <BpCheckbox size="small" checked />
+                                                            </div>
+                                                            <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">
+                                                                {v.description}
+                                                            </div>
+                                                        </div>
+                                                        {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
+                                                    </>
+                                                ))}
+                                            </div>
+                                        }
+                                        trigger="click"
+                                    >
+                                        <div
+                                            className="flex items-center mb-1 cursor-pointer px-[8px]"
+                                            onClick={() => setSkillOpen(!skillOpen)}
+                                        >
+                                            <span className="text-sm ml-[40px]">技能:</span>
+                                            <div className="flex items-center justify-start">
+                                                {skillWorkflowList &&
+                                                    skillWorkflowList
+                                                        .slice(0, 5)
+                                                        .map((item: any, index: number) => (
+                                                            <img
+                                                                className="rounded ml-1"
+                                                                key={index}
+                                                                src={item.images}
+                                                                width={18}
+                                                                height={18}
+                                                            />
+                                                        ))}
+                                            </div>
+                                            {skillWorkflowList.length > 5 && <span>...</span>}
+                                            {skillOpen ? (
+                                                <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
+                                            ) : (
+                                                <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
+                                            )}
+                                        </div>
+                                    </Popover>
+                                ) : (
+                                    <div />
+                                )}
+                                <div className="flex items-center">
+                                    <div className="flex items-center justify-center">
+                                        <span className="mr-1 text-sm">联网查询</span>
+                                        <Switch
+                                            checked={!!chatBotInfo.enableSearchInWeb}
+                                            checkedChildren="开启"
+                                            unCheckedChildren="关闭"
+                                            disabled={mode === 'iframe'}
+                                            onChange={(value) => {
+                                                console.log(value, 'value');
+                                                if (value && !permissions.includes('chat:config:websearch')) {
+                                                    setOpenUpgradeOnline(true);
+                                                    return;
+                                                }
+                                                setChatBotInfo({
+                                                    ...chatBotInfo,
+                                                    enableSearchInWeb: !chatBotInfo.enableSearchInWeb
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="text-right text-stone-600 mx-3">{message?.length || 0}/200</div>
                                 </div>
                             </div>
                             <div className="w-full flex justify-center">
@@ -1666,6 +1732,8 @@ export const Chat = ({
                 )}
             </div>
             {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
+            <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>
     );
 };

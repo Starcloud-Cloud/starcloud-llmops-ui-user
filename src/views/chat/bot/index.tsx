@@ -109,6 +109,7 @@ const chatBot = () => {
                 statisticsMode={statisticsMode}
                 showSelect={showSelect}
                 botList={list}
+                setChatBotInfo={setChatBotInfo}
             />
         </div>
     );

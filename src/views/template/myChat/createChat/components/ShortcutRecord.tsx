@@ -1,4 +1,4 @@
-import { Button, Switch } from '@mui/material';
+import { Button, Switch, TablePagination } from '@mui/material';
 
 // material-ui
 import {
@@ -24,6 +24,8 @@ import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import { getSkillList } from 'api/chat';
+import { useLocation } from 'react-router-dom';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -63,10 +65,10 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '关键词' },
-    { id: 'subject', numeric: false, disablePadding: false, label: '回复内容' },
-    { id: 'status', numeric: false, disablePadding: false, label: '状态' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '编辑' }
+    { id: 'key', numeric: false, disablePadding: false, label: '关键词' },
+    { id: 'value', numeric: false, disablePadding: false, label: '回复内容' },
+    { id: 'disabled', numeric: false, disablePadding: false, label: '状态' },
+    { id: 'operate', numeric: false, disablePadding: false, label: '编辑' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -85,17 +87,8 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
+                        <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'}>
                             {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
                         </TableSortLabel>
                     </TableCell>
                 ))}
@@ -107,30 +100,49 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 // ==============================|| TABLE - ENHANCED ||============================== //
 
 const Record: React.FC = () => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appId = searchParams.get('appId');
+
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const [menuList, setMenuList] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [count, setCount] = useState(0);
+
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | undefined) => {
+        setRowsPerPage(parseInt(event?.target.value!, 10));
+        setPage(0);
+    };
 
     useEffect(() => {
-        const fetchPageData = async () => {
-            // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
-            getOrderRecord({})
-                .then((res) => {
-                    // Once the data is fetched, map it and update rows state
-                    const fetchedRows = res.list;
-
-                    setRows([...fetchedRows]);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        };
-
-        fetchPageData();
-    }, []);
+        getSkillList(appId || '').then((res) => {
+            const list =
+                res?.['1']?.map((item: any) => ({
+                    key: item.chatMenuConfigDTO?.key,
+                    value: item.chatMenuConfigDTO?.key,
+                    type: item.chatMenuConfigDTO?.type,
+                    medias: item.systemHandlerSkillDTO?.medias,
+                    uid: item.uid,
+                    appConfigId: item.appConfigId,
+                    disabled: item.disabled
+                })) || [];
+            setTotal(list.length);
+            const currentData = list.slice(page * 10, page * 10 + 10);
+            setRows([...currentData]);
+        });
+    }, [page]);
 
     // Add a new state for rows
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
+    const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -153,7 +165,7 @@ const Record: React.FC = () => {
 
     return (
         <MainCard content={false}>
-            <TableContainer sx={{ maxHeight: 300 }}>
+            <TableContainer sx={{ maxHeight: 600 }}>
                 <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'small'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
@@ -164,53 +176,54 @@ const Record: React.FC = () => {
                         rowCount={rows.length}
                     />
                     <TableBody>
-                        {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
-                            getComparator(order, orderBy)
-                        )
-                            // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => {
-                                if (typeof row === 'number') {
-                                    return null; // 忽略数字类型的行
-                                }
-
-                                return (
-                                    <TableRow hover key={row.id}>
-                                        <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                        <TableCell align="center">{row.subject}</TableCell>
-                                        <TableCell align="center">
-                                            <Switch color={'secondary'} />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                className={'min-w-[30px] h-[30px] ml-2'}
-                                                startIcon={<BorderColorIcon />}
-                                                color={'secondary'}
-                                                size={'small'}
-                                                sx={{
-                                                    '& .MuiButton-startIcon': {
-                                                        marginRight: 0
-                                                    }
-                                                }}
-                                            />
-                                            <Button
-                                                className={'min-w-[30px] h-[30px] ml-2'}
-                                                startIcon={<DeleteOutlineIcon />}
-                                                color={'secondary'}
-                                                size={'small'}
-                                                sx={{
-                                                    '& .MuiButton-startIcon': {
-                                                        marginRight: 0
-                                                    }
-                                                }}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
+                        {rows.map((row, index) => {
+                            return (
+                                <TableRow hover key={row.id}>
+                                    <TableCell align="center">{row.key}</TableCell>
+                                    <TableCell align="center">{row.value}</TableCell>
+                                    <TableCell align="center">
+                                        <Switch color={'secondary'} checked={row.disabled} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Button
+                                            className={'min-w-[30px] h-[30px] ml-2'}
+                                            startIcon={<BorderColorIcon />}
+                                            color={'secondary'}
+                                            size={'small'}
+                                            sx={{
+                                                '& .MuiButton-startIcon': {
+                                                    marginRight: 0
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            className={'min-w-[30px] h-[30px] ml-2'}
+                                            startIcon={<DeleteOutlineIcon />}
+                                            color={'secondary'}
+                                            size={'small'}
+                                            sx={{
+                                                '& .MuiButton-startIcon': {
+                                                    marginRight: 0
+                                                }
+                                            }}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[10]}
+                component="div"
+                count={total}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="每页行数"
+            />
         </MainCard>
     );
 };

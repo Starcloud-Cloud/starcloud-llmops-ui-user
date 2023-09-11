@@ -16,6 +16,9 @@ import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AppModal from 'views/picture/create/Menu/appModal';
+import useUserStore from 'store/user';
+import { UpgradeOnlineModal } from './modal/upgradeOnline';
+import { UpgradeModelModal } from './modal/upgradeModel';
 
 const marks = [
     {
@@ -49,6 +52,11 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
     const [appOpen, setAppOpen] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [websiteCount, setWebsiteCount] = useState(0);
+    const permissions = useUserStore((state) => state.permissions);
+    const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+
+    console.log(chatBotInfo, 'chatBotInfo');
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
@@ -345,13 +353,17 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             <div className="flex justify-end items-center">
                                 <span className={'text-#697586'}>{chatBotInfo.enableSearchInWeb ? '启用' : '不启用'}</span>
                                 <Switch
-                                    checked={chatBotInfo.enableSearchInWeb}
-                                    onChange={() =>
+                                    checked={!!chatBotInfo.enableSearchInWeb}
+                                    onChange={(e) => {
+                                        if (e.target.checked && !permissions.includes('chat:config:websearch')) {
+                                            setOpenUpgradeOnline(true);
+                                            return;
+                                        }
                                         setChatBotInfo({
                                             ...chatBotInfo,
                                             enableSearchInWeb: !chatBotInfo.enableSearchInWeb
-                                        })
-                                    }
+                                        });
+                                    }}
                                     color="secondary"
                                 />
                             </div>
@@ -450,19 +462,20 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                 id="columnId"
                                 name="columnId"
                                 label={'模型选择'}
-                                value={1}
+                                value={chatBotInfo.modelProvider || 'GPT35'}
                                 fullWidth
-                                // onChange={(e: any) => handleRuleValue(3, e.target.value)}
+                                onChange={(e: any) => {
+                                    if (e.target.value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
+                                    setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
+                                }}
                             >
-                                <MenuItem value={1}>默认模型3.5</MenuItem>
-                                <MenuItem value={2} disabled>
-                                    默认模型4.0(测试中)
-                                </MenuItem>
-                                <MenuItem value={3} disabled>
-                                    文心一言(测试中)
-                                </MenuItem>
-                                <MenuItem value={4} disabled>
-                                    Llama2(测试中)
+                                <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
+                                <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
+                                <MenuItem value={'QWEN'} disabled>
+                                    通义千问(开发中)
                                 </MenuItem>
                             </Select>
                         </FormControl>
@@ -479,6 +492,8 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     setOpen={setAppOpen}
                 />
             )}
+            <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>
     );
 };

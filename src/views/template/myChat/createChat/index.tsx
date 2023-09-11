@@ -56,6 +56,7 @@ export type IChatInfo = {
     enableSearchInWeb?: boolean;
     searchInWeb?: string;
     skillWorkflowList?: any[];
+    modelProvider?: string;
 };
 
 function CreateDetail() {
@@ -86,7 +87,8 @@ function CreateDetail() {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    modelProvider: res?.chatConfig?.modelConfig?.provider
                 });
             });
         }
@@ -223,6 +225,7 @@ function CreateDetail() {
         data.images = [chatBotInfo.avatar];
         data.chatConfig.prePrompt = chatBotInfo.prePrompt;
         data.chatConfig.modelConfig.completionParams.temperature = chatBotInfo.temperature;
+        data.chatConfig.modelConfig.provider = chatBotInfo.modelProvider;
         data.chatConfig.openingStatement = { statement: chatBotInfo.statement, enabled: chatBotInfo.enableStatement };
         data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
         data.description = chatBotInfo.introduction;
@@ -311,7 +314,7 @@ function CreateDetail() {
                 {width < 1280 && (
                     <TabPanel value={value} index={5}>
                         <div className="h-screen">
-                            <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                            <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
                         </div>
                     </TabPanel>
                 )}
@@ -323,7 +326,7 @@ function CreateDetail() {
                 <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
                     <div className="text-base color-[#121926]">预览与调试</div>
                     <Card className="h-full">
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
                     </Card>
                 </div>
             )}

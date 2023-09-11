@@ -46,6 +46,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SkillWorkflowCard from './SkillWorkflowCard';
 import imgLoading from 'assets/images/picture/loading.gif';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import _ from 'lodash';
 
 const WorkflowEditModal = ({
     open,
@@ -457,8 +458,9 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
 
             const mergedArray = [...appWorkFlowList, ...systemList];
             const enableList = mergedArray.filter((v) => !v.disabled);
-            setChatBotInfo({ ...chatBotInfo, skillWorkflowList: enableList });
-
+            const copyChatBotInfo = _.cloneDeep(chatBotInfo);
+            copyChatBotInfo.skillWorkflowList = enableList;
+            setChatBotInfo(copyChatBotInfo);
             setWorkflowList(mergedArray);
         });
     }, [count]);

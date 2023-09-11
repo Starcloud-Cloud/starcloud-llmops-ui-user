@@ -1278,9 +1278,9 @@ export const Chat = ({
                                         </div>
                                         {skillWorkflowList.length > 5 && <span>...</span>}
                                         {skillOpen ? (
-                                            <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
+                                            <ExpandLessIcon className="h-[18px] w-[18px]" />
                                         ) : (
-                                            <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
+                                            <ExpandMoreIcon className="h-[18px] w-[18px]" />
                                         )}
                                     </div>
                                 </Popover>
@@ -1291,7 +1291,7 @@ export const Chat = ({
                                 <Select
                                     style={{ width: 85 }}
                                     bordered={false}
-                                    className="rounded-2xl border-[1px] border-[#673ab7] border-solid  mx-3 mb-1"
+                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid  mx-3 mb-1"
                                     value={chatBotInfo.modelProvider || 'GPT35'}
                                     disabled={mode === 'iframe'}
                                     rootClassName="modelSelect"
@@ -1411,7 +1411,7 @@ export const Chat = ({
                                 />
                             </Grid>
                         </Grid>
-                        <div className="flex justify-between mt-1">
+                        <div className="flex justify-between mt-1 items-center">
                             {/* {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover
                                     placement="topLeft"

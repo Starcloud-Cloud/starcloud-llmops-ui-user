@@ -355,7 +355,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                                 onClick={() => setSelectType(2)}
                             />
                             <Chip
-                                label="AI应用"
+                                label="应用市场"
                                 color={selectType === 3 ? 'secondary' : 'default'}
                                 variant="filled"
                                 className="w-[80px] cursor-pointer"

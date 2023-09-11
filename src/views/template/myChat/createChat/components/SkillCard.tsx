@@ -77,7 +77,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             return '系统';
         }
         if ((data.type === 3 && data.appType === 1) || data.type === 'market') {
-            return 'AI应用';
+            return '应用市场';
         }
         if ((data.type === 3 && data.appType === 0) || data.type === 'MYSELF') {
             return '我的应用';

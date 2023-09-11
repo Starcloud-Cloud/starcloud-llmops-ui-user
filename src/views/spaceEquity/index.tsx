@@ -161,7 +161,16 @@ const SpaceEquity = () => {
                     </Typography>
                     <Typography variant="h4">您推荐的越多，魔法值越高</Typography>
                 </Box>
-                <SubCard sx={{ mb: 5, mt: 3, background: '#673ab70d' }} contentSX={{ p: '0 !important' }}>
+                <SubCard
+                    sx={{
+                        mb: 5,
+                        mt: 3,
+                        maxWidth: '900px',
+                        margin: '30px auto',
+                        background: 'linear-gradient(125.8deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 229, 252, 0.9) 99.34%)'
+                    }}
+                    contentSX={{ p: '0 !important', maxWidth: '900px' }}
+                >
                     <List>
                         <ListItem>
                             <ListItemText
@@ -193,7 +202,7 @@ const SpaceEquity = () => {
                         </ListItem>
                     </List>
                 </SubCard>
-                <Box display="flex" alignItems="center" justifyContent="space-evenly">
+                <Box sx={{ margin: '0 auto' }} display="flex" maxWidth="900px" alignItems="center" justifyContent="space-evenly">
                     <Typography fontSize="16px" fontWeight={500}>
                         用邀请链接推荐给你的朋友
                     </Typography>
@@ -204,7 +213,7 @@ const SpaceEquity = () => {
                         获取奖励
                     </Typography>
                 </Box>
-                <Box display="flex" alignItems="center" justifyContent="space-around">
+                <Box sx={{ margin: 'auto' }} maxWidth="900px" display="flex" alignItems="center" justifyContent="space-around">
                     <img style={{ width: '50px' }} src={Link} alt="" />
                     <Box height="1px" width="100%" sx={{ background: 'red' }}></Box>
                     <img style={{ width: '50px' }} src={register} alt="" />

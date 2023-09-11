@@ -77,6 +77,7 @@ function CreateDetail() {
                 setDetail(res);
                 setChatBotInfo({
                     ...chatBotInfo,
+                    uid: res.uid,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介

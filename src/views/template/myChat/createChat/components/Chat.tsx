@@ -369,6 +369,7 @@ export const Chat = ({
     setUid?: (uid: string) => void;
     setChatBotInfo: (chatBotInfo: IChatInfo) => void;
 }) => {
+    console.log(chatBotInfo, 'chatBotInfo');
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -674,7 +675,47 @@ export const Chat = ({
     // 处理技能
     React.useEffect(() => {
         if (mode === 'test' && chatBotInfo.skillWorkflowList) {
-            setSkillWorkflowList([...chatBotInfo.skillWorkflowList]);
+            const copyData = _.cloneDeep(chatBotInfo.skillWorkflowList) || [];
+            if (copyData.length) {
+                setSkillWorkflowList([...copyData]);
+            } else {
+                if (chatBotInfo.uid) {
+                    getSkillList(chatBotInfo.uid).then((res) => {
+                        const appWorkFlowList =
+                            res?.['3']?.map((item: any) => ({
+                                name: item.appWorkflowSkillDTO?.name,
+                                description: item.appWorkflowSkillDTO?.desc,
+                                type: item.type,
+                                skillAppUid: item.appWorkflowSkillDTO?.skillAppUid,
+                                uid: item.uid,
+                                images: item.appWorkflowSkillDTO?.icon,
+                                appConfigId: item.appConfigId,
+                                appType: item.appWorkflowSkillDTO?.appType,
+                                defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
+                                copyWriting: item.appWorkflowSkillDTO?.copyWriting,
+                                disabled: item.disabled
+                            })) || [];
+
+                        const systemList =
+                            res?.['5']?.map((item: any) => ({
+                                name: item.systemHandlerSkillDTO?.name,
+                                description: item.systemHandlerSkillDTO?.desc,
+                                type: item.type,
+                                code: item.systemHandlerSkillDTO?.code,
+                                uid: item.uid,
+                                images: item.systemHandlerSkillDTO?.icon,
+                                appConfigId: item.appConfigId,
+                                copyWriting: item.systemHandlerSkillDTO?.copyWriting,
+                                disabled: item.disabled
+                            })) || [];
+
+                        const mergedArray = [...appWorkFlowList, ...systemList];
+                        const enableList = mergedArray.filter((v) => !v.disabled);
+
+                        setSkillWorkflowList(enableList);
+                    });
+                }
+            }
         } else {
             if (chatBotInfo.uid) {
                 getSkillList(chatBotInfo.uid).then((res) => {
@@ -1048,6 +1089,18 @@ export const Chat = ({
         setAnchorEl(null);
     };
 
+    useEffect(() => {
+        if (chatBotInfo.enableSearchInWeb) {
+            setChatBotInfo({ ...chatBotInfo, modelProvider: 'GPT4' });
+        }
+    }, [chatBotInfo.enableSearchInWeb]);
+
+    useEffect(() => {
+        if (chatBotInfo.modelProvider === 'GPT35') {
+            setChatBotInfo({ ...chatBotInfo, enableSearchInWeb: false });
+        }
+    }, [chatBotInfo.modelProvider]);
+
     return (
         <div className="h-full relative flex justify-center">
             {mode === 'market' && width > 1300 && (
@@ -1191,11 +1244,11 @@ export const Chat = ({
                     <div
                         className={`${
                             mode === 'market'
-                                ? 'w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 relative top-[20px]'
+                                ? 'w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 relative top-[10px]'
                                 : 'w-full max-w-[768px] p-[8px]'
                         }`}
                     >
-                        <div className="flex justify-between">
+                        <div className="flex justify-between mb-[2px]">
                             {/* <div className="ml-[48px] flex items-center"> */}
                             {/* <Tag className="cursor-pointer">Tag 1</Tag>
                                     <Tag className="cursor-pointer">Tag 2</Tag> */}
@@ -1243,10 +1296,7 @@ export const Chat = ({
                                     }
                                     trigger="click"
                                 >
-                                    <div
-                                        className="flex items-center mb-1 cursor-pointer px-[4px]"
-                                        onClick={() => setSkillOpen(!skillOpen)}
-                                    >
+                                    <div className="flex items-center cursor-pointer px-[4px]" onClick={() => setSkillOpen(!skillOpen)}>
                                         <span className="text-sm">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
@@ -1289,7 +1339,7 @@ export const Chat = ({
                             )}
                             <div>
                                 <Select
-                                    style={{ width: 85 }}
+                                    style={{ width: 90 }}
                                     bordered={false}
                                     className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid  mx-3 mb-1"
                                     value={chatBotInfo.modelProvider || 'GPT35'}

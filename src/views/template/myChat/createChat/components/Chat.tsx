@@ -672,6 +672,17 @@ export const Chat = ({
         }
     }, [isFetch]);
 
+    // 首次进入
+    React.useEffect(() => {
+        if (scrollRef?.current) {
+            setTimeout(() => {
+                const scrollContainer = scrollRef.current;
+                const contentElement = contentRef.current;
+                scrollContainer.scrollTop = contentElement.scrollHeight;
+            }, 1000);
+        }
+    }, [scrollRef?.current]);
+
     // 处理技能
     React.useEffect(() => {
         if (mode === 'test' && chatBotInfo.skillWorkflowList) {

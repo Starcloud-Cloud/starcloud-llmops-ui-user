@@ -369,7 +369,6 @@ export const Chat = ({
     setUid?: (uid: string) => void;
     setChatBotInfo: (chatBotInfo: IChatInfo) => void;
 }) => {
-    console.log(chatBotInfo, 'chatBotInfo');
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
@@ -391,6 +390,8 @@ export const Chat = ({
     const [skillOpen, setSkillOpen] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
+    const [enableOnline, setEnableOnline] = useState<any>();
+    const [selectModel, setSelectModel] = useState<any>();
 
     const { messageData, setMessageData } = useChatMessage();
     const navigate = useNavigate();
@@ -413,6 +414,16 @@ export const Chat = ({
         const result = event.results[event.resultIndex][0].transcript;
         setMessage(`${message}${result}`);
     };
+
+    // 左边联动右边,右边不联动左边
+    useEffect(() => {
+        setEnableOnline(chatBotInfo.enableSearchInWeb);
+    }, [chatBotInfo.enableSearchInWeb]);
+
+    // 左边联动右边,右边不联动左边
+    useEffect(() => {
+        setSelectModel(chatBotInfo.modelProvider);
+    }, [chatBotInfo.modelProvider]);
 
     // 开始语音识别
     const startListening = () => {
@@ -897,8 +908,8 @@ export const Chat = ({
                     query: message,
                     mediumUid,
                     conversationUid: jsCookie.get(conversationUniKey),
-                    modelType: chatBotInfo.modelProvider,
-                    webSearch: chatBotInfo.enableSearchInWeb
+                    modelType: selectModel,
+                    webSearch: enableOnline
                 });
             }
             if (mode === 'test') {
@@ -907,8 +918,8 @@ export const Chat = ({
                     scene: 'CHAT_TEST',
                     conversationUid,
                     query: message,
-                    modelType: chatBotInfo.modelProvider,
-                    webSearch: chatBotInfo.enableSearchInWeb
+                    modelType: selectModel,
+                    webSearch: enableOnline
                 });
             }
             if (mode === 'market') {
@@ -916,8 +927,8 @@ export const Chat = ({
                     appUid: uid,
                     conversationUid,
                     query: message,
-                    modelType: chatBotInfo.modelProvider,
-                    webSearch: chatBotInfo.enableSearchInWeb
+                    modelType: selectModel,
+                    webSearch: enableOnline
                 });
             }
             setIsFirst(false);
@@ -1099,18 +1110,6 @@ export const Chat = ({
     const handleCloseSort = () => {
         setAnchorEl(null);
     };
-
-    useEffect(() => {
-        if (chatBotInfo.enableSearchInWeb) {
-            setChatBotInfo({ ...chatBotInfo, modelProvider: 'GPT4' });
-        }
-    }, [chatBotInfo.enableSearchInWeb]);
-
-    useEffect(() => {
-        if (chatBotInfo.modelProvider === 'GPT35') {
-            setChatBotInfo({ ...chatBotInfo, enableSearchInWeb: false });
-        }
-    }, [chatBotInfo.modelProvider]);
 
     return (
         <div className="h-full relative flex justify-center">
@@ -1366,7 +1365,7 @@ export const Chat = ({
                                             setOpenUpgradeModel(true);
                                             return;
                                         }
-                                        setChatBotInfo({ ...chatBotInfo, modelProvider: value });
+                                        setSelectModel(value);
                                     }}
                                 >
                                     <Option value={'GPT35'}>大模型3.5</Option>
@@ -1540,7 +1539,7 @@ export const Chat = ({
                                 <div className="flex items-center justify-center">
                                     <span className="mr-1 text-sm">联网查询</span>
                                     <Switch
-                                        checked={!!chatBotInfo.enableSearchInWeb}
+                                        checked={!!enableOnline}
                                         checkedChildren="开启"
                                         unCheckedChildren="关闭"
                                         disabled={mode === 'iframe'}
@@ -1550,10 +1549,7 @@ export const Chat = ({
                                                 setOpenUpgradeOnline(true);
                                                 return;
                                             }
-                                            setChatBotInfo({
-                                                ...chatBotInfo,
-                                                enableSearchInWeb: !chatBotInfo.enableSearchInWeb
-                                            });
+                                            setEnableOnline(value);
                                         }}
                                     />
                                 </div>

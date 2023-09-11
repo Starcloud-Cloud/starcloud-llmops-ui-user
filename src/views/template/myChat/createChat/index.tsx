@@ -16,7 +16,6 @@ import { Knowledge } from './components/Knowledge';
 import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
 import Upload from '../../myTemplate/components/createTemplate/upLoad';
-import { appModify } from 'api/template';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {

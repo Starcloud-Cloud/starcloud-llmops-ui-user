@@ -6,6 +6,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import workflow from 'assets/images/chat/workflow.svg';
 
 function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
     const theme = useTheme();
@@ -98,7 +99,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             }}
         >
             <Box sx={{ aspectRatio: '186 / 80', overflow: 'hidden' }}>
-                {!data.images ? (
+                {/* {!data.images ? (
                     <svg
                         viewBox="0 0 1024 1024"
                         version="1.1"
@@ -113,17 +114,17 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
                             p-id="1616"
                         ></path>
                     </svg>
-                ) : (
-                    <img
-                        onClick={() => handleEdit(data)}
-                        alt="图片"
-                        className="headImg cursor"
-                        width="100%"
-                        height="100%"
-                        style={{ objectFit: 'cover' }}
-                        src={data.images}
-                    />
-                )}
+                ) : ( */}
+                <img
+                    onClick={() => handleEdit(data)}
+                    alt="图片"
+                    className="headImg cursor"
+                    width="100%"
+                    height="100%"
+                    style={{ objectFit: 'cover' }}
+                    src={data.images || workflow}
+                />
+                {/* )} */}
             </Box>
             <CardContent
                 sx={{

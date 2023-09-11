@@ -326,7 +326,7 @@ function CreateDetail() {
                     <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
 
-                {width < 1280 && (
+                {width < 1330 && (
                     <TabPanel value={value} index={5}>
                         <div className="h-screen">
                             <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />

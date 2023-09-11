@@ -337,7 +337,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                     </IconButton>
                 }
             >
-                <CardContent>
+                <CardContent sx={{ p: 2 }}>
                     <div className="flex justify-between items-baseline">
                         <Stack direction="row" spacing={1} className="mb-3">
                             <Chip
@@ -398,7 +398,7 @@ const WorkflowCreateModal = ({ open, handleClose, forceUpdate }: { open: boolean
                             hasMore={hasMore}
                             loader={<></>}
                             height={545}
-                            className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto"
+                            className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto mt-[8px]"
                         >
                             {pageData?.map((item: any, index: number) => (
                                 <Box key={index} className="w-full relative">
@@ -525,7 +525,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                             <MainCard>
                                 <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
                                     {workflowList?.map((item, index) => (
-                                        <Grid lg={3} md={4} sm={6} xs={6} key={item.uid + index} item>
+                                        <Grid lg={3} md={4} sm={6} xs={12} key={item.uid + index} item>
                                             <SkillWorkflowCard
                                                 data={item}
                                                 forceUpdate={forceUpdate}

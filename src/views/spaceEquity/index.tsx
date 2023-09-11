@@ -1,7 +1,31 @@
-import { Card, Tabs, Tab, Box, Typography, Grid } from '@mui/material';
-import Item from 'antd/es/list/Item';
-import { useState } from 'react';
+import {
+    Card,
+    Tabs,
+    Tab,
+    Box,
+    Typography,
+    Grid,
+    List,
+    ListItem,
+    IconButton,
+    Button,
+    ListItemText,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Pagination,
+    Divider
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
+import nothing from 'assets/images/upLoad/nothing.svg';
+import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
+import { getUserInfo } from 'api/login';
+import Link from 'assets/images/share/fenxianglianjie.svg';
+import register from 'assets/images/share/zhuce.svg';
+import Reward from 'assets/images/share/yaoqingjiangli.svg';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -59,11 +83,31 @@ const SpaceEquity = () => {
             total: 5
         }
     ];
+    const [tableList, setTableList] = useState<any[]>([]);
+    const [total, setTotal] = useState<number>(1);
+    const [pageQuery, setPageQuery] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const paginationChange = (event: any, value: number) => {
+        setPageQuery({
+            ...pageQuery,
+            pageNo: value
+        });
+    };
+    const [inviteUrl, setInviteUrl] = useState('');
+    const getList = async () => {
+        const result = await getUserInfo();
+        setInviteUrl(result.inviteUrl);
+    };
+    useEffect(() => {
+        getList();
+    }, [pageQuery.pageNo]);
     return (
         <Card sx={{ p: 2 }}>
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab label="版本权益" {...a11yProps(0)} />
-                <Tab label="成员设置" {...a11yProps(1)} />
+                <Tab label="邀请记录" {...a11yProps(1)} />
             </Tabs>
             <CustomTabPanel value={value} index={0}>
                 <>
@@ -110,7 +154,110 @@ const SpaceEquity = () => {
                 </>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-                暂未开放
+                <Box textAlign="center">
+                    <Typography variant="h2">邀请你的朋友并赚取魔法值</Typography>
+                    <Typography variant="h4" fontWeight={400} my={2}>
+                        为您和您的朋友赚取对应的魔法值
+                    </Typography>
+                    <Typography variant="h4">您推荐的越多，魔法值越高</Typography>
+                </Box>
+                <SubCard
+                    sx={{
+                        mb: 5,
+                        mt: 3,
+                        maxWidth: '900px',
+                        margin: '30px auto',
+                        background: 'linear-gradient(125.8deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 229, 252, 0.9) 99.34%)'
+                    }}
+                    contentSX={{ p: '0 !important', maxWidth: '900px' }}
+                >
+                    <List>
+                        <ListItem>
+                            <ListItemText
+                                sx={{ minWidth: '80px' }}
+                                primary={
+                                    <Typography whiteSpace="nowrap" fontWeight={500}>
+                                        邀请文案
+                                    </Typography>
+                                }
+                            />
+                            <ListItemText primary="邀请成功就送您和好友每人令牌额度, 奖励无上限" />
+                            <IconButton size="small" color="secondary">
+                                <BorderColorOutlinedIcon fontSize="small" />
+                            </IconButton>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText
+                                sx={{ minWidth: '80px' }}
+                                primary={
+                                    <Typography whiteSpace="nowrap" fontWeight={500}>
+                                        邀请链接
+                                    </Typography>
+                                }
+                            />
+                            <ListItemText primary={inviteUrl} />
+                            <Button size="small" color="secondary" variant="outlined">
+                                复制文案及链接
+                            </Button>
+                        </ListItem>
+                    </List>
+                </SubCard>
+                <Box sx={{ margin: '0 auto' }} display="flex" maxWidth="900px" alignItems="center" justifyContent="space-evenly">
+                    <Typography fontSize="16px" fontWeight={500}>
+                        用邀请链接推荐给你的朋友
+                    </Typography>
+                    <Typography fontSize="16px" fontWeight={500} mr="120px !important">
+                        你的朋友注册了
+                    </Typography>
+                    <Typography fontSize="16px" fontWeight={500}>
+                        获取奖励
+                    </Typography>
+                </Box>
+                <Box sx={{ margin: 'auto' }} maxWidth="900px" display="flex" alignItems="center" justifyContent="space-around">
+                    <img style={{ width: '50px' }} src={Link} alt="" />
+                    <Box height="1px" width="100%" sx={{ background: 'red' }}></Box>
+                    <img style={{ width: '50px' }} src={register} alt="" />
+                    <Box height="1px" width="100%" sx={{ background: 'red' }}></Box>
+                    <img style={{ width: '50px' }} src={Reward} alt="" />
+                </Box>
+                <Typography variant="h4" mt={5}>
+                    邀请记录
+                </Typography>
+                {tableList.length > 0 && (
+                    <Box>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">名称</TableCell>
+                                    <TableCell align="center">账户</TableCell>
+                                    <TableCell align="center">加入日期</TableCell>
+                                    <TableCell align="center">状态</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {tableList.map((row) => (
+                                    <TableRow key={row.name}>
+                                        <TableCell align="center">{row.calories}</TableCell>
+                                        <TableCell align="center">{row.fat}</TableCell>
+                                        <TableCell align="center">{row.carbs}</TableCell>
+                                        <TableCell align="center">{row.protein}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Box my={2}>
+                            <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
+                        </Box>
+                    </Box>
+                )}
+                {tableList.length === 0 && (
+                    <Box height="100%" textAlign="center" display="flex" justifyContent="center" alignItems="center">
+                        <Box>
+                            <img width="100px" src={nothing} alt="" />
+                            <Typography color="#697586">暂无邀请记录</Typography>
+                        </Box>
+                    </Box>
+                )}
             </CustomTabPanel>
         </Card>
     );

@@ -40,7 +40,8 @@ const ChatMy = () => {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
                 });
             })();
         }

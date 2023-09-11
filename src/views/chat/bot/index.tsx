@@ -66,6 +66,7 @@ const chatBot = () => {
             (async () => {
                 const res = await getChatDetail(mUid);
                 setChatBotInfo({
+                    uid: res.uid,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
@@ -77,7 +78,7 @@ const chatBot = () => {
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
                     searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
-                    uid: res.uid
+                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
                 });
             })();
         }
@@ -109,6 +110,7 @@ const chatBot = () => {
                 statisticsMode={statisticsMode}
                 showSelect={showSelect}
                 botList={list}
+                setChatBotInfo={setChatBotInfo}
             />
         </div>
     );

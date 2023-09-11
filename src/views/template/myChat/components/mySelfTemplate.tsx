@@ -106,7 +106,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                         </div>
                                         <div className="flex">
                                             <div className="flex items-center text-[#666] text-sm ">
-                                                <span>{data.updaterName}</span>
+                                                <span>{data.creatorName}</span>
                                             </div>
                                             <div className="flex items-center text-[#666] text-sm">
                                                 /<span>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD')}</span>

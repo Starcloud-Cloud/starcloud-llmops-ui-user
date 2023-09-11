@@ -244,7 +244,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                 <div className="flex flex-col pb-3 rounded-md">
                                                                                     <div
                                                                                         onClick={() => toggleItem(item.id)}
-                                                                                        className={`flex items-center px-[8px] py-[16px] ${
+                                                                                        className={`flex items-center px-[8px] py-[8px] ${
                                                                                             item.status === 0
                                                                                                 ? 'bg-[#dbf3d9]'
                                                                                                 : item.status && item.success

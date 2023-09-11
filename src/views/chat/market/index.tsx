@@ -40,7 +40,8 @@ const ChatMy = () => {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
                 });
             })();
         }
@@ -75,7 +76,15 @@ const ChatMy = () => {
             className="h-[calc(100vh-130px)]"
         >
             {/* <div className="rounded-lg h-full"> */}
-            <Chat chatBotInfo={chatBotInfo} mode={'individual'} uid={uid} setUid={setUid} showSelect={width <= 1300} botList={list} />
+            <Chat
+                chatBotInfo={chatBotInfo}
+                mode={'market'}
+                uid={uid}
+                setUid={setUid}
+                showSelect={width <= 1300}
+                botList={list}
+                setChatBotInfo={setChatBotInfo}
+            />
             {/* </div> */}
         </Card>
     );

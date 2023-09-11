@@ -469,14 +469,16 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                                         setOpenUpgradeModel(true);
                                         return;
                                     }
+                                    if (e.target.value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
                                     setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
                                 }}
                             >
                                 <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
                                 <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
-                                <MenuItem value={'QWEN'} disabled>
-                                    通义千问(开发中)
-                                </MenuItem>
+                                <MenuItem value={'QWEN'}>通义千问</MenuItem>
                             </Select>
                         </FormControl>
                     </div>

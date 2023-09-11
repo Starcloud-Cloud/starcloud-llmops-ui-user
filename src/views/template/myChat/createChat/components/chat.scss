@@ -1,0 +1,16 @@
+.modelSelect {
+    .ant-select-selection-item {
+        display: flex !important; 
+        align-items: center !important;
+        font-size: 12px !important;
+        padding-inline-end: 0 !important;
+        line-height: 21px !important; 
+    }
+    .ant-select-selector {
+        height: 21px !important;
+        padding: 0 5px !important;
+    }
+}
+.modelSelectPopup {
+    width: 110px !important;    
+}

@@ -42,6 +42,7 @@ import { BpCheckbox } from 'ui-component/BpCheckbox';
 import useUserStore from 'store/user';
 import { UpgradeModelModal } from './modal/upgradeModel';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
+import './chat.scss';
 
 const { Option } = Select;
 
@@ -358,7 +359,7 @@ export const Chat = ({
     setChatBotInfo
 }: {
     chatBotInfo: IChatInfo;
-    mode?: 'iframe' | 'test' | 'individual';
+    mode?: 'iframe' | 'test' | 'market';
     statisticsMode?: string;
     showSelect?: boolean;
     botList?: any[];
@@ -559,9 +560,9 @@ export const Chat = ({
     }, [mode, chatBotInfo]);
     // mode iframe end
 
-    // mode individual start
+    // mode market start
     React.useEffect(() => {
-        if (mode === 'individual' && uid) {
+        if (mode === 'market' && uid) {
             (async () => {
                 const res: IConversation = await conversation({ appUid: uid });
                 if (res) {
@@ -577,7 +578,7 @@ export const Chat = ({
     }, [mode, uid]);
 
     React.useEffect(() => {
-        if (mode === 'individual' && conversationUid) {
+        if (mode === 'market' && conversationUid) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({
@@ -600,7 +601,7 @@ export const Chat = ({
                 setIsFinish(true);
             })();
         }
-        if (mode === 'individual' && !conversationUid) {
+        if (mode === 'market' && !conversationUid) {
             const result = [
                 {
                     robotName: chatBotInfo.name,
@@ -617,11 +618,11 @@ export const Chat = ({
 
     // 加载完历史再请求
     useEffect(() => {
-        if (mode === 'individual' && messageData && chatBotInfo && uid && isFinish) {
+        if (mode === 'market' && messageData && chatBotInfo && uid && isFinish) {
             doFetch(messageData);
         }
     }, [mode, messageData, chatBotInfo, uid, isFinish]);
-    // mode individual end
+    // mode market end
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -775,7 +776,6 @@ export const Chat = ({
                     }
                 }
                 if (bufferObj.type === 'm') {
-                    debugger;
                     // 处理结论
                     const copyData = [...dataRef.current];
                     if (copyData[copyData.length - 1].isAds) {
@@ -844,7 +844,9 @@ export const Chat = ({
                     scene: statisticsMode,
                     query: message,
                     mediumUid,
-                    conversationUid: jsCookie.get(conversationUniKey)
+                    conversationUid: jsCookie.get(conversationUniKey),
+                    modelType: chatBotInfo.modelProvider,
+                    webSearch: chatBotInfo.enableSearchInWeb
                 });
             }
             if (mode === 'test') {
@@ -852,14 +854,18 @@ export const Chat = ({
                     appUid: appId,
                     scene: 'CHAT_TEST',
                     conversationUid,
-                    query: message
+                    query: message,
+                    modelType: chatBotInfo.modelProvider,
+                    webSearch: chatBotInfo.enableSearchInWeb
                 });
             }
-            if (mode === 'individual') {
+            if (mode === 'market') {
                 resp = await marketMessageSSE({
                     appUid: uid,
                     conversationUid,
-                    query: message
+                    query: message,
+                    modelType: chatBotInfo.modelProvider,
+                    webSearch: chatBotInfo.enableSearchInWeb
                 });
             }
             setIsFirst(false);
@@ -1044,7 +1050,7 @@ export const Chat = ({
 
     return (
         <div className="h-full relative flex justify-center">
-            {mode === 'individual' && width > 1300 && (
+            {mode === 'market' && width > 1300 && (
                 <div
                     className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
@@ -1086,7 +1092,7 @@ export const Chat = ({
             )}
             <div
                 className={`h-full flex flex-col max-w-[768px] ${
-                    mode === 'individual' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''
+                    mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''
                 }   w-full`}
             >
                 <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0`}>
@@ -1106,7 +1112,7 @@ export const Chat = ({
                                                     setMUid && setMUid(item.value);
                                                     setOpen(false);
                                                 }
-                                                if (mode === 'individual') {
+                                                if (mode === 'market') {
                                                     setUid && setUid(item.value);
                                                     setOpen(false);
                                                 }
@@ -1181,12 +1187,236 @@ export const Chat = ({
                         </div>
                     </div>
                 </div>
-                {mode === 'individual' ? (
-                    <div className="flex-shrink-0 flex justify-center w-full mb-1 ">
-                        <div className="w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 border border-[#E3E4E5] border-solid relative top-[20px]">
-                            {skillWorkflowList && skillWorkflowList?.length > 0 && (
+                <div className={`${mode === 'market' ? 'mb-1' : ''} flex-shrink-0 flex justify-center w-full`}>
+                    <div
+                        className={`${
+                            mode === 'market'
+                                ? 'w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg pt-3 px-1 pb-0 relative top-[20px]'
+                                : 'w-full max-w-[768px] p-[8px]'
+                        }`}
+                    >
+                        <div className="flex justify-between">
+                            {/* <div className="ml-[48px] flex items-center"> */}
+                            {/* <Tag className="cursor-pointer">Tag 1</Tag>
+                                    <Tag className="cursor-pointer">Tag 2</Tag> */}
+                            {/* </div> */}
+                            {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover
                                     placement="topLeft"
+                                    arrow={false}
+                                    open={skillOpen}
+                                    onOpenChange={(newOpen) => setSkillOpen(newOpen)}
+                                    content={
+                                        <div className="max-h-[220px] overflow-y-auto">
+                                            {skillWorkflowList.map((v: any, index: number) => (
+                                                <>
+                                                    <div className="flex flex-col w-[220px]">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center">
+                                                                {v.images ? (
+                                                                    <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                ) : (
+                                                                    <svg
+                                                                        viewBox="0 0 1024 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="18"
+                                                                        height="18"
+                                                                    >
+                                                                        <path
+                                                                            d="M689.737143 650.496c8.996571-5.339429 18.797714-9.435429 29.220571-12.105143a28.233143 28.233143 0 0 1-0.219428-3.474286v-27.940571a27.940571 27.940571 0 0 1 55.881143 0v27.940571a28.196571 28.196571 0 0 1-0.219429 3.474286c10.386286 2.669714 20.224 6.765714 29.257143 12.105143a28.233143 28.233143 0 0 1 2.267428-2.596571l19.748572-19.748572a27.940571 27.940571 0 1 1 39.497143 39.497143l-19.748572 19.748571a28.16 28.16 0 0 1-2.56 2.304c5.302857 9.033143 9.435429 18.834286 12.068572 29.257143a28.233143 28.233143 0 0 1 3.474285-0.219428h27.940572a27.940571 27.940571 0 1 1 0 55.881143h-27.940572a28.16 28.16 0 0 1-3.474285-0.219429 111.067429 111.067429 0 0 1-12.068572 29.257143c0.877714 0.658286 1.755429 1.462857 2.56 2.267428l19.748572 19.748572a27.940571 27.940571 0 1 1-39.497143 39.497143l-19.748572-19.748572a28.233143 28.233143 0 0 1-2.304-2.56 111.067429 111.067429 0 0 1-29.257142 12.068572 28.196571 28.196571 0 0 1 0.256 3.474285v27.940572a27.940571 27.940571 0 1 1-55.881143 0v-27.940572c0-1.170286 0.073143-2.304 0.219428-3.474285a111.067429 111.067429 0 0 1-29.257143-12.068572 28.233143 28.233143 0 0 1-2.304 2.56l-19.748571 19.748572a27.940571 27.940571 0 1 1-39.497143-39.497143l19.748572-19.748572a28.269714 28.269714 0 0 1 2.596571-2.304 111.067429 111.067429 0 0 1-12.105143-29.257142 28.16 28.16 0 0 1-3.474286 0.256h-27.940571a27.940571 27.940571 0 0 1 0-55.881143h27.940571c1.170286 0 2.340571 0.073143 3.474286 0.219428 2.669714-10.422857 6.765714-20.224 12.105143-29.257143a28.16 28.16 0 0 1-2.596571-2.304l-19.748572-19.748571a27.940571 27.940571 0 1 1 39.497143-39.497143l19.748571 19.748572a28.233143 28.233143 0 0 1 2.304 2.596571zM914.285714 582.436571A233.947429 233.947429 0 0 0 746.678857 512a234.057143 234.057143 0 0 0-172.397714 75.446857h-11.995429v14.043429A233.691429 233.691429 0 0 0 512 746.678857c0 65.645714 26.953143 125.001143 70.436571 167.606857H182.857143a73.142857 73.142857 0 0 1-73.142857-73.142857V182.857143a73.142857 73.142857 0 0 1 73.142857-73.142857h658.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v399.579428z m-640.950857-197.485714l-37.924571 36.059429 106.057143 116.114285L512 374.747429l-35.328-38.729143-132.644571 126.354285-70.692572-77.421714z m0 201.142857l-37.924571 36.059429 106.057143 116.114286L512 575.890286l-35.328-38.729143-132.644571 126.354286-70.692572-77.421715z m288.950857-199.789714v50.249143h201.142857v-50.249143h-201.142857z m184.393143 416.219429a55.881143 55.881143 0 1 0 0-111.725715 55.881143 55.881143 0 0 0 0 111.725715z"
+                                                                            fill="#6580A9"
+                                                                            p-id="1616"
+                                                                        ></path>
+                                                                    </svg>
+                                                                )}
+                                                                <span className="line-clamp-1 text-base ml-1">{v.name}</span>
+                                                            </div>
+                                                            <BpCheckbox size="small" checked />
+                                                        </div>
+                                                        <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">{v.description}</div>
+                                                    </div>
+                                                    {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
+                                                </>
+                                            ))}
+                                        </div>
+                                    }
+                                    trigger="click"
+                                >
+                                    <div
+                                        className="flex items-center mb-1 cursor-pointer px-[4px]"
+                                        onClick={() => setSkillOpen(!skillOpen)}
+                                    >
+                                        <span className="text-sm">技能:</span>
+                                        <div className="flex items-center justify-start">
+                                            {skillWorkflowList &&
+                                                skillWorkflowList.slice(0, 5).map((item: any, index: number) =>
+                                                    !item.images ? (
+                                                        <svg
+                                                            viewBox="0 0 1024 1024"
+                                                            version="1.1"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="18"
+                                                            height="18"
+                                                        >
+                                                            <path
+                                                                d="M689.737143 650.496c8.996571-5.339429 18.797714-9.435429 29.220571-12.105143a28.233143 28.233143 0 0 1-0.219428-3.474286v-27.940571a27.940571 27.940571 0 0 1 55.881143 0v27.940571a28.196571 28.196571 0 0 1-0.219429 3.474286c10.386286 2.669714 20.224 6.765714 29.257143 12.105143a28.233143 28.233143 0 0 1 2.267428-2.596571l19.748572-19.748572a27.940571 27.940571 0 1 1 39.497143 39.497143l-19.748572 19.748571a28.16 28.16 0 0 1-2.56 2.304c5.302857 9.033143 9.435429 18.834286 12.068572 29.257143a28.233143 28.233143 0 0 1 3.474285-0.219428h27.940572a27.940571 27.940571 0 1 1 0 55.881143h-27.940572a28.16 28.16 0 0 1-3.474285-0.219429 111.067429 111.067429 0 0 1-12.068572 29.257143c0.877714 0.658286 1.755429 1.462857 2.56 2.267428l19.748572 19.748572a27.940571 27.940571 0 1 1-39.497143 39.497143l-19.748572-19.748572a28.233143 28.233143 0 0 1-2.304-2.56 111.067429 111.067429 0 0 1-29.257142 12.068572 28.196571 28.196571 0 0 1 0.256 3.474285v27.940572a27.940571 27.940571 0 1 1-55.881143 0v-27.940572c0-1.170286 0.073143-2.304 0.219428-3.474285a111.067429 111.067429 0 0 1-29.257143-12.068572 28.233143 28.233143 0 0 1-2.304 2.56l-19.748571 19.748572a27.940571 27.940571 0 1 1-39.497143-39.497143l19.748572-19.748572a28.269714 28.269714 0 0 1 2.596571-2.304 111.067429 111.067429 0 0 1-12.105143-29.257142 28.16 28.16 0 0 1-3.474286 0.256h-27.940571a27.940571 27.940571 0 0 1 0-55.881143h27.940571c1.170286 0 2.340571 0.073143 3.474286 0.219428 2.669714-10.422857 6.765714-20.224 12.105143-29.257143a28.16 28.16 0 0 1-2.596571-2.304l-19.748572-19.748571a27.940571 27.940571 0 1 1 39.497143-39.497143l19.748571 19.748572a28.233143 28.233143 0 0 1 2.304 2.596571zM914.285714 582.436571A233.947429 233.947429 0 0 0 746.678857 512a234.057143 234.057143 0 0 0-172.397714 75.446857h-11.995429v14.043429A233.691429 233.691429 0 0 0 512 746.678857c0 65.645714 26.953143 125.001143 70.436571 167.606857H182.857143a73.142857 73.142857 0 0 1-73.142857-73.142857V182.857143a73.142857 73.142857 0 0 1 73.142857-73.142857h658.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v399.579428z m-640.950857-197.485714l-37.924571 36.059429 106.057143 116.114285L512 374.747429l-35.328-38.729143-132.644571 126.354285-70.692572-77.421714z m0 201.142857l-37.924571 36.059429 106.057143 116.114286L512 575.890286l-35.328-38.729143-132.644571 126.354286-70.692572-77.421715z m288.950857-199.789714v50.249143h201.142857v-50.249143h-201.142857z m184.393143 416.219429a55.881143 55.881143 0 1 0 0-111.725715 55.881143 55.881143 0 0 0 0 111.725715z"
+                                                                fill="#6580A9"
+                                                                p-id="1616"
+                                                            ></path>
+                                                        </svg>
+                                                    ) : (
+                                                        <img
+                                                            className="rounded ml-1"
+                                                            key={index}
+                                                            src={item.images}
+                                                            width={18}
+                                                            height={18}
+                                                        />
+                                                    )
+                                                )}
+                                        </div>
+                                        {skillWorkflowList.length > 5 && <span>...</span>}
+                                        {skillOpen ? (
+                                            <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
+                                        ) : (
+                                            <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
+                                        )}
+                                    </div>
+                                </Popover>
+                            ) : (
+                                <div />
+                            )}
+                            <div>
+                                <Select
+                                    style={{ width: 85 }}
+                                    bordered={false}
+                                    className="rounded-2xl border-[1px] border-[#673ab7] border-solid  mx-3 mb-1"
+                                    value={chatBotInfo.modelProvider || 'GPT35'}
+                                    disabled={mode === 'iframe'}
+                                    rootClassName="modelSelect"
+                                    popupClassName="modelSelectPopup"
+                                    onChange={(value) => {
+                                        if (value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                            setOpenUpgradeModel(true);
+                                            return;
+                                        }
+                                        if (value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                            setOpenUpgradeModel(true);
+                                            return;
+                                        }
+                                        setChatBotInfo({ ...chatBotInfo, modelProvider: value });
+                                    }}
+                                >
+                                    <Option value={'GPT35'}>大模型3.5</Option>
+                                    <Option value={'GPT4'}>大模型4.0</Option>
+                                    <Option value={'QWEN'}>通义千问</Option>
+                                </Select>
+                            </div>
+                        </div>
+                        <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
+                            {/* <Grid item className="!pl-0">
+                                <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
+                                    <MoreHorizTwoToneIcon />
+                                </IconButton>
+                                <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleCloseSort}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right'
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right'
+                                    }}
+                                >
+                                    <MenuItem onClick={handleClean}>
+                                        <CleaningServicesSharpIcon className="text-base" />
+                                        <span className="text-base ml-3">清除</span>
+                                    </MenuItem>
+                                </Menu>
+                            </Grid> */}
+                            <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                                <OutlinedInput
+                                    id="message-send"
+                                    fullWidth
+                                    multiline
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="请输入想咨询的问题"
+                                    className="!pt-0"
+                                    onKeyDown={handleKeyDown}
+                                    minRows={1}
+                                    maxRows={3}
+                                    endAdornment={
+                                        <>
+                                            <InputAdornment position="end">
+                                                {!isListening ? (
+                                                    <Tooltip arrow placement="top" title={'语音输入'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={'default'}
+                                                            onClick={startListening}
+                                                            aria-label="voice"
+                                                            className="p-0"
+                                                        >
+                                                            <KeyboardVoiceIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                        <div
+                                                            onClick={stopListening}
+                                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                        >
+                                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                                {time}
+                                                            </div>
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                            <InputAdornment position="end" className="relative">
+                                                {isFetch ? (
+                                                    <Tooltip placement="top" arrow title={'请求中'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            aria-label="send message"
+                                                        >
+                                                            <PendingIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'发送'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            onClick={handleOnSend}
+                                                            aria-label="send message"
+                                                        >
+                                                            <SendIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                        </>
+                                    }
+                                    aria-describedby="search-helper-text"
+                                    inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
+                                />
+                            </Grid>
+                        </Grid>
+                        <div className="flex justify-between mt-1">
+                            {/* {skillWorkflowList && skillWorkflowList?.length > 0 ? (
+                                <Popover
+                                    placement="topLeft"
+                                    arrow={false}
+                                    open={skillOpen}
                                     content={
                                         <div className="max-h-[220px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
@@ -1208,7 +1438,10 @@ export const Chat = ({
                                     }
                                     trigger="click"
                                 >
-                                    <div className="flex items-center mb-1 cursor-pointer px-[8px]">
+                                    <div
+                                        className="flex items-center mb-1 cursor-pointer px-[8px]"
+                                        onClick={() => setSkillOpen(!skillOpen)}
+                                    >
                                         <span className="text-sm ml-[40px]">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
@@ -1224,346 +1457,70 @@ export const Chat = ({
                                                         />
                                                     ))}
                                         </div>
+                                        {skillWorkflowList.length > 5 && <span>...</span>}
+                                        {skillOpen ? (
+                                            <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
+                                        ) : (
+                                            <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
+                                        )}
                                     </div>
                                 </Popover>
-                            )}
-                            <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
-                                <Grid item className="!pl-0">
-                                    <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                                        <MoreHorizTwoToneIcon />
-                                    </IconButton>
-                                    <Menu
-                                        id="simple-menu"
-                                        anchorEl={anchorEl}
-                                        keepMounted
-                                        open={Boolean(anchorEl)}
-                                        onClose={handleCloseSort}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'right'
-                                        }}
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right'
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleClean}>
-                                            <CleaningServicesSharpIcon className="text-base" />
-                                            <span className="text-base ml-3">清除</span>
-                                        </MenuItem>
-                                    </Menu>
-                                </Grid>
-                                <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                                    <OutlinedInput
-                                        id="message-send"
-                                        fullWidth
-                                        multiline
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="请输入想咨询的问题"
-                                        className="!pt-0"
-                                        onKeyDown={handleKeyDown}
-                                        minRows={1}
-                                        maxRows={3}
-                                        endAdornment={
-                                            <>
-                                                <InputAdornment position="end">
-                                                    {!isListening ? (
-                                                        <Tooltip arrow placement="top" title={'语音输入'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={'default'}
-                                                                onClick={startListening}
-                                                                aria-label="voice"
-                                                                className="p-0"
-                                                            >
-                                                                <KeyboardVoiceIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                            <div
-                                                                onClick={stopListening}
-                                                                className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                            >
-                                                                <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                                    {time}
-                                                                </div>
-                                                            </div>
-                                                        </Tooltip>
-                                                    )}
-                                                </InputAdornment>
-                                                <InputAdornment position="end" className="relative">
-                                                    {isFetch ? (
-                                                        <Tooltip placement="top" arrow title={'请求中'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={message ? 'secondary' : 'default'}
-                                                                aria-label="send message"
-                                                            >
-                                                                <PendingIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Tooltip placement="top" arrow title={'发送'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={message ? 'secondary' : 'default'}
-                                                                onClick={handleOnSend}
-                                                                aria-label="send message"
-                                                            >
-                                                                <SendIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-                                                </InputAdornment>
-                                            </>
-                                        }
-                                        aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <div>
-                                <div className="flex justify-end px-[24px]">
-                                    <div className="text-right text-stone-600 mr-1">{message?.length || 0}/200</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex-shrink-0 flex justify-center w-full">
-                        <div className="w-full max-w-[768px] p-[8px] ">
-                            <div className="flex justify-between">
-                                <div className="ml-[48px] flex items-center">
-                                    {/* <Tag className="cursor-pointer">Tag 1</Tag>
-                                    <Tag className="cursor-pointer">Tag 2</Tag> */}
-                                </div>
-                                <div>
-                                    <Select
-                                        style={{ width: 110 }}
-                                        bordered={false}
-                                        className="rounded-2xl border-[1px] border-[#673ab7] border-solid  mr-[19px] mb-1"
-                                        value={chatBotInfo.modelProvider || 'GPT35'}
+                            ) : (
+                                <div />
+                            )} */}
+                            <Tooltip title={'清除'} placement="top" arrow>
+                                <CleaningServicesSharpIcon
+                                    className="text-base cursor-pointer hover:text-[#673ab7] mx-[4px]"
+                                    onClick={handleClean}
+                                />
+                            </Tooltip>
+                            <div />
+                            <div className="flex items-center">
+                                <div className="flex items-center justify-center">
+                                    <span className="mr-1 text-sm">联网查询</span>
+                                    <Switch
+                                        checked={!!chatBotInfo.enableSearchInWeb}
+                                        checkedChildren="开启"
+                                        unCheckedChildren="关闭"
                                         disabled={mode === 'iframe'}
+                                        size={'small'}
                                         onChange={(value) => {
-                                            if (value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
-                                                setOpenUpgradeModel(true);
+                                            if (value && !permissions.includes('chat:config:websearch')) {
+                                                setOpenUpgradeOnline(true);
                                                 return;
                                             }
-                                            setChatBotInfo({ ...chatBotInfo, modelProvider: value });
+                                            setChatBotInfo({
+                                                ...chatBotInfo,
+                                                enableSearchInWeb: !chatBotInfo.enableSearchInWeb
+                                            });
                                         }}
-                                    >
-                                        <Option value={'GPT35'}>大模型3.5</Option>
-                                        <Option value={'GPT4'}>大模型4.0</Option>
-                                        <Option value={'QWEN'} disabled>
-                                            通义千问(开发中)
-                                        </Option>
-                                    </Select>
-                                </div>
-                            </div>
-                            <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
-                                <Grid item className="!pl-0">
-                                    <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                                        <MoreHorizTwoToneIcon />
-                                    </IconButton>
-                                    <Menu
-                                        id="simple-menu"
-                                        anchorEl={anchorEl}
-                                        keepMounted
-                                        open={Boolean(anchorEl)}
-                                        onClose={handleCloseSort}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'right'
-                                        }}
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right'
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleClean}>
-                                            <CleaningServicesSharpIcon className="text-base" />
-                                            <span className="text-base ml-3">清除</span>
-                                        </MenuItem>
-                                    </Menu>
-                                </Grid>
-                                <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                                    <OutlinedInput
-                                        id="message-send"
-                                        fullWidth
-                                        multiline
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="请输入想咨询的问题"
-                                        className="!pt-0"
-                                        onKeyDown={handleKeyDown}
-                                        minRows={1}
-                                        maxRows={3}
-                                        endAdornment={
-                                            <>
-                                                <InputAdornment position="end">
-                                                    {!isListening ? (
-                                                        <Tooltip arrow placement="top" title={'语音输入'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={'default'}
-                                                                onClick={startListening}
-                                                                aria-label="voice"
-                                                                className="p-0"
-                                                            >
-                                                                <KeyboardVoiceIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                            <div
-                                                                onClick={stopListening}
-                                                                className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                            >
-                                                                <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                                    {time}
-                                                                </div>
-                                                            </div>
-                                                        </Tooltip>
-                                                    )}
-                                                </InputAdornment>
-                                                <InputAdornment position="end" className="relative">
-                                                    {isFetch ? (
-                                                        <Tooltip placement="top" arrow title={'请求中'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={message ? 'secondary' : 'default'}
-                                                                aria-label="send message"
-                                                            >
-                                                                <PendingIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    ) : (
-                                                        <Tooltip placement="top" arrow title={'发送'}>
-                                                            <IconButton
-                                                                disableRipple
-                                                                color={message ? 'secondary' : 'default'}
-                                                                onClick={handleOnSend}
-                                                                aria-label="send message"
-                                                            >
-                                                                <SendIcon />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    )}
-                                                </InputAdornment>
-                                            </>
-                                        }
-                                        aria-describedby="search-helper-text"
-                                        inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
                                     />
-                                </Grid>
-                            </Grid>
-                            <div className="flex justify-between mt-1">
-                                {skillWorkflowList && skillWorkflowList?.length > 0 ? (
-                                    <Popover
-                                        placement="topLeft"
-                                        arrow={false}
-                                        open={skillOpen}
-                                        content={
-                                            <div className="max-h-[220px] overflow-y-auto">
-                                                {skillWorkflowList.map((v: any, index: number) => (
-                                                    <>
-                                                        <div className="flex flex-col w-[220px]">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center">
-                                                                    <img className="rounded w-[18px] h-[18px]" src={v.images} />
-                                                                    <span className="line-clamp-1 text-base ml-1">{v.name}</span>
-                                                                </div>
-                                                                <BpCheckbox size="small" checked />
-                                                            </div>
-                                                            <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">
-                                                                {v.description}
-                                                            </div>
-                                                        </div>
-                                                        {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
-                                                    </>
-                                                ))}
-                                            </div>
-                                        }
-                                        trigger="click"
-                                    >
-                                        <div
-                                            className="flex items-center mb-1 cursor-pointer px-[8px]"
-                                            onClick={() => setSkillOpen(!skillOpen)}
-                                        >
-                                            <span className="text-sm ml-[40px]">技能:</span>
-                                            <div className="flex items-center justify-start">
-                                                {skillWorkflowList &&
-                                                    skillWorkflowList
-                                                        .slice(0, 5)
-                                                        .map((item: any, index: number) => (
-                                                            <img
-                                                                className="rounded ml-1"
-                                                                key={index}
-                                                                src={item.images}
-                                                                width={18}
-                                                                height={18}
-                                                            />
-                                                        ))}
-                                            </div>
-                                            {skillWorkflowList.length > 5 && <span>...</span>}
-                                            {skillOpen ? (
-                                                <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
-                                            ) : (
-                                                <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
-                                            )}
-                                        </div>
-                                    </Popover>
-                                ) : (
-                                    <div />
-                                )}
-                                <div className="flex items-center">
-                                    <div className="flex items-center justify-center">
-                                        <span className="mr-1 text-sm">联网查询</span>
-                                        <Switch
-                                            checked={!!chatBotInfo.enableSearchInWeb}
-                                            checkedChildren="开启"
-                                            unCheckedChildren="关闭"
-                                            disabled={mode === 'iframe'}
-                                            onChange={(value) => {
-                                                console.log(value, 'value');
-                                                if (value && !permissions.includes('chat:config:websearch')) {
-                                                    setOpenUpgradeOnline(true);
-                                                    return;
-                                                }
-                                                setChatBotInfo({
-                                                    ...chatBotInfo,
-                                                    enableSearchInWeb: !chatBotInfo.enableSearchInWeb
-                                                });
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="text-right text-stone-600 mx-3">{message?.length || 0}/200</div>
                                 </div>
+                                <div className="text-right text-stone-600 mx-3">{message?.length || 0}/200</div>
                             </div>
-                            <div className="w-full flex justify-center">
-                                <div className="flex justify-center items-center">
-                                    <svg
-                                        version="1.1"
-                                        id="Layer_1"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                                        x="0px"
-                                        y="0px"
-                                        width="18px"
-                                        height="18px"
-                                        viewBox="0 0 18 18"
-                                        enableBackground="new 0 0 24 24"
-                                        xmlSpace="preserve"
-                                    >
-                                        <image
-                                            id="image0"
-                                            width="18"
-                                            height="18"
-                                            x="0"
-                                            y="0"
-                                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                        </div>
+                        <div className="w-full flex justify-center">
+                            <div className="flex justify-center items-center">
+                                <svg
+                                    version="1.1"
+                                    id="Layer_1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                    x="0px"
+                                    y="0px"
+                                    width="18px"
+                                    height="18px"
+                                    viewBox="0 0 18 18"
+                                    enableBackground="new 0 0 24 24"
+                                    xmlSpace="preserve"
+                                >
+                                    <image
+                                        id="image0"
+                                        width="18"
+                                        height="18"
+                                        x="0"
+                                        y="0"
+                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -1718,20 +1675,19 @@ export const Chat = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                        />
-                                    </svg>
-                                    <span className="text-[#596780] text-xs truncate leading-5 ml-1">
-                                        <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
-                                            Powered by 魔法AI
-                                        </a>
-                                    </span>
-                                </div>
+                                    />
+                                </svg>
+                                <span className="text-[#596780] text-xs truncate leading-5 ml-1">
+                                    <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
+                                        Powered by 魔法AI
+                                    </a>
+                                </span>
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
             </div>
-            {mode === 'individual' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
+            {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
             <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>

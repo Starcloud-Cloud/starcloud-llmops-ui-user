@@ -77,7 +77,7 @@ const ChatMy = () => {
             {/* <div className="rounded-lg h-full"> */}
             <Chat
                 chatBotInfo={chatBotInfo}
-                mode={'individual'}
+                mode={'market'}
                 uid={uid}
                 setUid={setUid}
                 showSelect={width <= 1300}

@@ -48,6 +48,8 @@ import imgLoading from 'assets/images/picture/loading.gif';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import _ from 'lodash';
 import { UpgradeSkillModel } from './modal/upgradeSkillModel';
+import useUserStore from 'store/user';
+import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 
 const WorkflowEditModal = ({
     open,
@@ -230,6 +232,7 @@ const WorkflowCreateModal = ({
     const searchParams = new URLSearchParams(location.search);
 
     const appId = searchParams.get('appId');
+    const permissions = useUserStore((state) => state.permissions);
 
     const [list, setList] = useState<any[]>([]);
     const [selectType, setSelectType] = useState(1);
@@ -238,6 +241,7 @@ const WorkflowCreateModal = ({
     const [hasMore, setHasMore] = useState(true);
     const [pageData, setPageData] = useState<any[]>([]);
     const [page, setPage] = useState(1);
+    const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -298,6 +302,11 @@ const WorkflowCreateModal = ({
             setSkillCountVisible(true);
             return;
         }
+        if (!permissions.includes('chat:config:websearch')) {
+            setSkillUpgradeOnline(true);
+            return;
+        }
+
         let data: any = {};
         data.appConfigId = appId;
         data.type = item.type === 'system' ? 5 : 3;
@@ -338,123 +347,126 @@ const WorkflowCreateModal = ({
     };
 
     return (
-        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
-            <MainCard
-                style={{
-                    position: 'absolute',
-                    width: '920px',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                }}
-                title="新增技能"
-                content={false}
-                secondary={
-                    <IconButton onClick={handleClose} size="large" aria-label="close modal">
-                        <CloseIcon fontSize="small" />
-                    </IconButton>
-                }
-            >
-                <CardContent sx={{ p: 2 }}>
-                    <div className="flex justify-between items-baseline">
-                        <Stack direction="row" spacing={1} className="mb-3">
-                            <Chip
-                                label="全部"
-                                color={selectType === 1 ? 'secondary' : 'default'}
-                                variant="filled"
-                                className="w-[80px] cursor-pointer"
-                                onClick={() => setSelectType(1)}
+        <>
+            <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+                <MainCard
+                    style={{
+                        position: 'absolute',
+                        width: '920px',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)'
+                    }}
+                    title="新增技能"
+                    content={false}
+                    secondary={
+                        <IconButton onClick={handleClose} size="large" aria-label="close modal">
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    }
+                >
+                    <CardContent sx={{ p: 2 }}>
+                        <div className="flex justify-between items-baseline">
+                            <Stack direction="row" spacing={1} className="mb-3">
+                                <Chip
+                                    label="全部"
+                                    color={selectType === 1 ? 'secondary' : 'default'}
+                                    variant="filled"
+                                    className="w-[80px] cursor-pointer"
+                                    onClick={() => setSelectType(1)}
+                                />
+                                <Chip
+                                    label="系统"
+                                    color={selectType === 2 ? 'secondary' : 'default'}
+                                    variant="filled"
+                                    className="w-[80px] cursor-pointer"
+                                    onClick={() => setSelectType(2)}
+                                />
+                                <Chip
+                                    label="应用市场"
+                                    color={selectType === 3 ? 'secondary' : 'default'}
+                                    variant="filled"
+                                    className="w-[80px] cursor-pointer"
+                                    onClick={() => setSelectType(3)}
+                                />
+                                <Chip
+                                    label="我的应用"
+                                    color={selectType === 4 ? 'secondary' : 'default'}
+                                    variant="filled"
+                                    className="w-[80px] cursor-pointer"
+                                    onClick={() => setSelectType(4)}
+                                />
+                            </Stack>
+                            <TextField
+                                size="small"
+                                id="filled-start-adornment"
+                                sx={{ width: '300px', ml: 2 }}
+                                placeholder={'所搜应用'}
+                                name="name"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    )
+                                }}
                             />
-                            <Chip
-                                label="系统"
-                                color={selectType === 2 ? 'secondary' : 'default'}
-                                variant="filled"
-                                className="w-[80px] cursor-pointer"
-                                onClick={() => setSelectType(2)}
-                            />
-                            <Chip
-                                label="应用市场"
-                                color={selectType === 3 ? 'secondary' : 'default'}
-                                variant="filled"
-                                className="w-[80px] cursor-pointer"
-                                onClick={() => setSelectType(3)}
-                            />
-                            <Chip
-                                label="我的应用"
-                                color={selectType === 4 ? 'secondary' : 'default'}
-                                variant="filled"
-                                className="w-[80px] cursor-pointer"
-                                onClick={() => setSelectType(4)}
-                            />
-                        </Stack>
-                        <TextField
-                            size="small"
-                            id="filled-start-adornment"
-                            sx={{ width: '300px', ml: 2 }}
-                            placeholder={'所搜应用'}
-                            name="name"
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                    </div>
-                    {loading && (
-                        <div className="flex justify-center items-center w-full h-[545px]">
-                            <img width={60} src={imgLoading} alt="loading" />
                         </div>
-                    )}
-                    {(selectType === 2 || selectType === 1) && !loading && (
-                        <InfiniteScroll
-                            dataLength={pageData.length}
-                            next={fetchMoreData}
-                            hasMore={hasMore}
-                            loader={<></>}
-                            height={545}
-                            className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto mt-[8px]"
-                        >
-                            {pageData?.map((item: any, index: number) => (
-                                <Box key={index} className="w-full relative">
-                                    <SkillCard data={item} handleCreate={handleCreate} />
-                                </Box>
-                            ))}
-                        </InfiniteScroll>
-                    )}
-                    {(selectType === 3 || selectType === 4) && (
-                        <div className="h-[545px] mt-[8px] flex justify-center items-center flex-col">
-                            <Popover
-                                zIndex={9999}
-                                content={
-                                    <div className="flex justify-start items-center flex-col">
-                                        <div className="text-sm text-center w-[330px]">
-                                            <div>功能正在封闭测试中。</div>
-                                            <div>可联系我们产品顾问进一步了解，</div>
-                                            <div>并获得提前免费使用的权利。</div>
-                                        </div>
-                                        <img className="w-40" src={workWechatPay} alt="" />
-                                    </div>
-                                }
-                                trigger="hover"
+                        {loading && (
+                            <div className="flex justify-center items-center w-full h-[545px]">
+                                <img width={60} src={imgLoading} alt="loading" />
+                            </div>
+                        )}
+                        {(selectType === 2 || selectType === 1) && !loading && (
+                            <InfiniteScroll
+                                dataLength={pageData.length}
+                                next={fetchMoreData}
+                                hasMore={hasMore}
+                                loader={<></>}
+                                height={545}
+                                className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto mt-[8px]"
                             >
-                                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
-                                    <path
-                                        d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
-                                        fill="#515151"
-                                        p-id="6181"
-                                    ></path>
-                                </svg>
-                            </Popover>
-                            <div className="text-base">即将推出</div>
-                        </div>
-                    )}
-                </CardContent>
-            </MainCard>
-        </Modal>
+                                {pageData?.map((item: any, index: number) => (
+                                    <Box key={index} className="w-full relative">
+                                        <SkillCard data={item} handleCreate={handleCreate} />
+                                    </Box>
+                                ))}
+                            </InfiniteScroll>
+                        )}
+                        {(selectType === 3 || selectType === 4) && (
+                            <div className="h-[545px] mt-[8px] flex justify-center items-center flex-col">
+                                <Popover
+                                    zIndex={9999}
+                                    content={
+                                        <div className="flex justify-start items-center flex-col">
+                                            <div className="text-sm text-center w-[330px]">
+                                                <div>功能正在封闭测试中。</div>
+                                                <div>可联系我们产品顾问进一步了解，</div>
+                                                <div>并获得提前免费使用的权利。</div>
+                                            </div>
+                                            <img className="w-40" src={workWechatPay} alt="" />
+                                        </div>
+                                    }
+                                    trigger="hover"
+                                >
+                                    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+                                        <path
+                                            d="M880.64 358.4h-819.2v423.936c0 34.816 26.624 61.44 61.44 61.44h491.52c12.288 0 20.48 8.192 20.48 20.48s-8.192 20.48-20.48 20.48h-491.52c-57.344 0-102.4-45.056-102.4-102.4v-552.96c0-57.344 45.056-102.4 102.4-102.4h696.32c57.344 0 102.4 45.056 102.4 102.4v176.128c0 12.288-8.192 20.48-20.48 20.48s-20.48-8.192-20.48-20.48v-47.104z m0-40.96v-88.064c0-34.816-26.624-61.44-61.44-61.44h-696.32c-34.816 0-61.44 26.624-61.44 61.44v88.064h819.2z m-204.8-51.2c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m61.44 0c-12.288 0-20.48-8.192-20.48-20.48s8.192-20.48 20.48-20.48 20.48 8.192 20.48 20.48-8.192 20.48-20.48 20.48z m-448.512 241.664c6.144-10.24 18.432-12.288 28.672-8.192 10.24 6.144 12.288 18.432 8.192 28.672l-102.4 178.176c-6.144 10.24-18.432 12.288-28.672 8.192s-12.288-18.432-8.192-28.672l102.4-178.176z m-126.976 6.144l-55.296 90.112 55.296 94.208c6.144 10.24 2.048 22.528-8.192 28.672-10.24 6.144-22.528 2.048-28.672-8.192l-67.584-114.688 67.584-110.592c6.144-10.24 18.432-12.288 28.672-6.144 10.24 4.096 12.288 16.384 8.192 26.624z m188.416 184.32l55.296-94.208-55.296-90.112c-6.144-10.24-2.048-22.528 6.144-28.672 10.24-6.144 22.528-2.048 28.672 6.144l67.584 110.592-67.584 114.688c-6.144 10.24-18.432 12.288-28.672 8.192-8.192-4.096-10.24-18.432-6.144-26.624z m577.536-122.88l4.096 10.24-40.96 51.2c-8.192 10.24-8.192 26.624 0 36.864l38.912 47.104-4.096 10.24c-8.192 26.624-22.528 51.2-38.912 71.68l-8.192 10.24-61.44-10.24c-12.288-2.048-26.624 6.144-30.72 18.432l-20.48 61.44-10.24 2.048c-32.768 8.192-69.632 8.192-102.4 0l-12.288-2.048-20.48-61.44c-4.096-12.288-18.432-20.48-30.72-18.432l-63.488 10.24-8.192-8.192c-8.192-10.24-16.384-20.48-22.528-32.768-8.192-12.288-14.336-26.624-18.432-40.96l-4.096-10.24 40.96-49.152c8.192-10.24 8.192-26.624 0-36.864l-40.96-49.152 4.096-10.24c10.24-26.624 22.528-51.2 40.96-73.728l8.192-8.192 61.44 10.24c12.288 2.048 26.624-6.144 30.72-18.432l22.528-61.44 10.24-2.048c32.768-6.144 67.584-6.144 100.352 0l12.288 2.048 20.48 59.392c4.096 12.288 18.432 20.48 30.72 20.48l63.488-8.192 8.192 8.192c8.192 10.24 16.384 20.48 22.528 32.768 8.192 12.288 14.336 24.576 18.432 38.912z m-53.248-20.48l-12.288-18.432-38.912 4.096c-32.768 4.096-65.536-16.384-75.776-47.104l-12.288-36.864c-20.48-4.096-40.96-4.096-61.44 0l-14.336 38.912c-10.24 30.72-45.056 51.2-75.776 45.056l-36.864-6.144c-10.24 12.288-16.384 26.624-22.528 40.96l26.624 30.72c20.48 24.576 20.48 63.488 0 90.112l-26.624 30.72c4.096 8.192 6.144 16.384 12.288 24.576 4.096 6.144 6.144 12.288 10.24 16.384l40.96-6.144c32.768-4.096 65.536 16.384 75.776 47.104l12.288 38.912c20.48 4.096 40.96 4.096 61.44 0l14.336-40.96c10.24-30.72 45.056-51.2 75.776-45.056l36.864 6.144c8.192-12.288 16.384-26.624 22.528-40.96l-24.576-28.672c-20.48-24.576-20.48-63.488-2.048-88.064l26.624-32.768c-4.096-6.144-8.192-14.336-12.288-22.528z m-169.984 202.752c-57.344 0-102.4-45.056-102.4-102.4s45.056-102.4 102.4-102.4 102.4 45.056 102.4 102.4c0 55.296-47.104 102.4-102.4 102.4z m0-40.96c34.816 0 61.44-26.624 61.44-61.44s-26.624-61.44-61.44-61.44-61.44 26.624-61.44 61.44 26.624 61.44 61.44 61.44z"
+                                            fill="#515151"
+                                            p-id="6181"
+                                        ></path>
+                                    </svg>
+                                </Popover>
+                                <div className="text-base">即将推出</div>
+                            </div>
+                        )}
+                    </CardContent>
+                </MainCard>
+            </Modal>
+            <SkillUpgradeOnline open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+        </>
     );
 };
 
@@ -469,6 +481,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const [workflowList, setWorkflowList] = useState<any[]>([]);
     const [workflowCurrentRecord, setWorkflowCurrentRecord] = useState({});
     const [count, setCount] = useState(0);
+
     const [skillCountVisible, setSkillCountVisible] = useState(false);
     const forceUpdate = () => setCount((pre) => pre + 1);
 

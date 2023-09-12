@@ -222,7 +222,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                                 </Typography>
                                             </Grid>
-                                            <div className="flex flex-col">
+                                            <div className="inline-flex flex-col">
                                                 <Card
                                                     sx={{
                                                         display: 'inline-block',

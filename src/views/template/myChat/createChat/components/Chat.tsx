@@ -1361,7 +1361,7 @@ export const Chat = ({
                                 <Select
                                     style={{ width: 90 }}
                                     bordered={false}
-                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid  mx-3 mb-1"
+                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-1"
                                     value={selectModel || 'GPT35'}
                                     disabled={mode === 'iframe'}
                                     rootClassName="modelSelect"
@@ -1388,7 +1388,7 @@ export const Chat = ({
                                 </Select>
                             </div>
                         </div>
-                        <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
+                        <Grid container spacing={1} alignItems="center" className="px-0 flex-nowrap w-full ml-0">
                             {/* <Grid item className="!pl-0">
                                 <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
                                     <MoreHorizTwoToneIcon />
@@ -1567,7 +1567,7 @@ export const Chat = ({
                                         }}
                                     />
                                 </div>
-                                <div className="text-right text-stone-600 mx-3">{message?.length || 0}/200</div>
+                                <div className="text-right text-stone-600 w-[55px] ml-2">{message?.length || 0}/200</div>
                             </div>
                         </div>
                         {mode !== 'market' && (

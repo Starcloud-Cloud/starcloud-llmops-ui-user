@@ -113,13 +113,15 @@ function Upload({
     saveState,
     saveDetail,
     mode,
-    getStatus
+    getStatus,
+    handleSave
 }: {
     appUid: string;
     saveState: number;
     saveDetail: () => void;
     mode?: 'CHAT';
     getStatus: (data: boolean) => void;
+    handleSave?: () => void;
 }) {
     const defaultUpLoadList = [
         {
@@ -1048,6 +1050,9 @@ function Upload({
                             </SubCard>
                         </Grid>
                     ))}
+                    <Button onClick={handleSave} sx={{ mt: 3, ml: 2 }} color="secondary" variant="outlined">
+                        保存设置
+                    </Button>
                 </Grid>
             </CustomTabPanel>
             {historyState && (

@@ -276,19 +276,19 @@ function CreateDetail() {
                         </Button>
                     }
                     title={chatBotInfo?.name}
-                    action={
-                        (value === 0 || value === 1 || value === 6) && (
-                            <Button
-                                // className="right-[25px] top-[85px] absolute z-50"
-                                variant="contained"
-                                color="secondary"
-                                autoFocus
-                                onClick={saveDetail}
-                            >
-                                {t('myApp.save')}
-                            </Button>
-                        )
-                    }
+                    // action={
+                    //     (value === 0 || value === 1 || value === 6) && (
+                    //         <Button
+                    //             // className="right-[25px] top-[85px] absolute z-50"
+                    //             variant="contained"
+                    //             color="secondary"
+                    //             autoFocus
+                    //             onClick={saveDetail}
+                    //         >
+                    //             {t('myApp.save')}
+                    //         </Button>
+                    //     )
+                    // }
                 ></CardHeader>
                 <Divider />
                 <Tabs value={value} variant="scrollable" onChange={handleChange}>
@@ -310,10 +310,10 @@ function CreateDetail() {
                     <Tab component={Link} label={'应用分析'} {...a11yProps(7)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
-                    <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
+                    <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} handleSave={saveDetail} />
                 </TabPanel>
                 <TabPanel value={value} index={1}>
-                    <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
+                    <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} handleSave={saveDetail} />
                 </TabPanel>
                 <TabPanel value={value} index={7}>
                     <ApplicationAnalysis appUid={detail?.uid} value={value} type="CHAT_ANALYSIS" />
@@ -334,7 +334,14 @@ function CreateDetail() {
                 )}
                 <TabPanel value={value} index={6}>
                     {detail?.uid && (
-                        <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} getStatus={getStatus} mode={'CHAT'} />
+                        <Upload
+                            appUid={detail?.uid}
+                            saveState={saveState}
+                            saveDetail={updateDetail}
+                            getStatus={getStatus}
+                            mode={'CHAT'}
+                            handleSave={saveDetail}
+                        />
                     )}
                 </TabPanel>
             </Card>

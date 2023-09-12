@@ -491,10 +491,12 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
  */
 export const FashionStyling = ({
     setChatBotInfo,
-    chatBotInfo
+    chatBotInfo,
+    handleSave
 }: {
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
+    handleSave: () => void;
 }) => {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [voiceOpen, setVoiceOpen] = useState(false);
@@ -1106,6 +1108,9 @@ export const FashionStyling = ({
                         </div>
                     </Popover>
                 </div>
+                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                    保存设置
+                </Button>
             </div>
             {voiceOpen && (
                 <VoiceModal

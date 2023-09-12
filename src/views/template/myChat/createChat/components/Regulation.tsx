@@ -45,7 +45,15 @@ const marks = [
 
 const TEXT = `- Identify what language users use in questions and use the same language in your answers. \n - Use English or 中文 to answer questions based on the language of the question.`;
 
-export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
+export const Regulation = ({
+    setChatBotInfo,
+    chatBotInfo,
+    handleSave
+}: {
+    setChatBotInfo: (chatInfo: IChatInfo) => void;
+    chatBotInfo: IChatInfo;
+    handleSave: () => void;
+}) => {
     const [regulationText, setRegulationText] = useState('');
     const [startCheck, setStartCheck] = useState(false);
     const regulationTextRef = useRef(regulationText);
@@ -483,6 +491,9 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                         </FormControl>
                     </div>
                 </div>
+                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                    保存设置
+                </Button>
             </div>
             {appOpen && (
                 <AppModal

@@ -129,10 +129,11 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             <CardContent
                 sx={{
                     px: 2,
-                    py: 1,
+                    pt: 1,
                     position: 'relative',
                     overflow: 'hidden'
                 }}
+                className="pb-[18px]"
             >
                 <Tooltip disableInteractive title={data.name}>
                     <Typography
@@ -158,18 +159,19 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
                         {data.description}
                     </Typography>
                 </Tooltip>
-                <div className="flex justify-end mt-3">
-                    <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
-                </div>
             </CardContent>
-            <Divider />
-            {handleCreate && (
-                <div className="mt-[10px] px-1 flex justify-end items-center">
-                    <Button variant="contained" size={'small'} color="secondary" onClick={() => handleCreate(data)}>
-                        添加
-                    </Button>
-                </div>
-            )}
+            <div className="py-[8px] px-1 flex justify-between items-center absolute bottom-0 w-full border-t-[1px] border-solid border-[#e3e8ef]">
+                <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
+                <Button
+                    className="!py-[2px] !max-w-[50px]"
+                    variant="contained"
+                    size={'small'}
+                    color="secondary"
+                    onClick={() => handleCreate(data)}
+                >
+                    添加
+                </Button>
+            </div>
             {handleEdit && (
                 <div className="mt-[7px] px-1 flex justify-between items-center">
                     <div>

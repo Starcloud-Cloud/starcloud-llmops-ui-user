@@ -68,15 +68,28 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                 display="flex"
                                 alignItems="center"
                             >
-                                <div className=" w-[100px] h-[100px] flex justify-center items-center outline outline-1  outline-offset-2 outline-[#6839b7] rounded-full">
+                                <div className="w-[100px] h-[100px] flex justify-center items-center outline outline-1  outline-offset-2 outline-[#6839b7] rounded-full">
                                     <img className="object-cover rounded-full w-[100px] h-[100px]" src={data?.images?.[0]} alt="icon" />
                                 </div>
                                 <Box marginLeft="20px" className="flex  flex-col flex-1">
-                                    <Tooltip title={data.name}>
-                                        <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">
-                                            {data?.name}
-                                        </Typography>
-                                    </Tooltip>
+                                    <div className="flex items-center justify-start">
+                                        <Tooltip title={data.name}>
+                                            <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px] line-clamp-1">
+                                                {data?.name}
+                                            </Typography>
+                                        </Tooltip>
+                                        <div
+                                            className="flex items-center text-[#666] text-sm hover:text-[#6839b7] absolute top-[30px] right-[15px]"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDialogOpen(true);
+                                                setCurrentUid(data.uid);
+                                            }}
+                                        >
+                                            <DeleteIcon className="text-sm" />
+                                            <span>删除</span>
+                                        </div>
+                                    </div>
                                     <Typography
                                         sx={{ lineHeight: '1.2rem', height: '53px' }}
                                         className="cursor desc"
@@ -91,17 +104,6 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                             <div className="flex items-center text-[#666] text-sm hover:text-[#6839b7]">
                                                 <ModeEditIcon className="text-sm" />
                                                 <span>编辑</span>
-                                            </div>
-                                            <div
-                                                className="flex items-center text-[#666] ml-3 text-sm hover:text-[#6839b7]"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDialogOpen(true);
-                                                    setCurrentUid(data.uid);
-                                                }}
-                                            >
-                                                <DeleteIcon className="text-sm" />
-                                                <span>删除</span>
                                             </div>
                                         </div>
                                         <div className="flex">

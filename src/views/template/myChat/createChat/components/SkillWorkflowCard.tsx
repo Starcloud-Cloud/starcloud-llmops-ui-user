@@ -148,13 +148,16 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     />
                     <Tooltip disableInteractive title={data.name}>
                         <Typography
-                            className="line-clamp-1 cursor-pointer"
+                            className={`${data.type === 5 || data.type === 'system' ? 'line-clamp-1' : 'cursor-pointer line-clamp-1'}`}
                             gutterBottom
                             variant="h3"
                             sx={{ fontSize: '1.1rem' }}
                             component="div"
                             my={1}
                             onClick={() => {
+                                if (data.type === 5 || data.type === 'system') {
+                                    return;
+                                }
                                 handleEdit(data);
                             }}
                         >
@@ -212,13 +215,16 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     overflow: 'hidden'
                 }}
                 onClick={() => {
+                    // if (data.type === 5 || data.type === 'system') {
+                    //     return;
+                    // }
                     handleEdit(data);
                 }}
             >
                 <Tooltip disableInteractive title={data.description}>
                     <Typography
                         sx={{ fontSize: '.8rem', height: '52px' }}
-                        className="line-clamp-3 cursor-pointer"
+                        className={`${data.type === 5 || data.type === 'system' ? 'line-clamp-5' : 'cursor-pointer line-clamp-5'}`}
                         variant="body2"
                         lineHeight="1.1rem"
                     >

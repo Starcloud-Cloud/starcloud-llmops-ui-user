@@ -194,6 +194,44 @@ export const Regulation = ({
                 >
                     基础规则
                 </span>
+                <div className={'mt-3'}>
+                    <div className="flex items-center">
+                        <span className={'text-md text-black'}>首选模型</span>
+                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
+                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                        </Tooltip>
+                    </div>
+                    <div className={'mt-3'}>
+                        <FormControl className="w-[280px] md:w-[310px]">
+                            <InputLabel size={'small'} id="age-select">
+                                选择模型
+                            </InputLabel>
+                            <Select
+                                size={'small'}
+                                id="columnId"
+                                name="columnId"
+                                label={'模型选择'}
+                                value={chatBotInfo.modelProvider || 'GPT35'}
+                                fullWidth
+                                onChange={(e: any) => {
+                                    if (e.target.value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
+                                    if (e.target.value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
+                                    setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
+                                }}
+                            >
+                                <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
+                                <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
+                                <MenuItem value={'QWEN'}>通义千问</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+                </div>
                 <Box className={'mt-0'} display="flex" justifyContent="right">
                     <Button
                         color="secondary"
@@ -445,56 +483,9 @@ export const Regulation = ({
                     </Grid>
                 </div>
             </div>
-            <div className="mt-10">
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
-                    }
-                >
-                    模型规则
-                </span>
-                <div className={'mt-3'}>
-                    <div className="flex items-center">
-                        <span className={'text-md text-black'}>首选模型</span>
-                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
-                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                        </Tooltip>
-                    </div>
-                    <div className={'mt-3'}>
-                        <FormControl className="w-[280px] md:w-[310px]">
-                            <InputLabel size={'small'} id="age-select">
-                                选择模型
-                            </InputLabel>
-                            <Select
-                                size={'small'}
-                                id="columnId"
-                                name="columnId"
-                                label={'模型选择'}
-                                value={chatBotInfo.modelProvider || 'GPT35'}
-                                fullWidth
-                                onChange={(e: any) => {
-                                    if (e.target.value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
-                                        setOpenUpgradeModel(true);
-                                        return;
-                                    }
-                                    if (e.target.value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
-                                        setOpenUpgradeModel(true);
-                                        return;
-                                    }
-                                    setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
-                                }}
-                            >
-                                <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
-                                <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
-                                <MenuItem value={'QWEN'}>通义千问</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                </div>
-                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
-                    保存设置
-                </Button>
-            </div>
+            <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                保存设置
+            </Button>
             {appOpen && (
                 <AppModal
                     title={'角色描述优化'}

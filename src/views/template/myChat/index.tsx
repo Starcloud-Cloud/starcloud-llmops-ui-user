@@ -152,7 +152,7 @@ function MyTemplate() {
                 {/*    <TextField v-model="queryParams.tags" label={t('apply.tag')} InputLabelProps={{ shrink: true }} fullWidth />*/}
                 {/*</Grid>*/}
             </Grid>
-            <Box display="flex" alignItems="end" my={2}>
+            {/* <Box display="flex" alignItems="end" my={2}>
                 <Typography variant="h3">{t('chat.recommend')}</Typography>
                 <Typography fontSize="12px" ml={1}>
                     {t('chat.recommendDes')}
@@ -166,7 +166,7 @@ function MyTemplate() {
                         </Box>
                     ))}
                 </ScrollMenu>
-            </Box>
+            </Box> */}
             {/* {totals > 0 && ( */}
             <Box>
                 <Typography variant="h3" my={2}>

@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import marketStore from 'store/market';
 import './textnoWarp.scss';
 
-function Template({ data, handleDetail }: any) {
+function Template({ data, handleDetail, uid }: any) {
     const { categoryList } = marketStore();
     const theme = useTheme();
     return (
@@ -17,15 +17,15 @@ function Template({ data, handleDetail }: any) {
                 display: 'flex',
                 flexDirection: 'column',
                 itemAlign: 'center',
-                justifyContent: 'center',
                 cursor: 'pointer',
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
                 }
             }}
+            className={`xs:w-full sm:w-[203.33px]  hover:border-[#673ab7]` + (uid === data?.uid ? 'border-solid border-[#673ab7]' : '')}
         >
-            <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ textAlign: 'center', marginTop: '15px' }}>
                 <img
                     alt="图片"
                     className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]"

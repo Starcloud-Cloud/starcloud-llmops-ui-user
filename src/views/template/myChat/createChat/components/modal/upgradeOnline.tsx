@@ -16,7 +16,7 @@ export const UpgradeOnlineModal = ({ handleClose, open }: { handleClose: () => v
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="联网查询功能仅为VIP用户开放"
+                title="联网查询功能需要VIP角色"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">

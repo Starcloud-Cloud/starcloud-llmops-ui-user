@@ -19,6 +19,8 @@ import AppModal from 'views/picture/create/Menu/appModal';
 import useUserStore from 'store/user';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import { UpgradeModelModal } from './modal/upgradeModel';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const marks = [
     {
@@ -222,6 +224,22 @@ export const Regulation = ({
                                         setOpenUpgradeModel(true);
                                         return;
                                     }
+                                    // 当选择了技能，选择非GPT4.0提示
+                                    if (chatBotInfo.skillWorkflowList?.length && e.target.value !== 'GPT4') {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '技能依赖于大模型4.0，请先停用技能再切换模型',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return;
+                                    }
+
                                     setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
                                 }}
                             >
@@ -401,6 +419,7 @@ export const Regulation = ({
                                 <Switch
                                     checked={!!chatBotInfo.enableSearchInWeb}
                                     onChange={(e) => {
+                                        // 没有权限弹窗
                                         if (e.target.checked && !permissions.includes('chat:config:websearch')) {
                                             setOpenUpgradeOnline(true);
                                             return;

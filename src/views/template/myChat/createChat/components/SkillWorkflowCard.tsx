@@ -121,6 +121,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                 overflow: 'hidden',
                 border: '1px solid',
                 position: 'relative',
+                maxWidth: '203px',
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'

@@ -298,12 +298,12 @@ const WorkflowCreateModal = ({
     };
 
     const handleCreate = async (item: any) => {
-        if (workflowList?.length >= 3) {
-            setSkillCountVisible(true);
+        if (!permissions.includes('chat:config:skills')) {
+            setSkillUpgradeOnline(true);
             return;
         }
-        if (!permissions.includes('chat:config:websearch')) {
-            setSkillUpgradeOnline(true);
+        if (workflowList?.length >= 3) {
+            setSkillCountVisible(true);
             return;
         }
 

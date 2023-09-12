@@ -1111,6 +1111,16 @@ export const Chat = ({
         setAnchorEl(null);
     };
 
+    // 监听技能模型切换到4.0
+    useEffect(() => {
+        if (skillWorkflowList.length) {
+            setChatBotInfo({
+                ...chatBotInfo,
+                modelProvider: 'GPT4'
+            });
+        }
+    }, [skillWorkflowList.length]);
+
     return (
         <div className="h-full relative flex justify-center">
             {mode === 'market' && width > 1300 && (

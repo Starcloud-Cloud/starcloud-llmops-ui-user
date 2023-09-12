@@ -1352,7 +1352,7 @@ export const Chat = ({
                                     style={{ width: 90 }}
                                     bordered={false}
                                     className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid  mx-3 mb-1"
-                                    value={chatBotInfo.modelProvider || 'GPT35'}
+                                    value={selectModel || 'GPT35'}
                                     disabled={mode === 'iframe'}
                                     rootClassName="modelSelect"
                                     popupClassName="modelSelectPopup"

@@ -1368,9 +1368,13 @@ export const Chat = ({
                                         setSelectModel(value);
                                     }}
                                 >
-                                    <Option value={'GPT35'}>大模型3.5</Option>
+                                    <Option value={'GPT35'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
+                                        大模型3.5
+                                    </Option>
                                     <Option value={'GPT4'}>大模型4.0</Option>
-                                    <Option value={'QWEN'}>通义千问</Option>
+                                    <Option value={'QWEN'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
+                                        通义千问
+                                    </Option>
                                 </Select>
                             </div>
                         </div>
@@ -1542,7 +1546,7 @@ export const Chat = ({
                                         checked={!!enableOnline}
                                         checkedChildren="开启"
                                         unCheckedChildren="关闭"
-                                        disabled={mode === 'iframe'}
+                                        disabled={mode === 'iframe' || !!chatBotInfo.enableSearchInWeb}
                                         size={'small'}
                                         onChange={(value) => {
                                             if (value && !permissions.includes('chat:config:websearch')) {

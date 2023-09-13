@@ -591,7 +591,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                             >
                                 <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
                                     {workflowList?.map((item, index) => (
-                                        <Grid lg={3} md={4} sm={6} xs={12} key={item.uid + index} item>
+                                        <Grid key={item.uid + index} item>
                                             <SkillWorkflowCard
                                                 data={item}
                                                 forceUpdate={forceUpdate}

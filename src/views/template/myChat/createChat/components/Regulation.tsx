@@ -66,8 +66,6 @@ export const Regulation = ({
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
 
-    console.log(chatBotInfo, 'chatBotInfo');
-
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
             const pattern = /- 请使用(.*)语气跟我进行对话/g;

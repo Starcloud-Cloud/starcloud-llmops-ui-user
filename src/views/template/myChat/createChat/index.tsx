@@ -97,6 +97,20 @@ function CreateDetail() {
 
     //保存更改
     const saveDetail = async () => {
+        if (chatBotInfo?.skillWorkflowList?.filter((v) => !v.disabled).length && chatBotInfo.modelProvider !== 'GPT4') {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '开启技能的同时模型必须选择大模型4',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
         if (chatBotInfo.name === undefined || chatBotInfo.name === '') {
             dispatch(
                 openSnackbar({

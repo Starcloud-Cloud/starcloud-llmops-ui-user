@@ -1166,7 +1166,7 @@ export const Chat = ({
                     <div
                         className={`${
                             mode === 'market'
-                                ? 'w-full max-w-[768px] text-sm rounded-lg bg-white shadow-lg py-2  px-1  relative top-[10px]'
+                                ? 'w-full max-w-[768px] text-sm rounded-lg bg-white py-2  px-1  relative top-[10px] shadow-[4px_-2px_10px_0_rgba(0,0,0,0.2)]'
                                 : 'w-full max-w-[768px] p-[8px]'
                         }`}
                     >

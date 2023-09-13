@@ -16,6 +16,11 @@ import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AppModal from 'views/picture/create/Menu/appModal';
+import useUserStore from 'store/user';
+import { UpgradeOnlineModal } from './modal/upgradeOnline';
+import { UpgradeModelModal } from './modal/upgradeModel';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const marks = [
     {
@@ -42,13 +47,26 @@ const marks = [
 
 const TEXT = `- Identify what language users use in questions and use the same language in your answers. \n - Use English or 中文 to answer questions based on the language of the question.`;
 
-export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (chatInfo: IChatInfo) => void; chatBotInfo: IChatInfo }) => {
+export const Regulation = ({
+    setChatBotInfo,
+    chatBotInfo,
+    handleSave
+}: {
+    setChatBotInfo: (chatInfo: IChatInfo) => void;
+    chatBotInfo: IChatInfo;
+    handleSave: () => void;
+}) => {
     const [regulationText, setRegulationText] = useState('');
     const [startCheck, setStartCheck] = useState(false);
     const regulationTextRef = useRef(regulationText);
     const [appOpen, setAppOpen] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [websiteCount, setWebsiteCount] = useState(0);
+    const permissions = useUserStore((state) => state.permissions);
+    const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+
+    console.log(chatBotInfo, 'chatBotInfo');
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
@@ -178,6 +196,60 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                 >
                     基础规则
                 </span>
+                <div className={'mt-3'}>
+                    <div className="flex items-center">
+                        <span className={'text-md text-black'}>首选模型</span>
+                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
+                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                        </Tooltip>
+                    </div>
+                    <div className={'mt-3'}>
+                        <FormControl className="w-[280px] md:w-[310px]">
+                            <InputLabel size={'small'} id="age-select">
+                                选择模型
+                            </InputLabel>
+                            <Select
+                                size={'small'}
+                                id="columnId"
+                                name="columnId"
+                                label={'模型选择'}
+                                value={chatBotInfo.modelProvider || 'GPT35'}
+                                fullWidth
+                                onChange={(e: any) => {
+                                    if (e.target.value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
+                                    if (e.target.value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                        setOpenUpgradeModel(true);
+                                        return;
+                                    }
+                                    // 当选择了技能，选择非GPT4.0提示
+                                    if (chatBotInfo.skillWorkflowList?.length && e.target.value !== 'GPT4') {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '技能依赖于大模型4.0，请先停用技能再切换模型',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return;
+                                    }
+
+                                    setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
+                                }}
+                            >
+                                <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
+                                <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
+                                <MenuItem value={'QWEN'}>通义千问</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+                </div>
                 <Box className={'mt-0'} display="flex" justifyContent="right">
                     <Button
                         color="secondary"
@@ -345,13 +417,18 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                             <div className="flex justify-end items-center">
                                 <span className={'text-#697586'}>{chatBotInfo.enableSearchInWeb ? '启用' : '不启用'}</span>
                                 <Switch
-                                    checked={chatBotInfo.enableSearchInWeb}
-                                    onChange={() =>
+                                    checked={!!chatBotInfo.enableSearchInWeb}
+                                    onChange={(e) => {
+                                        // 没有权限弹窗
+                                        if (e.target.checked && !permissions.includes('chat:config:websearch')) {
+                                            setOpenUpgradeOnline(true);
+                                            return;
+                                        }
                                         setChatBotInfo({
                                             ...chatBotInfo,
                                             enableSearchInWeb: !chatBotInfo.enableSearchInWeb
-                                        })
-                                    }
+                                        });
+                                    }}
                                     color="secondary"
                                 />
                             </div>
@@ -425,50 +502,9 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     </Grid>
                 </div>
             </div>
-            <div className="mt-10">
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative text-black"
-                    }
-                >
-                    模型规则
-                </span>
-                <div className={'mt-3'}>
-                    <div className="flex items-center">
-                        <span className={'text-md text-black'}>首选模型</span>
-                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
-                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                        </Tooltip>
-                    </div>
-                    <div className={'mt-3'}>
-                        <FormControl className="w-[280px] md:w-[310px]">
-                            <InputLabel size={'small'} id="age-select">
-                                选择模型
-                            </InputLabel>
-                            <Select
-                                size={'small'}
-                                id="columnId"
-                                name="columnId"
-                                label={'模型选择'}
-                                value={1}
-                                fullWidth
-                                // onChange={(e: any) => handleRuleValue(3, e.target.value)}
-                            >
-                                <MenuItem value={1}>默认模型3.5</MenuItem>
-                                <MenuItem value={2} disabled>
-                                    默认模型4.0(测试中)
-                                </MenuItem>
-                                <MenuItem value={3} disabled>
-                                    文心一言(测试中)
-                                </MenuItem>
-                                <MenuItem value={4} disabled>
-                                    Llama2(测试中)
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                </div>
-            </div>
+            <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                保存设置
+            </Button>
             {appOpen && (
                 <AppModal
                     title={'角色描述优化'}
@@ -479,6 +515,8 @@ export const Regulation = ({ setChatBotInfo, chatBotInfo }: { setChatBotInfo: (c
                     setOpen={setAppOpen}
                 />
             )}
+            <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>
     );
 };

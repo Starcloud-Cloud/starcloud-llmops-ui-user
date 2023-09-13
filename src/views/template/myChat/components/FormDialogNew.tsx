@@ -52,7 +52,7 @@ export default function FormDialogNew({
                 }}
                 title={t('chat.createRobot')}
                 content={false}
-                className="sm:w-[700px] xs:w-[300px]"
+                className="sm:w-[920px] xs:w-[300px]"
                 secondary={
                     <IconButton
                         onClick={() => {
@@ -89,18 +89,18 @@ export default function FormDialogNew({
                             </div>
                         </div>
                         <div className="pt-[16px] w-full text-base">选择模版</div>
-                        <div className="w-full mt-[8px] grid xs:grid-cols-1 gap-4 sm:grid-cols-3 h-[530px] overflow-y-auto">
+                        <div className="w-full mt-[8px] grid xs:grid-cols-1 xs:gap-4 sm:gap-4 sm:grid-cols-4 h-[530px] overflow-y-auto">
                             {recommendList.map((item: any, index) => (
                                 <Box
                                     key={index}
                                     // style={{ width: '203.33px' }}
-                                    className={
-                                        `xs:w-full sm:w-[203.33px] hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
-                                        (uid === item?.uid ? ' border-[1px] border-solid border-[#673ab7]' : '')
-                                    }
+                                    // className={
+                                    //     `xs:w-full sm:w-[203.33px] hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
+                                    //     (uid === item?.uid ? ' border-[1px] border-solid border-[#673ab7]' : '')
+                                    // }
                                     onClick={() => setUid(item?.uid)}
                                 >
-                                    <Template data={item} />
+                                    <Template data={item} uid={uid} />
                                 </Box>
                             ))}
                         </div>

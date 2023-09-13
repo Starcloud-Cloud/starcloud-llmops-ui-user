@@ -222,7 +222,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         dayjs(history.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                                 </Typography>
                                             </Grid>
-                                            <div className="flex flex-col">
+                                            <div className="inline-flex flex-col">
                                                 <Card
                                                     sx={{
                                                         display: 'inline-block',
@@ -244,7 +244,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                 <div className="flex flex-col pb-3 rounded-md">
                                                                                     <div
                                                                                         onClick={() => toggleItem(item.id)}
-                                                                                        className={`flex items-center px-[8px] py-[16px] ${
+                                                                                        className={`flex items-center px-[8px] py-[8px] ${
                                                                                             item.status === 0
                                                                                                 ? 'bg-[#dbf3d9]'
                                                                                                 : item.status && item.success

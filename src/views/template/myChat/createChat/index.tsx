@@ -16,7 +16,6 @@ import { Knowledge } from './components/Knowledge';
 import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
 import Upload from '../../myTemplate/components/createTemplate/upLoad';
-import { appModify } from 'api/template';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
@@ -57,6 +56,7 @@ export type IChatInfo = {
     enableSearchInWeb?: boolean;
     searchInWeb?: string;
     skillWorkflowList?: any[];
+    modelProvider?: string;
 };
 
 function CreateDetail() {
@@ -77,6 +77,7 @@ function CreateDetail() {
                 setDetail(res);
                 setChatBotInfo({
                     ...chatBotInfo,
+                    uid: res.uid,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
@@ -87,7 +88,8 @@ function CreateDetail() {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
                 });
             });
         }
@@ -224,6 +226,7 @@ function CreateDetail() {
         data.images = [chatBotInfo.avatar];
         data.chatConfig.prePrompt = chatBotInfo.prePrompt;
         data.chatConfig.modelConfig.completionParams.temperature = chatBotInfo.temperature;
+        data.chatConfig.modelConfig.provider = chatBotInfo.modelProvider;
         data.chatConfig.openingStatement = { statement: chatBotInfo.statement, enabled: chatBotInfo.enableStatement };
         data.chatConfig.description.enabled = chatBotInfo.enableIntroduction;
         data.description = chatBotInfo.introduction;
@@ -273,19 +276,19 @@ function CreateDetail() {
                         </Button>
                     }
                     title={chatBotInfo?.name}
-                    action={
-                        (value === 0 || value === 1 || value === 6) && (
-                            <Button
-                                // className="right-[25px] top-[85px] absolute z-50"
-                                variant="contained"
-                                color="secondary"
-                                autoFocus
-                                onClick={saveDetail}
-                            >
-                                {t('myApp.save')}
-                            </Button>
-                        )
-                    }
+                    // action={
+                    //     (value === 0 || value === 1 || value === 6) && (
+                    //         <Button
+                    //             // className="right-[25px] top-[85px] absolute z-50"
+                    //             variant="contained"
+                    //             color="secondary"
+                    //             autoFocus
+                    //             onClick={saveDetail}
+                    //         >
+                    //             {t('myApp.save')}
+                    //         </Button>
+                    //     )
+                    // }
                 ></CardHeader>
                 <Divider />
                 <Tabs value={value} variant="scrollable" onChange={handleChange}>
@@ -307,10 +310,10 @@ function CreateDetail() {
                     <Tab component={Link} label={'应用分析'} {...a11yProps(7)} />
                 </Tabs>
                 <TabPanel value={value} index={0}>
-                    <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
+                    <FashionStyling setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} handleSave={saveDetail} />
                 </TabPanel>
                 <TabPanel value={value} index={1}>
-                    <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
+                    <Regulation setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} handleSave={saveDetail} />
                 </TabPanel>
                 <TabPanel value={value} index={7}>
                     <ApplicationAnalysis appUid={detail?.uid} value={value} type="CHAT_ANALYSIS" />
@@ -322,16 +325,23 @@ function CreateDetail() {
                     <Skill setChatBotInfo={setChatBotInfo} chatBotInfo={chatBotInfo} />
                 </TabPanel>
 
-                {width < 1280 && (
+                {width < 1330 && (
                     <TabPanel value={value} index={5}>
                         <div className="h-screen">
-                            <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                            <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
                         </div>
                     </TabPanel>
                 )}
                 <TabPanel value={value} index={6}>
                     {detail?.uid && (
-                        <Upload appUid={detail?.uid} saveState={saveState} saveDetail={updateDetail} getStatus={getStatus} mode={'CHAT'} />
+                        <Upload
+                            appUid={detail?.uid}
+                            saveState={saveState}
+                            saveDetail={updateDetail}
+                            getStatus={getStatus}
+                            mode={'CHAT'}
+                            handleSave={saveDetail}
+                        />
                     )}
                 </TabPanel>
             </Card>
@@ -339,7 +349,7 @@ function CreateDetail() {
                 <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
                     <div className="text-base color-[#121926]">预览与调试</div>
                     <Card className="h-full">
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} />
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
                     </Card>
                 </div>
             )}

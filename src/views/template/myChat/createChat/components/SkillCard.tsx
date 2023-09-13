@@ -6,6 +6,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import workflow from 'assets/images/chat/workflow.svg';
 
 function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
     const theme = useTheme();
@@ -77,7 +78,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             return '系统';
         }
         if ((data.type === 3 && data.appType === 1) || data.type === 'market') {
-            return 'AI应用';
+            return '应用市场';
         }
         if ((data.type === 3 && data.appType === 0) || data.type === 'MYSELF') {
             return '我的应用';
@@ -98,6 +99,22 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             }}
         >
             <Box sx={{ aspectRatio: '186 / 80', overflow: 'hidden' }}>
+                {/* {!data.images ? (
+                    <svg
+                        viewBox="0 0 1024 1024"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="200"
+                        height="200"
+                        onClick={() => handleEdit(data)}
+                    >
+                        <path
+                            d="M689.737143 650.496c8.996571-5.339429 18.797714-9.435429 29.220571-12.105143a28.233143 28.233143 0 0 1-0.219428-3.474286v-27.940571a27.940571 27.940571 0 0 1 55.881143 0v27.940571a28.196571 28.196571 0 0 1-0.219429 3.474286c10.386286 2.669714 20.224 6.765714 29.257143 12.105143a28.233143 28.233143 0 0 1 2.267428-2.596571l19.748572-19.748572a27.940571 27.940571 0 1 1 39.497143 39.497143l-19.748572 19.748571a28.16 28.16 0 0 1-2.56 2.304c5.302857 9.033143 9.435429 18.834286 12.068572 29.257143a28.233143 28.233143 0 0 1 3.474285-0.219428h27.940572a27.940571 27.940571 0 1 1 0 55.881143h-27.940572a28.16 28.16 0 0 1-3.474285-0.219429 111.067429 111.067429 0 0 1-12.068572 29.257143c0.877714 0.658286 1.755429 1.462857 2.56 2.267428l19.748572 19.748572a27.940571 27.940571 0 1 1-39.497143 39.497143l-19.748572-19.748572a28.233143 28.233143 0 0 1-2.304-2.56 111.067429 111.067429 0 0 1-29.257142 12.068572 28.196571 28.196571 0 0 1 0.256 3.474285v27.940572a27.940571 27.940571 0 1 1-55.881143 0v-27.940572c0-1.170286 0.073143-2.304 0.219428-3.474285a111.067429 111.067429 0 0 1-29.257143-12.068572 28.233143 28.233143 0 0 1-2.304 2.56l-19.748571 19.748572a27.940571 27.940571 0 1 1-39.497143-39.497143l19.748572-19.748572a28.269714 28.269714 0 0 1 2.596571-2.304 111.067429 111.067429 0 0 1-12.105143-29.257142 28.16 28.16 0 0 1-3.474286 0.256h-27.940571a27.940571 27.940571 0 0 1 0-55.881143h27.940571c1.170286 0 2.340571 0.073143 3.474286 0.219428 2.669714-10.422857 6.765714-20.224 12.105143-29.257143a28.16 28.16 0 0 1-2.596571-2.304l-19.748572-19.748571a27.940571 27.940571 0 1 1 39.497143-39.497143l19.748571 19.748572a28.233143 28.233143 0 0 1 2.304 2.596571zM914.285714 582.436571A233.947429 233.947429 0 0 0 746.678857 512a234.057143 234.057143 0 0 0-172.397714 75.446857h-11.995429v14.043429A233.691429 233.691429 0 0 0 512 746.678857c0 65.645714 26.953143 125.001143 70.436571 167.606857H182.857143a73.142857 73.142857 0 0 1-73.142857-73.142857V182.857143a73.142857 73.142857 0 0 1 73.142857-73.142857h658.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v399.579428z m-640.950857-197.485714l-37.924571 36.059429 106.057143 116.114285L512 374.747429l-35.328-38.729143-132.644571 126.354285-70.692572-77.421714z m0 201.142857l-37.924571 36.059429 106.057143 116.114286L512 575.890286l-35.328-38.729143-132.644571 126.354286-70.692572-77.421715z m288.950857-199.789714v50.249143h201.142857v-50.249143h-201.142857z m184.393143 416.219429a55.881143 55.881143 0 1 0 0-111.725715 55.881143 55.881143 0 0 0 0 111.725715z"
+                            fill="#6580A9"
+                            p-id="1616"
+                        ></path>
+                    </svg>
+                ) : ( */}
                 <img
                     onClick={() => handleEdit(data)}
                     alt="图片"
@@ -105,16 +122,18 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
                     width="100%"
                     height="100%"
                     style={{ objectFit: 'cover' }}
-                    src={data.images}
+                    src={data.images || workflow}
                 />
+                {/* )} */}
             </Box>
             <CardContent
                 sx={{
                     px: 2,
-                    py: 1,
+                    pt: 1,
                     position: 'relative',
                     overflow: 'hidden'
                 }}
+                className="pb-[18px]"
             >
                 <Tooltip disableInteractive title={data.name}>
                     <Typography
@@ -140,18 +159,19 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
                         {data.description}
                     </Typography>
                 </Tooltip>
-                <div className="flex justify-end mt-3">
-                    <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
-                </div>
             </CardContent>
-            <Divider />
-            {handleCreate && (
-                <div className="mt-[10px] px-1 flex justify-end items-center">
-                    <Button variant="contained" size={'small'} color="secondary" onClick={() => handleCreate(data)}>
-                        添加
-                    </Button>
-                </div>
-            )}
+            <div className="py-[8px] px-1 flex justify-between items-center absolute bottom-0 w-full border-t-[1px] border-solid border-[#e3e8ef]">
+                <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
+                <Button
+                    className="!py-[2px] !max-w-[50px]"
+                    variant="contained"
+                    size={'small'}
+                    color="secondary"
+                    onClick={() => handleCreate(data)}
+                >
+                    添加
+                </Button>
+            </div>
             {handleEdit && (
                 <div className="mt-[7px] px-1 flex justify-between items-center">
                     <div>

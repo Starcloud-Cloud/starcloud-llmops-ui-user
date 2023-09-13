@@ -12,7 +12,7 @@ export const UpgradeSkillModel = ({ handleClose, open }: { handleClose: () => vo
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '530px',
+                    width: '350px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'

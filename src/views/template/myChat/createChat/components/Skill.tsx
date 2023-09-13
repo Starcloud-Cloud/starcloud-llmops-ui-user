@@ -401,7 +401,7 @@ const WorkflowCreateModal = ({
                                 size="small"
                                 id="filled-start-adornment"
                                 sx={{ width: '300px', ml: 2 }}
-                                placeholder={'所搜应用'}
+                                placeholder={'搜索应用'}
                                 name="name"
                                 value={searchValue}
                                 onChange={(e) => setSearchValue(e.target.value)}

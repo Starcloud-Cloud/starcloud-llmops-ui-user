@@ -11,12 +11,12 @@ export const UpgradeOnlineModal = ({ handleClose, open }: { handleClose: () => v
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '530px',
+                    width: '350px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="联网查询功能需要VIP角色"
+                title="升级"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">

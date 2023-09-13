@@ -1050,10 +1050,10 @@ function Upload({
                             </SubCard>
                         </Grid>
                     ))}
-                    <Button onClick={handleSave} sx={{ mt: 3, ml: 2 }} color="secondary" variant="outlined">
-                        保存设置
-                    </Button>
                 </Grid>
+                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                    保存设置
+                </Button>
             </CustomTabPanel>
             {historyState && (
                 <Dialog

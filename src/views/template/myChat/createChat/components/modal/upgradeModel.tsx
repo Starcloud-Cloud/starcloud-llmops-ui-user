@@ -11,12 +11,12 @@ export const UpgradeModelModal = ({ handleClose, open }: { handleClose: () => vo
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '530px',
+                    width: '350px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="该模型仅为VIP用户开放"
+                title="升级"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">

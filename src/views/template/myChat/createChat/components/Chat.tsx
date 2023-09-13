@@ -43,6 +43,7 @@ import useUserStore from 'store/user';
 import { UpgradeModelModal } from './modal/upgradeModel';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
+import { UpgradeSkillModel } from './modal/upgradeSkillModel';
 
 const { Option } = Select;
 
@@ -390,6 +391,7 @@ export const Chat = ({
     const [skillOpen, setSkillOpen] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
+    const [openUpgradeSkillModel, setOpenUpgradeSkillModel] = useState(false);
     const [enableOnline, setEnableOnline] = useState<any>();
     const [selectModel, setSelectModel] = useState<any>();
 
@@ -1424,6 +1426,33 @@ export const Chat = ({
                                     placeholder="请输入想咨询的问题"
                                     className="!pt-0"
                                     onKeyDown={handleKeyDown}
+                                    onClick={(e) => {
+                                        // 判断当前人是否有权限使用
+                                        if (chatBotInfo.enableSearchInWeb && !permissions.includes('chat:config:websearch')) {
+                                            setOpenUpgradeOnline(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (chatBotInfo.modelProvider === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                            setOpenUpgradeModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (chatBotInfo.modelProvider === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                            setOpenUpgradeModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (skillWorkflowList?.length && !permissions.includes('chat:config:skills')) {
+                                            setOpenUpgradeSkillModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                    }}
                                     minRows={1}
                                     maxRows={3}
                                     endAdornment={
@@ -1763,6 +1792,7 @@ export const Chat = ({
             {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
             <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <UpgradeSkillModel open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
         </div>
     );
 };

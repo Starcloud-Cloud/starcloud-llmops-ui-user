@@ -28,7 +28,7 @@ export const UpgradeOnlineModal = ({ handleClose, open }: { handleClose: () => v
                     <div className="flex justify-center flex-col items-center">
                         <div className="flex items-center justify-center flex-col">
                             {/* <img width={204} src={upgradeModel} /> */}
-                            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="150">
+                            <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" height="128">
                                 <path
                                     d="M512 810.666667m-42.666667 0a42.666667 42.666667 0 1 0 85.333334 0 42.666667 42.666667 0 1 0-85.333334 0Z"
                                     p-id="13104"

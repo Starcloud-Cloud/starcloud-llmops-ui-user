@@ -38,7 +38,6 @@ import { getListAll, getSkillList, modifySkill, skillCreate } from 'api/chat';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AddIcon from '@mui/icons-material/Add';
-import document from 'assets/images/upLoad/document.svg';
 import SkillCard from './SkillCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -253,7 +252,8 @@ const WorkflowCreateModal = ({
                 description: item.desc,
                 images: item.icon,
                 code: item.code,
-                type: item.type
+                type: item.type,
+                usage: item.usage
             }));
             // setList([...systemSkill, ...marketRespList, ...appRespList]);
             setList([...systemSkill]);
@@ -268,6 +268,7 @@ const WorkflowCreateModal = ({
                 data = list;
             }
             if (selectType === 2) {
+                // 系统通过code判断
                 data = list.filter((item) => item.type === 'system');
             }
             if (selectType === 3) {
@@ -317,6 +318,7 @@ const WorkflowCreateModal = ({
                 desc: item.description,
                 code: item.code,
                 icon: item.images
+                // usage: item.usage
             };
         }
         if (data.type === 3) {
@@ -430,7 +432,7 @@ const WorkflowCreateModal = ({
                             >
                                 {pageData?.map((item: any, index: number) => (
                                     <Box key={index} className="w-full relative">
-                                        <SkillCard data={item} handleCreate={handleCreate} />
+                                        <SkillCard data={item} handleCreate={handleCreate} workflowList={workflowList} />
                                     </Box>
                                 ))}
                             </InfiniteScroll>
@@ -591,7 +593,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                             >
                                 <Grid container spacing={1} sx={{ height: '560px', overflowY: 'auto' }}>
                                     {workflowList?.map((item, index) => (
-                                        <Grid lg={3} md={4} sm={6} xs={12} key={item.uid + index} item>
+                                        <Grid key={item.uid + index} item>
                                             <SkillWorkflowCard
                                                 data={item}
                                                 forceUpdate={forceUpdate}

@@ -66,8 +66,6 @@ export const Regulation = ({
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
 
-    console.log(chatBotInfo, 'chatBotInfo');
-
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
             const pattern = /- 请使用(.*)语气跟我进行对话/g;
@@ -199,7 +197,16 @@ export const Regulation = ({
                 <div className={'mt-3'}>
                     <div className="flex items-center">
                         <span className={'text-md text-black'}>首选模型</span>
-                        <Tooltip title="默认模型集成多个LLM，自动适配你的设置提供最佳回复内容。" placement="top">
+                        <Tooltip
+                            title={
+                                <div>
+                                    <div>模型介绍</div>
+                                    <div>- 默认模型集成多个LLM，自动适配提供最佳回复方式和内容</div>
+                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                </div>
+                            }
+                            placement="top"
+                        >
                             <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                         </Tooltip>
                     </div>
@@ -243,7 +250,7 @@ export const Regulation = ({
                                     setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
                                 }}
                             >
-                                <MenuItem value={'GPT35'}>大模型3.5</MenuItem>
+                                <MenuItem value={'GPT35'}>默认模型</MenuItem>
                                 <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
                                 <MenuItem value={'QWEN'}>通义千问</MenuItem>
                             </Select>

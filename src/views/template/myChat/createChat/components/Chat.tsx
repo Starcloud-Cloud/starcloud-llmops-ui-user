@@ -43,7 +43,8 @@ import useUserStore from 'store/user';
 import { UpgradeModelModal } from './modal/upgradeModel';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
-import { UpgradeSkillModel } from './modal/upgradeSkillModel';
+import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
+import { handleIcon } from './SkillWorkflowCard';
 
 const { Option } = Select;
 
@@ -327,8 +328,8 @@ export function extractChatBlocks(data: any) {
                 currentData.process[index] = {
                     tips: '查询完成',
                     showType: transformType(JSON.parse(item[0].answer).arguments.type),
-                    input: JSON.parse(item[0].answer).arguments,
-                    data: JSON.parse(item[1].answer),
+                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                    data: item?.[1]?.answer && JSON.parse(item[1].answer),
                     success: true,
                     status: 1,
                     id: uuidv4()
@@ -1289,7 +1290,9 @@ export const Chat = ({
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
-                                                                    <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    handleIcon(v.images, 'w-[18px] h-[18px]') || (
+                                                                        <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    )
                                                                 ) : (
                                                                     <svg
                                                                         viewBox="0 0 1024 1024"
@@ -1318,7 +1321,7 @@ export const Chat = ({
                                     }
                                     trigger="click"
                                 >
-                                    <div className="flex items-center cursor-pointer px-[4px]" onClick={() => setSkillOpen(!skillOpen)}>
+                                    <div className="flex items-center cursor-pointer" onClick={() => setSkillOpen(!skillOpen)}>
                                         <span className="text-sm">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
@@ -1338,13 +1341,15 @@ export const Chat = ({
                                                             ></path>
                                                         </svg>
                                                     ) : (
-                                                        <img
-                                                            className="rounded ml-1"
-                                                            key={index}
-                                                            src={item.images}
-                                                            width={18}
-                                                            height={18}
-                                                        />
+                                                        handleIcon(item.images, 'w-[18px] h-[18px]') || (
+                                                            <img
+                                                                className="rounded ml-1"
+                                                                key={index}
+                                                                src={item.images}
+                                                                width={18}
+                                                                height={18}
+                                                            />
+                                                        )
                                                     )
                                                 )}
                                         </div>
@@ -1381,7 +1386,7 @@ export const Chat = ({
                                     }}
                                 >
                                     <Option value={'GPT35'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
-                                        大模型3.5
+                                        默认模型
                                     </Option>
                                     <Option value={'GPT4'}>大模型4.0</Option>
                                     <Option value={'QWEN'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
@@ -1573,7 +1578,7 @@ export const Chat = ({
                             )} */}
                             <Tooltip title={'清除'} placement="top" arrow>
                                 <CleaningServicesSharpIcon
-                                    className="text-base cursor-pointer hover:text-[#673ab7] mx-[4px]"
+                                    className="text-base cursor-pointer hover:text-[#673ab7]"
                                     onClick={handleClean}
                                 />
                             </Tooltip>
@@ -1792,7 +1797,7 @@ export const Chat = ({
             {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
             <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-            <UpgradeSkillModel open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <SkillUpgradeOnline open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
         </div>
     );
 };

@@ -267,6 +267,7 @@ const WorkflowCreateModal = ({
                 data = list;
             }
             if (selectType === 2) {
+                // 系统通过code判断
                 data = list.filter((item) => item.type === 'system');
             }
             if (selectType === 3) {
@@ -429,7 +430,7 @@ const WorkflowCreateModal = ({
                             >
                                 {pageData?.map((item: any, index: number) => (
                                     <Box key={index} className="w-full relative">
-                                        <SkillCard data={item} handleCreate={handleCreate} />
+                                        <SkillCard data={item} handleCreate={handleCreate} workflowList={workflowList} />
                                     </Box>
                                 ))}
                             </InfiniteScroll>

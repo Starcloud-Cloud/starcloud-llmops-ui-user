@@ -8,7 +8,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import workflow from 'assets/images/chat/workflow.svg';
 
-function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
+function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }: any) {
     const theme = useTheme();
     const [open, setOpen] = useState(false);
 
@@ -82,6 +82,14 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
         }
         if ((data.type === 3 && data.appType === 0) || data.type === 'MYSELF') {
             return '我的应用';
+        }
+    };
+
+    const handleDisabled = (data: any) => {
+        // 系统的通过这个判断 // TODO别的后面再加
+        if (data.type === 'system') {
+            const codeList = workflowList.map((v: any) => v.code);
+            return codeList.includes(data.code);
         }
     };
 
@@ -163,10 +171,11 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate }: any) {
             <div className="py-[8px] px-1 flex justify-between items-center absolute bottom-0 w-full border-t-[1px] border-solid border-[#e3e8ef]">
                 <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
                 <Button
-                    className="!py-[2px] !max-w-[50px]"
+                    className="!py-[2px] !min-w-[45px] !px-[5px] leading-5"
                     variant="contained"
                     size={'small'}
                     color="secondary"
+                    disabled={handleDisabled(data)}
                     onClick={() => handleCreate(data)}
                 >
                     添加

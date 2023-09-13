@@ -221,9 +221,9 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                         overflow: 'hidden'
                     }}
                     onClick={() => {
-                        // if (data.type === 5 || data.type === 'system') {
-                        //     return;
-                        // }
+                        if (data.type === 5 || data.type === 'system') {
+                            return;
+                        }
                         handleEdit(data);
                     }}
                 >

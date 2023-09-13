@@ -340,8 +340,8 @@ function Upload({
     //保存按钮是否触发更新
     const [updateBtnSate, setUpdateBtnSate] = useState(false);
     const handleUpdate = () => {
-        setUpdateBtnSate(true);
         saveDetail();
+        setUpdateBtnSate(true);
     };
     //发布到市场
     const uploadMarket = async () => {

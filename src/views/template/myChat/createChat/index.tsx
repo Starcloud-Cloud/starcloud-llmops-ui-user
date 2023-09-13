@@ -272,7 +272,7 @@ function CreateDetail() {
 
     const updateDetail = async () => {
         await saveDetail();
-        setSaveState(saveState + 1);
+        // setSaveState(saveState + 1);
     };
     //获取状态
     const [flag, setflag] = useState<boolean>(false);

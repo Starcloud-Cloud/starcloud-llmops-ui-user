@@ -101,7 +101,7 @@ function CreateDetail() {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '开启技能的同时模型必须选择大模型4',
+                    message: '开启技能的同时模型必须选择默认模型4.0',
                     variant: 'alert',
                     alert: {
                         color: 'error'

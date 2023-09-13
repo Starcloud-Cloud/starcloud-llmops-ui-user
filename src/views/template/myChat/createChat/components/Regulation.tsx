@@ -21,6 +21,8 @@ import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import { UpgradeModelModal } from './modal/upgradeModel';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { getSkillList } from 'api/chat';
+import _ from 'lodash';
 
 const marks = [
     {
@@ -65,6 +67,7 @@ export const Regulation = ({
     const permissions = useUserStore((state) => state.permissions);
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+    const [skillWorkflowList, setSkillWorkflowList] = useState<any[]>([]);
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
@@ -184,6 +187,50 @@ export const Regulation = ({
     //     }
     // }, [chatBotInfo.searchInWeb]);
 
+    useEffect(() => {
+        const copyData = _.cloneDeep(chatBotInfo.skillWorkflowList) || [];
+        if (copyData.length) {
+            setSkillWorkflowList([...copyData]);
+        } else {
+            if (chatBotInfo.uid) {
+                getSkillList(chatBotInfo.uid).then((res) => {
+                    const appWorkFlowList =
+                        res?.['3']?.map((item: any) => ({
+                            name: item.appWorkflowSkillDTO?.name,
+                            description: item.appWorkflowSkillDTO?.desc,
+                            type: item.type,
+                            skillAppUid: item.appWorkflowSkillDTO?.skillAppUid,
+                            uid: item.uid,
+                            images: item.appWorkflowSkillDTO?.icon,
+                            appConfigId: item.appConfigId,
+                            appType: item.appWorkflowSkillDTO?.appType,
+                            defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
+                            copyWriting: item.appWorkflowSkillDTO?.copyWriting,
+                            disabled: item.disabled
+                        })) || [];
+
+                    const systemList =
+                        res?.['5']?.map((item: any) => ({
+                            name: item.systemHandlerSkillDTO?.name,
+                            description: item.systemHandlerSkillDTO?.desc,
+                            type: item.type,
+                            code: item.systemHandlerSkillDTO?.code,
+                            uid: item.uid,
+                            images: item.systemHandlerSkillDTO?.icon,
+                            appConfigId: item.appConfigId,
+                            copyWriting: item.systemHandlerSkillDTO?.copyWriting,
+                            disabled: item.disabled
+                        })) || [];
+
+                    const mergedArray = [...appWorkFlowList, ...systemList];
+                    const enableList = mergedArray.filter((v) => !v.disabled);
+
+                    setSkillWorkflowList(enableList);
+                });
+            }
+        }
+    }, [chatBotInfo.skillWorkflowList]);
+
     return (
         <div>
             <div>
@@ -232,11 +279,11 @@ export const Regulation = ({
                                         return;
                                     }
                                     // 当选择了技能，选择非GPT4.0提示
-                                    if (chatBotInfo.skillWorkflowList?.length && e.target.value !== 'GPT4') {
+                                    if (skillWorkflowList?.length && e.target.value !== 'GPT4') {
                                         dispatch(
                                             openSnackbar({
                                                 open: true,
-                                                message: '技能依赖于大模型4.0，请先停用技能再切换模型',
+                                                message: '技能依赖于默认模型4.0，请先停用技能再切换模型',
                                                 variant: 'alert',
                                                 alert: {
                                                     color: 'error'
@@ -250,8 +297,8 @@ export const Regulation = ({
                                     setChatBotInfo({ ...chatBotInfo, modelProvider: e.target.value });
                                 }}
                             >
-                                <MenuItem value={'GPT35'}>默认模型</MenuItem>
-                                <MenuItem value={'GPT4'}>大模型4.0</MenuItem>
+                                <MenuItem value={'GPT35'}>默认模型3.5</MenuItem>
+                                <MenuItem value={'GPT4'}>默认模型4.0</MenuItem>
                                 <MenuItem value={'QWEN'}>通义千问</MenuItem>
                             </Select>
                         </FormControl>

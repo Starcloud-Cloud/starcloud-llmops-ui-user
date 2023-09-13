@@ -472,7 +472,7 @@ const WorkflowCreateModal = ({
     );
 };
 
-export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo; setChatBotInfo: (chatInfo: IChatInfo) => void }) => {
+export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo; setChatBotInfo: any }) => {
     const theme = useTheme();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -521,7 +521,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
             const enableList = mergedArray.filter((v) => !v.disabled);
             const copyChatBotInfo = _.cloneDeep(chatBotInfo);
             copyChatBotInfo.skillWorkflowList = enableList;
-            setChatBotInfo(copyChatBotInfo);
+            setChatBotInfo((pre: any) => ({ ...pre, skillWorkflowList: enableList }));
             setWorkflowList(mergedArray);
         });
     }, [count]);

@@ -19,7 +19,7 @@ import { useTheme } from '@mui/material/styles';
 import './skillCard.scss';
 import { delSkill, modifySkill } from 'api/chat';
 import { Confirm } from 'ui-component/Confirm';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
@@ -51,6 +51,12 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<Element | ((element: Element) => Element) | null | undefined>(null);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
+    const [currenSwitch, setCurrentSwitch] = useState(true);
+
+    useEffect(() => {
+        setCurrentSwitch(data.disabled);
+    }, [data.disabled]);
+
     const permissions = useUserStore((state) => state.permissions);
 
     const handleClickSort = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
@@ -280,12 +286,11 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     <Divider />
                     <div className="mt-[3px] px-1 flex justify-between items-center py-1">
                         <div className="flex justify-end">
-                            <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
+                            <Chip label={handleTag(data)} size={'small'} className="flex items-end" variant={'outlined'} />
                         </div>
                         <div>
-                            {/* <span className="text-sm">{data.disabled ? '关闭' : '开启'}</span> */}
                             <Switch
-                                checked={!data.disabled}
+                                checked={!currenSwitch}
                                 checkedChildren="开"
                                 unCheckedChildren="关"
                                 onChange={(v, e) => {
@@ -294,17 +299,10 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                                         setSkillUpgradeOnline(true);
                                         return;
                                     }
+                                    setCurrentSwitch(!currenSwitch);
                                     handleAble();
                                 }}
                             />
-                            {/* <Switch
-                            color={'secondary'}
-                            checked={!data.disabled}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleAble();
-                            }}
-                        /> */}
                         </div>
                     </div>
                 </div>

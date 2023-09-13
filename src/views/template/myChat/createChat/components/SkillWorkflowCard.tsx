@@ -12,7 +12,8 @@ import {
     Grid,
     IconButton,
     Menu,
-    MenuItem
+    MenuItem,
+    Icon
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import './skillCard.scss';
@@ -27,6 +28,23 @@ import workflow from 'assets/images/chat/workflow.svg';
 import { Switch } from 'antd';
 import useUserStore from 'store/user';
 import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { FindInPage, FiberNew, ImageSearch, AddPhotoAlternate } from '@mui/icons-material';
+
+export const handleIcon = (name: string, className?: string) => {
+    switch (name) {
+        case 'FindInPage':
+            return <FindInPage className={className} />;
+        case 'FiberNew':
+            return <FiberNew className={className} />;
+        case 'ImageSearch':
+            return <ImageSearch className={className} />;
+        case 'AddPhotoAlternate':
+            return <AddPhotoAlternate className={className} />;
+        default:
+            return null; // 可以选择返回空或其他默认的图标
+    }
+};
 
 function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
     const theme = useTheme();
@@ -144,14 +162,16 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     }}
                 >
                     <div className="flex justify-center items-center">
-                        <img
-                            alt="图片"
-                            className="headImg cursor rounded"
-                            width="16px"
-                            height="16px"
-                            style={{ objectFit: 'cover', marginRight: '4px' }}
-                            src={data.images || workflow}
-                        />
+                        {handleIcon(data.images, 'w-[16px] h-[16px]') || (
+                            <img
+                                alt="图片"
+                                className="headImg cursor rounded"
+                                width="16px"
+                                height="16px"
+                                style={{ objectFit: 'cover', marginRight: '4px' }}
+                                src={data.images || workflow}
+                            />
+                        )}
                         <Tooltip disableInteractive title={data.name}>
                             <Typography
                                 className={`${data.type === 5 || data.type === 'system' ? 'line-clamp-1' : 'cursor-pointer line-clamp-1'}`}
@@ -238,6 +258,24 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                         </Typography>
                     </Tooltip>
                 </CardContent>
+                <div className="absolute bottom-[50px] right-[4px]">
+                    {data.usage && (
+                        <Tooltip
+                            title={
+                                <div>
+                                    <div>使用示例</div>
+                                    <div>{data.usage}</div>
+                                </div>
+                            }
+                            placement="top"
+                        >
+                            <div className="flex items-center cursor-pointer">
+                                <span className="text-sm">使用</span>
+                                <HelpOutlineIcon className="text-base cursor-pointer" />
+                            </div>
+                        </Tooltip>
+                    )}
+                </div>
                 <div className="absolute bottom-1 w-full">
                     <Divider />
                     <div className="mt-[3px] px-1 flex justify-between items-center py-1">

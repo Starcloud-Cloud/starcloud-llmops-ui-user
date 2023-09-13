@@ -44,6 +44,7 @@ import { UpgradeModelModal } from './modal/upgradeModel';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
 import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
+import { handleIcon } from './SkillWorkflowCard';
 
 const { Option } = Select;
 
@@ -1289,7 +1290,9 @@ export const Chat = ({
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
-                                                                    <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    handleIcon(v.images, 'w-[18px] h-[18px]') || (
+                                                                        <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    )
                                                                 ) : (
                                                                     <svg
                                                                         viewBox="0 0 1024 1024"
@@ -1338,13 +1341,15 @@ export const Chat = ({
                                                             ></path>
                                                         </svg>
                                                     ) : (
-                                                        <img
-                                                            className="rounded ml-1"
-                                                            key={index}
-                                                            src={item.images}
-                                                            width={18}
-                                                            height={18}
-                                                        />
+                                                        handleIcon(item.images, 'w-[18px] h-[18px]') || (
+                                                            <img
+                                                                className="rounded ml-1"
+                                                                key={index}
+                                                                src={item.images}
+                                                                width={18}
+                                                                height={18}
+                                                            />
+                                                        )
                                                     )
                                                 )}
                                         </div>

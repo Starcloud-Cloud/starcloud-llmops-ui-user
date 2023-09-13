@@ -38,12 +38,17 @@ import {
     TableRow,
     TableCell,
     TableBody,
-    TableContainer
+    TableContainer,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { Tag } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
-import { Upload, UploadProps, Popover } from 'antd';
+import { Upload, UploadProps, Popover, Progress } from 'antd';
 import { useFormik } from 'formik';
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'store';
@@ -54,7 +59,15 @@ import { Confirm } from 'ui-component/Confirm';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
 import * as yup from 'yup';
-import { delDataset, getDetails, detailsSplit, getDatasetSource, uploadCharacters, uploadUrls } from '../../../../../api/chat';
+import {
+    delDataset,
+    getDetails,
+    detailsSplit,
+    getDatasetSource,
+    uploadCharacters,
+    uploadUrls,
+    documentText
+} from '../../../../../api/chat';
 import { getAccessToken } from '../../../../../utils/auth';
 import AddRuleModal from './modal/addRule';
 
@@ -569,6 +582,9 @@ interface DetaData {
     dataSourceInfo?: {
         initAddress?: string;
     };
+    ruleVO?: {
+        ruleName: string;
+    };
     storageVO?: {
         storageKey?: string;
     };
@@ -576,12 +592,14 @@ interface DetaData {
 const DetailModal = ({
     detailOpen,
     uid,
+    dataId,
     dataType,
     datasetId,
     detailClose
 }: {
     detailOpen: boolean;
     dataType: string | undefined;
+    dataId: number | undefined;
     uid: string | undefined;
     datasetId: string;
     detailClose: () => void;
@@ -628,6 +646,21 @@ const DetailModal = ({
             }
         }
     };
+    //命中测试
+    const [text, setText] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [k, setK] = useState<number>(2);
+    const [record, setRecord] = useState<any[]>([]);
+    const hitTest = async () => {
+        setLoading(true);
+        const res = await documentText({
+            text,
+            k,
+            docId: [dataId]
+        });
+        setLoading(false);
+        setRecord(res.records);
+    };
     return (
         <Modal open={detailOpen} onClose={detailClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -652,16 +685,18 @@ const DetailModal = ({
                     <Tabs value={value} onChange={handleChange}>
                         <Tab label="内容" {...a11yProps(0)} />
                         <Tab label="详情" {...a11yProps(1)} />
+                        <Tab label="命中测试" {...a11yProps(2)} />
                     </Tabs>
                     {value === 0 && (
                         <Box pt={2}>
                             <Typography variant="h4">标题</Typography>
                             <TextField disabled value={detaData.name} sx={{ mt: 2 }} fullWidth InputLabelProps={{ shrink: true }} />
-                            <Typography mt={2} mb={2} variant="h4">
+                            <Typography mt={2} mb={1} variant="h4">
                                 原始链接
                             </Typography>
                             <Box>
-                                {detaData.dataType === 'HTML' && (
+                                {detaData.dataType === 'HTML' ? detaData.dataSourceInfo?.initAddress : detaData.storageVO?.storageKey}
+                                {/* {detaData.dataType === 'HTML' && (
                                     <Button
                                         color="secondary"
                                         variant="outlined"
@@ -704,8 +739,11 @@ const DetailModal = ({
                                     >
                                         下载
                                     </Button>
-                                )}
+                                )} */}
                             </Box>
+                            <Typography mt={2} variant="h4">
+                                规则名称：{detaData.ruleVO?.ruleName}
+                            </Typography>
                             <Typography mt={2} mb={2} variant="h4">
                                 描述
                             </Typography>
@@ -745,6 +783,98 @@ const DetailModal = ({
                                             disabled
                                             value={item.content}
                                             sx={{ mt: 2 }}
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    )}
+                    {value === 2 && (
+                        <Box>
+                            <Grid sx={{ mt: 1 }} container spacing={2}>
+                                <Grid item md={6}>
+                                    <TextField
+                                        color="secondary"
+                                        size="small"
+                                        InputLabelProps={{ shrink: true }}
+                                        label="原文本"
+                                        placeholder="请输入文本，建议使用简短的陈述句"
+                                        multiline
+                                        value={text}
+                                        onChange={(e) => setText(e.target.value)}
+                                        minRows={4}
+                                        maxRows={4}
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item md={6}>
+                                    <FormControl size="small" fullWidth>
+                                        <InputLabel
+                                            sx={{
+                                                background: '#f8fafc',
+                                                pl: '10px',
+                                                pr: '4px',
+                                                fontSize: '1.07rem',
+                                                left: '-5px',
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                            shrink
+                                            color="secondary"
+                                            id="type"
+                                        >
+                                            文档数
+                                        </InputLabel>
+                                        <Select
+                                            value={k}
+                                            onChange={(e) => setK(e.target.value as number)}
+                                            fullWidth
+                                            color="secondary"
+                                            labelId="type"
+                                            label="文档数"
+                                        >
+                                            <MenuItem value={1}>1</MenuItem>
+                                            <MenuItem value={2}>2</MenuItem>
+                                            <MenuItem value={3}>3</MenuItem>
+                                            <MenuItem value={4}>4</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Box my={1} display="flex" justifyContent="right">
+                                <LoadingButton
+                                    sx={{ width: '100px' }}
+                                    color="secondary"
+                                    onClick={hitTest}
+                                    disabled={!text}
+                                    loading={loading}
+                                    loadingIndicator="Loading…"
+                                    variant="outlined"
+                                >
+                                    测试
+                                </LoadingButton>
+                            </Box>
+                            <Typography variant="h4">命中段落</Typography>
+                            <Grid mt={1} spacing={2} container>
+                                {record.map((item, index: number) => (
+                                    <Grid item md={6}>
+                                        <Progress
+                                            size="small"
+                                            percent={item.score * 100}
+                                            format={(percent) => `${((percent as number) / 100).toFixed(2)}`}
+                                        />
+                                        <TextField
+                                            color="secondary"
+                                            size="small"
+                                            value={item.content}
+                                            disabled
+                                            InputLabelProps={{ shrink: true }}
+                                            label={`分段序号${item.position}`}
+                                            placeholder="请输入文本，建议使用简短的陈述句"
+                                            multiline
+                                            minRows={4}
+                                            maxRows={4}
                                             fullWidth
                                         />
                                     </Grid>
@@ -879,6 +1009,16 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                             }
                         >
                             文档式
+                            <Tooltip
+                                placement="top"
+                                title={
+                                    <Typography>
+                                        完成添加后，AI 将快速完成文档的浏览和学习，并通过 5-10 分钟消化知识，随后可在调试聊天中测试效果。
+                                    </Typography>
+                                }
+                            >
+                                <HelpOutlineOutlinedIcon sx={{ display: 'inline-block', verticalAlign: 'middle' }} fontSize="small" />
+                            </Tooltip>
                         </span>
                         <Box>
                             <Button
@@ -946,14 +1086,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                         <MainCard contentSX={{ p: 0 }}>
                             {documentList.length > 0 && (
                                 <TableContainer sx={{ height: '650px' }}>
-                                    <Table stickyHeader aria-label="simple table">
+                                    <Table size="small" stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>文件名</TableCell>
+                                                <TableCell width="200px">文件名</TableCell>
                                                 <TableCell>类型</TableCell>
                                                 <TableCell>大小/字符</TableCell>
-                                                <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    全部状态{' '}
+                                                <TableCell>
+                                                    <span style={{ display: 'inline-block', verticalAlign: 'middle' }}>全部状态</span>
                                                     <Tooltip
                                                         title={
                                                             <>
@@ -968,7 +1108,10 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             </>
                                                         }
                                                     >
-                                                        <HelpOutlineOutlinedIcon fontSize="small" />
+                                                        <HelpOutlineOutlinedIcon
+                                                            sx={{ display: 'inline-block', verticalAlign: 'middle' }}
+                                                            fontSize="small"
+                                                        />
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell>创建时间</TableCell>
@@ -980,7 +1123,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                 <TableRow key={item.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                                     <TableCell component="th" width="200px" scope="row">
                                                         <Tooltip placement="top" title={<Typography>{item.name}</Typography>}>
-                                                            <Typography width="200px" noWrap>
+                                                            <Typography width="200px" display="flex" alignItems="center" noWrap>
                                                                 {transformDataType(item.dataType)}&nbsp;{item.name}
                                                             </Typography>
                                                         </Tooltip>
@@ -997,79 +1140,50 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell>
-                                                        {item.wordCount}&nbsp;字符/
-                                                        {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                        <Typography>{item.wordCount}&nbsp;字符</Typography>
+                                                        <Typography>
+                                                            {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
+                                                        </Typography>
                                                     </TableCell>
                                                     <TableCell>
                                                         {item.status === 0 ? (
-                                                            <Tag icon={<CloseCircleOutlined rev={undefined} />} color="error">
-                                                                上传失败
-                                                            </Tag>
+                                                            <Tag color="error">上传失败</Tag>
                                                         ) : item.status === 15 ? (
-                                                            <Tag icon={<CloseCircleOutlined rev={undefined} />} color="error">
-                                                                上传失败
-                                                            </Tag>
+                                                            <Tag color="error">上传失败</Tag>
                                                         ) : item.status === 20 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                上传成功
-                                                            </Tag>
+                                                            <Tag color="success">上传成功</Tag>
                                                         ) : item.status === 21 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                同步中
-                                                            </Tag>
+                                                            <Tag color="processing">同步中</Tag>
                                                         ) : item.status === 25 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                同步失败
-                                                            </Tag>
+                                                            <Tag color="success">同步失败</Tag>
                                                         ) : item.status === 30 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                同步完成
-                                                            </Tag>
+                                                            <Tag color="success">同步完成</Tag>
                                                         ) : item.status === 31 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 35 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                学习失败
-                                                            </Tag>
+                                                            <Tag color="success">学习失败</Tag>
                                                         ) : item.status === 40 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 41 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 45 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                学习失败
-                                                            </Tag>
+                                                            <Tag color="success">学习失败</Tag>
                                                         ) : item.status === 50 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 51 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 55 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                学习失败
-                                                            </Tag>
+                                                            <Tag color="success">学习失败</Tag>
                                                         ) : item.status === 60 ? (
-                                                            <Tag icon={<LoadingOutlined rev={undefined} />} color="processing">
-                                                                学习中
-                                                            </Tag>
+                                                            <Tag color="processing">学习中</Tag>
                                                         ) : item.status >= 90 ? (
-                                                            <Tag icon={<CheckCircleOutlined rev={undefined} />} color="success">
-                                                                学习完成
-                                                            </Tag>
+                                                            <Tag color="success">学习完成</Tag>
                                                         ) : null}
                                                     </TableCell>
                                                     <TableCell>{formatDate(item.updateTime)}</TableCell>
                                                     <TableCell>
                                                         <Button
+                                                            sx={{ mr: 1 }}
                                                             onClick={() => {
                                                                 setCurrent(item);
                                                                 setDetailOpen(true);
@@ -1490,6 +1604,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                 <DetailModal
                     detailOpen={detailOpen}
                     dataType={current?.dataType}
+                    dataId={current?.id}
                     datasetId={datasetId}
                     uid={current?.uid}
                     detailClose={() => setDetailOpen(false)}

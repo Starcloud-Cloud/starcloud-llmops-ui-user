@@ -269,3 +269,8 @@ export const modifySkill = (data: any) => {
 export const delSkill = (uid: string) => {
     return request.delete({ url: `/llm/chat/config/delete/${uid}` });
 };
+
+// 命中测试
+export const documentText = (data: any) => {
+    return request.post({ url: `/llm/dataset/segment/match/document/text`, data });
+};

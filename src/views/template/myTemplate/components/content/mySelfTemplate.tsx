@@ -4,6 +4,7 @@ import { Item } from 'types/template';
 import { useNavigate } from 'react-router-dom';
 import marketStore from 'store/market';
 import './textnoWarp.scss';
+import formatDate from 'hooks/useDate';
 function MyselfTemplate({ appList }: { appList: Item[] }) {
     const navigate = useNavigate();
     const { categoryList } = marketStore();
@@ -11,7 +12,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
         <Grid container spacing={2}>
             {appList?.map((data) => (
                 <Grid key={data.uid} item xs={12} md={12} lg={6}>
-                    <SubCard sx={{ height: 150, cursor: 'pointer' }}>
+                    <SubCard sx={{ cursor: 'pointer' }} contentSX={{ p: '16px !important' }}>
                         <Box
                             onClick={() => {
                                 navigate('/createApp?uid=' + data?.uid);
@@ -26,14 +27,14 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                     alt="icon"
                                 />
                             )}
-                            <Box overflow="hidden" marginLeft="20px">
+                            <Box width="100%" overflow="hidden" marginLeft="20px" position="relative">
                                 <Tooltip title={data.name}>
                                     <Typography variant="h3" noWrap mb={1}>
                                         {data?.name}
                                     </Typography>
                                 </Tooltip>
                                 <Tooltip title={data.description}>
-                                    <Typography className="desc" variant="body2" height="38px" lineHeight="1.2rem">
+                                    <Typography className="desc" variant="body2" height="35px" lineHeight="1.2rem">
                                         {data?.description}
                                     </Typography>
                                 </Tooltip>
@@ -49,6 +50,16 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                         <Chip sx={{ mr: 0.5 }} key={el} label={el} size="small" variant="outlined" />
                                     ))}
                                 </Box>
+                                <Tooltip placement="top" title="修改时间">
+                                    <Typography fontWeight={500} position="absolute" top={0} right={0} fontSize="12px">
+                                        {formatDate(data?.updateTime)}
+                                    </Typography>
+                                </Tooltip>
+                                <Tooltip placement="top" title="创建者">
+                                    <Typography fontWeight={500} position="absolute" bottom={0} right={0} fontSize="12px">
+                                        {data.creator}
+                                    </Typography>
+                                </Tooltip>
                             </Box>
                         </Box>
                     </SubCard>

@@ -1,7 +1,7 @@
 import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress, TextField } from '@mui/material';
-// import ReplyIcon from '@mui/icons-material/Reply';
+import ReplyIcon from '@mui/icons-material/Reply';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-// import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import NotStartedIcon from '@mui/icons-material/NotStarted';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -15,7 +15,7 @@ import { t } from 'hooks/web/useI18n';
 import { El } from 'types/template';
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import _ from 'lodash-es';
-// import copy from 'clipboard-copy';
+import copy from 'clipboard-copy';
 
 const CarrOut = forwardRef(
     ({ config, source, loadings, variableChange, promptChange, item, steps, callBack, changeanswer, history }: any, ref) => {
@@ -267,27 +267,55 @@ const CarrOut = forwardRef(
                             //         )}
                             //     </Box>
                             // </>
-
-                            <TextField
-                                sx={{ mt: 2 }}
-                                inputRef={mdRef}
-                                fullWidth
-                                color="secondary"
-                                InputLabelProps={{ shrink: true }}
-                                label={
-                                    <Box display="flex" alignItems="center">
-                                        <AutoAwesomeIcon fontSize="small" />
-                                        {t('myApp.execuent')}
+                            <>
+                                <TextField
+                                    sx={{ mt: 2 }}
+                                    inputRef={mdRef}
+                                    fullWidth
+                                    color="secondary"
+                                    InputLabelProps={{ shrink: true }}
+                                    label={
+                                        <Box display="flex" alignItems="center">
+                                            <AutoAwesomeIcon fontSize="small" />
+                                            {t('myApp.execuent')}
+                                        </Box>
+                                    }
+                                    onChange={(e) => {
+                                        changeanswer({ value: e.target.value, index: steps });
+                                    }}
+                                    value={item.flowStep.response.answer}
+                                    multiline
+                                    minRows={item.flowStep.response.style === 'TEXTAREA' ? 5 : 1}
+                                    maxRows={item.flowStep.response.style === 'TEXTAREA' ? 7 : 2}
+                                />
+                                {item.flowStep.response.answer && (
+                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
+                                        <Box>
+                                            <Button
+                                                sx={{ mt: 1, mr: 1 }}
+                                                size="small"
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<ContentPasteIcon fontSize="small" />}
+                                                onClick={() => {
+                                                    copy(item.flowStep.response.answer);
+                                                }}
+                                            >
+                                                {t('market.copys')}
+                                            </Button>
+                                            <Button
+                                                sx={{ display: { xs: 'inlineBlock', md: 'none' }, mt: 1, mr: 1 }}
+                                                size="small"
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<ReplyIcon />}
+                                            >
+                                                {t('market.share')}
+                                            </Button>
+                                        </Box>
                                     </Box>
-                                }
-                                onChange={(e) => {
-                                    changeanswer({ value: e.target.value, index: steps });
-                                }}
-                                value={item.flowStep.response.answer}
-                                multiline
-                                minRows={item.flowStep.response.style === 'TEXTAREA' ? 5 : 1}
-                                maxRows={item.flowStep.response.style === 'TEXTAREA' ? 7 : 2}
-                            />
+                                )}
+                            </>
                         ) : (
                             <Card
                                 elevation={3}

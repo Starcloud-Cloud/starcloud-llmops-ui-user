@@ -1318,7 +1318,7 @@ export const Chat = ({
                                     }
                                     trigger="click"
                                 >
-                                    <div className="flex items-center cursor-pointer px-[4px]" onClick={() => setSkillOpen(!skillOpen)}>
+                                    <div className="flex items-center cursor-pointer" onClick={() => setSkillOpen(!skillOpen)}>
                                         <span className="text-sm">技能:</span>
                                         <div className="flex items-center justify-start">
                                             {skillWorkflowList &&
@@ -1573,7 +1573,7 @@ export const Chat = ({
                             )} */}
                             <Tooltip title={'清除'} placement="top" arrow>
                                 <CleaningServicesSharpIcon
-                                    className="text-base cursor-pointer hover:text-[#673ab7] mx-[4px]"
+                                    className="text-base cursor-pointer hover:text-[#673ab7]"
                                     onClick={handleClean}
                                 />
                             </Tooltip>

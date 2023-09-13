@@ -255,7 +255,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                 >
                     <Tooltip disableInteractive title={data.description}>
                         <Typography
-                            sx={{ fontSize: '.8rem', height: '52px' }}
+                            sx={{ fontSize: '.8rem' }}
                             className={`${data.type === 5 || data.type === 'system' ? 'line-clamp-5' : 'cursor-pointer line-clamp-5'}`}
                             variant="body2"
                             lineHeight="1.1rem"

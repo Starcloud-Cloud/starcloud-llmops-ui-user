@@ -38,7 +38,6 @@ import { getListAll, getSkillList, modifySkill, skillCreate } from 'api/chat';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AddIcon from '@mui/icons-material/Add';
-import document from 'assets/images/upLoad/document.svg';
 import SkillCard from './SkillCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';

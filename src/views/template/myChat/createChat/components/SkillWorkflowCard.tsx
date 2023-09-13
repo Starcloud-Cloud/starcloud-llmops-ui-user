@@ -45,10 +45,6 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
     };
 
     const handleAble = () => {
-        if (!permissions.includes('chat:config:skills')) {
-            setSkillUpgradeOnline(true);
-            return;
-        }
         const values: any = {
             uid: data.uid,
             type: data.type,
@@ -256,6 +252,10 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                                 unCheckedChildren="关"
                                 onChange={(v, e) => {
                                     e.stopPropagation();
+                                    if (v && !permissions.includes('chat:config:skills')) {
+                                        setSkillUpgradeOnline(true);
+                                        return;
+                                    }
                                     handleAble();
                                 }}
                             />

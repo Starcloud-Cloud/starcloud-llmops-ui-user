@@ -43,7 +43,7 @@ import useUserStore from 'store/user';
 import { UpgradeModelModal } from './modal/upgradeModel';
 import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
-import { UpgradeSkillModel } from './modal/upgradeSkillModel';
+import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 
 const { Option } = Select;
 
@@ -327,8 +327,8 @@ export function extractChatBlocks(data: any) {
                 currentData.process[index] = {
                     tips: '查询完成',
                     showType: transformType(JSON.parse(item[0].answer).arguments.type),
-                    input: JSON.parse(item[0].answer).arguments,
-                    data: JSON.parse(item[1].answer),
+                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                    data: item?.[1]?.answer && JSON.parse(item[1].answer),
                     success: true,
                     status: 1,
                     id: uuidv4()
@@ -1792,7 +1792,7 @@ export const Chat = ({
             {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
             <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-            <UpgradeSkillModel open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <SkillUpgradeOnline open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
         </div>
     );
 };

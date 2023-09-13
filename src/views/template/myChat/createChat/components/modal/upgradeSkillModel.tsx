@@ -1,7 +1,6 @@
 import { Button, CardContent, IconButton, Modal } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import gpt from 'assets/images/chat/gpt.png';
 import { useNavigate } from 'react-router-dom';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 

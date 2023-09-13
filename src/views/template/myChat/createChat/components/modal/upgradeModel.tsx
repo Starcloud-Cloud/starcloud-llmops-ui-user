@@ -27,7 +27,7 @@ export const UpgradeModelModal = ({ handleClose, open }: { handleClose: () => vo
                 <CardContent>
                     <div className="flex justify-center flex-col items-center">
                         <div className="flex items-center justify-center flex-col">
-                            <img width={204} src={gpt} />
+                            <img height={128} src={gpt} />
                             <div className="text-sm text-[#152737] my-4">升级后，魔法AI为您提供更好的语言理解能力和更强大的对话系统</div>
                         </div>
                         <Button variant="contained" color={'secondary'} className="w-[200px]" onClick={() => navigate('/subscribe')}>

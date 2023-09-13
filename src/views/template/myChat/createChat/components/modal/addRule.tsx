@@ -211,7 +211,9 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: [] } : splitRule
+                    splitRule: !splitValue
+                        ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '\\\\.', '！', '!', ' '] }
+                        : splitRule
                 });
                 if (result) {
                     getList();
@@ -243,7 +245,9 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: [] } : splitRule
+                    splitRule: !splitValue
+                        ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '\\\\.', '！', '!', ' '] }
+                        : splitRule
                 });
                 if (result) {
                     getList();
@@ -307,9 +311,14 @@ const AddRuleModal = ({
             if (activeStep === 0 && publishStep(basis, 0)) {
                 setActiveStep(activeStep + 1);
             } else if (activeStep === 1) {
-                if (!splitValue && publishStep({ chunkSize: splitRule.chunkSize }, 1)) {
+                if (
+                    !splitValue &&
+                    publishStep({ chunkSize: splitRule.chunkSize }, 1) &&
+                    splitRule.chunkSize >= 100 &&
+                    splitRule.chunkSize <= 3000
+                ) {
                     setActiveStep(activeStep + 1);
-                } else if (splitValue && publishStep(splitRule, 1)) {
+                } else if (splitValue && publishStep(splitRule, 1) && splitRule.chunkSize >= 100 && splitRule.chunkSize <= 3000) {
                     setActiveStep(activeStep + 1);
                 }
             } else {
@@ -527,19 +536,7 @@ const AddRuleModal = ({
                         </Box>
                     )}
                     {addOpen && (
-                        <Modal
-                            open={addOpen}
-                            onClose={(e) => {
-                                setAddOpen(false);
-                                setSaveBtn(true);
-                                setActiveStep(0);
-                                setUrl('');
-                                setResult('');
-                                formik.handleReset(e);
-                            }}
-                            aria-labelledby="modal-title"
-                            aria-describedby="modal-description"
-                        >
+                        <Modal open={addOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
                             <MainCard
                                 sx={{
                                     position: 'absolute',
@@ -571,7 +568,7 @@ const AddRuleModal = ({
                             >
                                 <CardContent sx={{ p: '16px !important' }}>
                                     {activeStep === 0 && (
-                                        <Grid container spacing={2}>
+                                        <Grid container justifyContent="space-between" spacing={2}>
                                             <Grid item md={6}>
                                                 <TextField
                                                     size="small"
@@ -600,9 +597,12 @@ const AddRuleModal = ({
                                                     }}
                                                     color="secondary"
                                                 />
-                                                <Grid mt={1} container display="flex" spacing={1}>
+                                                <Typography mt={1} variant="h5">
+                                                    规则处理类型
+                                                </Typography>
+                                                <Grid mt={0.5} container display="flex" spacing={1}>
                                                     {typeList.map((item: any, index: number) => (
-                                                        <Grid item md={4}>
+                                                        <Grid item md={6} lg={4}>
                                                             <SubCard
                                                                 sx={{
                                                                     mb: 1,
@@ -624,8 +624,8 @@ const AddRuleModal = ({
                                                                         {item.typeName}
                                                                     </Typography>
                                                                     <Typography
-                                                                        height="32px"
-                                                                        className="line-clamp-2"
+                                                                        height="48px"
+                                                                        className="line-clamp-3"
                                                                         color="#697586"
                                                                         fontSize="12px"
                                                                     >
@@ -667,7 +667,7 @@ const AddRuleModal = ({
                                     </Stepper>
                                     {activeStep === 0 && (
                                         <Box>
-                                            <Grid container spacing={2}>
+                                            <Grid container justifyContent="space-between" spacing={2}>
                                                 <Grid item md={6}>
                                                     <FormControl
                                                         error={basis.ruleFilter && basis.ruleFilter.length === 0 && condOpen}
@@ -789,7 +789,7 @@ const AddRuleModal = ({
                                                     >
                                                         网页清洗规则
                                                     </span>
-                                                    <Grid container spacing={2}>
+                                                    <Grid container justifyContent="space-between" spacing={2}>
                                                         <Grid item md={6}>
                                                             <FormControl size="small" fullWidth>
                                                                 <InputLabel
@@ -945,19 +945,6 @@ const AddRuleModal = ({
                                                                     id="type"
                                                                 >
                                                                     转化格式
-                                                                    <Tooltip
-                                                                        title={
-                                                                            <Box>
-                                                                                <Typography>
-                                                                                    txt：仅保存网页内文本信息，无图片格式
-                                                                                </Typography>
-                                                                                <Typography>markdown：包含网页图片及格式信息</Typography>
-                                                                            </Box>
-                                                                        }
-                                                                        placement="top"
-                                                                    >
-                                                                        <HelpOutline fontSize="small" />
-                                                                    </Tooltip>
                                                                 </InputLabel>
                                                                 <Select
                                                                     name="convertFormat"
@@ -978,7 +965,23 @@ const AddRuleModal = ({
                                                                 {cleanRule.convertFormat && <FormHelperText> </FormHelperText>}
                                                             </FormControl>
                                                         </Grid>
-                                                        <Grid item md={6}></Grid>
+                                                        <Grid item md={4}>
+                                                            <SubCard
+                                                                sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
+                                                                contentSX={{ p: '10px !important' }}
+                                                            >
+                                                                <Typography mb={1} variant="h5">
+                                                                    说明
+                                                                    <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
+                                                                </Typography>
+                                                                <Typography fontSize="12px">
+                                                                    txt：仅保存网页内文本信息，无图片格式
+                                                                </Typography>
+                                                                <Typography my={1} fontSize="12px">
+                                                                    markdown：包含网页图片及格式信息
+                                                                </Typography>
+                                                            </SubCard>
+                                                        </Grid>
                                                         <Grid item md={6}>
                                                             <FormControl size="small" error={!cleanRule.acceptLanguage} fullWidth>
                                                                 <InputLabel
@@ -996,19 +999,6 @@ const AddRuleModal = ({
                                                                     id="type"
                                                                 >
                                                                     网页语言
-                                                                    <Tooltip
-                                                                        title={
-                                                                            <Box>
-                                                                                <Typography>
-                                                                                    网页语言：根据网站语言设置获取网页的语言
-                                                                                </Typography>
-                                                                                <Typography>默认：中文</Typography>
-                                                                            </Box>
-                                                                        }
-                                                                        placement="top"
-                                                                    >
-                                                                        <HelpOutline fontSize="small" />
-                                                                    </Tooltip>
                                                                 </InputLabel>
                                                                 <Select
                                                                     fullWidth
@@ -1026,6 +1016,23 @@ const AddRuleModal = ({
                                                                 {cleanRule.acceptLanguage && <FormHelperText> </FormHelperText>}
                                                             </FormControl>
                                                         </Grid>
+                                                        <Grid item md={4}>
+                                                            <SubCard
+                                                                sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
+                                                                contentSX={{ p: '10px !important' }}
+                                                            >
+                                                                <Typography mb={1} variant="h5">
+                                                                    说明
+                                                                    <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
+                                                                </Typography>
+                                                                <Typography fontSize="12px">
+                                                                    网页语言：根据网站语言设置获取网页的语言
+                                                                </Typography>
+                                                                <Typography my={1} fontSize="12px">
+                                                                    默认：中文
+                                                                </Typography>
+                                                            </SubCard>
+                                                        </Grid>
                                                     </Grid>
                                                 </>
                                             )}
@@ -1036,101 +1043,86 @@ const AddRuleModal = ({
                                             >
                                                 通用清洗规则
                                             </span>
-                                            <Grid container spacing={2}>
-                                                <Grid item md={3}>
-                                                    <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
-                                                        清除html标签
-                                                    </span>
-                                                    <Tooltip
-                                                        placement="top"
-                                                        title="此功能可以帮助您去除文本中的HTML标签，使文本更纯净，适用于从网页上提取文本时去除不必要的HTML标签"
-                                                    >
-                                                        <HelpOutline style={{ verticalAlign: 'middle' }} fontSize="small" />
-                                                    </Tooltip>
-                                                    <Switch
-                                                        name="removeAllHtmlTags"
-                                                        checked={commonCleanRule.removeAllHtmlTags}
-                                                        onChange={handleCommonCleanRule}
-                                                        color="secondary"
-                                                    />
-                                                </Grid>
-                                                <Grid item md={3}>
-                                                    <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
-                                                        清除所有图片
-                                                    </span>
-                                                    <Tooltip
-                                                        placement="top"
-                                                        title="此功能将移除文本中的所有图片，适用于需要纯文字处理的情况"
-                                                    >
-                                                        <HelpOutline style={{ verticalAlign: 'middle' }} fontSize="small" />
-                                                    </Tooltip>
-                                                    <Switch
-                                                        name="removeAllImage"
-                                                        checked={commonCleanRule.removeAllImage}
-                                                        onChange={handleCommonCleanRule}
-                                                        color="secondary"
-                                                    />
-                                                </Grid>
-                                                {/* <Grid item md={4}>
-                                                            <span className={'text-#697586'}>清除连续换行符</span>
+                                            <Grid container justifyContent="space-between" spacing={2}>
+                                                <Grid item md={6}>
+                                                    <Grid container spacing={2}>
+                                                        <Grid item md={6}>
+                                                            <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
+                                                                清除html标签
+                                                            </span>
                                                             <Switch
-                                                                name="removeConsecutiveNewlines"
-                                                                checked={commonCleanRule.removeConsecutiveNewlines}
+                                                                name="removeAllHtmlTags"
+                                                                checked={commonCleanRule.removeAllHtmlTags}
                                                                 onChange={handleCommonCleanRule}
                                                                 color="secondary"
                                                             />
                                                         </Grid>
-                                                        <Grid item md={4}>
-                                                            <span className={'text-#697586'}>清除制表符</span>
+                                                        <Grid item md={6}>
+                                                            <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
+                                                                清除所有图片
+                                                            </span>
                                                             <Switch
-                                                                name="removeConsecutiveTabs"
-                                                                checked={commonCleanRule.removeConsecutiveTabs}
+                                                                name="removeAllImage"
+                                                                checked={commonCleanRule.removeAllImage}
                                                                 onChange={handleCommonCleanRule}
                                                                 color="secondary"
                                                             />
-                                                        </Grid> */}
-                                                <Grid item md={6}></Grid>
-                                                <Grid item md={3}>
-                                                    <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
-                                                        清除电子邮箱地址
-                                                    </span>
-                                                    <Tooltip
-                                                        placement="top"
-                                                        title="此功能可以检测并移除文本中的所有电子邮件地址，保护您的隐私和安全"
-                                                    >
-                                                        <HelpOutline style={{ verticalAlign: 'middle' }} fontSize="small" />
-                                                    </Tooltip>
-                                                    <Switch
-                                                        name="removeUrlsEmails"
-                                                        checked={commonCleanRule.removeUrlsEmails}
-                                                        onChange={handleCommonCleanRule}
-                                                        color="secondary"
-                                                    />
+                                                        </Grid>
+                                                        <Grid item md={6}>
+                                                            <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
+                                                                清除电子邮箱地址
+                                                            </span>
+                                                            <Switch
+                                                                name="removeUrlsEmails"
+                                                                checked={commonCleanRule.removeUrlsEmails}
+                                                                onChange={handleCommonCleanRule}
+                                                                color="secondary"
+                                                            />
+                                                        </Grid>
+                                                        <Grid item md={6}></Grid>
+                                                        <Grid item md={12}>
+                                                            <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
+                                                                替换掉连续的空格、换行符和制表符
+                                                            </span>
+                                                            <Switch
+                                                                name="removeConsecutiveSpaces"
+                                                                checked={commonCleanRule.removeConsecutiveSpaces}
+                                                                onChange={() => {
+                                                                    setCommonCleanRule({
+                                                                        ...commonCleanRule,
+                                                                        removeConsecutiveSpaces: !commonCleanRule.removeConsecutiveSpaces,
+                                                                        removeConsecutiveNewlines:
+                                                                            !commonCleanRule.removeConsecutiveNewlines,
+                                                                        removeConsecutiveTabs: !commonCleanRule.removeConsecutiveTabs
+                                                                    });
+                                                                }}
+                                                                color="secondary"
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item md={9}></Grid>
-                                                <Grid item md={6}>
-                                                    <span style={{ verticalAlign: 'middle' }} className={'text-#697586'}>
-                                                        替换掉连续的空格、换行符和制表符
-                                                    </span>
-                                                    <Tooltip
-                                                        placement="top"
-                                                        title="此功能可以将连续的空格、换行符和制表符替换为单个实例，使文本更整洁，适用于文本格式化和清理"
+                                                <Grid item md={4}>
+                                                    <SubCard
+                                                        sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
+                                                        contentSX={{ p: '10px !important' }}
                                                     >
-                                                        <HelpOutline style={{ verticalAlign: 'middle' }} fontSize="small" />
-                                                    </Tooltip>
-                                                    <Switch
-                                                        name="removeConsecutiveSpaces"
-                                                        checked={commonCleanRule.removeConsecutiveSpaces}
-                                                        onChange={() => {
-                                                            setCommonCleanRule({
-                                                                ...commonCleanRule,
-                                                                removeConsecutiveSpaces: !commonCleanRule.removeConsecutiveSpaces,
-                                                                removeConsecutiveNewlines: !commonCleanRule.removeConsecutiveNewlines,
-                                                                removeConsecutiveTabs: !commonCleanRule.removeConsecutiveTabs
-                                                            });
-                                                        }}
-                                                        color="secondary"
-                                                    />
+                                                        <Typography mb={1} variant="h5">
+                                                            说明
+                                                            <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
+                                                        </Typography>
+                                                        <Typography fontSize="12px">
+                                                            清除html标签：此功能可以帮助您去除文本中的HTML标签，使文本更纯净，适用于从网页上提取文本时去除不必要的HTML标签
+                                                        </Typography>
+                                                        <Typography my={1} fontSize="12px">
+                                                            清除所有图片：此功能将移除文本中的所有图片，适用于需要纯文字处理的情况
+                                                        </Typography>
+                                                        <Typography fontSize="12px">
+                                                            清除电子邮箱地址：此功能可以检测并移除文本中的所有电子邮件地址，保护您的隐私和安全
+                                                        </Typography>
+                                                        <Typography my={1} fontSize="12px">
+                                                            替换掉连续的空格、换行符和制表符：此功能可以将连续的空格、换行符和制表符替换为单个实例，使文本更整洁，适用于文本格式化和清理{' '}
+                                                        </Typography>
+                                                    </SubCard>
                                                 </Grid>
                                             </Grid>
                                         </Box>
@@ -1144,53 +1136,58 @@ const AddRuleModal = ({
                                             >
                                                 分段清洗规则
                                             </span>
-                                            <Grid container spacing={2}>
-                                                <Grid item md={4}>
-                                                    <FormControl size="small" error={!splitRule.chunkSize && sizeOpen} fullWidth>
-                                                        <InputLabel
-                                                            sx={{
-                                                                background: '#f8fafc',
-                                                                pl: '10px',
-                                                                pr: '4px',
-                                                                fontSize: '1.07rem',
-                                                                left: '-5px',
-                                                                display: 'flex',
-                                                                alignItems: 'center'
-                                                            }}
-                                                            shrink
-                                                            color="secondary"
-                                                            id="chunkSize"
-                                                        >
-                                                            分段大小
-                                                            <Tooltip
-                                                                title="根据文本内容设定合理的数据块大小，以实现更准确的数据查询"
-                                                                placement="top"
-                                                            >
-                                                                <HelpOutline fontSize="small" />
-                                                            </Tooltip>
-                                                        </InputLabel>
-                                                        <TextField
-                                                            size="small"
-                                                            name="chunkSize"
-                                                            color="secondary"
-                                                            fullWidth
-                                                            error={!splitRule.chunkSize && sizeOpen}
-                                                            helperText={!splitRule.chunkSize && sizeOpen ? '分段大小必填' : ' '}
-                                                            value={splitRule.chunkSize}
-                                                            type="number"
-                                                            onChange={(e: any) => {
-                                                                setSizeOpen(true);
-                                                                const { name, value } = e.target;
-                                                                setSplitRule({
-                                                                    ...splitRule,
-                                                                    [name]: value
-                                                                });
-                                                            }}
-                                                            InputLabelProps={{ shrink: true }}
-                                                        />
-                                                    </FormControl>
+                                            <Grid container justifyContent="space-between" spacing={2}>
+                                                <Grid item md={6}>
+                                                    <TextField
+                                                        size="small"
+                                                        name="chunkSize"
+                                                        color="secondary"
+                                                        label="分段大小"
+                                                        fullWidth
+                                                        inputProps={{
+                                                            step: 1, // 设置输入步长
+                                                            min: 100, // 设置最小值
+                                                            max: 3000 // 设置最大值
+                                                        }}
+                                                        error={
+                                                            (!splitRule.chunkSize && sizeOpen) ||
+                                                            splitRule.chunkSize < 100 ||
+                                                            splitRule.chunkSize > 3000
+                                                        }
+                                                        helperText={
+                                                            !splitRule.chunkSize && sizeOpen
+                                                                ? '分段大小必填'
+                                                                : splitRule.chunkSize < 100 || splitRule.chunkSize > 3000
+                                                                ? '范围只能在100~3000之间'
+                                                                : ' '
+                                                        }
+                                                        value={splitRule.chunkSize}
+                                                        type="number"
+                                                        onChange={(e: any) => {
+                                                            setSizeOpen(true);
+                                                            const { name, value } = e.target;
+                                                            setSplitRule({
+                                                                ...splitRule,
+                                                                [name]: value
+                                                            });
+                                                        }}
+                                                        InputLabelProps={{ shrink: true }}
+                                                    />
                                                 </Grid>
-                                                <Grid item md={8}></Grid>
+                                                <Grid item md={4}>
+                                                    <SubCard
+                                                        sx={{ p: '0 !important', background: 'rgba(230,230,231,.4)' }}
+                                                        contentSX={{ p: '10px !important' }}
+                                                    >
+                                                        <Typography mb={1} variant="h5">
+                                                            说明
+                                                            <img style={{ verticalAlign: 'sub' }} width="18px" src={Tips} alt="" />
+                                                        </Typography>
+                                                        <Typography fontSize="12px">
+                                                            根据文本内容设定合理的数据块大小，以实现更准确的数据查询
+                                                        </Typography>
+                                                    </SubCard>
+                                                </Grid>
                                                 <Grid item md={6}>
                                                     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
                                                         <Typography width="80px" display="flex" alignItems="center" fontWeight={500}>
@@ -1388,7 +1385,7 @@ const AddRuleModal = ({
                                                 </Grid>
                                             </CardContent>
                                             <Divider />
-                                            <CardActions sx={{ p: 2 }}>
+                                            <CardActions sx={{ p: 2, pb: 0 }}>
                                                 <Grid container justifyContent="flex-end">
                                                     <Button
                                                         variant="contained"
@@ -1410,7 +1407,7 @@ const AddRuleModal = ({
                                     {activeStep === 2 && basis.ruleType === 'DOCUMENT' && (
                                         <Typography textAlign="center">文档暂不支持调试</Typography>
                                     )}
-                                    <Box mt={5} display="flex" justifyContent="center">
+                                    <Box mt="20px" display="flex" justifyContent="center">
                                         {activeStep > 0 && (
                                             <Button
                                                 onClick={() => {

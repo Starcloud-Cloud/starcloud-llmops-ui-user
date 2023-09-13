@@ -44,7 +44,7 @@ import { useFormik as Formik } from 'formik';
 import editValidationSchema from 'hooks/useEditValid';
 import _ from 'lodash-es';
 import { Validas, Rows } from 'types/template';
-import FormExecute from 'views/template/components/form';
+import FormExecute from 'views/template/components/validaForm';
 import { useState, memo, useEffect, useRef } from 'react';
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
     borderTop: `1px solid ${theme.palette.divider}`,
@@ -102,13 +102,9 @@ const Valida = ({
     ];
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
-        data.forEach((item: { field: string; defaultValue: string; value: string }) => {
-            const { field, defaultValue, value } = item;
-            if (field === 'prompt') {
-                Data[field] = value !== null && value !== undefined ? value : '';
-            } else {
-                Data[field] = defaultValue !== null && defaultValue !== undefined ? defaultValue : '';
-            }
+        data.forEach((item: { field: string; value: string }) => {
+            const { field, value } = item;
+            Data[field] = value !== null && value !== undefined ? value : '';
         });
         return Data;
     };
@@ -318,11 +314,11 @@ const Valida = ({
                     <AccordionDetails>
                         {variables?.map((el: any, i: number) => (
                             <Grid item md={12} xs={12} key={i + 'variables'}>
-                                {el.field !== 'prompt' && (
+                                {el.field !== 'prompt' && el.field !== 'n' && (
                                     <FormExecute
                                         formik={formik}
                                         item={el}
-                                        onChange={(e: any) => basisChange({ e, index, i, flag: false })}
+                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
                                     />
                                 )}
                             </Grid>

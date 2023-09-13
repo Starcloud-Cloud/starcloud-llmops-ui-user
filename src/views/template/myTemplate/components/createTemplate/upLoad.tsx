@@ -814,9 +814,9 @@ function Upload({
                         更新渠道
                     </Button>
                 </SubCard>
-                <Grid container spacing={2}>
+                <Grid container display="flex" spacing={2}>
                     {(permissions.includes('chat.publish.market') || mode !== 'CHAT') && (
-                        <Grid item md={6} xs={12}>
+                        <Grid flex={1} item md={6} xs={12}>
                             <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
                                 <Box>
                                     <Box
@@ -948,8 +948,8 @@ function Upload({
                         </Grid>
                     )}
                     {upLoadList.map((item) => (
-                        <Grid key={item.title} item md={6} xs={12}>
-                            <SubCard contentSX={{ minHeight: '140px', p: '20px', display: 'flex' }}>
+                        <Grid key={item.title} flex={1} item md={6} xs={12}>
+                            <SubCard sx={{ height: '100%' }} contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}>
                                 <Box>
                                     <Box
                                         width="40px"

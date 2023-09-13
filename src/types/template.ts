@@ -4,6 +4,8 @@ export interface Item {
     description: string;
     categories: string[];
     tags: string[];
+    updateTime: number;
+    creator: string;
     icon: string;
 }
 export interface Execute {

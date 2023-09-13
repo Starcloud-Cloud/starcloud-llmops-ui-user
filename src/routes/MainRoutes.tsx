@@ -18,6 +18,8 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
+//weShop
+const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
 
 // 聊天
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
@@ -74,6 +76,10 @@ const MainRoutes = {
         {
             path: '/textToImage',
             element: <PictureCreate />
+        },
+        {
+            path: '/shopImage',
+            element: <WeShop />
         },
         {
             path: '/user/account-profile/profile',

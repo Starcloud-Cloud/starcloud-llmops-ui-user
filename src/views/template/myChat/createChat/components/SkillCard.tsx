@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import workflow from 'assets/images/chat/workflow.svg';
+import { Tag } from 'antd';
 
 function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }: any) {
     const theme = useTheme();
@@ -168,6 +169,13 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                     </Typography>
                 </Tooltip>
             </CardContent>
+            <div className="absolute bottom-[50px] right-[4px]">
+                {data.usage && (
+                    <Tooltip title={data.usage}>
+                        <Chip size={'small'} className="cursor-pointer " label={'如何使用'} color={'secondary'} />
+                    </Tooltip>
+                )}
+            </div>
             <div className="py-[8px] px-1 flex justify-between items-center absolute bottom-0 w-full border-t-[1px] border-solid border-[#e3e8ef]">
                 <Chip label={handleTag(data)} size={'small'} className="h-[20px]" variant={'outlined'} />
                 <Button

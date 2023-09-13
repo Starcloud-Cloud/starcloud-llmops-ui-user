@@ -252,7 +252,8 @@ const WorkflowCreateModal = ({
                 description: item.desc,
                 images: item.icon,
                 code: item.code,
-                type: item.type
+                type: item.type,
+                usage: item.usage
             }));
             // setList([...systemSkill, ...marketRespList, ...appRespList]);
             setList([...systemSkill]);
@@ -317,6 +318,7 @@ const WorkflowCreateModal = ({
                 desc: item.description,
                 code: item.code,
                 icon: item.images
+                // usage: item.usage
             };
         }
         if (data.type === 3) {

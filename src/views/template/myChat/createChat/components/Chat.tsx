@@ -1381,7 +1381,7 @@ export const Chat = ({
                                     }}
                                 >
                                     <Option value={'GPT35'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
-                                        大模型3.5
+                                        默认模型
                                     </Option>
                                     <Option value={'GPT4'}>大模型4.0</Option>
                                     <Option value={'QWEN'} disabled={chatBotInfo.modelProvider === 'GPT4'}>

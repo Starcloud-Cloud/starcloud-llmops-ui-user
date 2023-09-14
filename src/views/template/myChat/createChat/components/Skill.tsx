@@ -46,10 +46,9 @@ import SkillWorkflowCard from './SkillWorkflowCard';
 import imgLoading from 'assets/images/picture/loading.gif';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import _ from 'lodash';
-import { UpgradeSkillModel } from './modal/upgradeSkillModel';
 import useUserStore from 'store/user';
-import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 import { UpgradeModel } from '../../components/upgradeRobotModel';
+import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const WorkflowEditModal = ({
     open,
@@ -469,7 +468,7 @@ const WorkflowCreateModal = ({
                     </CardContent>
                 </MainCard>
             </Modal>
-            <SkillUpgradeOnline open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+            <PermissionUpgradeModal open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
         </>
     );
 };

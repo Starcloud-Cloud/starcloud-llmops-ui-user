@@ -27,9 +27,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import workflow from 'assets/images/chat/workflow.svg';
 import { Switch } from 'antd';
 import useUserStore from 'store/user';
-import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { FindInPage, FiberNew, ImageSearch, AddPhotoAlternate } from '@mui/icons-material';
+import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 export const handleIcon = (name: string, className?: string) => {
     switch (name) {
@@ -315,7 +315,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     handleOk={handleDelete}
                 />
             </Card>
-            <SkillUpgradeOnline open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+            <PermissionUpgradeModal open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
         </>
     );
 }

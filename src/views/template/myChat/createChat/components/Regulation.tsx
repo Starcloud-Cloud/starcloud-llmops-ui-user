@@ -19,13 +19,12 @@ import { IChatInfo } from '../index';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AppModal from 'views/picture/create/Menu/appModal';
 import useUserStore from 'store/user';
-import { UpgradeOnlineModal } from './modal/upgradeOnline';
-import { UpgradeModelModal } from './modal/upgradeModel';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getSkillList } from 'api/chat';
 import _ from 'lodash';
 import styled from '@emotion/styled';
+import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const marks = [
     {
@@ -578,8 +577,8 @@ export const Regulation = ({
                     setOpen={setAppOpen}
                 />
             )}
-            <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
-            <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>
     );
 };

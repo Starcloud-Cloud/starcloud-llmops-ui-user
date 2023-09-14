@@ -40,12 +40,10 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import { BpCheckbox } from 'ui-component/BpCheckbox';
 import useUserStore from 'store/user';
-import { UpgradeModelModal } from './modal/upgradeModel';
-import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
-import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 import { handleIcon } from './SkillWorkflowCard';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const env = process.env.REACT_APP_ENV;
 
@@ -1717,9 +1715,9 @@ export const Chat = ({
                 </div>
             </div>
             {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
-            <UpgradeOnlineModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
-            <UpgradeModelModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-            <SkillUpgradeOnline open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
         </div>
     );
 };

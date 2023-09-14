@@ -1,10 +1,10 @@
 import { Button, CardContent, IconButton, Modal } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import gpt from 'assets/images/chat/gpt.png';
 import { useNavigate } from 'react-router-dom';
+import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 
-export const UpgradeModelModal = ({ handleClose, open }: { handleClose: () => void; open: boolean }) => {
+export const PermissionUpgradeModal = ({ handleClose, open, title }: { handleClose: () => void; open: boolean; title?: string }) => {
     const navigate = useNavigate();
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -27,12 +27,22 @@ export const UpgradeModelModal = ({ handleClose, open }: { handleClose: () => vo
                 <CardContent>
                     <div className="flex justify-center flex-col items-center">
                         <div className="flex items-center justify-center flex-col">
-                            <img height={128} src={gpt} />
-                            <div className="text-sm text-[#152737] my-4">升级后，魔法AI为您提供更好的语言理解能力和更强大的对话系统</div>
+                            <div className="text-sm text-[#152737] my-4 flex items-center flex-col">
+                                <img width={204} src={workWechatPay} />
+                                <p className="text-lg text-center mb-1">您暂无该功能权限</p>
+                                <p className=" text-center text-[#364152]">
+                                    如需使用，可直接升级或联系产品顾问进一步了解，更有其他丰富权益可解锁。
+                                </p>
+                                <Button
+                                    variant="contained"
+                                    color={'secondary'}
+                                    className="w-[200px] my-2"
+                                    onClick={() => navigate('/subscribe')}
+                                >
+                                    直接升级
+                                </Button>
+                            </div>
                         </div>
-                        <Button variant="contained" color={'secondary'} className="w-[200px]" onClick={() => navigate('/subscribe')}>
-                            升级
-                        </Button>
                     </div>
                 </CardContent>
             </MainCard>

@@ -33,6 +33,7 @@ import Upload from '../../myTemplate/components/createTemplate/upLoad';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Confirm } from 'ui-component/Confirm';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -86,6 +87,7 @@ function CreateDetail() {
     });
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const { width } = useWindowSize();
 
@@ -333,12 +335,7 @@ function CreateDetail() {
                             >
                                 <MenuItem
                                     onClick={() => {
-                                        deleteApp(searchParams.get('appId') as string).then((res) => {
-                                            if (res) {
-                                                setDelAnchorEl(null);
-                                                navigate('/my-chat');
-                                            }
-                                        });
+                                        setDialogOpen(true);
                                     }}
                                 >
                                     <ListItemIcon>
@@ -428,6 +425,23 @@ function CreateDetail() {
                     </Card>
                 </div>
             )}
+            <Confirm
+                handleOk={() => {
+                    deleteApp(searchParams.get('appId') as string).then((res) => {
+                        if (res) {
+                            setDelAnchorEl(null);
+                            navigate('/my-chat');
+                        }
+                    });
+                }}
+                open={dialogOpen}
+                handleClose={() => {
+                    setDelAnchorEl(null);
+                    setDialogOpen(false);
+                }}
+                title="提醒"
+                content="确认删除该机器人？"
+            />
         </div>
     );
 }

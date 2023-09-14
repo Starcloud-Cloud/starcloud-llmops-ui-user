@@ -29,7 +29,12 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
     };
 
     const handleCreateNew = async (uid: string) => {
-        const res = await createChat({ robotName: robotName, uid });
+        let res;
+        if (uid === 'temp_blank') {
+            res = await createChat({ robotName: robotName, uid: '' });
+        } else {
+            res = await createChat({ robotName: robotName, uid });
+        }
         setOpenNew(false);
         navigate(`/createChat?appId=${res}`);
     };
@@ -78,7 +83,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                                 {data?.name}
                                             </Typography>
                                         </Tooltip>
-                                        <div
+                                        {/* <div
                                             className="flex items-center text-[#666] text-sm hover:text-[#6839b7] absolute top-[30px] right-[15px]"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -88,7 +93,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                         >
                                             <DeleteIcon className="text-sm" />
                                             <span>删除</span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <Typography
                                         sx={{ lineHeight: '1.2rem', height: '53px' }}

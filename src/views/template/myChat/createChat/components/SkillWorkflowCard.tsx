@@ -53,6 +53,8 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
     const [currenSwitch, setCurrentSwitch] = useState(true);
 
+    console.log(data, 'data');
+
     useEffect(() => {
         setCurrentSwitch(data.disabled);
     }, [data.disabled]);
@@ -264,13 +266,13 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                         </Typography>
                     </Tooltip>
                 </CardContent>
-                <div className="absolute bottom-[50px] right-[4px]">
+                <div className="absolute bottom-[45px] right-[4px]">
                     {data.usage && (
                         <Tooltip
                             title={
                                 <div>
                                     <div>使用示例</div>
-                                    <div>{data.usage}</div>
+                                    <div className="whitespace-pre-line">{data.usage}</div>
                                 </div>
                             }
                             placement="top"

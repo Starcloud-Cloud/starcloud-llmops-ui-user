@@ -23,7 +23,7 @@ function Template({ data, handleDetail, uid }: any) {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
                 }
             }}
-            className={`xs:w-full sm:w-[203.33px]  hover:border-[#673ab7]` + (uid === data?.uid ? 'border-solid border-[#673ab7]' : '')}
+            className={`xs:w-[289px] sm:w-[203.33px]  hover:border-[#673ab7]` + (uid === data?.uid ? 'border-solid border-[#673ab7]' : '')}
         >
             <Box sx={{ textAlign: 'center', marginTop: '15px' }}>
                 <img
@@ -52,7 +52,7 @@ function Template({ data, handleDetail, uid }: any) {
                     </Typography>
                 </Tooltip>
                 <Tooltip disableInteractive title={data.description}>
-                    <Typography sx={{ fontSize: '.8rem' }} className="cursor desc" variant="body2" component="div">
+                    <Typography sx={{ fontSize: '.8rem' }} className="line-clamp-4 cursor-pointer" variant="body2" component="div">
                         {data.description}
                     </Typography>
                 </Tooltip>

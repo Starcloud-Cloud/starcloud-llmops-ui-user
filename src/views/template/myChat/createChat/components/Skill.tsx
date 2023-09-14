@@ -303,7 +303,7 @@ const WorkflowCreateModal = ({
             setSkillUpgradeOnline(true);
             return;
         }
-        if (workflowList?.length >= 3) {
+        if (workflowList?.length >= 2) {
             setSkillCountVisible(true);
             return;
         }
@@ -317,8 +317,8 @@ const WorkflowCreateModal = ({
                 name: item.name,
                 desc: item.description,
                 code: item.code,
-                icon: item.images
-                // usage: item.usage
+                icon: item.images,
+                usage: item.usage
             };
         }
         if (data.type === 3) {
@@ -502,6 +502,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                     defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
                     copyWriting: item.appWorkflowSkillDTO?.copyWriting,
                     disabled: item.disabled
+                    // usage: item.suggest
                 })) || [];
 
             const systemList =
@@ -514,7 +515,8 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                     images: item.systemHandlerSkillDTO?.icon,
                     appConfigId: item.appConfigId,
                     copyWriting: item.systemHandlerSkillDTO?.copyWriting,
-                    disabled: item.disabled
+                    disabled: item.disabled,
+                    usage: item.systemHandlerSkillDTO.usage
                 })) || [];
 
             const mergedArray = [...appWorkFlowList, ...systemList];

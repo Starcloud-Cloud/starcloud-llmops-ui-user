@@ -67,6 +67,9 @@ function CreateDetail() {
     const [detail, setDetail] = useState(null as unknown as Details);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
+    //是否显示分享翻译
+    const isShowRef: any = useRef([]);
+    const [isShows, setIsShow] = useState<any[]>([]);
     const basis = useRef<any>(null);
     let conversationUid: undefined | string = undefined;
     //判断是保存还是切换tabs
@@ -119,6 +122,13 @@ function CreateDetail() {
                     return;
                 }
                 if (done) {
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    const newShow = _.cloneDeep(isShows);
+                    newShow[index] = true;
+                    isShowRef.current[index] = true;
+                    setIsShow(newShow);
                     userBenefits().then((res) => {
                         setUserInfo(res);
                     });
@@ -510,6 +520,7 @@ function CreateDetail() {
                             {detail && value === 0 && (
                                 <Perform
                                     key={perform}
+                                    // isShows={isShowRef.current}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     loadings={loadings}
@@ -573,6 +584,7 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
+                                    // isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     changeanswer={changeanswer}

@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import documnt from 'assets/images/upLoad/document.svg';
 import formatDate, { formatYear } from 'hooks/useDate';
+import zhong from 'assets/images/chat/定位-圆-1.svg';
 // import fetch from 'utils/fetch';
 import {
     Box,
@@ -51,7 +52,7 @@ import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { Upload, UploadProps, Popover, Progress } from 'antd';
 import { useFormik } from 'formik';
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'store';
+import { dispatch, useDispatch } from 'store';
 import { gridSpacing } from 'store/constant';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
@@ -649,17 +650,22 @@ const DetailModal = ({
     //命中测试
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
-    const [k, setK] = useState<number>(2);
+    const [minScore, setMinScore] = useState('');
     const [record, setRecord] = useState<any[]>([]);
     const hitTest = async () => {
         setLoading(true);
-        const res = await documentText({
-            text,
-            k,
-            docId: [dataId]
-        });
-        setLoading(false);
-        setRecord(res.records);
+        try {
+            const res = await documentText({
+                text,
+                k: 8,
+                minScore,
+                docId: [dataId]
+            });
+            setLoading(false);
+            setRecord(res.records);
+        } catch (err) {
+            setLoading(false);
+        }
     };
     return (
         <Modal open={detailOpen} onClose={detailClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -792,13 +798,19 @@ const DetailModal = ({
                     )}
                     {value === 2 && (
                         <Box>
-                            <Grid sx={{ mt: 1 }} container spacing={2}>
+                            <Typography fontSize="18px" mt={2} variant="h5">
+                                命中测试
+                            </Typography>
+                            <Typography mt={1} mb={2} fontSize="12px" color="#697586">
+                                基于给定的查询文本测试数据集的命中效果
+                            </Typography>
+                            <Grid container spacing={2}>
                                 <Grid item md={6}>
                                     <TextField
                                         color="secondary"
                                         size="small"
                                         InputLabelProps={{ shrink: true }}
-                                        label="原文本"
+                                        label="源文本"
                                         placeholder="请输入文本，建议使用简短的陈述句"
                                         multiline
                                         value={text}
@@ -809,37 +821,23 @@ const DetailModal = ({
                                     />
                                 </Grid>
                                 <Grid item md={6}>
-                                    <FormControl size="small" fullWidth>
-                                        <InputLabel
-                                            sx={{
-                                                background: '#f8fafc',
-                                                pl: '10px',
-                                                pr: '4px',
-                                                fontSize: '1.07rem',
-                                                left: '-5px',
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                            }}
-                                            shrink
-                                            color="secondary"
-                                            id="type"
-                                        >
-                                            文档数
-                                        </InputLabel>
-                                        <Select
-                                            value={k}
-                                            onChange={(e) => setK(e.target.value as number)}
-                                            fullWidth
-                                            color="secondary"
-                                            labelId="type"
-                                            label="文档数"
-                                        >
-                                            <MenuItem value={1}>1</MenuItem>
-                                            <MenuItem value={2}>2</MenuItem>
-                                            <MenuItem value={3}>3</MenuItem>
-                                            <MenuItem value={4}>4</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <TextField
+                                        color="secondary"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(event) => {
+                                            const inputValue = event.target.value;
+                                            if (!isNaN(Number(inputValue))) {
+                                                if ((parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1) || inputValue === '') {
+                                                    setMinScore(inputValue);
+                                                }
+                                            }
+                                        }}
+                                        type="text"
+                                        label="最低打分"
+                                        value={minScore}
+                                        fullWidth
+                                        size="small"
+                                    />
                                 </Grid>
                             </Grid>
                             <Box my={1} display="flex" justifyContent="right">
@@ -847,7 +845,7 @@ const DetailModal = ({
                                     sx={{ width: '100px' }}
                                     color="secondary"
                                     onClick={hitTest}
-                                    disabled={!text}
+                                    disabled={!text || !minScore}
                                     loading={loading}
                                     loadingIndicator="Loading…"
                                     variant="outlined"
@@ -855,15 +853,23 @@ const DetailModal = ({
                                     测试
                                 </LoadingButton>
                             </Box>
-                            <Typography variant="h4">命中段落</Typography>
-                            <Grid mt={1} spacing={2} container>
+                            <Typography mb={1} variant="h4">
+                                命中段落
+                            </Typography>
+                            <Grid spacing={3} container>
                                 {record.map((item, index: number) => (
                                     <Grid item md={6}>
-                                        <Progress
-                                            size="small"
-                                            percent={item.score * 100}
-                                            format={(percent) => `${((percent as number) / 100).toFixed(2)}`}
-                                        />
+                                        <Tooltip placement="top" title="分数越高说明查询文本与段落内容越相关，最大值为1">
+                                            <Typography display="flex" alignItems="flex-start">
+                                                <img style={{ marginRight: '8px' }} width="20px" src={zhong} alt="" />
+                                                <Progress
+                                                    size="small"
+                                                    percent={item.score * 100}
+                                                    format={(percent) => `${((percent as number) / 100).toFixed(3)}`}
+                                                />
+                                            </Typography>
+                                        </Tooltip>
+
                                         <TextField
                                             color="secondary"
                                             size="small"
@@ -877,6 +883,9 @@ const DetailModal = ({
                                             maxRows={4}
                                             fullWidth
                                         />
+                                        <Typography fontSize="12px" ml={1} fontWeight={500}>
+                                            {item.wordCount}字符 &nbsp;&nbsp;&nbsp; {item.hitCount}命中次数
+                                        </Typography>
                                     </Grid>
                                 ))}
                             </Grid>
@@ -1038,6 +1047,20 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
+                                    if (documentList.length === 2) {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '最多添加两个文档',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return;
+                                    }
                                     setDocumentVisible(true);
                                 }}
                             >
@@ -1421,6 +1444,20 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
+                                                if (documentList.length === 2) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '最多添加两个文档',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return;
+                                                }
                                                 setDocumentVisible(true);
                                             }}
                                         >

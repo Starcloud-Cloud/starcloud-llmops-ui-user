@@ -8,7 +8,18 @@ import { t } from 'hooks/web/useI18n';
 import { useRef, memo } from 'react';
 import CarrOut from './carrOut';
 import _ from 'lodash-es';
-function Perform({ config, changeSon, source, loadings, isallExecute, variableChange, promptChange, changeanswer, history = false }: any) {
+function Perform({
+    config,
+    changeSon,
+    source,
+    loadings,
+    isallExecute,
+    variableChange,
+    promptChange,
+    changeanswer,
+    history = false
+}: // isShows
+any) {
     const refs = useRef<any>([]);
 
     //子组件返回的值
@@ -76,6 +87,7 @@ function Perform({ config, changeSon, source, loadings, isallExecute, variableCh
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (
                         <CarrOut
+                            // isShows={isShows}
                             history={history}
                             source={source}
                             loadings={loadings}

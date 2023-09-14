@@ -685,7 +685,7 @@ export const Chat = ({
             const contentElement = contentRef.current;
             scrollContainer.scrollTop = contentElement.scrollHeight;
         }
-    }, [isFetch]);
+    });
 
     // 首次进入
     React.useEffect(() => {
@@ -799,7 +799,6 @@ export const Chat = ({
     const handleSSEData = (eventData: any) => {
         try {
             const subString = eventData.substring(5);
-            console.log(subString, 'subString');
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
                 jsCookie.set(conversationUniKey, bufferObj.conversationUid);

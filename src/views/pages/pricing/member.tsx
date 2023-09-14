@@ -150,10 +150,10 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
-        description: '无需信用卡，每天签到获取字数/图片使用数',
+        description: '每天签到获取字数/图片使用数',
         monthPrice: '免费',
         yearPrice: '免费',
-        permission: [0, 1, 2, 4],
+        permission: [0, 1, 2, 4, 5, 6, 7, 8, 9],
         btnText: '免费使用'
     },
     {
@@ -163,7 +163,7 @@ const plans = [
         description: '200000字数创作，400张图片',
         monthPrice: 99,
         yearPrice: 999,
-        permission: [0, 1, 2, 3, 4, 5, 6],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'plus_month',
         yearCode: 'plus_year'
@@ -175,7 +175,7 @@ const plans = [
         description: '6个账号，无限字数创作，1000张图片',
         monthPrice: 499,
         yearPrice: 4999,
-        permission: [0, 1, 2, 3, 4, 5, 6],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
@@ -205,14 +205,13 @@ const planList = [
         '多渠道发布机器人客服', // 4
         '上传信息库/文档问答', // 4
         '2个文档上传', // 4
-        '2个文档上传', // 4
         'Google/Amazon联网查询', // 5
         '机器人插件扩展' // 6
     ],
     [
         '20万字数生成', // 0
         '生成图片400张', // 1
-        'GPT-3.5', // 2
+        'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
         '20个自定义应用', // 3
         '20个自定义机器人', // 3
@@ -226,7 +225,7 @@ const planList = [
     [
         '无限字数生成', // 0
         '生成图片1000张', // 1
-        'GPT-3.5', // 2
+        'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
         '无限自定义应用', // 4
         '无限自定义机器人', // 4

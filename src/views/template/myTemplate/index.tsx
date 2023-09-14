@@ -15,6 +15,7 @@ import {
 
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
+import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 
 import { recommends, appPage } from 'api/template/index';
 
@@ -121,7 +122,6 @@ function MyTemplate() {
     };
     useEffect(() => {
         recommends().then((res) => {
-            console.log(res, 'res');
             setRecommends(res);
         });
         appPage({ pageNo: 1, pageSize: 1000 }).then((res) => {
@@ -139,8 +139,13 @@ function MyTemplate() {
         });
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
+    const [botOpen, setBotOpen] = useState(false);
     //弹窗
     const handleDetail = (data: { uid: string }) => {
+        if (totalList.length >= 2) {
+            setBotOpen(true);
+            return;
+        }
         navigate('/createApp?recommend=' + data.uid);
     };
     const timeoutRef = useRef<any>();
@@ -254,6 +259,7 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
+            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={'添加应用个数已用完'} />
             {totals > 0 && (
                 <Box>
                     <Typography variant="h3" mt={4} mb={2}>

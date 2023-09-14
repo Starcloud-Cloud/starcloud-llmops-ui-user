@@ -1047,7 +1047,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (documentList.length === 2) {
+                                    if (documentList.length >= 2) {
                                         dispatch(
                                             openSnackbar({
                                                 open: true,
@@ -1453,7 +1453,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (documentList.length === 2) {
+                                                if (documentList.length >= 2) {
                                                     dispatch(
                                                         openSnackbar({
                                                             open: true,

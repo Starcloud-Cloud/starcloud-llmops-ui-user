@@ -1138,7 +1138,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell>创建时间</TableCell>
-                                                <TableCell>操作</TableCell>
+                                                <TableCell width="90px">操作</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -1178,25 +1178,25 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                         ) : item.status === 21 ? (
                                                             <Tag color="processing">同步中</Tag>
                                                         ) : item.status === 25 ? (
-                                                            <Tag color="success">同步失败</Tag>
+                                                            <Tag color="error">同步失败</Tag>
                                                         ) : item.status === 30 ? (
                                                             <Tag color="success">同步完成</Tag>
                                                         ) : item.status === 31 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 35 ? (
-                                                            <Tag color="success">学习失败</Tag>
+                                                            <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 40 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 41 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 45 ? (
-                                                            <Tag color="success">学习失败</Tag>
+                                                            <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 50 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 51 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status === 55 ? (
-                                                            <Tag color="success">学习失败</Tag>
+                                                            <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 60 ? (
                                                             <Tag color="processing">学习中</Tag>
                                                         ) : item.status >= 90 ? (
@@ -1205,27 +1205,36 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </TableCell>
                                                     <TableCell>{formatDate(item.updateTime)}</TableCell>
                                                     <TableCell>
-                                                        <Button
-                                                            sx={{ mr: 1 }}
+                                                        <span
+                                                            style={{
+                                                                marginRight: '10px',
+                                                                cursor: 'pointer',
+                                                                color: '#673ab7',
+                                                                fontSize: '12px',
+                                                                fontWeight: 500
+                                                            }}
                                                             onClick={() => {
                                                                 setCurrent(item);
                                                                 setDetailOpen(true);
                                                             }}
                                                             color="secondary"
-                                                            size="small"
                                                         >
                                                             详情
-                                                        </Button>
-                                                        <Button
+                                                        </span>
+                                                        <span
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                color: '#f44336',
+                                                                fontSize: '12px',
+                                                                fontWeight: 500
+                                                            }}
                                                             onClick={() => {
                                                                 setOpenConfirm(true);
                                                                 setCurrent(item);
                                                             }}
-                                                            color="error"
-                                                            size="small"
                                                         >
                                                             删除
-                                                        </Button>
+                                                        </span>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

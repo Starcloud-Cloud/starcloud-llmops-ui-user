@@ -303,7 +303,7 @@ const WorkflowCreateModal = ({
             setSkillUpgradeOnline(true);
             return;
         }
-        if (workflowList?.length >= 3) {
+        if (workflowList?.length >= 2) {
             setSkillCountVisible(true);
             return;
         }

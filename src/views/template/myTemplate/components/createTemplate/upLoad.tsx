@@ -766,7 +766,7 @@ function Upload({
                         </SubCard>
                     </Grid>
                 </Grid>
-                <Button onClick={saveSetting} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                <Button onClick={saveSetting} sx={{ mt: 6 }} color="secondary" variant="contained">
                     保存设置
                 </Button>
             </CustomTabPanel>
@@ -1051,7 +1051,7 @@ function Upload({
                         </Grid>
                     ))}
                 </Grid>
-                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
                     保存设置
                 </Button>
             </CustomTabPanel>

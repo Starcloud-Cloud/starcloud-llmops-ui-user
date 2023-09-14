@@ -1108,7 +1108,7 @@ export const FashionStyling = ({
                         </div>
                     </Popover>
                 </div>
-                <Button onClick={handleSave} sx={{ mt: 3 }} color="secondary" variant="outlined">
+                <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
                     保存设置
                 </Button>
             </div>

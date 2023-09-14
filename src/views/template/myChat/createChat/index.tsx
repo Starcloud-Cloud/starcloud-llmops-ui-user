@@ -1,7 +1,21 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Card, CardHeader, Divider, Link, Tab, Tabs } from '@mui/material';
+import {
+    Box,
+    Button,
+    Card,
+    CardHeader,
+    Divider,
+    IconButton,
+    Link,
+    ListItemIcon,
+    MenuItem,
+    Tab,
+    Tabs,
+    Typography,
+    Menu
+} from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
-import { chatSave, getChatInfo } from 'api/chat';
+import { chatSave, deleteApp, getChatInfo } from 'api/chat';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
@@ -17,6 +31,8 @@ import { Regulation } from './components/Regulation';
 import { Skill } from './components/Skill';
 import Upload from '../../myTemplate/components/createTemplate/upLoad';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -68,6 +84,8 @@ function CreateDetail() {
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']
     });
+    const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
+    const delOpen = Boolean(delAnchorEl);
 
     const { width } = useWindowSize();
 
@@ -290,6 +308,49 @@ function CreateDetail() {
                         </Button>
                     }
                     title={chatBotInfo?.name}
+                    action={
+                        <>
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-haspopup="true"
+                                onClick={(e) => {
+                                    setDelAnchorEl(e.currentTarget);
+                                }}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="del-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'del-button'
+                                }}
+                                anchorEl={delAnchorEl}
+                                open={delOpen}
+                                onClose={() => {
+                                    setDelAnchorEl(null);
+                                }}
+                            >
+                                <MenuItem
+                                    onClick={() => {
+                                        deleteApp(searchParams.get('appId') as string).then((res) => {
+                                            if (res) {
+                                                setDelAnchorEl(null);
+                                                navigate('/my-chat');
+                                            }
+                                        });
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <DeleteIcon color="error" />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit" noWrap>
+                                        删除机器人
+                                    </Typography>
+                                </MenuItem>
+                            </Menu>
+                        </>
+                    }
                     // action={
                     //     (value === 0 || value === 1 || value === 6) && (
                     //         <Button

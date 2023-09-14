@@ -230,7 +230,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     }}
                                                     className="bg-[#f2f3f5]"
                                                 >
-                                                    <CardContent className="px-[18px] !py-[12px]">
+                                                    <CardContent className="px-[24px] !py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
                                                                 {history.process &&

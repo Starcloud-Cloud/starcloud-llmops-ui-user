@@ -40,6 +40,7 @@ import {
     TableCell,
     TableBody,
     TableContainer,
+    Paper,
     FormControl,
     InputLabel,
     Select,
@@ -650,7 +651,6 @@ const DetailModal = ({
     //命中测试
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
-    const [minScore, setMinScore] = useState('');
     const [record, setRecord] = useState<any[]>([]);
     const hitTest = async () => {
         setLoading(true);
@@ -658,7 +658,6 @@ const DetailModal = ({
             const res = await documentText({
                 text,
                 k: 5,
-                minScore,
                 docId: [dataId]
             });
             setLoading(false);
@@ -820,32 +819,13 @@ const DetailModal = ({
                                         fullWidth
                                     />
                                 </Grid>
-                                <Grid item md={6}>
-                                    <TextField
-                                        color="secondary"
-                                        InputLabelProps={{ shrink: true }}
-                                        onChange={(event) => {
-                                            const inputValue = event.target.value;
-                                            if (!isNaN(Number(inputValue))) {
-                                                if ((parseFloat(inputValue) >= 0 && parseFloat(inputValue) <= 1) || inputValue === '') {
-                                                    setMinScore(inputValue);
-                                                }
-                                            }
-                                        }}
-                                        type="text"
-                                        label="最低打分"
-                                        value={minScore}
-                                        fullWidth
-                                        size="small"
-                                    />
-                                </Grid>
                             </Grid>
                             <Box my={1} display="flex" justifyContent="right">
                                 <LoadingButton
                                     sx={{ width: '100px' }}
                                     color="secondary"
                                     onClick={hitTest}
-                                    disabled={!text || !minScore}
+                                    disabled={!text}
                                     loading={loading}
                                     loadingIndicator="Loading…"
                                     variant="outlined"
@@ -883,7 +863,7 @@ const DetailModal = ({
                                             maxRows={4}
                                             fullWidth
                                         />
-                                        <Typography fontSize="12px" ml={1} fontWeight={500}>
+                                        <Typography mt={0.5} fontSize="12px" ml={1} fontWeight={500}>
                                             {item.wordCount}字符 &nbsp;&nbsp;&nbsp; {item.hitCount}命中次数
                                         </Typography>
                                     </Grid>
@@ -1108,11 +1088,11 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                     <div className={'mt-3'}>
                         <MainCard contentSX={{ p: 0 }}>
                             {documentList.length > 0 && (
-                                <TableContainer sx={{ height: '650px' }}>
-                                    <Table size="small" stickyHeader aria-label="simple table">
+                                <TableContainer component={Paper} sx={{ height: '650px' }}>
+                                    <Table sx={{ overflow: 'auto' }} size="small" stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell width="200px">文件名</TableCell>
+                                                <TableCell>文件名</TableCell>
                                                 <TableCell>类型</TableCell>
                                                 <TableCell>大小/字符</TableCell>
                                                 <TableCell>
@@ -1138,20 +1118,18 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell>创建时间</TableCell>
-                                                <TableCell width="90px">操作</TableCell>
+                                                <TableCell>操作</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {documentList.map((item) => (
                                                 <TableRow key={item.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                    <TableCell component="th" width="200px" scope="row">
-                                                        <Tooltip placement="top" title={<Typography>{item.name}</Typography>}>
-                                                            <Typography width="200px" display="flex" alignItems="center" noWrap>
-                                                                {transformDataType(item.dataType)}&nbsp;{item.name}
-                                                            </Typography>
-                                                        </Tooltip>
+                                                    <TableCell sx={{ minWidth: '200px' }} component="th" scope="row">
+                                                        <Typography display="flex" alignItems="center">
+                                                            {transformDataType(item.dataType)}&nbsp;{item.name}
+                                                        </Typography>
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell sx={{ minWidth: '60px', maxWidth: '60px' }}>
                                                         <Typography sx={{ display: 'flex', alignItems: 'center' }}>
                                                             {item.dataType === 'HTML'
                                                                 ? '网页'
@@ -1162,13 +1140,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 : null}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
                                                         <Typography>{item.wordCount}&nbsp;字符</Typography>
                                                         <Typography>
                                                             {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
                                                         {item.status === 0 ? (
                                                             <Tag color="error">上传失败</Tag>
                                                         ) : item.status === 15 ? (
@@ -1203,8 +1181,10 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             <Tag color="success">学习完成</Tag>
                                                         ) : null}
                                                     </TableCell>
-                                                    <TableCell>{formatDate(item.updateTime)}</TableCell>
-                                                    <TableCell>
+                                                    <TableCell sx={{ minWidth: '170px', maxWidth: '170px' }}>
+                                                        {formatDate(item.updateTime)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
                                                         <span
                                                             style={{
                                                                 marginRight: '10px',

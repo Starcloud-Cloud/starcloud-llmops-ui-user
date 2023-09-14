@@ -106,7 +106,8 @@ const AddRuleModal = ({
             setBasis({
                 enable: true,
                 ruleType: 'DOCUMENT',
-                ruleFilter: []
+                ruleFilter: [],
+                ruleName: ''
             });
             setCleanRule({
                 whiteList: [],
@@ -124,11 +125,11 @@ const AddRuleModal = ({
             });
             setSplitRule({
                 separator: ['\\n', '。', '.', '！', '!', ' '],
-                chunkSize: 500
+                chunkSize: 500,
+                type: 0
             });
             setEditData({});
             setActive(0);
-            setSplitValue(false);
             setNameOpen(false);
             setCondOpen(false);
             setSizeOpen(false);
@@ -136,6 +137,7 @@ const AddRuleModal = ({
     }, [addOpen]);
     //基础规则
     const [basis, setBasis] = useState<Basis>({
+        ruleName: '',
         ruleType: 'DOCUMENT',
         enable: true,
         ruleFilter: []
@@ -182,9 +184,9 @@ const AddRuleModal = ({
     //分段规则
     const [splitRule, setSplitRule] = useState<any>({
         separator: ['\\n', '。', '.', '！', '!', ' '],
-        chunkSize: 500
+        chunkSize: 500,
+        type: 0
     });
-    const [splitValue, setSplitValue] = useState(false);
     const [sizeOpen, setSizeOpen] = useState(false);
     //编辑保存的数据
     const [editData, setEditData] = useState<any>({});
@@ -193,7 +195,7 @@ const AddRuleModal = ({
         const newArr = [
             ...Object.values(basis),
             ...Object.values(commonCleanRule),
-            ...Object.values(!splitValue ? { chunkSize: splitRule.chunkSize } : splitRule)
+            ...Object.values(!splitRule.type ? { chunkSize: splitRule.chunkSize } : splitRule)
         ];
         if (basis.ruleType === 'HTML') {
             newArr.push(cleanRule.convertFormat);
@@ -211,7 +213,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
+                    splitRule: !splitRule.type ? { ...splitRule, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -243,7 +245,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
+                    splitRule: !splitRule.type ? { ...splitRule, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -293,7 +295,7 @@ const AddRuleModal = ({
                 if (index === 0) {
                     setNameOpen(true);
                     setCondOpen(true);
-                } else if (index === 1 && splitValue) {
+                } else if (index === 1 && splitRule.type) {
                     setSizeOpen(true);
                 }
             }
@@ -308,13 +310,13 @@ const AddRuleModal = ({
                 setActiveStep(activeStep + 1);
             } else if (activeStep === 1) {
                 if (
-                    !splitValue &&
+                    !splitRule.type &&
                     publishStep({ chunkSize: splitRule.chunkSize }, 1) &&
                     splitRule.chunkSize >= 100 &&
                     splitRule.chunkSize <= 3000
                 ) {
                     setActiveStep(activeStep + 1);
-                } else if (splitValue && publishStep(splitRule, 1) && splitRule.chunkSize >= 100 && splitRule.chunkSize <= 3000) {
+                } else if (splitRule.type && publishStep(splitRule, 1) && splitRule.chunkSize >= 100 && splitRule.chunkSize <= 3000) {
                     setActiveStep(activeStep + 1);
                 }
             } else {
@@ -443,7 +445,9 @@ const AddRuleModal = ({
                             <TableRow>
                                 <TableCell align="center">规则名称</TableCell>
                                 <TableCell align="center">类型</TableCell>
-                                <TableCell align="center">命中条件</TableCell>
+                                <TableCell align="center" width="300px">
+                                    命中条件
+                                </TableCell>
                                 <TableCell align="center">修改时间</TableCell>
                                 <TableCell align="center">创建时间</TableCell>
                                 <TableCell align="center">操作</TableCell>
@@ -458,7 +462,9 @@ const AddRuleModal = ({
                                     <TableCell align="center">{row.ruleType}</TableCell>
                                     <TableCell align="center">
                                         {row.ruleFilter.map((item: string) => (
-                                            <Typography key={item}>{item}</Typography>
+                                            <Typography width="300px" noWrap key={item}>
+                                                {item}
+                                            </Typography>
                                         ))}
                                     </TableCell>
                                     <TableCell align="center" width="200px">
@@ -484,7 +490,6 @@ const AddRuleModal = ({
                                                 } else if (row.ruleType === 'CHARACTERS') {
                                                     setActive(2);
                                                 }
-                                                if (row.splitRule.separator.length > 0) setSplitValue(true);
                                                 setCleanRule(row.cleanRule.htmlCleanRule);
                                                 setCommonCleanRule(row.cleanRule.commonCleanRule);
                                                 setSplitRule(row.splitRule);
@@ -1196,26 +1201,26 @@ const AddRuleModal = ({
                                                         </Typography>
                                                         <RadioGroup
                                                             onChange={() => {
-                                                                setSplitValue(!splitValue);
+                                                                setSplitRule({ ...splitRule, type: splitRule.type === 0 ? 1 : 0 });
                                                             }}
-                                                            value={splitValue}
+                                                            value={splitRule.type}
                                                             sx={{ width: '300px' }}
                                                             row
                                                         >
                                                             <FormControlLabel
-                                                                value={false}
+                                                                value={0}
                                                                 control={<Radio color="secondary" />}
                                                                 label="系统推荐"
                                                             />
                                                             <FormControlLabel
-                                                                value={true}
+                                                                value={1}
                                                                 control={<Radio color="secondary" />}
                                                                 label="自定义"
                                                             />
                                                         </RadioGroup>
                                                     </Box>
                                                     <FormControl
-                                                        sx={{ display: splitValue ? 'block' : 'none' }}
+                                                        sx={{ display: splitRule.type ? 'block' : 'none' }}
                                                         error={splitRule.separator && splitRule.separator.length === 0}
                                                         size="small"
                                                         fullWidth

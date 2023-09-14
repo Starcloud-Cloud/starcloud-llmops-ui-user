@@ -11,6 +11,7 @@ import { Item } from 'types/template';
 import { Confirm } from 'ui-component/Confirm';
 import SubCard from 'ui-component/cards/SubCard';
 import FormDialogNew from './FormDialogNew';
+import formatDate from 'hooks/useDate';
 import './textnoWarp.scss';
 import dayjs from 'dayjs';
 function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (pre: any) => any }) {
@@ -65,7 +66,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
             {appList?.map((data: any) => (
                 <>
                     <Grid key={data.uid} item xs={12} md={6} className="relative">
-                        <SubCard sx={{ height: 150, cursor: 'pointer', padding: 0 }}>
+                        <SubCard sx={{ height: 150, cursor: 'pointer', padding: '0 !important', position: 'relative' }}>
                             <Box
                                 onClick={() => {
                                     navigate('/createChat?appId=' + data?.uid);
@@ -111,17 +112,14 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                                 <span>编辑</span>
                                             </div>
                                         </div>
-                                        <div className="flex">
-                                            <div className="flex items-center text-[#666] text-sm ">
-                                                <span>{data.creatorName}</span>
-                                            </div>
-                                            <div className="flex items-center text-[#666] text-sm">
-                                                /<span>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD')}</span>
-                                            </div>
-                                        </div>
                                     </div>
                                 </Box>
                             </Box>
+                            <Tooltip placement="top" title="创建者/修改时间">
+                                <Typography fontWeight={500} position="absolute" bottom={5} right={10} fontSize="12px">
+                                    {data.creatorName}/{formatDate(data?.updateTime)}
+                                </Typography>
+                            </Tooltip>
                         </SubCard>
                     </Grid>
                 </>

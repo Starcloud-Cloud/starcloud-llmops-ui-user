@@ -53,8 +53,6 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
     const [currenSwitch, setCurrentSwitch] = useState(true);
 
-    console.log(data, 'data');
-
     useEffect(() => {
         setCurrentSwitch(data.disabled);
     }, [data.disabled]);

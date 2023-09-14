@@ -45,6 +45,7 @@ import { UpgradeOnlineModal } from './modal/upgradeOnline';
 import './chat.scss';
 import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 import { handleIcon } from './SkillWorkflowCard';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const { Option } = Select;
 
@@ -731,7 +732,8 @@ export const Chat = ({
                                 images: item.systemHandlerSkillDTO?.icon,
                                 appConfigId: item.appConfigId,
                                 copyWriting: item.systemHandlerSkillDTO?.copyWriting,
-                                disabled: item.disabled
+                                disabled: item.disabled,
+                                usage: item.systemHandlerSkillDTO.usage
                             })) || [];
 
                         const mergedArray = [...appWorkFlowList, ...systemList];
@@ -769,7 +771,8 @@ export const Chat = ({
                             images: item.systemHandlerSkillDTO?.icon,
                             appConfigId: item.appConfigId,
                             copyWriting: item.systemHandlerSkillDTO?.copyWriting,
-                            disabled: item.disabled
+                            disabled: item.disabled,
+                            usage: item.systemHandlerSkillDTO.usage
                         })) || [];
 
                     const mergedArray = [...appWorkFlowList, ...systemList];
@@ -1186,7 +1189,7 @@ export const Chat = ({
                                         <div className="max-h-[220px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
                                                 <>
-                                                    <div className="flex flex-col w-[220px]">
+                                                    <div className="flex flex-col w-[280px]">
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
@@ -1209,10 +1212,27 @@ export const Chat = ({
                                                                     </svg>
                                                                 )}
                                                                 <span className="line-clamp-1 text-base ml-1">{v.name}</span>
+                                                                <span>
+                                                                    {v.usage && (
+                                                                        <Tooltip
+                                                                            title={
+                                                                                <div>
+                                                                                    <div>使用示例</div>
+                                                                                    <div className="whitespace-pre-line">{v.usage}</div>
+                                                                                </div>
+                                                                            }
+                                                                            placement="top"
+                                                                        >
+                                                                            <div className="flex items-center cursor-pointer">
+                                                                                <HelpOutlineIcon className="text-base cursor-pointer" />
+                                                                            </div>
+                                                                        </Tooltip>
+                                                                    )}
+                                                                </span>
                                                             </div>
                                                             <BpCheckbox size="small" checked />
                                                         </div>
-                                                        <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">{v.description}</div>
+                                                        <div className="line-clamp-3 text-xs text-[#364152] h-[48px]">{v.description}</div>
                                                     </div>
                                                     {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
                                                 </>
@@ -1266,7 +1286,7 @@ export const Chat = ({
                             )}
                             <div>
                                 <Select
-                                    style={{ width: 90 }}
+                                    style={{ width: 100 }}
                                     bordered={false}
                                     className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-1"
                                     value={selectModel || 'GPT35'}

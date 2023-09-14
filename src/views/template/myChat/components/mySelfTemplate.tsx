@@ -29,7 +29,12 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
     };
 
     const handleCreateNew = async (uid: string) => {
-        const res = await createChat({ robotName: robotName, uid });
+        let res;
+        if (uid === 'temp_blank') {
+            res = await createChat({ robotName: robotName, uid: '' });
+        } else {
+            res = await createChat({ robotName: robotName, uid });
+        }
         setOpenNew(false);
         navigate(`/createChat?appId=${res}`);
     };

@@ -10,7 +10,9 @@ import {
     Slider,
     Switch,
     TextField,
-    Tooltip
+    Tooltip,
+    TooltipProps,
+    tooltipClasses
 } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { IChatInfo } from '../index';
@@ -23,6 +25,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getSkillList } from 'api/chat';
 import _ from 'lodash';
+import styled from '@emotion/styled';
 
 const marks = [
     {
@@ -68,6 +71,12 @@ export const Regulation = ({
     const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [skillWorkflowList, setSkillWorkflowList] = useState<any[]>([]);
+
+    const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)({
+        [`& .${tooltipClasses.tooltip}`]: {
+            maxWidth: 310
+        }
+    });
 
     const handleRuleValue = (type: number, value: string) => {
         if (type === 1) {
@@ -244,18 +253,18 @@ export const Regulation = ({
                 <div className={'mt-3'}>
                     <div className="flex items-center">
                         <span className={'text-md text-black'}>首选模型</span>
-                        <Tooltip
+                        <CustomWidthTooltip
                             title={
-                                <div>
+                                <div className="w-[500px]">
                                     <div>模型介绍</div>
-                                    <div>- 默认模型集成多个LLM，自动适配提供最佳回复方式和内容</div>
+                                    <div className="min-w-[500px]">- 默认模型集成多个LLM，自动适配提供最佳回复方式和内容</div>
                                     <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
                                 </div>
                             }
                             placement="top"
                         >
                             <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                        </Tooltip>
+                        </CustomWidthTooltip>
                     </div>
                     <div className={'mt-3'}>
                         <FormControl className="w-[280px] md:w-[310px]">

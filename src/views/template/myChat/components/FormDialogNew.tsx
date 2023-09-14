@@ -1,6 +1,20 @@
 // material-ui
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, TextField } from '@mui/material';
+import {
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    Divider,
+    Grid,
+    IconButton,
+    Modal,
+    TextField,
+    Tooltip,
+    Typography,
+    useTheme
+} from '@mui/material';
 import { getChatTemplate } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
@@ -9,6 +23,7 @@ import { gridSpacing } from 'store/constant';
 import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Template from './template';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
@@ -28,6 +43,7 @@ export default function FormDialogNew({
     const [checked, setChecked] = useState(false);
     const [recommendList, setRecommends] = useState([]);
     const [uid, setUid] = useState('');
+    const theme = useTheme();
 
     const handleClose = () => {
         setOpen(false);
@@ -52,7 +68,7 @@ export default function FormDialogNew({
                 }}
                 title={t('chat.createRobot')}
                 content={false}
-                className="sm:w-[920px] xs:w-[300px]"
+                className="2xl:w-[1322px] xl:w-[900px] xs:w-[350px] sm:w-[476px]"
                 secondary={
                     <IconButton
                         onClick={() => {
@@ -89,17 +105,59 @@ export default function FormDialogNew({
                             </div>
                         </div>
                         <div className="pt-[16px] w-full text-base">选择模版</div>
-                        <div className="w-full mt-[8px] grid xs:grid-cols-1 xs:gap-4 sm:gap-4 sm:grid-cols-4 h-[530px] overflow-y-auto">
-                            {recommendList.map((item: any, index) => (
-                                <Box
-                                    key={index}
-                                    // style={{ width: '203.33px' }}
-                                    // className={
-                                    //     `xs:w-full sm:w-[203.33px] hover:border-[1px] hover:border-solid hover:border-[#673ab7] rounded-[8px]` +
-                                    //     (uid === item?.uid ? ' border-[1px] border-solid border-[#673ab7]' : '')
-                                    // }
-                                    onClick={() => setUid(item?.uid)}
+                        <div className="w-full mt-[8px] flex flex-wrap h-[530px] overflow-y-auto">
+                            <Box className="mr-[8px] mb-[8px]" onClick={() => setUid('temp_blank')}>
+                                <Card
+                                    sx={{
+                                        aspectRatio: '186 / 235',
+                                        overflow: 'hidden',
+                                        position: 'relative',
+                                        border: '1px solid',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        itemAlign: 'center',
+                                        cursor: 'pointer',
+                                        borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
+                                        ':hover': {
+                                            boxShadow:
+                                                theme.palette.mode === 'dark'
+                                                    ? '0 2px 14px 0 rgb(33 150 243 / 10%)'
+                                                    : '0 2px 5px 0 rgb(32 40 45 / 8%)'
+                                        }
+                                    }}
+                                    className={
+                                        `xs:w-[289px] sm:w-[203.33px]  hover:border-[#673ab7]` +
+                                        (uid === 'temp_blank' ? 'border-solid border-[#673ab7]' : '')
+                                    }
                                 >
+                                    <Box sx={{ textAlign: 'center', marginTop: '15px' }}>
+                                        <SmartToyIcon className="object-cover rounded-full w-[100px] h-[100px] outline outline-1  outline-offset-2 outline-[#6839b7]" />
+                                    </Box>
+                                    <CardContent
+                                        sx={{
+                                            px: 2,
+                                            py: 1,
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        <Typography
+                                            className="textnoWarp active cursor"
+                                            gutterBottom
+                                            variant="h3"
+                                            sx={{ fontSize: '1.1rem', color: '#0009', textAlign: 'center' }}
+                                            component="div"
+                                            my={1}
+                                        >
+                                            创建空白机器人
+                                        </Typography>
+                                        <Typography sx={{ fontSize: '.8rem' }} className="line-clamp-4" variant="body2" component="div">
+                                            这是一个空白机器人，适合熟悉配置的用户从头配置一个机器人。
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Box>
+                            {recommendList.map((item: any, index) => (
+                                <Box className="mr-[8px] mb-[8px]" key={index} onClick={() => setUid(item?.uid)}>
                                     <Template data={item} uid={uid} />
                                 </Box>
                             ))}
@@ -112,6 +170,7 @@ export default function FormDialogNew({
                         <Button
                             variant="contained"
                             type="button"
+                            color={'secondary'}
                             onClick={() => {
                                 setChecked(true);
                                 if (!value) {

@@ -147,9 +147,10 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                 </Tooltip>
                 <Tooltip disableInteractive title={data.description}>
                     <Typography
-                        sx={{ fontSize: '.8rem', height: '36px' }}
+                        sx={{ fontSize: '.8rem', height: '50px' }}
                         onClick={() => handleEdit(data)}
-                        className="cursor desc"
+                        // className="cursor desc"
+                        className="cursor-pointer line-clamp-3"
                         variant="body2"
                         lineHeight="1.1rem"
                     >
@@ -157,13 +158,13 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                     </Typography>
                 </Tooltip>
             </CardContent>
-            <div className="absolute bottom-[48px] right-[4px]">
+            <div className="absolute bottom-[46px] right-[4px]">
                 {data.usage && (
                     <Tooltip
                         title={
                             <div>
                                 <div>使用示例</div>
-                                <div>{data.usage}</div>
+                                <div className="whitespace-pre-line">{data.usage}</div>
                             </div>
                         }
                         placement="top"

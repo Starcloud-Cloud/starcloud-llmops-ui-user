@@ -108,6 +108,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
                 }
             }}
+            className="xs:w-[310px] sm:w-[203px]"
         >
             <Box sx={{ aspectRatio: '186 / 80', overflow: 'hidden' }}>
                 {handleIcon(data.images, 'w-[100%] h-[100%]') || (
@@ -121,7 +122,6 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                         src={data.images || workflow}
                     />
                 )}
-                {/* )} */}
             </Box>
             <CardContent
                 sx={{

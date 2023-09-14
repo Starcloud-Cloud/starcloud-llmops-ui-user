@@ -104,7 +104,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                     >
                                         {data.description}
                                     </Typography>
-                                    <div className="flex justify-between flex-col sm:flex-row pt-[3] relative top-[10px]">
+                                    <div className="flex justify-between flex-col sm:flex-row relative top-[10px]">
                                         <div className="flex">
                                             <div className="flex items-center text-[#666] text-sm hover:text-[#6839b7]">
                                                 <ModeEditIcon className="text-sm" />

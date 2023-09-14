@@ -354,11 +354,11 @@ const WorkflowCreateModal = ({
                 <MainCard
                     style={{
                         position: 'absolute',
-                        width: '920px',
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)'
                     }}
+                    className="xl:w-[880px] xs:w-[350px] sm:w-[450px]"
                     title="新增技能"
                     content={false}
                     secondary={
@@ -368,7 +368,7 @@ const WorkflowCreateModal = ({
                     }
                 >
                     <CardContent sx={{ p: 2 }}>
-                        <div className="flex justify-between items-baseline">
+                        <div className="justify-between items-baseline flex flex-wrap overflow-x-auto">
                             <Stack direction="row" spacing={1} className="mb-3">
                                 <Chip
                                     label="全部"
@@ -428,7 +428,8 @@ const WorkflowCreateModal = ({
                                 hasMore={hasMore}
                                 loader={<></>}
                                 height={545}
-                                className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-[545px] overflow-y-auto mt-[8px]"
+                                //   className="xl:w-[880px] xs:w-[350px] sm:w-[476px]"
+                                className="grid gap-2 xl:grid-cols-4 sm:grid-cols-2 sx:grid-cols-1 h-[545px] overflow-y-auto mt-[8px]"
                             >
                                 {pageData?.map((item: any, index: number) => (
                                     <Box key={index} className="w-full relative">

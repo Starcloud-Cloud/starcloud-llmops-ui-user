@@ -5,7 +5,7 @@ export interface Item {
     categories: string[];
     tags: string[];
     updateTime: number;
-    creator: string;
+    creatorName: string;
     icon: string;
 }
 export interface Execute {

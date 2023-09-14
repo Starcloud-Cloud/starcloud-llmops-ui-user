@@ -123,7 +123,7 @@ const AddRuleModal = ({
                 removeUrlsEmails: false
             });
             setSplitRule({
-                separator: ['\\n', '。', '\\\\.', '！', '!', ' '],
+                separator: ['\\n', '。', '.', '！', '!', ' '],
                 chunkSize: 500
             });
             setEditData({});
@@ -181,7 +181,7 @@ const AddRuleModal = ({
     };
     //分段规则
     const [splitRule, setSplitRule] = useState<any>({
-        separator: ['\\n', '。', '\\\\.', '！', '!', ' '],
+        separator: ['\\n', '。', '.', '！', '!', ' '],
         chunkSize: 500
     });
     const [splitValue, setSplitValue] = useState(false);
@@ -211,9 +211,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue
-                        ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '\\\\.', '！', '!', ' '] }
-                        : splitRule
+                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -245,9 +243,7 @@ const AddRuleModal = ({
                         htmlCleanRule: cleanRule,
                         commonCleanRule
                     },
-                    splitRule: !splitValue
-                        ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '\\\\.', '！', '!', ' '] }
-                        : splitRule
+                    splitRule: !splitValue ? { chunkSize: splitRule.chunkSize, separator: ['\\n', '。', '.', '！', '!', ' '] } : splitRule
                 });
                 if (result) {
                     getList();
@@ -544,7 +540,6 @@ const AddRuleModal = ({
                                     top: '10%',
                                     left: '50%',
                                     maxHeight: '80%',
-                                    overflowY: 'auto',
                                     transform: 'translate(-50%, 0)'
                                 }}
                                 headerSX={{ p: '16px !important' }}
@@ -566,9 +561,9 @@ const AddRuleModal = ({
                                     </IconButton>
                                 }
                             >
-                                <CardContent sx={{ p: '16px !important' }}>
+                                <CardContent sx={{ p: '16px !important', maxHeight: 'calc(80vh - 76px)', overflowY: 'auto' }}>
                                     {activeStep === 0 && (
-                                        <Grid container justifyContent="space-between" spacing={2}>
+                                        <Grid container spacing={2}>
                                             <Grid item md={6}>
                                                 <TextField
                                                     size="small"
@@ -667,7 +662,7 @@ const AddRuleModal = ({
                                     </Stepper>
                                     {activeStep === 0 && (
                                         <Box>
-                                            <Grid container justifyContent="space-between" spacing={2}>
+                                            <Grid container spacing={2}>
                                                 <Grid item md={6}>
                                                     <FormControl
                                                         error={basis.ruleFilter && basis.ruleFilter.length === 0 && condOpen}
@@ -789,7 +784,7 @@ const AddRuleModal = ({
                                                     >
                                                         网页清洗规则
                                                     </span>
-                                                    <Grid container justifyContent="space-between" spacing={2}>
+                                                    <Grid container spacing={2}>
                                                         <Grid item md={6}>
                                                             <FormControl size="small" fullWidth>
                                                                 <InputLabel
@@ -1043,7 +1038,7 @@ const AddRuleModal = ({
                                             >
                                                 通用清洗规则
                                             </span>
-                                            <Grid container justifyContent="space-between" spacing={2}>
+                                            <Grid container spacing={2}>
                                                 <Grid item md={6}>
                                                     <Grid container spacing={2}>
                                                         <Grid item md={6}>
@@ -1136,7 +1131,7 @@ const AddRuleModal = ({
                                             >
                                                 分段清洗规则
                                             </span>
-                                            <Grid container justifyContent="space-between" spacing={2}>
+                                            <Grid container spacing={2}>
                                                 <Grid item md={6}>
                                                     <TextField
                                                         size="small"

@@ -657,7 +657,7 @@ const DetailModal = ({
         try {
             const res = await documentText({
                 text,
-                k: 8,
+                k: 5,
                 minScore,
                 docId: [dataId]
             });

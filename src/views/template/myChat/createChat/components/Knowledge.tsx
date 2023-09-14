@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import documnt from 'assets/images/upLoad/document.svg';
 import formatDate, { formatYear } from 'hooks/useDate';
+import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 import zhong from 'assets/images/chat/定位-圆-1.svg';
 // import fetch from 'utils/fetch';
 import {
@@ -984,6 +985,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
         setCurrent(null);
         setOpenConfirm(false);
     };
+    const [botOpen, setBotOpen] = useState(false);
 
     //增加规则弹窗
     const [ruleOpen, setRuleOpen] = useState(false);
@@ -1028,17 +1030,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 size={'small'}
                                 onClick={() => {
                                     if (documentList.length >= 2) {
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '最多添加两个文档',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'error'
-                                                },
-                                                close: false
-                                            })
-                                        );
+                                        setBotOpen(true);
                                         return;
                                     }
                                     setDocumentVisible(true);
@@ -1434,17 +1426,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             sx={{ mt: 3 }}
                                             onClick={() => {
                                                 if (documentList.length >= 2) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '最多添加两个文档',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            close: false
-                                                        })
-                                                    );
+                                                    setBotOpen(true);
                                                     return;
                                                 }
                                                 setDocumentVisible(true);
@@ -1479,6 +1461,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                     </Box>
                                 </Box>
                             )}
+                            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={'添加文档个数已用完'} />
                         </MainCard>
                     </div>
                 </div>

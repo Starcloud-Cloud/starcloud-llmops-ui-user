@@ -25,7 +25,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import Template from './template';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import myChat from 'store/myChat';
-import { UpgradeRobotModel } from './upgradeRobotModel';
+import { UpgradeModel } from './upgradeRobotModel';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
@@ -199,7 +199,7 @@ export default function FormDialogNew({
                     </CardActions>
                 </MainCard>
             </Modal>
-            <UpgradeRobotModel open={botOpen} handleClose={() => setBotOpen(false)} />
+            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={'添加机器人个数已用完'} />
         </>
     );
 }

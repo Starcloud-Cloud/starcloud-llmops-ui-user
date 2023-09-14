@@ -49,6 +49,7 @@ import _ from 'lodash';
 import { UpgradeSkillModel } from './modal/upgradeSkillModel';
 import useUserStore from 'store/user';
 import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
+import { UpgradeModel } from '../../components/upgradeRobotModel';
 
 const WorkflowEditModal = ({
     open,
@@ -676,7 +677,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                     setSkillCountVisible={setSkillCountVisible}
                 />
             )}
-            <UpgradeSkillModel open={skillCountVisible} handleClose={() => setSkillCountVisible(false)} />
+            <UpgradeModel open={skillCountVisible} handleClose={() => setSkillCountVisible(false)} title="添加技能个数已用完" />
         </div>
     );
 };

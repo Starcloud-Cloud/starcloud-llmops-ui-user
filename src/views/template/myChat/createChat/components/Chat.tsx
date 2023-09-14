@@ -47,6 +47,8 @@ import { SkillUpgradeOnline } from './modal/skillUpgradeOnline';
 import { handleIcon } from './SkillWorkflowCard';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
+const env = process.env.REACT_APP_ENV;
+
 const { Option } = Select;
 
 export type IHistory = Partial<{
@@ -872,11 +874,11 @@ export const Chat = ({
             } else {
                 const copyData = [...dataRef.current]; // 使用dataRef.current代替data
                 if (copyData[copyData.length - 1].isAds) {
-                    copyData[copyData.length - 2].answer = bufferObj.content || '未知异常';
+                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '系统异常';
                     copyData[copyData.length - 2].status = 'ERROR';
                     copyData[copyData.length - 2].isNew = false;
                 } else {
-                    copyData[copyData.length - 1].answer = bufferObj.content || '未知异常';
+                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '系统异常';
                     copyData[copyData.length - 1].status = 'ERROR';
                     copyData[copyData.length - 1].isNew = false;
                 }

@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 
-export const UpgradeRobotModel = ({ handleClose, open }: { handleClose: () => void; open: boolean }) => {
+export const UpgradeModel = ({ handleClose, open, title }: { handleClose: () => void; open: boolean; title: string }) => {
     const navigate = useNavigate();
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -27,16 +27,22 @@ export const UpgradeRobotModel = ({ handleClose, open }: { handleClose: () => vo
                 <CardContent>
                     <div className="flex justify-center flex-col items-center">
                         <div className="flex items-center justify-center flex-col">
-                            <img width={204} src={workWechatPay} />
                             <div className="text-sm text-[#152737] my-4 flex items-center flex-col">
-                                <p>添加机器人个数已用完。</p>
-                                <p>如需创建更多，请联系产品顾问进一步了解。</p>
-                                <p>更有其他丰富权益可解锁。</p>
+                                <img width={204} src={workWechatPay} />
+                                <p className="text-lg text-center mb-1">{title}</p>
+                                <p className=" text-center text-[#364152]">
+                                    如需创建更多，可直接升级或联系产品顾问进一步了解，更有其他丰富权益可解锁。
+                                </p>
+                                <Button
+                                    variant="contained"
+                                    color={'secondary'}
+                                    className="w-[200px] my-2"
+                                    onClick={() => navigate('/subscribe')}
+                                >
+                                    直接升级
+                                </Button>
                             </div>
                         </div>
-                        {/* <Button variant="contained" color={'secondary'} className="w-[200px]" onClick={() => navigate('/subscribe')}>
-                            升级
-                        </Button> */}
                     </div>
                 </CardContent>
             </MainCard>

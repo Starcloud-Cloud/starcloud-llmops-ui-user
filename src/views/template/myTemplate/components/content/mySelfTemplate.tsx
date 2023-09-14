@@ -56,9 +56,9 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                         />
                                     ))}
                                 </Box>
-                                <Tooltip placement="top" title="修改时间/创建者">
-                                    <Typography fontWeight={500} position="absolute" top={5} right={5} fontSize="14px">
-                                        {formatDate(data?.updateTime)}/{data.creatorName}
+                                <Tooltip placement="top" title="创建者/修改时间">
+                                    <Typography fontWeight={500} position="absolute" bottom={5} right={10} fontSize="12px">
+                                        {data.creatorName}/{formatDate(data?.updateTime)}
                                     </Typography>
                                 </Tooltip>
                             </Box>

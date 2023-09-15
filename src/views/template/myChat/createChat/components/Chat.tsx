@@ -489,7 +489,7 @@ export const Chat = ({
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (mode === 'test' && conversationUid && isFirst) {
+        if (mode === 'test' && conversationUid && isFirst && chatBotInfo.name) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({

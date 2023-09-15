@@ -30,6 +30,8 @@ function Deatail() {
     const detailRef: any = useRef(null);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
+    //是否显示分享翻译
+    const [isShows, setIsShow] = useState<any[]>([]);
     let isAllExecute = false;
     let conversationUid: undefined | string = undefined;
     //执行
@@ -83,6 +85,12 @@ function Deatail() {
                     return;
                 }
                 if (done) {
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    const newShow = _.cloneDeep(isShows);
+                    newShow[index] = true;
+                    setIsShow(newShow);
                     userBenefits().then((res) => {
                         setUserInfo(res);
                     });
@@ -296,6 +304,7 @@ function Deatail() {
             <Divider sx={{ mb: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
                 config={detailData}
+                isShows={isShows}
                 changeData={changeData}
                 variableChange={variableChange}
                 promptChange={promptChange}

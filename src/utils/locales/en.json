@@ -659,6 +659,10 @@
     "pro": "Pro",
     "令牌": "Token",
     "图片": "Images",
+    "应用": "App",
+    "微信机器人": "Wechat Robot",
+    "机器人文档数": "Number Wechat Documents",
+    "机器人技能插件": "Robot Skills Plugin",
     "remaining": "Remaining"
   },
   "homepage": {

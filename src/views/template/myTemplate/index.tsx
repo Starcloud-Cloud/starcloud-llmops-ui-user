@@ -32,6 +32,7 @@ import myApp from 'store/myApp';
 import { useContext } from 'react';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
+import userInfoStore from 'store/entitlementAction';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -140,9 +141,10 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     const [botOpen, setBotOpen] = useState(false);
+    const { userInfo }: any = userInfoStore();
     //弹窗
     const handleDetail = (data: { uid: string }) => {
-        if (totalList.length >= 2) {
+        if (totalList.length >= userInfo.benefits[2].totalNum) {
             setBotOpen(true);
             return;
         }

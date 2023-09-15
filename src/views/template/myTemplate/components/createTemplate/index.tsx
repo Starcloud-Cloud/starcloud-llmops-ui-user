@@ -68,7 +68,6 @@ function CreateDetail() {
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
-    const isShowRef: any = useRef([]);
     const [isShows, setIsShow] = useState<any[]>([]);
     const basis = useRef<any>(null);
     let conversationUid: undefined | string = undefined;
@@ -127,7 +126,6 @@ function CreateDetail() {
                     setLoadings(newValue1);
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
-                    isShowRef.current[index] = true;
                     setIsShow(newShow);
                     userBenefits().then((res) => {
                         setUserInfo(res);
@@ -520,7 +518,7 @@ function CreateDetail() {
                             {detail && value === 0 && (
                                 <Perform
                                     key={perform}
-                                    // isShows={isShowRef.current}
+                                    isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     loadings={loadings}
@@ -584,7 +582,7 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
-                                    // isShows={isShows}
+                                    isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeSon={changeData}
                                     changeanswer={changeanswer}

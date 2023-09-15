@@ -58,6 +58,8 @@ const IframeExecute = () => {
     });
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
+    //是否显示分享翻译
+    const [isShows, setIsShow] = useState<any[]>([]);
     //类别列表
     const [categoryList, setCategoryList] = useState<any[]>([]);
     useEffect(() => {
@@ -153,6 +155,12 @@ const IframeExecute = () => {
                     return;
                 }
                 if (done) {
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    const newShow = _.cloneDeep(isShows);
+                    newShow[index] = true;
+                    setIsShow(newShow);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -257,6 +265,7 @@ const IframeExecute = () => {
                 changeSon={changeData}
                 changeanswer={changeanswer}
                 loadings={loadings}
+                isShows={isShows}
                 variableChange={exeChange}
                 promptChange={promptChange}
                 isallExecute={(flag: boolean) => {

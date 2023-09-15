@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getChat, getChatHistory, getSkillList, messageSSE } from '../../../../../api/chat';
+import { getChat, getChatHistory, getSkillList, messageSSE, shareChat } from '../../../../../api/chat';
 import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
@@ -46,6 +46,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const env = process.env.REACT_APP_ENV;
+import ShareIcon from '@mui/icons-material/Share';
+import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
 
 const { Option } = Select;
 
@@ -328,7 +330,7 @@ export function extractChatBlocks(data: any) {
             loop.forEach((item: { answer: string }[], index: string | number) => {
                 currentData.process[index] = {
                     tips: '查询完成',
-                    showType: transformType(JSON.parse(item[0].answer).arguments.type),
+                    showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
                     input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
                     data: item?.[1]?.answer && JSON.parse(item[1].answer),
                     success: true,
@@ -398,6 +400,7 @@ export const Chat = ({
     const [selectModel, setSelectModel] = useState<any>();
 
     const { messageData, setMessageData } = useChatMessage();
+    const [state, copyToClipboard] = useCopyToClipboard();
     const navigate = useNavigate();
 
     const { width } = useWindowSize();
@@ -546,6 +549,7 @@ export const Chat = ({
     // mode iframe start
     // iframe 模式下获取历史记录
     React.useEffect(() => {
+        setConversationUid(jsCookie.get(conversationUniKey) || '');
         if (mode === 'iframe') {
             (async () => {
                 const res = await getShareChatHistory({
@@ -1025,6 +1029,28 @@ export const Chat = ({
         }
     }, [skillWorkflowList.length]);
 
+    const handleShare = async () => {
+        const res = await shareChat({
+            conversationUid: conversationUid,
+            mediumUid: mediumUid
+        });
+        if (res) {
+            copyToClipboard(`${window.location.origin}/share_cb/${res}`);
+        }
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '复制成功, 快去分享吧~',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+        return;
+    };
+
     return (
         <div className="h-full relative flex justify-center">
             {mode === 'market' && width > 1300 && (
@@ -1067,12 +1093,8 @@ export const Chat = ({
                     </div>
                 </div>
             )}
-            <div
-                className={`h-full flex flex-col max-w-[768px] ${
-                    mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''
-                }   w-full`}
-            >
-                <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0`}>
+            <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
+                <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative`}>
                     {showSelect ? (
                         <Popover
                             content={
@@ -1130,6 +1152,12 @@ export const Chat = ({
                             </div>
                             <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
                         </div>
+                    )}
+                    {conversationUid && mode !== 'test' && (
+                        <ShareIcon
+                            className={`absolute ${statisticsMode === 'SHARE_JS' ? 'right-[53px]' : 'right-2'}  text-[16px] cursor-pointer`}
+                            onClick={() => handleShare()}
+                        />
                     )}
                 </div>
                 <Divider variant={'fullWidth'} />

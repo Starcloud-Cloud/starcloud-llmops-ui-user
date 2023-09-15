@@ -274,3 +274,30 @@ export const delSkill = (uid: string) => {
 export const documentText = (data: any) => {
     return request.post({ url: `/llm/dataset/segment/match/document/text`, data });
 };
+
+/**
+ * 创建分享
+ * @param data
+ * @returns
+ */
+export const shareChat = (data: any) => {
+    return request.post({ url: '/share/conversation/create', data });
+};
+
+/**
+ * 分享应用详情
+ * @param shareKey
+ * @returns
+ */
+export const shareChatBotInfo = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/app/${shareKey}` });
+};
+
+/**
+ * 会话记录
+ * @param shareKey
+ * @returns
+ */
+export const shareChatBotList = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/history/${shareKey}` });
+};

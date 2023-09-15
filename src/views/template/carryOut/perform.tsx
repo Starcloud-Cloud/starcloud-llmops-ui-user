@@ -17,11 +17,10 @@ function Perform({
     variableChange,
     promptChange,
     changeanswer,
-    history = false
-}: // isShows
-any) {
+    history = false,
+    isShows
+}: any) {
     const refs = useRef<any>([]);
-
     //子组件返回的值
     const callBack = (data: any) => {
         isallExecute(false);
@@ -87,7 +86,7 @@ any) {
                 (item: any, steps: number) =>
                     item.flowStep?.response.style !== 'BUTTON' && (
                         <CarrOut
-                            // isShows={isShows}
+                            isShows={isShows}
                             history={history}
                             source={source}
                             loadings={loadings}
@@ -110,7 +109,8 @@ any) {
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
-        JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings)
+        JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
+        JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)
     );
 };
 export default memo(Perform, arePropsEqual);

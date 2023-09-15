@@ -84,6 +84,8 @@ const AppModal = ({
     const [perform, setPerform] = useState(0);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
+    //是否显示分享翻译
+    const [isShows, setIsShow] = useState<any[]>([]);
     //历史记录
     const [historyList, setHistoryList] = useState<any[]>([]);
     //点击历史记录填入数据
@@ -212,6 +214,12 @@ const AppModal = ({
                     return;
                 }
                 if (done) {
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    const newShow = _.cloneDeep(isShows);
+                    newShow[index] = true;
+                    setIsShow(newShow);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -287,9 +295,7 @@ const AppModal = ({
     };
     const leftRef: any = useRef(null);
     const [leftHeight, setLeftHeight] = useState(0);
-    useEffect(() => {
-        console.log(leftRef.current?.clientHeight);
-    }, [leftRef.current?.clientHeight]);
+    useEffect(() => {}, [leftRef.current?.clientHeight]);
     return (
         <Modal
             open={open}
@@ -355,6 +361,7 @@ const AppModal = ({
                                             changeSon={changeData}
                                             changeanswer={changeanswer}
                                             loadings={loadings}
+                                            isShows={isShows}
                                             variableChange={exeChange}
                                             promptChange={promptChange}
                                             key={perform}

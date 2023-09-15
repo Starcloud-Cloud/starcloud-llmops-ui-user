@@ -61,6 +61,7 @@ import { TabsProps } from 'types';
 import { Confirm } from 'ui-component/Confirm';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
+import userInfoStore from 'store/entitlementAction';
 import * as yup from 'yup';
 import {
     delDataset,
@@ -582,11 +583,33 @@ interface DetaData {
     dataType?: string;
     cleanContent?: string;
     summary?: string | null;
+    status?: number;
     dataSourceInfo?: {
         initAddress?: string;
     };
     ruleVO?: {
         ruleName: string;
+        ruleType: string;
+        ruleFilter: any[];
+        splitRule: {
+            chunkSize: number;
+            separator: any[];
+            type: number;
+        };
+        cleanRule?: {
+            commonCleanRule: {
+                removeAllHtmlTags: boolean;
+                removeAllImage: boolean;
+                removeUrlsEmails: boolean;
+                removeConsecutiveNewlines: boolean;
+            };
+            htmlCleanRule: {
+                acceptLanguage: string;
+                blackList: any[];
+                convertFormat: string;
+                whiteList: any[];
+            };
+        };
     };
     storageVO?: {
         storageKey?: string;
@@ -701,7 +724,16 @@ const DetailModal = ({
                                 原始链接
                             </Typography>
                             <Box>
-                                {detaData.dataType === 'HTML' ? detaData.dataSourceInfo?.initAddress : detaData.storageVO?.storageKey}
+                                <Link
+                                    color="secondary"
+                                    target="_blank"
+                                    href={
+                                        detaData.dataType === 'HTML' ? detaData.dataSourceInfo?.initAddress : detaData.storageVO?.storageKey
+                                    }
+                                >
+                                    {detaData.dataType === 'HTML' ? detaData.dataSourceInfo?.initAddress : detaData.storageVO?.storageKey}
+                                </Link>
+
                                 {/* {detaData.dataType === 'HTML' && (
                                     <Button
                                         color="secondary"
@@ -747,8 +779,104 @@ const DetailModal = ({
                                     </Button>
                                 )} */}
                             </Box>
-                            <Typography mt={2} variant="h4">
-                                规则名称：{detaData.ruleVO?.ruleName}
+                            <Typography mt={2} variant="h4" display="flex" alignItems="center">
+                                规则名称
+                                <Tooltip
+                                    placement="top"
+                                    title={
+                                        <>
+                                            <Typography mt=".5">规则名称：{detaData?.ruleVO?.ruleName}</Typography>
+                                            <Typography mt=".5">规则类型：{detaData?.ruleVO?.ruleType}</Typography>
+                                            <Typography mt=".5">命中条件：{detaData?.ruleVO?.ruleFilter.toString()}</Typography>
+                                            <Typography mt=".5">分段大小：{detaData?.ruleVO?.splitRule.chunkSize}</Typography>
+                                            <Typography mt=".5">
+                                                分割符：
+                                                {detaData?.ruleVO?.splitRule.type === 1
+                                                    ? detaData?.ruleVO?.splitRule.separator.toString()
+                                                    : '系统推荐'}
+                                            </Typography>
+
+                                            {detaData?.ruleVO?.ruleType === 'HTML' && (
+                                                <Typography mt=".5">
+                                                    白名单：{detaData?.ruleVO?.cleanRule?.htmlCleanRule.whiteList.toString()}
+                                                </Typography>
+                                            )}
+                                            {detaData?.ruleVO?.ruleType === 'HTML' && (
+                                                <Typography mt=".5">
+                                                    黑名单：{detaData?.ruleVO?.cleanRule?.htmlCleanRule.blackList.toString()}
+                                                </Typography>
+                                            )}
+                                            {detaData?.ruleVO?.ruleType === 'HTML' && (
+                                                <Typography mt=".5">
+                                                    转化格式：{detaData?.ruleVO?.cleanRule?.htmlCleanRule.convertFormat.toString()}
+                                                </Typography>
+                                            )}
+                                            {detaData?.ruleVO?.ruleType === 'HTML' && (
+                                                <Typography mt=".5">
+                                                    网页语言：{detaData?.ruleVO?.cleanRule?.htmlCleanRule.acceptLanguage.toString()}
+                                                </Typography>
+                                            )}
+
+                                            <Typography mt=".5">
+                                                清洗html标签：
+                                                {detaData?.ruleVO?.cleanRule?.commonCleanRule.removeAllHtmlTags ? '已开启' : '未开启'}
+                                            </Typography>
+                                            <Typography mt=".5">
+                                                清洗所有图片：
+                                                {detaData?.ruleVO?.cleanRule?.commonCleanRule.removeAllImage ? '已开启' : '未开启'}
+                                            </Typography>
+                                            <Typography mt=".5">
+                                                清除电子邮箱地址：
+                                                {detaData?.ruleVO?.cleanRule?.commonCleanRule.removeUrlsEmails ? '已开启' : '未开启'}
+                                            </Typography>
+                                            <Typography mt=".5">
+                                                替换掉连续的空格、换行符和制表符：
+                                                {detaData?.ruleVO?.cleanRule?.commonCleanRule.removeConsecutiveNewlines
+                                                    ? '已开启'
+                                                    : '未开启'}
+                                            </Typography>
+                                        </>
+                                    }
+                                >
+                                    <HelpOutlineOutlinedIcon sx={{ fontWeight: 400, cursor: 'pointer' }} fontSize="small" />
+                                </Tooltip>
+                                ：<Typography variant="h5">{detaData.ruleVO?.ruleName}</Typography>
+                            </Typography>
+                            <Typography mt={2} variant="h4" display="flex" alignItems="center">
+                                规则状态：
+                                {detaData.status === 0 ? (
+                                    <Tag color="error">数据上传失败</Tag>
+                                ) : detaData.status === 15 ? (
+                                    <Tag color="error">数据上传失败</Tag>
+                                ) : detaData.status === 20 ? (
+                                    <Tag color="success">数据上传成功</Tag>
+                                ) : detaData.status === 21 ? (
+                                    <Tag color="processing">数据同步中</Tag>
+                                ) : detaData.status === 25 ? (
+                                    <Tag color="error">数据同步失败</Tag>
+                                ) : detaData.status === 30 ? (
+                                    <Tag color="success">数据同步完成</Tag>
+                                ) : detaData.status === 31 ? (
+                                    <Tag color="processing">数据清洗中</Tag>
+                                ) : detaData.status === 35 ? (
+                                    <Tag color="error">数据清洗失败</Tag>
+                                ) : detaData.status === 40 ? (
+                                    <Tag color="success">数据清洗完成</Tag>
+                                ) : detaData.status === 41 ? (
+                                    <Tag color="processing">数据分割中</Tag>
+                                ) : detaData.status === 45 ? (
+                                    <Tag color="error">数据分割失败</Tag>
+                                ) : detaData.status === 50 ? (
+                                    <Tag color="success">数据分割完成</Tag>
+                                ) : detaData.status === 51 ? (
+                                    <Tag color="processing">正在创建索引</Tag>
+                                ) : detaData.status === 55 ? (
+                                    <Tag color="error">创建索引失败</Tag>
+                                ) : detaData.status === 60 ? (
+                                    <Tag color="success">创建索引完成</Tag>
+                                ) : detaData.status && detaData.status >= 90 ? (
+                                    <Tag color="success">学习完成</Tag>
+                                ) : null}
                             </Typography>
                             <Typography mt={2} mb={2} variant="h4">
                                 描述
@@ -798,10 +926,7 @@ const DetailModal = ({
                     )}
                     {value === 2 && (
                         <Box>
-                            <Typography fontSize="18px" mt={2} variant="h5">
-                                命中测试
-                            </Typography>
-                            <Typography mt={1} mb={2} fontSize="12px" color="#697586">
+                            <Typography mt={1} my={2} color="#697586">
                                 基于给定的查询文本测试数据集的命中效果
                             </Typography>
                             <Grid container spacing={2}>
@@ -989,6 +1114,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
 
     //增加规则弹窗
     const [ruleOpen, setRuleOpen] = useState(false);
+    const { userInfo }: any = userInfoStore();
     return (
         <div>
             <div>
@@ -1029,7 +1155,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (documentList.length >= 2) {
+                                    console.log(userInfo);
+
+                                    if (documentList.length >= userInfo.benefits[5].totalNum) {
                                         setBotOpen(true);
                                         return;
                                     }
@@ -1094,17 +1222,14 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                             <>
                                                                 <Typography>上传失败</Typography>
                                                                 <Typography my={0.5}>上传成功</Typography>
-                                                                <Typography>同步中</Typography>
-                                                                <Typography my={0.5}>同步失败</Typography>
-                                                                <Typography>同步完成</Typography>
-                                                                <Typography my={0.5}>学习中</Typography>
-                                                                <Typography>学习失败</Typography>
-                                                                <Typography my={0.5}>学习完成</Typography>
+                                                                <Typography>学习中</Typography>
+                                                                <Typography my={0.5}>学习失败</Typography>
+                                                                <Typography>学习完成</Typography>
                                                             </>
                                                         }
                                                     >
                                                         <HelpOutlineOutlinedIcon
-                                                            sx={{ display: 'inline-block', verticalAlign: 'middle' }}
+                                                            sx={{ display: 'inline-block', verticalAlign: 'middle', cursor: 'pointer' }}
                                                             fontSize="small"
                                                         />
                                                     </Tooltip>
@@ -1132,43 +1257,72 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                                 : null}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
+                                                    <TableCell sx={{ minWidth: '150px', maxWidth: '150px' }}>
                                                         <Typography>{item.wordCount}&nbsp;字符</Typography>
                                                         <Typography>
                                                             {((item.storageVO?.size as number) / 1024).toFixed(2) + ' KB'}
                                                         </Typography>
                                                     </TableCell>
-                                                    <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
+                                                    <TableCell sx={{ minWidth: '150px', maxWidth: '150px' }}>
                                                         {item.status === 0 ? (
-                                                            <Tag color="error">上传失败</Tag>
+                                                            <>
+                                                                <Progress
+                                                                    size="small"
+                                                                    strokeColor="exception"
+                                                                    percent={100}
+                                                                    showInfo={false}
+                                                                />
+                                                                <Tag color="error">上传失败</Tag>
+                                                            </>
                                                         ) : item.status === 15 ? (
                                                             <Tag color="error">上传失败</Tag>
                                                         ) : item.status === 20 ? (
                                                             <Tag color="success">上传成功</Tag>
                                                         ) : item.status === 21 ? (
-                                                            <Tag color="processing">同步中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={20} showInfo={false} />
+                                                                <Tag color="processing">同步中</Tag>
+                                                            </Box>
                                                         ) : item.status === 25 ? (
                                                             <Tag color="error">同步失败</Tag>
                                                         ) : item.status === 30 ? (
                                                             <Tag color="success">同步完成</Tag>
                                                         ) : item.status === 31 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={30} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status === 35 ? (
                                                             <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 40 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={40} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status === 41 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={50} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status === 45 ? (
                                                             <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 50 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={60} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status === 51 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={70} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status === 55 ? (
                                                             <Tag color="error">学习失败</Tag>
                                                         ) : item.status === 60 ? (
-                                                            <Tag color="processing">学习中</Tag>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Progress size="small" percent={80} showInfo={false} />
+                                                                <Tag color="processing">学习中</Tag>
+                                                            </Box>
                                                         ) : item.status >= 90 ? (
                                                             <Tag color="success">学习完成</Tag>
                                                         ) : null}
@@ -1425,7 +1579,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (documentList.length >= 2) {
+                                                if (documentList.length >= userInfo.benefits[5].totalNum) {
                                                     setBotOpen(true);
                                                     return;
                                                 }

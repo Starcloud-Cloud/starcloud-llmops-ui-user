@@ -301,3 +301,11 @@ export const shareChatBotInfo = (shareKey: string) => {
 export const shareChatBotList = (shareKey: string) => {
     return request.get({ url: `/share/conversation/history/${shareKey}` });
 };
+
+/**
+ * 获取媒体ID
+ * @param shareKey
+ */
+export const shareDetail = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/detail/${shareKey}` });
+};

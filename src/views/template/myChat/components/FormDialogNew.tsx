@@ -26,6 +26,7 @@ import Template from './template';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import myChat from 'store/myChat';
 import { UpgradeModel } from './upgradeRobotModel';
+import userInfoStore from 'store/entitlementAction';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
@@ -48,6 +49,7 @@ export default function FormDialogNew({
     const theme = useTheme();
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
+    const { userInfo }: any = userInfoStore();
 
     const handleClose = () => {
         setOpen(false);
@@ -182,7 +184,8 @@ export default function FormDialogNew({
                                 type="button"
                                 color={'secondary'}
                                 onClick={() => {
-                                    if (totalList.length >= 2) {
+                                    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'BOT');
+                                    if (totalList.length >= totalNum) {
                                         setBotOpen(true);
                                         return;
                                     }

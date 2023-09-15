@@ -93,7 +93,7 @@ interface BenefitItem {
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
-    const list = info?.benefits?.filter((v: any) => v.type !== 'BOT');
+    const list = info?.benefits?.filter((v: any) => ['TOKEN', 'IMAGE'].includes(v.type));
     return (
         <Box>
             {list?.map((item: BenefitItem) => (

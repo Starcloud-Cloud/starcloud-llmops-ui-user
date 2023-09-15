@@ -49,6 +49,7 @@ import _ from 'lodash';
 import useUserStore from 'store/user';
 import { UpgradeModel } from '../../components/upgradeRobotModel';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
+import userInfoStore from 'store/entitlementAction';
 
 const WorkflowEditModal = ({
     open,
@@ -241,6 +242,7 @@ const WorkflowCreateModal = ({
     const [pageData, setPageData] = useState<any[]>([]);
     const [page, setPage] = useState(1);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
+    const { userInfo }: any = userInfoStore();
 
     useEffect(() => {
         (async () => {
@@ -303,7 +305,8 @@ const WorkflowCreateModal = ({
             setSkillUpgradeOnline(true);
             return;
         }
-        if (workflowList?.length >= 2) {
+        const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
+        if (workflowList?.length >= totalNum) {
             setSkillCountVisible(true);
             return;
         }

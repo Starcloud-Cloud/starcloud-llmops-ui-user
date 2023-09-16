@@ -1155,8 +1155,6 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    console.log(userInfo);
-
                                     if (documentList.length >= userInfo.benefits[5].totalNum) {
                                         setBotOpen(true);
                                         return;

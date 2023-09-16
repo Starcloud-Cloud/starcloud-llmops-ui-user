@@ -547,6 +547,7 @@ function ApplicationAnalysis({
                                             changeSon={() => {}}
                                             changeanswer={() => {}}
                                             loadings={[]}
+                                            isShows={[]}
                                             variableChange={() => {}}
                                             promptChange={() => {}}
                                             isallExecute={() => {}}

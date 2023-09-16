@@ -568,8 +568,8 @@ export const Chat = ({
     // mode iframe start
     // iframe 模式下获取历史记录
     React.useEffect(() => {
-        setConversationUid(jsCookie.get(conversationUniKey) || '');
         if (mode === 'iframe') {
+            setConversationUid(jsCookie.get(conversationUniKey) || '');
             (async () => {
                 const res = await getShareChatHistory({
                     pageNo: 1,

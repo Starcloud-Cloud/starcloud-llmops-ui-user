@@ -29,6 +29,7 @@ let requestList: any[] = [];
 let isRefreshToken = false;
 // 请求白名单，无须token的接口
 const whiteList: string[] = ['/login', '/refresh-token'];
+const whiteListV2: string[] = ['/share/conversation/create'];
 
 // 创建axios实例
 const service: AxiosInstance = axios.create({
@@ -56,6 +57,11 @@ service.interceptors.request.use(
         if (getAccessToken() && !isToken) {
             (config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken(); // 让每个请求携带自定义token
         }
+
+        if (whiteListV2.includes(config.url || '')) {
+            delete config.headers.Authorization;
+        }
+
         // 设置租户
         if (tenantEnable && tenantEnable === 'true') {
             const tenantId = getTenantId();

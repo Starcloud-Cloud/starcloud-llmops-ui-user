@@ -1054,9 +1054,9 @@ function Upload({
                         </Grid>
                     ))}
                 </Grid>
-                <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
+                {/* <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
                     保存设置
-                </Button>
+                </Button> */}
             </CustomTabPanel>
             {historyState && (
                 <Dialog

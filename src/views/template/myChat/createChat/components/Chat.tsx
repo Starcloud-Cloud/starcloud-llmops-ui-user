@@ -489,7 +489,7 @@ export const Chat = ({
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (mode === 'test' && conversationUid && isFirst) {
+        if (mode === 'test' && conversationUid && isFirst && chatBotInfo.name) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({
@@ -568,8 +568,8 @@ export const Chat = ({
     // mode iframe start
     // iframe 模式下获取历史记录
     React.useEffect(() => {
-        setConversationUid(jsCookie.get(conversationUniKey) || '');
         if (mode === 'iframe') {
+            setConversationUid(jsCookie.get(conversationUniKey) || '');
             (async () => {
                 const res = await getShareChatHistory({
                     pageNo: 1,
@@ -824,7 +824,9 @@ export const Chat = ({
             const subString = eventData.substring(5);
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
-                jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                if (mediumUid) {
+                    jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                }
                 setConversationUid(bufferObj.conversationUid);
 
                 // 处理流程
@@ -1059,7 +1061,7 @@ export const Chat = ({
         dispatch(
             openSnackbar({
                 open: true,
-                message: '复制成功, 快去分享吧~',
+                message: '把你的对话分享给朋友吧，还可以免费增加权益哦！',
                 variant: 'alert',
                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 alert: {

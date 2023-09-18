@@ -233,8 +233,8 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                     <CardContent className="px-[24px] !py-[12px]">
                                                         <Grid container spacing={1}>
                                                             <Grid item xs={12}>
-                                                                {history.process &&
-                                                                    history.process.map((item: any, index: number) => {
+                                                                {history?.process &&
+                                                                    history?.process?.map((item: any, index: number) => {
                                                                         if (
                                                                             item.showType === 'tips' ||
                                                                             item.showType == 'url' ||
@@ -339,84 +339,86 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                             );
                                                                         }
                                                                         if (item.showType === 'docs') {
+                                                                            return (
+                                                                                <div>
+                                                                                    {history?.answer ? (
+                                                                                        <div
+                                                                                            className={`text-sm whitespace-pre-line  ${
+                                                                                                history.status === 'ERROR'
+                                                                                                    ? 'text-[red]'
+                                                                                                    : 'text-[#364152]'
+                                                                                            }`}
+                                                                                        >
+                                                                                            <ChatMarkdown textContent={history.answer} />
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div className="flex justify-start mb-1">
+                                                                                            <LoadingDot />
+                                                                                        </div>
+                                                                                    )}
+                                                                                    <div className="py-1">
+                                                                                        <Divider />
+                                                                                    </div>
+                                                                                    <div className="flex items-center mt-1">
+                                                                                        <div
+                                                                                            className="text-xs"
+                                                                                            style={{ flex: '0 0 37px' }}
+                                                                                        >
+                                                                                            来源：
+                                                                                        </div>
+                                                                                        <div className="grid grid-cols-3 gap-1 flex: 1 w-full">
+                                                                                            {item?.data?.map((v: any, index: number) => (
+                                                                                                <Popover
+                                                                                                    key={index}
+                                                                                                    content={
+                                                                                                        <div className="max-w-[325px]">
+                                                                                                            <span>{v?.desc}</span>
+                                                                                                            {isMobile && (
+                                                                                                                <div>
+                                                                                                                    <a
+                                                                                                                        target="_blank"
+                                                                                                                        href={v.url}
+                                                                                                                    >
+                                                                                                                        点击查看
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    trigger={isMobile ? 'click' : 'hover'}
+                                                                                                    title={v.name}
+                                                                                                >
+                                                                                                    <Tag
+                                                                                                        color="#673ab7"
+                                                                                                        className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
+                                                                                                        onClick={() =>
+                                                                                                            !isMobile && window.open(v?.url)
+                                                                                                        }
+                                                                                                    >
+                                                                                                        {v?.name}
+                                                                                                    </Tag>
+                                                                                                </Popover>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
                                                                         }
                                                                     })}
-                                                                {/* 思考中 */}
-                                                                {/* {history.process && ( */}
-                                                                {false && (
-                                                                    <div className="flex flex-col bg-[#e3f2fd] p-[8px] rounded-md">
-                                                                        <div className="items-center px-[4px] py-[8px] bg-[#e3f2fd] inline-flex justify-center rounded-md cursor-pointer">
-                                                                            <LoadingSpin />
-                                                                            <span className="ml-1">正在生成</span>
-                                                                            <ExpandLessIcon className="w-[18px] h-[18px]" />
-                                                                            {/* <ExpandMoreIcon /> */}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                {history?.process?.showType === 'docs' && history?.answer && (
-                                                                    <div>
+                                                                {history?.process?.[0]?.showType !== 'docs' &&
+                                                                    (history?.answer ? (
                                                                         <div
                                                                             className={`text-sm whitespace-pre-line  ${
                                                                                 history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                             }`}
                                                                         >
-                                                                            <ChatMarkdown textContent={history?.answer} />
+                                                                            <ChatMarkdown textContent={history.answer} />
                                                                         </div>
-                                                                        <div className="py-1">
-                                                                            <Divider />
+                                                                    ) : (
+                                                                        <div className="flex justify-start">
+                                                                            <LoadingDot />
                                                                         </div>
-                                                                        <div className="flex items-center mt-1">
-                                                                            <div className="text-xs" style={{ flex: '0 0 37px' }}>
-                                                                                来源：
-                                                                            </div>
-                                                                            <div className="grid grid-cols-2 gap-1 flex: 1">
-                                                                                {history?.process?.data?.map((item: any, index: number) => (
-                                                                                    <Popover
-                                                                                        key={index}
-                                                                                        content={
-                                                                                            <div className=" max-w-[325px]">
-                                                                                                <span>{item?.desc}</span>
-                                                                                                {isMobile && (
-                                                                                                    <div>
-                                                                                                        <a target="_blank" href={item.url}>
-                                                                                                            点击查看
-                                                                                                        </a>
-                                                                                                    </div>
-                                                                                                )}
-                                                                                            </div>
-                                                                                        }
-                                                                                        trigger={isMobile ? 'click' : 'hover'}
-                                                                                        title={item.name}
-                                                                                    >
-                                                                                        <Tag
-                                                                                            color="#673ab7"
-                                                                                            className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
-                                                                                            onClick={() =>
-                                                                                                !isMobile && window.open(item?.url)
-                                                                                            }
-                                                                                        >
-                                                                                            {item?.name}
-                                                                                        </Tag>
-                                                                                    </Popover>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                {/* 文本回答 */}
-                                                                {history?.answer ? (
-                                                                    <div
-                                                                        className={`text-sm whitespace-pre-line  ${
-                                                                            history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
-                                                                        }`}
-                                                                    >
-                                                                        <ChatMarkdown textContent={history.answer} />
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="flex justify-start">
-                                                                        <LoadingDot />
-                                                                    </div>
-                                                                )}
+                                                                    ))}
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>

@@ -1061,7 +1061,7 @@ export const Chat = ({
         dispatch(
             openSnackbar({
                 open: true,
-                message: '复制成功, 快去分享吧~',
+                message: '把你的对话分享给朋友吧，还可以免费增加权益哦！',
                 variant: 'alert',
                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 alert: {

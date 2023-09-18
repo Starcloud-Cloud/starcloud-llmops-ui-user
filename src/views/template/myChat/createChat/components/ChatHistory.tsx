@@ -26,6 +26,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { ImageCard } from 'ui-component/imageCard';
 import imgError from 'assets/images/img_error.svg';
+import ReplayIcon from '@mui/icons-material/Replay';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
@@ -33,6 +34,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 interface ChartHistoryProps {
     data: IHistory[];
     theme: Theme;
+    handleRetry?: (index: number) => void;
 }
 
 const value2JsonMd = (value: any, type: number) => `这里是${type === 1 ? '输入信息' : '输出信息'} :
@@ -42,7 +44,7 @@ ${JSON.stringify(value)}
 ~~~
 `;
 
-const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
+const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
     const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
 
@@ -421,7 +423,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                         </Grid>
                                                     </CardContent>
                                                 </Card>
-                                                {/* 正在生成的没有 */}
+                                                {/* 正在生成的没有, 只有error的才有重试 */}
                                                 {!history.isNew && (
                                                     <div className=" leading-5 mt-2 inline-block transition-opacity text-[#B5BED0]">
                                                         <Tooltip title={'复制'}>
@@ -443,8 +445,17 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                 }}
                                                             />
                                                         </Tooltip>
+                                                        {history.status === 'ERROR' && (
+                                                            <Tooltip title={'重试'}>
+                                                                <ReplayIcon
+                                                                    className="text-[16px] cursor-pointer ml-1"
+                                                                    onClick={() => handleRetry && handleRetry(index)}
+                                                                />
+                                                            </Tooltip>
+                                                        )}
                                                     </div>
                                                 )}
+
                                                 {/* 正在执行的才有 */}
                                                 {history.isNew &&
                                                     (history.answer ? (

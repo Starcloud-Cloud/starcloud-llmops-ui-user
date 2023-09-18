@@ -4,6 +4,7 @@ import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
 import PendingIcon from '@mui/icons-material/Pending';
 import SendIcon from '@mui/icons-material/Send';
 import {
+    Button,
     Card,
     CardContent,
     Divider,
@@ -20,7 +21,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getChat, getChatHistory, getSkillList, messageSSE, shareChat, shareChatBotList } from '../../../../../api/chat';
 import { dispatch } from '../../../../../store';
@@ -702,6 +703,13 @@ export const Chat = ({
         return <>{parts}</>;
     }
 
+    // 重试
+    const handleRetry = (index: number) => {
+        const data = dataRef.current;
+        const current = data[index];
+        doFetch(current.message);
+    };
+
     React.useEffect(() => {
         if (isFetch && scrollRef?.current) {
             const scrollContainer = scrollRef.current;
@@ -712,14 +720,14 @@ export const Chat = ({
 
     // 首次进入
     React.useEffect(() => {
-        if (scrollRef?.current) {
+        if (scrollRef?.current && data.length) {
             setTimeout(() => {
                 const scrollContainer = scrollRef.current;
                 const contentElement = contentRef.current;
                 scrollContainer.scrollTop = contentElement.scrollHeight;
             }, 1000);
         }
-    }, [scrollRef?.current]);
+    }, [scrollRef?.current, data]);
 
     // 处理技能
     React.useEffect(() => {
@@ -914,7 +922,7 @@ export const Chat = ({
         }
     };
 
-    const doFetch = async (message: string) => {
+    const doFetch = async (message: string, isGoOn?: boolean) => {
         setMessage('');
         setMessageData('');
         const newMessage: IHistory = {
@@ -939,7 +947,7 @@ export const Chat = ({
                     mediumUid,
                     conversationUid: jsCookie.get(conversationUniKey),
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             if (mode === 'test') {
@@ -949,7 +957,7 @@ export const Chat = ({
                     conversationUid,
                     query: message,
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             if (mode === 'market') {
@@ -958,7 +966,7 @@ export const Chat = ({
                     conversationUid,
                     query: message,
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             setIsFirst(false);
@@ -1072,6 +1080,18 @@ export const Chat = ({
         );
         return;
     };
+
+    const goShow = useMemo(() => {
+        if (!isFetch && data.length) {
+            const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'Error');
+            const answer = data[data.length - 1]?.answer;
+            if (!answer) return false;
+            const text = answer?.trim();
+            const lastChar = text.slice(-1);
+            const sentenceEndRegex = /[.?!。？！]/;
+            return !sentenceEndRegex.test(lastChar);
+        }
+    }, [isFetch, data]);
 
     return (
         <div className="h-full relative flex justify-center">
@@ -1229,26 +1249,30 @@ export const Chat = ({
                                     </Card>
                                 )}
                                 <CardContent className="!p-0">
-                                    <ChatHistory theme={theme} data={data} />
+                                    <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
                                 </CardContent>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className={`${mode === 'market' ? 'mb-1' : ''} flex-shrink-0 flex justify-center w-full`}>
-                    <div
-                        className={`${
-                            mode === 'market'
-                                ? // ? 'w-full max-w-[768px] text-sm rounded-lg bg-white py-2  px-1  relative top-[10px] shadow-[4px_-2px_10px_0_rgba(0,0,0,0.2)]'
-                                  'w-full max-w-[768px] p-[8px]'
-                                : 'w-full max-w-[768px] p-[8px]'
-                        }`}
-                    >
+                    <div className={'w-full max-w-[768px] p-[8px] relative'}>
+                        {!goShow && (
+                            <div className="absolute top-0 inset-x-0 flex justify-center">
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    className="w-[200px] rounded-3xl"
+                                    onClick={() => {
+                                        doFetch('继续', true);
+                                    }}
+                                >
+                                    继续
+                                </Button>
+                            </div>
+                        )}
                         <div className="flex justify-between mb-[2px]">
-                            {/* <div className="ml-[48px] flex items-center"> */}
-                            {/* <Tag className="cursor-pointer">Tag 1</Tag>
-                                    <Tag className="cursor-pointer">Tag 2</Tag> */}
-                            {/* </div> */}
                             {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover
                                     placement="topLeft"

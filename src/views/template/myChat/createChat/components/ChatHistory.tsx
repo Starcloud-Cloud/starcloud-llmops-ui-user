@@ -371,7 +371,7 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                 <Popover
                                                                                                     key={index}
                                                                                                     content={
-                                                                                                        <div className="max-w-[325px]">
+                                                                                                        <div className="max-w-[250px]">
                                                                                                             <span>{v?.desc}</span>
                                                                                                             {isMobile && (
                                                                                                                 <div>
@@ -386,7 +386,11 @@ const ChatHistory = ({ data, theme }: ChartHistoryProps) => {
                                                                                                         </div>
                                                                                                     }
                                                                                                     trigger={isMobile ? 'click' : 'hover'}
-                                                                                                    title={v.name}
+                                                                                                    title={
+                                                                                                        <div className="w-[250px]">
+                                                                                                            {v.name}
+                                                                                                        </div>
+                                                                                                    }
                                                                                                 >
                                                                                                     <Tag
                                                                                                         color="#673ab7"

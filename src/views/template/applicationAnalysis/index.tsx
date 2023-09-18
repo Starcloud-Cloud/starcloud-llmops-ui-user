@@ -24,6 +24,8 @@ import {
     IconButton,
     CardContent
 } from '@mui/material';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import ClearIcon from '@mui/icons-material/Clear';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
@@ -264,8 +266,22 @@ function ApplicationAnalysis({
     const getDeList = (row: { appMode: string; uid: string }) => {
         if (row.appMode === 'BASE_GENERATE_IMAGE') {
             detailImage({ conversationUid: row.uid }).then((res) => {
-                setImgDetail(res.imageInfo);
-                setPicOpen(true);
+                if (res.status === 'SUCCESS') {
+                    setImgDetail(res.imageInfo);
+                    setPicOpen(true);
+                } else {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: res.errorMessage,
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
+                }
             });
         }
     };

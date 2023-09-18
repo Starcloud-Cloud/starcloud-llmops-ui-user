@@ -89,7 +89,7 @@ export default function FormDialogNew({
                         </IconButton>
                     }
                 >
-                    <CardContent>
+                    <CardContent className="h-[60vh] overflow-auto">
                         <Grid container spacing={gridSpacing} className="w-full flex justify-center pt-[24px] ml-0">
                             <div className={'w-full'}>
                                 <TextField
@@ -116,7 +116,7 @@ export default function FormDialogNew({
                                 </div>
                             </div>
                             <div className="pt-[16px] w-full text-base">选择模版</div>
-                            <div className="w-full mt-[8px] flex flex-wrap h-[530px] overflow-y-auto">
+                            <div className="w-full mt-[8px] flex flex-wrap max-h-[530px] overflow-y-auto">
                                 <Box className="mr-[8px] mb-[8px]" onClick={() => setUid('temp_blank')}>
                                     <Card
                                         sx={{

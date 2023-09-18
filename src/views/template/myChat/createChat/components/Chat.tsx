@@ -824,7 +824,9 @@ export const Chat = ({
             const subString = eventData.substring(5);
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
-                jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                if (mediumUid) {
+                    jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                }
                 setConversationUid(bufferObj.conversationUid);
 
                 // 处理流程

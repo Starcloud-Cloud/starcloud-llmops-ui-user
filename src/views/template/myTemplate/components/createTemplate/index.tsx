@@ -38,6 +38,7 @@ import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
 import _ from 'lodash-es';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -71,6 +72,8 @@ function CreateDetail() {
     const [isShows, setIsShow] = useState<any[]>([]);
     const basis = useRef<any>(null);
     let conversationUid: undefined | string = undefined;
+    //token不足
+    const [tokenOpen, setTokenOpen] = useState(false);
     //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -104,17 +107,7 @@ function CreateDetail() {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
                 if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
+                    setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
@@ -614,6 +607,7 @@ function CreateDetail() {
                     />
                 )}
             </TabPanel>
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
         </Card>
     );
 }

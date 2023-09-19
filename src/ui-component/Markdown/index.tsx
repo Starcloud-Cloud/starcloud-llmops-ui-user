@@ -32,7 +32,6 @@ const ChatMarkdown = (props: tProps) => {
             <div className="markdown-wrapper mt-2">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    // @ts-expect-error
                     rehypePlugins={[rehypeRaw]}
                     components={{
                         // 自定义链接组件

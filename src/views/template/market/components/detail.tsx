@@ -21,6 +21,7 @@ import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
     const { setUserInfo }: any = userInfoStore();
@@ -28,6 +29,8 @@ function Deatail() {
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>(null as unknown as Details);
     const detailRef: any = useRef(null);
+    //token不足
+    const [tokenOpen, setTokenOpen] = useState(false);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
@@ -66,17 +69,7 @@ function Deatail() {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
                 if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
+                    setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1.forEach((item) => {
                         item = false;
@@ -314,6 +307,7 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
         </Card>
     );
 }

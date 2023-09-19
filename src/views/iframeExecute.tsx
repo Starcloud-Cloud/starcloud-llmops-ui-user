@@ -9,6 +9,7 @@ import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useLocation, useParams } from 'react-router-dom';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Details {
     name?: string;
     description?: string;
@@ -57,6 +58,8 @@ const IframeExecute = () => {
         }
     });
     const detailRef: any = useRef(null);
+    //token不足
+    const [tokenOpen, setTokenOpen] = useState(false);
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
@@ -138,17 +141,7 @@ const IframeExecute = () => {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
                 if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
+                    setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
@@ -273,6 +266,7 @@ const IframeExecute = () => {
                 }}
                 source="myApp"
             />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
         </Card>
     );
 };

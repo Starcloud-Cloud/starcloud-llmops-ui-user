@@ -30,6 +30,7 @@ import Perform from 'views/template/carryOut/perform';
 import nothing from 'assets/images/upLoad/nothing.svg';
 import _ from 'lodash-es';
 import formatDate from 'hooks/useDate';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Details {
     name?: string;
     description?: string;
@@ -83,6 +84,8 @@ const AppModal = ({
     });
     const [perform, setPerform] = useState(0);
     const detailRef: any = useRef(null);
+    //token不足
+    const [tokenOpen, setTokenOpen] = useState(false);
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
@@ -197,17 +200,7 @@ const AppModal = ({
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
                 if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
+                    setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
@@ -457,6 +450,7 @@ const AppModal = ({
                         </Box>
                     </CardContent>
                 </MainCard>
+                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
             </Box>
         </Modal>
     );

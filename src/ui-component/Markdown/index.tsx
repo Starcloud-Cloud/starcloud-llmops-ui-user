@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import rehypeRaw from 'rehype-raw';
 import './index.scss';
 
 type tProps = {
@@ -14,11 +15,25 @@ type tProps = {
 
 const ChatMarkdown = (props: tProps) => {
     const { textContent } = props;
+
+    // 处理文档类型
+    const replacedText = textContent.replace(
+        /\{(\d+)\}/g,
+        `<span style="
+    padding: 0 3px;
+    background: rgb(103, 58, 183);
+    color: white;
+    border-radius: 4px;
+">$1</span>`
+    );
+
     return (
         <>
             <div className="markdown-wrapper mt-2">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
+                    // @ts-expect-error
+                    rehypePlugins={[rehypeRaw]}
                     components={{
                         // 自定义链接组件
                         a({ node, href, children, ...props }) {
@@ -56,10 +71,10 @@ const ChatMarkdown = (props: tProps) => {
                                                 <svg
                                                     stroke="currentColor"
                                                     fill="none"
-                                                    stroke-width="2"
+                                                    strokeWidth="2"
                                                     viewBox="0 0 24 24"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
                                                     className="h-4 w-4"
                                                     height="1em"
                                                     width="1em"
@@ -90,7 +105,7 @@ const ChatMarkdown = (props: tProps) => {
                         }
                     }}
                 >
-                    {textContent}
+                    {replacedText}
                 </ReactMarkdown>
             </div>
         </>

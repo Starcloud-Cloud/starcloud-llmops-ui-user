@@ -66,6 +66,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
+    docs: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -824,7 +825,9 @@ export const Chat = ({
             const subString = eventData.substring(5);
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
-                console.log(bufferObj, 'bufferObj');
+                if (env === 'development') {
+                    console.log(bufferObj, 'bufferObj');
+                }
                 if (mediumUid) {
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
@@ -837,9 +840,8 @@ export const Chat = ({
 
                     // 处理文档（文档状态默认不更新）
                     if (content.showType === 'docs') {
-                        console.log(content.data, 'content.data');
                         content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].process = content ? [content] : [];
+                        copyData[copyData.length - 1].docs = content ? [content] : [];
                         console.log(copyData, 'copyData');
                         dataRef.current = copyData;
                         setData(copyData);
@@ -1193,10 +1195,10 @@ export const Chat = ({
                                 }  text-[16px] cursor-pointer`}
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 viewBox="0 0 24 24"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                                 height="1em"
                                 width="1em"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -1264,7 +1266,7 @@ export const Chat = ({
                                         <div className="max-h-[260px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
                                                 <>
-                                                    <div className="flex flex-col w-[280px]">
+                                                    <div className="flex flex-col w-[280px]" key={index}>
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
@@ -1323,6 +1325,7 @@ export const Chat = ({
                                                 skillWorkflowList.slice(0, 5).map((item: any, index: number) =>
                                                     !item.images ? (
                                                         <svg
+                                                            key={index}
                                                             viewBox="0 0 1024 1024"
                                                             version="1.1"
                                                             xmlns="http://www.w3.org/2000/svg"

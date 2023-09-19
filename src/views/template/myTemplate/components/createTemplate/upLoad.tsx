@@ -784,8 +784,11 @@ function Upload({
                     <Box>
                         <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
                             点击[更新渠道]按钮保存当前设置，以便同步修改到各个渠道。
-                            <Tooltip title="每次编辑后，可先验证结果满足需求后，再点击更新。点击更新后，会把修改的配置同步到不同的发布渠道上">
-                                <Error fontSize="small" />
+                            <Tooltip
+                                placement="top"
+                                title="每次编辑后，可先验证结果满足需求后，再点击更新渠道。点击更新渠道后，会把修改的配置同步到不同的发布渠道上"
+                            >
+                                <Error sx={{ cursor: 'pointer' }} fontSize="small" />
                             </Tooltip>
                         </Typography>
                         {updateBtn?.isFirstCreatePublishRecord && !updateBtn.needUpdate && (

@@ -67,6 +67,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
+    docs: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -832,20 +833,24 @@ export const Chat = ({
             const subString = eventData.substring(5);
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
+                if (env === 'development') {
+                    console.log(bufferObj, 'bufferObj');
+                }
                 if (mediumUid) {
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
                 setConversationUid(bufferObj.conversationUid);
-
-                // 处理流程
-                if (bufferObj.type === 'i') {
+                if (bufferObj.type === 'i' || bufferObj.type === 'docs') {
+                    // 处理流程
                     const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
                     const process = copyData[copyData.length - 1].process || [];
                     const content = JSON.parse(bufferObj.content);
+
                     // 处理文档（文档状态默认不更新）
                     if (content.showType === 'docs') {
                         content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].process = [...process, content];
+                        copyData[copyData.length - 1].docs = content ? [content] : [];
+                        console.log(copyData, 'copyData');
                         dataRef.current = copyData;
                         setData(copyData);
                     }
@@ -902,13 +907,14 @@ export const Chat = ({
             } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
                 return;
             } else {
+                console.log('error', bufferObj.content);
                 const copyData = [...dataRef.current]; // 使用dataRef.current代替data
                 if (copyData[copyData.length - 1].isAds) {
-                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '系统异常';
+                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
                     copyData[copyData.length - 2].status = 'ERROR';
                     copyData[copyData.length - 2].isNew = false;
                 } else {
-                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '系统异常';
+                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
                     copyData[copyData.length - 1].status = 'ERROR';
                     copyData[copyData.length - 1].isNew = false;
                 }
@@ -918,7 +924,7 @@ export const Chat = ({
                 setIsFetch(false);
             }
         } catch (e) {
-            console.error(e, 'error-JSON.parse异常');
+            console.log(e, 'error-JSON.parse异常');
         }
     };
 
@@ -1004,6 +1010,7 @@ export const Chat = ({
                 }
             }
         } catch (e: any) {
+            console.log('error', e);
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
             if (e.message === 'Request timeout') {
                 copyData[copyData.length - 1].answer = '机器人超时，请重试';
@@ -1208,10 +1215,10 @@ export const Chat = ({
                                 }  text-[16px] cursor-pointer`}
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 viewBox="0 0 24 24"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                                 height="1em"
                                 width="1em"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -1283,7 +1290,7 @@ export const Chat = ({
                                         <div className="max-h-[260px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
                                                 <>
-                                                    <div className="flex flex-col w-[280px]">
+                                                    <div className="flex flex-col w-[280px]" key={index}>
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
@@ -1342,6 +1349,7 @@ export const Chat = ({
                                                 skillWorkflowList.slice(0, 5).map((item: any, index: number) =>
                                                     !item.images ? (
                                                         <svg
+                                                            key={index}
                                                             viewBox="0 0 1024 1024"
                                                             version="1.1"
                                                             xmlns="http://www.w3.org/2000/svg"

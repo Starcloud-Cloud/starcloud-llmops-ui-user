@@ -237,7 +237,7 @@ export const Regulation = ({
                 });
             }
         }
-    }, [chatBotInfo.skillWorkflowList]);
+    }, [chatBotInfo]);
 
     return (
         <div>

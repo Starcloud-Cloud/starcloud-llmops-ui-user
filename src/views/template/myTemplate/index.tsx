@@ -33,6 +33,7 @@ import { useContext } from 'react';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
 import userInfoStore from 'store/entitlementAction';
+import useUserStore from 'store/user';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -142,9 +143,13 @@ function MyTemplate() {
     };
     const [botOpen, setBotOpen] = useState(false);
     const { userInfo }: any = userInfoStore();
+    const { user } = useUserStore();
     //弹窗
     const handleDetail = (data: { uid: string }) => {
-        if (totalList.length >= userInfo.benefits[2].totalNum) {
+        if (
+            totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo.benefits[2].totalNum ||
+            userInfo.benefits[2].totalNum === -1
+        ) {
             setBotOpen(true);
             return;
         }
@@ -261,7 +266,11 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
-            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={'添加应用个数已用完'} />
+            <UpgradeModel
+                open={botOpen}
+                handleClose={() => setBotOpen(false)}
+                title={`添加应用个数(${userInfo.benefits[2].totalNum})已用完`}
+            />
             {totals > 0 && (
                 <Box>
                     <Typography variant="h3" mt={4} mb={2}>

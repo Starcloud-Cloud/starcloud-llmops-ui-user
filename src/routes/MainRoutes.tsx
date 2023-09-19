@@ -18,6 +18,14 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
+//智能抠图
+const SmartCutout = Loadable(lazy(() => import('views/picture/smartCutout')));
+//删除背景文字
+const DelDebackGroundText = Loadable(lazy(() => import('views/picture/delDebackGroundText')));
+//放大图片
+const EnlargementImage = Loadable(lazy(() => import('views/picture/enlargementImage')));
+//放大图片清晰度
+const UpscaleImage = Loadable(lazy(() => import('views/picture/upscaleImage')));
 //weShop
 const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
 
@@ -76,6 +84,22 @@ const MainRoutes = {
         {
             path: '/textToImage',
             element: <PictureCreate />
+        },
+        {
+            path: '/smartImage',
+            element: <SmartCutout />
+        },
+        {
+            path: '/delImageText',
+            element: <DelDebackGroundText />
+        },
+        {
+            path: '/largementImage',
+            element: <EnlargementImage />
+        },
+        {
+            path: '/upscaleImage',
+            element: <UpscaleImage />
         },
         {
             path: '/shopImage',

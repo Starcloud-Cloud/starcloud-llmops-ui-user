@@ -243,6 +243,7 @@ const WorkflowCreateModal = ({
     const [page, setPage] = useState(1);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
     const { userInfo }: any = userInfoStore();
+    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
 
     useEffect(() => {
         (async () => {
@@ -305,10 +306,12 @@ const WorkflowCreateModal = ({
             setSkillUpgradeOnline(true);
             return;
         }
-        const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
-        if (workflowList?.length >= totalNum) {
-            setSkillCountVisible(true);
-            return;
+
+        if (totalNum > -1) {
+            if (workflowList?.length >= totalNum) {
+                setSkillCountVisible(true);
+                return;
+            }
         }
 
         let data: any = {};
@@ -490,6 +493,8 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
 
     const [skillCountVisible, setSkillCountVisible] = useState(false);
     const forceUpdate = () => setCount((pre) => pre + 1);
+    const { userInfo }: any = userInfoStore();
+    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
 
     useEffect(() => {
         getSkillList(appId || '').then((res) => {
@@ -679,7 +684,11 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                     setSkillCountVisible={setSkillCountVisible}
                 />
             )}
-            <UpgradeModel open={skillCountVisible} handleClose={() => setSkillCountVisible(false)} title="添加技能个数已用完" />
+            <UpgradeModel
+                open={skillCountVisible}
+                handleClose={() => setSkillCountVisible(false)}
+                title={`添加技能个数(${totalNum})已用完`}
+            />
         </div>
     );
 };

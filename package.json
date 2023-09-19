@@ -93,6 +93,7 @@
         "react18-input-otp": "^1.1.2",
         "redux": "^4.2.0",
         "redux-persist": "^6.0.0",
+        "rehype-raw": "^7.0.0",
         "remark-gfm": "^3.0.1",
         "slick-carousel": "^1.8.1",
         "start": "^5.1.0",

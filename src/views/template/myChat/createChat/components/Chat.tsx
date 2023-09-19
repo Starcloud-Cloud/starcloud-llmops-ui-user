@@ -4,6 +4,7 @@ import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
 import PendingIcon from '@mui/icons-material/Pending';
 import SendIcon from '@mui/icons-material/Send';
 import {
+    Button,
     Card,
     CardContent,
     Divider,
@@ -20,7 +21,7 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getChat, getChatHistory, getSkillList, messageSSE, shareChat, shareChatBotList } from '../../../../../api/chat';
 import { dispatch } from '../../../../../store';
@@ -66,6 +67,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
+    docs: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -400,6 +402,7 @@ export const Chat = ({
     const [openUpgradeSkillModel, setOpenUpgradeSkillModel] = useState(false);
     const [enableOnline, setEnableOnline] = useState<any>();
     const [selectModel, setSelectModel] = useState<any>();
+    const [openToken, setOpenToken] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -702,6 +705,13 @@ export const Chat = ({
         return <>{parts}</>;
     }
 
+    // 重试
+    const handleRetry = (index: number) => {
+        const data = dataRef.current;
+        const current = data[index];
+        doFetch(current.message);
+    };
+
     React.useEffect(() => {
         if (isFetch && scrollRef?.current) {
             const scrollContainer = scrollRef.current;
@@ -712,14 +722,14 @@ export const Chat = ({
 
     // 首次进入
     React.useEffect(() => {
-        if (scrollRef?.current) {
+        if (scrollRef?.current && data.length) {
             setTimeout(() => {
                 const scrollContainer = scrollRef.current;
                 const contentElement = contentRef.current;
                 scrollContainer.scrollTop = contentElement.scrollHeight;
             }, 1000);
         }
-    }, [scrollRef?.current]);
+    }, [scrollRef?.current, data]);
 
     // 处理技能
     React.useEffect(() => {
@@ -824,29 +834,31 @@ export const Chat = ({
             const subString = eventData.substring(5);
             const bufferObj = JSON.parse(subString);
             if (bufferObj?.code === 200) {
+                if (env === 'development') {
+                    console.log(bufferObj, 'bufferObj');
+                }
                 if (mediumUid) {
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
                 setConversationUid(bufferObj.conversationUid);
-
-                // 处理流程
-                if (bufferObj.type === 'i') {
+                if (bufferObj.type === 'i' || bufferObj.type === 'docs') {
+                    // 处理流程
                     const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
                     const process = copyData[copyData.length - 1].process || [];
                     const content = JSON.parse(bufferObj.content);
+
                     // 处理文档（文档状态默认不更新）
                     if (content.showType === 'docs') {
                         content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].process = [...process, content];
+                        copyData[copyData.length - 1].docs = content ? [content] : [];
+                        console.log(copyData, 'copyData');
                         dataRef.current = copyData;
                         setData(copyData);
                     }
                     // 处理链接
                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
-                        const index = copyData[copyData.length - 1].process
-                            // ?.filter((v: any) => v.showType === 'tips')
-                            ?.findIndex((v: any) => v.id === content.id);
+                        const index = copyData[copyData.length - 1].process?.findIndex((v: any) => v.id === content.id);
 
                         if (index > -1) {
                             // 替换
@@ -892,29 +904,37 @@ export const Chat = ({
                     setData([...copyData]);
                 }
             } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
+                // 不处理
                 return;
+            } else if (bufferObj?.code === 2008002007) {
+                // 处理token不足
+                const copyData = [...dataRef.current];
+                copyData[copyData.length - 1].answer = bufferObj.content;
+                copyData[copyData.length - 1].status = 'ERROR';
+                copyData[copyData.length - 1].isNew = false;
+                setOpenToken(true);
             } else {
+                console.log('error', bufferObj);
                 const copyData = [...dataRef.current]; // 使用dataRef.current代替data
                 if (copyData[copyData.length - 1].isAds) {
-                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '系统异常';
+                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
                     copyData[copyData.length - 2].status = 'ERROR';
                     copyData[copyData.length - 2].isNew = false;
                 } else {
-                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '系统异常';
+                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
                     copyData[copyData.length - 1].status = 'ERROR';
                     copyData[copyData.length - 1].isNew = false;
                 }
-
                 dataRef.current = copyData;
                 setData(copyData);
                 setIsFetch(false);
             }
         } catch (e) {
-            console.error(e, 'error-JSON.parse异常');
+            console.log(e, 'error-JSON.parse异常');
         }
     };
 
-    const doFetch = async (message: string) => {
+    const doFetch = async (message: string, isGoOn?: boolean) => {
         setMessage('');
         setMessageData('');
         const newMessage: IHistory = {
@@ -939,7 +959,7 @@ export const Chat = ({
                     mediumUid,
                     conversationUid: jsCookie.get(conversationUniKey),
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             if (mode === 'test') {
@@ -949,7 +969,7 @@ export const Chat = ({
                     conversationUid,
                     query: message,
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             if (mode === 'market') {
@@ -958,7 +978,7 @@ export const Chat = ({
                     conversationUid,
                     query: message,
                     modelType: selectModel,
-                    webSearch: enableOnline
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             setIsFirst(false);
@@ -996,6 +1016,7 @@ export const Chat = ({
                 }
             }
         } catch (e: any) {
+            console.log('error', e);
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
             if (e.message === 'Request timeout') {
                 copyData[copyData.length - 1].answer = '机器人超时，请重试';
@@ -1072,6 +1093,20 @@ export const Chat = ({
         );
         return;
     };
+
+    const goShow = useMemo(() => {
+        if (!isFetch && data.length) {
+            const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'ERROR');
+            const answer = data[data.length - 1]?.answer;
+            if (!answer) return false;
+            // 对{x}做处理
+            const text = answer?.trim().replace(/\{(\d+)\}/g, '');
+            const lastChar = text.slice(-1);
+            const sentenceEndRegex = /[.?!。？！]/;
+            const result = sentenceEndRegex.test(lastChar);
+            return !result;
+        }
+    }, [isFetch, data]);
 
     return (
         <div className="h-full relative flex justify-center">
@@ -1188,10 +1223,10 @@ export const Chat = ({
                                 }  text-[16px] cursor-pointer`}
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 viewBox="0 0 24 24"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                                 height="1em"
                                 width="1em"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -1229,26 +1264,30 @@ export const Chat = ({
                                     </Card>
                                 )}
                                 <CardContent className="!p-0">
-                                    <ChatHistory theme={theme} data={data} />
+                                    <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
                                 </CardContent>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className={`${mode === 'market' ? 'mb-1' : ''} flex-shrink-0 flex justify-center w-full`}>
-                    <div
-                        className={`${
-                            mode === 'market'
-                                ? // ? 'w-full max-w-[768px] text-sm rounded-lg bg-white py-2  px-1  relative top-[10px] shadow-[4px_-2px_10px_0_rgba(0,0,0,0.2)]'
-                                  'w-full max-w-[768px] p-[8px]'
-                                : 'w-full max-w-[768px] p-[8px]'
-                        }`}
-                    >
+                    <div className={'w-full max-w-[768px] p-[8px] relative'}>
+                        {goShow && (
+                            <div className="absolute top-0 inset-x-0 flex justify-center">
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    className="w-[200px] rounded-3xl"
+                                    onClick={() => {
+                                        doFetch('继续', true);
+                                    }}
+                                >
+                                    继续
+                                </Button>
+                            </div>
+                        )}
                         <div className="flex justify-between mb-[2px]">
-                            {/* <div className="ml-[48px] flex items-center"> */}
-                            {/* <Tag className="cursor-pointer">Tag 1</Tag>
-                                    <Tag className="cursor-pointer">Tag 2</Tag> */}
-                            {/* </div> */}
                             {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover
                                     placement="topLeft"
@@ -1259,7 +1298,7 @@ export const Chat = ({
                                         <div className="max-h-[260px] overflow-y-auto">
                                             {skillWorkflowList.map((v: any, index: number) => (
                                                 <>
-                                                    <div className="flex flex-col w-[280px]">
+                                                    <div className="flex flex-col w-[280px]" key={index}>
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center">
                                                                 {v.images ? (
@@ -1318,6 +1357,7 @@ export const Chat = ({
                                                 skillWorkflowList.slice(0, 5).map((item: any, index: number) =>
                                                     !item.images ? (
                                                         <svg
+                                                            key={index}
                                                             viewBox="0 0 1024 1024"
                                                             version="1.1"
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -1789,6 +1829,7 @@ export const Chat = ({
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的令牌不足'} />
         </div>
     );
 };

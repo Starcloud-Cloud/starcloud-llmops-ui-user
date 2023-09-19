@@ -4,7 +4,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 
-export const PermissionUpgradeModal = ({ handleClose, open, title }: { handleClose: () => void; open: boolean; title?: string }) => {
+export const PermissionUpgradeModal = ({
+    handleClose,
+    open,
+    title = '您暂无该功能权限'
+}: {
+    handleClose: () => void;
+    open: boolean;
+    title?: string;
+}) => {
     const navigate = useNavigate();
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -29,7 +37,7 @@ export const PermissionUpgradeModal = ({ handleClose, open, title }: { handleClo
                         <div className="flex items-center justify-center flex-col">
                             <div className="text-sm text-[#152737] my-4 flex items-center flex-col">
                                 <img width={204} src={workWechatPay} />
-                                <p className="text-lg text-center mb-1">您暂无该功能权限</p>
+                                <p className="text-lg text-center mb-1">{title}</p>
                                 <p className=" text-center text-[#364152]">
                                     如需使用，可直接升级或联系产品顾问进一步了解，更有其他丰富权益可解锁。
                                 </p>

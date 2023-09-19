@@ -402,6 +402,7 @@ export const Chat = ({
     const [openUpgradeSkillModel, setOpenUpgradeSkillModel] = useState(false);
     const [enableOnline, setEnableOnline] = useState<any>();
     const [selectModel, setSelectModel] = useState<any>();
+    const [openToken, setOpenToken] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -857,9 +858,7 @@ export const Chat = ({
                     // 处理链接
                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
-                        const index = copyData[copyData.length - 1].process
-                            // ?.filter((v: any) => v.showType === 'tips')
-                            ?.findIndex((v: any) => v.id === content.id);
+                        const index = copyData[copyData.length - 1].process?.findIndex((v: any) => v.id === content.id);
 
                         if (index > -1) {
                             // 替换
@@ -905,9 +904,17 @@ export const Chat = ({
                     setData([...copyData]);
                 }
             } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
+                // 不处理
                 return;
+            } else if (bufferObj?.code === 2008002007) {
+                // 处理token不足
+                const copyData = [...dataRef.current];
+                copyData[copyData.length - 1].answer = bufferObj.content;
+                copyData[copyData.length - 1].status = 'ERROR';
+                copyData[copyData.length - 1].isNew = false;
+                setOpenToken(true);
             } else {
-                console.log('error', bufferObj.content);
+                console.log('error', bufferObj);
                 const copyData = [...dataRef.current]; // 使用dataRef.current代替data
                 if (copyData[copyData.length - 1].isAds) {
                     copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
@@ -918,7 +925,6 @@ export const Chat = ({
                     copyData[copyData.length - 1].status = 'ERROR';
                     copyData[copyData.length - 1].isNew = false;
                 }
-
                 dataRef.current = copyData;
                 setData(copyData);
                 setIsFetch(false);
@@ -1090,17 +1096,14 @@ export const Chat = ({
 
     const goShow = useMemo(() => {
         if (!isFetch && data.length) {
-            const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'Error');
-            console.log(data, '过滤后的data');
+            const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'ERROR');
             const answer = data[data.length - 1]?.answer;
-            console.log(answer, '最后的answer');
             if (!answer) return false;
             // 对{x}做处理
             const text = answer?.trim().replace(/\{(\d+)\}/g, '');
             const lastChar = text.slice(-1);
             const sentenceEndRegex = /[.?!。？！]/;
             const result = sentenceEndRegex.test(lastChar);
-            console.log(result, 'r');
             return !result;
         }
     }, [isFetch, data]);
@@ -1826,6 +1829,7 @@ export const Chat = ({
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的令牌不足'} />
         </div>
     );
 };

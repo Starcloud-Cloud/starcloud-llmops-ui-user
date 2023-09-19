@@ -286,6 +286,19 @@ const AppModal = ({
         };
         fetchData();
     };
+    //增加 删除 改变变量
+    const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            workflowConfig: data
+        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                workflowConfig: data
+            })
+        );
+    };
     const leftRef: any = useRef(null);
     const [leftHeight, setLeftHeight] = useState(0);
     useEffect(() => {}, [leftRef.current?.clientHeight]);
@@ -352,6 +365,7 @@ const AppModal = ({
                                         <Perform
                                             config={_.cloneDeep(detailRef.current?.workflowConfig)}
                                             changeSon={changeData}
+                                            changeConfigs={changeConfigs}
                                             changeanswer={changeanswer}
                                             loadings={loadings}
                                             isShows={isShows}

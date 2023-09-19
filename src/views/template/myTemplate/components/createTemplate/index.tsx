@@ -258,7 +258,7 @@ function CreateDetail() {
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
-    //增加 删除变量
+    //增加 删除 改变变量
     const changeConfigs = (data: any) => {
         detailRef.current = _.cloneDeep({
             ...detail,
@@ -513,6 +513,7 @@ function CreateDetail() {
                                     key={perform}
                                     isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                    changeConfigs={changeConfigs}
                                     changeSon={changeData}
                                     loadings={loadings}
                                     variableChange={exeChange}
@@ -577,6 +578,7 @@ function CreateDetail() {
                                     key={perform}
                                     isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                    changeConfigs={changeConfigs}
                                     changeSon={changeData}
                                     changeanswer={changeanswer}
                                     loadings={loadings}

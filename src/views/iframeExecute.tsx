@@ -227,6 +227,19 @@ const IframeExecute = () => {
         };
         fetchData();
     };
+    //增加 删除 改变变量
+    const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            workflowConfig: data
+        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                workflowConfig: data
+            })
+        );
+    };
     return (
         <Card elevation={2} sx={{ p: 2 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -256,6 +269,7 @@ const IframeExecute = () => {
             <Perform
                 config={_.cloneDeep(detailRef.current?.workflowConfig)}
                 changeSon={changeData}
+                changeConfigs={changeConfigs}
                 changeanswer={changeanswer}
                 loadings={loadings}
                 isShows={isShows}

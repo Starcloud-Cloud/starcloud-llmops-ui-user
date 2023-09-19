@@ -8,7 +8,7 @@ function Template({ data, handleDetail, uid }: any) {
     const theme = useTheme();
     return (
         <Card
-            onClick={() => handleDetail(data)}
+            onClick={() => handleDetail && handleDetail(data)}
             sx={{
                 aspectRatio: '186 / 235',
                 overflow: 'hidden',

@@ -1091,12 +1091,17 @@ export const Chat = ({
     const goShow = useMemo(() => {
         if (!isFetch && data.length) {
             const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'Error');
+            console.log(data, '过滤后的data');
             const answer = data[data.length - 1]?.answer;
+            console.log(answer, '最后的answer');
             if (!answer) return false;
-            const text = answer?.trim();
+            // 对{x}做处理
+            const text = answer?.trim().replace(/\{(\d+)\}/g, '');
             const lastChar = text.slice(-1);
             const sentenceEndRegex = /[.?!。？！]/;
-            return !sentenceEndRegex.test(lastChar);
+            const result = sentenceEndRegex.test(lastChar);
+            console.log(result, 'r');
+            return !result;
         }
     }, [isFetch, data]);
 
@@ -1264,7 +1269,7 @@ export const Chat = ({
                 </div>
                 <div className={`${mode === 'market' ? 'mb-1' : ''} flex-shrink-0 flex justify-center w-full`}>
                     <div className={'w-full max-w-[768px] p-[8px] relative'}>
-                        {!goShow && (
+                        {goShow && (
                             <div className="absolute top-0 inset-x-0 flex justify-center">
                                 <Button
                                     variant="outlined"

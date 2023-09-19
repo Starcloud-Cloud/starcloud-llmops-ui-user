@@ -27,6 +27,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import myChat from 'store/myChat';
 import { UpgradeModel } from './upgradeRobotModel';
 import userInfoStore from 'store/entitlementAction';
+import useUserStore from 'store/user';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
 
@@ -50,6 +51,8 @@ export default function FormDialogNew({
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
     const { userInfo }: any = userInfoStore();
+    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'BOT');
+    const { user } = useUserStore();
 
     const handleClose = () => {
         setOpen(false);
@@ -184,10 +187,14 @@ export default function FormDialogNew({
                                 type="button"
                                 color={'secondary'}
                                 onClick={() => {
-                                    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'BOT');
-                                    if (totalList.length >= totalNum) {
-                                        setBotOpen(true);
-                                        return;
+                                    const count = totalList.filter((v) => Number(v.creator) === Number(user.id)).length;
+                                    console.log(count, 'count');
+
+                                    if (totalNum > -1) {
+                                        if (count >= totalNum) {
+                                            setBotOpen(true);
+                                            return;
+                                        }
                                     }
                                     setChecked(true);
                                     if (!value) {
@@ -202,7 +209,7 @@ export default function FormDialogNew({
                     </CardActions>
                 </MainCard>
             </Modal>
-            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={'添加机器人个数已用完'} />
+            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={`添加机器人个数(${totalNum})已用完`} />
         </>
     );
 }

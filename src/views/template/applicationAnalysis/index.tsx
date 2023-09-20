@@ -39,7 +39,7 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
-import DetailErr from './detailErr';
+import DetailErr from '../../../ui-component/detailErr';
 import useUserStore from 'store/user';
 interface LogStatistics {
     messageCount: string;
@@ -540,8 +540,8 @@ function ApplicationAnalysis({
                                 }
                             >
                                 <CardContent>
-                                    {result.status === 'ERROR' && <DetailErr result={result} />}
                                     <Box>
+                                        {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                                 {result.status !== 'ERROR' && <AccessAlarm sx={{ fontSize: '70px' }} />}

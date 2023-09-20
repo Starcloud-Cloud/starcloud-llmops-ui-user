@@ -7,6 +7,10 @@ export const marketPage = (params: PageParam) => {
 export const marketDeatail = (data: { uid: string }) => {
     return request.get({ url: `/llm/app/market/get/${data.uid}` });
 };
+//删除模板市场
+export const delMarket = (uid: any) => {
+    return request.delete({ url: `/llm/app/market/delete/${uid}` });
+};
 //获取等级
 export const userBenefits = () => {
     return request.post({ url: '/llm/user-benefits/info' });

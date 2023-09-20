@@ -28,6 +28,8 @@ const EnlargementImage = Loadable(lazy(() => import('views/picture/enlargementIm
 const UpscaleImage = Loadable(lazy(() => import('views/picture/upscaleImage')));
 //weShop
 const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
+//轮廓出图
+const ContourImage = Loadable(lazy(() => import('views/picture/contourImage')));
 
 // 聊天
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
@@ -104,6 +106,10 @@ const MainRoutes = {
         {
             path: '/shopImage',
             element: <WeShop />
+        },
+        {
+            path: '/contourImage',
+            element: <ContourImage />
         },
         {
             path: '/user/account-profile/profile',

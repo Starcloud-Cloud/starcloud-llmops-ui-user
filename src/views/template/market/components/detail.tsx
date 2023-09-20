@@ -1,10 +1,12 @@
-import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress, Button } from '@mui/material';
+import { Popconfirm } from 'antd';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import DeleteIcon from '@mui/icons-material/Delete';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import {
+    delMarket,
     marketDeatail
     // installTemplate
 } from 'api/template';
@@ -21,6 +23,7 @@ import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
+import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -212,6 +215,23 @@ function Deatail() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const permissions = useUserStore((state) => state.permissions);
+    //删除模板
+    const delTemplate = async () => {
+        const res = await delMarket(detailData.uid);
+        navigate('/appMarket/list');
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '删除成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
     // const iconStyle = {
     //     fontSize: '16px',
     //     display: 'inline-block',
@@ -306,6 +326,18 @@ function Deatail() {
                 >
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
+                {permissions.includes('app:market:delete') && (
+                    <Popconfirm placement="top" title="请再次确认是否删除" onConfirm={delTemplate} okText="Yes" cancelText="No">
+                        <Button
+                            startIcon={<DeleteIcon fontSize="small" />}
+                            variant="outlined"
+                            className="absolute top-[16px] right-[16px]"
+                            color="error"
+                        >
+                            删除模板
+                        </Button>
+                    </Popconfirm>
+                )}
             </Box>
             <Divider sx={{ mb: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut

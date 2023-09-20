@@ -1,37 +1,30 @@
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import { useRef } from 'react';
+import { TextField, MenuItem } from '@mui/material';
+import { useState } from 'react';
 import { t } from 'i18next';
-function FormExecute({ formik, item, onChange }: any) {
+function FormExecute({ item, onChange }: any) {
     const mt = {
         marginTop: 2
     };
-    const timeoutRef = useRef<any>();
+    const [value, setValue] = useState(false);
     return (
-        <Box>
+        <>
             {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
                     size="small"
                     color="secondary"
                     label={item.label}
-                    value={formik.values[item.field]}
+                    value={item.value}
                     id={item.field}
                     required
                     name={item.field}
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
-                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={
-                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
-                    }
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!item.value && value}
+                    helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
-                        formik.handleChange(e);
-                        clearTimeout(timeoutRef.current);
-                        timeoutRef.current = setTimeout(() => {
-                            onChange(e.target);
-                        }, 200);
+                        setValue(true);
+                        onChange(e.target);
                     }}
                     fullWidth
                 />
@@ -41,7 +34,7 @@ function FormExecute({ formik, item, onChange }: any) {
                     size="small"
                     color="secondary"
                     label={item.label === 'Prompt' ? t('market.' + item.field) : item.label}
-                    value={formik.values[item.field]}
+                    value={item.value}
                     id={item.field}
                     required
                     name={item.field}
@@ -49,17 +42,12 @@ function FormExecute({ formik, item, onChange }: any) {
                     minRows={3}
                     maxRows={3}
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
-                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={
-                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
-                    }
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!item.value && value}
+                    helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
-                        formik.handleChange(e);
-                        clearTimeout(timeoutRef.current);
-                        timeoutRef.current = setTimeout(() => {
-                            onChange(e.target);
-                        }, 200);
+                        setValue(true);
+                        onChange(e.target);
                     }}
                     fullWidth
                 />
@@ -68,24 +56,19 @@ function FormExecute({ formik, item, onChange }: any) {
                     sx={mt}
                     size="small"
                     color="secondary"
-                    value={formik.values[item.field]}
+                    value={item.value}
                     InputLabelProps={{ shrink: true }}
                     select
                     required
                     id={item.field}
                     name={item.field}
                     label={item.label}
-                    error={formik.touched[item.field] && Boolean(formik.errors[item.field])}
-                    helperText={
-                        formik.touched[item.field] && formik.errors[item.field] ? String(formik.errors[item.field]) : item.description
-                    }
-                    placeholder={item.defaultValue !== undefined ? String(item.defaultValue) : ''}
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!item.value && value}
+                    helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
-                        formik.handleChange(e);
-                        clearTimeout(timeoutRef.current);
-                        timeoutRef.current = setTimeout(() => {
-                            onChange(e.target);
-                        }, 200);
+                        setValue(true);
+                        onChange(e.target);
                     }}
                     fullWidth
                 >
@@ -96,7 +79,7 @@ function FormExecute({ formik, item, onChange }: any) {
                     ))}
                 </TextField>
             ) : null}
-        </Box>
+        </>
     );
 }
 export default FormExecute;

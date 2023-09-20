@@ -560,6 +560,7 @@ function ApplicationAnalysis({
                                         <Perform
                                             history={true}
                                             config={exeDetail.workflowConfig}
+                                            changeConfigs={() => {}}
                                             changeSon={() => {}}
                                             changeanswer={() => {}}
                                             loadings={[]}

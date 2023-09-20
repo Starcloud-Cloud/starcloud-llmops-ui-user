@@ -185,6 +185,19 @@ function Deatail() {
         detailRef.current = newValue;
         setDetailData(newValue);
     };
+    //增加 删除 改变变量
+    const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detailData,
+            workflowConfig: data
+        });
+        setDetailData(
+            _.cloneDeep({
+                ...detailData,
+                workflowConfig: data
+            })
+        );
+    };
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
             setAllLoading(false);
@@ -298,6 +311,7 @@ function Deatail() {
             <CarryOut
                 config={detailData}
                 isShows={isShows}
+                changeConfigs={changeConfigs}
                 changeData={changeData}
                 variableChange={variableChange}
                 promptChange={promptChange}

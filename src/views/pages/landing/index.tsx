@@ -41,7 +41,10 @@ const Landing = () => {
     const searchParams = new URLSearchParams(location.search);
     const inviteCode = searchParams.get('q');
     if (inviteCode) {
+        const currentTime = new Date().getTime();
+        const expiryTime = currentTime + 24 * 60 * 60 * 1000; // 24 hours from now
         localStorage.setItem('inviteCode', inviteCode);
+        localStorage.setItem('inviteCodeExpiry', expiryTime.toString());
     }
 
     return (

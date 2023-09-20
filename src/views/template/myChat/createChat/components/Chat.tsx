@@ -1074,10 +1074,11 @@ export const Chat = ({
     const handleShare = async () => {
         const res = await shareChat({
             conversationUid: conversationUid,
-            mediumUid: mediumUid
+            mediumUid: mediumUid,
+            scene: statisticsMode
         });
         if (res) {
-            copyToClipboard(`${window.location.origin}/share_cb/${res}`);
+            copyToClipboard(`${window.location.origin}/share_cb/${res?.shareKey}?q=${res?.inviteCode}`);
         }
         dispatch(
             openSnackbar({
@@ -1211,10 +1212,6 @@ export const Chat = ({
                         </div>
                     )}
                     {conversationUid && mode !== 'share' && (
-                        // <ShareIcon
-                        //     className={`absolute ${statisticsMode === 'SHARE_JS' ? 'right-[53px]' : 'right-2'}  text-[16px] cursor-pointer`}
-                        //     onClick={() => handleShare()}
-                        // />
                         <Tooltip title={'把你的对话分享给朋友'}>
                             <svg
                                 onClick={() => handleShare()}

@@ -1,7 +1,7 @@
 import { Button, Card, CardContent, Divider, Typography, useTheme } from '@mui/material';
 import { shareChatBotInfo, shareChatBotList, shareDetail } from 'api/chat';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Chat, extractChatBlocks } from 'views/template/myChat/createChat/components/Chat';
 import ChatHistory from 'views/template/myChat/createChat/components/ChatHistory';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ export const ShareChat = () => {
     const [chatBotInfo, setChatBotInfo] = React.useState<any>({});
     const [data, setData] = useState<any[]>([]);
     const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
 
     useEffect(() => {
         if (shareKey) {
@@ -45,7 +47,6 @@ export const ShareChat = () => {
                 }));
 
                 const chatBlocks = extractChatBlocks(list);
-                console.log(chatBlocks, 'list');
                 setData(chatBlocks);
             });
         }
@@ -55,9 +56,9 @@ export const ShareChat = () => {
         if (shareKey) {
             const res = await shareDetail(shareKey);
             if (res.mediumUid) {
-                navigate(`/cb_web/${res.mediumUid}`);
+                navigate(`/cb_web/${res.mediumUid}?q=${res.inviteCode}`);
             } else {
-                navigate('/');
+                navigate(`/?q=${res.inviteCode}`);
             }
         }
     };
@@ -71,7 +72,7 @@ export const ShareChat = () => {
                 className="fixed inset-x-0  flex justify-center flex-col items-center bottom-[-1rem] h-[95px]"
             >
                 <div className="mb-4">
-                    <Button variant="contained" color={'secondary'} onClick={() => navigate('/')}>
+                    <Button variant="contained" color={'secondary'} onClick={() => navigate(`/?q=${searchParams.get('q')}`)}>
                         创建自己的机器人
                     </Button>
                     <Button className="ml-8" variant="contained" color={'secondary'} onClick={() => handleRouter()}>

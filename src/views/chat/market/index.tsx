@@ -84,6 +84,7 @@ const ChatMy = () => {
                 showSelect={width <= 1300}
                 botList={list}
                 setChatBotInfo={setChatBotInfo}
+                statisticsMode={'CHAT_MARKET'}
             />
             {/* </div> */}
         </Card>

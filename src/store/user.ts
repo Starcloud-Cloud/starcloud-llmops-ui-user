@@ -62,7 +62,9 @@ const useUserStore = create<UserStore>((set) => ({
     loginOut: async () => {
         await loginOut();
         removeToken();
-        wsCache.clear();
+        wsCache.delete('user');
+        wsCache.delete('roleRouters');
+        // wsCache.clear();
         set({
             permissions: [],
             roles: [],

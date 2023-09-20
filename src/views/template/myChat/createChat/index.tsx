@@ -400,7 +400,7 @@ function CreateDetail() {
                 {width < 1330 && (
                     <TabPanel value={value} index={5}>
                         <div className="h-screen">
-                            <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
+                            <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} statisticsMode={'CHAT_TEST'} />
                         </div>
                     </TabPanel>
                 )}
@@ -421,7 +421,7 @@ function CreateDetail() {
                 <div className="xl:col-span-4 xl:block xs:hidden h-[calc(100vh-154px)]">
                     <div className="text-base color-[#121926]">预览与调试</div>
                     <Card className="h-full">
-                        <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} />
+                        <Chat chatBotInfo={chatBotInfo} mode={'test'} setChatBotInfo={setChatBotInfo} statisticsMode={'CHAT_TEST'} />
                     </Card>
                 </div>
             )}

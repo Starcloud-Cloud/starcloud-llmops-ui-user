@@ -13,6 +13,7 @@ import FooterSection from './FooterSection';
 // import CustomizeSection from './CustomizeSection';
 import PreBuildDashBoard from './PreBuildDashBoard';
 import StartupProjectSection from './StartupProjectSection';
+import { useLocation } from 'react-router-dom';
 // import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
@@ -36,6 +37,12 @@ export const SectionWrapper = styled('div')({
 
 const Landing = () => {
     const theme = useTheme();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const inviteCode = searchParams.get('q');
+    if (inviteCode) {
+        localStorage.setItem('inviteCode', inviteCode);
+    }
 
     return (
         <>

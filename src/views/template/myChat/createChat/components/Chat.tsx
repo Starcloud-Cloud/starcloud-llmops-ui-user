@@ -821,11 +821,15 @@ export const Chat = ({
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
-            setMessage(message + '\n');
+            if (!isFetch) {
+                setMessage(message + '\n');
+            }
         } else if (!event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
             // 单独按回车键提交表单
-            await handleOnSend();
+            if (!isFetch) {
+                await handleOnSend();
+            }
         }
     };
 

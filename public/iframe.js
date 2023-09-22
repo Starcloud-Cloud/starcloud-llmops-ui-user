@@ -3,6 +3,9 @@ window.onload = function () {
         return;
     }
 
+    const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
+    const width = isMobile ? '320px' : '408px';
+
     function init() {
         var e = document.createElement('div'),
             t = document.createElement('div'),
@@ -46,7 +49,7 @@ window.onload = function () {
 			right: 44px;
 			bottom: 44px;
 			z-index: 999999;
-			width: 408px;
+			width: ${width};
 			height: 600px;
 			border: 1px solid #DCDFE6;
             border-radius: 8px; 
@@ -84,7 +87,7 @@ window.onload = function () {
 			right: 44px;
 			bottom: 44px;
 			z-index: 999999;
-			width: 408px;
+			width: ${width};
 			height: 600px;
 			border: 1px solid #DCDFE6;
             border-radius: 8px; 
@@ -122,7 +125,7 @@ window.onload = function () {
                     right: 44px;
                     bottom: 44px;
                     z-index: 999999;
-                    width: 408px;
+                    width: ${width}};
                     height: 600px;
                     border: 1px solid #DCDFE6;
                     border-radius: 8px; 

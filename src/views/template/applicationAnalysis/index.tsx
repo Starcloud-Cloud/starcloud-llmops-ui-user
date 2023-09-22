@@ -22,7 +22,8 @@ import {
     Chip,
     IconButton,
     CardContent,
-    Tooltip
+    Tooltip,
+    Link
 } from '@mui/material';
 import { Tag } from 'antd';
 import formatDate from 'hooks/useDate';
@@ -31,6 +32,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, statisticsByAppUid, infoPage, infoPageByAppUid, logMetaData, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
@@ -293,7 +295,7 @@ function ApplicationAnalysis({
     const [chatVisible, setChatVisible] = useState(false);
     //绘话id
     const [conversationUid, setConversationUid] = useState('');
-
+    const navigate = useNavigate();
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -400,9 +402,6 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '200px' }} align="center">
                                 {t('generate.status')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                错误信息
-                            </TableCell>
                             <TableCell sx={{ minWidth: '150px' }} align="center">
                                 更新时间
                             </TableCell>
@@ -419,16 +418,21 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
-                                    <Tag color={row.status === 'SUCCESS' ? 'success' : 'error'}>
-                                        {row.status === 'SUCCESS' ? '执行成功' : '执行失败'}
-                                    </Tag>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <Tooltip placement="top" title={<Typography>系统错误（{row.errorCode}）</Typography>}>
-                                        <Typography sx={{ cursor: 'pointer' }}>
-                                            {row.errorCode === '2008002007' ? '令牌不足' : '系统异常'}
-                                        </Typography>
-                                    </Tooltip>
+                                    {row.status !== 'SUCCESS' ? (
+                                        row.errorCode === '2008002007' ? (
+                                            <Link onClick={() => navigate('/subscribe')} color="secondary" className="cursor-pointer">
+                                                令牌不足，去升级
+                                            </Link>
+                                        ) : (
+                                            <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>
+                                                <Tag className="cursor-pointer" color={row.status === 'SUCCESS' ? 'success' : 'error'}>
+                                                    失败
+                                                </Tag>
+                                            </Tooltip>
+                                        )
+                                    ) : (
+                                        <Tag color="success">成功</Tag>
+                                    )}
                                 </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">

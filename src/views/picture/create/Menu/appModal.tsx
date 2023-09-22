@@ -388,7 +388,7 @@ const AppModal = ({
                                             sx={{ ml: 4, overflowY: 'auto', height: leftRef.current?.clientHeight, minHeight: '500px' }}
                                         >
                                             {historyList.map((item) => (
-                                                <>
+                                                <div key={item.uid}>
                                                     <ListItem>
                                                         <ListItemButton
                                                             sx={{ display: 'flex', width: '100%' }}
@@ -403,7 +403,7 @@ const AppModal = ({
                                                         </ListItemButton>
                                                     </ListItem>
                                                     <Divider />
-                                                </>
+                                                </div>
                                             ))}
                                         </List>
                                     </Box>

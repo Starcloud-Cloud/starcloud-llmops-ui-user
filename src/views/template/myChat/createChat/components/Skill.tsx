@@ -530,9 +530,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
 
             const mergedArray = [...appWorkFlowList, ...systemList];
             const enableList = mergedArray.filter((v) => !v.disabled);
-            const copyChatBotInfo = _.cloneDeep(chatBotInfo);
-            copyChatBotInfo.skillWorkflowList = enableList;
-            setChatBotInfo((pre: any) => ({ ...pre, skillWorkflowList: enableList }));
+            setChatBotInfo((pre: IChatInfo) => ({ ...pre, skillWorkflowList: enableList }));
             setWorkflowList(mergedArray);
         });
     }, [count]);

@@ -494,7 +494,7 @@ export const FashionStyling = ({
     chatBotInfo,
     handleSave
 }: {
-    setChatBotInfo: (chatInfo: IChatInfo) => void;
+    setChatBotInfo: any;
     chatBotInfo: IChatInfo;
     handleSave: () => void;
 }) => {
@@ -531,10 +531,10 @@ export const FashionStyling = ({
         (async () => {
             const res = await getVoiceList();
             if (!chatBotInfo.voiceName) {
-                setChatBotInfo({
-                    ...chatBotInfo,
+                setChatBotInfo((preState: IChatInfo) => ({
+                    ...preState,
                     voiceName: res?.[0]?.LocalName
-                });
+                }));
                 setList(res || []);
             }
         })();

@@ -196,47 +196,8 @@ export const Regulation = ({
     // }, [chatBotInfo.searchInWeb]);
 
     useEffect(() => {
-        const copyData = _.cloneDeep(chatBotInfo.skillWorkflowList) || [];
-        if (copyData.length) {
-            setSkillWorkflowList([...copyData]);
-        } else {
-            if (chatBotInfo.uid) {
-                getSkillList(chatBotInfo.uid).then((res) => {
-                    const appWorkFlowList =
-                        res?.['3']?.map((item: any) => ({
-                            name: item.appWorkflowSkillDTO?.name,
-                            description: item.appWorkflowSkillDTO?.desc,
-                            type: item.type,
-                            skillAppUid: item.appWorkflowSkillDTO?.skillAppUid,
-                            uid: item.uid,
-                            images: item.appWorkflowSkillDTO?.icon,
-                            appConfigId: item.appConfigId,
-                            appType: item.appWorkflowSkillDTO?.appType,
-                            defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
-                            copyWriting: item.appWorkflowSkillDTO?.copyWriting,
-                            disabled: item.disabled
-                        })) || [];
-
-                    const systemList =
-                        res?.['5']?.map((item: any) => ({
-                            name: item.systemHandlerSkillDTO?.name,
-                            description: item.systemHandlerSkillDTO?.desc,
-                            type: item.type,
-                            code: item.systemHandlerSkillDTO?.code,
-                            uid: item.uid,
-                            images: item.systemHandlerSkillDTO?.icon,
-                            appConfigId: item.appConfigId,
-                            copyWriting: item.systemHandlerSkillDTO?.copyWriting,
-                            disabled: item.disabled
-                        })) || [];
-
-                    const mergedArray = [...appWorkFlowList, ...systemList];
-                    const enableList = mergedArray.filter((v) => !v.disabled);
-
-                    setSkillWorkflowList(enableList);
-                });
-            }
-        }
+        const copyData = chatBotInfo.skillWorkflowList ? _.cloneDeep(chatBotInfo.skillWorkflowList) : [];
+        setSkillWorkflowList([...copyData]);
     }, [chatBotInfo]);
 
     return (

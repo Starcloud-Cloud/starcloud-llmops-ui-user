@@ -95,21 +95,24 @@ function CreateDetail() {
         if (searchParams.get('appId')) {
             getChatInfo({ appId: searchParams.get('appId') as string }).then((res) => {
                 setDetail(res);
-                setChatBotInfo({
-                    ...chatBotInfo,
-                    uid: res.uid,
-                    name: res.name,
-                    avatar: res?.images?.[0],
-                    introduction: res.description, // 简介
-                    enableIntroduction: res.chatConfig?.description?.enabled,
-                    statement: res.chatConfig?.openingStatement.statement,
-                    enableStatement: res.chatConfig?.openingStatement.enabled,
-                    prePrompt: res.chatConfig.prePrompt,
-                    temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
-                    defaultImg: res?.images?.[0],
-                    enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
-                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
+                setChatBotInfo((preState) => {
+                    return {
+                        ...preState,
+                        uid: res.uid,
+                        name: res.name,
+                        avatar: res?.images?.[0],
+                        introduction: res.description, // 简介
+                        enableIntroduction: res.chatConfig?.description?.enabled,
+                        statement: res.chatConfig?.openingStatement.statement,
+                        enableStatement: res.chatConfig?.openingStatement.enabled,
+                        prePrompt: res.chatConfig.prePrompt,
+                        temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
+                        defaultImg: res?.images?.[0],
+                        enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
+                        searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                        modelProvider:
+                            res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
+                    };
                 });
             });
         }

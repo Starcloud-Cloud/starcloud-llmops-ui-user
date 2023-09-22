@@ -1221,7 +1221,7 @@ export const Chat = ({
                                 <svg
                                     onClick={() => handleShare()}
                                     className={`absolute ${
-                                        statisticsMode === 'SHARE_JS' ? 'right-[53px]' : 'right-2'
+                                        statisticsMode === 'SHARE_JS' && width <= 406 ? 'right-[53px]' : 'right-2'
                                     }  text-[16px] cursor-pointer`}
                                     stroke="currentColor"
                                     fill="none"

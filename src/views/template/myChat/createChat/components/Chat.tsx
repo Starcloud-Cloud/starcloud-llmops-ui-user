@@ -821,11 +821,15 @@ export const Chat = ({
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
-            setMessage(message + '\n');
+            if (!isFetch) {
+                setMessage(message + '\n');
+            }
         } else if (!event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
             // 单独按回车键提交表单
-            await handleOnSend();
+            if (!isFetch) {
+                await handleOnSend();
+            }
         }
     };
 
@@ -1152,88 +1156,90 @@ export const Chat = ({
                 </div>
             )}
             <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
-                <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative`}>
-                    {showSelect ? (
-                        <Popover
-                            content={
-                                <div className="h-[380px] overflow-y-auto">
-                                    <div className="flex justify-center">切换员工</div>
-                                    {botList?.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
-                                                (mediumUid || uid) === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
-                                            }`}
-                                            onClick={() => {
-                                                if (mode === 'iframe') {
-                                                    setMUid && setMUid(item.value);
-                                                    setOpen(false);
-                                                }
-                                                if (mode === 'market') {
-                                                    setUid && setUid(item.value);
-                                                    setOpen(false);
-                                                }
-                                            }}
-                                        >
-                                            <div className="w-[40px] h-[40px]">
-                                                <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
-                                            </div>
-                                            <div className="ml-2">
-                                                <div className="text-lg">{item.name}</div>
-                                                <div className="text-sm w-[260px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
-                                                    {item.des || '无'}
+                <div className="flex justify-center">
+                    <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
+                        {showSelect ? (
+                            <Popover
+                                content={
+                                    <div className="h-[380px] overflow-y-auto">
+                                        <div className="flex justify-center">切换员工</div>
+                                        {botList?.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
+                                                    (mediumUid || uid) === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                                }`}
+                                                onClick={() => {
+                                                    if (mode === 'iframe') {
+                                                        setMUid && setMUid(item.value);
+                                                        setOpen(false);
+                                                    }
+                                                    if (mode === 'market') {
+                                                        setUid && setUid(item.value);
+                                                        setOpen(false);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="w-[40px] h-[40px]">
+                                                    <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
+                                                </div>
+                                                <div className="ml-2">
+                                                    <div className="text-lg">{item.name}</div>
+                                                    <div className="text-sm w-[260px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
+                                                        {item.des || '无'}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+                                }
+                                placement="bottom"
+                                trigger="click"
+                                open={open}
+                                onOpenChange={setOpen}
+                            >
+                                <div className="flex items-center justify-center cursor-pointer">
+                                    <div className="w-[28px] h-[28px] flex justify-center items-center">
+                                        <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                                    </div>
+                                    <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+
+                                    {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
+                                    <span className="text-xs ml-1 text-[#697586]">切换员工</span>
                                 </div>
-                            }
-                            placement="bottom"
-                            trigger="click"
-                            open={open}
-                            onOpenChange={setOpen}
-                        >
+                            </Popover>
+                        ) : (
                             <div className="flex items-center justify-center cursor-pointer">
                                 <div className="w-[28px] h-[28px] flex justify-center items-center">
                                     <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                                 </div>
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-
-                                {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
-                                <span className="text-xs ml-1 text-[#697586]">切换员工</span>
                             </div>
-                        </Popover>
-                    ) : (
-                        <div className="flex items-center justify-center cursor-pointer">
-                            <div className="w-[28px] h-[28px] flex justify-center items-center">
-                                <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
-                            </div>
-                            <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-                        </div>
-                    )}
-                    {conversationUid && mode !== 'share' && (
-                        <Tooltip title={'把你的对话分享给朋友'}>
-                            <svg
-                                onClick={() => handleShare()}
-                                className={`absolute ${
-                                    statisticsMode === 'SHARE_JS' ? 'right-[53px]' : 'right-2'
-                                }  text-[16px] cursor-pointer`}
-                                stroke="currentColor"
-                                fill="none"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                height="1em"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                <polyline points="16 6 12 2 8 6"></polyline>
-                                <line x1="12" y1="2" x2="12" y2="15"></line>
-                            </svg>
-                        </Tooltip>
-                    )}
+                        )}
+                        {conversationUid && mode !== 'share' && (
+                            <Tooltip title={'把你的对话分享给朋友'}>
+                                <svg
+                                    onClick={() => handleShare()}
+                                    className={`absolute ${
+                                        statisticsMode === 'SHARE_JS' && width <= 406 ? 'right-[53px]' : 'right-2'
+                                    }  text-[16px] cursor-pointer`}
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    height="1em"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                    <polyline points="16 6 12 2 8 6"></polyline>
+                                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                                </svg>
+                            </Tooltip>
+                        )}
+                    </div>
                 </div>
                 <Divider variant={'fullWidth'} />
                 <div className="flex-grow flex justify-center overflow-y-auto w-full" style={{ scrollbarGutter: 'stable' }}>

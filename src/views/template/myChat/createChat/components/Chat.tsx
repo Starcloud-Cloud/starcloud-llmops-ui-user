@@ -49,6 +49,7 @@ import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
 import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
+import { convertLegacyProps } from 'antd/es/button/button';
 
 const { Option } = Select;
 
@@ -309,12 +310,12 @@ export function extractChatBlocks(data: any) {
             let currentLoop: any = [];
             currentBlock.push(item);
             insideBlock = false;
-            currentData.robotName = currentBlock[0].robotName;
-            currentData.robotAvatar = currentBlock[0].robotAvatar;
-            currentData.message = currentBlock[0].message;
-            currentData.createTime = currentBlock[0].createTime;
+            currentData.robotName = currentBlock?.[0]?.robotName;
+            currentData.robotAvatar = currentBlock?.[0]?.robotAvatar;
+            currentData.message = currentBlock?.[0]?.message;
+            currentData.createTime = currentBlock?.[0]?.createTime;
             currentData.isNew = false;
-            currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+            currentData.answer = currentBlock?.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
             currentData.process = [];
 
             for (const block of currentBlock) {
@@ -332,8 +333,8 @@ export function extractChatBlocks(data: any) {
             loop.forEach((item: { answer: string }[], index: string | number) => {
                 currentData.process[index] = {
                     tips: '查询完成',
-                    showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
-                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                    showType: item?.[0]?.answer && transformType(JSON.parse(item[0].answer)?.arguments?.type),
+                    input: item?.[0]?.answer && JSON.parse(item[0].answer)?.arguments,
                     data: item?.[1]?.answer && JSON.parse(item[1].answer),
                     success: true,
                     status: 1,
@@ -500,6 +501,7 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+                console.log(list, 'list');
 
                 const chatBlocks = extractChatBlocks(list);
 

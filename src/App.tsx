@@ -20,7 +20,6 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import usePubSubEvent from 'hooks/usePubsub';
 import { ConfigProvider } from 'antd';
-import { ChatBotProvider } from 'contexts/ChatBotContext';
 // import { t } from 'hooks/web/useI18n';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 // import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
@@ -65,14 +64,12 @@ const App = () => {
             <ThemeCustomization>
                 <RTLLayout>
                     <NavigationScroll>
-                        <ChatBotProvider>
-                            <AuthProvider>
-                                <>
-                                    <Routes />
-                                    <Snackbar />
-                                </>
-                            </AuthProvider>
-                        </ChatBotProvider>
+                        <AuthProvider>
+                            <>
+                                <Routes />
+                                <Snackbar />
+                            </>
+                        </AuthProvider>
                     </NavigationScroll>
                 </RTLLayout>
             </ThemeCustomization>

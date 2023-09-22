@@ -151,19 +151,17 @@ function TemplateMarket() {
                 }}
             >
                 <Box>
-                    <Box display="flex" alignItems="center" mb={1}>
-                        <Box display="flex" alignItems="end">
-                            <Typography variant="h2" lineHeight={1}>
-                                {t('market.title')}
-                            </Typography>
-                            {/* <Typography color="#697586" fontSize="12px" ml={0.5} fontWeight={500}>
+                    <Box className="flex mb-[8px] flex-wrap items-end gap-3">
+                        <Typography variant="h2" lineHeight={1}>
+                            {t('market.title')}
+                        </Typography>
+                        {/* <Typography color="#697586" fontSize="12px" ml={0.5} fontWeight={500}>
                                 {t('market.subLeft')} {total} + {t('market.subright')}
                             </Typography> */}
-                        </Box>
                         <TextField
                             size="small"
                             id="filled-start-adornment"
-                            sx={{ width: '300px', ml: 2 }}
+                            sx={{ width: '300px' }}
                             placeholder={t('market.place')}
                             name="name"
                             value={queryParams.name}

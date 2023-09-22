@@ -42,6 +42,7 @@ import {
     TableBody,
     TableContainer,
     Paper,
+    Switch,
     FormControl,
     InputLabel,
     Select,
@@ -70,7 +71,9 @@ import {
     getDatasetSource,
     uploadCharacters,
     uploadUrls,
-    documentText
+    documentText,
+    upDoc,
+    disDoc
 } from '../../../../../api/chat';
 import { getAccessToken } from '../../../../../utils/auth';
 import AddRuleModal from './modal/addRule';
@@ -1242,6 +1245,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell>创建时间</TableCell>
+                                                <TableCell>启禁用</TableCell>
                                                 <TableCell>操作</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -1355,6 +1359,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </TableCell>
                                                     <TableCell sx={{ minWidth: '170px', maxWidth: '170px' }}>
                                                         {formatDate(item.updateTime)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ minWidth: '100px', maxWidth: '100px' }}>
+                                                        <Switch onChange={() => {}} />
                                                     </TableCell>
                                                     <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
                                                         <span

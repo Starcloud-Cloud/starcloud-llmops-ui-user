@@ -309,3 +309,19 @@ export const shareChatBotList = (shareKey: string) => {
 export const shareDetail = (shareKey: string) => {
     return request.get({ url: `/share/conversation/detail/${shareKey}` });
 };
+
+/**
+ * 启用源数据
+ * @param shareKey
+ */
+export const upDoc = (data: string) => {
+    return request.post({ url: `/llm/dataset-source-data/delete`, data });
+};
+
+/**
+ * 禁用源数据
+ * @param shareKey
+ */
+export const disDoc = (shareKey: string) => {
+    return request.post({ url: `/share/conversation/disable/${shareKey}` });
+};

@@ -21,9 +21,10 @@ import {
     Divider,
     Chip,
     IconButton,
-    CardContent
+    CardContent,
+    Tooltip
 } from '@mui/material';
-
+import { Tag } from 'antd';
 import formatDate from 'hooks/useDate';
 import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
@@ -399,10 +400,7 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '200px' }} align="center">
                                 {t('generate.status')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '200px' }} align="center">
-                                错误码
-                            </TableCell>
-                            <TableCell sx={{ minWidth: '300px' }} align="center">
+                            <TableCell sx={{ minWidth: '100px' }} align="center">
                                 错误信息
                             </TableCell>
                             <TableCell sx={{ minWidth: '150px' }} align="center">
@@ -419,11 +417,19 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
-
                                 <TableCell align="center">{row.appExecutor}</TableCell>
-                                <TableCell align="center">{row.status}</TableCell>
-                                <TableCell align="center">{row.errorCode}</TableCell>
-                                <TableCell align="center">{row.errorMsg}</TableCell>
+                                <TableCell align="center">
+                                    <Tag color={row.status === 'SUCCESS' ? 'success' : 'error'}>
+                                        {row.status === 'SUCCESS' ? '执行成功' : '执行失败'}
+                                    </Tag>
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Tooltip placement="top" title={<Typography>系统错误（{row.errorCode}）</Typography>}>
+                                        <Typography sx={{ cursor: 'pointer' }}>
+                                            {row.errorCode === '2008002007' ? '令牌不足' : '系统异常'}
+                                        </Typography>
+                                    </Tooltip>
+                                </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button

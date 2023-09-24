@@ -40,11 +40,18 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
         navigate(`/createChat?appId=${res}`);
     };
 
+    const handleCreateNewV2 = async () => {
+        const res = await createChat({ robotName: robotName, uid: '' });
+        if (res) {
+            navigate(`/chatCreate?appId=${res}`);
+        }
+    };
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
                 <SubCard sx={{ height: 150, cursor: 'pointer' }}>
-                    <Box onClick={() => setOpenNew(true)} display="flex" alignItems="center">
+                    <Box onClick={() => handleCreateNewV2()} display="flex" alignItems="center">
                         <AddCircleIcon className="text-[80px]" />
                         <Box overflow="hidden" marginLeft="20px" className="flex h-[100px] flex-col">
                             <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">

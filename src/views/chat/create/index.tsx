@@ -1,6 +1,6 @@
 import { Box, Button, Card, Switch, TextField } from '@mui/material';
 import { Upload, UploadFile, UploadProps } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getAccessToken } from 'utils/auth';
 import { IChatInfo } from 'views/template/myChat/createChat';
@@ -8,6 +8,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { config } from 'utils/axios/config';
 import AppModal from 'views/picture/create/Menu/appModal';
 import { Chat } from '../../template/myChat/createChat/components/Chat';
+import { v4 as uuidv4 } from 'uuid';
+import { getAvatarList, getChatInfo } from 'api/chat';
 
 /**
  * 新增机器人页面
@@ -23,10 +25,68 @@ const createBot = () => {
     const [appValues, setAppValues] = useState<any>('');
     const [tags, setTags] = useState<any[]>([]);
     const [regulationText, setRegulationText] = useState('');
+    const [isFirst, setIsFirst] = useState(true);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+
+    useEffect(() => {
+        if (searchParams.get('appId')) {
+            getChatInfo({ appId: searchParams.get('appId') as string }).then((res) => {
+                setChatBotInfo((preState) => {
+                    return {
+                        ...preState,
+                        uid: res.uid,
+                        name: res.name,
+                        avatar: res?.images?.[0],
+                        introduction: res.description, // 简介
+                        enableIntroduction: res.chatConfig?.description?.enabled,
+                        statement: res.chatConfig?.openingStatement.statement,
+                        enableStatement: res.chatConfig?.openingStatement.enabled,
+                        prePrompt: res.chatConfig.prePrompt,
+                        temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
+                        defaultImg: res?.images?.[0],
+                        enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
+                        searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                        modelProvider:
+                            res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
+                    };
+                });
+            });
+        }
+    }, []);
+
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+
+    useEffect(() => {
+        if (fileList?.[0]?.response?.data) {
+            console.log(1);
+            setChatBotInfo({
+                ...chatBotInfo,
+                avatar: fileList?.[0]?.response?.data
+            });
+        }
+    }, [fileList]);
+
+    // 获取头像列表和初始头像回显(只有第一次)
+    useEffect(() => {
+        if (isFirst && chatBotInfo.defaultImg) {
+            (async () => {
+                const res = await getAvatarList();
+                setAvatarList([chatBotInfo.defaultImg, ...res.map((item: string, index: number) => `${item}?index=${uuidv4()}`)]);
+                setIsFirst(false);
+            })();
+        }
+    }, [chatBotInfo, isFirst]);
+
+    // 上传头像之后头像列表
+    useEffect(() => {
+        if (fileList?.[0]?.response?.data) {
+            setAvatarList([fileList?.[0]?.response?.data, ...avatarList]);
+            // 把fileList清空
+            setFileList([]);
+        }
+    }, [fileList]);
 
     const emits = (data: any) => {
         setAppOpen(false);
@@ -233,62 +293,64 @@ const createBot = () => {
                     </div>
                 </div>
 
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                    }
-                >
-                    对话配置
-                </span>
-                <div className={'mt-10'}>
-                    <div className={'mt-0'}>
-                        <div className="flex justify-end items-center">
-                            <Button
-                                color="secondary"
-                                size="small"
-                                variant="text"
-                                onClick={() => {
-                                    setTags(['Optimize Prompt', 'Chat', 'Welcome']);
-                                    setAppOpen(true);
-                                    setTitle('欢迎语优化');
-                                    setAppValues(chatBotInfo.introduction);
-                                }}
-                            >
-                                一键AI生成
-                            </Button>
-                            <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
-                            <Switch
-                                color={'secondary'}
-                                checked={chatBotInfo.enableStatement}
+                <div className="mt-5">
+                    <span
+                        className={
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        }
+                    >
+                        对话配置
+                    </span>
+                    <div className={'mt-2'}>
+                        <div className={'mt-0'}>
+                            <div className="flex justify-end items-center">
+                                <Button
+                                    color="secondary"
+                                    size="small"
+                                    variant="text"
+                                    onClick={() => {
+                                        setTags(['Optimize Prompt', 'Chat', 'Welcome']);
+                                        setAppOpen(true);
+                                        setTitle('欢迎语优化');
+                                        setAppValues(chatBotInfo.introduction);
+                                    }}
+                                >
+                                    一键AI生成
+                                </Button>
+                                <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
+                                <Switch
+                                    color={'secondary'}
+                                    checked={chatBotInfo.enableStatement}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setChatBotInfo({ ...chatBotInfo, enableStatement: !chatBotInfo.enableStatement });
+                                    }}
+                                />
+                            </div>
+                            <TextField
+                                className={'mt-1'}
+                                size={'small'}
+                                fullWidth
+                                multiline={true}
+                                maxRows={5}
+                                minRows={5}
+                                error={(chatBotInfo?.statement?.length || 0) > 300}
+                                aria-valuemax={200}
+                                label={'欢迎语'}
+                                placeholder="打开聊天窗口后会主动发送"
+                                InputLabelProps={{ shrink: true }}
+                                value={chatBotInfo.statement}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    setChatBotInfo({ ...chatBotInfo, enableStatement: !chatBotInfo.enableStatement });
+                                    setChatBotInfo({ ...chatBotInfo, statement: value });
                                 }}
                             />
-                        </div>
-                        <TextField
-                            className={'mt-1'}
-                            size={'small'}
-                            fullWidth
-                            multiline={true}
-                            maxRows={5}
-                            minRows={5}
-                            error={(chatBotInfo?.statement?.length || 0) > 300}
-                            aria-valuemax={200}
-                            label={'欢迎语'}
-                            placeholder="打开聊天窗口后会主动发送"
-                            InputLabelProps={{ shrink: true }}
-                            value={chatBotInfo.statement}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setChatBotInfo({ ...chatBotInfo, statement: value });
-                            }}
-                        />
-                        <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
-                            <div className="ml-1 text-left">
-                                打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
+                            <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
+                                <div className="ml-1 text-left">
+                                    打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
+                                </div>
+                                <div>{chatBotInfo?.statement?.length || 0}/300</div>
                             </div>
-                            <div>{chatBotInfo?.statement?.length || 0}/300</div>
                         </div>
                     </div>
                 </div>

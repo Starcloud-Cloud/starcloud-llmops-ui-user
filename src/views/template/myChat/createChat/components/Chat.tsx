@@ -289,68 +289,73 @@ const transformType = (key: string) => {
     }
 };
 export function extractChatBlocks(data: any) {
-    const chatBlocks: any[] = [];
-    let currentBlock: any[] = [];
-    let insideBlock = false;
+    try {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
 
-    for (const item of data) {
-        if (item.msgType === 'CHAT_FUN') {
-            if (!insideBlock) {
-                insideBlock = true;
-                currentBlock.push(item);
-            } else {
-                currentBlock.push(item);
-            }
-        } else if (item.msgType === 'CHAT') {
-            chatBlocks.push(item);
-        } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
-            let currentData: any = {};
-            let loop: any = [];
-            let currentLoop: any = [];
-            currentBlock.push(item);
-            insideBlock = false;
-            currentData.robotName = currentBlock[0].robotName;
-            currentData.robotAvatar = currentBlock[0].robotAvatar;
-            currentData.message = currentBlock[0].message;
-            currentData.createTime = currentBlock[0].createTime;
-            currentData.isNew = false;
-            currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
-            currentData.process = [];
-
-            for (const block of currentBlock) {
-                if (block.msgType === 'CHAT_FUN') {
-                    currentLoop.push(block);
-                } else if (block.msgType === 'FUN_CALL') {
-                    currentLoop.push(block);
-                    loop.push(currentLoop);
-                    currentLoop = [];
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
                 } else {
-                    currentLoop = [];
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT') {
+                chatBlocks.push(item);
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string; status: string }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: item?.[1]?.status === 'ERROR' ? '查询失败' : '查询完成',
+                        showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
+                        input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                        data: item?.[1]?.status === 'ERROR' ? item?.[1]?.answer : item?.[1]?.answer && JSON.parse(item[1].answer),
+                        success: true,
+                        status: 1,
+                        id: uuidv4()
+                    };
+                });
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
                 }
             }
-
-            loop.forEach((item: { answer: string }[], index: string | number) => {
-                currentData.process[index] = {
-                    tips: '查询完成',
-                    showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
-                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
-                    data: item?.[1]?.answer && JSON.parse(item[1].answer),
-                    success: true,
-                    status: 1,
-                    id: uuidv4()
-                };
-            });
-
-            chatBlocks.push(currentData);
-            currentData = {};
-            currentBlock = [];
-        } else {
-            if (insideBlock) {
-                currentBlock.push(item);
-            }
         }
+        return chatBlocks;
+    } catch (e) {
+        console.log(e, 'e');
+        return [];
     }
-    return chatBlocks;
 }
 
 export const Chat = ({

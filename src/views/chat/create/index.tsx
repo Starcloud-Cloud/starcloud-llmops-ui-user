@@ -10,6 +10,7 @@ import AppModal from 'views/picture/create/Menu/appModal';
 import { Chat } from '../../template/myChat/createChat/components/Chat';
 import { v4 as uuidv4 } from 'uuid';
 import { getAvatarList, getChatInfo } from 'api/chat';
+import TemplateModal from './components/template-modal';
 
 /**
  * 新增机器人页面
@@ -26,9 +27,12 @@ const createBot = () => {
     const [tags, setTags] = useState<any[]>([]);
     const [regulationText, setRegulationText] = useState('');
     const [isFirst, setIsFirst] = useState(true);
+    const [openTemplate, setOpenTemplate] = useState(false);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+
+    const handleTemplate = () => {};
 
     useEffect(() => {
         if (searchParams.get('appId')) {
@@ -111,7 +115,10 @@ const createBot = () => {
                 <div className="inline-block p-4 bg-[#F2F3F5] rounded-lg lg:block md:w-[484px] sm:w-full">
                     <p className="text-xs text-[#596780] leading-5 mb-3">通过以下两种方式之一，只要 20 秒即可快速填充基础信息</p>
                     <div className="grid md:grid-cols-2 gap-5 sm:grid-cols-1 md:gap-4">
-                        <div className="flex cursor-pointer bg-white items-center rounded-lg py-4 px-6 gap-4">
+                        <div
+                            className="flex cursor-pointer bg-white items-center rounded-lg py-4 px-6 gap-4"
+                            onClick={() => setOpenTemplate(true)}
+                        >
                             <svg
                                 className="w-8 h-8 text-[#7c5cfc] shrink-0"
                                 viewBox="0 0 1024 1024"
@@ -380,6 +387,7 @@ const createBot = () => {
                 </Card>
             </div>
             {appOpen && <AppModal title={title} value={appValues} open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
+            <TemplateModal open={openTemplate} setOpen={() => setOpenTemplate(false)} handleOk={handleTemplate} />
         </div>
     );
 };

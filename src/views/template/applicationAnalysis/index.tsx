@@ -21,15 +21,17 @@ import {
     Divider,
     Chip,
     IconButton,
-    CardContent
+    CardContent,
+    Tooltip,
+    Link
 } from '@mui/material';
-
+import { Tag, Image } from 'antd';
 import formatDate from 'hooks/useDate';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, statisticsByAppUid, infoPage, infoPageByAppUid, logMetaData, detailImage, detailApp } from 'api/template';
 import SearchIcon from '@mui/icons-material/Search';
@@ -292,7 +294,7 @@ function ApplicationAnalysis({
     const [chatVisible, setChatVisible] = useState(false);
     //绘话id
     const [conversationUid, setConversationUid] = useState('');
-
+    const navigate = useNavigate();
     return (
         <Box>
             <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
@@ -399,12 +401,6 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '200px' }} align="center">
                                 {t('generate.status')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '200px' }} align="center">
-                                错误码
-                            </TableCell>
-                            <TableCell sx={{ minWidth: '300px' }} align="center">
-                                错误信息
-                            </TableCell>
                             <TableCell sx={{ minWidth: '150px' }} align="center">
                                 更新时间
                             </TableCell>
@@ -419,14 +415,28 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
-
                                 <TableCell align="center">{row.appExecutor}</TableCell>
-                                <TableCell align="center">{row.status}</TableCell>
-                                <TableCell align="center">{row.errorCode}</TableCell>
-                                <TableCell align="center">{row.errorMsg}</TableCell>
+                                <TableCell align="center">
+                                    {row.status !== 'SUCCESS' ? (
+                                        row.errorCode === '2008002007' ? (
+                                            <Link onClick={() => navigate('/subscribe')} color="secondary" className="cursor-pointer">
+                                                令牌不足，去升级
+                                            </Link>
+                                        ) : (
+                                            <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>
+                                                <Tag className="cursor-pointer" color={row.status === 'SUCCESS' ? 'success' : 'error'}>
+                                                    失败
+                                                </Tag>
+                                            </Tooltip>
+                                        )
+                                    ) : (
+                                        <Tag color="success">成功</Tag>
+                                    )}
+                                </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
+                                        disabled={row.status !== 'SUCCESS'}
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
@@ -544,7 +554,14 @@ function ApplicationAnalysis({
                                         {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                {result.status !== 'ERROR' && <AccessAlarm sx={{ fontSize: '70px' }} />}
+                                                {result.status !== 'ERROR' && (
+                                                    <Image
+                                                        preview={false}
+                                                        className="rounded-lg overflow-hidden"
+                                                        height={60}
+                                                        src={exeDetail?.images[0]}
+                                                    />
+                                                )}
                                                 <Box>
                                                     <Box>
                                                         <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -570,7 +587,7 @@ function ApplicationAnalysis({
                                                 </Box>
                                             </Box>
                                         </Box>
-                                        {result.status !== 'ERROR' && <Divider sx={{ mb: 1 }} />}
+                                        {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                             {exeDetail?.description}
                                         </Typography>

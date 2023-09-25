@@ -10,6 +10,8 @@ import _ from 'lodash-es';
 import copy from 'clipboard-copy';
 import FormExecute from 'views/template/components/validaForm';
 import { translateText } from 'api/picture/create';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 function Perform({
     config,
     changeSon,
@@ -291,6 +293,19 @@ function Perform({
                                                             color="secondary"
                                                             onClick={() => {
                                                                 copy(item.flowStep.response.answer);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '复制成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        close: false,
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                        transition: 'SlideLeft'
+                                                                    })
+                                                                );
                                                             }}
                                                         >
                                                             <ContentPaste fontSize="small" />

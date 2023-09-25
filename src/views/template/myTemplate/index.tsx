@@ -19,7 +19,7 @@ import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel
 
 import { recommends, appPage } from 'api/template/index';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -29,7 +29,6 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import marketStore from 'store/market';
 import myApp from 'store/myApp';
-import { useContext } from 'react';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
 import userInfoStore from 'store/entitlementAction';
@@ -161,6 +160,7 @@ function MyTemplate() {
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
                     <TextField
+                        color="secondary"
                         label={t('apply.name')}
                         onChange={(e) => {
                             changeParams(e);
@@ -285,5 +285,4 @@ function MyTemplate() {
         </Box>
     );
 }
-
 export default MyTemplate;

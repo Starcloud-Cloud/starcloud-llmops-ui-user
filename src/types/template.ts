@@ -17,6 +17,7 @@ export interface Details {
     name: string;
     description: string;
     categories: string[];
+    images: string[];
     scenes: string[];
     tags: string[];
     example: string;

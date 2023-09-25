@@ -124,7 +124,9 @@ const Header = () => {
             >
                 <Box display="flex" alignItems="center" sx={{ cursor: 'pointer', ml: '47px' }} onClick={handleClick}>
                     <QrCode2Icon />
-                    <Typography ml={1}>跨境卖家AI工具群</Typography>
+                    <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
+                        跨境卖家AI工具群
+                    </Typography>
                     <KeyboardArrowDownIcon />
                 </Box>
             </Popover>

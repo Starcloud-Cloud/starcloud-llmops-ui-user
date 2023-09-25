@@ -20,7 +20,7 @@ import { LoadingSpin } from 'ui-component/LoadingSpin';
 import { WebPageInfo } from '../../../../../ui-component/webPageInfo/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Popover, Tag } from 'antd';
+import { ConfigProvider, Popover, Tag } from 'antd';
 import { isMobile } from 'react-device-detect';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -397,10 +397,20 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                                         </div>
                                                                                                     }
                                                                                                 >
+                                                                                                    {/* <ConfigProvider
+                                                                                                        theme={{
+                                                                                                            components: {
+                                                                                                                Tag: {
+                                                                                                                    defaultBg: '#ede7f6',
+                                                                                                                    defaultColor: '#673ab7'
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }}
+                                                                                                    > */}
                                                                                                     <Tag
-                                                                                                        color="purple"
                                                                                                         className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
                                                                                                         bordered={false}
+                                                                                                        color={'purple'}
                                                                                                         onClick={() =>
                                                                                                             v.type === 'WEB' &&
                                                                                                             !isMobile &&
@@ -412,6 +422,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                                             {v?.name}
                                                                                                         </span>
                                                                                                     </Tag>
+                                                                                                    {/* </ConfigProvider> */}
                                                                                                 </Popover>
                                                                                             ))}
                                                                                         </div>

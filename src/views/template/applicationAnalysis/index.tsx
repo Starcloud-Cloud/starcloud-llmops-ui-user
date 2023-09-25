@@ -437,6 +437,7 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
+                                        disabled={row.status !== 'SUCCESS'}
                                         color="secondary"
                                         size="small"
                                         onClick={() => {

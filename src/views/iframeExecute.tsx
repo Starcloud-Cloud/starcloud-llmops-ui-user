@@ -1,7 +1,7 @@
 import Perform from './template/carryOut/perform';
 import { Card, Box, Chip, Divider, Typography } from '@mui/material';
+import { Image } from 'antd';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { appDetail, appExecute } from 'api/template/share';
 
 import _ from 'lodash-es';
@@ -14,6 +14,7 @@ interface Details {
     name?: string;
     description?: string;
     categories?: string[];
+    images?: string[];
     scenes?: string[];
     tags?: string[];
     example?: string;
@@ -243,8 +244,13 @@ const IframeExecute = () => {
     return (
         <Card elevation={2} sx={{ p: 2 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                    <Image
+                        preview={false}
+                        className="rounded-lg overflow-hidden"
+                        height={60}
+                        src={detail?.images ? detail?.images[0] : undefined}
+                    />
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -262,7 +268,7 @@ const IframeExecute = () => {
                     </Box>
                 </Box>
             </Box>
-            <Divider sx={{ mb: 1 }} />
+            <Divider sx={{ my: 1 }} />
             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                 {detail?.description}
             </Typography>

@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/EditTwoTone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import LinkIcon from '@mui/icons-material/Link';
-import { Dropdown } from 'antd';
+import { Dropdown, Row } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import documnt from 'assets/images/upLoad/document.svg';
@@ -1025,6 +1025,7 @@ export type typeDocumentChild = {
         type: string;
         size?: number;
     };
+    enabled: boolean;
     errorMessage?: string;
     status?: any;
     tokens?: any;
@@ -1245,7 +1246,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell>创建时间</TableCell>
-                                                {/* <TableCell>启禁用</TableCell> */}
+                                                <TableCell>启禁用</TableCell>
                                                 <TableCell>操作</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -1360,11 +1361,21 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     <TableCell sx={{ minWidth: '170px', maxWidth: '170px' }}>
                                                         {formatDate(item.updateTime)}
                                                     </TableCell>
-                                                    {/* <TableCell sx={{ minWidth: '100px', maxWidth: '100px' }}>
-                                                        <Switch color="secondary" onChange={() => {
-
-                                                        }} />
-                                                    </TableCell> */}
+                                                    <TableCell sx={{ minWidth: '100px', maxWidth: '100px' }}>
+                                                        <Switch
+                                                            color="secondary"
+                                                            checked={item.enabled}
+                                                            onChange={async () => {
+                                                                if (item.enabled) {
+                                                                    await disDoc({ uid: item.uid });
+                                                                    forceUpdate();
+                                                                } else {
+                                                                    await upDoc({ uid: item.uid });
+                                                                    forceUpdate();
+                                                                }
+                                                            }}
+                                                        />
+                                                    </TableCell>
                                                     <TableCell sx={{ minWidth: '110px', maxWidth: '110px' }}>
                                                         <span
                                                             style={{

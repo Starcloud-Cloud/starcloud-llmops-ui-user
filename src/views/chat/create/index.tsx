@@ -11,6 +11,7 @@ import { Chat } from '../../template/myChat/createChat/components/Chat';
 import { v4 as uuidv4 } from 'uuid';
 import { getAvatarList, getChatInfo } from 'api/chat';
 import TemplateModal from './components/template-modal';
+import { DocumentList } from 'views/template/myChat/createChat/components/Knowledge';
 
 /**
  * 新增机器人页面
@@ -307,7 +308,16 @@ const createBot = () => {
                         <div className="text-right text-stone-600 mr-1 mt-1">{regulationText?.length || 0}/1000</div>
                     </div>
                 </div>
-
+                <div className="mt-5">
+                    <span
+                        className={
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        }
+                    >
+                        知识
+                    </span>
+                    <DocumentList datasetId={''} mode={'simple'} />
+                </div>
                 <div className="mt-5">
                     <span
                         className={

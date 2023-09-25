@@ -25,9 +25,8 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag } from 'antd';
+import { Tag, Image } from 'antd';
 import formatDate from 'hooks/useDate';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
@@ -555,7 +554,14 @@ function ApplicationAnalysis({
                                         {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                {result.status !== 'ERROR' && <AccessAlarm sx={{ fontSize: '70px' }} />}
+                                                {result.status !== 'ERROR' && (
+                                                    <Image
+                                                        preview={false}
+                                                        className="rounded-lg overflow-hidden"
+                                                        height={60}
+                                                        src={exeDetail?.images[0]}
+                                                    />
+                                                )}
                                                 <Box>
                                                     <Box>
                                                         <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -581,7 +587,7 @@ function ApplicationAnalysis({
                                                 </Box>
                                             </Box>
                                         </Box>
-                                        {result.status !== 'ERROR' && <Divider sx={{ mb: 1 }} />}
+                                        {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                             {exeDetail?.description}
                                         </Typography>

@@ -1,6 +1,5 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress, Button } from '@mui/material';
-import { Popconfirm } from 'antd';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
+import { Image, Popconfirm } from 'antd';
 import DeleteIcon from '@mui/icons-material/Delete';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
@@ -290,8 +289,8 @@ function Deatail() {
                 </Typography>
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                    <Image preview={false} className="rounded-lg overflow-hidden" height={60} src={detailData?.images[0]} />
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -339,7 +338,7 @@ function Deatail() {
                     </Popconfirm>
                 )}
             </Box>
-            <Divider sx={{ mb: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
+            <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
                 config={detailData}
                 isShows={isShows}

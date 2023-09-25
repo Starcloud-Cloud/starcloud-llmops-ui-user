@@ -107,13 +107,21 @@ const createBot = () => {
     return (
         <div className="grid grid-cols-12 gap-4">
             <Card className="xl:col-span-8 xs:col-span-12 relative p-[16px]">
-                <h3 className="text-[#303133] font-medium text-xl mb-6">创建机器人</h3>
-                <div className="inline-block p-4 bg-[#F2F3F5] rounded-lg mb-10 lg:block md:w-[484px] sm:w-full">
+                <h3 className="text-[#303133] font-medium text-xl mb-5">创建机器人</h3>
+                <div className="inline-block p-4 bg-[#F2F3F5] rounded-lg lg:block md:w-[484px] sm:w-full">
                     <p className="text-xs text-[#596780] leading-5 mb-3">通过以下两种方式之一，只要 20 秒即可快速填充基础信息</p>
                     <div className="grid md:grid-cols-2 gap-5 sm:grid-cols-1 md:gap-4">
                         <div className="flex cursor-pointer bg-white items-center rounded-lg py-4 px-6 gap-4">
-                            <svg className="w-8 h-8 text-[#7c5cfc] shrink-0">
-                                <use href="#icon-collection"></use>
+                            <svg
+                                className="w-8 h-8 text-[#7c5cfc] shrink-0"
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M623.3 467.5h169.2v-0.1c127.9-1.2 231.5-105.5 231.5-233.7C1024 104.9 919.1 0 790.3 0S556.5 104.9 556.5 233.7c0 0.7 0 1.5 0.1 2.2h-0.1v164.7c0 36.9 30 66.9 66.8 66.9zM601 236c0.1-0.8 0-1.5 0-2.3 0-104.3 84.9-189.2 189.2-189.2s189.2 84.9 189.2 189.2c0 103.6-83.7 188-187 189.2v0.1H623.3c-12.3 0-22.3-10-22.3-22.3V236zM233.7 0C104.9 0 0 104.9 0 233.7c0 128.1 103.7 232.5 231.5 233.7v0.1h169.2c36.8 0 66.8-30 66.8-66.8V236h-0.1c0-0.7 0.1-1.5 0.1-2.2C467.5 104.9 362.6 0 233.7 0zM423 235.9v164.8c0 12.3-10 22.3-22.3 22.3H231.5v-0.1c-103.3-1.2-187-85.6-187-189.2 0-104.3 84.9-189.2 189.2-189.2S423 129.4 423 233.7v2.2zM792.5 556.6l-169.2-0.1c-36.8 0-66.8 30-66.8 66.8V788h0.1c0 0.7-0.1 1.5-0.1 2.2 0 128.9 104.9 233.7 233.7 233.7S1024 919.1 1024 790.3c0-128.2-103.7-232.5-231.5-233.7z m-2.2 422.9c-104.3 0-189.2-84.9-189.2-189.2 0-0.7 0-1.5 0.1-2.2h-0.2V623.3c0-12.3 10-22.3 22.3-22.3h169.2v0.1c103.3 1.2 187 85.6 187 189.2 0 104.3-84.9 189.2-189.2 189.2zM400.7 556.5H231.5v0.1C103.7 557.8 0 662.1 0 790.3 0 919.1 104.9 1024 233.7 1024s233.7-104.9 233.7-233.7c0-0.7 0-1.5-0.1-2.2h0.1V623.3c0.1-36.8-29.9-66.8-66.7-66.8zM423 788c-0.1 0.8 0 1.5 0 2.3 0 104.3-84.9 189.2-189.2 189.2S44.5 894.6 44.5 790.3c0-103.6 83.7-188 187-189.2v-0.1h169.2c12.3 0 22.3 10 22.3 22.3V788z"
+                                    fill=""
+                                ></path>
                             </svg>
                             <div className="space-y-1">
                                 <p className="text-[#303133] text-sm font-medium tracking-[0.13px] transition-colors">选择模版创建</p>
@@ -133,7 +141,7 @@ const createBot = () => {
                 </div>
                 <span
                     className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black mt-5"
                     }
                 >
                     基本信息
@@ -248,7 +256,7 @@ const createBot = () => {
                 </div>
                 <span
                     className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black mt-5"
                     }
                 >
                     基本规则
@@ -352,6 +360,16 @@ const createBot = () => {
                                 <div>{chatBotInfo?.statement?.length || 0}/300</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div className="flex mt-5 justify-end">
+                    <div>
+                        <Button color="secondary" variant="outlined">
+                            存为草稿
+                        </Button>
+                        <Button color="secondary" variant="contained" className="ml-3">
+                            保存并创建
+                        </Button>
                     </div>
                 </div>
             </Card>

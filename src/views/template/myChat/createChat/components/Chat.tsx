@@ -67,7 +67,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
-    docs: any;
+    context: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -333,10 +333,10 @@ export function extractChatBlocks(data: any) {
                 loop.forEach((item: { answer: string; status: string }[], index: string | number) => {
                     currentData.process[index] = {
                         tips: item?.[1]?.status === 'ERROR' ? '查询失败' : '查询完成',
-                        showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
+                        showType: item?.[0]?.answer && transformType(JSON.parse(item[0].answer).arguments?.type),
                         input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
                         data: item?.[1]?.status === 'ERROR' ? item?.[1]?.answer : item?.[1]?.answer && JSON.parse(item[1].answer),
-                        success: true,
+                        success: item?.[1]?.status === 'ERROR' ? false : true,
                         status: 1,
                         id: uuidv4()
                     };
@@ -850,20 +850,25 @@ export const Chat = ({
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
                 setConversationUid(bufferObj.conversationUid);
-                if (bufferObj.type === 'i' || bufferObj.type === 'docs') {
+                if (bufferObj.type === 'context') {
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const content = JSON.parse(bufferObj.content);
+                    const idList = content.data.filter((v: any) => v.id);
+                    const notIdList = content.data.filter((v: any) => !v.id);
+
+                    // 处理文档（文档状态默认不更新）
+                    content.data = [...uniqBy(idList, 'id'), ...notIdList];
+                    copyData[copyData.length - 1].context = content ? [content] : [];
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+
+                if (bufferObj.type === 'i') {
                     // 处理流程
                     const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
                     const process = copyData[copyData.length - 1].process || [];
                     const content = JSON.parse(bufferObj.content);
 
-                    // 处理文档（文档状态默认不更新）
-                    if (content.showType === 'docs') {
-                        content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].docs = content ? [content] : [];
-                        console.log(copyData, 'copyData');
-                        dataRef.current = copyData;
-                        setData(copyData);
-                    }
                     // 处理链接
                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入

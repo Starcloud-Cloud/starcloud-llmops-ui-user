@@ -17,15 +17,15 @@ const ChatMarkdown = (props: tProps) => {
     const { textContent } = props;
 
     // 处理文档类型
-    const replacedText = textContent.replace(
-        /\{(\d+)\}/g,
-        `<span style="
-    padding: 0 3px;
-    background: rgb(103, 58, 183);
-    color: white;
-    border-radius: 4px;
-">$1</span>`
-    );
+    // const replacedText = textContent.replace(
+    //     /\{(\d+)\}/g,
+    //     `<span style="
+    //     padding: 0 3px;
+    //     background: rgb(103, 58, 183);
+    //     color: white;
+    //     border-radius: 4px;
+    // ">$1</span>`
+    // );
 
     return (
         <>
@@ -105,7 +105,7 @@ const ChatMarkdown = (props: tProps) => {
                         }
                     }}
                 >
-                    {replacedText}
+                    {textContent}
                 </ReactMarkdown>
             </div>
         </>

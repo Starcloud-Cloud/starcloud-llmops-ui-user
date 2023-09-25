@@ -341,8 +341,8 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                             );
                                                                         }
                                                                     })}
-                                                                {history.docs &&
-                                                                    history.docs.map((item: any, index: number) => (
+                                                                {history.context &&
+                                                                    history.context.map((item: any, index: number) => (
                                                                         <div key={index}>
                                                                             {history?.answer ? (
                                                                                 <div
@@ -359,51 +359,68 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                     <LoadingDot />
                                                                                 </div>
                                                                             )}
-                                                                            <div className="py-1">
-                                                                                <Divider />
-                                                                            </div>
-                                                                            <div className="flex items-center mt-1">
-                                                                                <div className="text-xs" style={{ flex: '0 0 37px' }}>
-                                                                                    来源：
-                                                                                </div>
-                                                                                <div className="grid grid-cols-3 gap-1 flex: 1 w-full">
-                                                                                    {item?.data?.map((v: any, index: number) => (
-                                                                                        <Popover
-                                                                                            key={index}
-                                                                                            content={
-                                                                                                <div className="max-w-[250px]">
-                                                                                                    <span>{v?.desc}</span>
-                                                                                                    {isMobile && (
-                                                                                                        <div>
-                                                                                                            <a target="_blank" href={v.url}>
-                                                                                                                点击查看
-                                                                                                            </a>
-                                                                                                        </div>
-                                                                                                    )}
-                                                                                                </div>
-                                                                                            }
-                                                                                            trigger={isMobile ? 'click' : 'hover'}
-                                                                                            title={
-                                                                                                <div className="w-[250px]">{v.name}</div>
-                                                                                            }
+                                                                            {!history.isNew && (
+                                                                                <>
+                                                                                    <div className="py-1">
+                                                                                        <Divider />
+                                                                                    </div>
+                                                                                    <div className="flex items-center mt-1">
+                                                                                        <div
+                                                                                            className="text-xs"
+                                                                                            style={{ flex: '0 0 37px' }}
                                                                                         >
-                                                                                            <Tag
-                                                                                                color="#673ab7"
-                                                                                                className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
-                                                                                                onClick={() =>
-                                                                                                    !isMobile && window.open(v?.url)
-                                                                                                }
-                                                                                            >
-                                                                                                <span>{index + 1}</span>
-                                                                                                <span> {v?.name}</span>
-                                                                                            </Tag>
-                                                                                        </Popover>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
+                                                                                            来源：
+                                                                                        </div>
+                                                                                        <div className="grid grid-cols-3 gap-1 flex: 1 w-full">
+                                                                                            {item?.data?.map((v: any, index: number) => (
+                                                                                                <Popover
+                                                                                                    key={index}
+                                                                                                    content={
+                                                                                                        <div className="max-w-[250px]">
+                                                                                                            <span>{v?.desc}</span>
+                                                                                                            {isMobile && (
+                                                                                                                <div>
+                                                                                                                    <a
+                                                                                                                        target="_blank"
+                                                                                                                        href={v.url}
+                                                                                                                    >
+                                                                                                                        点击查看
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                    trigger={isMobile ? 'click' : 'hover'}
+                                                                                                    title={
+                                                                                                        <div className="w-[250px]">
+                                                                                                            {v.name}
+                                                                                                        </div>
+                                                                                                    }
+                                                                                                >
+                                                                                                    <Tag
+                                                                                                        color="purple"
+                                                                                                        className="cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis w-full !text-[12px]"
+                                                                                                        bordered={false}
+                                                                                                        onClick={() =>
+                                                                                                            v.type === 'WEB' &&
+                                                                                                            !isMobile &&
+                                                                                                            window.open(v?.url)
+                                                                                                        }
+                                                                                                    >
+                                                                                                        <span>{index + 1}.</span>
+                                                                                                        <span className="ml-[2px]">
+                                                                                                            {v?.name}
+                                                                                                        </span>
+                                                                                                    </Tag>
+                                                                                                </Popover>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </>
+                                                                            )}
                                                                         </div>
                                                                     ))}
-                                                                {!history?.docs &&
+                                                                {!history?.context &&
                                                                     (history?.answer ? (
                                                                         <div
                                                                             className={`text-sm whitespace-pre-line  ${

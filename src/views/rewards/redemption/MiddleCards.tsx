@@ -33,7 +33,7 @@ const MiddleCards = () => {
         {
             Icon: AccountBoxIcon,
             title: '注册魔法AI账号',
-            description: '送5000字/10张图片',
+            description: '送5000字/5张图片',
             buttonText: '已注册',
             isDisabled: true,
             onClick: undefined

@@ -8,7 +8,7 @@ export default function fetchRequest(url: string, method: string, body: any, hea
             credentials: 'include' as RequestCredentials,
             headers: {
                 ...headers,
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: body ? JSON.stringify(body) : null
         };
@@ -19,7 +19,7 @@ export default function fetchRequest(url: string, method: string, body: any, hea
         const timer = setTimeout(() => {
             controller.abort(); // 请求超时时中断请求
             reject(new Error('Request timeout'));
-        }, 1000 * 60 * 3);
+        }, 1000 * 60 * 5);
 
         fetch(share_base_url + url, { ...options, signal })
             .then((response) => {

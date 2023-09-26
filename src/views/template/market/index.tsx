@@ -173,7 +173,7 @@ function TemplateMarket() {
             setVCodeOpen(false);
             const res = await sendCode({
                 tool: 2,
-                scene: 21,
+                scene: 23,
                 account: values.phone
             });
         }
@@ -284,12 +284,12 @@ function TemplateMarket() {
                                 phone: Yup.string()
                                     .required('手机号必填')
                                     .matches(/^1[3-9]\d{9}$/, '请输入有效的手机号'),
-                                vcode: Yup.string().max(4, '验证码格式错误').required('请输入验证码')
+                                vcode: Yup.string().max(6, '验证码格式错误').required('请输入验证码')
                             })}
                             onSubmit={async (values, { setErrors, setStatus }) => {
                                 //手机号绑定
                                 const res = await validateCode({
-                                    sence: 23,
+                                    scene: 23,
                                     tool: 2,
                                     account: values.phone,
                                     code: values.vcode
@@ -298,7 +298,10 @@ function TemplateMarket() {
                         >
                             {({ errors, handleBlur, handleChange, validateField, handleSubmit, touched, values }) => (
                                 <form noValidate onSubmit={handleSubmit}>
-                                    <Grid container spacing={2}>
+                                    <Grid container>
+                                        <Grid item md={12}>
+                                            <Typography variant="body1">为保障帐号安全，请完成手机号绑定</Typography>
+                                        </Grid>
                                         <Grid item md={12}>
                                             <TextField
                                                 fullWidth
@@ -330,7 +333,7 @@ function TemplateMarket() {
                                                         }
                                                     }}
                                                 />
-                                                <Box mt="10px">
+                                                <Box mt="5px">
                                                     <Button
                                                         disabled={!vcodeOpen}
                                                         onClick={() => {

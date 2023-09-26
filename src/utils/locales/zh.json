@@ -784,13 +784,14 @@
     "CHAT": "聊天",
     "COMPLETION": "生成",
     "BASE_GENERATE_IMAGE": "生成图片",
+    "IMAGE": "生成图片",
     "detail": "详情"
   },
   "generateLog": {
     "messageTotal": "使用次数",
     "usertotal": "用户满意程度",
     "TimeConsuming": "平均耗时",
-    "tokenTotal": "字节总数",
+    "tokenTotal": "消耗令牌数",
     "name": "名称",
     "date": "时间",
     "search": "搜索"

@@ -42,14 +42,13 @@ import {
     TableBody,
     TableContainer,
     Paper,
-    Switch,
     FormControl,
     InputLabel,
     Select,
     MenuItem
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Tag } from 'antd';
+import { Tag, Switch } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { Upload, UploadProps, Popover, Progress } from 'antd';
@@ -1363,7 +1362,8 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                                     </TableCell>
                                                     <TableCell sx={{ minWidth: '100px', maxWidth: '100px' }}>
                                                         <Switch
-                                                            color="secondary"
+                                                            checkedChildren="开启"
+                                                            unCheckedChildren="关闭"
                                                             checked={item.enabled}
                                                             onChange={async () => {
                                                                 if (item.enabled) {

@@ -136,6 +136,10 @@ export default function PicModal({
                                     <span className="text-base">{engine}</span>
                                 </div>
                                 <div className="flex flex-col  mt-3">
+                                    <span className="text-lg font-medium">风格:</span>
+                                    <span className="text-base">{engine}</span>
+                                </div>
+                                <div className="flex flex-col  mt-3">
                                     <span className="text-lg font-medium">尺寸:</span>
                                     <span className="text-base">
                                         {width} x {height}
@@ -149,7 +153,7 @@ export default function PicModal({
                                             downloadFile(
                                                 currentImageList[currentIndex].url,
                                                 `${currentImageList[currentIndex].uuid}.${
-                                                    currentImageList[currentIndex].media_type?.split('/')[1]
+                                                    currentImageList[currentIndex].mediaType?.split('/')[1]
                                                 }`
                                             )
                                         }

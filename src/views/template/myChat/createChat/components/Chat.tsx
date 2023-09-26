@@ -570,7 +570,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -586,7 +586,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -653,7 +653,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -696,7 +696,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -710,7 +710,7 @@ export const Chat = ({
                 {
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar,
-                    answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                    answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                     isStatement: true
                 }
             ];

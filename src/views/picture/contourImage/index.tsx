@@ -10,9 +10,12 @@ const ContourImage = () => {
     const [lines, setLines] = useState<any[]>([]);
     const isDrawing = useRef(false);
     const hisRef = useRef(false);
+    const stageRef: any = useRef(null);
     const handleMouseDown = (e: any) => {
         hisRef.current = false;
         isDrawing.current = true;
+        console.log(e.target);
+
         const pos = e.target.getStage().getPointerPosition();
         setLines([...lines, { points: [pos.x, pos.y] }]);
     };
@@ -27,7 +30,9 @@ const ContourImage = () => {
         lines.splice(lines.length - 1, 1, lastLine);
         setLines(lines.concat());
     };
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: any) => {
+        console.log(e);
+
         isDrawing.current = false;
     };
     useEffect(() => {
@@ -65,7 +70,14 @@ const ContourImage = () => {
         <div className="h-full flex items-top justify-center gap-3">
             <div>
                 <div className="w-[500px] h-[500px] border border-solid border-black">
-                    <Stage width={500} height={500} onMouseDown={handleMouseDown} onMousemove={handleMouseMove} onMouseup={handleMouseUp}>
+                    <Stage
+                        width={500}
+                        height={500}
+                        ref={stageRef}
+                        onMouseDown={handleMouseDown}
+                        onMousemove={handleMouseMove}
+                        onMouseup={handleMouseUp}
+                    >
                         <Layer>
                             {lines.map((line, i: number) => (
                                 <Line
@@ -127,7 +139,14 @@ const ContourImage = () => {
                         setDesc(e.target.value);
                     }}
                 />
-                <Button color="secondary" variant="outlined" fullWidth>
+                <Button
+                    onClick={() => {
+                        console.log(stageRef.current.toDataURL());
+                    }}
+                    color="secondary"
+                    variant="outlined"
+                    fullWidth
+                >
                     生成简笔画
                 </Button>
             </div>

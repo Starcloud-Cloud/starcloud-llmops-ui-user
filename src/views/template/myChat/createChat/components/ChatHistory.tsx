@@ -240,7 +240,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                         if (
                                                                             item.showType === 'tips' ||
                                                                             item.showType == 'url' ||
-                                                                            item.showType == 'img'
+                                                                            item.showType == 'json'
                                                                         ) {
                                                                             return (
                                                                                 <div className="flex flex-col pb-3 rounded-md" key={index}>
@@ -325,22 +325,10 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                                 </div>
                                                                                             )}
                                                                                             {item.showType === 'url' && (
-                                                                                                <WebPageInfo
-                                                                                                    data={
-                                                                                                        item.data?.response ||
-                                                                                                        item.data ||
-                                                                                                        []
-                                                                                                    }
-                                                                                                />
+                                                                                                <WebPageInfo data={item.data || []} />
                                                                                             )}
                                                                                             {item.showType === 'img' && (
-                                                                                                <ImageCard
-                                                                                                    data={
-                                                                                                        item.data?.response ||
-                                                                                                        item.data ||
-                                                                                                        []
-                                                                                                    }
-                                                                                                />
+                                                                                                <ImageCard data={item.data || []} />
                                                                                             )}
                                                                                         </>
                                                                                     )}

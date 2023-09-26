@@ -25,6 +25,7 @@ export type IImageListTypeChild = {
     width: number;
     height: number;
     create: boolean;
+    stylePreset?: string;
 };
 
 const PictureCreate = () => {

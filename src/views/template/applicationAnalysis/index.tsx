@@ -282,7 +282,8 @@ function ApplicationAnalysis({
         prompt: '',
         engine: '',
         width: 0,
-        height: 0
+        height: 0,
+        stylePreset: ''
     });
     const [currentIndex, setCurrentIndex] = useState(0);
     //执行弹窗
@@ -490,6 +491,7 @@ function ApplicationAnalysis({
                     engine={ImgDetail.engine}
                     width={ImgDetail.width}
                     height={ImgDetail.height}
+                    stylePreset={ImgDetail?.stylePreset}
                 />
             )}
             {chatVisible && (

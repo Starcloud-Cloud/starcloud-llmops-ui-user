@@ -304,9 +304,9 @@ const transformTips = (key: IChatType, status: string | undefined) => {
             }
         case 'ImageGenerationHandler':
             if (status === 'ERROR') {
-                return '生成图片失败';
+                return '图片生成失败';
             } else {
-                return '生成图片完毕';
+                return '图片生成完成';
             }
         case 'NewsSearchHandler':
             if (status === 'ERROR') {
@@ -321,17 +321,23 @@ const transformTips = (key: IChatType, status: string | undefined) => {
                 return '查询完成';
             }
         }
+        default:
+            break;
     }
 };
 
 const transformData = (key: IChatType, data: any) => {
     switch (key) {
         case 'WebSearch2DocHandler':
-            return [data];
+            return data ? [data] : [];
         case 'NewsSearchHandler':
             return data?.response || [];
         case 'ImageSearchHandler':
             return data?.response || [];
+        case 'ImageGenerationHandler':
+            return data?.imageUrls || [];
+        default:
+            break;
     }
 };
 

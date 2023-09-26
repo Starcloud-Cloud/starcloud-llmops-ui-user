@@ -46,6 +46,7 @@ export const PictureCreateContainer = ({
         width: number;
         engine: string;
         prompt: string;
+        stylePreset?: string;
     } | null>(null);
 
     const [currentTranslateIndex, setCurrentTranslateIndex] = useState<number>();
@@ -394,7 +395,8 @@ export const PictureCreateContainer = ({
                                                             height: item.height,
                                                             width: item.width,
                                                             prompt: item.prompt,
-                                                            engine: item.engine
+                                                            engine: item.engine,
+                                                            stylePreset: item?.stylePreset
                                                         });
                                                     }}
                                                 >
@@ -442,6 +444,7 @@ export const PictureCreateContainer = ({
                         prompt={record?.prompt}
                         width={record?.width}
                         height={record?.height}
+                        stylePreset={record?.stylePreset}
                     />
                 )}
             </div>

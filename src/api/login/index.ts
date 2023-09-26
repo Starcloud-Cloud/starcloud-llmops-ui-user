@@ -88,3 +88,13 @@ export const oriregister = (data: any) => {
 export const qRcodeLogin = (data: any) => {
     return request.postOriginal({ url: 'llm/wechat/qr/login', data });
 };
+
+//获取验证码
+export const sendCode = (data: any) => {
+    return request.postOriginal({ url: 'llm/communication/code/send', data });
+};
+
+//手机号注册
+export const validateCode = (data: any) => {
+    return request.postOriginal({ url: 'llm/communication/validate/code', data });
+};

@@ -99,6 +99,8 @@ export type IConversation = {
     createTime: number;
 };
 
+export type IChatType = 'WebSearch2DocHandler' | 'NewsSearchHandler' | 'ImageSearchHandler' | 'ImageGenerationHandler' | undefined;
+
 export const ChatBtn = () => {
     const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);
     const [isListening, setIsListening] = React.useState(false);
@@ -276,18 +278,63 @@ export const ChatBtn = () => {
 };
 
 // 转换type
-const transformType = (key: string) => {
+const transformType = (key: IChatType) => {
     switch (key) {
-        case 'news':
+        // 技能 网页和文档分析
+        case 'WebSearch2DocHandler':
             return 'url';
-        case 'content':
+        case 'NewsSearchHandler':
             return 'url';
-        case 'image':
+        case 'ImageGenerationHandler':
             return 'img';
+        case 'ImageSearchHandler':
+            return 'url';
         default:
             break;
     }
 };
+
+const transformTips = (key: IChatType, status: string | undefined) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            if (status === 'ERROR') {
+                return '生成回答失败';
+            } else {
+                return '生成回答完毕';
+            }
+        case 'ImageGenerationHandler':
+            if (status === 'ERROR') {
+                return '生成图片失败';
+            } else {
+                return '生成图片完毕';
+            }
+        case 'NewsSearchHandler':
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        case 'ImageSearchHandler': {
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        }
+    }
+};
+
+const transformData = (key: IChatType, data: any) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            return [data];
+        case 'NewsSearchHandler':
+            return data?.response || [];
+        case 'ImageSearchHandler':
+            return data?.response || [];
+    }
+};
+
 export function extractChatBlocks(data: any) {
     try {
         const chatBlocks: any[] = [];
@@ -330,12 +377,15 @@ export function extractChatBlocks(data: any) {
                     }
                 }
 
-                loop.forEach((item: { answer: string; status: string }[], index: string | number) => {
+                loop.forEach((item: { answer: string; status: string; message?: IChatType }[], index: string | number) => {
                     currentData.process[index] = {
-                        tips: item?.[1]?.status === 'ERROR' ? '查询失败' : '查询完成',
-                        showType: item?.[0]?.answer && transformType(JSON.parse(item[0].answer).arguments?.type),
+                        tips: transformTips(item?.[1]?.message, item?.[1]?.status),
+                        showType: transformType(item?.[1]?.message),
                         input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
-                        data: item?.[1]?.status === 'ERROR' ? item?.[1]?.answer : item?.[1]?.answer && JSON.parse(item[1].answer),
+                        data:
+                            item?.[1]?.status === 'ERROR'
+                                ? item?.[1]?.answer
+                                : item?.[1]?.answer && transformData(item?.[1]?.message, JSON.parse(item?.[1]?.answer)),
                         success: item?.[1]?.status === 'ERROR' ? false : true,
                         status: 1,
                         id: uuidv4()
@@ -498,7 +548,7 @@ export const Chat = ({
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (mode === 'test' && conversationUid && isFirst && chatBotInfo.name) {
+        if (mode === 'test' && conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({

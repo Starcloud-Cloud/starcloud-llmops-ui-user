@@ -245,7 +245,11 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                             return (
                                                                                 <div className="flex flex-col pb-3 rounded-md" key={index}>
                                                                                     <div
-                                                                                        onClick={() => toggleItem(item.id)}
+                                                                                        onClick={() =>
+                                                                                            item.status &&
+                                                                                            item.success &&
+                                                                                            toggleItem(item.id)
+                                                                                        }
                                                                                         className={`flex items-center px-[8px] py-[8px] ${
                                                                                             item.status === 0
                                                                                                 ? 'bg-[#dbf3d9]'
@@ -287,13 +291,16 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                                 </div>
                                                                                             )}
                                                                                         </div>
-                                                                                        <div className="flex items-center justify-center">
-                                                                                            {expandedItems.includes(item.id) ? (
-                                                                                                <ExpandLessIcon className="w-[18px] h-[18px]" />
-                                                                                            ) : (
-                                                                                                <ExpandMoreIcon className="w-[18px] h-[18px]" />
-                                                                                            )}
-                                                                                        </div>
+                                                                                        {/* 完成并且是成功的才能打开 */}
+                                                                                        {item.status && item.success && (
+                                                                                            <div className="flex items-center justify-center">
+                                                                                                {expandedItems.includes(item.id) ? (
+                                                                                                    <ExpandLessIcon className="w-[18px] h-[18px]" />
+                                                                                                ) : (
+                                                                                                    <ExpandMoreIcon className="w-[18px] h-[18px]" />
+                                                                                                )}
+                                                                                            </div>
+                                                                                        )}
                                                                                     </div>
                                                                                     {expandedItems.includes(item.id) && (
                                                                                         <>

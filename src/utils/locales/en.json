@@ -726,6 +726,7 @@
     "CHAT": "Chat",
     "COMPLETION": "Completion",
     "BASE_GENERATE_IMAGE": "Base Generate Image",
+    "IMAGE": "Generate Picture",
     "detail": "Detail"
   },
   "generateLog": {

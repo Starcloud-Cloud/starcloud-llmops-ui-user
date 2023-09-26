@@ -266,7 +266,7 @@ function ApplicationAnalysis({
     };
     const categoryList = marketStore((state) => state.categoryList);
     const getDeList = (row: { appMode: string; uid: string }) => {
-        if (row.appMode === 'BASE_GENERATE_IMAGE') {
+        if (row.appMode === 'IMAGE') {
             detailImage({ conversationUid: row.uid }).then((res) => {
                 setResult(res);
                 setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
@@ -436,11 +436,11 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
-                                        disabled={row.status !== 'SUCCESS'}
+                                        disabled={row.status !== 'SUCCESS' && row.totalAnswerTokens === 0}
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
-                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                            if (row.appMode === 'IMAGE') {
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ conversationUid: row.uid }).then((res) => {

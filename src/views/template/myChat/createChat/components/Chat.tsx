@@ -351,6 +351,7 @@ export function extractChatBlocks(data: any) {
                 }
             }
         }
+        console.log(chatBlocks, 'chatBlocks');
         return chatBlocks;
     } catch (e) {
         console.log(e, 'e');

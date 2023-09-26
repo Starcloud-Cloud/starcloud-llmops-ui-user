@@ -554,12 +554,12 @@ function ApplicationAnalysis({
                                         {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                {result.status !== 'ERROR' && (
+                                                {result.status !== 'ERROR' && exeDetail?.icon && (
                                                     <Image
                                                         preview={false}
-                                                        className="rounded-lg overflow-hidden"
                                                         height={60}
-                                                        src={exeDetail?.images[0]}
+                                                        className="rounded-lg overflow-hidden"
+                                                        src={require('../../../assets/images/category/' + exeDetail?.icon + '.svg')}
                                                     />
                                                 )}
                                                 <Box>

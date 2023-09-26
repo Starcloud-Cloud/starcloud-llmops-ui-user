@@ -151,54 +151,32 @@ function TemplateMarket() {
                 }}
             >
                 <Box>
-                    <Box className="flex mb-[8px] flex-wrap items-end gap-3">
-                        <Typography variant="h2" lineHeight={1}>
-                            {t('market.title')}
-                        </Typography>
-                        {/* <Typography color="#697586" fontSize="12px" ml={0.5} fontWeight={500}>
-                                {t('market.subLeft')} {total} + {t('market.subright')}
-                            </Typography> */}
-                        <TextField
-                            size="small"
-                            id="filled-start-adornment"
-                            sx={{ width: '300px' }}
-                            placeholder={t('market.place')}
-                            name="name"
-                            value={queryParams.name}
-                            onChange={handleChange}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                    </Box>
-
-                    <Grid container spacing={2} mb={1}>
-                        <Grid item xs={12} md={10}>
+                    <Grid alignItems="center" container spacing={2} mb={1}>
+                        <Grid item xs={12} md={9}>
                             <ScrollMenus change={changeCategory} />
                         </Grid>
-                        <Grid item xs={12} md={2}>
-                            <FormControl fullWidth>
-                                <InputLabel id="sort">{t('market.sortby')}</InputLabel>
-                                <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label={t('market.sortby')}>
-                                    {sortList.map((el: any) => (
-                                        <MenuItem key={el.key} value={el.key}>
-                                            {el.text}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <Grid item xs={12} md={3}>
+                            <TextField
+                                size="small"
+                                id="filled-start-adornment"
+                                fullWidth
+                                placeholder={t('market.place')}
+                                name="name"
+                                value={queryParams.name}
+                                onChange={handleChange}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
                         </Grid>
                     </Grid>
                 </Box>
                 <Outlet />
             </Box>
-            {/* <div className="w-full bottom-5 absolute">
-                <ChatBtn />
-            </div> */}
         </Box>
     );
 }

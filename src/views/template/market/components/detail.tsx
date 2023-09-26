@@ -290,7 +290,14 @@ function Deatail() {
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                    <Image preview={false} className="rounded-lg overflow-hidden" height={60} src={detailData?.images[0]} />
+                    {detailData?.icon && (
+                        <Image
+                            preview={false}
+                            className="rounded-lg overflow-hidden"
+                            height={60}
+                            src={require('../../../../assets/images/category/' + detailData?.icon + '.svg')}
+                        />
+                    )}
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>

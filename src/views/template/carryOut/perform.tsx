@@ -97,7 +97,9 @@ function Perform({
     useEffect(() => {
         if (mdRef.current && mdRef.current.length > 0) {
             config.steps?.map((item: any, index: number) => {
-                mdRef.current[index].scrollTop = mdRef.current[index].scrollHeight;
+                if (item.flowStep.response.style !== 'IMAGE') {
+                    mdRef.current[index].scrollTop = mdRef.current[index].scrollHeight;
+                }
             });
         }
     }, [config?.steps?.map((item: any) => item?.flowStep.response.answer)]);

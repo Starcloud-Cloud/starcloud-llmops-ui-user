@@ -481,7 +481,14 @@ function CreateDetail() {
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    <Image preview={false} className="rounded-lg overflow-hidden" height={60} src={detail?.images[0]} />
+                                    {detail?.icon && (
+                                        <Image
+                                            preview={false}
+                                            height={60}
+                                            className="rounded-lg overflow-hidden"
+                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                        />
+                                    )}
                                     <Box>
                                         <Box>
                                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -501,7 +508,7 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                             </Box>
-                            <Divider sx={{ mb: 1 }} />
+                            <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
@@ -546,7 +553,14 @@ function CreateDetail() {
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    <Image preview={false} className="rounded-lg overflow-hidden" height={60} src={detail?.images[0]} />
+                                    {detail?.icon && (
+                                        <Image
+                                            preview={false}
+                                            height={60}
+                                            className="rounded-lg overflow-hidden"
+                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                        />
+                                    )}
                                     <Box>
                                         <Box>
                                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -566,7 +580,7 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                             </Box>
-                            <Divider sx={{ mb: 1 }} />
+                            <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>

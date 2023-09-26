@@ -853,6 +853,24 @@
     "Model 3D": "三维模型",
     "Pixel Art": "像素艺术"
   },
+  "textToImageValue": {
+    "enhance": "增强",
+    "anime": "动漫",
+    "photographic": "摄影",
+    "digital-art": "数字艺术",
+    "comic-book": "漫画风",
+    "fantasy-art": "奇幻艺术",
+    "analog-film": "胶片风",
+    "neon-punk": "霓虹朋克",
+    "isometric": "等轴投影",
+    "low-poly": "低多边形",
+    "origami": "折纸",
+    "line-art": "线条艺术",
+    "modeling-compound": "手工泥塑",
+    "cinematic": "电影风",
+    "3d-model": "三维模型",
+    "pixel-art": "像素艺术"
+  },
   "voiceStyles": {
     "affectionate": "深情",
     "embarrassed": "尴尬",

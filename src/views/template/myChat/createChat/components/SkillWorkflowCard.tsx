@@ -81,7 +81,8 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                 desc: data.description,
                 copyWriting: data.copyWriting,
                 code: data.code,
-                icon: data.images
+                icon: data.images,
+                usage: data?.usage
             };
         }
         if (data.type === 3) {
@@ -92,7 +93,8 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                 skillAppUid: data.skillAppUid,
                 icon: data.images,
                 appType: data?.appType,
-                defaultPromptDesc: data.defaultPromptDesc
+                defaultPromptDesc: data.defaultPromptDesc,
+                usage: data?.usage
             };
         }
 

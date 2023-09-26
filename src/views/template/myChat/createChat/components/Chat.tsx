@@ -1216,8 +1216,8 @@ export const Chat = ({
                                 <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
                             </div>
                         )}
-                        {conversationUid && mode !== 'share' && (
-                            <Tooltip title={'把你的对话分享给朋友'}>
+                        {conversationUid && mode !== 'share' && !isFetch && (
+                            <Tooltip title={'把你的对话分享给朋友吧，还可以免费增加权益哦！'}>
                                 <svg
                                     onClick={() => handleShare()}
                                     className={`absolute ${

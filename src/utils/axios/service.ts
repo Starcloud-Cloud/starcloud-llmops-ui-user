@@ -175,7 +175,7 @@ service.interceptors.response.use(
             return Promise.reject('error');
         } else if (code !== 200 && code !== 0) {
             PubSub.publish('global.error', { message: msg, type: 'error' });
-            return Promise.reject('error');
+            return Promise.reject(data);
         } else {
             return data;
         }

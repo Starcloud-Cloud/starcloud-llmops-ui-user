@@ -99,16 +99,16 @@ const ProfileSection = () => {
         setOpen(false);
     };
     const prevOpen = useRef(open);
-    const { invitationCode, setInvitationCode } = infoStore();
+    const { use, setuse } = infoStore();
     const fetchData = async () => {
-        if (!invitationCode) {
+        if (!use?.inviteCode) {
             const result = await getUserInfo();
-            setInvitationCode(result.inviteCode);
+            setuse(result);
         }
     };
     const [loading, setLoading] = useState(false);
     const copyCode = () => {
-        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode);
+        copy(use?.inviteUrl as string);
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -242,20 +242,10 @@ const ProfileSection = () => {
                                                         </Grid>
                                                     </Grid>
                                                     <Typography variant="body1" sx={{ width: '220px', textDecoration: 'underline' }}>
-                                                        {window.location.protocol + '//' + window.location.host}/login?q=
-                                                        {invitationCode}
+                                                        {use?.inviteUrl}
                                                     </Typography>
                                                     <Box marginTop={1} textAlign="center">
-                                                        <QRCode
-                                                            size={100}
-                                                            value={
-                                                                window.location.protocol +
-                                                                '//' +
-                                                                window.location.host +
-                                                                '/login?q=' +
-                                                                invitationCode
-                                                            }
-                                                        />
+                                                        <QRCode size={100} value={use?.inviteUrl as string} />
                                                         <Typography variant="h5" mb={1}>
                                                             {t('market.invitation')}
                                                         </Typography>

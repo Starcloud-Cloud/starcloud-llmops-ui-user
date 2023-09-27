@@ -13,13 +13,13 @@ const LintellgentMatting = () => {
                         title="green iguana"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5">
+                        <Typography gutterBottom variant="h3">
                             批量自动抠图
                         </Typography>
-                        <Typography my={1} variant="h5" color="text.secondary">
+                        <Typography my={1} variant="h3" color="text.secondary">
                             全品类智能识别
                         </Typography>
-                        <Typography variant="h5" color="text.secondary">
+                        <Typography variant="h3" color="text.secondary">
                             一键批量自动抠出主体
                         </Typography>
                     </CardContent>
@@ -31,13 +31,13 @@ const LintellgentMatting = () => {
                         title="green iguana"
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
+                        <Typography gutterBottom variant="h3" component="div">
                             批量自动取背景文字
                         </Typography>
-                        <Typography my={1} variant="h5" color="text.secondary">
+                        <Typography my={1} variant="h3" color="text.secondary">
                             全品类智能识别
                         </Typography>
-                        <Typography variant="h5" color="text.secondary">
+                        <Typography variant="h3" color="text.secondary">
                             一键去除背景文字
                         </Typography>
                     </CardContent>

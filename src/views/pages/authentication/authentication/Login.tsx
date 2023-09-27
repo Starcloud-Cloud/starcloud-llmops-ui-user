@@ -41,9 +41,9 @@ const Login = () => {
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
-    const { setInvitationCode } = infoStore();
+    const { setuse } = infoStore();
     useEffect(() => {
-        setInvitationCode(null);
+        setuse({});
     }, []);
     return (
         <AuthWrapper2>

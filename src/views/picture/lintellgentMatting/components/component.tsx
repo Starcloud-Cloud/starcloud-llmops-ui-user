@@ -5,14 +5,18 @@ import { ColorPicker, Radio, InputNumber, Upload, Progress, Image } from 'antd';
 import type { UploadProps } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
     const [scale, setScale] = useState<number | null>(100);
+    //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
+    //抠图完成的图片
+    const [sucImageList, setSucImageList] = useState<any[]>([]);
+    const suRef = useRef([]);
     const [open, setOpen] = useState(false);
     //上传图片
     const { Dragger } = Upload;
@@ -56,6 +60,8 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                         imageUrl: item.response?.data?.url
                     }
                 }).then((res: any) => {
+                    // suRef.current.push(res)
+                    // setSucImageList(suRef.current)
                     console.log(res);
                 });
             }
@@ -73,7 +79,7 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                         <p className="ant-upload-hint">仅支持 .jpg/.png/.webp 格式</p>
                     </div>
                 </Dragger>
-                {imageList.map((item, index) => (
+                {sucImageList.map((item, index) => (
                     <div key={index} className="w-[240px] h-[240px] rounded-lg overflow-hidden relative border">
                         <Image
                             width="100%"

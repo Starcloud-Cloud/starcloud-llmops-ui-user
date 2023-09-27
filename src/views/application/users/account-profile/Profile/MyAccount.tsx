@@ -11,6 +11,7 @@ import { ProfileVO, updateUserProfile } from 'api/system/user/profile';
 import { openSnackbar } from 'store/slices/snackbar';
 import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
+import Phone from 'ui-component/login/phone';
 
 interface MyAccountProps {
     userProfile: ProfileVO | null;
@@ -78,8 +79,20 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
     const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSex(event.target.value);
     };
+    //手机号
+    const [phoneOpne, setPhoneOpen] = useState(false);
     return (
         <Grid container spacing={gridSpacing}>
+            <Phone
+                onClose={() => setPhoneOpen(false)}
+                phoneOpne={phoneOpne}
+                title="修改手机号"
+                submitText="修改"
+                emits={() => {
+                    forceUpdate();
+                    setPhoneOpen(false);
+                }}
+            />
             <Grid item xs={12}>
                 <SubCard title={t('2profile.user.general')}>
                     <form noValidate autoComplete="off">
@@ -108,7 +121,10 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
                                     fullWidth
                                     label={t('2profile.user.mobile')}
                                     value={mobile}
-                                    onChange={(e) => setMobile(e.target.value)}
+                                    onClick={() => {
+                                        setPhoneOpen(true);
+                                    }}
+                                    // onChange={(e) => setMobile(e.target.value)}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>

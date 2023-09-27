@@ -33,7 +33,6 @@ const ImageMatting = () => {
                         <Typography mt={1} variant="h3" color="text.secondary">
                             放大清晰不失真，细节更丰富
                         </Typography>
-                        、
                     </CardContent>
                 </Card>
             </div>

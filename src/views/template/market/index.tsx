@@ -208,7 +208,7 @@ function TemplateMarket() {
                 </Box>
                 <Outlet />
             </Box>
-            <Phone
+            {/* <Phone
                 phoneOpne={phoneOpne}
                 title="绑定手机号"
                 submitText="绑定"
@@ -218,7 +218,7 @@ function TemplateMarket() {
                     const result = await getUserInfo();
                     setuse(result);
                 }}
-            />
+            /> */}
         </Box>
     );
 }

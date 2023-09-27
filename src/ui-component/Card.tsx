@@ -137,7 +137,7 @@ const Cards = ({ flag = false }) => {
     const navigate = useNavigate();
     const { userInfo, setUserInfo }: any = userInfoStore();
     const copyCode = () => {
-        copy(use.inviteUrl as string);
+        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         dispatch(
             openSnackbar({
                 open: true,
@@ -237,11 +237,14 @@ const Cards = ({ flag = false }) => {
                                     '&:hover': { color: '#673ab7' }
                                 }}
                             >
-                                {use.inviteUrl as string}
+                                {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
                             </Typography>
                         </Tooltip>
                         <Box marginTop={3} textAlign="center">
-                            <QRCode size={100} value={use.inviteUrl as string} />
+                            <QRCode
+                                size={100}
+                                value={window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
+                            />
                             <Typography variant="h5">{t('market.invitation')}</Typography>
                         </Box>
                     </Box>

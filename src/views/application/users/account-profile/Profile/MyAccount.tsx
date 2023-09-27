@@ -83,16 +83,18 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
     const [phoneOpne, setPhoneOpen] = useState(false);
     return (
         <Grid container spacing={gridSpacing}>
-            <Phone
-                onClose={() => setPhoneOpen(false)}
-                phoneOpne={phoneOpne}
-                title="修改手机号"
-                submitText="修改"
-                emits={() => {
-                    forceUpdate();
-                    setPhoneOpen(false);
-                }}
-            />
+            {phoneOpne && (
+                <Phone
+                    onClose={() => setPhoneOpen(false)}
+                    phoneOpne={phoneOpne}
+                    title="修改手机号"
+                    submitText="修改"
+                    emits={() => {
+                        forceUpdate();
+                        setPhoneOpen(false);
+                    }}
+                />
+            )}
             <Grid item xs={12}>
                 <SubCard title={t('2profile.user.general')}>
                     <form noValidate autoComplete="off">

@@ -108,7 +108,7 @@ const ProfileSection = () => {
     };
     const [loading, setLoading] = useState(false);
     const copyCode = () => {
-        copy(use?.inviteUrl as string);
+        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -242,10 +242,23 @@ const ProfileSection = () => {
                                                         </Grid>
                                                     </Grid>
                                                     <Typography variant="body1" sx={{ width: '220px', textDecoration: 'underline' }}>
-                                                        {use?.inviteUrl}
+                                                        {window.location.protocol +
+                                                            '//' +
+                                                            window.location.host +
+                                                            '/login?q=' +
+                                                            use?.inviteCode}
                                                     </Typography>
                                                     <Box marginTop={1} textAlign="center">
-                                                        <QRCode size={100} value={use?.inviteUrl as string} />
+                                                        <QRCode
+                                                            size={100}
+                                                            value={
+                                                                window.location.protocol +
+                                                                '//' +
+                                                                window.location.host +
+                                                                '/login?q=' +
+                                                                use?.inviteCode
+                                                            }
+                                                        />
                                                         <Typography variant="h5" mb={1}>
                                                             {t('market.invitation')}
                                                         </Typography>

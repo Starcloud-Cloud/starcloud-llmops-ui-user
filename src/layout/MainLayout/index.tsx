@@ -21,6 +21,10 @@ import { openDrawer } from 'store/slices/menu';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
+import { getVipTimeOut } from 'api/vip';
+import CloseIcon from '@mui/icons-material/Close';
+import { Button } from 'antd';
+import dayjs from 'dayjs';
 
 import infoStore from 'store/entitlementAction';
 import Phone from 'ui-component/login/phone';
@@ -86,122 +90,35 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
-const MainLayout = () => {
-    const navigation = getMenuItems();
-    const theme = useTheme();
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
-    const dispatch = useDispatch();
-    const { drawerOpen } = useSelector((state) => state.menu);
-    const { drawerType, container, layout } = useConfig();
-
-    const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
-        const path = location.pathname;
-        return IS_LARGE_PATH.includes(path);
-    }, [location]);
-    // useEffect(() => {
-    //     if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER) {
-    //         dispatch(openDrawer(true));
-    //     } else {
-    //         dispatch(openDrawer(false));
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [drawerType]);
-
-    useEffect(() => {
-        if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER && !matchDownMd) {
-            dispatch(openDrawer(true));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // useEffect(() => {
-    //     if (matchDownMd) {
-    //         dispatch(openDrawer(true));
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [matchDownMd]);
-
-    const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
-
-    const header = useMemo(
-        () => (
-            <Toolbar sx={{ p: condition ? '10px' : '16px' }}>
-                <Header />
-            </Toolbar>
-        ),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [layout, matchDownMd]
-    );
-    //绑定手机号
-    const { use, setuse } = infoStore();
-    useEffect(() => {
-        if (use?.mobile === '' && !use?.mobile) {
-            setPhoneOpen(true);
-        } else {
-            setPhoneOpen(false);
-        }
-    }, [use?.mobile, location]);
-    const [phoneOpne, setPhoneOpen] = useState(false);
+function ChatLink({ navigate }: { navigate: (link: string) => void }) {
     return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            {/* header */}
-            <AppBar enableColorOnDark position="fixed" color="inherit" elevation={0} sx={{ bgcolor: theme.palette.background.default }}>
-                {header}
-            </AppBar>
-
-            {/* horizontal menu-list bar */}
-            {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
-
-            {/* drawer */}
-            {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
-
-            {/* main content */}
-            <Main theme={theme} open={drawerOpen} layout={layout}>
-                {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
-                {!isLarge ? (
-                    <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
-                        {/* breadcrumb */}
-                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                        <Outlet />
-                    </Container>
-                ) : (
-                    <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
-                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                        <Outlet />
-                    </Container>
-                )}
-                <div
-                    className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
-                    onClick={() => {
-                        navigate('/chatMarket');
-                    }}
+        <div
+            className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
+            onClick={() => {
+                navigate('/chatMarket');
+            }}
+        >
+            <div>
+                <svg
+                    version="1.1"
+                    id="Layer_1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                    x="0px"
+                    y="0px"
+                    width="18px"
+                    height="18px"
+                    viewBox="0 0 18 18"
+                    enableBackground="new 0 0 24 24"
+                    xmlSpace="preserve"
                 >
-                    <div>
-                        <svg
-                            version="1.1"
-                            id="Layer_1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlnsXlink="http://www.w3.org/1999/xlink"
-                            x="0px"
-                            y="0px"
-                            width="18px"
-                            height="18px"
-                            viewBox="0 0 18 18"
-                            enableBackground="new 0 0 24 24"
-                            xmlSpace="preserve"
-                        >
-                            <image
-                                id="image0"
-                                width="18"
-                                height="18"
-                                x="0"
-                                y="0"
-                                xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                    <image
+                        id="image0"
+                        width="18"
+                        height="18"
+                        x="0"
+                        y="0"
+                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -356,32 +273,177 @@ const MainLayout = () => {
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                            />
-                        </svg>
-                    </div>
-                    <div className="text-[13px] text-[#364152] ml-[6px]">
-                        <div>有问题?</div>
-                        <div>点击开始自由对话</div>
+                    />
+                </svg>
+            </div>
+            <div className="text-[13px] text-[#364152] ml-[6px]">
+                <div>有问题?</div>
+                <div>点击开始自由对话</div>
+            </div>
+        </div>
+    );
+}
+
+const MainLayout = () => {
+    const navigation = getMenuItems();
+    const theme = useTheme();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
+    const dispatch = useDispatch();
+    const { drawerOpen } = useSelector((state) => state.menu);
+    const { drawerType, container, layout } = useConfig();
+    const [timeOutObj, setTimeOutObj] = useState<{
+        type: number;
+        time: number;
+    } | null>(null);
+
+    const isLarge = useMemo(() => {
+        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
+        const path = location.pathname;
+        return IS_LARGE_PATH.includes(path);
+    }, [location]);
+    // useEffect(() => {
+    //     if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER) {
+    //         dispatch(openDrawer(true));
+    //     } else {
+    //         dispatch(openDrawer(false));
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [drawerType]);
+
+    useEffect(() => {
+        if (drawerType === LAYOUT_CONST.DEFAULT_DRAWER && !matchDownMd) {
+            dispatch(openDrawer(true));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // useEffect(() => {
+    //     if (matchDownMd) {
+    //         dispatch(openDrawer(true));
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [matchDownMd]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await getVipTimeOut();
+            if (res.userLevel.expirationTime) {
+                setTimeOutObj({
+                    type: 1,
+                    time: dayjs(res.userLevel.expirationTime).diff(dayjs(), 'day')
+                });
+                return;
+            }
+            if (res.userBenefits.expirationTime) {
+                setTimeOutObj({
+                    type: 2,
+                    time: dayjs(res.userBenefits.expirationTime).diff(dayjs(), 'day')
+                });
+            }
+        })();
+    }, []);
+    //绑定手机号
+    const { use, setuse } = infoStore();
+    useEffect(() => {
+        if (use?.mobile === '' && !use?.mobile) {
+            setPhoneOpen(true);
+        } else {
+            setPhoneOpen(false);
+        }
+    }, [use?.mobile, location]);
+    const [phoneOpne, setPhoneOpen] = useState(false);
+    const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
+
+    const header = useMemo(
+        () => (
+            <Toolbar sx={{ p: condition ? '10px' : '16px' }}>
+                <Header />
+            </Toolbar>
+        ),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [layout, matchDownMd]
+    );
+
+    return (
+        <div className="flex flex-col">
+            {timeOutObj && (
+                <div className="flex justify-center bg-[#f4f6f8] py-1">
+                    <div className="flex items-center">
+                        {timeOutObj?.type === 1 ? (
+                            <span className="text-sm">
+                                当前套餐即将过期，{timeOutObj.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
+                            </span>
+                        ) : (
+                            <span className="text-sm">当前令牌权益将在{timeOutObj.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
+                        )}
+                        <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
+                            立即续费
+                        </Button>
+                        <div className="flex items-center" onClick={() => setTimeOutObj(null)}>
+                            <CloseIcon className="text-base ml-3 cursor-pointer" />
+                        </div>
                     </div>
                 </div>
-                {phoneOpne && (
-                    <Phone
-                        phoneOpne={phoneOpne}
-                        title="绑定手机号"
-                        submitText="绑定"
-                        onClose={() => {
-                            setPhoneOpen(false);
-                        }}
-                        emits={async () => {
-                            setPhoneOpen(false);
-                            const result = await getUserInfo();
-                            setuse(result);
-                        }}
-                    />
-                )}
-            </Main>
-            {/*<Customization />*/}
-        </Box>
+            )}
+            <div className="relative flex-1">
+                <Box sx={{ display: 'flex' }}>
+                    <CssBaseline />
+                    {/* header */}
+                    <AppBar
+                        enableColorOnDark
+                        position="absolute"
+                        color="inherit"
+                        elevation={0}
+                        sx={{ bgcolor: theme.palette.background.default }}
+                    >
+                        {header}
+                    </AppBar>
+
+                    {/* horizontal menu-list bar */}
+                    {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
+
+                    {/* drawer */}
+                    {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
+
+                    {/* main content */}
+                    <Main theme={theme} open={drawerOpen} layout={layout}>
+                        {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
+                        {!isLarge ? (
+                            <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                                {/* breadcrumb */}
+                                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                <Outlet />
+                            </Container>
+                        ) : (
+                            <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                <Outlet />
+                            </Container>
+                        )}
+                        <ChatLink navigate={navigate} />
+                        {phoneOpne && (
+                            <Phone
+                                phoneOpne={phoneOpne}
+                                title="绑定手机号"
+                                submitText="绑定"
+                                onClose={() => {
+                                    setPhoneOpen(false);
+                                }}
+                                emits={async () => {
+                                    setPhoneOpen(false);
+                                    const result = await getUserInfo();
+                                    setuse(result);
+                                }}
+                            />
+                        )}
+                    </Main>
+                    {/*<Customization />*/}
+                </Box>
+            </div>
+        </div>
     );
 };
 

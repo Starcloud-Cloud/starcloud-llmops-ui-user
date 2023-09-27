@@ -1170,7 +1170,7 @@ export const Chat = ({
         if (!isFetch && data.length) {
             const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'ERROR');
             const answer = data[data.length - 1]?.answer;
-            if (!answer) return false;
+            if (!answer || answer?.length < 200) return false;
             // 对{x}做处理
             const text = answer?.trim().replace(/\{(\d+)\}/g, '');
             const lastChar = text.slice(-1);

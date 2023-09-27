@@ -21,14 +21,7 @@ function Template({ data, handleDetail }: any) {
                 p: 2
             }}
         >
-            {data?.icon ? (
-                <Image
-                    preview={false}
-                    className="rounded-lg overflow-hidden border border-solid border-slate-200"
-                    height={60}
-                    src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
-                />
-            ) : (
+            {data?.icon && (
                 <Image
                     preview={false}
                     className="rounded-lg overflow-hidden border border-solid border-slate-200"

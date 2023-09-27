@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 // material-ui
@@ -25,6 +25,10 @@ import { getVipTimeOut } from 'api/vip';
 import CloseIcon from '@mui/icons-material/Close';
 import { Button } from 'antd';
 import dayjs from 'dayjs';
+
+import infoStore from 'store/entitlementAction';
+import Phone from 'ui-component/login/phone';
+import { getUserInfo } from 'api/login';
 
 interface MainStyleProps {
     theme: Theme;
@@ -341,7 +345,16 @@ const MainLayout = () => {
             }
         })();
     }, []);
-
+    //绑定手机号
+    const { use, setuse } = infoStore();
+    useEffect(() => {
+        if (use?.mobile === '' && !use?.mobile) {
+            setPhoneOpen(true);
+        } else {
+            setPhoneOpen(false);
+        }
+    }, [use?.mobile, location]);
+    const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 
     const header = useMemo(
@@ -411,6 +424,21 @@ const MainLayout = () => {
                             </Container>
                         )}
                         <ChatLink navigate={navigate} />
+                        {phoneOpne && (
+                            <Phone
+                                phoneOpne={phoneOpne}
+                                title="绑定手机号"
+                                submitText="绑定"
+                                onClose={() => {
+                                    setPhoneOpen(false);
+                                }}
+                                emits={async () => {
+                                    setPhoneOpen(false);
+                                    const result = await getUserInfo();
+                                    setuse(result);
+                                }}
+                            />
+                        )}
                     </Main>
                     {/*<Customization />*/}
                 </Box>

@@ -240,7 +240,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                         if (
                                                                             item.showType === 'tips' ||
                                                                             item.showType == 'url' ||
-                                                                            item.showType == 'json'
+                                                                            item.showType == 'img'
                                                                         ) {
                                                                             return (
                                                                                 <div className="flex flex-col pb-3 rounded-md" key={index}>
@@ -292,7 +292,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                                                                             )}
                                                                                         </div>
                                                                                         {/* 完成并且是成功的才能打开 */}
-                                                                                        {item.status && item.success && (
+                                                                                        {!!(item.status && item.success) && (
                                                                                             <div className="flex items-center justify-center">
                                                                                                 {expandedItems.includes(item.id) ? (
                                                                                                     <ExpandLessIcon className="w-[18px] h-[18px]" />

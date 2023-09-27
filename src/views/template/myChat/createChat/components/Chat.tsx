@@ -1184,7 +1184,7 @@ export const Chat = ({
         <div className="h-full relative flex justify-center">
             {mode === 'market' && width > 1300 && (
                 <div
-                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
+                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto overflow-x-hidden bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
                     <div className="h-full  px-[8px] flex flex-col">

@@ -132,7 +132,7 @@ const ChatMy = () => {
                     onClick={() => setVisible(true)}
                 >
                     <ExpandMore />
-                    <span>查看使用教程</span>
+                    <span className="text-sm">查看使用教程</span>
                 </div>
             )}
 

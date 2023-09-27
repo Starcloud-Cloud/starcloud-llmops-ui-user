@@ -1466,7 +1466,7 @@ export const Chat = ({
                             )}
                             <div>
                                 <Select
-                                    style={{ width: 100 }}
+                                    style={{ width: 100, height: 23 }}
                                     bordered={false}
                                     className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-1"
                                     value={selectModel || 'GPT35'}

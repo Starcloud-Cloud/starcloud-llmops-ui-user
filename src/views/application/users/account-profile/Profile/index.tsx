@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
+import infoStore from 'store/entitlementAction';
 
 // project imports
 // import Profile from './Profile';
@@ -88,13 +89,14 @@ const Profilnew = () => {
     const [value, setValue] = useState<number>(0);
     const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
     const [updateCount, setUpdateCount] = useState(0);
-
+    const { setuse } = infoStore();
     const forceUpdate = () => setUpdateCount((pre) => pre + 1);
 
     useEffect(() => {
         const fetchData = async () => {
             const result = await getUserInfo();
             setUserProfile(result);
+            setuse(result);
         };
         fetchData();
     }, [updateCount]);

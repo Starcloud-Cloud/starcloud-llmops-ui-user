@@ -53,16 +53,22 @@ const Phone = ({
         if (!/^1[3-9]\d{9}$/.test(values.phone)) {
             validateField('phone');
         } else {
-            setVCodeOpen(false);
             const res = await sendCode({
                 tool: 2,
                 scene: 23,
                 account: values.phone
             });
+            setVCodeOpen(false);
         }
     };
     return (
-        <Modal open={phoneOpne} onClose={() => onClose()} aria-labelledby="modal-title" aria-describedby="modal-description">
+        <Modal
+            disableAutoFocus
+            open={phoneOpne}
+            onClose={() => onClose()}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+        >
             <MainCard
                 sx={{
                     position: 'absolute',

@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import {Outlet, useLocation, useNavigate} from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 // material-ui
 import { AppBar, Box, Container, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
@@ -21,6 +21,10 @@ import { openDrawer } from 'store/slices/menu';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
+
+import infoStore from 'store/entitlementAction';
+import Phone from 'ui-component/login/phone';
+import { getUserInfo } from 'api/login';
 
 interface MainStyleProps {
     theme: Theme;
@@ -88,7 +92,6 @@ const MainLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
@@ -133,7 +136,16 @@ const MainLayout = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [layout, matchDownMd]
     );
-
+    //绑定手机号
+    const { use, setuse } = infoStore();
+    useEffect(() => {
+        if (use?.mobile === '' && !use?.mobile) {
+            setPhoneOpen(true);
+        } else {
+            setPhoneOpen(false);
+        }
+    }, [use?.mobile, location]);
+    const [phoneOpne, setPhoneOpen] = useState(false);
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -163,9 +175,12 @@ const MainLayout = () => {
                         <Outlet />
                     </Container>
                 )}
-                <div className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer" onClick={() => {
-                    navigate('/chatMarket')
-                }}>
+                <div
+                    className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
+                    onClick={() => {
+                        navigate('/chatMarket');
+                    }}
+                >
                     <div>
                         <svg
                             version="1.1"
@@ -349,6 +364,21 @@ const MainLayout = () => {
                         <div>点击开始自由对话</div>
                     </div>
                 </div>
+                {phoneOpne && (
+                    <Phone
+                        phoneOpne={phoneOpne}
+                        title="绑定手机号"
+                        submitText="绑定"
+                        onClose={() => {
+                            setPhoneOpen(false);
+                        }}
+                        emits={async () => {
+                            setPhoneOpen(false);
+                            const result = await getUserInfo();
+                            setuse(result);
+                        }}
+                    />
+                )}
             </Main>
             {/*<Customization />*/}
         </Box>

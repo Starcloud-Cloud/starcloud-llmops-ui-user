@@ -6,9 +6,6 @@ import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import ScrollMenus from './ScrollMenu';
 import { useTheme } from '@mui/material/styles';
-import infoStore from 'store/entitlementAction';
-import Phone from 'ui-component/login/phone';
-import { getUserInfo } from 'api/login';
 
 interface MarketList {
     name: string;
@@ -22,16 +19,6 @@ interface Page {
     pageSize: number;
 }
 function TemplateMarket() {
-    //绑定手机号
-    const { use, setuse } = infoStore();
-    const [phoneOpne, setPhoneOpen] = useState(false);
-    useEffect(() => {
-        if (!use?.mobile) {
-            setPhoneOpen(true);
-        } else {
-            setPhoneOpen(false);
-        }
-    }, [use?.mobile]);
     const theme = useTheme();
     const navigate = useNavigate();
     const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList } = marketStore();
@@ -208,17 +195,6 @@ function TemplateMarket() {
                 </Box>
                 <Outlet />
             </Box>
-            {/* <Phone
-                phoneOpne={phoneOpne}
-                title="绑定手机号"
-                submitText="绑定"
-                onClose={() => {}}
-                emits={async () => {
-                    setPhoneOpen(false);
-                    const result = await getUserInfo();
-                    setuse(result);
-                }}
-            /> */}
         </Box>
     );
 }

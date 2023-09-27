@@ -21,11 +21,6 @@ import { dispatch } from 'store';
 import usePubSubEvent from 'hooks/usePubsub';
 import { ConfigProvider } from 'antd';
 
-import infoStore from 'store/entitlementAction';
-import Phone from 'ui-component/login/phone';
-import { getUserInfo } from 'api/login';
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 // import { t } from 'hooks/web/useI18n';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 // import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
@@ -64,17 +59,6 @@ const App = () => {
     });
 
     // if (!loading) return <Loader />;
-    //绑定手机号
-    const { use, setuse } = infoStore();
-    const location = useLocation();
-    useEffect(() => {
-        if (use?.mobile === '' && !use?.mobile) {
-            setPhoneOpen(true);
-        } else {
-            setPhoneOpen(false);
-        }
-    }, [use?.mobile, location]);
-    const [phoneOpne, setPhoneOpen] = useState(false);
     return (
         <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }} locale={zhCN}>
             <ThemeCustomization>
@@ -89,21 +73,6 @@ const App = () => {
                     </NavigationScroll>
                 </RTLLayout>
             </ThemeCustomization>
-            {phoneOpne && (
-                <Phone
-                    phoneOpne={phoneOpne}
-                    title="绑定手机号"
-                    submitText="绑定"
-                    onClose={() => {
-                        setPhoneOpen(false);
-                    }}
-                    emits={async () => {
-                        setPhoneOpen(false);
-                        const result = await getUserInfo();
-                        setuse(result);
-                    }}
-                />
-            )}
         </ConfigProvider>
     );
 };

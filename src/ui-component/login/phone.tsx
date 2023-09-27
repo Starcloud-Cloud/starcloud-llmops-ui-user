@@ -1,4 +1,5 @@
-import { Box, Grid, TextField, Typography, Modal, CardContent, Button, Link, CardMedia } from '@mui/material';
+import { Box, Grid, TextField, Typography, Modal, CardContent, Button, Link, CardMedia, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { Popover } from 'antd';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { dispatch } from 'store';
@@ -62,13 +63,7 @@ const Phone = ({
         }
     };
     return (
-        <Modal
-            disableAutoFocus
-            open={phoneOpne}
-            onClose={() => onClose()}
-            aria-labelledby="modal-title"
-            aria-describedby="modal-description"
-        >
+        <Modal disableAutoFocus open={phoneOpne} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
                 sx={{
                     position: 'absolute',
@@ -82,6 +77,18 @@ const Phone = ({
                 title={title}
                 content={false}
             >
+                <IconButton
+                    onClick={() => onClose()}
+                    size="large"
+                    aria-label="close modal"
+                    sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8
+                    }}
+                >
+                    <CloseIcon fontSize="small" />
+                </IconButton>
                 <CardContent sx={{ p: '16px !important' }}>
                     <Formik
                         initialValues={{

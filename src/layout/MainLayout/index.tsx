@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 
 // material-ui
 import { AppBar, Box, Container, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
@@ -86,6 +86,8 @@ const MainLayout = () => {
     const navigation = getMenuItems();
     const theme = useTheme();
     const location = useLocation();
+    const navigate = useNavigate();
+
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
@@ -161,7 +163,9 @@ const MainLayout = () => {
                         <Outlet />
                     </Container>
                 )}
-                <div className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[30px] cursor-pointer">
+                <div className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer" onClick={() => {
+                    navigate('/chatMarket')
+                }}>
                     <div>
                         <svg
                             version="1.1"

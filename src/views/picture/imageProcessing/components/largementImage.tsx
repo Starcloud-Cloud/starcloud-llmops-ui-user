@@ -1,4 +1,4 @@
-import EditBackgroundImage from '../components/upscaleImage';
+import EditBackgroundImage from './component';
 const EnlargementImage = () => {
     return <EditBackgroundImage />;
 };

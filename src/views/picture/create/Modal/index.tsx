@@ -17,6 +17,7 @@ import { downloadFile } from 'utils/download';
 import { useDispatch } from '../../../../store';
 import { openSnackbar } from '../../../../store/slices/snackbar';
 import { IImageListTypeChildImages } from '../index';
+import { t } from 'hooks/web/useI18n';
 
 export default function PicModal({
     open,
@@ -27,7 +28,8 @@ export default function PicModal({
     width,
     height,
     engine,
-    prompt
+    prompt,
+    stylePreset
 }: {
     open: boolean;
     setOpen: (open: boolean) => void;
@@ -38,6 +40,7 @@ export default function PicModal({
     height: number;
     engine: string;
     prompt: string;
+    stylePreset?: string;
 }) {
     // getModalStyle is not a pure function, we roll the style only on the first render
 
@@ -135,6 +138,12 @@ export default function PicModal({
                                     <span className="text-lg font-medium">模型:</span>
                                     <span className="text-base">{engine}</span>
                                 </div>
+                                {stylePreset && (
+                                    <div className="flex flex-col  mt-3">
+                                        <span className="text-lg font-medium">风格:</span>
+                                        <span className="text-base">{t(`textToImageValue.${stylePreset}`)}</span>
+                                    </div>
+                                )}
                                 <div className="flex flex-col  mt-3">
                                     <span className="text-lg font-medium">尺寸:</span>
                                     <span className="text-base">
@@ -149,7 +158,7 @@ export default function PicModal({
                                             downloadFile(
                                                 currentImageList[currentIndex].url,
                                                 `${currentImageList[currentIndex].uuid}.${
-                                                    currentImageList[currentIndex].media_type?.split('/')[1]
+                                                    currentImageList[currentIndex].mediaType?.split('/')[1]
                                                 }`
                                             )
                                         }

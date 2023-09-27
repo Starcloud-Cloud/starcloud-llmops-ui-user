@@ -295,14 +295,14 @@ export const PictureCreateMenu = ({
             width: width,
             height: height,
             samples,
-            style_preset: currentStyle,
-            image_strength: imageStrength / 100,
+            stylePreset: currentStyle,
+            imageStrength: imageStrength / 100,
             seed: seed,
             steps: step,
-            negative_prompt: voidInputValue,
+            negativePrompt: voidInputValue,
             engine: selectModel,
-            init_image: uploadFile,
-            guidance_strength: strength
+            initImage: uploadFile,
+            guidanceStrength: strength
         };
 
         setInputValueTranslate(true);
@@ -331,10 +331,10 @@ export const PictureCreateMenu = ({
                     sourceLanguage: 'zh',
                     targetLanguage: 'en'
                 });
-                imageRequest.negative_prompt = resVoidTranslate.translatedList[0].translated;
+                imageRequest.negativePrompt = resVoidTranslate.translatedList[0].translated;
                 setVoidInputValue(resVoidTranslate.translatedList[0].translated);
             } catch (e) {
-                imageRequest.negative_prompt = voidInputValue;
+                imageRequest.negativePrompt = voidInputValue;
                 setVoidInputValue(voidInputValue);
             }
         }
@@ -342,7 +342,7 @@ export const PictureCreateMenu = ({
         try {
             const res = await createText2Img({
                 scene: 'WEB_IMAGE',
-                appUid: 'BASE_GENERATE_IMAGE',
+                appUid: 'GENERATE_IMAGE',
                 imageRequest: removeFalseProperties(imageRequest)
             });
             const benefitsRes = await userBenefits();
@@ -350,7 +350,7 @@ export const PictureCreateMenu = ({
 
             setIsFetch(false);
             setIsFirst(false);
-            setImgList([res, ...imgList] || []);
+            setImgList([res?.response, ...imgList] || []);
         } catch (e: any) {
             if (e?.code === 2008002007) {
                 setOpenToken(true);

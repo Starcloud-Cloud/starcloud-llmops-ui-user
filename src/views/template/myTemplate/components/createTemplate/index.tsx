@@ -1,7 +1,3 @@
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
     Box,
     Button,
@@ -18,7 +14,8 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import ErrorIcon from '@mui/icons-material/ErrorOutline';
+import { Image } from 'antd';
+import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { userBenefits } from 'api/template';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
@@ -385,7 +382,7 @@ function CreateDetail() {
                 avatar={
                     <Button
                         variant="contained"
-                        startIcon={<ArrowBackIcon />}
+                        startIcon={<ArrowBack />}
                         color="secondary"
                         onClick={() => navigate('/template/createCenter')}
                     >
@@ -406,7 +403,7 @@ function CreateDetail() {
                                     setDelAnchorEl(e.currentTarget);
                                 }}
                             >
-                                <MoreVertIcon />
+                                <MoreVert />
                             </IconButton>
                         )}
                         <Menu
@@ -431,7 +428,7 @@ function CreateDetail() {
                                 }}
                             >
                                 <ListItemIcon>
-                                    <DeleteIcon color="error" />
+                                    <Delete color="error" />
                                 </ListItemIcon>
                                 <Typography variant="inherit" noWrap>
                                     {t('myApp.delApp')}
@@ -454,7 +451,7 @@ function CreateDetail() {
                         label={
                             <Box display="flex" alignItems="center">
                                 {t('myApp.upload')}
-                                {flag && <ErrorIcon color="warning" sx={{ fontSize: '14px' }} />}
+                                {flag && <ErrorOutline color="warning" sx={{ fontSize: '14px' }} />}
                             </Box>
                         }
                         {...a11yProps(3)}
@@ -483,8 +480,15 @@ function CreateDetail() {
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                    {detail?.icon && (
+                                        <Image
+                                            preview={false}
+                                            height={60}
+                                            className="rounded-lg overflow-hidden"
+                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                        />
+                                    )}
                                     <Box>
                                         <Box>
                                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -504,7 +508,7 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                             </Box>
-                            <Divider sx={{ mb: 1 }} />
+                            <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>
@@ -548,8 +552,15 @@ function CreateDetail() {
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                    {detail?.icon && (
+                                        <Image
+                                            preview={false}
+                                            height={60}
+                                            className="rounded-lg overflow-hidden"
+                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                        />
+                                    )}
                                     <Box>
                                         <Box>
                                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -569,7 +580,7 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                             </Box>
-                            <Divider sx={{ mb: 1 }} />
+                            <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
                             </Typography>

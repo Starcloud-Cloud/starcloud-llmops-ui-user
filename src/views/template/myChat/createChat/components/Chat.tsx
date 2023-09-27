@@ -67,7 +67,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
-    docs: any;
+    context: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -98,6 +98,8 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
+
+export type IChatType = 'WebSearch2DocHandler' | 'NewsSearchHandler' | 'ImageSearchHandler' | 'ImageGenerationHandler' | undefined;
 
 export const ChatBtn = () => {
     const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);
@@ -276,81 +278,141 @@ export const ChatBtn = () => {
 };
 
 // 转换type
-const transformType = (key: string) => {
+const transformType = (key: IChatType) => {
     switch (key) {
-        case 'news':
+        // 技能 网页和文档分析
+        case 'WebSearch2DocHandler':
             return 'url';
-        case 'content':
+        case 'NewsSearchHandler':
             return 'url';
-        case 'image':
+        case 'ImageGenerationHandler':
             return 'img';
+        case 'ImageSearchHandler':
+            return 'url';
         default:
             break;
     }
 };
-export function extractChatBlocks(data: any) {
-    const chatBlocks: any[] = [];
-    let currentBlock: any[] = [];
-    let insideBlock = false;
 
-    for (const item of data) {
-        if (item.msgType === 'CHAT_FUN') {
-            if (!insideBlock) {
-                insideBlock = true;
-                currentBlock.push(item);
+const transformTips = (key: IChatType, status: string | undefined) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            if (status === 'ERROR') {
+                return '生成回答失败';
             } else {
-                currentBlock.push(item);
+                return '生成回答完毕';
             }
-        } else if (item.msgType === 'CHAT') {
-            chatBlocks.push(item);
-        } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
-            let currentData: any = {};
-            let loop: any = [];
-            let currentLoop: any = [];
-            currentBlock.push(item);
-            insideBlock = false;
-            currentData.robotName = currentBlock[0].robotName;
-            currentData.robotAvatar = currentBlock[0].robotAvatar;
-            currentData.message = currentBlock[0].message;
-            currentData.createTime = currentBlock[0].createTime;
-            currentData.isNew = false;
-            currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
-            currentData.process = [];
-
-            for (const block of currentBlock) {
-                if (block.msgType === 'CHAT_FUN') {
-                    currentLoop.push(block);
-                } else if (block.msgType === 'FUN_CALL') {
-                    currentLoop.push(block);
-                    loop.push(currentLoop);
-                    currentLoop = [];
-                } else {
-                    currentLoop = [];
-                }
+        case 'ImageGenerationHandler':
+            if (status === 'ERROR') {
+                return '图片生成失败';
+            } else {
+                return '图片生成完成';
             }
-
-            loop.forEach((item: { answer: string }[], index: string | number) => {
-                currentData.process[index] = {
-                    tips: '查询完成',
-                    showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
-                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
-                    data: item?.[1]?.answer && JSON.parse(item[1].answer),
-                    success: true,
-                    status: 1,
-                    id: uuidv4()
-                };
-            });
-
-            chatBlocks.push(currentData);
-            currentData = {};
-            currentBlock = [];
-        } else {
-            if (insideBlock) {
-                currentBlock.push(item);
+        case 'NewsSearchHandler':
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        case 'ImageSearchHandler': {
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
             }
         }
+        default:
+            break;
     }
-    return chatBlocks;
+};
+
+const transformData = (key: IChatType, data: any) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            return data ? [data] : [];
+        case 'NewsSearchHandler':
+            return data?.response || [];
+        case 'ImageSearchHandler':
+            return data?.response || [];
+        case 'ImageGenerationHandler':
+            return data?.imageUrls || [];
+        default:
+            break;
+    }
+};
+
+export function extractChatBlocks(data: any) {
+    try {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
+
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
+                } else {
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT') {
+                chatBlocks.push(item);
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string; status: string; message?: IChatType }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: transformTips(item?.[1]?.message, item?.[1]?.status),
+                        showType: transformType(item?.[1]?.message),
+                        input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                        data:
+                            item?.[1]?.status === 'ERROR'
+                                ? item?.[1]?.answer
+                                : item?.[1]?.answer && transformData(item?.[1]?.message, JSON.parse(item?.[1]?.answer)),
+                        success: item?.[1]?.status === 'ERROR' ? false : true,
+                        status: 1,
+                        id: uuidv4()
+                    };
+                });
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
+                }
+            }
+        }
+        console.log(chatBlocks, 'chatBlocks');
+        return chatBlocks;
+    } catch (e) {
+        console.log(e, 'e');
+        return [];
+    }
 }
 
 export const Chat = ({
@@ -492,7 +554,7 @@ export const Chat = ({
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (mode === 'test' && conversationUid && isFirst && chatBotInfo.name) {
+        if (mode === 'test' && conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({
@@ -508,7 +570,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -524,7 +586,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -591,7 +653,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -634,7 +696,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -648,7 +710,7 @@ export const Chat = ({
                 {
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar,
-                    answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                    answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                     isStatement: true
                 }
             ];
@@ -845,20 +907,25 @@ export const Chat = ({
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
                 setConversationUid(bufferObj.conversationUid);
-                if (bufferObj.type === 'i' || bufferObj.type === 'docs') {
+                if (bufferObj.type === 'context') {
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const content = JSON.parse(bufferObj.content);
+                    const idList = content.data.filter((v: any) => v.id);
+                    const notIdList = content.data.filter((v: any) => !v.id);
+
+                    // 处理文档（文档状态默认不更新）
+                    content.data = [...uniqBy(idList, 'id'), ...notIdList];
+                    copyData[copyData.length - 1].context = content ? [content] : [];
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+
+                if (bufferObj.type === 'i') {
                     // 处理流程
                     const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
                     const process = copyData[copyData.length - 1].process || [];
                     const content = JSON.parse(bufferObj.content);
 
-                    // 处理文档（文档状态默认不更新）
-                    if (content.showType === 'docs') {
-                        content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].docs = content ? [content] : [];
-                        console.log(copyData, 'copyData');
-                        dataRef.current = copyData;
-                        setData(copyData);
-                    }
                     // 处理链接
                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入

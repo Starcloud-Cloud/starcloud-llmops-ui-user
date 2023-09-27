@@ -25,9 +25,8 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag } from 'antd';
+import { Tag, Image } from 'antd';
 import formatDate from 'hooks/useDate';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
@@ -267,7 +266,7 @@ function ApplicationAnalysis({
     };
     const categoryList = marketStore((state) => state.categoryList);
     const getDeList = (row: { appMode: string; uid: string }) => {
-        if (row.appMode === 'BASE_GENERATE_IMAGE') {
+        if (row.appMode === 'IMAGE') {
             detailImage({ conversationUid: row.uid }).then((res) => {
                 setResult(res);
                 setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
@@ -283,7 +282,8 @@ function ApplicationAnalysis({
         prompt: '',
         engine: '',
         width: 0,
-        height: 0
+        height: 0,
+        stylePreset: ''
     });
     const [currentIndex, setCurrentIndex] = useState(0);
     //执行弹窗
@@ -437,10 +437,11 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
+                                        disabled={row.status !== 'SUCCESS' && row.totalAnswerTokens === 0}
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
-                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                            if (row.appMode === 'IMAGE') {
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ conversationUid: row.uid }).then((res) => {
@@ -490,6 +491,7 @@ function ApplicationAnalysis({
                     engine={ImgDetail.engine}
                     width={ImgDetail.width}
                     height={ImgDetail.height}
+                    stylePreset={ImgDetail?.stylePreset}
                 />
             )}
             {chatVisible && (
@@ -554,7 +556,14 @@ function ApplicationAnalysis({
                                         {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                {result.status !== 'ERROR' && <AccessAlarm sx={{ fontSize: '70px' }} />}
+                                                {result.status !== 'ERROR' && exeDetail?.icon && (
+                                                    <Image
+                                                        preview={false}
+                                                        height={60}
+                                                        className="rounded-lg overflow-hidden"
+                                                        src={require('../../../assets/images/category/' + exeDetail?.icon + '.svg')}
+                                                    />
+                                                )}
                                                 <Box>
                                                     <Box>
                                                         <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -580,7 +589,7 @@ function ApplicationAnalysis({
                                                 </Box>
                                             </Box>
                                         </Box>
-                                        {result.status !== 'ERROR' && <Divider sx={{ mb: 1 }} />}
+                                        {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                             {exeDetail?.description}
                                         </Typography>

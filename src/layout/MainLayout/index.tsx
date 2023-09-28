@@ -296,7 +296,8 @@ const MainLayout = () => {
     const { drawerType, container, layout } = useConfig();
     const [timeOutObj, setTimeOutObj] = useState<{
         type: number;
-        time: number;
+        time?: number;
+        num?: number;
     } | null>(null);
 
     const isLarge = useMemo(() => {
@@ -342,6 +343,14 @@ const MainLayout = () => {
                     type: 2,
                     time: dayjs(res.userBenefits.expirationTime).diff(dayjs(), 'day')
                 });
+                return;
+            }
+            if (res.tokenExpiredReminderVO.isReminder) {
+                setTimeOutObj({
+                    type: 3,
+                    num: res.tokenExpiredReminderVO.expiredNum
+                });
+                return;
             }
         })();
     }, []);
@@ -374,10 +383,12 @@ const MainLayout = () => {
                     <div className="flex items-center">
                         {timeOutObj?.type === 1 ? (
                             <span className="text-sm">
-                                当前套餐即将过期，{timeOutObj.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
+                                当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
                             </span>
+                        ) : timeOutObj?.type === 2 ? (
+                            <span className="text-sm">当前令牌权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
                         ) : (
-                            <span className="text-sm">当前令牌权益将在{timeOutObj.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">当前令牌权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
                         )}
                         <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
                             立即续费

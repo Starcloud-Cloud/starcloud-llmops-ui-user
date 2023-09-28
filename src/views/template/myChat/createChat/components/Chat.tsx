@@ -84,6 +84,7 @@ export type IHistory = Partial<{
     isStatement?: boolean;
     isAds?: boolean;
     ads?: string;
+    showTip?: boolean;
 }>;
 
 export type IConversation = {
@@ -465,6 +466,7 @@ export const Chat = ({
     const [enableOnline, setEnableOnline] = useState<any>();
     const [selectModel, setSelectModel] = useState<any>();
     const [openToken, setOpenToken] = useState(false);
+    const [isFreedomChat, setIsFreedomChat] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -698,6 +700,9 @@ export const Chat = ({
                         robotAvatar: chatBotInfo.avatar,
                         answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
+                    },
+                    {
+                        showTip: true
                     }
                 ];
                 dataRef.current = result;
@@ -712,6 +717,9 @@ export const Chat = ({
                     robotAvatar: chatBotInfo.avatar,
                     answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                     isStatement: true
+                },
+                {
+                    showTip: true
                 }
             ];
             dataRef.current = result;
@@ -1199,6 +1207,11 @@ export const Chat = ({
                                         }`}
                                         onClick={() => {
                                             setUid && setUid(item.value);
+                                            if (mode === 'market' && index === 0) {
+                                                setIsFreedomChat(true);
+                                            } else {
+                                                setIsFreedomChat(false);
+                                            }
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">
@@ -1244,6 +1257,11 @@ export const Chat = ({
                                                     if (mode === 'market') {
                                                         setUid && setUid(item.value);
                                                         setOpen(false);
+                                                        if (index === 0) {
+                                                            setIsFreedomChat(true);
+                                                        } else {
+                                                            setIsFreedomChat(false);
+                                                        }
                                                     }
                                                 }}
                                             >
@@ -1335,6 +1353,7 @@ export const Chat = ({
                                 )}
                                 <CardContent className="!p-0">
                                     <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
+                                    {/* {isFreedomChat && <ChatTip />} */}
                                 </CardContent>
                             </div>
                         </div>

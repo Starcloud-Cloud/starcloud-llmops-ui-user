@@ -51,7 +51,7 @@ export default function FormDialogNew({
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
     const { userInfo }: any = userInfoStore();
-    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'BOT');
+    const { totalNum } = userInfo?.benefits?.find((v: any) => v.type === 'BOT') || 0;
     const { user } = useUserStore();
 
     const handleClose = () => {
@@ -188,7 +188,6 @@ export default function FormDialogNew({
                                 color={'secondary'}
                                 onClick={() => {
                                     const count = totalList.filter((v) => Number(v.creator) === Number(user.id)).length;
-                                    console.log(count, 'count');
 
                                     if (totalNum > -1) {
                                         if (count >= totalNum) {
@@ -209,7 +208,7 @@ export default function FormDialogNew({
                     </CardActions>
                 </MainCard>
             </Modal>
-            <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={`添加机器人个数(${totalNum})已用完`} />
+            {botOpen && <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={`添加机器人个数(${totalNum})已用完`} />}
         </>
     );
 }

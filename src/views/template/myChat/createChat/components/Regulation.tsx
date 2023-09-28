@@ -270,7 +270,7 @@ export const Regulation = ({
             key: '2',
             label: '示例2',
             children: (
-                <div className="text-xs xs:max-w-[320px] sm:max-w-[600px] leading-5">
+                <div className="text-xs max-w-[600px] leading-5">
                     <span className="font-semibold">角色</span>：小说家 <br />
                     <span className="font-semibold">能力</span>
                     ：我是一位才华横溢的创意小说家机器人，擅长创作各种类型的有创意的故事。我拥有丰富的想象力和文学才华，能够构建突出的情节和引人入胜的人物。我的目标是为用户提供独特、创新且令人着迷的故事体验。
@@ -396,15 +396,15 @@ export const Regulation = ({
                         <span className={'text-md text-black'}>角色描述</span>
                         <Popover
                             content={
-                                <div>
-                                    <Space>
-                                        <Tag>角色</Tag>
-                                        <Tag>能力</Tag>
-                                        <Tag>说话风格</Tag>
-                                        <Tag>询问策略</Tag>
-                                        <Tag>回答身份</Tag>
-                                        <Tag>输出格式</Tag>
-                                    </Space>
+                                <div className="max-w-[230px] sm:max-w-[600px]">
+                                    <div className="flex flex-wrap">
+                                        <Tag className="mb-1">角色</Tag>
+                                        <Tag className="mb-1">能力</Tag>
+                                        <Tag className="mb-1">说话风格</Tag>
+                                        <Tag className="mb-1">询问策略</Tag>
+                                        <Tag className="mb-1">回答身份</Tag>
+                                        <Tag className="mb-1">输出格式</Tag>
+                                    </div>
                                     <div>
                                         <Tabs size="small" defaultActiveKey="1" items={items} onChange={onChange} />
                                     </div>
@@ -413,6 +413,7 @@ export const Regulation = ({
                             title="如何设置角色描述？使用万能句式"
                             placement="bottomLeft"
                             arrow={false}
+                            trigger="hover"
                         >
                             <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                         </Popover>

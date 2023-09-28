@@ -338,19 +338,18 @@ const MainLayout = () => {
                 });
                 return;
             }
-            if (res.userBenefits.expirationTime) {
-                setTimeOutObj({
-                    type: 2,
-                    time: dayjs(res.userBenefits.expirationTime).diff(dayjs(), 'day')
-                });
-                return;
-            }
+            // if (res.userBenefits.expirationTime) {
+            //     setTimeOutObj({
+            //         type: 2,
+            //         time: dayjs(res.userBenefits.expirationTime).diff(dayjs(), 'day')
+            //     });
+            //     return;
+            // }
             if (res.tokenExpiredReminderVO.isReminder) {
                 setTimeOutObj({
                     type: 3,
                     num: res.tokenExpiredReminderVO.expiredNum
                 });
-                return;
             }
         })();
     }, []);

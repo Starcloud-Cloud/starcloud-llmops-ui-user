@@ -32,7 +32,7 @@ const LintellgentMatting = () => {
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h3" component="div">
-                            批量自动取背景文字
+                            批量自动去除背景文字
                         </Typography>
                         <Typography my={1} variant="h3" color="text.secondary">
                             全品类智能识别

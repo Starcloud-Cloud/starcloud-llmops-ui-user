@@ -268,6 +268,7 @@ export const Chat = ({
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
+    const chatBoxRef: any = useRef(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
@@ -291,6 +292,7 @@ export const Chat = ({
     const [selectModel, setSelectModel] = useState<any>();
     const [openToken, setOpenToken] = useState(false);
     const [isFreedomChat, setIsFreedomChat] = useState(false);
+    const [chatBoxHeight, setChatBoxHeight] = useState(0);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -347,6 +349,13 @@ export const Chat = ({
             timeOutRef.current && clearInterval(timeOutRef.current);
         };
     }, []);
+
+    useEffect(() => {
+        if (chatBoxRef.current) {
+            const height = chatBoxRef.current.clientHeight;
+            setChatBoxHeight(height);
+        }
+    }, [width]); //
 
     // mode share start
     useEffect(() => {
@@ -491,6 +500,13 @@ export const Chat = ({
     // mode iframe end
 
     // mode market start
+    // 初始设置为自由聊天
+    React.useEffect(() => {
+        if (mode === 'market') {
+            setIsFreedomChat(true);
+        }
+    }, [mode]);
+
     React.useEffect(() => {
         if (mode === 'market' && uid) {
             (async () => {
@@ -517,35 +533,39 @@ export const Chat = ({
                     robotAvatar: chatBotInfo.avatar
                 }));
                 const chatBlocks = extractChatBlocks(list);
-                const result = [
+                const result: any = [
                     ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
                         answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
-                    },
-                    {
-                        showTip: true
                     }
                 ];
+                if (isFreedomChat) {
+                    result.push({
+                        showTip: true
+                    });
+                }
                 dataRef.current = result;
                 setData(result);
                 setIsFinish(true);
             })();
         }
         if (mode === 'market' && !conversationUid) {
-            const result = [
+            const result: any = [
                 {
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar,
                     answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                     isStatement: true
-                },
-                {
-                    showTip: true
                 }
             ];
+            if (isFreedomChat) {
+                result.push({
+                    showTip: true
+                });
+            }
             dataRef.current = result;
             setData(result);
             setIsFinish(true);
@@ -604,6 +624,11 @@ export const Chat = ({
         const data = dataRef.current;
         const current = data[index];
         doFetch(current.message);
+    };
+
+    // 例子
+    const handleExample = (q: string) => {
+        setMessage(q);
     };
 
     React.useEffect(() => {
@@ -1151,7 +1176,11 @@ export const Chat = ({
                     </div>
                 </div>
                 <Divider variant={'fullWidth'} />
-                <div className="flex-grow flex justify-center overflow-y-auto w-full" style={{ scrollbarGutter: 'stable' }}>
+                <div
+                    className="flex-grow flex justify-center overflow-y-auto w-full"
+                    style={{ scrollbarGutter: 'stable' }}
+                    ref={chatBoxRef}
+                >
                     <div className={'max-w-[768px] w-full'}>
                         <div
                             style={{
@@ -1176,8 +1205,13 @@ export const Chat = ({
                                     </Card>
                                 )}
                                 <CardContent className="!p-0">
-                                    <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
-                                    {/* {isFreedomChat && <ChatTip />} */}
+                                    <ChatHistory
+                                        theme={theme}
+                                        data={data}
+                                        handleRetry={handleRetry}
+                                        chatBoxHeight={chatBoxHeight}
+                                        handleExample={handleExample}
+                                    />
                                 </CardContent>
                             </div>
                         </div>

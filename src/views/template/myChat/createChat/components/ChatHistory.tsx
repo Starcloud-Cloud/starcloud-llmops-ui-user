@@ -35,7 +35,9 @@ import { ChatTip } from 'views/chat/market';
 interface ChartHistoryProps {
     data: IHistory[];
     theme: Theme;
+    chatBoxHeight?: number;
     handleRetry?: (index: number) => void;
+    handleExample?: (q: string) => void;
 }
 
 const value2JsonMd = (value: any, type: number) => `这里是${type === 1 ? '输入信息' : '输出信息'} :
@@ -45,7 +47,7 @@ ${JSON.stringify(value)}
 ~~~
 `;
 
-const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
+const ChatHistory = ({ data, theme, handleRetry, chatBoxHeight, handleExample }: ChartHistoryProps) => {
     const [currentChat, setCurrentChat] = React.useState('');
     const [expandedItems, setExpandedItems] = React.useState<any[]>([]);
 
@@ -76,7 +78,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
     }, []);
 
     return (
-        <Grid item xs={12} className="p-[12px]">
+        <Grid item xs={12} className="p-[12px] h-full">
             <Grid container spacing={gridSpacing}>
                 {data.map((history, index) => (
                     <React.Fragment key={index}>
@@ -203,7 +205,7 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                 </Grid>
                             )
                         ) : history.showTip ? (
-                            <ChatTip />
+                            <ChatTip chatBoxHeight={chatBoxHeight} handleExample={handleExample} />
                         ) : (
                             <Grid item xs={12}>
                                 <Grid container spacing={gridSpacing}>

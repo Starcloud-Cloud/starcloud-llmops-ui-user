@@ -5,10 +5,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { getChatInfo, marketPage } from 'api/chat/mark';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { Card } from '@mui/material';
-import { cards } from '../../pages/landing/CardData';
-import { Alert, Space, Tag } from 'antd';
-import { ExpandMore } from '@mui/icons-material';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { Space, Tag } from 'antd';
 
 const list = [
     {
@@ -32,56 +29,61 @@ const list = [
 export const ChatTip = (props: any) => {
     return (
         <div
-            className={`${
-                props.width > 1300 ? 'max-w-[calc(100%-220px)]' : 'w-full'
-            }  "h-full flex flex-col  rounded-lg bg-white w-full p-4 mb-3 pt-10"`}
+            style={{ minHeight: `${props.chatBoxHeight}px` }}
+            className={`flex flex-col rounded-lg bg-white w-full p-3 mb-3 pt-10 justify-center pl-6`}
         >
-            <div className="flex justify-center flex-col items-center">
-                <h3 className={'text-3xl text-black'}>
-                    欢迎使用 <span className={'text-[#673ab7]'}>魔法AI</span> 自由对话
-                </h3>
-                <div className={'py-1 mt-5'}>如何更聪明的提问？让魔法AI给你需要的答案？使用提问的万能句式</div>
-                <div className="mt-5">
-                    <Space size={[0, 8]} wrap>
-                        <Tag color="blue" className="h-[54px] flex items-center rounded-lg ml-[8px]">
-                            聪明的提问
-                        </Tag>
-                        =
-                        <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
-                            设定角色
-                        </Tag>
-                        +
-                        <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
-                            简述背景
-                        </Tag>
-                        +
-                        <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
-                            定目标
-                        </Tag>
-                        +
-                        <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
-                            补要求
-                        </Tag>
-                    </Space>
-                </div>
-            </div>
-            <div className="flex flex-col items-center">
-                <div className="text-base my-7 text-[#0009]">提问示例</div>
-                {list.map((item: any, index) => (
-                    <div className="max-w-[550px] flex justify-start flex-col" key={index}>
-                        <div className="flex items-center">
-                            <img src={item.icon} alt="" />
-                            <span className="my-[10px] text-lg text-[#0009]">{item?.title}</span>
-                        </div>
-                        {item?.desList?.map((v: any, i: number) => {
-                            return (
-                                <div className="text-base text-[#0009] mb-[10px] cursor-pointer hover:text-[#673ab7]" key={i}>
-                                    {`“${v}”`}
-                                </div>
-                            );
-                        })}
+            <div>
+                <div className="flex justify-center flex-col items-center">
+                    <h3 className={'text-3xl text-black'}>
+                        欢迎使用 <span className={'text-[#673ab7]'}>魔法AI</span> 自由对话
+                    </h3>
+                    <div className={'py-1 mt-5'}>如何更聪明的提问？让魔法AI给你需要的答案？使用提问的万能句式</div>
+                    <div className="mt-5">
+                        <Space size={[0, 8]} wrap>
+                            <Tag color="blue" className="h-[54px] flex items-center rounded-lg ml-[8px]">
+                                聪明的提问
+                            </Tag>
+                            =
+                            <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
+                                设定角色
+                            </Tag>
+                            +
+                            <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
+                                简述背景
+                            </Tag>
+                            +
+                            <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
+                                定目标
+                            </Tag>
+                            +
+                            <Tag color="red" className="h-[54px] flex items-center rounded-lg ml-[8px]">
+                                补要求
+                            </Tag>
+                        </Space>
                     </div>
-                ))}
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="text-base my-7 text-[#0009]">提问示例</div>
+                    {list.map((item: any, index) => (
+                        <div className="max-w-[550px] flex justify-start flex-col" key={index}>
+                            <div className="flex items-center">
+                                <img src={item.icon} alt="" />
+                                <span className="my-[10px] text-lg text-[#0009]">{item?.title}</span>
+                            </div>
+                            {item?.desList?.map((v: any, i: number) => {
+                                return (
+                                    <div
+                                        className="text-base text-[#0009] mb-[10px] cursor-pointer hover:text-[#673ab7]"
+                                        key={i}
+                                        onClick={() => props.handleExample(v)}
+                                    >
+                                        {`“${v}”`}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -104,13 +106,6 @@ const ChatMy = () => {
             setUid(appUid);
         }
     }, [appUid]);
-
-    useEffect(() => {
-        const r = localStorage.getItem('showChatAlert');
-        if (r !== '1') {
-            setVisible(true);
-        }
-    }, []);
 
     useEffect(() => {
         if (uid) {
@@ -157,20 +152,6 @@ const ChatMy = () => {
 
     return (
         <div className="relative">
-            <div
-                className={`${
-                    width > 1300 ? 'max-w-[calc(100%-220px)] right-[220px]' : 'w-full right-0'
-                } flex justify-end items-center cursor-pointer absolute top-[-21px]`}
-                onClick={() => {
-                    if (visible) {
-                        localStorage.setItem('showChatAlert', '1');
-                    }
-                    setVisible(!visible);
-                }}
-            >
-                {!visible ? <ExpandMore /> : <ExpandLessIcon />}
-                <span className="text-sm">{visible ? '收起使用教程' : '展开使用教程'}</span>
-            </div>
             <Card
                 sx={{
                     overflow: 'visible',
@@ -178,7 +159,6 @@ const ChatMy = () => {
                 }}
                 className={'h-[calc(100vh-154px)] overflow-auto'}
             >
-                {visible && <ChatTip width={width}></ChatTip>}
                 <Chat
                     chatBotInfo={chatBotInfo}
                     mode={'market'}

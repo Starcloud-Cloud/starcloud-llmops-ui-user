@@ -29,7 +29,7 @@ const list = [
     }
 ];
 
-export function ChatTip(props: any) {
+export const ChatTip = (props: any) => {
     return (
         <div
             className={`${
@@ -85,7 +85,7 @@ export function ChatTip(props: any) {
             </div>
         </div>
     );
-}
+};
 
 const ChatMy = () => {
     const location = useLocation();

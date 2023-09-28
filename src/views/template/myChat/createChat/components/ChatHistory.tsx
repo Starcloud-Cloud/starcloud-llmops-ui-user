@@ -202,6 +202,8 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                     </Grid>
                                 </Grid>
                             )
+                        ) : history.showTip ? (
+                            <ChatTip />
                         ) : (
                             <Grid item xs={12}>
                                 <Grid container spacing={gridSpacing}>
@@ -495,7 +497,6 @@ const ChatHistory = ({ data, theme, handleRetry }: ChartHistoryProps) => {
                                 </Grid>
                             </Grid>
                         )}
-                        {history.showTip && <ChatTip />}
                     </React.Fragment>
                 ))}
             </Grid>

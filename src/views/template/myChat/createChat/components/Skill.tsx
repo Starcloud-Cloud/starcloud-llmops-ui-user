@@ -243,7 +243,7 @@ const WorkflowCreateModal = ({
     const [page, setPage] = useState(1);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
     const { userInfo }: any = userInfoStore();
-    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
+    const { totalNum } = userInfo?.benefits?.find((v: any) => v.type === 'SKILL_PLUGIN') || 0;
 
     useEffect(() => {
         (async () => {
@@ -494,7 +494,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const [skillCountVisible, setSkillCountVisible] = useState(false);
     const forceUpdate = () => setCount((pre) => pre + 1);
     const { userInfo }: any = userInfoStore();
-    const { totalNum } = userInfo.benefits.find((v: any) => v.type === 'SKILL_PLUGIN');
+    const { totalNum } = userInfo?.benefits?.find((v: any) => v.type === 'SKILL_PLUGIN') || 0;
 
     useEffect(() => {
         getSkillList(appId || '').then((res) => {

@@ -1664,11 +1664,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                     </Box>
                                 </Box>
                             )}
-                            <UpgradeModel
-                                open={botOpen}
-                                handleClose={() => setBotOpen(false)}
-                                title={`添加文档个数(${userInfo.benefits[5].totalNum})已用完`}
-                            />
+                            {botOpen && (
+                                <UpgradeModel
+                                    open={botOpen}
+                                    handleClose={() => setBotOpen(false)}
+                                    title={`添加文档个数(${userInfo?.benefits[5].totalNum})已用完`}
+                                />
+                            )}
                         </MainCard>
                     </div>
                 </div>

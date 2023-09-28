@@ -28,7 +28,6 @@ import { ImageCard } from 'ui-component/imageCard';
 import imgError from 'assets/images/img_error.svg';
 import ReplayIcon from '@mui/icons-material/Replay';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { ChatTip } from 'views/chat/market';
 
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
@@ -204,8 +203,6 @@ const ChatHistory = ({ data, theme, handleRetry, chatBoxHeight, handleExample }:
                                     </Grid>
                                 </Grid>
                             )
-                        ) : history.showTip ? (
-                            <ChatTip chatBoxHeight={chatBoxHeight} handleExample={handleExample} />
                         ) : (
                             <Grid item xs={12}>
                                 <Grid container spacing={gridSpacing}>

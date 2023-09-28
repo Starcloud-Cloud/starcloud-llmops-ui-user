@@ -43,12 +43,15 @@ import { BpCheckbox } from 'ui-component/BpCheckbox';
 import useUserStore from 'store/user';
 import './chat.scss';
 import { handleIcon } from './SkillWorkflowCard';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
 import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
+import { ChatTip } from 'views/chat/market';
 
 const { Option } = Select;
 
@@ -84,7 +87,6 @@ export type IHistory = Partial<{
     isStatement?: boolean;
     isAds?: boolean;
     ads?: string;
-    showTip?: boolean;
 }>;
 
 export type IConversation = {
@@ -268,7 +270,6 @@ export const Chat = ({
     const theme = useTheme();
     const scrollRef: any = React.useRef();
     const contentRef: any = useRef(null);
-    const chatBoxRef: any = useRef(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
@@ -292,7 +293,7 @@ export const Chat = ({
     const [selectModel, setSelectModel] = useState<any>();
     const [openToken, setOpenToken] = useState(false);
     const [isFreedomChat, setIsFreedomChat] = useState(false);
-    const [chatBoxHeight, setChatBoxHeight] = useState(0);
+    const [openChatMask, setOpenChatMask] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -350,12 +351,13 @@ export const Chat = ({
         };
     }, []);
 
-    useEffect(() => {
-        if (chatBoxRef.current) {
-            const height = chatBoxRef.current.clientHeight;
-            setChatBoxHeight(height);
+    const visibleTip = React.useMemo(() => {
+        if (isFreedomChat && openChatMask) {
+            return true;
+        } else {
+            return false;
         }
-    }, [width]); //
+    }, [openChatMask, isFreedomChat]);
 
     // mode share start
     useEffect(() => {
@@ -508,6 +510,15 @@ export const Chat = ({
     }, [mode]);
 
     React.useEffect(() => {
+        const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
+        if (!r.length) {
+            setOpenChatMask(true);
+        } else {
+            setOpenChatMask(false);
+        }
+    }, [data]);
+
+    React.useEffect(() => {
         if (mode === 'market' && uid) {
             (async () => {
                 const res: IConversation = await conversation({ appUid: uid });
@@ -542,11 +553,6 @@ export const Chat = ({
                         isStatement: true
                     }
                 ];
-                if (isFreedomChat) {
-                    result.push({
-                        showTip: true
-                    });
-                }
                 dataRef.current = result;
                 setData(result);
                 setIsFinish(true);
@@ -561,11 +567,6 @@ export const Chat = ({
                     isStatement: true
                 }
             ];
-            if (isFreedomChat) {
-                result.push({
-                    showTip: true
-                });
-            }
             dataRef.current = result;
             setData(result);
             setIsFinish(true);
@@ -1084,6 +1085,7 @@ export const Chat = ({
                     </div>
                 </div>
             )}
+
             <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
                 <div className="flex justify-center">
                     <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
@@ -1176,11 +1178,7 @@ export const Chat = ({
                     </div>
                 </div>
                 <Divider variant={'fullWidth'} />
-                <div
-                    className="flex-grow flex justify-center overflow-y-auto w-full"
-                    style={{ scrollbarGutter: 'stable' }}
-                    ref={chatBoxRef}
-                >
+                <div className="flex-grow flex justify-center overflow-y-auto w-full relative" style={{ scrollbarGutter: 'stable' }}>
                     <div className={'max-w-[768px] w-full'}>
                         <div
                             style={{
@@ -1205,13 +1203,8 @@ export const Chat = ({
                                     </Card>
                                 )}
                                 <CardContent className="!p-0">
-                                    <ChatHistory
-                                        theme={theme}
-                                        data={data}
-                                        handleRetry={handleRetry}
-                                        chatBoxHeight={chatBoxHeight}
-                                        handleExample={handleExample}
-                                    />
+                                    <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
+                                    {visibleTip && <ChatTip handleExample={handleExample} />}
                                 </CardContent>
                             </div>
                         </div>
@@ -1691,7 +1684,34 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
+            {mode === 'market' && (
+                <div className={`${width > 1300 ? 'min-w-[220px]' : 'min-w-[40px]'} h-full bg-[#f4f6f8] relative`}>
+                    <div
+                        className="bg-white absolute rounded-tr-lg rounded-br-lg p-2 top-[44px] cursor-pointer"
+                        onClick={() => setOpenChatMask(!openChatMask)}
+                    >
+                        {!openChatMask ? (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowLeftIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowRightIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />

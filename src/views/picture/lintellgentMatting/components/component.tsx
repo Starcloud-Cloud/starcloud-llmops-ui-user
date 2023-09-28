@@ -6,10 +6,11 @@ import { ColorPicker, Radio, InputNumber, Upload, Progress, Image } from 'antd';
 import type { UploadProps } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getAccessToken } from 'utils/auth';
+import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
-const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
+const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
     const [scale, setScale] = useState<number | null>(100);
@@ -36,13 +37,8 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
         accept: '.png, .jpg, .webp',
         onChange(info) {
             console.log(info);
-
             if (info.file.status === 'uploading') {
-                if (info.file.response) {
-                    return info.file;
-                } else {
-                    return {};
-                }
+                return info.file;
             } else if (info.file.status === 'done') {
                 const newValue = _.cloneDeep(imageList);
                 newValue.push(info.file);
@@ -54,26 +50,56 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-    const handleSave = () => {
+    const handleSave = async () => {
+        const sucIndex = suRef.current.length;
+        suRef.current.push(...imageList);
         setOpen(false);
-        suRef.current = _.cloneDeep(imageList);
-        setSucImageList(_.cloneDeep(imageList));
-        imageList.map((item, index) => {
-            if (item.response?.data?.url) {
-                save({
-                    scene: 'IMAGE_REMOVE_BACKGROUND',
-                    appUid: 'REMOVE_BACKGROUND_IMAGE',
-                    imageRequest: {
-                        imageUrl: item.response?.data?.url
-                    }
-                }).then((res: any) => {
-                    suRef.current.splice(index, 1, res.response);
-                    setSucImageList(suRef.current);
-                });
+        setSucImageList(suRef.current);
+        for (let index = 0; index < imageList.length; index++) {
+            if (imageList[index].response?.data?.url) {
+                showFn(imageList[index], index + sucIndex);
+            }
+        }
+    };
+    const showFn = async (item: any, index: number) => {
+        const res = await save({
+            scene,
+            appUid,
+            imageRequest: {
+                imageUrl: item.response?.data?.url
             }
         });
+        suRef.current.splice(index, 1, res.response);
+        setSucImageList(_.cloneDeep(suRef.current));
     };
-
+    useEffect(() => {
+        if (!open) {
+            setImageList([]);
+        }
+    }, [open]);
+    //下载图片
+    const downLoadImage = () => {
+        fetch(detailData?.images[0].url)
+            .then((response: any) => {
+                if (response.ok) {
+                    return response.blob();
+                }
+            })
+            .then((blob) => {
+                // 创建一个临时链接
+                const url = window.URL.createObjectURL(blob as Blob);
+                // 创建一个临时链接的<a>标签
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = '下载.' + detailData?.images[0].url.split('.')[detailData?.images[0].url.split('.').length - 1]; // 设置下载的文件名
+                link.click();
+                // 释放临时链接的资源
+                window.URL.revokeObjectURL(url);
+            })
+            .catch((error) => {
+                console.error('下载文件时出错:', error);
+            });
+    };
     return (
         <Card className="h-full p-[16px]">
             <div className="flex flex-wrap gap-2">
@@ -87,34 +113,41 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                     </div>
                 </Dragger>
                 {sucImageList.map((item, index) => (
-                    <div key={index} className="w-[240px] h-[240px] rounded-lg overflow-hidden relative border">
-                        <Image
-                            width="100%"
-                            preview={{
-                                visible: false,
-                                mask: (
-                                    <div
-                                        className="w-full h-full flex justify-center items-center"
-                                        onClick={() => {
-                                            setDetailData(item);
-                                            setDetailOpen(true);
-                                        }}
-                                    >
-                                        <EyeOutlined className="text-[20px]" rev={undefined} />
-                                        预览
-                                    </div>
-                                )
-                            }}
-                            className="object-cover"
-                            style={{
-                                backgroundImage:
-                                    'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
-                                backgroundSize: '6px 6px',
-                                backgroundPosition: '0 0,3px 3px'
-                            }}
-                            src={item?.images && item?.images[0].url}
-                            fallback="data:image/png;base64,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"
-                        />
+                    <div
+                        key={index}
+                        className="w-[240px] h-[240px] rounded-lg overflow-hidden relative border border-solid border-[#d9d9d9]"
+                    >
+                        {item?.images && item?.images[0].url ? (
+                            <Image
+                                width="100%"
+                                preview={{
+                                    visible: false,
+                                    mask: (
+                                        <div
+                                            className="w-full h-full flex justify-center items-center"
+                                            onClick={() => {
+                                                setDetailData(item);
+                                                setDetailOpen(true);
+                                            }}
+                                        >
+                                            <EyeOutlined className="text-[20px]" rev={undefined} />
+                                            预览
+                                        </div>
+                                    )
+                                }}
+                                className="object-cover"
+                                style={{
+                                    backgroundImage:
+                                        'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
+                                    backgroundSize: '6px 6px',
+                                    backgroundPosition: '0 0,3px 3px'
+                                }}
+                                src={item?.images && item?.images[0].url}
+                                fallback="data:image/png;base64,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"
+                            />
+                        ) : (
+                            <img className="w-[30px] absolute top-0 bottom-0 left-0 right-0 m-auto" src={imgLoading} alt="" />
+                        )}
                     </div>
                 ))}
             </div>
@@ -132,6 +165,7 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                         left: '50%',
                         transform: 'translate(-50%, 0)',
                         maxHeight: '80%',
+                        maxWidth: '800px',
                         overflow: 'auto'
                     }}
                     title="预览图片"
@@ -149,21 +183,21 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                                 <Chip className="absolute top-[0] right-[10px] text-[12px]" size="small" label="原图" variant="outlined" />
                             </div>
                             <div className="w-[50%] min-h-[300px] flex justify-center items-center relative">
-                                <div
+                                <Image
                                     style={{
                                         backgroundImage:
                                             'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
                                         backgroundSize: '6px 6px',
                                         backgroundPosition: '0 0,3px 3px'
                                     }}
-                                    className="w-[200px] h-[200px]"
-                                >
-                                    <Image width={200} preview={false} src={detailData?.images && detailData?.images[0].url} />
-                                </div>
+                                    width={200}
+                                    preview={false}
+                                    src={detailData?.images && detailData?.images[0].url}
+                                />
                                 <Chip className="absolute top-[0] left-[10px] text-[12px]" size="small" label="抠图后" variant="outlined" />
                             </div>
                         </div>
-                        <IconButton className="absolute right-[10px] bottom-[10px]" size="small" color="secondary">
+                        <IconButton onClick={downLoadImage} className="absolute right-[10px] bottom-[10px]" size="small" color="secondary">
                             <DownloadForOffline />
                         </IconButton>
                     </CardContent>
@@ -203,15 +237,17 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                                     preview={{
                                         visible: false,
                                         mask: (
-                                            <div
-                                                className="w-full h-full flex justify-center items-center"
-                                                onClick={() => {
-                                                    const newValue = _.cloneDeep(imageList);
-                                                    newValue.splice(index, 1);
-                                                    setImageList(newValue);
-                                                }}
-                                            >
-                                                <DeleteOutlined className="text-[20px]" rev={undefined} />
+                                            <div className="w-full h-full flex justify-center items-center cursor-default">
+                                                <span
+                                                    onClick={() => {
+                                                        const newValue = _.cloneDeep(imageList);
+                                                        newValue.splice(index, 1);
+                                                        setImageList(newValue);
+                                                    }}
+                                                    className="cursor-pointer hover:text-[red]"
+                                                >
+                                                    <DeleteOutlined className="text-[20px]" rev={undefined} />
+                                                </span>
                                             </div>
                                         )
                                     }}
@@ -233,8 +269,7 @@ const EditBackgroundImage = ({ save }: { save: (data: any) => any }) => {
                             <div className="text-sm leading-4">支持多张图片同时上传，仅支持 JPG/PNG/WEBP 格式图片</div>
                         </div>
                         <div>
-                            <Button size="small">取消</Button>
-                            <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="outlined">
+                            <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="contained">
                                 抠图
                             </Button>
                         </div>

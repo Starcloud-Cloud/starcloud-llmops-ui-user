@@ -57,7 +57,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         Groups2Icon,
         FormatShapesIcon
     };
-    const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
+    const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 
     const itemIcon = item?.icon ? (
         <Icon

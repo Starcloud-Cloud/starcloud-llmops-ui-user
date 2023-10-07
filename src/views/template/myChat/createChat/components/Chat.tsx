@@ -52,6 +52,8 @@ const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
 import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
 import { ChatTip } from 'views/chat/market';
+import { fetchRequestCanCancel } from 'utils/fetch';
+import { fetchRequestCanCancelShare } from 'utils/fetch/indexShare';
 
 const { Option } = Select;
 
@@ -303,6 +305,7 @@ export const Chat = ({
 
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
+    const controllerRef: any = useRef(null);
 
     const conversationUniKey = `conversationUid-${mediumUid}`;
 
@@ -882,7 +885,7 @@ export const Chat = ({
         try {
             let resp: any;
             if (mode === 'iframe') {
-                resp = await shareMessageSSE({
+                const { promise, controller } = fetchRequestCanCancelShare('/share/chat/conversation', 'post', {
                     scene: statisticsMode,
                     query: message,
                     mediumUid,
@@ -890,9 +893,11 @@ export const Chat = ({
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             if (mode === 'test') {
-                resp = await messageSSE({
+                const { promise, controller } = fetchRequestCanCancel('/llm/chat/completions', 'post', {
                     appUid: appId,
                     scene: 'CHAT_TEST',
                     conversationUid,
@@ -900,15 +905,19 @@ export const Chat = ({
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             if (mode === 'market') {
-                resp = await marketMessageSSE({
+                const { promise, controller } = fetchRequestCanCancel('/llm/market/chat', 'post', {
                     appUid: uid,
                     conversationUid,
                     query: message,
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             setIsFirst(false);
 
@@ -947,6 +956,14 @@ export const Chat = ({
         } catch (e: any) {
             console.log('error', e);
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+            if (e instanceof DOMException && e.name == 'AbortError') {
+                copyData[dataRef.current.length - 1].isNew = false;
+                dataRef.current = copyData;
+                setData(copyData);
+                setIsFetch(false);
+                return;
+            }
+
             if (e.message === 'Request timeout') {
                 copyData[copyData.length - 1].answer = '机器人超时，请重试';
             } else {
@@ -968,6 +985,10 @@ export const Chat = ({
             return;
         }
         doFetch(message);
+    };
+
+    const handleStop = () => {
+        controllerRef.current.abort();
     };
 
     const handleClean = () => {
@@ -1037,6 +1058,7 @@ export const Chat = ({
             return !result;
         }
     }, [isFetch, data]);
+    console.log(data, 'data');
 
     return (
         <div className="h-full relative flex justify-center">
@@ -1224,6 +1246,21 @@ export const Chat = ({
                                     }}
                                 >
                                     继续
+                                </Button>
+                            </div>
+                        )}
+                        {isFetch && (
+                            <div className="absolute top-0 inset-x-0 flex justify-center">
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    className="w-[200px] rounded-3xl"
+                                    onClick={() => {
+                                        handleStop();
+                                    }}
+                                >
+                                    停止
                                 </Button>
                             </div>
                         )}

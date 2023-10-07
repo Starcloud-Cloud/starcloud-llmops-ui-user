@@ -1,19 +1,28 @@
 import { Grid, Card, Modal, IconButton, DialogActions, Button, Typography, Divider, CardContent, Chip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import DownloadForOffline from '@mui/icons-material/DownloadForOffline';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import HistoryIcon from '@mui/icons-material/History';
 import MainCard from 'ui-component/cards/MainCard';
 import { ColorPicker, Radio, InputNumber, Upload, Progress, Image } from 'antd';
 import type { UploadProps } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from 'utils/auth';
 import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
-const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: string; save: any }) => {
+import JSZip from 'jszip';
+import SubCard from 'ui-component/cards/SubCard';
+import ImageHistory from '../../components/imageHistory';
+import ImageDetail from '../../components/detail';
+import downLoadImages from 'hooks/useDownLoadImage';
+const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
     const [scale, setScale] = useState<number | null>(100);
+    const navigate = useNavigate();
     //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
     //抠图完成的图片
@@ -38,12 +47,22 @@ const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: s
         onChange(info) {
             console.log(info);
             if (info.file.status === 'uploading') {
-                return info.file;
+                if (!open) {
+                    setOpen(true);
+                }
+                const newValue = _.cloneDeep(imageList);
+                if (newValue.every((value) => value.uid !== info.file.uid)) {
+                    newValue.push(info.file);
+                    setImageList(newValue);
+                }
             } else if (info.file.status === 'done') {
                 const newValue = _.cloneDeep(imageList);
-                newValue.push(info.file);
-                setImageList(newValue);
-                setOpen(true);
+                newValue.forEach((value, index) => {
+                    if (value.uid === info.file.uid) {
+                        newValue.splice(index, 1, info.file);
+                        setImageList(newValue);
+                    }
+                });
             }
         },
         onDrop(e) {
@@ -77,31 +96,71 @@ const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: s
             setImageList([]);
         }
     }, [open]);
-    //下载图片
-    const downLoadImage = () => {
-        fetch(detailData?.images[0].url)
-            .then((response: any) => {
-                if (response.ok) {
-                    return response.blob();
-                }
-            })
-            .then((blob) => {
-                // 创建一个临时链接
-                const url = window.URL.createObjectURL(blob as Blob);
-                // 创建一个临时链接的<a>标签
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = '下载.' + detailData?.images[0].url.split('.')[detailData?.images[0].url.split('.').length - 1]; // 设置下载的文件名
-                link.click();
-                // 释放临时链接的资源
-                window.URL.revokeObjectURL(url);
+    //批量下载图片
+    const batchDownload = () => {
+        console.log(sucImageList);
+        const zip = new JSZip();
+        const imageUrls = sucImageList.map((item) => item.images[0].url);
+        // 异步加载图片并添加到压缩包
+        const promises = imageUrls.map(async (imageUrl, index) => {
+            const response = await fetch(imageUrl);
+            const arrayBuffer = await response.arrayBuffer();
+            zip.file(`下载${index + 1}.jpg`, arrayBuffer);
+        });
+        // 等待所有图片添加完成后创建压缩包并下载
+        Promise.all(promises)
+            .then(() => {
+                zip.generateAsync({ type: 'blob' }).then((content) => {
+                    const url = window.URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'images.zip'; // 设置下载的文件名
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
             })
             .catch((error) => {
-                console.error('下载文件时出错:', error);
+                console.error('Error downloading images:', error);
             });
     };
+    //生成的历史记录
+    const [historyOpen, setHistoryOpen] = useState(false);
     return (
         <Card className="h-full p-[16px]">
+            <SubCard
+                sx={{ mb: 3 }}
+                contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+            >
+                <div>
+                    <IconButton onClick={() => navigate('/imageMatting')} color="secondary">
+                        <KeyboardBackspaceIcon fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#697586] font-[500]">智能抠图</span>&nbsp;
+                    <span className="text-[#000c] font-[500]">- {subTitle}</span>
+                </div>
+                <div>
+                    <Button
+                        disabled={sucImageList.length === 0}
+                        startIcon={<ArrowCircleDownIcon />}
+                        onClick={batchDownload}
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                    >
+                        批量下载
+                    </Button>
+                    <Button
+                        startIcon={<HistoryIcon />}
+                        onClick={() => setHistoryOpen(true)}
+                        sx={{ ml: 1 }}
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                    >
+                        历史记录
+                    </Button>
+                </div>
+            </SubCard>
             <div className="flex flex-wrap gap-2">
                 <Dragger className="w-[240px] h-[240px]" {...imageprops}>
                     <div>
@@ -113,96 +172,57 @@ const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: s
                     </div>
                 </Dragger>
                 {sucImageList.map((item, index) => (
-                    <div
-                        key={index}
-                        className="w-[240px] h-[240px] rounded-lg overflow-hidden relative border border-solid border-[#d9d9d9]"
-                    >
+                    <div key={index}>
                         {item?.images && item?.images[0].url ? (
-                            <Image
-                                width="100%"
-                                preview={{
-                                    visible: false,
-                                    mask: (
-                                        <div
-                                            className="w-full h-full flex justify-center items-center"
-                                            onClick={() => {
-                                                setDetailData(item);
-                                                setDetailOpen(true);
-                                            }}
-                                        >
-                                            <EyeOutlined className="text-[20px]" rev={undefined} />
-                                            预览
-                                        </div>
-                                    )
-                                }}
-                                className="object-cover"
-                                style={{
-                                    backgroundImage:
-                                        'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
-                                    backgroundSize: '6px 6px',
-                                    backgroundPosition: '0 0,3px 3px'
-                                }}
-                                src={item?.images && item?.images[0].url}
-                                fallback="data:image/png;base64,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"
-                            />
-                        ) : (
-                            <img className="w-[30px] absolute top-0 bottom-0 left-0 right-0 m-auto" src={imgLoading} alt="" />
-                        )}
-                    </div>
-                ))}
-            </div>
-            <Modal
-                open={detailOpen}
-                onClose={() => setDetailOpen(false)}
-                aria-labelledby="modal-title"
-                aria-describedby="modal-description"
-            >
-                <MainCard
-                    style={{
-                        position: 'absolute',
-                        width: '80%',
-                        top: '10%',
-                        left: '50%',
-                        transform: 'translate(-50%, 0)',
-                        maxHeight: '80%',
-                        maxWidth: '800px',
-                        overflow: 'auto'
-                    }}
-                    title="预览图片"
-                    content={false}
-                    secondary={
-                        <IconButton onClick={() => setDetailOpen(false)} size="large" aria-label="close modal">
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
-                    }
-                >
-                    <CardContent sx={{ p: 2, height: '100%', position: 'relative' }}>
-                        <div className="min-h-[300px] flex items-center bg-[#fff]">
-                            <div className="w-[50%] min-h-[300px] flex justify-center items-center border-r border-solid border-[#E8E8E8] relative">
-                                <Image width={200} preview={false} src={detailData?.originalUrl} />
-                                <Chip className="absolute top-[0] right-[10px] text-[12px]" size="small" label="原图" variant="outlined" />
-                            </div>
-                            <div className="w-[50%] min-h-[300px] flex justify-center items-center relative">
+                            <div className="min-w-[240px] min-h-[240px] rounded-lg overflow-hidden">
                                 <Image
+                                    width="240px"
+                                    preview={{
+                                        visible: false,
+                                        mask: (
+                                            <div
+                                                className="w-full h-full flex justify-center items-center relative"
+                                                onClick={() => {
+                                                    setDetailData(item);
+                                                    setDetailOpen(true);
+                                                }}
+                                            >
+                                                <EyeOutlined className="text-[20px]" rev={undefined} />
+                                                预览
+                                                <Button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        downLoadImages(item?.images[0].url, item?.images[0].mediaType.split('/')[1]);
+                                                    }}
+                                                    className="absolute right-[5px] bottom-[5px]"
+                                                    size="small"
+                                                    color="secondary"
+                                                >
+                                                    <ArrowCircleDownIcon />
+                                                </Button>
+                                            </div>
+                                        )
+                                    }}
+                                    className="object-cover"
                                     style={{
                                         backgroundImage:
                                             'linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%)',
                                         backgroundSize: '6px 6px',
                                         backgroundPosition: '0 0,3px 3px'
                                     }}
-                                    width={200}
-                                    preview={false}
-                                    src={detailData?.images && detailData?.images[0].url}
+                                    src={item?.images && item?.images[0].url}
+                                    fallback="data:image/png;base64,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"
                                 />
-                                <Chip className="absolute top-[0] left-[10px] text-[12px]" size="small" label="抠图后" variant="outlined" />
                             </div>
-                        </div>
-                        <IconButton onClick={downLoadImage} className="absolute right-[10px] bottom-[10px]" size="small" color="secondary">
-                            <DownloadForOffline />
-                        </IconButton>
-                    </CardContent>
-                </MainCard>
-            </Modal>
+                        ) : (
+                            <div className="min-w-[240px] min-h-[240px] rounded-lg overflow-hidden relative border border-solid border-[#d9d9d9]">
+                                <img className="w-[30px] absolute top-0 bottom-0 left-0 right-0 m-auto" src={imgLoading} alt="" />
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+            {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
             <Modal open={open} onClose={() => setOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <MainCard
                     style={{
@@ -230,33 +250,36 @@ const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: s
                             </div>
                         </Dragger>
                         {imageList.map((item, index) => (
-                            <div key={index} className="w-[160px] h-[160px] rounded-lg relative overflow-hidden">
-                                <Image
-                                    width="100%"
-                                    className="object-cover"
-                                    preview={{
-                                        visible: false,
-                                        mask: (
-                                            <div className="w-full h-full flex justify-center items-center cursor-default">
-                                                <span
-                                                    onClick={() => {
-                                                        const newValue = _.cloneDeep(imageList);
-                                                        newValue.splice(index, 1);
-                                                        setImageList(newValue);
-                                                    }}
-                                                    className="cursor-pointer hover:text-[red]"
-                                                >
-                                                    <DeleteOutlined className="text-[20px]" rev={undefined} />
-                                                </span>
-                                            </div>
-                                        )
-                                    }}
-                                    src={item.response?.data?.url}
-                                    fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2Ibzx0tc44fYX/16lV6NDFLXH+YL32jwiACRBiEbf5KcXoTIsQSpzXx4N28Ja4BQoK7rgXiydbHjx/P25TaQAJEGAguWy0+2Q8PD6/Ki4R8EVl+bzBOnZY95fq9rj9zAkTI2SxdidBHqG9+skdw43borCXO/ZcJdraPWdv22uIEiLA4q7nvvCug8WTqzQveOH26fodo7g6uFe/a17W3+nFBAkRYENRdb1vkkz1CH9cPsVy/jrhr27PqMYvENYNlHAIesRiBYwRy0V+8iXP8+/fvX11Mr7L7ECueb/r48eMqm7FuI2BGWDEG8cm+7G3NEOfmdcTQw4h9/55lhm7DekRYKQPZF2ArbXTAyu4kDYB2YxUzwg0gi/41ztHnfQG26HbGel/crVrm7tNY+/1btkOEAZ2M05r4FB7r9GbAIdxaZYrHdOsgJ/wCEQY0J74TmOKnbxxT9n3FgGGWWsVdowHtjt9Nnvf7yQM2aZU/TIAIAxrw6dOnAWtZZcoEnBpNuTuObWMEiLAx1HY0ZQJEmHJ3HNvGCBBhY6jtaMoEiJB0Z29vL6ls58vxPcO8/zfrdo5qvKO+d3Fx8Wu8zf1dW4p/cPzLly/dtv9Ts/EbcvGAHhHyfBIhZ6NSiIBTo0LNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiEC/wGgKKC4YMA4TAAAAABJRU5ErkJggg=="
-                                />
-                                {item.percent !== 100 && (
-                                    <div className="absolute bg-[#e5e7eb] left-0 top-0 w-full h-full opacity-70 flex items-center justify-center">
-                                        <Progress type="circle" percent={item.percent} />
+                            <div key={index}>
+                                {item.percent === 100 ? (
+                                    <div className="min-w-[160px] min-h-[160px] rounded-lg relative overflow-hidden">
+                                        <Image
+                                            width="160px"
+                                            className="object-cover"
+                                            preview={{
+                                                visible: false,
+                                                mask: (
+                                                    <div className="w-full h-full flex justify-center items-center cursor-default">
+                                                        <span
+                                                            onClick={() => {
+                                                                const newValue = _.cloneDeep(imageList);
+                                                                newValue.splice(index, 1);
+                                                                setImageList(newValue);
+                                                            }}
+                                                            className="cursor-pointer hover:text-[red]"
+                                                        >
+                                                            <DeleteOutlined className="text-[20px]" rev={undefined} />
+                                                        </span>
+                                                    </div>
+                                                )
+                                            }}
+                                            src={item.response?.data?.url}
+                                            fallback="data:image/png;base64,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"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="w-[160px] h-[160px]  rounded-lg relative overflow-hidden  border border-solid border-[#d9d9d9]">
+                                        <img className="w-[30px] absolute top-0 bottom-0 left-0 right-0 m-auto" src={imgLoading} alt="" />
                                     </div>
                                 )}
                             </div>
@@ -276,6 +299,7 @@ const EditBackgroundImage = ({ scene, appUid, save }: { scene: string; appUid: s
                     </div>
                 </MainCard>
             </Modal>
+            {historyOpen && <ImageHistory open={historyOpen} handleClose={() => setHistoryOpen(false)} />}
         </Card>
         // <div>
         //     <Grid container spacing={2}>

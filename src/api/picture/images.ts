@@ -15,3 +15,19 @@ export const removeBackground = (data: any) => {
 export const removeText = (data: any) => {
     return request.post({ url: '/llm/image/removeText', data });
 };
+
+/**
+ * 图片放大、增加清晰度
+ * @returns
+ */
+export const upscale = (data: any) => {
+    return request.post({ url: '/llm/image/upscale', data });
+};
+
+/**
+ * 图片历史记录
+ * @returns
+ */
+export const history = (params: any) => {
+    return request.get({ url: '/llm/image/history', params });
+};

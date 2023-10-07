@@ -8,7 +8,7 @@ const LintellgentMatting = () => {
             <div className="flex gap-10">
                 <Card onClick={() => navigate('/smartImage')} sx={{ width: 345, textAlign: 'center', cursor: 'pointer' }}>
                     <CardMedia
-                        sx={{ height: 140 }}
+                        sx={{ height: 224 }}
                         image="https://linkfoxai-ailab-prod.oss-cn-shenzhen.aliyuncs.com/UPLOAD/example/cutout-auto.png"
                         title="green iguana"
                     />
@@ -26,7 +26,7 @@ const LintellgentMatting = () => {
                 </Card>
                 <Card onClick={() => navigate('/delImageText')} sx={{ width: 345, textAlign: 'center', cursor: 'pointer' }}>
                     <CardMedia
-                        sx={{ height: 140 }}
+                        sx={{ height: 224 }}
                         image="https://linkfoxai-ailab-prod.oss-cn-shenzhen.aliyuncs.com/UPLOAD/example/cutout-by-select.png"
                         title="green iguana"
                     />

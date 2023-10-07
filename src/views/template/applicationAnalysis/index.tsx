@@ -165,8 +165,7 @@ function ApplicationAnalysis({
         logMetaData(type).then((res) => {
             setDateList(res.timeType);
             setAppMode(res.appMode);
-            // TODO 前端临时处理 然后端加枚举
-            setAppScene([...res.appScene, { label: '自由会话', value: 'CHAT_MARKET' }]);
+            setAppScene(res.appScene);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

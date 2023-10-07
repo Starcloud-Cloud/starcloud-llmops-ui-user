@@ -54,6 +54,7 @@ import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
 import { ChatTip } from 'views/chat/market';
 import { fetchRequestCanCancel } from 'utils/fetch';
 import { fetchRequestCanCancelShare } from 'utils/fetch/indexShare';
+import { isMobile } from 'react-device-detect';
 
 const { Option } = Select;
 
@@ -296,6 +297,7 @@ export const Chat = ({
     const [openToken, setOpenToken] = useState(false);
     const [isFreedomChat, setIsFreedomChat] = useState(false);
     const [openChatMask, setOpenChatMask] = useState(false);
+    const [visibleTip, setVisibleTip] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -353,14 +355,6 @@ export const Chat = ({
             timeOutRef.current && clearInterval(timeOutRef.current);
         };
     }, []);
-
-    const visibleTip = React.useMemo(() => {
-        if (isFreedomChat && openChatMask) {
-            return true;
-        } else {
-            return false;
-        }
-    }, [openChatMask, isFreedomChat]);
 
     // mode share start
     useEffect(() => {
@@ -505,21 +499,32 @@ export const Chat = ({
     // mode iframe end
 
     // mode market start
-    // 初始设置为自由聊天
+    // 默认初始进来就是自由聊天
     React.useEffect(() => {
         if (mode === 'market') {
             setIsFreedomChat(true);
         }
     }, [mode]);
 
+    // 当是自由聊天的时候 没有内容才展示
     React.useEffect(() => {
-        const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
-        if (!r.length) {
-            setOpenChatMask(true);
-        } else {
-            setOpenChatMask(false);
+        if (isFreedomChat) {
+            const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
+            if (!r.length) {
+                setOpenChatMask(true);
+            } else {
+                setOpenChatMask(false);
+            }
         }
-    }, [data]);
+    }, [data, isFreedomChat]);
+
+    useEffect(() => {
+        if (isFreedomChat && openChatMask) {
+            setVisibleTip(true);
+        } else {
+            setVisibleTip(false);
+        }
+    }, [isFreedomChat, openChatMask]);
 
     React.useEffect(() => {
         if (mode === 'market' && uid) {
@@ -1058,7 +1063,6 @@ export const Chat = ({
             return !result;
         }
     }, [isFetch, data]);
-    console.log(data, 'data');
 
     return (
         <div className="h-full relative flex justify-center">
@@ -1111,6 +1115,11 @@ export const Chat = ({
             <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
                 <div className="flex justify-center">
                     <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
+                        {mode === 'market' && isMobile && (
+                            <span className="absolute left-2 cursor-pointer" onClick={() => setVisibleTip(!visibleTip)}>
+                                <HelpOutlineIcon className="text-base cursor-pointer" />
+                            </span>
+                        )}
                         {showSelect ? (
                             <Popover
                                 content={
@@ -1240,7 +1249,7 @@ export const Chat = ({
                                     variant="outlined"
                                     color="secondary"
                                     size="small"
-                                    className="w-[200px] rounded-3xl"
+                                    className="sm:w-[200px] xs:w-[120px] rounded-3xl"
                                     onClick={() => {
                                         doFetch('继续', true);
                                     }}
@@ -1255,7 +1264,7 @@ export const Chat = ({
                                     variant="outlined"
                                     color="secondary"
                                     size="small"
-                                    className="w-[200px] rounded-3xl"
+                                    className="sm:w-[200px] xs:w-[120px] rounded-3xl"
                                     onClick={() => {
                                         handleStop();
                                     }}
@@ -1721,31 +1730,20 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            {mode === 'market' && (
+            {mode === 'market' && !isMobile && (
                 <div className={`${width > 1300 ? 'min-w-[220px]' : 'min-w-[40px]'} h-full bg-[#f4f6f8] relative`}>
                     <div
                         className="bg-white absolute rounded-tr-lg rounded-br-lg p-2 top-[44px] cursor-pointer"
-                        onClick={() => setOpenChatMask(!openChatMask)}
+                        onClick={() => setVisibleTip(!visibleTip)}
                     >
-                        {!openChatMask ? (
-                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
-                                <KeyboardDoubleArrowLeftIcon />
-                                <span>如</span>
-                                <span>何</span>
-                                <span>提</span>
-                                <span>问</span>
-                                <span>?</span>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
-                                <KeyboardDoubleArrowRightIcon />
-                                <span>如</span>
-                                <span>何</span>
-                                <span>提</span>
-                                <span>问</span>
-                                <span>?</span>
-                            </div>
-                        )}
+                        <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                            {!visibleTip ? <KeyboardDoubleArrowLeftIcon /> : <KeyboardDoubleArrowRightIcon />}
+                            <span>如</span>
+                            <span>何</span>
+                            <span>提</span>
+                            <span>问</span>
+                            <span>?</span>
+                        </div>
                     </div>
                 </div>
             )}

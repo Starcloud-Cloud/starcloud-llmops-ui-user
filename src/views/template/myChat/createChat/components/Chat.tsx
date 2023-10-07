@@ -1258,7 +1258,7 @@ export const Chat = ({
                                 </Button>
                             </div>
                         )}
-                        {isFetch && (
+                        {/* {isFetch && (
                             <div className="absolute top-0 inset-x-0 flex justify-center">
                                 <Button
                                     variant="outlined"
@@ -1272,7 +1272,7 @@ export const Chat = ({
                                     停止
                                 </Button>
                             </div>
-                        )}
+                        )} */}
                         <div className="flex justify-between mb-[2px]">
                             {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover

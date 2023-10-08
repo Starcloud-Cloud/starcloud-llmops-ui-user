@@ -98,7 +98,6 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     }, [open]);
     //批量下载图片
     const batchDownload = () => {
-        console.log(sucImageList);
         const zip = new JSZip();
         const imageUrls = sucImageList.map((item) => item.images[0].url);
         // 异步加载图片并添加到压缩包
@@ -135,8 +134,8 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     <IconButton onClick={() => navigate('/imageMatting')} color="secondary">
                         <KeyboardBackspaceIcon fontSize="small" />
                     </IconButton>
-                    <span className="text-[#697586] font-[500]">智能抠图</span>&nbsp;
-                    <span className="text-[#000c] font-[500]">- {subTitle}</span>
+                    <span className="text-[#000c] font-[500]">智能抠图</span>&nbsp;
+                    <span className="text-[#673ab7] font-[500]">- {subTitle}</span>
                 </div>
                 <div>
                     <Button
@@ -176,7 +175,8 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                         {item?.images && item?.images[0].url ? (
                             <div className="min-w-[240px] min-h-[240px] rounded-lg overflow-hidden">
                                 <Image
-                                    width="240px"
+                                    width={240}
+                                    height={240}
                                     preview={{
                                         visible: false,
                                         mask: (
@@ -189,17 +189,15 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                             >
                                                 <EyeOutlined className="text-[20px]" rev={undefined} />
                                                 预览
-                                                <Button
+                                                <div
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         downLoadImages(item?.images[0].url, item?.images[0].mediaType.split('/')[1]);
                                                     }}
-                                                    className="absolute right-[5px] bottom-[5px]"
-                                                    size="small"
-                                                    color="secondary"
+                                                    className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"
                                                 >
                                                     <ArrowCircleDownIcon />
-                                                </Button>
+                                                </div>
                                             </div>
                                         )
                                     }}

@@ -2,7 +2,7 @@ export interface Item {
     uid: string;
     name: string;
     description: string;
-    categories: string[];
+    category: string;
     tags: string[];
     updateTime: number;
     creatorName: string;
@@ -16,7 +16,7 @@ export interface Execute {
 export interface Details {
     name: string;
     description: string;
-    categories: string[];
+    category: string;
     icon?: string;
     scenes: string[];
     tags: string[];
@@ -33,7 +33,7 @@ export interface Anyevent {
     initialValues: {
         name: string;
         description: string;
-        categories: string[];
+        category: string;
         tags: string[];
     };
     setValues: (data: { name: string; value: string | string[] }) => void;

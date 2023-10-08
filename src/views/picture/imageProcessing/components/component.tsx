@@ -137,8 +137,8 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     <IconButton onClick={() => navigate('/imageUpscaling')} color="secondary">
                         <KeyboardBackspaceIcon fontSize="small" />
                     </IconButton>
-                    <span className="text-[#697586] font-[500]">图片质量提升</span>&nbsp;
-                    <span className="text-[#000c] font-[500]">- {subTitle}</span>
+                    <span className="text-[#000c] font-[500]">图片质量提升</span>&nbsp;
+                    <span className="text-[#673ab7] font-[500]">- {subTitle}</span>
                 </div>
                 <div>
                     <Button
@@ -178,7 +178,8 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         {item?.images && item?.images[0].url ? (
                             <div className="min-w-[240px] min-h-[240px] rounded-lg overflow-hidden">
                                 <Image
-                                    width="240px"
+                                    width={240}
+                                    height={240}
                                     preview={{
                                         visible: false,
                                         mask: (
@@ -191,17 +192,15 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                             >
                                                 <EyeOutlined className="text-[20px]" rev={undefined} />
                                                 预览
-                                                <Button
+                                                <div
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         downLoadImages(item?.images[0].url, item?.images[0].mediaType.split('/')[1]);
                                                     }}
-                                                    className="absolute right-[5px] bottom-[5px]"
-                                                    size="small"
-                                                    color="secondary"
+                                                    className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"
                                                 >
                                                     <ArrowCircleDownIcon />
-                                                </Button>
+                                                </div>
                                             </div>
                                         )
                                     }}

@@ -1,4 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
+import { RightOutlined } from '@ant-design/icons';
 import { Box, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -6,7 +7,8 @@ import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import ScrollMenus from './ScrollMenu';
 import { useTheme } from '@mui/material/styles';
-
+import { listGroupByCategory } from 'api/template';
+import Template from 'views/template/myTemplate/components/content/template';
 interface MarketList {
     name: string;
     tags: string[];
@@ -23,20 +25,35 @@ function TemplateMarket() {
     const navigate = useNavigate();
     const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList } = marketStore();
     const [page, setPage] = useState<Page>({ pageNo: 1, pageSize: 30 });
+    const [appList, setAppList] = useState<any[]>([]);
+    const [newList, setNewList] = useState<any[]>([]);
+    useEffect(() => {
+        listGroupByCategory({ isSearchHot: true }).then((res) => {
+            setAppList(res);
+            setNewList(res);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [queryParams, setQueryParams] = useState({
         name: '',
         sort: '',
-        category: 'AMAZON'
+        category: 'ALL'
     });
+    // useEffect(() => {
+    //     handleSearch();
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [queryParams, templateList]);
     useEffect(() => {
-        handleSearch();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [queryParams, templateList]);
-    const sortList = [
-        { text: t('market.new'), key: 'gmt_create' },
-        { text: t('market.popular'), key: 'like' },
-        { text: t('market.recommend'), key: 'step' }
-    ];
+        if (queryParams.category !== 'ALL') {
+            setNewList(
+                appList.map((item) => {
+                    if (item.code === queryParams.category) {
+                        return item;
+                    }
+                })
+            );
+        }
+    }, [queryParams]);
     //更改筛选
     const handleChange = (event: any) => {
         navigate('/appMarket/list');
@@ -119,7 +136,9 @@ function TemplateMarket() {
         });
     };
     const [maxHeight, setHeight] = useState(133);
-
+    const handleDetail = (data: { uid: string }) => {
+        navigate(`/appMarket/detail/${data.uid}`);
+    };
     return (
         <Box
             sx={{
@@ -149,18 +168,15 @@ function TemplateMarket() {
                     }
                 }}
             >
-                <Box>
-                    <Box className="flex mb-[8px] flex-wrap items-end gap-3">
-                        <Typography variant="h2" lineHeight={1}>
-                            {t('market.title')}
-                        </Typography>
-                        {/* <Typography color="#697586" fontSize="12px" ml={0.5} fontWeight={500}>
-                                {t('market.subLeft')} {total} + {t('market.subright')}
-                            </Typography> */}
+                <Grid alignItems="center" container spacing={2} mb={1}>
+                    <Grid item xs={12} md={9}>
+                        <ScrollMenus change={changeCategory} />
+                    </Grid>
+                    <Grid item xs={12} md={3}>
                         <TextField
                             size="small"
                             id="filled-start-adornment"
-                            sx={{ width: '300px' }}
+                            fullWidth
                             placeholder={t('market.place')}
                             name="name"
                             value={queryParams.name}
@@ -173,27 +189,29 @@ function TemplateMarket() {
                                 )
                             }}
                         />
-                    </Box>
-
-                    <Grid container spacing={2} mb={1}>
-                        <Grid item xs={12} md={10}>
-                            <ScrollMenus change={changeCategory} />
-                        </Grid>
-                        <Grid item xs={12} md={2}>
-                            <FormControl fullWidth>
-                                <InputLabel id="sort">{t('market.sortby')}</InputLabel>
-                                <Select id="sort" onChange={handleChange} name="sort" value={queryParams.sort} label={t('market.sortby')}>
-                                    {sortList.map((el: any) => (
-                                        <MenuItem key={el.key} value={el.key}>
-                                            {el.text}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
                     </Grid>
-                </Box>
-                <Outlet />
+                </Grid>
+                {newList.map((item) => (
+                    <div key={item.code}>
+                        <div className="flex justify-between items-center my-[24px]">
+                            <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                <img height="20px" src={require('../../../assets/images/category/' + item.icon + '.svg')} alt="" />
+                                <span>{item.name}</span>
+                            </div>
+                            <div className="text-[#673ab7] cursor-pointer">
+                                更多模板
+                                <RightOutlined rev={undefined} />
+                            </div>
+                        </div>
+                        <Grid container display="flex" flexWrap="nowrap" overflow="hidden" spacing={2}>
+                            {item.appList.map((item: any, index: number) => (
+                                <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={item.uid + index} item>
+                                    <Template handleDetail={handleDetail} data={item} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </div>
+                ))}
             </Box>
         </Box>
     );

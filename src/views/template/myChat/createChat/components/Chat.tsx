@@ -1116,8 +1116,9 @@ export const Chat = ({
                 <div className="flex justify-center">
                     <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
                         {mode === 'market' && isMobile && (
-                            <span className="absolute left-2 cursor-pointer" onClick={() => setVisibleTip(!visibleTip)}>
+                            <span className="absolute left-2 cursor-pointer flex items-center" onClick={() => setVisibleTip(!visibleTip)}>
                                 <HelpOutlineIcon className="text-base cursor-pointer" />
+                                <span className="text-xs text-[#697586]">如何提问</span>
                             </span>
                         )}
                         {showSelect ? (
@@ -1169,7 +1170,7 @@ export const Chat = ({
                                     <div className="w-[28px] h-[28px] flex justify-center items-center">
                                         <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                                     </div>
-                                    <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                                    <div className={'text-lg font-medium ml-2 line-clamp-1 max-w-[95px]'}>{chatBotInfo.name}</div>
 
                                     {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                                     <span className="text-xs ml-1 text-[#697586]">切换员工</span>

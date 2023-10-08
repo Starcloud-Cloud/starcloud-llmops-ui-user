@@ -29,6 +29,14 @@ function Template({ data, handleDetail }: any) {
                     src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
                 />
             )}
+            {data?.images && (
+                <Image
+                    preview={false}
+                    className="rounded-lg overflow-hidden border border-solid border-slate-200"
+                    height={60}
+                    src={data.images[0]}
+                />
+            )}
             <CardContent
                 sx={{
                     p: '0',

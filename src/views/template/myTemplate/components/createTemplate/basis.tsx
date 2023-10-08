@@ -20,7 +20,7 @@ import marketStore from 'store/market';
 import * as yup from 'yup';
 const validationSchema = yup.object({
     name: yup.string().required(t('myApp.isrequire')),
-    categories: yup.array().min(1, t('myApp.categoryVaid'))
+    category: yup.string().required(t('myApp.isrequire'))
 });
 
 const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
@@ -72,28 +72,19 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                     }}
                     variant="outlined"
                 />
-                <FormControl fullWidth sx={{ mt: 4 }} error={formik?.touched.categories && Boolean(formik?.errors.categories)}>
-                    <InputLabel color="secondary" id="categories">
+                <FormControl fullWidth sx={{ mt: 4 }} error={formik?.touched.category && Boolean(formik?.errors.category)}>
+                    <InputLabel color="secondary" id="category">
                         {t('myApp.categary')}
                     </InputLabel>
                     <Select
-                        labelId="categories"
-                        name="categories"
-                        multiple
+                        labelId="category"
+                        name="category"
                         color="secondary"
-                        value={formik.values.categories}
+                        value={formik.values.category}
                         onChange={(e) => {
                             formik.handleChange(e);
                             setValues({ name: e.target.name, value: e.target.value });
                         }}
-                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) =>
-                                    categoryList.map((item) => item.code === value && <Chip key={value} label={item.name} />)
-                                )}
-                            </Box>
-                        )}
                         label={t('myApp.categary')}
                     >
                         {categoryList.map(
@@ -105,9 +96,7 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                                 )
                         )}
                     </Select>
-                    <FormHelperText>
-                        {formik?.touched.categories && formik?.errors.categories ? formik?.errors.categories : ' '}
-                    </FormHelperText>
+                    <FormHelperText>{formik?.touched.category && formik?.errors.category ? formik?.errors.category : ' '}</FormHelperText>
                 </FormControl>
                 <Stack sx={{ mt: 2 }}>
                     <Autocomplete

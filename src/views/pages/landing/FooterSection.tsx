@@ -149,6 +149,9 @@ const FooterSection = () => {
                     <a target="_blank" className="text-[#2196f3] ml-2" href="https://www.aiwht.com">
                         AI万花筒
                     </a>
+                    <a target="_blank" className="text-[#2196f3] ml-2" href="https://www.aitop100.cn">
+                        AI Top100
+                    </a>
                 </div>
             </div>
             <Box sx={{ bgcolor: 'dark.dark', py: { xs: 3, sm: 1.5 } }}>

@@ -1,14 +1,12 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
-
 import { useEffect, useState } from 'react';
-
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import ScrollMenus from './ScrollMenu';
 import { useTheme } from '@mui/material/styles';
-import { ChatBtn } from '../myChat/createChat/components/Chat';
+
 interface MarketList {
     name: string;
     tags: string[];
@@ -121,6 +119,7 @@ function TemplateMarket() {
         });
     };
     const [maxHeight, setHeight] = useState(133);
+
     return (
         <Box
             sx={{

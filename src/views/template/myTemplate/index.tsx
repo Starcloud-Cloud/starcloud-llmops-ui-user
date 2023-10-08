@@ -270,7 +270,7 @@ function MyTemplate() {
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加应用个数(${userInfo.benefits[2].totalNum})已用完`}
+                    title={`添加应用个数(${userInfo?.benefits[2].totalNum})已用完`}
                 />
             )}
             {totals > 0 && (

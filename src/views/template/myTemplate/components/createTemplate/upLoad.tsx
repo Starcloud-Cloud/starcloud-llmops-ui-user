@@ -798,10 +798,11 @@ function Upload({
                         )}
                         {updateBtn.needUpdate && (
                             <Box fontSize={12} mt="12px" display="flex" alignItems="center">
-                                <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未更新渠道的设置。配置最后更新日期::
+                                <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到还未更新渠道的设置。配置最后更新日期:
                                 <Typography color="secondary">
                                     {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
                                 </Typography>
+                                需要点击[更新渠道]来同步配置。
                             </Box>
                         )}
                         {updateBtn && !updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate && (

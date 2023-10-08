@@ -266,11 +266,13 @@ function ApplicationAnalysis({
     };
     const categoryList = marketStore((state) => state.categoryList);
     const getDeList = (row: { appMode: string; uid: string }) => {
-        if (row.appMode === 'BASE_GENERATE_IMAGE') {
+        if (row.appMode === 'IMAGE') {
             detailImage({ conversationUid: row.uid }).then((res) => {
-                setResult(res);
-                setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
-                setPicOpen(true);
+                if (res) {
+                    setResult(res);
+                    setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
+                    setPicOpen(true);
+                }
             });
         }
     };
@@ -282,7 +284,8 @@ function ApplicationAnalysis({
         prompt: '',
         engine: '',
         width: 0,
-        height: 0
+        height: 0,
+        stylePreset: ''
     });
     const [currentIndex, setCurrentIndex] = useState(0);
     //执行弹窗
@@ -436,21 +439,21 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 <TableCell align="center">
                                     <Button
-                                        disabled={row.status !== 'SUCCESS'}
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
-                                            if (row.appMode === 'BASE_GENERATE_IMAGE') {
+                                            if (row.appMode === 'IMAGE') {
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ conversationUid: row.uid }).then((res) => {
-                                                    setExeDetail(res.appInfo);
-                                                    setResult(res);
-                                                    setConversationUid(res.conversationUid);
-                                                    setExeOpen(true);
+                                                    if (res) {
+                                                        setExeDetail(res.appInfo);
+                                                        setResult(res);
+                                                        setConversationUid(res.conversationUid);
+                                                        setExeOpen(true);
+                                                    }
                                                 });
                                             } else if (row.appMode === 'CHAT') {
-                                                setChatVisible(true);
                                                 setConversationUid(row.uid);
                                                 getChatRecord({
                                                     conversationUid: row.uid,
@@ -458,7 +461,10 @@ function ApplicationAnalysis({
                                                     pageSize: 100,
                                                     fromScene: row.fromScene
                                                 }).then((res) => {
-                                                    setDetail(res.list);
+                                                    if (res) {
+                                                        setChatVisible(true);
+                                                        setDetail(res.list);
+                                                    }
                                                 });
                                             }
                                         }}
@@ -490,6 +496,7 @@ function ApplicationAnalysis({
                     engine={ImgDetail.engine}
                     width={ImgDetail.width}
                     height={ImgDetail.height}
+                    stylePreset={ImgDetail?.stylePreset}
                 />
             )}
             {chatVisible && (
@@ -551,10 +558,9 @@ function ApplicationAnalysis({
                             >
                                 <CardContent>
                                     <Box>
-                                        {result.status === 'ERROR' && <DetailErr result={result} />}
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                {result.status !== 'ERROR' && exeDetail?.icon && (
+                                                {exeDetail?.icon && (
                                                     <Image
                                                         preview={false}
                                                         height={60}
@@ -562,7 +568,7 @@ function ApplicationAnalysis({
                                                         src={require('../../../assets/images/category/' + exeDetail?.icon + '.svg')}
                                                     />
                                                 )}
-                                                <Box>
+                                                <Box ml={1}>
                                                     <Box>
                                                         <Typography variant="h1" sx={{ fontSize: '2rem' }}>
                                                             {exeDetail?.name}

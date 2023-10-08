@@ -43,12 +43,15 @@ import { BpCheckbox } from 'ui-component/BpCheckbox';
 import useUserStore from 'store/user';
 import './chat.scss';
 import { handleIcon } from './SkillWorkflowCard';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 
 const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
 import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
+import { ChatTip } from 'views/chat/market';
 
 const { Option } = Select;
 
@@ -67,7 +70,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
-    docs: any;
+    context: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -99,258 +102,144 @@ export type IConversation = {
     createTime: number;
 };
 
-export const ChatBtn = () => {
-    const [anchorEl, setAnchorEl] = React.useState<Element | ((element: Element) => Element) | null | undefined>(null);
-    const [isListening, setIsListening] = React.useState(false);
-    const [message, setMessage] = React.useState('');
-    const [time, setTime] = React.useState(1);
-    const { setMessageData } = useChatMessage();
-    const navigate = useNavigate();
-
-    const timeOutRef: any = useRef(null);
-
-    const handleClean = () => {
-        setAnchorEl(null);
-        // setData([]);
-        // dataRef.current = [];
-        // setConversationUid('');
-        // jsCookie.remove(conversationUniKey);
-    };
-
-    const handleClickSort = (event: React.MouseEvent<HTMLButtonElement> | undefined) => {
-        setAnchorEl(event?.currentTarget);
-    };
-
-    const handleCloseSort = () => {
-        setAnchorEl(null);
-    };
-
-    // 创建语音识别对象
-    const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
-
-    // 设置语言为中文
-    recognition.lang = navigator.language;
-
-    // 语音识别结果事件处理函数
-    recognition.onresult = (event: any) => {
-        const result = event.results[event.resultIndex][0].transcript;
-        setMessage(`${message}${result}`);
-    };
-
-    // 开始语音识别
-    const startListening = () => {
-        timeOutRef.current = setInterval(() => {
-            setTime((time) => time + 1);
-        }, 1000);
-        setIsListening(true);
-        recognition.start();
-    };
-
-    // 停止语音识别
-    const stopListening = () => {
-        timeOutRef.current && clearInterval(timeOutRef.current);
-        setTime(1);
-        setIsListening(false);
-        recognition.stop();
-    };
-
-    useEffect(() => {
-        return () => {
-            timeOutRef.current && clearInterval(timeOutRef.current);
-        };
-    }, []);
-
-    const handleKeyDown = async (event: any) => {
-        // 按下 Shift + Enter 换行
-        if (event.shiftKey && event.keyCode === 13) {
-            event.preventDefault();
-            setMessage(message + '\n');
-        } else if (!event.shiftKey && event.keyCode === 13) {
-            event.preventDefault();
-            // 单独按回车键提交表单
-            await handleOnSend();
-        }
-    };
-
-    const handleOnSend = async () => {
-        setMessageData(message);
-        navigate('/chat/my');
-    };
-
-    return (
-        <div className="flex-shrink-0 flex justify-center w-full ">
-            <div className="w-full max-w-[768px]  relative text-sm rounded-lg bg-white shadow-lg p-3 border border-[#E3E4E5]">
-                <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
-                    <Grid item className="!pl-0">
-                        <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                            <MoreHorizTwoToneIcon />
-                        </IconButton>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleCloseSort}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'right'
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right'
-                            }}
-                        >
-                            <MenuItem onClick={handleClean}>
-                                <CleaningServicesSharpIcon className="text-base" />
-                                <span className="text-base ml-3">清除</span>
-                            </MenuItem>
-                        </Menu>
-                    </Grid>
-                    <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                        <OutlinedInput
-                            id="message-send"
-                            fullWidth
-                            multiline
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="请输入想咨询的问题"
-                            className="!pt-0"
-                            onKeyDown={handleKeyDown}
-                            minRows={1}
-                            maxRows={3}
-                            endAdornment={
-                                <>
-                                    <InputAdornment position="end">
-                                        {!isListening ? (
-                                            <Tooltip arrow placement="top" title={'语音输入'}>
-                                                <IconButton
-                                                    disableRipple
-                                                    color={'default'}
-                                                    onClick={startListening}
-                                                    aria-label="voice"
-                                                    className="p-0"
-                                                >
-                                                    <KeyboardVoiceIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        ) : (
-                                            <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                <div
-                                                    onClick={stopListening}
-                                                    className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                >
-                                                    <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                        {time}
-                                                    </div>
-                                                </div>
-                                            </Tooltip>
-                                        )}
-                                    </InputAdornment>
-                                    <InputAdornment position="end" className="relative">
-                                        <Tooltip placement="top" arrow title={'发送'}>
-                                            <IconButton
-                                                disableRipple
-                                                color={message ? 'secondary' : 'default'}
-                                                onClick={handleOnSend}
-                                                aria-label="send message"
-                                            >
-                                                <SendIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </InputAdornment>
-                                </>
-                            }
-                            aria-describedby="search-helper-text"
-                            inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
-                        />
-                    </Grid>
-                </Grid>
-                <div>
-                    <div className="flex justify-end px-[24px]">
-                        <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/200</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+export type IChatType = 'WebSearch2DocHandler' | 'NewsSearchHandler' | 'ImageSearchHandler' | 'ImageGenerationHandler' | undefined;
 
 // 转换type
-const transformType = (key: string) => {
+const transformType = (key: IChatType) => {
     switch (key) {
-        case 'news':
+        // 技能 网页和文档分析
+        case 'WebSearch2DocHandler':
             return 'url';
-        case 'content':
+        case 'NewsSearchHandler':
             return 'url';
-        case 'image':
+        case 'ImageGenerationHandler':
             return 'img';
+        case 'ImageSearchHandler':
+            return 'url';
         default:
             break;
     }
 };
-export function extractChatBlocks(data: any) {
-    const chatBlocks: any[] = [];
-    let currentBlock: any[] = [];
-    let insideBlock = false;
 
-    for (const item of data) {
-        if (item.msgType === 'CHAT_FUN') {
-            if (!insideBlock) {
-                insideBlock = true;
-                currentBlock.push(item);
+const transformTips = (key: IChatType, status: string | undefined) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            if (status === 'ERROR') {
+                return '生成回答失败';
             } else {
-                currentBlock.push(item);
+                return '生成回答完毕';
             }
-        } else if (item.msgType === 'CHAT') {
-            chatBlocks.push(item);
-        } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
-            let currentData: any = {};
-            let loop: any = [];
-            let currentLoop: any = [];
-            currentBlock.push(item);
-            insideBlock = false;
-            currentData.robotName = currentBlock[0].robotName;
-            currentData.robotAvatar = currentBlock[0].robotAvatar;
-            currentData.message = currentBlock[0].message;
-            currentData.createTime = currentBlock[0].createTime;
-            currentData.isNew = false;
-            currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
-            currentData.process = [];
-
-            for (const block of currentBlock) {
-                if (block.msgType === 'CHAT_FUN') {
-                    currentLoop.push(block);
-                } else if (block.msgType === 'FUN_CALL') {
-                    currentLoop.push(block);
-                    loop.push(currentLoop);
-                    currentLoop = [];
-                } else {
-                    currentLoop = [];
-                }
+        case 'ImageGenerationHandler':
+            if (status === 'ERROR') {
+                return '图片生成失败';
+            } else {
+                return '图片生成完成';
             }
-
-            loop.forEach((item: { answer: string }[], index: string | number) => {
-                currentData.process[index] = {
-                    tips: '查询完成',
-                    showType: item[0].answer && transformType(JSON.parse(item[0].answer).arguments?.type),
-                    input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
-                    data: item?.[1]?.answer && JSON.parse(item[1].answer),
-                    success: true,
-                    status: 1,
-                    id: uuidv4()
-                };
-            });
-
-            chatBlocks.push(currentData);
-            currentData = {};
-            currentBlock = [];
-        } else {
-            if (insideBlock) {
-                currentBlock.push(item);
+        case 'NewsSearchHandler':
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        case 'ImageSearchHandler': {
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
             }
         }
+        default:
+            break;
     }
-    return chatBlocks;
+};
+
+const transformData = (key: IChatType, data: any) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            return data ? [data] : [];
+        case 'NewsSearchHandler':
+            return data?.response || [];
+        case 'ImageSearchHandler':
+            return data?.response || [];
+        case 'ImageGenerationHandler':
+            return data?.imageUrls || [];
+        default:
+            break;
+    }
+};
+
+export function extractChatBlocks(data: any) {
+    try {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
+
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
+                } else {
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT') {
+                chatBlocks.push(item);
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string; status: string; message?: IChatType }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: transformTips(item?.[1]?.message, item?.[1]?.status),
+                        showType: transformType(item?.[1]?.message),
+                        input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                        data:
+                            item?.[1]?.status === 'ERROR'
+                                ? item?.[1]?.answer
+                                : item?.[1]?.answer && transformData(item?.[1]?.message, JSON.parse(item?.[1]?.answer)),
+                        success: item?.[1]?.status === 'ERROR' ? false : true,
+                        status: 1,
+                        id: uuidv4()
+                    };
+                });
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
+                }
+            }
+        }
+        console.log(chatBlocks, 'chatBlocks');
+        return chatBlocks;
+    } catch (e) {
+        console.log(e, 'e');
+        return [];
+    }
 }
 
 export const Chat = ({
@@ -403,6 +292,8 @@ export const Chat = ({
     const [enableOnline, setEnableOnline] = useState<any>();
     const [selectModel, setSelectModel] = useState<any>();
     const [openToken, setOpenToken] = useState(false);
+    const [isFreedomChat, setIsFreedomChat] = useState(false);
+    const [openChatMask, setOpenChatMask] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -460,6 +351,14 @@ export const Chat = ({
         };
     }, []);
 
+    const visibleTip = React.useMemo(() => {
+        if (isFreedomChat && openChatMask) {
+            return true;
+        } else {
+            return false;
+        }
+    }, [openChatMask, isFreedomChat]);
+
     // mode share start
     useEffect(() => {
         if (shareKey && chatBotInfo && mode === 'share') {
@@ -492,7 +391,7 @@ export const Chat = ({
 
     // 获取历史记录, 只加载一次
     React.useEffect(() => {
-        if (mode === 'test' && conversationUid && isFirst && chatBotInfo.name) {
+        if (mode === 'test' && conversationUid && isFirst) {
             (async () => {
                 const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
                 const list = res.list.map((v: any) => ({
@@ -508,7 +407,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -524,7 +423,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -591,7 +490,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -603,6 +502,22 @@ export const Chat = ({
     // mode iframe end
 
     // mode market start
+    // 初始设置为自由聊天
+    React.useEffect(() => {
+        if (mode === 'market') {
+            setIsFreedomChat(true);
+        }
+    }, [mode]);
+
+    React.useEffect(() => {
+        const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
+        if (!r.length) {
+            setOpenChatMask(true);
+        } else {
+            setOpenChatMask(false);
+        }
+    }, [data]);
+
     React.useEffect(() => {
         if (mode === 'market' && uid) {
             (async () => {
@@ -629,12 +544,12 @@ export const Chat = ({
                     robotAvatar: chatBotInfo.avatar
                 }));
                 const chatBlocks = extractChatBlocks(list);
-                const result = [
+                const result: any = [
                     ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -644,11 +559,11 @@ export const Chat = ({
             })();
         }
         if (mode === 'market' && !conversationUid) {
-            const result = [
+            const result: any = [
                 {
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar,
-                    answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                    answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                     isStatement: true
                 }
             ];
@@ -710,6 +625,11 @@ export const Chat = ({
         const data = dataRef.current;
         const current = data[index];
         doFetch(current.message);
+    };
+
+    // 例子
+    const handleExample = (q: string) => {
+        setMessage(q);
     };
 
     React.useEffect(() => {
@@ -845,20 +765,25 @@ export const Chat = ({
                     jsCookie.set(conversationUniKey, bufferObj.conversationUid);
                 }
                 setConversationUid(bufferObj.conversationUid);
-                if (bufferObj.type === 'i' || bufferObj.type === 'docs') {
+                if (bufferObj.type === 'context') {
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const content = JSON.parse(bufferObj.content);
+                    const idList = content.data.filter((v: any) => v.id);
+                    const notIdList = content.data.filter((v: any) => !v.id);
+
+                    // 处理文档（文档状态默认不更新）
+                    content.data = [...uniqBy(idList, 'id'), ...notIdList];
+                    copyData[copyData.length - 1].context = content ? [content] : [];
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+
+                if (bufferObj.type === 'i') {
                     // 处理流程
                     const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
                     const process = copyData[copyData.length - 1].process || [];
                     const content = JSON.parse(bufferObj.content);
 
-                    // 处理文档（文档状态默认不更新）
-                    if (content.showType === 'docs') {
-                        content.data = uniqBy(content.data, 'id');
-                        copyData[copyData.length - 1].docs = content ? [content] : [];
-                        console.log(copyData, 'copyData');
-                        dataRef.current = copyData;
-                        setData(copyData);
-                    }
                     // 处理链接
                     if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
                         //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
@@ -1103,7 +1028,7 @@ export const Chat = ({
         if (!isFetch && data.length) {
             const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'ERROR');
             const answer = data[data.length - 1]?.answer;
-            if (!answer) return false;
+            if (!answer || answer?.length < 200) return false;
             // 对{x}做处理
             const text = answer?.trim().replace(/\{(\d+)\}/g, '');
             const lastChar = text.slice(-1);
@@ -1117,7 +1042,7 @@ export const Chat = ({
         <div className="h-full relative flex justify-center">
             {mode === 'market' && width > 1300 && (
                 <div
-                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto  bg-white"
+                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto overflow-x-hidden bg-white"
                     style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
                 >
                     <div className="h-full  px-[8px] flex flex-col">
@@ -1132,6 +1057,11 @@ export const Chat = ({
                                         }`}
                                         onClick={() => {
                                             setUid && setUid(item.value);
+                                            if (mode === 'market' && index === 0) {
+                                                setIsFreedomChat(true);
+                                            } else {
+                                                setIsFreedomChat(false);
+                                            }
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">
@@ -1155,6 +1085,7 @@ export const Chat = ({
                     </div>
                 </div>
             )}
+
             <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
                 <div className="flex justify-center">
                     <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
@@ -1177,6 +1108,11 @@ export const Chat = ({
                                                     if (mode === 'market') {
                                                         setUid && setUid(item.value);
                                                         setOpen(false);
+                                                        if (index === 0) {
+                                                            setIsFreedomChat(true);
+                                                        } else {
+                                                            setIsFreedomChat(false);
+                                                        }
                                                     }
                                                 }}
                                             >
@@ -1242,7 +1178,7 @@ export const Chat = ({
                     </div>
                 </div>
                 <Divider variant={'fullWidth'} />
-                <div className="flex-grow flex justify-center overflow-y-auto w-full" style={{ scrollbarGutter: 'stable' }}>
+                <div className="flex-grow flex justify-center overflow-y-auto w-full relative" style={{ scrollbarGutter: 'stable' }}>
                     <div className={'max-w-[768px] w-full'}>
                         <div
                             style={{
@@ -1268,6 +1204,7 @@ export const Chat = ({
                                 )}
                                 <CardContent className="!p-0">
                                     <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
+                                    {visibleTip && <ChatTip handleExample={handleExample} />}
                                 </CardContent>
                             </div>
                         </div>
@@ -1399,7 +1336,7 @@ export const Chat = ({
                             )}
                             <div>
                                 <Select
-                                    style={{ width: 100 }}
+                                    style={{ width: 100, height: 23 }}
                                     bordered={false}
                                     className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-1"
                                     value={selectModel || 'GPT35'}
@@ -1429,31 +1366,6 @@ export const Chat = ({
                             </div>
                         </div>
                         <Grid container spacing={1} alignItems="center" className="px-0 flex-nowrap w-full ml-0">
-                            {/* <Grid item className="!pl-0">
-                                <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                                    <MoreHorizTwoToneIcon />
-                                </IconButton>
-                                <Menu
-                                    id="simple-menu"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleCloseSort}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'right'
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right'
-                                    }}
-                                >
-                                    <MenuItem onClick={handleClean}>
-                                        <CleaningServicesSharpIcon className="text-base" />
-                                        <span className="text-base ml-3">清除</span>
-                                    </MenuItem>
-                                </Menu>
-                            </Grid> */}
                             <Grid item xs={12} sm zeroMinWidth className="!pl-0">
                                 <OutlinedInput
                                     id="message-send"
@@ -1554,62 +1466,6 @@ export const Chat = ({
                             </Grid>
                         </Grid>
                         <div className="flex justify-between mt-1 items-center">
-                            {/* {skillWorkflowList && skillWorkflowList?.length > 0 ? (
-                                <Popover
-                                    placement="topLeft"
-                                    arrow={false}
-                                    open={skillOpen}
-                                    content={
-                                        <div className="max-h-[220px] overflow-y-auto">
-                                            {skillWorkflowList.map((v: any, index: number) => (
-                                                <>
-                                                    <div className="flex flex-col w-[220px]">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center">
-                                                                <img className="rounded w-[18px] h-[18px]" src={v.images} />
-                                                                <span className="line-clamp-1 text-base ml-1">{v.name}</span>
-                                                            </div>
-                                                            <BpCheckbox size="small" checked />
-                                                        </div>
-                                                        <div className="line-clamp-2 text-xs text-[#364152] h-[32px]">{v.description}</div>
-                                                    </div>
-                                                    {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
-                                                </>
-                                            ))}
-                                        </div>
-                                    }
-                                    trigger="click"
-                                >
-                                    <div
-                                        className="flex items-center mb-1 cursor-pointer px-[8px]"
-                                        onClick={() => setSkillOpen(!skillOpen)}
-                                    >
-                                        <span className="text-sm ml-[40px]">技能:</span>
-                                        <div className="flex items-center justify-start">
-                                            {skillWorkflowList &&
-                                                skillWorkflowList
-                                                    .slice(0, 5)
-                                                    .map((item: any, index: number) => (
-                                                        <img
-                                                            className="rounded ml-1"
-                                                            key={index}
-                                                            src={item.images}
-                                                            width={18}
-                                                            height={18}
-                                                        />
-                                                    ))}
-                                        </div>
-                                        {skillWorkflowList.length > 5 && <span>...</span>}
-                                        {skillOpen ? (
-                                            <ExpandLessIcon className="ml-1 h-[18px] w-[18px]" />
-                                        ) : (
-                                            <ExpandMoreIcon className="ml-1 h-[18px] w-[18px]" />
-                                        )}
-                                    </div>
-                                </Popover>
-                            ) : (
-                                <div />
-                            )} */}
                             <Tooltip title={'清除'} placement="top" arrow>
                                 <CleaningServicesSharpIcon
                                     className="text-base cursor-pointer hover:text-[#673ab7]"
@@ -1828,7 +1684,34 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            {mode === 'market' && width > 1300 && <div className="min-w-[220px] h-full bg-[#f4f6f8]" />}
+            {mode === 'market' && (
+                <div className={`${width > 1300 ? 'min-w-[220px]' : 'min-w-[40px]'} h-full bg-[#f4f6f8] relative`}>
+                    <div
+                        className="bg-white absolute rounded-tr-lg rounded-br-lg p-2 top-[44px] cursor-pointer"
+                        onClick={() => setOpenChatMask(!openChatMask)}
+                    >
+                        {!openChatMask ? (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowLeftIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowRightIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />

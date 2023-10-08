@@ -784,13 +784,14 @@
     "CHAT": "聊天",
     "COMPLETION": "生成",
     "BASE_GENERATE_IMAGE": "生成图片",
+    "IMAGE": "生成图片",
     "detail": "详情"
   },
   "generateLog": {
     "messageTotal": "使用次数",
     "usertotal": "用户满意程度",
     "TimeConsuming": "平均耗时",
-    "tokenTotal": "字节总数",
+    "tokenTotal": "消耗令牌数",
     "name": "名称",
     "date": "时间",
     "search": "搜索"
@@ -851,6 +852,24 @@
     "Cinematic": "电影风",
     "Model 3D": "三维模型",
     "Pixel Art": "像素艺术"
+  },
+  "textToImageValue": {
+    "enhance": "增强",
+    "anime": "动漫",
+    "photographic": "摄影",
+    "digital-art": "数字艺术",
+    "comic-book": "漫画风",
+    "fantasy-art": "奇幻艺术",
+    "analog-film": "胶片风",
+    "neon-punk": "霓虹朋克",
+    "isometric": "等轴投影",
+    "low-poly": "低多边形",
+    "origami": "折纸",
+    "line-art": "线条艺术",
+    "modeling-compound": "手工泥塑",
+    "cinematic": "电影风",
+    "3d-model": "三维模型",
+    "pixel-art": "像素艺术"
   },
   "voiceStyles": {
     "affectionate": "深情",

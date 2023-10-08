@@ -133,11 +133,11 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
 
 const Cards = ({ flag = false }) => {
     const theme = useTheme();
-    const { invitationCode } = infoStore();
+    const { use } = infoStore();
     const navigate = useNavigate();
     const { userInfo, setUserInfo }: any = userInfoStore();
     const copyCode = () => {
-        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode);
+        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         dispatch(
             openSnackbar({
                 open: true,
@@ -237,14 +237,13 @@ const Cards = ({ flag = false }) => {
                                     '&:hover': { color: '#673ab7' }
                                 }}
                             >
-                                {`${window.location.protocol}//${window.location.host}
-                            /login?q=${invitationCode}`}
+                                {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
                             </Typography>
                         </Tooltip>
                         <Box marginTop={3} textAlign="center">
                             <QRCode
                                 size={100}
-                                value={window.location.protocol + '//' + window.location.host + '/login?q=' + invitationCode}
+                                value={window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
                             />
                             <Typography variant="h5">{t('market.invitation')}</Typography>
                         </Box>

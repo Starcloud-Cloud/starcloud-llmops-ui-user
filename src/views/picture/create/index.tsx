@@ -15,7 +15,7 @@ export type IImageListType = IImageListTypeChild[];
 export type IImageListTypeChildImages = {
     uuid: string;
     url: string;
-    media_type?: string;
+    mediaType?: string;
 };
 export type IImageListTypeChild = {
     prompt: string;
@@ -25,6 +25,7 @@ export type IImageListTypeChild = {
     width: number;
     height: number;
     create: boolean;
+    stylePreset?: string;
 };
 
 const PictureCreate = () => {

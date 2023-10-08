@@ -25,6 +25,7 @@ import { getSkillList } from 'api/chat';
 import _ from 'lodash';
 import styled from '@emotion/styled';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
+import { Popover, Space, Tabs, TabsProps, Tag } from 'antd';
 
 const marks = [
     {
@@ -239,16 +240,94 @@ export const Regulation = ({
         }
     }, [chatBotInfo]);
 
+    const onChange = (key: string) => {
+        console.log(key);
+    };
+
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: '示例1',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span className="font-semibold">角色</span>：朋友圈文案生成器 <br />
+                    <span className="font-semibold">能力</span>
+                    ：专注于为用户创造最佳的朋友圈文案，根据用户的需求和喜好提供个性化的文案建议，帮助他们在朋友圈中展现出独特的个性和魅力。
+                    <br />
+                    <span className="font-semibold">说话风格</span>：友善、灵活、富有创意，注重与用户的互动和沟通，以满足用户的需求为目标。
+                    <br />
+                    <span className="font-semibold">询问策略</span>
+                    ：在回答用户问题后，会进一步了解用户的朋友圈主题、情感表达或产品推广的目的，以便提供更加精准和个性化的文案建议。
+                    <br />
+                    <span className="font-semibold">回答身份</span>：作为朋友圈文案生成器，我将以专业的文案创作能力和创意思维回答您的问题。
+                    <br />
+                    <span className="font-semibold">输出格式</span>：我将以文字形式输出朋友圈文案建议，并提供多种风格和表达方式供用户选择。
+                    <br />
+                </div>
+            )
+        },
+        {
+            key: '2',
+            label: '示例2',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span className="font-semibold">角色</span>：小说家 <br />
+                    <span className="font-semibold">能力</span>
+                    ：我是一位才华横溢的创意小说家机器人，擅长创作各种类型的有创意的故事。我拥有丰富的想象力和文学才华，能够构建突出的情节和引人入胜的人物。我的目标是为用户提供独特、创新且令人着迷的故事体验。
+                    <br />
+                    <span className="font-semibold">说话风格</span>
+                    ：我以优美的文笔和富有情感的语言来表达故事，注重细节描写和情节推进。我会用生动的描写和丰富的比喻来吸引读者的注意力，让他们沉浸在故事的世界中。
+                    <br />
+                    <span className="font-semibold">询问策略</span>
+                    ：当用户提出问题时，我会通过提问来了解用户的需求和喜好，以便为他们创作出更符合他们口味的故事。我会询问用户对不同情节、人物或结局的偏好，以确保他们获得最满意的故事体验。
+                    <br />
+                    <span className="font-semibold">回答身份</span>
+                    ：作为一位才华横溢的创意小说家机器人，我将以创意小说家的身份回答用户的问题，并为他们提供独特、创新且令人着迷的故事体验。
+                    <br />
+                    <span className="font-semibold">输出格式</span>
+                    ：我将以文本形式输出故事，使用生动的描写和丰富的比喻来吸引读者的注意力。我会注重细节描写和情节推进，以让读者沉浸在故事的世界中。
+                    <br />
+                </div>
+            )
+        },
+        {
+            key: '3',
+            label: '示例3',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span className="font-semibold">角色</span>：短视频创作助手 <br />
+                    <span className="font-semibold">能力</span>
+                    ：我是一位名为「短视频创作助手」的AI聊天机器人。我是短视频创作的魔法笔，能够根据用户的需求和指令，快速生成精彩的短视频脚本。我以高效、创造力和灵活性为特征，能够根据不同的主题和风格，生成多样化的短视频脚本，满足用户的创作需求。我能够帮助用户节省时间和精力，让他们的短视频在社交媒体上引起轰动。
+                    <br />
+                    <span className="font-semibold">说话风格</span>
+                    ：我以简洁明了的语言风格为主，注重表达用户的创作意图，并提供创意和灵感的引导。我会用生动的词语和形象的描述，激发用户的创作灵感。
+                    <br />
+                    <span className="font-semibold">询问策略</span>
+                    ：当用户提出创作需求时，我会询问他们的主题、风格和时长等要素，以便更好地理解他们的创作意图。我还会提供一些创意和建议，帮助用户更好地构思短视频的内容和结构。
+                    <br />
+                    <span className="font-semibold">回答身份</span>
+                    ：作为短视频创作助手，我将以专业的创作助手身份回答用户的问题，并提供创意和灵感的引导，帮助用户创作出精彩的短视频。
+                    <br />
+                    <span className="font-semibold">输出格式</span>
+                    ：我将以文本形式输出短视频脚本，并根据用户的需求，提供不同的场景、对白和镜头切换等元素，以便用户更好地理解和使用脚本。
+                    <br />
+                </div>
+            )
+        }
+    ];
+
     return (
         <div>
             <div>
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
-                    }
-                >
-                    基础规则
-                </span>
+                <div className="flex items-center">
+                    <span
+                        className={
+                            "before:bg-[#673ab7] before:left-0 before:top-[2px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-[1.125rem] font-medium pl-[12px] relative text-black"
+                        }
+                    >
+                        基础规则
+                    </span>
+                </div>
                 <div className={'mt-3'}>
                     <div className="flex items-center">
                         <span className={'text-md text-black'}>首选模型</span>
@@ -312,7 +391,33 @@ export const Regulation = ({
                         </FormControl>
                     </div>
                 </div>
-                <Box className={'mt-0'} display="flex" justifyContent="right">
+                <Box className={'mt-3 items-center'} display="flex" justifyContent="space-between">
+                    <div className="flex items-center">
+                        <span className={'text-md text-black'}>角色描述</span>
+                        <Popover
+                            content={
+                                <div className="max-w-[230px] sm:max-w-[600px]">
+                                    <div className="flex flex-wrap">
+                                        <Tag className="mb-1">角色</Tag>
+                                        <Tag className="mb-1">能力</Tag>
+                                        <Tag className="mb-1">说话风格</Tag>
+                                        <Tag className="mb-1">询问策略</Tag>
+                                        <Tag className="mb-1">回答身份</Tag>
+                                        <Tag className="mb-1">输出格式</Tag>
+                                    </div>
+                                    <div>
+                                        <Tabs size="small" defaultActiveKey="1" items={items} onChange={onChange} />
+                                    </div>
+                                </div>
+                            }
+                            title="如何设置角色描述？使用万能句式"
+                            placement="bottomLeft"
+                            arrow={false}
+                            trigger="hover"
+                        >
+                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                        </Popover>
+                    </div>
                     <Button
                         color="secondary"
                         size="small"
@@ -327,7 +432,7 @@ export const Regulation = ({
                 <div>
                     <TextField
                         value={regulationText}
-                        label={'角色描述'}
+                        // label={'角色描述'}
                         className={'mt-1'}
                         fullWidth
                         size={'small'}

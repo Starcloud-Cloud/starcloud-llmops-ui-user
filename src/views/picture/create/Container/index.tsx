@@ -46,6 +46,7 @@ export const PictureCreateContainer = ({
         width: number;
         engine: string;
         prompt: string;
+        stylePreset?: string;
     } | null>(null);
 
     const [currentTranslateIndex, setCurrentTranslateIndex] = useState<number>();
@@ -79,7 +80,7 @@ export const PictureCreateContainer = ({
 
     const batchHandle = (images: IImageListTypeChildImages[]) => {
         images.forEach((img) => {
-            downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`);
+            downloadFile(img.url, `${img.uuid}.${img.mediaType?.split('/')[1]}`);
         });
     };
 
@@ -394,7 +395,8 @@ export const PictureCreateContainer = ({
                                                             height: item.height,
                                                             width: item.width,
                                                             prompt: item.prompt,
-                                                            engine: item.engine
+                                                            engine: item.engine,
+                                                            stylePreset: item?.stylePreset
                                                         });
                                                     }}
                                                 >
@@ -412,7 +414,7 @@ export const PictureCreateContainer = ({
                                                             <div
                                                                 className="bg-black/50 w-7 h-7 flex justify-center items-center rounded-md cursor-pointer"
                                                                 onClick={() =>
-                                                                    downloadFile(img.url, `${img.uuid}.${img.media_type?.split('/')[1]}`)
+                                                                    downloadFile(img.url, `${img.uuid}.${img.mediaType?.split('/')[1]}`)
                                                                 }
                                                             >
                                                                 <MuiTooltip title="下载" arrow placement="top">
@@ -442,6 +444,7 @@ export const PictureCreateContainer = ({
                         prompt={record?.prompt}
                         width={record?.width}
                         height={record?.height}
+                        stylePreset={record?.stylePreset}
                     />
                 )}
             </div>

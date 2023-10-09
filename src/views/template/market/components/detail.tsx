@@ -218,7 +218,7 @@ function Deatail() {
     //删除模板
     const delTemplate = async () => {
         const res = await delMarket(detailData.uid);
-        navigate('/appMarket/list');
+        navigate('/appMarket');
         dispatch(
             openSnackbar({
                 open: true,
@@ -281,7 +281,7 @@ function Deatail() {
                 </div>
             )}
             <Breadcrumbs aria-label="breadcrumb">
-                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket/list')}>
+                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
                     {t('market.all')}
                 </Link>
                 <Typography color="text.primary">{detailData?.category}</Typography>

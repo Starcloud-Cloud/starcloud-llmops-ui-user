@@ -148,7 +148,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     >
                         批量下载
                     </Button>
-                    <Button
+                    {/* <Button
                         startIcon={<HistoryIcon />}
                         onClick={() => setHistoryOpen(true)}
                         sx={{ ml: 1 }}
@@ -157,7 +157,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                         color="secondary"
                     >
                         历史记录
-                    </Button>
+                    </Button> */}
                 </div>
             </SubCard>
             <div className="flex flex-wrap gap-2">
@@ -252,7 +252,8 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                 {item.percent === 100 ? (
                                     <div className="min-w-[160px] min-h-[160px] rounded-lg relative overflow-hidden">
                                         <Image
-                                            width="160px"
+                                            width={160}
+                                            height={160}
                                             className="object-cover"
                                             preview={{
                                                 visible: false,

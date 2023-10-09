@@ -8,8 +8,8 @@ export const listGroupByCategory = (params: any) => {
     return request.get({ url: '/llm/app/market/listGroupByCategory', params });
 };
 //模板市场类别树
-export const categoryTree = (params: PageParam) => {
-    return request.get({ url: '/llm/app/categoryTree', params });
+export const categoryTree = () => {
+    return request.get({ url: '/llm/app/categoryTree' });
 };
 //模板市场详情
 export const marketDeatail = (data: { uid: string }) => {

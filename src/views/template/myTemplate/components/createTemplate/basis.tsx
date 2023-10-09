@@ -1,4 +1,4 @@
-import { useImperativeHandle, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
 import {
     Card,
     TextField,
@@ -13,11 +13,15 @@ import {
     Stack,
     FormHelperText
 } from '@mui/material';
+import { categoryTree } from 'api/template';
+import { Tree, Popover, TreeSelect } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { t } from 'hooks/web/useI18n';
 import { Anyevent } from 'types/template';
 import { useFormik } from 'formik';
 import marketStore from 'store/market';
 import * as yup from 'yup';
+import _ from 'lodash-es';
 const validationSchema = yup.object({
     name: yup.string().required(t('myApp.isrequire')),
     category: yup.string().required(t('myApp.isrequire'))
@@ -36,7 +40,17 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
         validationSchema,
         onSubmit: () => {}
     });
-
+    const [cateTree, setCateTree] = useState<any[]>([]);
+    useEffect(() => {
+        //类别树
+        categoryTree().then((res) => {
+            const newData = _.cloneDeep(res);
+            newData.forEach((item: any) => {
+                item.disabled = true;
+            });
+            setCateTree(newData);
+        });
+    }, []);
     return (
         <Card sx={{ overflow: 'visible' }}>
             <form>
@@ -72,32 +86,39 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                     }}
                     variant="outlined"
                 />
-                <FormControl fullWidth sx={{ mt: 4 }} error={formik?.touched.category && Boolean(formik?.errors.category)}>
-                    <InputLabel color="secondary" id="category">
-                        {t('myApp.categary')}
-                    </InputLabel>
-                    <Select
-                        labelId="category"
-                        name="category"
-                        color="secondary"
+                <div className=" relative mt-[16px]">
+                    <TreeSelect
+                        status={!formik.values.category ? 'error' : ''}
+                        className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px]"
+                        showSearch
+                        style={{ width: '100%' }}
                         value={formik.values.category}
+                        dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
+                        placeholder="Please select"
+                        allowClear
+                        treeCheckable={false}
+                        treeDefaultExpandAll
                         onChange={(e) => {
-                            formik.handleChange(e);
-                            setValues({ name: e.target.name, value: e.target.value });
+                            formik.setFieldValue('category', e);
+                            setValues({ name: 'category', value: e });
                         }}
-                        label={t('myApp.categary')}
+                        onClear={() => {
+                            formik.setFieldValue('category', '');
+                            setValues({ name: 'category', value: '' });
+                        }}
+                        fieldNames={{
+                            label: 'name',
+                            value: 'code'
+                        }}
+                        treeData={cateTree}
+                    />
+                    <span
+                        className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-5 text-[12px]"
+                        style={{ color: !formik.values.category ? 'red' : '#697586' }}
                     >
-                        {categoryList.map(
-                            (item) =>
-                                item.code !== 'ALL' && (
-                                    <MenuItem key={item.code} value={item.code}>
-                                        {item.name}
-                                    </MenuItem>
-                                )
-                        )}
-                    </Select>
-                    <FormHelperText>{formik?.touched.category && formik?.errors.category ? formik?.errors.category : ' '}</FormHelperText>
-                </FormControl>
+                        类目*
+                    </span>
+                </div>
                 <Stack sx={{ mt: 2 }}>
                     <Autocomplete
                         multiple

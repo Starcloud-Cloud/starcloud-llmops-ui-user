@@ -23,16 +23,18 @@ function Template({ data, handleDetail }: any) {
         >
             {data?.icon && (
                 <Image
+                    onClick={() => handleDetail(data)}
                     preview={false}
-                    className="rounded-lg overflow-hidden border border-solid border-slate-200"
+                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
                     height={60}
                     src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
                 />
             )}
-            {data?.images && (
+            {!data?.icon && data?.images && (
                 <Image
+                    onClick={() => handleDetail(data)}
                     preview={false}
-                    className="rounded-lg overflow-hidden border border-solid border-slate-200"
+                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
                     height={60}
                     src={data.images[0]}
                 />
@@ -62,7 +64,7 @@ function Template({ data, handleDetail }: any) {
                     <Typography
                         sx={{ fontSize: '.8rem' }}
                         onClick={() => handleDetail(data)}
-                        className="line-clamp-4 cursor-pointer"
+                        className="line-clamp-2 cursor-pointer"
                         variant="body2"
                         lineHeight="1.1rem"
                     >

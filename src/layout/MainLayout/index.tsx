@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import infoStore from 'store/entitlementAction';
 import Phone from 'ui-component/login/phone';
 import { getUserInfo } from 'api/login';
+import React from 'react';
 
 interface MainStyleProps {
     theme: Theme;
@@ -91,7 +92,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 // ==============================|| MAIN LAYOUT ||============================== //
 
 function ChatLink({ navigate }: { navigate: (link: string) => void }) {
-    return (
+    const [open, setOpen] = React.useState(true);
+    return open ? (
         <div
             className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
             onClick={() => {
@@ -276,12 +278,21 @@ function ChatLink({ navigate }: { navigate: (link: string) => void }) {
                     />
                 </svg>
             </div>
-            <div className="text-[13px] text-[#364152] ml-[6px]">
+            <div className="text-[13px] text-[#364152] ml-[6px] relative">
+                <span
+                    className="absolute right-[-8px] top-[-8px] p-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setOpen(false);
+                    }}
+                >
+                    <CloseIcon className="text-sm" />
+                </span>
                 <div>有问题?</div>
                 <div>点击开始自由对话</div>
             </div>
         </div>
-    );
+    ) : null;
 }
 
 const MainLayout = () => {

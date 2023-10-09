@@ -319,7 +319,7 @@ const MaskDrawer = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
                     <Typography component="span" variant="h5">
                         200
                     </Typography>
-                    点魔法值
+                    点魔力值
                 </Typography>
                 <Button color="secondary" variant="outlined" sx={{ width: '200px' }}>
                     执行

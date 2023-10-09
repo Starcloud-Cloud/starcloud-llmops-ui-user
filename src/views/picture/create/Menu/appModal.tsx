@@ -464,7 +464,7 @@ const AppModal = ({
                         </Box>
                     </CardContent>
                 </MainCard>
-                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
+                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔力值不足'} />
             </Box>
         </Modal>
     );

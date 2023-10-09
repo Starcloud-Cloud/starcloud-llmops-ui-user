@@ -181,7 +181,7 @@ const SpaceEquity = () => {
                                     </Typography>
                                 }
                             />
-                            <ListItemText primary="邀请成功就送您和好友每人令牌额度, 奖励无上限" />
+                            <ListItemText primary="邀请成功就送您和好友每人魔力值额度, 奖励无上限" />
                             <IconButton size="small" color="secondary">
                                 <BorderColorOutlinedIcon fontSize="small" />
                             </IconButton>

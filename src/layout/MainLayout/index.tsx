@@ -301,7 +301,7 @@ const MainLayout = () => {
     } | null>(null);
 
     const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
+        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat', '/listingBuilder'];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);
     }, [location]);

@@ -13,10 +13,11 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    Tooltip,
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Popover, Radio, Tag, Button as AntButton } from 'antd';
+import { Popover, Radio, Tag, Button as AntButton, Descriptions } from 'antd';
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -54,6 +55,7 @@ import people7 from 'assets/images/pay/people7.png';
 import people8 from 'assets/images/pay/people8.png';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { PlayArrow } from '@mui/icons-material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const recommendList = [
     {
@@ -154,6 +156,7 @@ const plans = [
         description: '每天签到获取魔力值/图片使用数',
         monthPrice: '免费',
         yearPrice: '免费',
+        des: '适用于新用户体验，打卡获得魔力值',
         permission: [0, 1, 2, 4, 5, 6, 7, 8, 9],
         btnText: '免费使用'
     },
@@ -165,6 +168,7 @@ const plans = [
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
+        des: '适用于普通用户',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'basic_month',
@@ -178,6 +182,7 @@ const plans = [
         monthPrice: 99,
         yearPrice: 999,
         preMonthPrice: 83.25,
+        des: '适用于专业卖家',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'plus_month',
@@ -191,6 +196,7 @@ const plans = [
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
+        des: '适用于公司团队',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'pro_month',
@@ -225,13 +231,28 @@ const planList = [
         '机器人插件扩展' // 6
     ],
     [
-        '1000魔力值', // 0
+        <div className="flex items-center">
+            <span>1000魔力值</span>
+            <Tooltip title={'执行应用或聊天消耗一点'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>, // 0
         '生成图片100张', // 1
         'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
+        <div className="flex items-center">
+            <span>GPT-4</span>
+            <Tooltip title={'消耗30点魔力值'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>,
         '5个自定义应用', // 3
         '5个自定义机器人', // 3
-        '1个微信群机器人', // 3
+        <div className="flex items-center">
+            <span>1个微信群机器人</span>
+            <Tooltip title={'机器人可发布到微信群使用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>,
         '多渠道发布机器人客服', // 3
         '上传信息库/文档问答', // 4
         '每个机器人5个文档上传', // 4
@@ -239,13 +260,28 @@ const planList = [
         '1个机器人插件扩展' // 6
     ],
     [
-        '3000魔力值', // 0
+        <div className="flex items-center">
+            <span>3000魔力值</span>
+            <Tooltip title={'执行应用或聊天消耗一点'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>, // 0
         '生成图片300张', // 1
         'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
+        <div className="flex items-center">
+            <span>GPT-4</span>
+            <Tooltip title={'消耗30点魔力值'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>,
         '20个自定义应用', // 3
         '20个自定义机器人', // 3
-        '10个微信群机器人', // 3
+        <div className="flex items-center">
+            <span>10个微信群机器人</span>
+            <Tooltip title={'机器人可发布到微信群使用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+            </Tooltip>
+        </div>,
         '多渠道发布机器人客服', // 3
         '上传信息库/文档问答', // 4
         '每个机器人20个文档上传', // 4
@@ -254,6 +290,12 @@ const planList = [
     ],
     [
         '无限魔力值生成', // 0
+        <div className="flex items-center">
+            <span>无限魔力值生成</span>
+            <Tag color="#f50" className="ml-1">
+                无限
+            </Tag>
+        </div>,
         '生成图片1000张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
@@ -288,6 +330,7 @@ const Price1 = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [openPayDialog, setOpenPayDialog] = useState(false);
     const [swiperRef, setSwiperRef] = useState<any>(null);
+    const [payPrice, setPayPrice] = useState(0);
     const { width } = useWindowSize();
 
     const priceListDisable = {
@@ -413,7 +456,8 @@ const Price1 = () => {
         }
     };
 
-    const handleClick = (index: number, code?: string) => {
+    const handleClick = (index: number, code?: string, price?: any) => {
+        setPayPrice(price);
         switch (index) {
             case 0:
                 return navigate('/exchange');
@@ -452,7 +496,7 @@ const Price1 = () => {
                                 月付
                             </Radio.Button>
                             <Radio.Button value="2" style={{ width: '150px', textAlign: 'center' }}>
-                                年付 <Tag color="#f50">8折</Tag>
+                                年付 <Tag color="#f50">8折优惠</Tag>
                             </Radio.Button>
                         </Radio.Group>
                     </div>
@@ -522,8 +566,12 @@ const Price1 = () => {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                                {(index === 1 || index === 2 || index === 3) && (
-                                                    <div className="text-sm text-center">￥{plan?.yearPrice}/年</div>
+                                                {index === 1 || index === 2 || index === 3 ? (
+                                                    <div className="text-sm text-center text-[#d7d7d7] line-through">
+                                                        ￥{(plan?.monthPrice as number) * 2}/月
+                                                    </div>
+                                                ) : (
+                                                    <div className="h-[24px]"></div>
                                                 )}
                                                 <Typography
                                                     component="div"
@@ -538,9 +586,12 @@ const Price1 = () => {
                                                     }}
                                                 >
                                                     {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
-                                                    {value === '1' ? plan.monthPrice : plan.preMonthPrice}
-                                                    {(index === 1 || index === 2 || index === 3) && <span>/月</span>}
+                                                    {value === '1' ? plan.monthPrice : plan.preMonthPrice ?? plan.monthPrice}
+                                                    {(index === 1 || index === 2 || index === 3) && (
+                                                        <span className="text-[#aaa]">/月</span>
+                                                    )}
                                                 </Typography>
+                                                <div className="text-[#aaa] text-sm text-center">{plan?.des}</div>
                                             </Grid>
                                             <Grid item xs={12}>
                                                 {index === 4 ? (
@@ -566,7 +617,13 @@ const Price1 = () => {
                                                     <Button
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
-                                                        onClick={() => handleClick(index, value === '1' ? plan.monthCode : plan.yearCode)}
+                                                        onClick={() =>
+                                                            handleClick(
+                                                                index,
+                                                                value === '1' ? plan.monthCode : plan.yearCode,
+                                                                value === '1' ? plan.monthPrice : plan.yearPrice
+                                                            )
+                                                        }
                                                         color="secondary"
                                                     >
                                                         {plan.btnText}
@@ -670,7 +727,14 @@ const Price1 = () => {
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />
             </SectionWrapper>
-            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} isTimeout={isTimeout} onRefresh={onRefresh} />
+            <PayModal
+                open={open}
+                handleClose={() => handleClose()}
+                url={payUrl}
+                isTimeout={isTimeout}
+                onRefresh={onRefresh}
+                payPrice={payPrice}
+            />
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}
             <Dialog
                 open={openDialog}

@@ -55,17 +55,21 @@ const MainRoutes = {
         },
         {
             path: '/appMarket',
-            element: <Market />,
-            children: [
-                {
-                    path: 'list',
-                    element: <MarketList />
-                },
-                {
-                    path: 'detail/:uid',
-                    element: <MarketDetail />
-                }
-            ]
+            element: <Market />
+            // children: [
+            //     {
+            //         path: 'list',
+            //         element: <MarketList />
+            //     },
+            //     {
+            //         path: 'detail/:uid',
+            //         element: <MarketDetail />
+            //     }
+            // ]
+        },
+        {
+            path: '/appMarketDetail/:uid',
+            element: <MarketDetail />
         },
         {
             path: '/template/createCenter',

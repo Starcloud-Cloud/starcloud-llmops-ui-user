@@ -207,11 +207,11 @@ const PreBuildDashBoard = () => {
                                 hasNext && <SampleNextArrow onClickHandler={onClickHandler} hasNext={hasNext} label={label} />
                             }
                         >
-                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link="/appMarket/list" />
-                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link="/appMarket/list" />
-                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link="/appMarket/list" />
-                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link="/appMarket/list" />
-                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link="/appMarket/list" />
+                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link="/appMarket" />
+                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link="/appMarket" />
+                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link="/appMarket" />
+                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link="/appMarket" />
+                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link="/appMarket" />
                         </Carousel>
                     </Box>
                 </Grid>

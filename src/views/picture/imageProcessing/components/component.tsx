@@ -151,7 +151,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     >
                         批量下载
                     </Button>
-                    <Button
+                    {/* <Button
                         startIcon={<HistoryIcon />}
                         onClick={() => setHistoryOpen(true)}
                         sx={{ ml: 1 }}
@@ -160,7 +160,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         color="secondary"
                     >
                         历史记录
-                    </Button>
+                    </Button> */}
                 </div>
             </SubCard>
             <div className="flex flex-wrap gap-2">
@@ -255,7 +255,8 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                 {item.percent === 100 ? (
                                     <div className="min-w-[160px] min-h-[160px] rounded-lg relative overflow-hidden">
                                         <Image
-                                            width="160px"
+                                            width={160}
+                                            height={160}
                                             className="object-cover"
                                             preview={{
                                                 visible: false,
@@ -287,18 +288,21 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         ))}
                     </CardContent>
                     {subTitle === '图片无损放大' && (
-                        <div className="mb-[16px] flex justify-center items-center">
-                            <Radio.Group
-                                onChange={(e) => {
-                                    setMagnification(e.target.value);
-                                }}
-                                value={magnification}
-                            >
-                                <Radio.Button value={2}>X2</Radio.Button>
-                                <Radio.Button value={4}>x4</Radio.Button>
-                                <Radio.Button value={6}>X6</Radio.Button>
-                                <Radio.Button value={8}>X8</Radio.Button>
-                            </Radio.Group>
+                        <div className="mb-[8px] flex justify-center items-center">
+                            <div className="flex flex-col items-center ">
+                                <Radio.Group
+                                    onChange={(e) => {
+                                        setMagnification(e.target.value);
+                                    }}
+                                    value={magnification}
+                                >
+                                    <Radio.Button value={2}>X2</Radio.Button>
+                                    <Radio.Button value={4}>x4</Radio.Button>
+                                    <Radio.Button value={6}>X6</Radio.Button>
+                                    <Radio.Button value={8}>X8</Radio.Button>
+                                </Radio.Group>
+                                <span className="text-[#697586] text-[12px] mt-[8px]">(选择需要放大的倍数)</span>
+                            </div>
                         </div>
                     )}
                     <Divider />
@@ -309,7 +313,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         </div>
                         <div>
                             <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="contained">
-                                抠图
+                                {subTitle === '图片无损放大' ? '无损放大' : '提升质量'}
                             </Button>
                         </div>
                     </div>

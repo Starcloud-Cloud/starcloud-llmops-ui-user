@@ -53,6 +53,7 @@ import people6 from 'assets/images/pay/people6.png';
 import people7 from 'assets/images/pay/people7.png';
 import people8 from 'assets/images/pay/people8.png';
 import { useWindowSize } from 'hooks/useWindowSize';
+import { PlayArrow } from '@mui/icons-material';
 
 const recommendList = [
     {
@@ -150,19 +151,33 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
-        description: '每天签到获取字数/图片使用数',
+        description: '每天签到获取魔力值/图片使用数',
         monthPrice: '免费',
         yearPrice: '免费',
         permission: [0, 1, 2, 4, 5, 6, 7, 8, 9],
         btnText: '免费使用'
     },
     {
+        active: false,
+        icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
+        title: '基础版',
+        description: '1000魔力值，100张图片',
+        monthPrice: 59,
+        yearPrice: 599,
+        preMonthPrice: 49.91,
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        btnText: '立即购买',
+        monthCode: 'basic_month',
+        yearCode: 'basic_year'
+    },
+    {
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: '200000字数创作，400张图片',
+        description: '3000魔力值，300张图片',
         monthPrice: 99,
         yearPrice: 999,
+        preMonthPrice: 83.25,
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'plus_month',
@@ -172,9 +187,10 @@ const plans = [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: '6个账号，无限字数创作，1000张图片',
+        description: '6个账号，无限魔力值创作，1000张图片',
         monthPrice: 499,
         yearPrice: 4999,
+        preMonthPrice: 416.58,
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
         monthCode: 'pro_month',
@@ -195,22 +211,36 @@ const plans = [
 
 const planList = [
     [
-        '签到每天可免费', // 0
+        '签到可免费获得2魔力值', // 0
         '签到可免费获取图片2张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
-        '2个自定义应用', // 4
-        '2个自定义机器人', // 4
+        '1个自定义应用', // 4
+        '1个自定义机器人', // 4
         '1个微信群机器人', // 4
         '多渠道发布机器人客服', // 4
         '上传信息库/文档问答', // 4
-        '每个机器人2个文档上传', // 4
+        '每个机器人1个文档上传', // 4
         'Google/Amazon联网查询', // 5
         '机器人插件扩展' // 6
     ],
     [
-        '20万字数生成', // 0
-        '生成图片400张', // 1
+        '1000魔力值', // 0
+        '生成图片100张', // 1
+        'GPT-3.5/开源模型', // 2
+        'GPT-4', // 3
+        '5个自定义应用', // 3
+        '5个自定义机器人', // 3
+        '1个微信群机器人', // 3
+        '多渠道发布机器人客服', // 3
+        '上传信息库/文档问答', // 4
+        '每个机器人5个文档上传', // 4
+        'Google/Amazon联网查询', // 5
+        '1个机器人插件扩展' // 6
+    ],
+    [
+        '3000魔力值', // 0
+        '生成图片300张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
         '20个自定义应用', // 3
@@ -223,7 +253,7 @@ const planList = [
         '3个机器人插件扩展' // 6
     ],
     [
-        '无限字数生成', // 0
+        '无限魔力值生成', // 0
         '生成图片1000张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
@@ -392,6 +422,8 @@ const Price1 = () => {
             case 2:
                 return handleCreateOrder(code);
             case 3:
+                return handleCreateOrder(code);
+            case 4:
                 return;
         }
     };
@@ -412,7 +444,7 @@ const Price1 = () => {
                 <VipBar />
             </HeaderWrapper>
             <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
-                <div className="w-4/5">
+                <div className="w-[96%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
@@ -424,12 +456,12 @@ const Price1 = () => {
                             </Radio.Button>
                         </Radio.Group>
                     </div>
-                    <Grid container spacing={gridSpacing}>
+                    <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
                             return (
-                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                <Grid item xs={20} sm={10} md={4} key={index}>
                                     <MainCard
                                         boxShadow
                                         sx={{
@@ -488,7 +520,11 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 <Typography variant="body2">{plan.description}</Typography>
                                             </Grid>
+
                                             <Grid item xs={12}>
+                                                {(index === 1 || index === 2 || index === 3) && (
+                                                    <div className="text-sm text-center">￥{plan?.yearPrice}/年</div>
+                                                )}
                                                 <Typography
                                                     component="div"
                                                     variant="body2"
@@ -501,13 +537,13 @@ const Price1 = () => {
                                                         }
                                                     }}
                                                 >
-                                                    {(index === 1 || index === 2) && <span>￥</span>}
-                                                    {value === '1' ? plan.monthPrice : plan.yearPrice}
-                                                    {(index === 1 || index === 2) && <span>/{value === '1' ? '月' : '年'}</span>}
+                                                    {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
+                                                    {value === '1' ? plan.monthPrice : plan.preMonthPrice}
+                                                    {(index === 1 || index === 2 || index === 3) && <span>/月</span>}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12}>
-                                                {index === 3 ? (
+                                                {index === 4 ? (
                                                     <Popover
                                                         content={
                                                             <div className="flex justify-start items-center flex-col">

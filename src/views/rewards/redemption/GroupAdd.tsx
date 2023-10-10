@@ -62,7 +62,7 @@ const GroupAdd: React.FC<CustomModalProps> = ({ open, handleClose }) => {
                             扫码加入用户群，可获取基础免费权益包
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 2 }}>
-                            送3000字/2张图片
+                            送2魔力值/2张图片
                         </Typography>
                     </CardContent>
                 </MainCard>

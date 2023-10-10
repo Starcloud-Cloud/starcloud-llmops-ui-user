@@ -1167,11 +1167,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (documentList.length >= userInfo.benefits[5].totalNum || userInfo.benefits[5].totalNum === -1) {
+                                    if (userInfo.benefits[5].totalNum === -1) {
+                                        setDocumentVisible(true);
+                                    } else if (documentList.length < userInfo.benefits[5].totalNum) {
+                                        setDocumentVisible(true);
+                                    } else {
                                         setBotOpen(true);
-                                        return;
                                     }
-                                    setDocumentVisible(true);
                                 }}
                             >
                                 添加文档
@@ -1625,14 +1627,13 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (
-                                                    documentList.length >= userInfo.benefits[5].totalNum ||
-                                                    userInfo.benefits[5].totalNum === -1
-                                                ) {
+                                                if (userInfo.benefits[5].totalNum === -1) {
+                                                    setDocumentVisible(true);
+                                                } else if (documentList.length < userInfo.benefits[5].totalNum) {
+                                                    setDocumentVisible(true);
+                                                } else {
                                                     setBotOpen(true);
-                                                    return;
                                                 }
-                                                setDocumentVisible(true);
                                             }}
                                         >
                                             添加文档

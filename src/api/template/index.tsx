@@ -3,6 +3,14 @@ import request from 'utils/axios';
 export const marketPage = (params: PageParam) => {
     return request.get({ url: '/llm/app/market/page', params });
 };
+//模板市场新列表
+export const listGroupByCategory = (params: any) => {
+    return request.get({ url: '/llm/app/market/listGroupByCategory', params });
+};
+//模板市场类别树
+export const categoryTree = () => {
+    return request.get({ url: '/llm/app/categoryTree' });
+};
 //模板市场详情
 export const marketDeatail = (data: { uid: string }) => {
     return request.get({ url: `/llm/app/market/get/${data.uid}` });

@@ -1,4 +1,5 @@
 import { Card, CardContent, Box, Typography, Tooltip, Link } from '@mui/material';
+import { Image } from 'antd';
 import { useTheme } from '@mui/material/styles';
 import marketStore from 'store/market';
 import './textnoWarp.scss';
@@ -16,29 +17,37 @@ function Template({ data, handleDetail }: any) {
                 borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 15 : 'rgba(230,230,231,1)',
                 ':hover': {
                     boxShadow: theme.palette.mode === 'dark' ? '0 2px 14px 0 rgb(33 150 243 / 10%)' : '0 2px 5px 0 rgb(32 40 45 / 8%)'
-                }
+                },
+                p: 2
             }}
         >
-            <Box sx={{ aspectRatio: '186 / 80', overflow: 'hidden' }}>
-                <img
+            {data?.icon && (
+                <Image
                     onClick={() => handleDetail(data)}
-                    alt="图片"
-                    className="headImg cursor"
-                    width="100%"
-                    height="100%"
-                    style={{ objectFit: 'cover' }}
-                    src={data.images && data.images[0]}
+                    preview={false}
+                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
+                    height="2.25rem"
+                    src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
                 />
-            </Box>
+            )}
+            {!data?.icon && data?.images && (
+                <Image
+                    onClick={() => handleDetail(data)}
+                    preview={false}
+                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
+                    height="2.25rem"
+                    src={data.images[0]}
+                />
+            )}
             <CardContent
                 sx={{
-                    px: 2,
-                    py: 1,
+                    p: '0',
+                    pt: '8px',
                     position: 'relative',
                     overflow: 'hidden'
                 }}
             >
-                <Tooltip disableInteractive title={data.name}>
+                <Tooltip placement="top" disableInteractive title={data.name}>
                     <Typography
                         onClick={() => handleDetail(data)}
                         className="textnoWarp active cursor"
@@ -51,11 +60,11 @@ function Template({ data, handleDetail }: any) {
                         {data.name}
                     </Typography>
                 </Tooltip>
-                <Tooltip disableInteractive title={data.description}>
+                <Tooltip placement="top" disableInteractive title={data.description}>
                     <Typography
                         sx={{ fontSize: '.8rem' }}
                         onClick={() => handleDetail(data)}
-                        className="cursor desc"
+                        className="line-clamp-2 cursor-pointer"
                         variant="body2"
                         lineHeight="1.1rem"
                     >

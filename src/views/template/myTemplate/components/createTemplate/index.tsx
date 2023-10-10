@@ -467,7 +467,7 @@ function CreateDetail() {
                                 initialValues={{
                                     name: detail?.name,
                                     description: detail?.description,
-                                    categories: detail?.categories,
+                                    category: detail?.category,
                                     tags: detail?.tags
                                 }}
                                 setValues={setData}
@@ -496,11 +496,7 @@ function CreateDetail() {
                                             </Typography>
                                         </Box>
                                         <Box>
-                                            {detail?.categories?.map((item: any) => (
-                                                <span key={item}>
-                                                    #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
-                                                </span>
-                                            ))}
+                                            <span>#{detail?.category}</span>
                                             {detail?.tags?.map((el: any) => (
                                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                                             ))}
@@ -568,11 +564,7 @@ function CreateDetail() {
                                             </Typography>
                                         </Box>
                                         <Box>
-                                            {detail?.categories?.map((item: any) => (
-                                                <span key={item}>
-                                                    #{categoryList?.find((el: { code: string }) => el.code === item)?.name}
-                                                </span>
-                                            ))}
+                                            <span>#{detail?.category}</span>
                                             {detail?.tags?.map((el: any) => (
                                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                                             ))}
@@ -620,7 +612,7 @@ function CreateDetail() {
                     />
                 )}
             </TabPanel>
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔力值不足'} />
         </Card>
     );
 }

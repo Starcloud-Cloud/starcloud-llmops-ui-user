@@ -30,6 +30,7 @@ import infoStore from 'store/entitlementAction';
 import Phone from 'ui-component/login/phone';
 import { getUserInfo } from 'api/login';
 import { isMobile } from 'react-device-detect';
+import React from 'react';
 
 interface MainStyleProps {
     theme: Theme;
@@ -92,7 +93,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 // ==============================|| MAIN LAYOUT ||============================== //
 
 function ChatLink({ navigate }: { navigate: (link: string) => void }) {
-    return (
+    const [open, setOpen] = React.useState(true);
+    return open ? (
         <div
             className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
             onClick={() => {
@@ -277,12 +279,21 @@ function ChatLink({ navigate }: { navigate: (link: string) => void }) {
                     />
                 </svg>
             </div>
-            <div className="text-[13px] text-[#364152] ml-[6px]">
+            <div className="text-[13px] text-[#364152] ml-[6px] relative">
+                <span
+                    className="absolute right-[-8px] top-[-8px] p-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setOpen(false);
+                    }}
+                >
+                    <CloseIcon className="text-sm" />
+                </span>
                 <div>有问题?</div>
                 <div>点击开始自由对话</div>
             </div>
         </div>
-    );
+    ) : null;
 }
 
 const MainLayout = () => {
@@ -386,9 +397,11 @@ const MainLayout = () => {
                                 当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
                             </span>
                         ) : timeOutObj?.type === 2 ? (
-                            <span className="text-sm">当前令牌权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">
+                                当前魔力值权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
+                            </span>
                         ) : (
-                            <span className="text-sm">当前令牌权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">当前魔力值权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
                         )}
                         <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
                             立即续费

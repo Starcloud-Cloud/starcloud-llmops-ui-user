@@ -146,13 +146,13 @@ function MyTemplate() {
     //弹窗
     const handleDetail = (data: { uid: string }) => {
         if (
-            totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo.benefits[2].totalNum ||
-            userInfo.benefits[2].totalNum === -1
+            userInfo.benefits[2].totalNum === -1 ||
+            totalList.filter((item) => Number(item.creator) === user.id).length < userInfo.benefits[2].totalNum
         ) {
+            navigate('/createApp?recommend=' + data.uid);
+        } else if (totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo.benefits[2].totalNum) {
             setBotOpen(true);
-            return;
         }
-        navigate('/createApp?recommend=' + data.uid);
     };
     const timeoutRef = useRef<any>();
     return (

@@ -47,6 +47,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
+import { Tooltip as AntTooltip } from 'antd';
 
 const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
@@ -1185,27 +1186,49 @@ export const Chat = ({
                             </div>
                         )}
                         {conversationUid && mode !== 'share' && !isFetch && (
-                            <Tooltip title={'把你的对话分享给朋友吧，还可以免费增加权益哦！'}>
-                                <svg
-                                    onClick={() => handleShare()}
-                                    className={`absolute ${
-                                        statisticsMode === 'SHARE_JS' && width <= 406 ? 'right-[53px]' : 'right-2'
-                                    }  text-[16px] cursor-pointer`}
-                                    stroke="currentColor"
-                                    fill="none"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    height="1em"
-                                    width="1em"
-                                    xmlns="http://www.w3.org/2000/svg"
+                            <AntTooltip
+                                color={'#fa8c16'}
+                                arrow={true}
+                                placement={'left'}
+                                open={!isMobile && (mode === 'test' || mode === 'market')}
+                                title={
+                                    <span className="text-xs">
+                                        分享给朋友，
+                                        <br />
+                                        免费增加权益！
+                                    </span>
+                                }
+                            >
+                                <Tooltip
+                                    title={
+                                        <div>
+                                            把你的对话分享给朋友吧，
+                                            <br />
+                                            还可以免费增加权益哦！
+                                        </div>
+                                    }
                                 >
-                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                    <polyline points="16 6 12 2 8 6"></polyline>
-                                    <line x1="12" y1="2" x2="12" y2="15"></line>
-                                </svg>
-                            </Tooltip>
+                                    <svg
+                                        onClick={() => handleShare()}
+                                        className={`absolute ${
+                                            statisticsMode === 'SHARE_JS' && width <= 406 ? 'right-[53px]' : 'right-2'
+                                        }  text-[16px] cursor-pointer`}
+                                        stroke="currentColor"
+                                        fill="none"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        height="1em"
+                                        width="1em"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                        <polyline points="16 6 12 2 8 6"></polyline>
+                                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                                    </svg>
+                                </Tooltip>
+                            </AntTooltip>
                         )}
                     </div>
                 </div>

@@ -20,6 +20,7 @@ import {
     Tab,
     TextField
 } from '@mui/material';
+import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 import { styled } from '@mui/material/styles';
 import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { InputNumber } from 'antd';
@@ -60,6 +61,7 @@ import WeChatDrawer from './components/WeChatDrawer';
 import DomainModal from './components/DomainModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
+import userInfoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -123,6 +125,7 @@ function Upload({
     getStatus: (data: boolean) => void;
     handleSave?: () => void;
 }) {
+    const { userInfo }: any = userInfoStore();
     const defaultUpLoadList = [
         {
             title: '网页',
@@ -161,11 +164,28 @@ function Upload({
             icon: 'qiyeweixin',
             desc: '在微信群聊中提供机器人服务',
             // enable: true,
+            chat: true,
             enableValue: false,
             comingSoon: false,
             type: 5,
             action: [
-                { title: '创建群聊', icon: 'contentPaste', onclick: () => setOpenWchat(true) },
+                {
+                    title: '创建群聊',
+                    icon: 'contentPaste',
+                    onclick: () => {
+                        userInfo.benefits.map((value: any) => {
+                            if (value.name === '微信机器人') {
+                                if (value.totalNum === -1) {
+                                    setOpenWchat(true);
+                                } else if (updateBtn.channelMap[7].length < value.totalNum) {
+                                    setOpenWchat(true);
+                                } else {
+                                    setBotOpen(true);
+                                }
+                            }
+                        });
+                    }
+                },
                 {
                     title: '查看群聊',
                     icon: 'historyOutlined',
@@ -193,11 +213,12 @@ function Upload({
     const [openDrawer, setOpenDrawer] = useState(false);
     const [openDomain, setOpenDomain] = useState(false);
     const [openCopySite, setOpenCopySite] = useState(false);
-    const [upLoadList, setUpLoadList] = useState(defaultUpLoadList);
+    const [upLoadList, setUpLoadList] = useState<any[]>(defaultUpLoadList);
     const [webMediumUid, setWebMediumUid] = useState('');
     const webMediumUidRef = useRef();
     const [openWchat, setOpenWchat] = useState(false);
     const [openWeDrawer, setOpenWeDrawer] = useState(false);
+    const [botOpen, setBotOpen] = useState(false);
     //tabs
     const [tabValue, setTabValue] = useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -336,6 +357,9 @@ function Upload({
         needTips: true,
         isFirstCreatePublishRecord: true
     });
+    useEffect(() => {
+        setUpLoadList([...defaultUpLoadList]);
+    }, [updateBtn]);
     const [tableData, setTableData] = useState([]);
     //保存按钮是否触发更新
     const [updateBtnSate, setUpdateBtnSate] = useState(false);
@@ -951,109 +975,227 @@ function Upload({
                             </SubCard>
                         </Grid>
                     )}
-                    {upLoadList.map((item) => (
-                        <Grid key={item.title} flex={1} item md={6} xs={12}>
-                            <SubCard sx={{ height: '100%' }} contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}>
-                                <Box>
-                                    <Box
-                                        width="40px"
-                                        height="40px"
-                                        borderRadius="50%"
-                                        sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
+                    {upLoadList.map((item) =>
+                        item.title === '微信群聊' ? (
+                            mode === 'CHAT' && (
+                                <Grid key={item.title} flex={1} item md={6} xs={12}>
+                                    <SubCard
+                                        sx={{ height: '100%' }}
+                                        contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}
                                     >
-                                        {IconList[item.icon]}
-                                        {!IconList[item.icon] && (
-                                            <img
-                                                style={{ width: '25px', height: '25px' }}
-                                                src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
-                                                alt=""
-                                            />
-                                        )}
-                                    </Box>
-                                </Box>
-                                <Box ml={2} className="w-full">
-                                    <div className="flex justify-between items-center">
-                                        <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                            {item.title}
-                                            {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
-                                        </Typography>
-                                        <div>
-                                            {item.enable && (
-                                                <>
-                                                    <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
-                                                    <Switch
-                                                        disabled={updateBtn.isFirstCreatePublishRecord}
-                                                        size={'small'}
-                                                        color={'secondary'}
-                                                        checked={item.enableValue}
-                                                        onChange={() => handleSwitch(item)}
+                                        <Box>
+                                            <Box
+                                                width="40px"
+                                                height="40px"
+                                                borderRadius="50%"
+                                                sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                            >
+                                                {IconList[item.icon]}
+                                                {!IconList[item.icon] && (
+                                                    <img
+                                                        style={{ width: '25px', height: '25px' }}
+                                                        src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
+                                                        alt=""
                                                     />
-                                                </>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                        <Box ml={2} className="w-full">
+                                            <div className="flex justify-between items-center">
+                                                <Typography
+                                                    component="div"
+                                                    fontSize={16}
+                                                    fontWeight={500}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                >
+                                                    {item.title}
+                                                    {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                                </Typography>
+                                                <div>
+                                                    {item.enable && (
+                                                        <>
+                                                            <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
+                                                            <Switch
+                                                                disabled={updateBtn.isFirstCreatePublishRecord}
+                                                                size={'small'}
+                                                                color={'secondary'}
+                                                                checked={item.enableValue}
+                                                                onChange={() => handleSwitch(item)}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
+                                                {item.desc}
+                                            </Typography>
+                                            <Box display="flex">
+                                                {item.action.map((el: any, i: number) =>
+                                                    item.type === 2 ? (
+                                                        <Box
+                                                            key={i}
+                                                            color="#b5bed0"
+                                                            fontSize="12px"
+                                                            display="flex"
+                                                            flexWrap="wrap"
+                                                            alignItems="center"
+                                                            mr={2}
+                                                            onClick={() => {
+                                                                if (item.enableValue) el.onclick();
+                                                            }}
+                                                            className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                        >
+                                                            <Box whiteSpace="nowrap">
+                                                                {IconList[el.icon]}
+                                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                            </Box>
+                                                        </Box>
+                                                    ) : (
+                                                        <Box
+                                                            key={i}
+                                                            color="#b5bed0"
+                                                            fontSize="12px"
+                                                            display="flex"
+                                                            flexWrap="wrap"
+                                                            alignItems="center"
+                                                            mr={2}
+                                                            onClick={() => {
+                                                                if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                                    el.onclick();
+                                                                } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                                    el.onclick();
+                                                                }
+                                                            }}
+                                                            className={`${
+                                                                (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                                (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                                    ? 'cursor-pointer hover:text-purple-500'
+                                                                    : ''
+                                                            }`}
+                                                        >
+                                                            <Box whiteSpace="nowrap">
+                                                                {IconList[el.icon]}
+                                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                            </Box>
+                                                        </Box>
+                                                    )
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </SubCard>
+                                </Grid>
+                            )
+                        ) : (
+                            <Grid key={item.title} flex={1} item md={6} xs={12}>
+                                <SubCard
+                                    sx={{ height: '100%' }}
+                                    contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}
+                                >
+                                    <Box>
+                                        <Box
+                                            width="40px"
+                                            height="40px"
+                                            borderRadius="50%"
+                                            sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                        >
+                                            {IconList[item.icon]}
+                                            {!IconList[item.icon] && (
+                                                <img
+                                                    style={{ width: '25px', height: '25px' }}
+                                                    src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
+                                                    alt=""
+                                                />
                                             )}
-                                        </div>
-                                    </div>
-                                    <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
-                                        {item.desc}
-                                    </Typography>
-                                    <Box display="flex">
-                                        {item.action.map((el: any, i) =>
-                                            item.type === 2 ? (
-                                                <Box
-                                                    key={i}
-                                                    color="#b5bed0"
-                                                    fontSize="12px"
-                                                    display="flex"
-                                                    flexWrap="wrap"
-                                                    alignItems="center"
-                                                    mr={2}
-                                                    onClick={() => {
-                                                        if (item.enableValue) el.onclick();
-                                                    }}
-                                                    className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
-                                                >
-                                                    <Box whiteSpace="nowrap">
-                                                        {IconList[el.icon]}
-                                                        <span style={{ marginLeft: '8px' }}>{el.title}</span>
-                                                    </Box>
-                                                </Box>
-                                            ) : (
-                                                <Box
-                                                    key={i}
-                                                    color="#b5bed0"
-                                                    fontSize="12px"
-                                                    display="flex"
-                                                    flexWrap="wrap"
-                                                    alignItems="center"
-                                                    mr={2}
-                                                    onClick={() => {
-                                                        if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
-                                                            el.onclick();
-                                                        } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
-                                                            el.onclick();
-                                                        }
-                                                    }}
-                                                    className={`${
-                                                        (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
-                                                        (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
-                                                            ? 'cursor-pointer hover:text-purple-500'
-                                                            : ''
-                                                    }`}
-                                                >
-                                                    <Box whiteSpace="nowrap">
-                                                        {IconList[el.icon]}
-                                                        <span style={{ marginLeft: '8px' }}>{el.title}</span>
-                                                    </Box>
-                                                </Box>
-                                            )
-                                        )}
+                                        </Box>
                                     </Box>
-                                </Box>
-                            </SubCard>
-                        </Grid>
-                    ))}
+                                    <Box ml={2} className="w-full">
+                                        <div className="flex justify-between items-center">
+                                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                                {item.title}
+                                                {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                            </Typography>
+                                            <div>
+                                                {item.enable && (
+                                                    <>
+                                                        <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
+                                                        <Switch
+                                                            disabled={updateBtn.isFirstCreatePublishRecord}
+                                                            size={'small'}
+                                                            color={'secondary'}
+                                                            checked={item.enableValue}
+                                                            onChange={() => handleSwitch(item)}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
+                                            {item.desc}
+                                        </Typography>
+                                        <Box display="flex">
+                                            {item.action.map((el: any, i: number) =>
+                                                item.type === 2 ? (
+                                                    <Box
+                                                        key={i}
+                                                        color="#b5bed0"
+                                                        fontSize="12px"
+                                                        display="flex"
+                                                        flexWrap="wrap"
+                                                        alignItems="center"
+                                                        mr={2}
+                                                        onClick={() => {
+                                                            if (item.enableValue) el.onclick();
+                                                        }}
+                                                        className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                    >
+                                                        <Box whiteSpace="nowrap">
+                                                            {IconList[el.icon]}
+                                                            <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                        </Box>
+                                                    </Box>
+                                                ) : (
+                                                    <Box
+                                                        key={i}
+                                                        color="#b5bed0"
+                                                        fontSize="12px"
+                                                        display="flex"
+                                                        flexWrap="wrap"
+                                                        alignItems="center"
+                                                        mr={2}
+                                                        onClick={() => {
+                                                            if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                                el.onclick();
+                                                            } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                                el.onclick();
+                                                            }
+                                                        }}
+                                                        className={`${
+                                                            (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                            (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                                ? 'cursor-pointer hover:text-purple-500'
+                                                                : ''
+                                                        }`}
+                                                    >
+                                                        <Box whiteSpace="nowrap">
+                                                            {IconList[el.icon]}
+                                                            <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                        </Box>
+                                                    </Box>
+                                                )
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </SubCard>
+                            </Grid>
+                        )
+                    )}
                 </Grid>
                 {/* <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
                     保存设置
@@ -1137,6 +1279,13 @@ function Upload({
                     open={openWeDrawer}
                     setOpen={setOpenWeDrawer}
                     getUpdateBtn={getUpdateBtn}
+                />
+            )}
+            {botOpen && (
+                <UpgradeModel
+                    open={botOpen}
+                    handleClose={() => setBotOpen(false)}
+                    title={`添加文档个数(${userInfo?.benefits[4].totalNum})已用完`}
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

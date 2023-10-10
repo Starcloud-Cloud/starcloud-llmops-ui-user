@@ -59,7 +59,7 @@ const PictureCreate = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await getImgList({ pageNo, pageSize: 10 });
+            const res = await getImgList({ pageNo, pageSize: 10, scene: 'WEB_IMAGE' });
             setImgList(res.list || []);
             setTotal(res.total || 0);
         })();
@@ -72,7 +72,7 @@ const PictureCreate = () => {
         }
         const newPageNo = pageNo + 1;
         setPageNo(newPageNo);
-        const res = await getImgList({ pageNo: newPageNo, pageSize: 10 });
+        const res = await getImgList({ pageNo: newPageNo, pageSize: 10, scene: 'WEB_IMAGE' });
         setImgList([...imgList, ...(res.list || [])]);
     };
 

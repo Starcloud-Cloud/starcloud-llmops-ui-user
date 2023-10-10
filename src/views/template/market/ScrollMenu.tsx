@@ -9,7 +9,6 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 
 import { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 interface MenuList {
     name: string;
@@ -18,7 +17,7 @@ interface MenuList {
 function ScrollMenus({ change }: { change: any }) {
     const theme = useTheme();
     const [menuList, setMenuList] = useState<MenuList[]>([]);
-    const [active, setActive] = useState<number | string>(1);
+    const [active, setActive] = useState<number | string>(0);
     const setCategoryList = marketStore((state) => state.setCategoryList);
     useEffect(() => {
         categories().then((res) => {
@@ -28,9 +27,7 @@ function ScrollMenus({ change }: { change: any }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const navigate = useNavigate();
     const changeCategory = (item: any, index: number) => {
-        navigate('/appMarket/list');
         if (active === index) {
             setActive(0);
             change('ALL');

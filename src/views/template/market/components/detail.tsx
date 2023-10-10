@@ -218,7 +218,7 @@ function Deatail() {
     //删除模板
     const delTemplate = async () => {
         const res = await delMarket(detailData.uid);
-        navigate('/appMarket/list');
+        navigate('/appMarket');
         dispatch(
             openSnackbar({
                 open: true,
@@ -280,13 +280,11 @@ function Deatail() {
                     <CircularProgress />
                 </div>
             )}
-            <Breadcrumbs aria-label="breadcrumb">
-                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket/list')}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
+                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
                     {t('market.all')}
                 </Link>
-                <Typography color="text.primary">
-                    {categoryList?.find((el: { code: string }) => el.code === (detailData?.categories && detailData?.categories[0]))?.name}
-                </Typography>
+                <Typography color="text.primary">{detailData?.category}</Typography>
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
@@ -305,9 +303,7 @@ function Deatail() {
                             </Typography>
                         </Box>
                         <Box>
-                            {detailData?.categories?.map((item: any) => (
-                                <span key={item}>#{categoryList?.find((el: { code: string }) => el.code === item).name}</span>
-                            ))}
+                            <span>#{detailData?.category}</span>
                             {detailData?.tags?.map((el: any) => (
                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                             ))}
@@ -359,7 +355,7 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的令牌不足'} />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔力值不足'} />
         </Card>
     );
 }

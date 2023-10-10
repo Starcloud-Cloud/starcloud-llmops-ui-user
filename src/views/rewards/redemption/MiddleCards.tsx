@@ -33,7 +33,7 @@ const MiddleCards = () => {
         {
             Icon: AccountBoxIcon,
             title: '注册魔法AI账号',
-            description: '送5000字/5张图片',
+            description: '送10魔力值/2张图片',
             buttonText: '已注册',
             isDisabled: true,
             onClick: undefined
@@ -41,7 +41,7 @@ const MiddleCards = () => {
         {
             Icon: EventNoteIcon,
             title: '每日签到',
-            description: '送3000字/2张图片',
+            description: '送2魔力值/2张图片',
             buttonText: signInStatus ? '已签到' : '立即签到',
             isDisabled: signInStatus ? true : false,
             onClick: !signInStatus ? handleSignIn : undefined

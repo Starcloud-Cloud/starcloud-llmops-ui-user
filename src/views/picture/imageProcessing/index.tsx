@@ -13,7 +13,12 @@ const ImageMatting = () => {
     return (
         <div className="h-full w-full flex items-center justify-center">
             <div className="flex gap-10">
-                <Card onClick={() => {}} sx={{ width: 400, textAlign: 'center', cursor: 'pointer' }}>
+                <Card
+                    onClick={() => {
+                        navigate('/upscaleImage');
+                    }}
+                    sx={{ width: 400, textAlign: 'center', cursor: 'pointer' }}
+                >
                     <div
                         onMouseMove={(e: any) => {
                             if (isDragging) {
@@ -67,7 +72,7 @@ const ImageMatting = () => {
                     </CardContent>
                 </Card>
                 <Card
-                    onClick={() => navigate('/delImageText')}
+                    onClick={() => navigate('/largementImage')}
                     sx={{ width: 400, textAlign: 'center', cursor: 'pointer', position: 'relative' }}
                 >
                     <CardMedia

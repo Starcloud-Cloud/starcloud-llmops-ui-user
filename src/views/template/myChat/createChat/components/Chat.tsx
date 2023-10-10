@@ -1161,7 +1161,7 @@ export const Chat = ({
                                 placement={'left'}
                                 open={!isMobile && (mode === 'test' || mode === 'market')}
                                 title={
-                                    <span>
+                                    <span className="text-xs">
                                         分享给朋友，
                                         <br />
                                         免费增加权益！

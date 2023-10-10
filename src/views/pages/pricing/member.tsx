@@ -487,9 +487,7 @@ const Price1 = () => {
                 <VipBar />
             </HeaderWrapper>
             <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
-                {/* TODO */}
-                {/* <div className="w-[96%]"> */}
-                <div className="w-[80%]">
+                <div className="w-[94%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
@@ -503,15 +501,10 @@ const Price1 = () => {
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
-                            // TODO;
-                            if (index === 1) {
-                                return;
-                            }
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
                             return (
-                                // TODO
-                                <Grid item xs={20} sm={10} md={5} key={index}>
+                                <Grid item xs={20} sm={10} md={4} key={index}>
                                     <MainCard
                                         boxShadow
                                         sx={{
@@ -521,29 +514,6 @@ const Price1 = () => {
                                         }}
                                     >
                                         <Grid container textAlign="center" spacing={gridSpacing}>
-                                            {/* <Grid item xs={12}>
-                                                <Box
-                                                    sx={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        borderRadius: '50%',
-                                                        width: 80,
-                                                        height: 80,
-                                                        background:
-                                                            theme.palette.mode === 'dark'
-                                                                ? theme.palette.dark[800]
-                                                                : theme.palette.primary.light,
-                                                        color: theme.palette.primary.main,
-                                                        '& > svg': {
-                                                            width: 35,
-                                                            height: 35
-                                                        }
-                                                    }}
-                                                >
-                                                    {plan.icon}
-                                                </Box>
-                                            </Grid> */}
                                             <Grid item xs={12}>
                                                 <Typography
                                                     variant="h6"

@@ -353,7 +353,7 @@
 //     },
 //     children: [
 //       {
-//         path: "productManagementAdd", // TODO @puhui999：最好拆成 add 和 edit 两个路由；添加商品；修改商品
+//         path: "productManagementAdd",
 //         component: () => import("@/views/mall/product/spu/addForm.vue"),
 //         name: "ProductManagementAdd",
 //         meta: {

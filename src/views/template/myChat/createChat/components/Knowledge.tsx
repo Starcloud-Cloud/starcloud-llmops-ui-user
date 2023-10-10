@@ -297,7 +297,6 @@ const DocumentModal = ({
     };
 
     const { Dragger } = Upload;
-    // TODO 最大20M, 以及错误的提示
     const props: UploadProps = {
         name: 'file',
         multiple: true,

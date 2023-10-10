@@ -355,7 +355,7 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔力值不足'} />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
         </Card>
     );
 }

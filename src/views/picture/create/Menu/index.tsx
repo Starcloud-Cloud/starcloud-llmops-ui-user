@@ -836,7 +836,7 @@ export const PictureCreateMenu = ({
                     </Button>
                 </Row>
             </Col>
-            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔力值不足'} />
+            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔法豆不足'} />
         </>
     );
 };

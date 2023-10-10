@@ -840,7 +840,7 @@ export const Chat = ({
             } else if (bufferObj?.code === 2008002007) {
                 // 处理token不足
                 const copyData = [...dataRef.current];
-                copyData[copyData.length - 1].answer = '当前使用的魔力值不足';
+                copyData[copyData.length - 1].answer = '当前使用的魔法豆不足';
                 copyData[copyData.length - 1].status = 'ERROR';
                 copyData[copyData.length - 1].isNew = false;
                 setOpenToken(true);
@@ -1739,7 +1739,7 @@ export const Chat = ({
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
-            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔力值不足'} />
+            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔法豆不足'} />
         </div>
     );
 };

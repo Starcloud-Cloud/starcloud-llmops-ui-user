@@ -555,6 +555,7 @@ const Price1 = () => {
                                                     sx={{
                                                         fontSize: '2.1875rem',
                                                         fontWeight: 700,
+                                                        lineHeight: '1.2em',
                                                         '& > span': {
                                                             fontSize: '1.25rem',
                                                             fontWeight: 500

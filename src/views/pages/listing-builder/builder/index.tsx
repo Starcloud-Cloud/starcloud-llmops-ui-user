@@ -1,6 +1,7 @@
 import { Button, Card, CardHeader, Divider, IconButton } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { KeyWord } from './components/Keyword';
+import { Content } from './components/Content';
 
 const ListingBuilder = () => {
     return (
@@ -26,7 +27,9 @@ const ListingBuilder = () => {
                 <div className="w-[400px] h-full">
                     <KeyWord />
                 </div>
-                <div>右</div>
+                <div className="flex-1 h-full ml-2">
+                    <Content />
+                </div>
             </div>
         </Card>
     );

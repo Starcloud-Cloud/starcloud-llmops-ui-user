@@ -1,10 +1,11 @@
-import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal } from '@mui/material';
+import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, Tab, Tabs, TextField } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { gridSpacing } from 'store/constant';
 import { InboxOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
+import { useState } from 'react';
+import { TabPanel } from 'views/template/myChat/createChat';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -33,7 +34,16 @@ const props: UploadProps = {
     }
 };
 
+function a11yProps(index: number) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`
+    };
+}
+
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
+    const [tab, setTab] = useState(0);
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -43,7 +53,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title={'导入关键词'}
+                title={'新增'}
                 content={false}
                 className="sm:w-[700px] xs:w-[300px]"
                 secondary={
@@ -52,8 +62,25 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     </IconButton>
                 }
             >
-                <CardContent>
-                    <Grid container spacing={gridSpacing} className="w-full flex justify-center pt-[24px] ml-0">
+                <CardContent
+                    sx={{
+                        p: 1
+                    }}
+                >
+                    <Tabs
+                        value={tab}
+                        onChange={(e, v) => {
+                            setTab(v);
+                        }}
+                        aria-label="basic tabs example"
+                    >
+                        <Tab label="新增" {...a11yProps(0)} />
+                        <Tab label="导入" {...a11yProps(1)} />
+                    </Tabs>
+                    <TabPanel value={tab} index={0}>
+                        <TextField multiline rows={4} label={'关键词'} className="w-full" />
+                    </TabPanel>
+                    <TabPanel value={tab} index={1}>
                         <Dragger {...props}>
                             <p className="ant-upload-drag-icon">
                                 <InboxOutlined rev={undefined} />
@@ -63,7 +90,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                                 Support for a single or bulk upload. Strictly prohibited from uploading company data or other banned files.
                             </p>
                         </Dragger>
-                    </Grid>
+                    </TabPanel>
                 </CardContent>
                 <Divider />
                 <CardActions>

@@ -3,6 +3,7 @@ import { Tag, Space, Table } from 'antd';
 import React from 'react';
 import { AddKeywordModal } from '../AddKeyworkModal';
 import AddIcon from '@mui/icons-material/Add';
+import { CSVLink } from 'react-csv';
 
 export const KeyWord = () => {
     const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>([]);
@@ -14,12 +15,12 @@ export const KeyWord = () => {
 
     const columns = [
         {
-            title: 'keyword',
+            title: '关键词',
             dataIndex: 'keyword',
             key: 'keyword'
         },
         {
-            title: 'score',
+            title: '得分',
             dataIndex: 'score',
             key: 'score'
         },
@@ -39,7 +40,7 @@ export const KeyWord = () => {
             key: 'comp'
         },
         {
-            title: 'usage',
+            title: '使用',
             dataIndex: 'usage',
             key: 'usage'
         }
@@ -67,6 +68,7 @@ export const KeyWord = () => {
 
     return (
         <div className="h-full p-3 bg-white">
+            <div className="text-lg font-bold py-1">关键词</div>
             <div className="flex justify-between">
                 {/* <FormControl variant="outlined" className="flex-1">
                     <InputLabel size="small" htmlFor="outlined-adornment-password">
@@ -99,27 +101,35 @@ export const KeyWord = () => {
                     新增
                 </Button>
                 <div>
-                    <IconButton size="small" disabled={!selectedRowKeys.length}>
-                        <svg
-                            className={`${selectedRowKeys.length && 'text-[#673ab7]'} `}
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.75"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                            <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"></path>
-                            <path d="M7 16.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0"></path>
-                            <path d="M10 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"></path>
-                            <path d="M16 15l2 6l2 -6"></path>
-                        </svg>
-                    </IconButton>
+                    <CSVLink
+                        data={data}
+                        // headers={columns}
+                        onClick={() => {
+                            console.log('You click the link'); // 👍🏻 Your click handling logic
+                        }}
+                    >
+                        <IconButton size="small" disabled={!selectedRowKeys.length}>
+                            <svg
+                                className={`${selectedRowKeys.length && 'text-[#673ab7]'} `}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.75"
+                                stroke="currentColor"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                                <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"></path>
+                                <path d="M7 16.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0"></path>
+                                <path d="M10 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"></path>
+                                <path d="M16 15l2 6l2 -6"></path>
+                            </svg>
+                        </IconButton>
+                    </CSVLink>
                 </div>
             </div>
 

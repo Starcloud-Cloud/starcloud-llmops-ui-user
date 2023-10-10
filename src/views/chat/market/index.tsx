@@ -28,15 +28,15 @@ const list = [
 
 export const ChatTip = (props: any) => {
     return (
-        <div className={`flex flex-col rounded-lg bg-white w-full p-3 justify-center pl-6 absolute top-0 left-0 bottom-0 `}>
+        <div className={`flex flex-col rounded-lg bg-white w-full justify-center pl-2 absolute top-0 left-0 bottom-0 `}>
             <div className="overflow-auto">
                 <div className="flex justify-center flex-col items-center">
-                    <h3 className={'text-3xl text-black'}>
+                    <h3 className={'text-3xl text-black p-3'}>
                         欢迎使用 <span className={'text-[#673ab7]'}>魔法AI</span> 自由对话
                     </h3>
                     <div className={'py-1 mt-5'}>如何更聪明的提问？让魔法AI给你需要的答案？使用提问的万能句式</div>
                     <div className="mt-5">
-                        <Space size={[0, 8]} wrap>
+                        <Space size={[0, 8]} wrap className="flex justify-center">
                             <Tag color="blue" className="h-[54px] flex items-center rounded-lg ml-[8px]">
                                 聪明的提问
                             </Tag>
@@ -90,7 +90,6 @@ const ChatMy = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appUid = searchParams.get('appUid') as string;
-    const [visible, setVisible] = useState(false);
 
     const [chatBotInfo, setChatBotInfo] = useState<IChatInfo>({
         guideList: ['', '']

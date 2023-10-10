@@ -62,7 +62,7 @@ const SpaceEquity = () => {
             total: 20
         },
         {
-            name: '魔力值',
+            name: '魔法豆',
             icon: 'mofa',
             desc: '已使用量/总量',
             trained: 2,
@@ -155,11 +155,11 @@ const SpaceEquity = () => {
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 <Box textAlign="center">
-                    <Typography variant="h2">邀请你的朋友并赚取魔力值</Typography>
+                    <Typography variant="h2">邀请你的朋友并赚取魔法豆</Typography>
                     <Typography variant="h4" fontWeight={400} my={2}>
-                        为您和您的朋友赚取对应的魔力值
+                        为您和您的朋友赚取对应的魔法豆
                     </Typography>
-                    <Typography variant="h4">您推荐的越多，魔力值越高</Typography>
+                    <Typography variant="h4">您推荐的越多，魔法豆越高</Typography>
                 </Box>
                 <SubCard
                     sx={{
@@ -181,7 +181,7 @@ const SpaceEquity = () => {
                                     </Typography>
                                 }
                             />
-                            <ListItemText primary="邀请成功就送您和好友每人魔力值额度, 奖励无上限" />
+                            <ListItemText primary="邀请成功就送您和好友每人魔法豆额度, 奖励无上限" />
                             <IconButton size="small" color="secondary">
                                 <BorderColorOutlinedIcon fontSize="small" />
                             </IconButton>

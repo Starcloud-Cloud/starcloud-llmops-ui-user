@@ -33,7 +33,7 @@ const MiddleCards = () => {
         {
             Icon: AccountBoxIcon,
             title: '注册魔法AI账号',
-            description: '送10魔力值/2张图片',
+            description: '送10魔法豆/2张图片',
             buttonText: '已注册',
             isDisabled: true,
             onClick: undefined
@@ -41,7 +41,13 @@ const MiddleCards = () => {
         {
             Icon: EventNoteIcon,
             title: '每日签到',
-            description: '送2魔力值/2张图片',
+            description: (
+                <div>
+                    <span>方式一：点击右边“签到”即可获得2魔法豆/2张图片</span>
+                    <br />
+                    <span>方式二：魔法AI小助手公众号“菜单栏--权益领取--点击签到”即可</span>
+                </div>
+            ),
             buttonText: signInStatus ? '已签到' : '立即签到',
             isDisabled: signInStatus ? true : false,
             onClick: !signInStatus ? handleSignIn : undefined

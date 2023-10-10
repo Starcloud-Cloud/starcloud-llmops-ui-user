@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import infoStore from 'store/entitlementAction';
 import Phone from 'ui-component/login/phone';
 import { getUserInfo } from 'api/login';
+import { isMobile } from 'react-device-detect';
 import React from 'react';
 
 interface MainStyleProps {
@@ -454,13 +455,20 @@ const MainLayout = () => {
                     <Main theme={theme} open={drawerOpen} layout={layout}>
                         {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                         {!isLarge ? (
-                            <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                            <Container
+                                className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
+                                {...(!container && { sx: { px: { xs: 0 } } })}
+                            >
                                 {/* breadcrumb */}
                                 <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                 <Outlet />
                             </Container>
                         ) : (
-                            <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                            <Container
+                                maxWidth={false}
+                                className={`h-full ${isMobile && '!px-0'}`}
+                                {...(!container && { sx: { px: { xs: 0 } } })}
+                            >
                                 <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                 <Outlet />
                             </Container>

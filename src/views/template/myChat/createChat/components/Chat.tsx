@@ -53,6 +53,8 @@ const env = process.env.REACT_APP_ENV;
 import ShareIcon from '@mui/icons-material/Share';
 import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
 import { ChatTip } from 'views/chat/market';
+import { fetchRequestCanCancel } from 'utils/fetch';
+import { fetchRequestCanCancelShare } from 'utils/fetch/indexShare';
 import { isMobile } from 'react-device-detect';
 
 const { Option } = Select;
@@ -296,6 +298,7 @@ export const Chat = ({
     const [openToken, setOpenToken] = useState(false);
     const [isFreedomChat, setIsFreedomChat] = useState(false);
     const [openChatMask, setOpenChatMask] = useState(false);
+    const [visibleTip, setVisibleTip] = useState(false);
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -305,6 +308,7 @@ export const Chat = ({
 
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
+    const controllerRef: any = useRef(null);
 
     const conversationUniKey = `conversationUid-${mediumUid}`;
 
@@ -352,14 +356,6 @@ export const Chat = ({
             timeOutRef.current && clearInterval(timeOutRef.current);
         };
     }, []);
-
-    const visibleTip = React.useMemo(() => {
-        if (isFreedomChat && openChatMask) {
-            return true;
-        } else {
-            return false;
-        }
-    }, [openChatMask, isFreedomChat]);
 
     // mode share start
     useEffect(() => {
@@ -504,21 +500,32 @@ export const Chat = ({
     // mode iframe end
 
     // mode market start
-    // 初始设置为自由聊天
+    // 默认初始进来就是自由聊天
     React.useEffect(() => {
         if (mode === 'market') {
             setIsFreedomChat(true);
         }
     }, [mode]);
 
+    // 当是自由聊天的时候 没有内容才展示
     React.useEffect(() => {
-        const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
-        if (!r.length) {
-            setOpenChatMask(true);
-        } else {
-            setOpenChatMask(false);
+        if (isFreedomChat) {
+            const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
+            if (!r.length) {
+                setOpenChatMask(true);
+            } else {
+                setOpenChatMask(false);
+            }
         }
-    }, [data]);
+    }, [data, isFreedomChat]);
+
+    useEffect(() => {
+        if (isFreedomChat && openChatMask) {
+            setVisibleTip(true);
+        } else {
+            setVisibleTip(false);
+        }
+    }, [isFreedomChat, openChatMask]);
 
     React.useEffect(() => {
         if (mode === 'market' && uid) {
@@ -884,7 +891,7 @@ export const Chat = ({
         try {
             let resp: any;
             if (mode === 'iframe') {
-                resp = await shareMessageSSE({
+                const { promise, controller } = fetchRequestCanCancelShare('/share/chat/conversation', 'post', {
                     scene: statisticsMode,
                     query: message,
                     mediumUid,
@@ -892,9 +899,11 @@ export const Chat = ({
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             if (mode === 'test') {
-                resp = await messageSSE({
+                const { promise, controller } = fetchRequestCanCancel('/llm/chat/completions', 'post', {
                     appUid: appId,
                     scene: 'CHAT_TEST',
                     conversationUid,
@@ -902,15 +911,19 @@ export const Chat = ({
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             if (mode === 'market') {
-                resp = await marketMessageSSE({
+                const { promise, controller } = fetchRequestCanCancel('/llm/market/chat', 'post', {
                     appUid: uid,
                     conversationUid,
                     query: message,
                     modelType: selectModel,
                     webSearch: isGoOn ? false : enableOnline
                 });
+                resp = await promise;
+                controllerRef.current = controller;
             }
             setIsFirst(false);
 
@@ -949,6 +962,14 @@ export const Chat = ({
         } catch (e: any) {
             console.log('error', e);
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+            if (e instanceof DOMException && e.name == 'AbortError') {
+                copyData[dataRef.current.length - 1].isNew = false;
+                dataRef.current = copyData;
+                setData(copyData);
+                setIsFetch(false);
+                return;
+            }
+
             if (e.message === 'Request timeout') {
                 copyData[copyData.length - 1].answer = '机器人超时，请重试';
             } else {
@@ -970,6 +991,10 @@ export const Chat = ({
             return;
         }
         doFetch(message);
+    };
+
+    const handleStop = () => {
+        controllerRef.current.abort();
     };
 
     const handleClean = () => {
@@ -1091,6 +1116,12 @@ export const Chat = ({
             <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
                 <div className="flex justify-center">
                     <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
+                        {mode === 'market' && isMobile && (
+                            <span className="absolute left-2 cursor-pointer flex items-center" onClick={() => setVisibleTip(!visibleTip)}>
+                                <HelpOutlineIcon className="text-base cursor-pointer" />
+                                <span className="text-xs text-[#697586]">如何提问</span>
+                            </span>
+                        )}
                         {showSelect ? (
                             <Popover
                                 content={
@@ -1140,7 +1171,7 @@ export const Chat = ({
                                     <div className="w-[28px] h-[28px] flex justify-center items-center">
                                         <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
                                     </div>
-                                    <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                                    <div className={'text-lg font-medium ml-2 line-clamp-1 max-w-[95px]'}>{chatBotInfo.name}</div>
 
                                     {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
                                     <span className="text-xs ml-1 text-[#697586]">切换员工</span>
@@ -1242,7 +1273,7 @@ export const Chat = ({
                                     variant="outlined"
                                     color="secondary"
                                     size="small"
-                                    className="w-[200px] rounded-3xl"
+                                    className="sm:w-[200px] xs:w-[120px] rounded-3xl"
                                     onClick={() => {
                                         doFetch('继续', true);
                                     }}
@@ -1251,6 +1282,21 @@ export const Chat = ({
                                 </Button>
                             </div>
                         )}
+                        {/* {isFetch && (
+                            <div className="absolute top-0 inset-x-0 flex justify-center">
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    className="sm:w-[200px] xs:w-[120px] rounded-3xl"
+                                    onClick={() => {
+                                        handleStop();
+                                    }}
+                                >
+                                    停止
+                                </Button>
+                            </div>
+                        )} */}
                         <div className="flex justify-between mb-[2px]">
                             {skillWorkflowList && skillWorkflowList?.length > 0 ? (
                                 <Popover
@@ -1708,31 +1754,20 @@ export const Chat = ({
                     </div>
                 </div>
             </div>
-            {mode === 'market' && (
+            {mode === 'market' && !isMobile && (
                 <div className={`${width > 1300 ? 'min-w-[220px]' : 'min-w-[40px]'} h-full bg-[#f4f6f8] relative`}>
                     <div
                         className="bg-white absolute rounded-tr-lg rounded-br-lg p-2 top-[44px] cursor-pointer"
-                        onClick={() => setOpenChatMask(!openChatMask)}
+                        onClick={() => setVisibleTip(!visibleTip)}
                     >
-                        {!openChatMask ? (
-                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
-                                <KeyboardDoubleArrowLeftIcon />
-                                <span>如</span>
-                                <span>何</span>
-                                <span>提</span>
-                                <span>问</span>
-                                <span>?</span>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
-                                <KeyboardDoubleArrowRightIcon />
-                                <span>如</span>
-                                <span>何</span>
-                                <span>提</span>
-                                <span>问</span>
-                                <span>?</span>
-                            </div>
-                        )}
+                        <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                            {!visibleTip ? <KeyboardDoubleArrowLeftIcon /> : <KeyboardDoubleArrowRightIcon />}
+                            <span>如</span>
+                            <span>何</span>
+                            <span>提</span>
+                            <span>问</span>
+                            <span>?</span>
+                        </div>
                     </div>
                 </div>
             )}

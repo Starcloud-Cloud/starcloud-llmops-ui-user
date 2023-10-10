@@ -26,7 +26,7 @@ function Template({ data, handleDetail }: any) {
                     onClick={() => handleDetail(data)}
                     preview={false}
                     className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
-                    height={60}
+                    height="2.25rem"
                     src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
                 />
             )}
@@ -35,7 +35,7 @@ function Template({ data, handleDetail }: any) {
                     onClick={() => handleDetail(data)}
                     preview={false}
                     className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
-                    height={60}
+                    height="2.25rem"
                     src={data.images[0]}
                 />
             )}

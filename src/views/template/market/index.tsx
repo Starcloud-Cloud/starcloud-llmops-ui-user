@@ -69,11 +69,37 @@ function TemplateMarket() {
                 return item.code === queryParams.category;
             })[0].children;
             const newList = appList.filter((item) => item.code === queryParams.category)[0]?.appList;
+            const changeList = newList ? _.cloneDeep(newList) : [];
             newData.forEach((item: any) => {
                 item.appList = [];
-                item.appList.push(...(newList ? newList.filter((el: any) => item.code === el.category) : []));
+                item.appList.push(
+                    ...(newList
+                        ? newList.filter((el: any) => {
+                              if (changeList && item.code === el.category) {
+                                  changeList.splice(
+                                      changeList.findIndex((value: any) => value.code === el.category),
+                                      1
+                                  );
+                              }
+                              return item.code === el.category;
+                          })
+                        : [])
+                );
             });
-            setNewList(newData);
+            const newData1 = _.cloneDeep(newData);
+            newData1.push({
+                sort: 9999,
+                children: [],
+                name: '其他',
+                appList: [...changeList],
+                code: 'OTHER',
+                parentCode: 'AMAZON',
+                icon: 'amazon',
+                image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
+            });
+            console.log(newData1);
+
+            setNewList(newData1);
         } else {
             const newData = _.cloneDeep(appList);
             newData.forEach((item: any) => {
@@ -180,7 +206,7 @@ function TemplateMarket() {
     };
     const focus = {
         textAlign: 'center',
-        padding: '0px 15px',
+        paddingRight: '20px',
         borderRadius: 15,
         cursor: 'pointer',
         fontSize: '12px',
@@ -190,7 +216,7 @@ function TemplateMarket() {
     };
     const focuos = {
         textAlign: 'center',
-        padding: '0px 15px',
+        paddingRight: '20px',
         borderRadius: 15,
         cursor: 'pointer',
         paddingTop: '5px',
@@ -232,7 +258,7 @@ function TemplateMarket() {
                 <Typography variant="h2" lineHeight={1}>
                     {t('market.title')}
                 </Typography>
-                <TextField
+                {/* <TextField
                     size="small"
                     id="filled-start-adornment"
                     sx={{ width: '300px' }}
@@ -247,7 +273,7 @@ function TemplateMarket() {
                             </InputAdornment>
                         )
                     }}
-                />
+                /> */}
             </Box>
             <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                 {menuList?.map((item, index) => (
@@ -274,35 +300,37 @@ function TemplateMarket() {
                                 )}
                                 <span>{item.name}</span>
                             </div>
-                            {queryParams.category === 'ALL' && (
+                            {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
                                 <div onClick={() => changeCategory(item, index)} className="text-[#673ab7] cursor-pointer">
-                                    更多模板
+                                    更多应用
                                     <RightOutlined rev={undefined} />
                                 </div>
                             )}
                         </div>
                     )}
-                    <Grid
-                        container
-                        display="flex"
-                        flexWrap={queryParams.category === 'ALL' ? 'nowrap' : 'wrap'}
-                        overflow="hidden"
-                        spacing={2}
-                    >
-                        {item.appList.map((item: any, index: number) =>
-                            queryParams.category === 'ALL' && index < 6 ? (
-                                <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={item.uid + index} item>
-                                    <Template handleDetail={handleDetail} data={item} />
-                                </Grid>
-                            ) : queryParams.category !== 'ALL' ? (
-                                <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={item.uid + index} item>
-                                    <Template handleDetail={handleDetail} data={item} />
-                                </Grid>
-                            ) : (
-                                ''
-                            )
-                        )}
-                    </Grid>
+                    {item.appList.length > 0 && (
+                        <Grid
+                            container
+                            display="flex"
+                            flexWrap={queryParams.category === 'ALL' ? 'nowrap' : 'wrap'}
+                            overflow="hidden"
+                            spacing={2}
+                        >
+                            {item.appList.map((el: any, index: number) =>
+                                queryParams.category === 'ALL' && index < 6 ? (
+                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                        <Template handleDetail={handleDetail} data={el} />
+                                    </Grid>
+                                ) : queryParams.category !== 'ALL' ? (
+                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                        <Template handleDetail={handleDetail} data={el} />
+                                    </Grid>
+                                ) : (
+                                    ''
+                                )
+                            )}
+                        </Grid>
+                    )}
                 </div>
             ))}
         </Box>

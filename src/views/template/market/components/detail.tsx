@@ -280,7 +280,7 @@ function Deatail() {
                     <CircularProgress />
                 </div>
             )}
-            <Breadcrumbs aria-label="breadcrumb">
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
                 <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
                     {t('market.all')}
                 </Link>

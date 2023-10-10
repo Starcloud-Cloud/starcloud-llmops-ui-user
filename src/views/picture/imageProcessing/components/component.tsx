@@ -70,6 +70,14 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     };
     //放大倍数
     const [magnification, setMagnification] = useState(2);
+    //判断放大倍数禁用
+    const [diskey, setDiskey] = useState(0);
+    const disMagn = (num: number) => {
+        return imageList.some((item: any) => item?.response?.data?.width * num * item?.response?.data?.height * num > 4194304);
+    };
+    useEffect(() => {
+        setDiskey(diskey + 1);
+    }, [imageList]);
     const handleSave = async () => {
         const sucIndex = suRef.current.length;
         suRef.current.push(...imageList);
@@ -287,19 +295,28 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                             </div>
                         ))}
                     </CardContent>
-                    {subTitle === '图片无损放大' && (
+                    {subTitle === '图片无损放大' && imageList.every((item) => item.response) && (
                         <div className="mb-[8px] flex justify-center items-center">
                             <div className="flex flex-col items-center ">
                                 <Radio.Group
+                                    key={diskey}
                                     onChange={(e) => {
                                         setMagnification(e.target.value);
                                     }}
                                     value={magnification}
                                 >
-                                    <Radio.Button value={2}>X2</Radio.Button>
-                                    <Radio.Button value={4}>x4</Radio.Button>
-                                    <Radio.Button value={6}>X6</Radio.Button>
-                                    <Radio.Button value={8}>X8</Radio.Button>
+                                    <Radio.Button disabled={Boolean(disMagn(2))} value={2}>
+                                        X2
+                                    </Radio.Button>
+                                    <Radio.Button disabled={Boolean(disMagn(4))} value={4}>
+                                        x4
+                                    </Radio.Button>
+                                    <Radio.Button disabled={Boolean(disMagn(6))} value={6}>
+                                        X6
+                                    </Radio.Button>
+                                    <Radio.Button disabled={Boolean(disMagn(8))} value={8}>
+                                        X8
+                                    </Radio.Button>
                                 </Radio.Group>
                                 <span className="text-[#697586] text-[12px] mt-[8px]">(选择需要放大的倍数)</span>
                             </div>

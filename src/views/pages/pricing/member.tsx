@@ -289,7 +289,6 @@ const planList = [
         '3个机器人插件扩展' // 6
     ],
     [
-        '无限魔力值生成', // 0
         <div className="flex items-center">
             <span>无限魔力值生成</span>
             <Tag color="#f50" className="ml-1">
@@ -488,7 +487,9 @@ const Price1 = () => {
                 <VipBar />
             </HeaderWrapper>
             <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
-                <div className="w-[96%]">
+                {/* TODO */}
+                {/* <div className="w-[96%]"> */}
+                <div className="w-[80%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
@@ -502,10 +503,15 @@ const Price1 = () => {
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
+                            // TODO;
+                            if (index === 1) {
+                                return;
+                            }
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
                             return (
-                                <Grid item xs={20} sm={10} md={4} key={index}>
+                                // TODO
+                                <Grid item xs={20} sm={10} md={5} key={index}>
                                     <MainCard
                                         boxShadow
                                         sx={{

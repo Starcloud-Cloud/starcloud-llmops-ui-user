@@ -182,8 +182,10 @@ const Cards = ({ flag = false }) => {
                                     color={
                                         userInfo?.userLevel === 'free'
                                             ? 'primary'
-                                            : userInfo?.userLevel === 'plus'
+                                            : userInfo?.userLevel === 'basic'
                                             ? 'secondary'
+                                            : userInfo?.userLevel === 'plus'
+                                            ? 'warning'
                                             : userInfo?.userLevel === 'pro'
                                             ? 'warning'
                                             : 'primary'

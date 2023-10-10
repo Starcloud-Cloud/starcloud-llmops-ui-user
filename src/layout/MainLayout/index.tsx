@@ -398,10 +398,10 @@ const MainLayout = () => {
                             </span>
                         ) : timeOutObj?.type === 2 ? (
                             <span className="text-sm">
-                                当前魔力值权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
+                                当前魔法豆权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
                             </span>
                         ) : (
-                            <span className="text-sm">当前魔力值权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">当前魔法豆权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
                         )}
                         <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
                             立即续费

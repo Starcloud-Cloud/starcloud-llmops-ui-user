@@ -80,7 +80,7 @@ const BottomCards: React.FC = () => {
             description: '加入魔法AI官方社群即可获得相应权益包',
             buttonText: '点击加入',
             Icon: GroupAddIcon,
-            endText: '送2魔力值/2张图片',
+            endText: '送2魔法豆/2张图片',
             onClick: handleOpenGroupAdd
         },
         {
@@ -89,7 +89,7 @@ const BottomCards: React.FC = () => {
             description: '注册一位获取一个权益包，无上限，发送链接邀请注册。每邀请三个获取额外权益包（联系客服）',
             buttonText: '复制链接',
             Icon: PersonAddIcon,
-            endText: '送2魔力值/2张图片',
+            endText: '送2魔法豆/2张图片',
             onClick: handleInvite
         },
         {
@@ -98,7 +98,7 @@ const BottomCards: React.FC = () => {
             description: '分享一次送一次，无上限,社交媒体发布测评，截图认证可获取权益包',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送2魔力值/2张图片',
+            endText: '送2魔法豆/2张图片',
             onClick: handleOpenShare
         },
         {
@@ -107,7 +107,7 @@ const BottomCards: React.FC = () => {
             description: '需要什么模板?哪些模板不满意？您的建议是我们改进的动力。',
             buttonText: '点击参加',
             Icon: PollIcon,
-            endText: '送2魔力值/2张图片',
+            endText: '送2魔法豆/2张图片',
             onClick: () => window.open('http://ov9t0w4iwaq9xq9l.mikecrm.com/OX02r3z', '_blank')
         },
         {
@@ -116,7 +116,7 @@ const BottomCards: React.FC = () => {
             description: '一键关注，即可马上兑换',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送2魔力值/2张图片',
+            endText: '送2魔法豆/2张图片',
             onClick: handleOpenFollow
         }
     ];

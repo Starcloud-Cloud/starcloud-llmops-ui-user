@@ -10,7 +10,7 @@ import SubCard from 'ui-component/cards/SubCard';
 // Define the shape of props that this component expects
 interface MiddleCardProps {
     title: string;
-    description: string;
+    description: any;
     buttonText: string;
     isDisabled: boolean;
     Icon: typeof AccountBoxIcon | typeof EventNoteIcon;

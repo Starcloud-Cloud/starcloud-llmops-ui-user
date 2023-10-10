@@ -386,7 +386,26 @@ const MainLayout = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [layout, matchDownMd]
     );
-
+    // useEffect(() => {
+    //     if (localStorage.getItem('roleRouters')) {
+    //         let list: any = {};
+    //         JSON.parse(JSON.parse(localStorage.getItem('roleRouters') as string).v).map((item: any) => {
+    //             if (item.name === 'mofaai') {
+    //                 list = item;
+    //             }
+    //         });
+    //         list.children.map((item: any) => {
+    //             if (item.name === '应用市场') {
+    //                 item.children.map((el: any) => {
+    //                     if (el.path === 'appMarket') {
+    //                         localStorage.clear();
+    //                         window.location.href = 'http://localhost:3000/login';
+    //                     }
+    //                 });
+    //             }
+    //         });
+    //     }
+    // }, []);
     return (
         <div className="flex flex-col">
             {timeOutObj && (

@@ -234,7 +234,7 @@ const planList = [
         <div className="flex items-center">
             <span>1000魔力值</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
         '生成图片100张', // 1
@@ -242,7 +242,7 @@ const planList = [
         <div className="flex items-center">
             <span>GPT-4</span>
             <Tooltip title={'消耗30点魔力值'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
         '5个自定义应用', // 3
@@ -250,7 +250,7 @@ const planList = [
         <div className="flex items-center">
             <span>1个微信群机器人</span>
             <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
         '多渠道发布机器人客服', // 3
@@ -263,7 +263,7 @@ const planList = [
         <div className="flex items-center">
             <span>3000魔力值</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
         '生成图片300张', // 1
@@ -271,7 +271,7 @@ const planList = [
         <div className="flex items-center">
             <span>GPT-4</span>
             <Tooltip title={'消耗30点魔力值'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
         '20个自定义应用', // 3
@@ -279,7 +279,7 @@ const planList = [
         <div className="flex items-center">
             <span>10个微信群机器人</span>
             <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
         '多渠道发布机器人客服', // 3
@@ -651,7 +651,12 @@ const Price1 = () => {
                                                                 <ListItemIcon>
                                                                     <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                                                 </ListItemIcon>
-                                                                <ListItemText primary={list} />
+                                                                <ListItemText
+                                                                    sx={{
+                                                                        '& .tips': { fill: '#000' }
+                                                                    }}
+                                                                    primary={list}
+                                                                />
                                                             </ListItem>
                                                             <Divider />
                                                         </React.Fragment>

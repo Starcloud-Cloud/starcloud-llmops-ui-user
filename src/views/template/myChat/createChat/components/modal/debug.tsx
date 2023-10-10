@@ -216,6 +216,7 @@ const DeBug = ({
                                 minRows={8}
                                 maxRows={8}
                                 fullWidth
+                                color="secondary"
                                 value={result}
                                 label="调试结果"
                                 InputLabelProps={{ shrink: true }}

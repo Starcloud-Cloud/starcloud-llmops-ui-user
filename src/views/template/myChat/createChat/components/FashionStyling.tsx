@@ -22,7 +22,7 @@ import {
     TextField
 } from '@mui/material';
 import { Popover, Upload, UploadFile, UploadProps } from 'antd';
-import { getAvatarList, getVoiceList } from 'api/chat';
+import { getAvatarList, getVoiceList, skillCreate } from 'api/chat';
 import { t } from 'hooks/web/useI18n';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -36,6 +36,9 @@ import { config } from 'utils/axios/config';
 import { v4 as uuidv4 } from 'uuid';
 import { IChatInfo } from '../index';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
+import ShortcutRecord from './ShortcutRecord';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
 const { base_url } = config;
 
@@ -330,7 +333,59 @@ const VoiceModal = ({
 };
 
 const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
-    const [type, setType] = useState('0');
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appId = searchParams.get('appId');
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    console.log(fileList, 'fileList');
+
+    const uploadButton = (
+        <div>
+            <AddIcon />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+    const formik = useFormik({
+        initialValues: {
+            type: 1,
+            key: '',
+            value: ''
+        },
+        validationSchema: yup.object({
+            type: yup.string().required('请选择类型'),
+            key: yup.string().required('关键词是必填的'),
+            value: yup.string().required('回复内容是必填的')
+        }),
+        onSubmit: (values: any) => {
+            const data: any = {};
+            data.appConfigId = appId;
+            data.type = 1;
+            data.disabled = true;
+            data.chatMenuConfigDTO = {
+                key: values.key,
+                value: values.value,
+                isButton: true,
+                picture: []
+            };
+
+            skillCreate(data).then((res) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '添加成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+            });
+        }
+    });
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -349,44 +404,78 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                     </IconButton>
                 }
             >
-                <div className={'w-full p-[24px] '}>
-                    <FormControl sx={{ width: '100%' }}>
-                        <InputLabel id="age-select">类型</InputLabel>
-                        <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
-                            <MenuItem value="0">文本内容</MenuItem>
-                            <MenuItem value="1">执行AI流程</MenuItem>
-                        </Select>
-                    </FormControl>
+                <div className={'w-full px-[24px] '}>
+                    <form>
+                        <FormControl fullWidth sx={{ mt: 4 }}>
+                            <InputLabel color="secondary" id="type">
+                                类型
+                            </InputLabel>
+                            <Select
+                                labelId="type"
+                                name="type"
+                                color="secondary"
+                                value={formik.values.type}
+                                onChange={formik.handleChange}
+                                label={'类型'}
+                                error={formik.touched.type && Boolean(formik.errors.type)}
+                            >
+                                <MenuItem key={1} value={1}>
+                                    菜单栏回复
+                                </MenuItem>
+                                <MenuItem key={2} value={2}>
+                                    关键字回复
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
 
-                    <TextField className={'mt-2'} fullWidth label={'关键字'} />
-                    {type === '0' ? (
+                        <TextField
+                            className={'mt-2'}
+                            fullWidth
+                            id="key"
+                            name="key"
+                            label={'关键词'}
+                            value={formik.values.key}
+                            onChange={formik.handleChange}
+                            error={formik.touched.key && Boolean(formik.errors.key)}
+                            helperText={formik.touched.key && (formik.errors.key as string)}
+                        />
                         <TextField
                             className={'mt-2'}
                             fullWidth
                             multiline={true}
                             maxRows={3}
                             minRows={3}
+                            id="value"
+                            name="value"
                             aria-valuemax={200}
                             label={'回复内容'}
+                            value={formik.values.value}
+                            onChange={formik.handleChange}
+                            error={formik.touched.value && Boolean(formik.errors.value)}
+                            helperText={formik.touched.value && (formik.errors.value as string)}
                         />
-                    ) : (
-                        <FormControl sx={{ width: '100%' }} className={'mt-2'}>
-                            <InputLabel id="age-select">选择应用</InputLabel>
-                            <Select id="columnId" name="columnId" label={'style'} fullWidth onChange={(e: any) => setType(e.target.value)}>
-                                <MenuItem value="0">
-                                    <em>文本内容</em>
-                                </MenuItem>
-                                <MenuItem value="1">
-                                    <em>执行AI流程</em>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    )}
+                    </form>
+                    <div className="text-sm mt-2">图片（最多上传9张）</div>
+                    <Upload
+                        maxCount={1}
+                        action={`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/infra/file/upload`}
+                        headers={{
+                            Authorization: 'Bearer ' + getAccessToken()
+                        }}
+                        accept=".png, .jpg, .jpeg"
+                        name="file"
+                        listType="picture-card"
+                        fileList={fileList}
+                        onChange={handleChange}
+                        className="mt-1"
+                    >
+                        {fileList.length >= 9 ? null : uploadButton}
+                    </Upload>
                 </div>
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button">
+                        <Button variant="contained" type="submit" onClick={() => formik.handleSubmit()}>
                             保存
                         </Button>
                     </Grid>
@@ -402,10 +491,12 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
  */
 export const FashionStyling = ({
     setChatBotInfo,
-    chatBotInfo
+    chatBotInfo,
+    handleSave
 }: {
     setChatBotInfo: (chatInfo: IChatInfo) => void;
     chatBotInfo: IChatInfo;
+    handleSave: () => void;
 }) => {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [voiceOpen, setVoiceOpen] = useState(false);
@@ -580,7 +671,7 @@ export const FashionStyling = ({
                                     setAppValues(chatBotInfo.introduction);
                                 }}
                             >
-                                一键优化
+                                一键AI生成
                             </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableIntroduction ? '展示' : '不展示'}</span>
                             <Switch
@@ -599,8 +690,8 @@ export const FashionStyling = ({
                             size={'small'}
                             fullWidth
                             multiline={true}
-                            maxRows={5}
-                            minRows={5}
+                            maxRows={3}
+                            minRows={3}
                             InputLabelProps={{ shrink: true }}
                             value={chatBotInfo.introduction}
                             error={(chatBotInfo?.introduction?.length || 0) > 300}
@@ -676,11 +767,11 @@ export const FashionStyling = ({
                                 onClick={() => {
                                     setTags(['Optimize Prompt', 'Chat', 'Welcome']);
                                     setAppOpen(true);
-                                    setTitle('描述语优化');
-                                    setAppValues(chatBotInfo.statement);
+                                    setTitle('欢迎语优化');
+                                    setAppValues(chatBotInfo.introduction);
                                 }}
                             >
-                                一键优化
+                                一键AI生成
                             </Button>
                             <span className={'text-#697586'}>{chatBotInfo.enableStatement ? '展示' : '不展示'}</span>
                             <Switch
@@ -711,7 +802,7 @@ export const FashionStyling = ({
                             }}
                         />
                         <div className="text-right text-stone-600 mr-1 mt-1 flex items-center justify-between">
-                            <div className="ml-1">
+                            <div className="ml-1 text-left">
                                 打开聊天窗口后会主动发送的内容，可以写一写常见提问示例。提问示例格式：#帮我写一篇产品推荐文案#
                             </div>
                             <div>{chatBotInfo?.statement?.length || 0}/300</div>
@@ -774,7 +865,7 @@ export const FashionStyling = ({
                         </div> */}
                     </div>
                     {/* <div className={'mt-5'}>
-                        <span className={'text-base'}>快捷方式</span>
+                        <span className={'text-base text-black'}>快捷方式</span>
                         <div className={'mt-3'}>
                             <Button
                                 variant={'contained'}
@@ -1017,15 +1108,20 @@ export const FashionStyling = ({
                         </div>
                     </Popover>
                 </div>
+                <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
+                    保存设置
+                </Button>
             </div>
-            <VoiceModal
-                open={voiceOpen}
-                handleClose={closeVoiceModal}
-                chatBotInfo={chatBotInfo}
-                setChatBotInfo={setChatBotInfo}
-                list={list}
-            />
-            <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />
+            {voiceOpen && (
+                <VoiceModal
+                    open={voiceOpen}
+                    handleClose={closeVoiceModal}
+                    chatBotInfo={chatBotInfo}
+                    setChatBotInfo={setChatBotInfo}
+                    list={list}
+                />
+            )}
+            {shortcutOpen && <ShortcutModal open={shortcutOpen} handleClose={() => setShortcutOpen(false)} />}
             {appOpen && <AppModal title={title} value={appValues} open={appOpen} emits={emits} tags={tags} setOpen={setAppOpen} />}
         </>
     );

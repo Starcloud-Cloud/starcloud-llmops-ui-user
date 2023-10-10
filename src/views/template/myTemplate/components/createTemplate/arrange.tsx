@@ -470,6 +470,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                                 basisChange={basisChange}
                                 index={index}
                                 allvalida={allvalida[index]}
+                                fields={item.field}
                                 setModal={(i) => {
                                     setModal(i);
                                 }}

@@ -2,8 +2,10 @@ export interface Item {
     uid: string;
     name: string;
     description: string;
-    categories: string[];
+    category: string;
     tags: string[];
+    updateTime: number;
+    creatorName: string;
     icon: string;
 }
 export interface Execute {
@@ -14,7 +16,8 @@ export interface Execute {
 export interface Details {
     name: string;
     description: string;
-    categories: string[];
+    category: string;
+    icon?: string;
     scenes: string[];
     tags: string[];
     example: string;
@@ -30,7 +33,7 @@ export interface Anyevent {
     initialValues: {
         name: string;
         description: string;
-        categories: string[];
+        category: string;
         tags: string[];
     };
     setValues: (data: { name: string; value: string | string[] }) => void;
@@ -51,6 +54,7 @@ export interface Validas {
     responent: { style: string };
     buttonLabel: string;
     index: number;
+    fields: string;
     allvalida: number | null;
     editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
     basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null; values?: boolean }) => void;

@@ -658,7 +658,12 @@
     "plus": "Plus",
     "pro": "Pro",
     "令牌": "Token",
+    "魔力值": "Magic",
     "图片": "Images",
+    "应用": "App",
+    "微信机器人": "Wechat Robot",
+    "机器人文档数": "Number Wechat Documents",
+    "机器人技能插件": "Robot Skills Plugin",
     "remaining": "Remaining"
   },
   "homepage": {
@@ -709,8 +714,8 @@
     }
   },
   "generate": {
-    "mode": "App Mode",
-    "name": "App Name",
+    "mode": "Mode",
+    "name": "Name",
     "fromScene": "From Scene",
     "totalAnswerTokens": "Total Answer Tokens",
     "messageCount": "Message Count",
@@ -722,6 +727,7 @@
     "CHAT": "Chat",
     "COMPLETION": "Completion",
     "BASE_GENERATE_IMAGE": "Base Generate Image",
+    "IMAGE": "Generate Picture",
     "detail": "Detail"
   },
   "generateLog": {

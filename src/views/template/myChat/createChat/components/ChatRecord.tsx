@@ -1,6 +1,7 @@
 import { Card, CardContent, Divider, Typography, useTheme } from '@mui/material';
 import React, { useEffect, useMemo, useRef } from 'react';
 import ChatHistory from './ChatHistory';
+import { extractChatBlocks } from './Chat';
 
 export const ChatRecord = ({ list, conversationUid }: { list: any; conversationUid: string }) => {
     const theme = useTheme();
@@ -28,7 +29,7 @@ export const ChatRecord = ({ list, conversationUid }: { list: any; conversationU
 
     const data = useMemo(() => {
         if (list) {
-            return list.map((v: any) => ({ ...v, robotName: v?.appName, robotAvatar: v?.images?.[0] }));
+            return extractChatBlocks(list.map((v: any) => ({ ...v, robotName: v?.appName, robotAvatar: v?.images?.[0] })));
         }
         return [];
     }, [list]);

@@ -44,7 +44,7 @@ export const VipBar = ({ ...others }) => {
             <MuiAppBar>
                 <Container>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
-                        <div className="cursor-pointer" onClick={() => navigate('/appMarket/list')}>
+                        <div className="cursor-pointer" onClick={() => navigate('/appMarket')}>
                             <Logo />
                         </div>
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>

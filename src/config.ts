@@ -7,7 +7,7 @@ import { ConfigProps } from 'types/config';
 // like '/berry-material-react/react/default'
 export const BASE_PATH = '';
 
-export const DASHBOARD_PATH = '/appMarket/list';
+export const DASHBOARD_PATH = '/appMarket';
 export const HORIZONTAL_MAX_ITEM = 6;
 
 const config: ConfigProps = {

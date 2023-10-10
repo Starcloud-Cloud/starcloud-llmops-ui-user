@@ -121,6 +121,7 @@ const Record: React.FC = () => {
 
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
+    const [record, setRecord] = useState<any>({});
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
@@ -303,7 +304,10 @@ const Record: React.FC = () => {
                                                 variant="text"
                                                 color="secondary"
                                                 disabled={row.status === 10 || row.status === 20}
-                                                onClick={() => handlePay(row.merchantOrderId)}
+                                                onClick={() => {
+                                                    setRecord(row);
+                                                    handlePay(row.merchantOrderId);
+                                                }}
                                             >
                                                 支付
                                             </Button>
@@ -326,7 +330,14 @@ const Record: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
-            <PayModal open={open} handleClose={() => handleClose()} url={payUrl} isTimeout={isTimeout} onRefresh={onRefresh} />
+            <PayModal
+                open={open}
+                handleClose={() => handleClose()}
+                url={payUrl}
+                isTimeout={isTimeout}
+                onRefresh={onRefresh}
+                payPrice={record.amount / 100}
+            />
             <Dialog
                 open={openPayDialog}
                 onClose={() => setOpenPayDialog(false)}

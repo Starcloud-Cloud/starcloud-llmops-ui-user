@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import wechat1 from 'assets/images/landing/wechat.png';
+import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { CardContent, CardMedia } from '@mui/material';
 
 interface CustomModalProps {
@@ -57,12 +57,12 @@ const GroupAdd: React.FC<CustomModalProps> = ({ open, handleClose }) => {
                             justifyContent: 'center'
                         }}
                     >
-                        <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }} />
+                        <CardMedia component="img" image={workWechatPay} alt="img1" sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }} />
                         <Typography id="modal-description" variant="body1" sx={{ mt: 2 }}>
                             扫码加入用户群，可获取基础免费权益包
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 2 }}>
-                            送5000字/2张图片
+                            送2魔力值/2张图片
                         </Typography>
                     </CardContent>
                 </MainCard>

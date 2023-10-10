@@ -1,18 +1,19 @@
 import Perform from './template/carryOut/perform';
 import { Card, Box, Chip, Divider, Typography } from '@mui/material';
+import { Image } from 'antd';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import AccessAlarm from '@mui/icons-material/AccessAlarm';
 import { appDetail, appExecute } from 'api/template/share';
-
 import _ from 'lodash-es';
 import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useLocation, useParams } from 'react-router-dom';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Details {
     name?: string;
     description?: string;
     categories?: string[];
+    icon?: string;
     scenes?: string[];
     tags?: string[];
     example?: string;
@@ -57,7 +58,11 @@ const IframeExecute = () => {
         }
     });
     const detailRef: any = useRef(null);
+    //token不足
+    const [tokenOpen, setTokenOpen] = useState(false);
     const [loadings, setLoadings] = useState<any[]>([]);
+    //是否显示分享翻译
+    const [isShows, setIsShow] = useState<any[]>([]);
     //类别列表
     const [categoryList, setCategoryList] = useState<any[]>([]);
     useEffect(() => {
@@ -136,23 +141,19 @@ const IframeExecute = () => {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
                 if (textDecoder.decode(value).includes('2008002007')) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.error'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            close: false
-                        })
-                    );
+                    setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
                     setLoadings(newValue1);
                     return;
                 }
                 if (done) {
+                    const newValue1 = [...loadings];
+                    newValue1[index] = false;
+                    setLoadings(newValue1);
+                    const newShow = _.cloneDeep(isShows);
+                    newShow[index] = true;
+                    setIsShow(newShow);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -166,9 +167,6 @@ const IframeExecute = () => {
                     }
                     break;
                 }
-                const newValue1 = [...loadings];
-                newValue1[index] = false;
-                setLoadings(newValue1);
                 let str = textDecoder.decode(value);
                 const lines = str.split('\n');
                 lines.forEach((message, i: number) => {
@@ -186,18 +184,31 @@ const IframeExecute = () => {
                     if (message?.startsWith('data:')) {
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
-                    if (bufferObj?.code === 200) {
+                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
                         if (!conversationUid && index === 0 && isAllExecute) {
                             conversationUid = bufferObj.conversationUid;
                         }
                         const contentData1 = _.cloneDeep(contentData);
-                        contentData.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            contentData.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
-                    } else if (bufferObj && bufferObj.code !== 200) {
+                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: bufferObj.content,
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -216,11 +227,31 @@ const IframeExecute = () => {
         };
         fetchData();
     };
+    //增加 删除 改变变量
+    const changeConfigs = (data: any) => {
+        detailRef.current = _.cloneDeep({
+            ...detail,
+            workflowConfig: data
+        });
+        setDetail(
+            _.cloneDeep({
+                ...detail,
+                workflowConfig: data
+            })
+        );
+    };
     return (
         <Card elevation={2} sx={{ p: 2 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <AccessAlarm sx={{ fontSize: '70px' }} />
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                    {detail?.icon && (
+                        <Image
+                            preview={false}
+                            className="rounded-lg overflow-hidden"
+                            height={60}
+                            src={require('../assets/images/category/' + detail?.icon + '.svg')}
+                        />
+                    )}
                     <Box>
                         <Box>
                             <Typography variant="h1" sx={{ fontSize: '2rem' }}>
@@ -238,15 +269,17 @@ const IframeExecute = () => {
                     </Box>
                 </Box>
             </Box>
-            <Divider sx={{ mb: 1 }} />
+            <Divider sx={{ my: 1 }} />
             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                 {detail?.description}
             </Typography>
             <Perform
                 config={_.cloneDeep(detailRef.current?.workflowConfig)}
                 changeSon={changeData}
+                changeConfigs={changeConfigs}
                 changeanswer={changeanswer}
                 loadings={loadings}
+                isShows={isShows}
                 variableChange={exeChange}
                 promptChange={promptChange}
                 isallExecute={(flag: boolean) => {
@@ -254,6 +287,7 @@ const IframeExecute = () => {
                 }}
                 source="myApp"
             />
+            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔力值不足'} />
         </Card>
     );
 };

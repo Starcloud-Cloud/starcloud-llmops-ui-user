@@ -56,6 +56,7 @@ service.interceptors.request.use(
         if (getAccessToken() && !isToken) {
             (config as Recordable).headers.Authorization = 'Bearer ' + getAccessToken(); // 让每个请求携带自定义token
         }
+
         // 设置租户
         if (tenantEnable && tenantEnable === 'true') {
             const tenantId = getTenantId();
@@ -174,7 +175,7 @@ service.interceptors.response.use(
             return Promise.reject('error');
         } else if (code !== 200 && code !== 0) {
             PubSub.publish('global.error', { message: msg, type: 'error' });
-            return Promise.reject('error');
+            return Promise.reject(data);
         } else {
             return data;
         }

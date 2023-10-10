@@ -33,8 +33,6 @@ const chatBot = () => {
     const [showSelect, setShowSelect] = useState(false);
     const [list, setList] = useState<any[]>([]);
 
-    console.log(mUid, 'mUid');
-
     useEffect(() => {
         if (mediumUid) {
             const result = mediumUid?.split('|');
@@ -68,6 +66,7 @@ const chatBot = () => {
             (async () => {
                 const res = await getChatDetail(mUid);
                 setChatBotInfo({
+                    uid: res.uid,
                     name: res.name,
                     avatar: res?.images?.[0],
                     introduction: res.description, // 简介
@@ -78,7 +77,8 @@ const chatBot = () => {
                     temperature: res.chatConfig.modelConfig?.completionParams?.temperature,
                     defaultImg: res?.images?.[0],
                     enableSearchInWeb: res.chatConfig?.webSearchConfig?.enabled,
-                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope
+                    searchInWeb: res.chatConfig?.webSearchConfig?.webScope,
+                    modelProvider: res?.chatConfig?.modelConfig?.provider === 'openai' ? 'GPT35' : res?.chatConfig?.modelConfig?.provider
                 });
             })();
         }
@@ -110,6 +110,7 @@ const chatBot = () => {
                 statisticsMode={statisticsMode}
                 showSelect={showSelect}
                 botList={list}
+                setChatBotInfo={setChatBotInfo}
             />
         </div>
     );

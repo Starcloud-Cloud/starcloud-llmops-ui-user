@@ -5,6 +5,7 @@ import { useRoutes } from 'react-router-dom';
 import LoginRoutes from './LoginRoutes';
 import MainRoutes from './MainRoutes';
 // import AuthenticationRoutes from './AuthenticationRoutes';
+import { ShareChat } from '../views/chat/share/index';
 import useRouteStore from 'store/router';
 import Loadable from 'ui-component/Loadable';
 import AuthenticationRoutes from './AuthenticationRoutes';
@@ -28,6 +29,7 @@ export default function ThemeRoutes() {
         { path: '/cb_i/:mediumUid', element: <PagesChatBot /> },
         { path: '/cb_js/:mediumUid', element: <PagesChatBot /> },
         { path: '/cb_web/:mediumUid', element: <PagesChatBot /> },
+        { path: '/share_cb/:shareKey', element: <ShareChat /> },
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
         AuthenticationRoutes,

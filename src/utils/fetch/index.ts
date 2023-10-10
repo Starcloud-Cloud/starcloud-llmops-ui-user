@@ -34,6 +34,7 @@ export default function fetchRequest(url: string, method: string, body: any, hea
                 resolve(data);
             })
             .catch((error) => {
+                console.log(error, 'error');
                 clearTimeout(timer); // 请求失败时，清除计时器
                 reject(error);
             });

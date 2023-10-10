@@ -11,6 +11,7 @@ import { Item } from 'types/template';
 import { Confirm } from 'ui-component/Confirm';
 import SubCard from 'ui-component/cards/SubCard';
 import FormDialogNew from './FormDialogNew';
+import formatDate from 'hooks/useDate';
 import './textnoWarp.scss';
 import dayjs from 'dayjs';
 function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (pre: any) => any }) {
@@ -29,7 +30,12 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
     };
 
     const handleCreateNew = async (uid: string) => {
-        const res = await createChat({ robotName: robotName, uid });
+        let res;
+        if (uid === 'temp_blank') {
+            res = await createChat({ robotName: robotName, uid: '' });
+        } else {
+            res = await createChat({ robotName: robotName, uid });
+        }
         setOpenNew(false);
         navigate(`/createChat?appId=${res}`);
     };
@@ -60,7 +66,7 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
             {appList?.map((data: any) => (
                 <>
                     <Grid key={data.uid} item xs={12} md={6} className="relative">
-                        <SubCard sx={{ height: 150, cursor: 'pointer', padding: 0 }}>
+                        <SubCard sx={{ height: 150, cursor: 'pointer', padding: '0 !important', position: 'relative' }}>
                             <Box
                                 onClick={() => {
                                     navigate('/createChat?appId=' + data?.uid);
@@ -68,15 +74,28 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                 display="flex"
                                 alignItems="center"
                             >
-                                <div className=" w-[100px] h-[100px] flex justify-center items-center outline outline-1  outline-offset-2 outline-[#6839b7] rounded-full">
+                                <div className="w-[100px] h-[100px] flex justify-center items-center outline outline-1  outline-offset-2 outline-[#6839b7] rounded-full">
                                     <img className="object-cover rounded-full w-[100px] h-[100px]" src={data?.images?.[0]} alt="icon" />
                                 </div>
                                 <Box marginLeft="20px" className="flex  flex-col flex-1">
-                                    <Tooltip title={data.name}>
-                                        <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px]">
-                                            {data?.name}
-                                        </Typography>
-                                    </Tooltip>
+                                    <div className="flex items-center justify-start">
+                                        <Tooltip title={data.name}>
+                                            <Typography variant="h3" noWrap mb={0.5} className="text-[#0009] mb-[8px] line-clamp-1">
+                                                {data?.name}
+                                            </Typography>
+                                        </Tooltip>
+                                        {/* <div
+                                            className="flex items-center text-[#666] text-sm hover:text-[#6839b7] absolute top-[30px] right-[15px]"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDialogOpen(true);
+                                                setCurrentUid(data.uid);
+                                            }}
+                                        >
+                                            <DeleteIcon className="text-sm" />
+                                            <span>删除</span>
+                                        </div> */}
+                                    </div>
                                     <Typography
                                         sx={{ lineHeight: '1.2rem', height: '53px' }}
                                         className="cursor desc"
@@ -86,35 +105,21 @@ function MyselfTemplate({ appList, setUpdate }: { appList: Item[]; setUpdate: (p
                                     >
                                         {data.description}
                                     </Typography>
-                                    <div className="flex justify-between flex-col sm:flex-row pt-[3] relative top-[10px]">
+                                    <div className="flex justify-between flex-col sm:flex-row relative top-[10px]">
                                         <div className="flex">
                                             <div className="flex items-center text-[#666] text-sm hover:text-[#6839b7]">
                                                 <ModeEditIcon className="text-sm" />
                                                 <span>编辑</span>
                                             </div>
-                                            <div
-                                                className="flex items-center text-[#666] ml-3 text-sm hover:text-[#6839b7]"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDialogOpen(true);
-                                                    setCurrentUid(data.uid);
-                                                }}
-                                            >
-                                                <DeleteIcon className="text-sm" />
-                                                <span>删除</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex">
-                                            <div className="flex items-center text-[#666] text-sm ">
-                                                <span>{data.updaterName}</span>
-                                            </div>
-                                            <div className="flex items-center text-[#666] text-sm">
-                                                /<span>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD')}</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </Box>
                             </Box>
+                            <Tooltip placement="top" title="创建者/修改时间">
+                                <Typography fontWeight={500} position="absolute" bottom={5} right={10} fontSize="12px">
+                                    {data.creatorName}/{formatDate(data?.updateTime)}
+                                </Typography>
+                            </Tooltip>
                         </SubCard>
                     </Grid>
                 </>

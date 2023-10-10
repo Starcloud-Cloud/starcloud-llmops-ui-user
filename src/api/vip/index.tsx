@@ -36,3 +36,7 @@ export const getOrderRecord = (data: any) => {
 export const getOrderIsPay = (data: any) => {
     return request.post({ url: '/llm/pay/order/is-success', data });
 };
+
+export const getVipTimeOut = () => {
+    return request.post({ url: '/llm/user-benefits/expiredReminder' });
+};

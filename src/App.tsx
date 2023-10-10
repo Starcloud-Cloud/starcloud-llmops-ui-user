@@ -20,6 +20,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import usePubSubEvent from 'hooks/usePubsub';
 import { ConfigProvider } from 'antd';
+
 // import { t } from 'hooks/web/useI18n';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 // import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
@@ -58,7 +59,6 @@ const App = () => {
     });
 
     // if (!loading) return <Loader />;
-
     return (
         <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }} locale={zhCN}>
             <ThemeCustomization>

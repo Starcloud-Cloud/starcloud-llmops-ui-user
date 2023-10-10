@@ -15,8 +15,15 @@ import {
     Paper,
     Pagination,
     Tooltip,
-    Switch
+    Switch,
+    Tabs,
+    Tab,
+    TextField
 } from '@mui/material';
+import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
+import { styled } from '@mui/material/styles';
+import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { InputNumber } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -31,10 +38,22 @@ import {
     Monitor,
     Api
 } from '@mui/icons-material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import formatDate from 'hooks/useDate';
-import { publishCreate, publishOperate, publishPage, getLatest, changeStatus, channelCreate, addFriend } from 'api/template';
+import {
+    publishCreate,
+    publishOperate,
+    publishPage,
+    getLatest,
+    changeStatus,
+    channelCreate,
+    addFriend,
+    getLimit,
+    createLimit,
+    modifyLimit
+} from 'api/template';
 import CreateSiteModal from './components/CreateSiteModal';
 import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
@@ -43,8 +62,71 @@ import DomainModal from './components/DomainModal';
 import WPAccountModal from './components/WPAccountModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
+import userInfoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
-function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveState: number; saveDetail: () => void; mode?: 'CHAT' }) {
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+}
+type FrequencyData = {
+    timeInterval?: number | null;
+    threshold?: number | null;
+    message?: string;
+    enable?: boolean;
+};
+type Account = {
+    timeInterval?: number | null;
+    threshold?: number | null;
+    message?: string;
+    enable?: boolean;
+};
+type AdvertisingConfig = {
+    threshold?: number | null;
+    message?: string;
+    enable?: boolean;
+};
+function CustomTabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
+            {value === index && (
+                <Box sx={{ py: 2 }}>
+                    <Box>{children}</Box>
+                </Box>
+            )}
+        </div>
+    );
+}
+
+function a11yProps(index: number) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`
+    };
+}
+const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)({
+    [`& .${tooltipClasses.tooltip}`]: {
+        maxWidth: 500
+    }
+});
+function Upload({
+    appUid,
+    saveState,
+    saveDetail,
+    mode,
+    getStatus,
+    handleSave
+}: {
+    appUid: string;
+    saveState: number;
+    saveDetail: () => void;
+    mode?: 'CHAT';
+    getStatus: (data: boolean) => void;
+    handleSave?: () => void;
+}) {
+    const { userInfo }: any = userInfoStore();
     const defaultUpLoadList = [
         {
             title: '网页',
@@ -83,11 +165,28 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             icon: 'qiyeweixin',
             desc: '在微信群聊中提供机器人服务',
             // enable: true,
+            chat: true,
             enableValue: false,
             comingSoon: false,
             type: 5,
             action: [
-                { title: '创建群聊', icon: 'contentPaste', onclick: () => setOpenWchat(true) },
+                {
+                    title: '创建群聊',
+                    icon: 'contentPaste',
+                    onclick: () => {
+                        userInfo.benefits.map((value: any) => {
+                            if (value.name === '微信机器人') {
+                                if (value.totalNum === -1) {
+                                    setOpenWchat(true);
+                                } else if (updateBtn.channelMap[7].length < value.totalNum) {
+                                    setOpenWchat(true);
+                                } else {
+                                    setBotOpen(true);
+                                }
+                            }
+                        });
+                    }
+                },
                 {
                     title: '查看群聊',
                     icon: 'historyOutlined',
@@ -132,12 +231,53 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     const [openDrawer, setOpenDrawer] = useState(false);
     const [openDomain, setOpenDomain] = useState(false);
     const [openCopySite, setOpenCopySite] = useState(false);
-    const [upLoadList, setUpLoadList] = useState(defaultUpLoadList);
+    const [upLoadList, setUpLoadList] = useState<any[]>(defaultUpLoadList);
     const [webMediumUid, setWebMediumUid] = useState('');
     const webMediumUidRef = useRef();
     const [openWchat, setOpenWchat] = useState(false);
     const [openWeDrawer, setOpenWeDrawer] = useState(false);
+    const [botOpen, setBotOpen] = useState(false);
     const [openWPAccount, setOpenWPAccount] = useState(false);
+    //tabs
+    const [tabValue, setTabValue] = useState(0);
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+    };
+    //Limit
+    const [allData, setAllData] = useState<any>({});
+    const [frequencyData, setFrequencyData] = useState<FrequencyData>({});
+    const [account, setAccount] = useState<Account>({});
+    const [advertisingConfig, setAdvertisingConfig] = useState<AdvertisingConfig>({});
+    //获取发布设置
+    const getLimitList = async (data: any) => {
+        const { appUid, uid } = data;
+        const res = await getLimit({ appUid, publishUid: uid });
+        setAllData(res);
+        setFrequencyData(res.rateConfig);
+        setAccount(res.userRateConfig);
+        setAdvertisingConfig(res.advertisingConfig);
+    };
+    //保存发布设置
+    const saveSetting = async () => {
+        if (allData.uid) {
+            const res = await modifyLimit({
+                ..._.cloneDeep(allData),
+                advertisingConfig: { ...advertisingConfig },
+                rateConfig: { ...frequencyData },
+                userRateConfig: { ...account }
+            });
+            getLimitList(updateBtn);
+        } else {
+            const res = await createLimit({
+                ..._.cloneDeep(allData),
+                advertisingConfig: { ...advertisingConfig },
+                rateConfig: { ...frequencyData },
+                userRateConfig: { ...account }
+            });
+            getLimitList(updateBtn);
+        }
+    };
+
     const IconList: { [key: string]: any } = {
         monitor: <Monitor color="secondary" />,
         code: <Code color="secondary" />,
@@ -208,7 +348,9 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
     }, [appUid]);
     const getUpdateBtn = () => {
         getLatest(appUid).then((res) => {
+            getLimitList(res);
             setUpdateBtn(res);
+            getStatus(res.needUpdate);
             setReleaseState(res.auditTag);
         });
     };
@@ -234,12 +376,15 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
         needTips: true,
         isFirstCreatePublishRecord: true
     });
+    useEffect(() => {
+        setUpLoadList([...defaultUpLoadList]);
+    }, [updateBtn]);
     const [tableData, setTableData] = useState([]);
     //保存按钮是否触发更新
     const [updateBtnSate, setUpdateBtnSate] = useState(false);
     const handleUpdate = () => {
-        setUpdateBtnSate(true);
         saveDetail();
+        setUpdateBtnSate(true);
     };
     //发布到市场
     const uploadMarket = async () => {
@@ -445,96 +590,341 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
             );
         }
     };
-
     const permissions = useUserStore((state) => state.permissions);
+
     return (
         <Box>
-            <SubCard
-                sx={{ p: 2, mb: 4 }}
-                contentSX={{ minHeight: '50px', p: '0 !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-                <Box>
-                    <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                        点击[更新]按钮保存设置以便发布。
-                        <Tooltip title="每次编辑后，可先验证结果满足需求后，再点击更新。点击更新后，会把修改的配置同步到不同的发布渠道上">
-                            <Error fontSize="small" />
-                        </Tooltip>
-                    </Typography>
-                    {updateBtn?.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
-                        <Box fontSize={12} mt="12px">
-                            更新所有发布渠道上的设置。
-                        </Box>
-                    )}
-                    {updateBtn.needUpdate && (
-                        <Box fontSize={12} mt="12px" display="flex" alignItems="center">
-                            <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到未保存的设置。最后更新日期:
-                            <Typography color="secondary">
-                                {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
-                            </Typography>
-                        </Box>
-                    )}
-                    {updateBtn && !updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
-                        <Box fontSize={12} mt="12px" display="flex" alignItems="center">
-                            <CheckCircle color="success" sx={{ fontSize: '14px' }} /> 所有设置已更新!最后一次更新日期：
-                            <Typography color="secondary">
-                                {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
-                            </Typography>
-                        </Box>
-                    )}
-                </Box>
-                <Button disabled={!updateBtn?.needUpdate} color="secondary" variant="outlined" onClick={handleUpdate}>
-                    更新
-                </Button>
-            </SubCard>
-            {/* <Typography mb={3}>
+            <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
+                <Tab label="发布渠道" {...a11yProps(0)} />
+                <Tab label="发布设置" {...a11yProps(1)} />
+            </Tabs>
+            <CustomTabPanel value={tabValue} index={1}>
                 <span
                     className={
                         "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
                     }
+                    style={{ display: 'flex', alignItems: 'center' }}
                 >
-                    基础
+                    用量限制
+                    <CustomWidthTooltip
+                        sx={{
+                            [`& .${tooltipClasses.tooltip}`]: {
+                                maxWidth: 500
+                            }
+                        }}
+                        placement="top"
+                        title={
+                            <>
+                                <Typography>限制将作用于当前机器人，同一设备同一浏览器访问时识别为一名用户</Typography>
+                                <Typography>在后台测试时的对话量不在限制范围内</Typography>
+                                <Typography>超出后的回复不扣权益</Typography>
+                            </>
+                        }
+                    >
+                        <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    </CustomWidthTooltip>
+                    <Typography ml={1} fontSize="12px" color="#697586">
+                        调试模式下不生效
+                    </Typography>
                 </span>
-            </Typography> */}
-            <Grid container spacing={2}>
-                {permissions.includes('chat.publish.market') && (
+                <Grid container spacing={2}>
                     <Grid item md={6} xs={12}>
-                        <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
+                        <SubCard sx={{ position: 'relative' }} title="按使用频率">
                             <Box>
-                                <Box
-                                    width="40px"
-                                    height="40px"
-                                    borderRadius="50%"
-                                    sx={{ background: '#673ab74f' }}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                >
-                                    <Storefront color={'secondary'} />
-                                </Box>
+                                每隔
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    controls={true}
+                                    value={frequencyData.timeInterval}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, timeInterval: value })}
+                                />
+                                秒， 只能发送
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    value={frequencyData.threshold}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setFrequencyData({ ...frequencyData, threshold: value })}
+                                />
+                                条
                             </Box>
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    应用市场
-                                    <Chip
-                                        sx={{ ml: 1.5 }}
-                                        size="small"
-                                        label={
-                                            releaseState === 0
-                                                ? '未发布'
-                                                : releaseState === 1
-                                                ? '待审核'
-                                                : releaseState === 2
-                                                ? '审核通过'
-                                                : releaseState === 3
-                                                ? '审核未通过'
-                                                : releaseState === 4
-                                                ? '用户已取消'
-                                                : '已失效'
-                                        }
-                                    />
+                            <Box mt={3} mb={2}>
+                                超出默认回复
+                            </Box>
+                            <Box>
+                                <TextField
+                                    size="small"
+                                    defaultValue="当前咨询用户过多，请排队等候"
+                                    value={frequencyData.message}
+                                    onChange={(e) => setFrequencyData({ ...frequencyData, message: e.target.value })}
+                                    color="secondary"
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="9px" right="8px">
+                                <Switch
+                                    checked={frequencyData.enable}
+                                    onChange={() => {
+                                        setFrequencyData({
+                                            ...frequencyData,
+                                            enable: !frequencyData.enable
+                                        });
+                                    }}
+                                />
+                            </Box>
+                        </SubCard>
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                        <SubCard sx={{ position: 'relative' }} title="按使用量">
+                            <Box>
+                                每隔
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    controls={true}
+                                    value={account.timeInterval}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setAccount({ ...account, timeInterval: value })}
+                                />
+                                秒， 只能发送
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    value={account.threshold}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setAccount({ ...account, threshold: value })}
+                                />
+                                条
+                            </Box>
+                            <Box mt={3} mb={2}>
+                                超出默认回复
+                            </Box>
+                            <Box>
+                                <TextField
+                                    size="small"
+                                    defaultValue="抱歉，您已经达到最大对话上限"
+                                    onChange={(e) => {
+                                        setAccount({
+                                            ...account,
+                                            message: e.target.value
+                                        });
+                                    }}
+                                    value={account.message}
+                                    color="secondary"
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="9px" right="8px">
+                                <Switch
+                                    checked={account.enable}
+                                    onChange={() => {
+                                        setAccount({
+                                            ...account,
+                                            enable: !account.enable
+                                        });
+                                    }}
+                                />
+                            </Box>
+                        </SubCard>
+                    </Grid>
+                </Grid>
+                <span
+                    className={
+                        "!mt-[30px] before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
+                    }
+                    style={{ display: 'flex', alignItems: 'center' }}
+                >
+                    对话广告
+                    <CustomWidthTooltip
+                        sx={{
+                            [`& .${tooltipClasses.tooltip}`]: {
+                                maxWidth: 500
+                            }
+                        }}
+                        placement="top"
+                        title={
+                            <>
+                                <Typography>广告将作用于当前机器人，同一设备同一浏览器访问时识别为一名用户</Typography>
+                                <Typography>当用户进行对话时，可插入自己的品牌和内容</Typography>
+                            </>
+                        }
+                    >
+                        <ErrorOutlineIcon sx={{ fontSize: '18px', ml: 0.5 }} />
+                    </CustomWidthTooltip>
+                    <Typography ml={1} fontSize="12px" color="#697586">
+                        调试模式下不生效
+                    </Typography>
+                </span>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <SubCard sx={{ position: 'relative' }} title="按使用量">
+                            <Box>
+                                每个用户每隔
+                                <InputNumber
+                                    style={{ margin: '0 10px' }}
+                                    min={0}
+                                    max={60}
+                                    value={advertisingConfig.threshold}
+                                    defaultValue={60}
+                                    onChange={(value: number | null) => setAdvertisingConfig({ ...advertisingConfig, threshold: value })}
+                                />
+                                条，展示一次广告
+                            </Box>
+                            <Box mt={3} mb={2}>
+                                超出默认回复
+                            </Box>
+                            <Box>
+                                <TextField
+                                    multiline
+                                    minRows={2}
+                                    size="small"
+                                    value={advertisingConfig.message}
+                                    onChange={(e) => {
+                                        setAdvertisingConfig({
+                                            ...advertisingConfig,
+                                            message: e.target.value
+                                        });
+                                    }}
+                                    color="secondary"
+                                    fullWidth
+                                />
+                            </Box>
+                            <Box position="absolute" top="9px" right="8px">
+                                <Switch
+                                    checked={advertisingConfig.enable}
+                                    onChange={() => {
+                                        setAdvertisingConfig({
+                                            ...advertisingConfig,
+                                            enable: !advertisingConfig.enable
+                                        });
+                                    }}
+                                />
+                            </Box>
+                        </SubCard>
+                    </Grid>
+                </Grid>
+                <Button onClick={saveSetting} sx={{ mt: 6 }} color="secondary" variant="contained">
+                    保存设置
+                </Button>
+            </CustomTabPanel>
+            <CustomTabPanel value={tabValue} index={0}>
+                <SubCard
+                    sx={{ p: 2, mb: 4 }}
+                    contentSX={{
+                        minHeight: '50px',
+                        p: '0 !important',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Box>
+                        <Typography fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                            点击[更新渠道]按钮保存当前设置，以便同步修改到各个渠道。
+                            <Tooltip
+                                placement="top"
+                                title="每次编辑后，可先验证结果满足需求后，再点击更新渠道。点击更新渠道后，会把修改的配置同步到不同的发布渠道上"
+                            >
+                                <Error sx={{ cursor: 'pointer' }} fontSize="small" />
+                            </Tooltip>
+                        </Typography>
+                        {updateBtn?.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
+                            <Box fontSize={12} mt="12px">
+                                更新所有发布渠道上的设置。
+                            </Box>
+                        )}
+                        {updateBtn.needUpdate && (
+                            <Box fontSize={12} mt="12px" display="flex" alignItems="center">
+                                <Error color="warning" sx={{ fontSize: '14px' }} /> 检测到还未更新渠道的设置。配置最后更新日期:
+                                <Typography color="secondary">
+                                    {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
+                                </Typography>
+                                需要点击[更新渠道]来同步配置。
+                            </Box>
+                        )}
+                        {updateBtn && !updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate && (
+                            <Box fontSize={12} mt="12px" display="flex" alignItems="center">
+                                <CheckCircle color="success" sx={{ fontSize: '14px' }} /> 所有设置已更新!最后一次更新日期：
+                                <Typography color="secondary">
+                                    {updateBtn.appLastUpdateTime && formatDate(updateBtn.appLastUpdateTime)}
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
+                    <Button disabled={!updateBtn?.needUpdate} color="secondary" variant="outlined" onClick={handleUpdate}>
+                        更新渠道
+                    </Button>
+                </SubCard>
+                <Grid container display="flex" spacing={2}>
+                    {(permissions.includes('chat.publish.market') || mode !== 'CHAT') && (
+                        <Grid flex={1} item md={6} xs={12}>
+                            <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
+                                <Box>
+                                    <Box
+                                        width="40px"
+                                        height="40px"
+                                        borderRadius="50%"
+                                        sx={{ background: '#673ab74f' }}
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                    >
+                                        <Storefront color={'secondary'} />
+                                    </Box>
+                                </Box>
+                                <Box ml={2}>
+                                    <Typography
+                                        component="div"
+                                        fontSize={16}
+                                        fontWeight={500}
+                                        display="flex"
+                                        alignItems="center"
+                                        flexWrap="wrap"
+                                    >
+                                        {mode === 'CHAT' ? '员工广场' : '应用市场'}
+
+                                        <Chip
+                                            sx={{ mx: 1.5 }}
+                                            size="small"
+                                            label={
+                                                releaseState === 0
+                                                    ? '未发布'
+                                                    : releaseState === 1
+                                                    ? '待审核'
+                                                    : releaseState === 2
+                                                    ? '审核通过'
+                                                    : releaseState === 3
+                                                    ? '审核未通过'
+                                                    : releaseState === 4
+                                                    ? '用户已取消'
+                                                    : '已失效'
+                                            }
+                                        />
+                                        {updateBtn?.needTips && (
+                                            <Chip
+                                                sx={{ mt: 1, display: { lg: 'block', md: 'none', xs: 'none' } }}
+                                                size="small"
+                                                color="warning"
+                                                label={
+                                                    updateBtn.needTips && releaseState === 1
+                                                        ? '检测到应用已经更新：建议更新重新发布'
+                                                        : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
+                                                        ? '需要更新后才能发布'
+                                                        : '检测到应用已经更新：需要更新重新发布'
+                                                }
+                                                variant="outlined"
+                                            />
+                                        )}
+                                    </Typography>
                                     {updateBtn?.needTips && (
                                         <Chip
-                                            sx={{ ml: 1.5, display: { lg: 'block', md: 'none', xs: 'none' } }}
+                                            sx={{ mt: '10px', display: { lg: 'none', md: 'block' } }}
                                             size="small"
                                             color="warning"
                                             label={
@@ -547,248 +937,289 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                                             variant="outlined"
                                         />
                                     )}
-                                </Typography>
-                                {updateBtn?.needTips && (
-                                    <Chip
-                                        sx={{ mt: '10px', display: { lg: 'none', md: 'block' } }}
-                                        size="small"
-                                        color="warning"
-                                        label={
-                                            updateBtn.needTips && releaseState === 1
-                                                ? '检测到应用已经更新：建议更新重新发布'
-                                                : updateBtn.needTips && releaseState === 0 && updateBtn.isFirstCreatePublishRecord
-                                                ? '需要更新后才能发布'
-                                                : '检测到应用已经更新：需要更新重新发布'
-                                        }
-                                        variant="outlined"
-                                    />
-                                )}
-                                <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
-                                    用户可在模板市场中下载你上传的应用
-                                </Typography>
-                                <Box display="flex">
-                                    <Box
-                                        color="#b5bed0"
-                                        fontSize="12px"
-                                        display="flex"
-                                        alignItems="center"
-                                        mr={2}
-                                        sx={{
-                                            cursor:
-                                                !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                    ? 'pointer'
-                                                    : 'default',
-                                            '&:hover': {
-                                                color:
+                                    <Typography minHeight="32px" margin="10px 0 10px" lineHeight="16px" color="#9da3af">
+                                        {mode === 'CHAT' ? '用户可在员工广场中使用你发布的机器人' : '用户可在员工广场中使用你发布的应用'}
+                                    </Typography>
+                                    <Box display="flex">
+                                        <Box
+                                            color="#b5bed0"
+                                            fontSize="12px"
+                                            display="flex"
+                                            alignItems="center"
+                                            mr={2}
+                                            sx={{
+                                                cursor:
                                                     !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
-                                                        ? '#673ab7'
-                                                        : 'none'
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
-                                                uploadMarket();
-                                            }
-                                        }}
-                                    >
-                                        <CloudUploadOutlined sx={{ fontSize: '12px' }} />
-                                        <span style={{ marginLeft: '8px' }}>{!updateBtn?.showPublish ? '取消发布' : '发布到模板市场'}</span>
-                                    </Box>
-                                    <Box
-                                        color="#b5bed0"
-                                        fontSize="12px"
-                                        display="flex"
-                                        alignItems="center"
-                                        flexWrap="wrap"
-                                        mr={2}
-                                        sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
-                                        onClick={marketRecord}
-                                    >
-                                        <Box whiteSpace="nowrap">
-                                            <HistoryOutlined sx={{ fontSize: '12px' }} />
-                                            <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                                        ? 'pointer'
+                                                        : 'default',
+                                                '&:hover': {
+                                                    color:
+                                                        !updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)
+                                                            ? '#673ab7'
+                                                            : 'none'
+                                                }
+                                            }}
+                                            onClick={() => {
+                                                if (!updateBtn?.showPublish || (updateBtn?.showPublish && updateBtn?.enablePublish)) {
+                                                    uploadMarket();
+                                                }
+                                            }}
+                                        >
+                                            <CloudUploadOutlined sx={{ fontSize: '12px' }} />
+                                            <span style={{ marginLeft: '8px' }}>
+                                                {!updateBtn?.showPublish
+                                                    ? '取消发布'
+                                                    : mode === 'CHAT'
+                                                    ? '发布到员工广场'
+                                                    : '发布到模板市场'}
+                                            </span>
+                                        </Box>
+                                        <Box
+                                            color="#b5bed0"
+                                            fontSize="12px"
+                                            display="flex"
+                                            alignItems="center"
+                                            flexWrap="wrap"
+                                            mr={2}
+                                            sx={{ cursor: 'pointer', '&:hover': { color: '#673ab7' } }}
+                                            onClick={marketRecord}
+                                        >
+                                            <Box whiteSpace="nowrap">
+                                                <HistoryOutlined sx={{ fontSize: '12px' }} />
+                                                <span style={{ marginLeft: '8px' }}>发布历史记录</span>
+                                            </Box>
                                         </Box>
                                     </Box>
                                 </Box>
-                            </Box>
-                        </SubCard>
-                    </Grid>
-                )}
-                {upLoadList.map((item) => (
-                    <Grid key={item.title} item md={6} xs={12}>
-                        <SubCard contentSX={{ minHeight: '140px', p: '20px', display: 'flex' }}>
-                            <Box>
-                                <Box
-                                    width="40px"
-                                    height="40px"
-                                    borderRadius="50%"
-                                    sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
+                            </SubCard>
+                        </Grid>
+                    )}
+                    {upLoadList.map((item) =>
+                        item.title === '微信群聊' ? (
+                            mode === 'CHAT' && (
+                                <Grid key={item.title} flex={1} item md={6} xs={12}>
+                                    <SubCard
+                                        sx={{ height: '100%' }}
+                                        contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}
+                                    >
+                                        <Box>
+                                            <Box
+                                                width="40px"
+                                                height="40px"
+                                                borderRadius="50%"
+                                                sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                            >
+                                                {IconList[item.icon]}
+                                                {!IconList[item.icon] && (
+                                                    <img
+                                                        style={{ width: '25px', height: '25px' }}
+                                                        src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
+                                                        alt=""
+                                                    />
+                                                )}
+                                            </Box>
+                                        </Box>
+                                        <Box ml={2} className="w-full">
+                                            <div className="flex justify-between items-center">
+                                                <Typography
+                                                    component="div"
+                                                    fontSize={16}
+                                                    fontWeight={500}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                >
+                                                    {item.title}
+                                                    {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                                </Typography>
+                                                <div>
+                                                    {item.enable && (
+                                                        <>
+                                                            <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
+                                                            <Switch
+                                                                disabled={updateBtn.isFirstCreatePublishRecord}
+                                                                size={'small'}
+                                                                color={'secondary'}
+                                                                checked={item.enableValue}
+                                                                onChange={() => handleSwitch(item)}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
+                                                {item.desc}
+                                            </Typography>
+                                            <Box display="flex">
+                                                {item.action.map((el: any, i: number) =>
+                                                    item.type === 2 ? (
+                                                        <Box
+                                                            key={i}
+                                                            color="#b5bed0"
+                                                            fontSize="12px"
+                                                            display="flex"
+                                                            flexWrap="wrap"
+                                                            alignItems="center"
+                                                            mr={2}
+                                                            onClick={() => {
+                                                                if (item.enableValue) el.onclick();
+                                                            }}
+                                                            className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                        >
+                                                            <Box whiteSpace="nowrap">
+                                                                {IconList[el.icon]}
+                                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                            </Box>
+                                                        </Box>
+                                                    ) : (
+                                                        <Box
+                                                            key={i}
+                                                            color="#b5bed0"
+                                                            fontSize="12px"
+                                                            display="flex"
+                                                            flexWrap="wrap"
+                                                            alignItems="center"
+                                                            mr={2}
+                                                            onClick={() => {
+                                                                if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                                    el.onclick();
+                                                                } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                                    el.onclick();
+                                                                }
+                                                            }}
+                                                            className={`${
+                                                                (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                                (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                                    ? 'cursor-pointer hover:text-purple-500'
+                                                                    : ''
+                                                            }`}
+                                                        >
+                                                            <Box whiteSpace="nowrap">
+                                                                {IconList[el.icon]}
+                                                                <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                            </Box>
+                                                        </Box>
+                                                    )
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </SubCard>
+                                </Grid>
+                            )
+                        ) : (
+                            <Grid key={item.title} flex={1} item md={6} xs={12}>
+                                <SubCard
+                                    sx={{ height: '100%' }}
+                                    contentSX={{ minHeight: '140px', height: '100%', p: '20px', display: 'flex' }}
                                 >
-                                    {IconList[item.icon]}
-                                    {!IconList[item.icon] && (
-                                        <img
-                                            style={{ width: '25px', height: '25px' }}
-                                            src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
-                                            alt=""
-                                        />
-                                    )}
-                                </Box>
-                            </Box>
-                            <Box ml={2} className="w-full">
-                                <div className="flex justify-between items-center">
-                                    <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                        {item.title}
-                                        {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
-                                    </Typography>
-                                    <div>
-                                        {item.enable && (
-                                            <>
-                                                <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
-                                                <Switch
-                                                    disabled={updateBtn.isFirstCreatePublishRecord}
-                                                    size={'small'}
-                                                    color={'secondary'}
-                                                    checked={item.enableValue}
-                                                    onChange={() => handleSwitch(item)}
+                                    <Box>
+                                        <Box
+                                            width="40px"
+                                            height="40px"
+                                            borderRadius="50%"
+                                            sx={item.comingSoon ? { background: '#f2f3f5' } : { background: '#673ab74f' }}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                        >
+                                            {IconList[item.icon]}
+                                            {!IconList[item.icon] && (
+                                                <img
+                                                    style={{ width: '25px', height: '25px' }}
+                                                    src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
+                                                    alt=""
                                                 />
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                                <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
-                                    {item.desc}
-                                </Typography>
-                                <Box display="flex">
-                                    {item.action.map((el: any, i) =>
-                                        item.type === 2 ? (
-                                            <Box
-                                                key={i}
-                                                color="#b5bed0"
-                                                fontSize="12px"
-                                                display="flex"
-                                                flexWrap="wrap"
-                                                alignItems="center"
-                                                mr={2}
-                                                onClick={() => {
-                                                    if (item.enableValue) el.onclick();
-                                                }}
-                                                className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
-                                            >
-                                                <Box whiteSpace="nowrap">
-                                                    {IconList[el.icon]}
-                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
-                                                </Box>
-                                            </Box>
-                                        ) : (
-                                            <Box
-                                                key={i}
-                                                color="#b5bed0"
-                                                fontSize="12px"
-                                                display="flex"
-                                                flexWrap="wrap"
-                                                alignItems="center"
-                                                mr={2}
-                                                onClick={() => {
-                                                    if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
-                                                        el.onclick();
-                                                    } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
-                                                        el.onclick();
-                                                    }
-                                                }}
-                                                className={`${
-                                                    (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
-                                                    (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
-                                                        ? 'cursor-pointer hover:text-purple-500'
-                                                        : ''
-                                                }`}
-                                            >
-                                                <Box whiteSpace="nowrap">
-                                                    {IconList[el.icon]}
-                                                    <span style={{ marginLeft: '8px' }}>{el.title}</span>
-                                                </Box>
-                                            </Box>
-                                        )
-                                    )}
-                                </Box>
-                            </Box>
-                        </SubCard>
-                    </Grid>
-                ))}
-            </Grid>
-
-            {/*
-             <Typography mt={4} mb={3}>
-                <span
-                    className={
-                        "before:bg-[#673ab7] before:left-0 before:top-[7px] before:content-[''] before:w-[3px] before:h-[14px] before:absolute before:ml-0.5 block text-lg font-medium pl-[12px] relative"
-                    }
-                >
-                    微信
-                </span>
-            </Typography>
-            <Grid container spacing={2}>
-                {wchatList.map((item) => (
-                    <Grid key={item.title} item md={6} xs={12}>
-                        <SubCard contentSX={{ height: '120px', p: '20px', display: 'flex' }}>
-                            <Box>
-                                <Box
-                                    width="40px"
-                                    height="40px"
-                                    borderRadius="50%"
-                                    sx={{ background: '#f2f3f5' }}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                >
-                                    <img
-                                        style={{ width: '25px', height: '25px' }}
-                                        src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
-                                        alt=""
-                                    />
-                                </Box>
-                            </Box>
-                            <Box ml={2}>
-                                <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
-                                    {item.title}
-                                    {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
-                                </Typography>
-                                <Typography margin="10px 0 10px" height="32px" lineHeight="16px" color="#9da3af">
-                                    {item.desc}
-                                </Typography>
-                            </Box>
-                        </SubCard>
-                    </Grid>
-                ))}
-            </Grid>
-            <Typography mt={4} mb={2} textAlign="center" fontSize="14px" fontWeight="500">
-                以下发布平台即将发布 敬请期待
-            </Typography>
-            <Box display="flex" justifyContent="center">
-                {otherList.map((item) => (
-                    <Box key={item.icon} textAlign="center" fontSize="12px" mr={2} color="#9da3af">
-                        <Box
-                            width="40px"
-                            height="40px"
-                            borderRadius="5px"
-                            sx={{ background: '#f2f3f5' }}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            mb="5px"
-                        >
-                            <img
-                                style={{ width: '25px', height: '25px' }}
-                                src={require(`../../../../../assets/images/upLoad/${item.icon}.svg`)}
-                                alt=""
-                            />
-                        </Box>
-                        {item.title}
-                    </Box>
-                ))}
-            </Box> */}
+                                            )}
+                                        </Box>
+                                    </Box>
+                                    <Box ml={2} className="w-full">
+                                        <div className="flex justify-between items-center">
+                                            <Typography component="div" fontSize={16} fontWeight={500} display="flex" alignItems="center">
+                                                {item.title}
+                                                {item.comingSoon && <Chip sx={{ ml: 1.5 }} size="small" label="即将推出" />}
+                                            </Typography>
+                                            <div>
+                                                {item.enable && (
+                                                    <>
+                                                        <span className={'text-#697586'}>{item.enableValue ? '开放' : '关闭'}</span>
+                                                        <Switch
+                                                            disabled={updateBtn.isFirstCreatePublishRecord}
+                                                            size={'small'}
+                                                            color={'secondary'}
+                                                            checked={item.enableValue}
+                                                            onChange={() => handleSwitch(item)}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <Typography margin="10px 0 10px" minHeight="32px" lineHeight="16px" color="#9da3af">
+                                            {item.desc}
+                                        </Typography>
+                                        <Box display="flex">
+                                            {item.action.map((el: any, i: number) =>
+                                                item.type === 2 ? (
+                                                    <Box
+                                                        key={i}
+                                                        color="#b5bed0"
+                                                        fontSize="12px"
+                                                        display="flex"
+                                                        flexWrap="wrap"
+                                                        alignItems="center"
+                                                        mr={2}
+                                                        onClick={() => {
+                                                            if (item.enableValue) el.onclick();
+                                                        }}
+                                                        className={`${item.enableValue ? 'cursor-pointer hover:text-purple-500' : ''}`}
+                                                    >
+                                                        <Box whiteSpace="nowrap">
+                                                            {IconList[el.icon]}
+                                                            <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                        </Box>
+                                                    </Box>
+                                                ) : (
+                                                    <Box
+                                                        key={i}
+                                                        color="#b5bed0"
+                                                        fontSize="12px"
+                                                        display="flex"
+                                                        flexWrap="wrap"
+                                                        alignItems="center"
+                                                        mr={2}
+                                                        onClick={() => {
+                                                            if (!updateBtn.isFirstCreatePublishRecord && i == 1) {
+                                                                el.onclick();
+                                                            } else if (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate) {
+                                                                el.onclick();
+                                                            }
+                                                        }}
+                                                        className={`${
+                                                            (!updateBtn.isFirstCreatePublishRecord && i == 1) ||
+                                                            (!updateBtn.isFirstCreatePublishRecord && !updateBtn.needUpdate)
+                                                                ? 'cursor-pointer hover:text-purple-500'
+                                                                : ''
+                                                        }`}
+                                                    >
+                                                        <Box whiteSpace="nowrap">
+                                                            {IconList[el.icon]}
+                                                            <span style={{ marginLeft: '8px' }}>{el.title}</span>
+                                                        </Box>
+                                                    </Box>
+                                                )
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </SubCard>
+                            </Grid>
+                        )
+                    )}
+                </Grid>
+                {/* <Button onClick={handleSave} sx={{ mt: 6 }} color="secondary" variant="contained">
+                    保存设置
+                </Button> */}
+            </CustomTabPanel>
             {historyState && (
                 <Dialog
                     maxWidth="lg"
@@ -867,6 +1298,13 @@ function Upload({ appUid, saveState, saveDetail, mode }: { appUid: string; saveS
                     open={openWeDrawer}
                     setOpen={setOpenWeDrawer}
                     getUpdateBtn={getUpdateBtn}
+                />
+            )}
+            {botOpen && (
+                <UpgradeModel
+                    open={botOpen}
+                    handleClose={() => setBotOpen(false)}
+                    title={`添加文档个数(${userInfo?.benefits[4].totalNum})已用完`}
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

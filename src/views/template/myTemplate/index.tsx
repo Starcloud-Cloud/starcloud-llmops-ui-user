@@ -15,10 +15,11 @@ import {
 
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
+import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 
 import { recommends, appPage } from 'api/template/index';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -28,9 +29,10 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import marketStore from 'store/market';
 import myApp from 'store/myApp';
-import { useContext } from 'react';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
+import userInfoStore from 'store/entitlementAction';
+import useUserStore from 'store/user';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -138,9 +140,19 @@ function MyTemplate() {
         });
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
+    const [botOpen, setBotOpen] = useState(false);
+    const { userInfo }: any = userInfoStore();
+    const { user } = useUserStore();
     //弹窗
     const handleDetail = (data: { uid: string }) => {
-        navigate('/createApp?recommend=' + data.uid);
+        if (
+            userInfo.benefits[2].totalNum === -1 ||
+            totalList.filter((item) => Number(item.creator) === user.id).length < userInfo.benefits[2].totalNum
+        ) {
+            navigate('/createApp?recommend=' + data.uid);
+        } else if (totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo.benefits[2].totalNum) {
+            setBotOpen(true);
+        }
     };
     const timeoutRef = useRef<any>();
     return (
@@ -148,6 +160,7 @@ function MyTemplate() {
             <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item lg={3}>
                     <TextField
+                        color="secondary"
                         label={t('apply.name')}
                         onChange={(e) => {
                             changeParams(e);
@@ -253,6 +266,13 @@ function MyTemplate() {
                     ))}
                 </ScrollMenu>
             </Box>
+            {botOpen && (
+                <UpgradeModel
+                    open={botOpen}
+                    handleClose={() => setBotOpen(false)}
+                    title={`添加应用个数(${userInfo?.benefits[2].totalNum})已用完`}
+                />
+            )}
             {totals > 0 && (
                 <Box>
                     <Typography variant="h3" mt={4} mb={2}>
@@ -267,5 +287,4 @@ function MyTemplate() {
         </Box>
     );
 }
-
 export default MyTemplate;

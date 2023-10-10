@@ -10,6 +10,9 @@ import UpgradeIcon from '@mui/icons-material/Upgrade';
 import ImageIcon from '@mui/icons-material/Image';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
+import ChatIcon from '@mui/icons-material/Chat';
+import Groups2Icon from '@mui/icons-material/Groups2';
+import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -49,9 +52,12 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         CurrencyExchangeIcon,
         UpgradeIcon,
         ImageIcon,
-        SmartToyIcon
+        SmartToyIcon,
+        ChatIcon,
+        Groups2Icon,
+        FormatShapesIcon
     };
-    const Icon = item?.icon ? obj[item.icon] : FiberManualRecordIcon;
+    const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 
     const itemIcon = item?.icon ? (
         <Icon

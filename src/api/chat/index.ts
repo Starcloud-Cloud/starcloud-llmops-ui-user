@@ -226,3 +226,102 @@ export const ruleDel = (data: any) => {
 export const ruleDebugRule = (data: any) => {
     return request.post({ url: '/llm/dataset/rule/debugRule', data });
 };
+
+/**
+ * 获取所有技能
+ * @returns
+ */
+export const getListAll = () => {
+    return request.get({ url: '/llm/chatskill/all' });
+};
+
+/**
+ * 创建
+ * @returns
+ */
+export const skillCreate = (data: any) => {
+    return request.post({ url: '/llm/chat/config/create', data });
+};
+
+/**
+ * 获取所有技能
+ * @param appConfigId
+ * @returns
+ */
+export const getSkillList = (appConfigId: string) => {
+    return request.get({ url: `/llm/chat/config/detail/${appConfigId}` });
+};
+
+/**
+ * 修改/编辑
+ * @param data
+ * @returns
+ */
+export const modifySkill = (data: any) => {
+    return request.post({ url: '/llm/chat/config/modify', data });
+};
+
+/**
+ * 删除技能
+ * @param uid
+ * @returns
+ */
+export const delSkill = (uid: string) => {
+    return request.delete({ url: `/llm/chat/config/delete/${uid}` });
+};
+
+// 命中测试
+export const documentText = (data: any) => {
+    return request.post({ url: `/llm/dataset/segment/match/document/text`, data });
+};
+
+/**
+ * 创建分享
+ * @param data
+ * @returns
+ */
+export const shareChat = (data: any) => {
+    return request.post({ url: '/share/conversation/create', data });
+};
+
+/**
+ * 分享应用详情
+ * @param shareKey
+ * @returns
+ */
+export const shareChatBotInfo = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/app/${shareKey}` });
+};
+
+/**
+ * 会话记录
+ * @param shareKey
+ * @returns
+ */
+export const shareChatBotList = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/history/${shareKey}` });
+};
+
+/**
+ * 获取媒体ID
+ * @param shareKey
+ */
+export const shareDetail = (shareKey: string) => {
+    return request.get({ url: `/share/conversation/detail/${shareKey}` });
+};
+
+/**
+ * 启用源数据
+ * @param shareKey
+ */
+export const upDoc = (params: any) => {
+    return request.post({ url: `/llm/dataset-source-data/enable`, params });
+};
+
+/**
+ * 禁用源数据
+ * @param shareKey
+ */
+export const disDoc = (params: any) => {
+    return request.post({ url: `/llm/dataset-source-data/disable`, params });
+};

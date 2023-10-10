@@ -2,16 +2,17 @@ import { service } from './service';
 
 import { config } from './config';
 
-const { default_headers } = config;
+const { default_headers, request_timeout } = config;
 
 const request = (option: any) => {
-    const { baseUrl, url, method, params, data, headersType, responseType } = option;
+    const { baseUrl, url, method, params, data, headersType, responseType, timeout } = option;
     return service({
         baseURL: baseUrl,
         url: url,
         method,
         params,
         data,
+        timeout: timeout || request_timeout,
         responseType: responseType,
         headers: {
             'Content-Type': headersType || default_headers

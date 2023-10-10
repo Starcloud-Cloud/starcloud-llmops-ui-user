@@ -1,20 +1,24 @@
 import { create } from 'zustand';
 type UserInfo = {
-    invitationCode: null | string;
+    use: {
+        inviteCode?: string;
+        inviteUrl?: string;
+        mobile?: string;
+    };
     userInfo: null | any;
     setUserInfo: (data: string | null) => void;
-    setInvitationCode: (data: string | null) => void;
+    setuse: (data: any) => void;
 };
 const userInfoStore = create<UserInfo>((set) => ({
     userInfo: null,
-    invitationCode: null,
+    use: {},
     setUserInfo: (data) =>
         set(() => ({
             userInfo: data
         })),
-    setInvitationCode: (data) =>
+    setuse: (data) =>
         set(() => ({
-            invitationCode: data
+            use: data
         }))
 }));
 export default userInfoStore;

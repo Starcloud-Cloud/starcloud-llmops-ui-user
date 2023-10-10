@@ -4,6 +4,7 @@ import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
 import PendingIcon from '@mui/icons-material/Pending';
 import SendIcon from '@mui/icons-material/Send';
 import {
+    Button,
     Card,
     CardContent,
     Divider,
@@ -15,16 +16,14 @@ import {
     Menu,
     MenuItem,
     OutlinedInput,
-    Select,
     Tooltip,
     Typography,
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { getChat, getChatHistory, messageSSE } from '../../../../../api/chat';
-import { t } from '../../../../../hooks/web/useI18n';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getChat, getChatHistory, getSkillList, messageSSE, shareChat, shareChatBotList } from '../../../../../api/chat';
 import { dispatch } from '../../../../../store';
 import { openSnackbar } from '../../../../../store/slices/snackbar';
 import { IChatInfo } from '../index';
@@ -33,8 +32,30 @@ import { getShareChatHistory, shareMessageSSE } from 'api/chat/share';
 import jsCookie from 'js-cookie';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Popover } from 'antd';
-import { height } from '@mui/system';
+import { Popover, Select, Switch, Tag } from 'antd';
+import { uniqBy } from 'lodash-es';
+import { conversation, marketMessageSSE } from 'api/chat/mark';
+import { useChatMessage } from 'store/chatMessage';
+import { useWindowSize } from 'hooks/useWindowSize';
+import { v4 as uuidv4 } from 'uuid';
+import _ from 'lodash';
+import { BpCheckbox } from 'ui-component/BpCheckbox';
+import useUserStore from 'store/user';
+import './chat.scss';
+import { handleIcon } from './SkillWorkflowCard';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
+import { Tooltip as AntTooltip } from 'antd';
+
+const env = process.env.REACT_APP_ENV;
+import ShareIcon from '@mui/icons-material/Share';
+import useCopyToClipboard from 'react-use/lib/useCopyToClipboard';
+import { ChatTip } from 'views/chat/market';
+import { isMobile } from 'react-device-detect';
+
+const { Option } = Select;
 
 export type IHistory = Partial<{
     uid: string;
@@ -51,6 +72,7 @@ export type IHistory = Partial<{
     messageTokens: number;
     messageUnitPrice: number;
     process: any;
+    context: any;
     answer: any;
     answerTokens: number;
     answerUnitPrice: number;
@@ -65,6 +87,8 @@ export type IHistory = Partial<{
     robotAvatar: string;
     isNew: boolean;
     isStatement?: boolean;
+    isAds?: boolean;
+    ads?: string;
 }>;
 
 export type IConversation = {
@@ -79,22 +103,171 @@ export type IConversation = {
     id: string;
     createTime: number;
 };
+
+export type IChatType = 'WebSearch2DocHandler' | 'NewsSearchHandler' | 'ImageSearchHandler' | 'ImageGenerationHandler' | undefined;
+
+// 转换type
+const transformType = (key: IChatType) => {
+    switch (key) {
+        // 技能 网页和文档分析
+        case 'WebSearch2DocHandler':
+            return 'url';
+        case 'NewsSearchHandler':
+            return 'url';
+        case 'ImageGenerationHandler':
+            return 'img';
+        case 'ImageSearchHandler':
+            return 'url';
+        default:
+            break;
+    }
+};
+
+const transformTips = (key: IChatType, status: string | undefined) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            if (status === 'ERROR') {
+                return '生成回答失败';
+            } else {
+                return '生成回答完毕';
+            }
+        case 'ImageGenerationHandler':
+            if (status === 'ERROR') {
+                return '图片生成失败';
+            } else {
+                return '图片生成完成';
+            }
+        case 'NewsSearchHandler':
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        case 'ImageSearchHandler': {
+            if (status === 'ERROR') {
+                return '查询失败';
+            } else {
+                return '查询完成';
+            }
+        }
+        default:
+            break;
+    }
+};
+
+const transformData = (key: IChatType, data: any) => {
+    switch (key) {
+        case 'WebSearch2DocHandler':
+            return data ? [data] : [];
+        case 'NewsSearchHandler':
+            return data?.response || [];
+        case 'ImageSearchHandler':
+            return data?.response || [];
+        case 'ImageGenerationHandler':
+            return data?.imageUrls || [];
+        default:
+            break;
+    }
+};
+
+export function extractChatBlocks(data: any) {
+    try {
+        const chatBlocks: any[] = [];
+        let currentBlock: any[] = [];
+        let insideBlock = false;
+
+        for (const item of data) {
+            if (item.msgType === 'CHAT_FUN') {
+                if (!insideBlock) {
+                    insideBlock = true;
+                    currentBlock.push(item);
+                } else {
+                    currentBlock.push(item);
+                }
+            } else if (item.msgType === 'CHAT') {
+                chatBlocks.push(item);
+            } else if (item.msgType === 'CHAT_DONE' && insideBlock) {
+                let currentData: any = {};
+                let loop: any = [];
+                let currentLoop: any = [];
+                currentBlock.push(item);
+                insideBlock = false;
+                currentData.robotName = currentBlock[0].robotName;
+                currentData.robotAvatar = currentBlock[0].robotAvatar;
+                currentData.message = currentBlock[0].message;
+                currentData.createTime = currentBlock[0].createTime;
+                currentData.isNew = false;
+                currentData.answer = currentBlock.find((v) => v.msgType === 'CHAT_DONE')?.answer || '';
+                currentData.process = [];
+
+                for (const block of currentBlock) {
+                    if (block.msgType === 'CHAT_FUN') {
+                        currentLoop.push(block);
+                    } else if (block.msgType === 'FUN_CALL') {
+                        currentLoop.push(block);
+                        loop.push(currentLoop);
+                        currentLoop = [];
+                    } else {
+                        currentLoop = [];
+                    }
+                }
+
+                loop.forEach((item: { answer: string; status: string; message?: IChatType }[], index: string | number) => {
+                    currentData.process[index] = {
+                        tips: transformTips(item?.[1]?.message, item?.[1]?.status),
+                        showType: transformType(item?.[1]?.message),
+                        input: item?.[0]?.answer && JSON.parse(item[0].answer).arguments,
+                        data:
+                            item?.[1]?.status === 'ERROR'
+                                ? item?.[1]?.answer
+                                : item?.[1]?.answer && transformData(item?.[1]?.message, JSON.parse(item?.[1]?.answer)),
+                        success: item?.[1]?.status === 'ERROR' ? false : true,
+                        status: 1,
+                        id: uuidv4()
+                    };
+                });
+
+                chatBlocks.push(currentData);
+                currentData = {};
+                currentBlock = [];
+            } else {
+                if (insideBlock) {
+                    currentBlock.push(item);
+                }
+            }
+        }
+        console.log(chatBlocks, 'chatBlocks');
+        return chatBlocks;
+    } catch (e) {
+        console.log(e, 'e');
+        return [];
+    }
+}
+
 export const Chat = ({
     chatBotInfo,
     mode,
-    mediumUid,
     statisticsMode,
     showSelect,
     botList,
-    setMUid
+    mediumUid,
+    setMUid,
+    uid,
+    setUid,
+    setChatBotInfo,
+    shareKey
 }: {
     chatBotInfo: IChatInfo;
-    mode?: 'iframe' | 'test';
-    mediumUid?: string;
+    mode?: 'iframe' | 'test' | 'market' | 'share';
     statisticsMode?: string;
     showSelect?: boolean;
     botList?: any[];
+    mediumUid?: string;
     setMUid?: (mediumUid: any) => void;
+    uid?: string;
+    setUid?: (uid: string) => void;
+    setChatBotInfo: (chatBotInfo: IChatInfo) => void;
+    shareKey?: string;
 }) => {
     const theme = useTheme();
     const scrollRef: any = React.useRef();
@@ -102,6 +275,7 @@ export const Chat = ({
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const appId = searchParams.get('appId') as string;
+    const permissions = useUserStore((state) => state.permissions);
 
     const [isListening, setIsListening] = React.useState(false);
     const [message, setMessage] = React.useState('');
@@ -111,6 +285,23 @@ export const Chat = ({
     const [isFirst, setIsFirst] = React.useState(true);
     const [isFetch, setIsFetch] = useState(false);
     const [open, setOpen] = useState(false);
+    const [isFinish, setIsFinish] = useState(false);
+    const [skillWorkflowList, setSkillWorkflowList] = useState<any[]>([]);
+    const [skillOpen, setSkillOpen] = useState(false);
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+    const [openUpgradeOnline, setOpenUpgradeOnline] = useState(false);
+    const [openUpgradeSkillModel, setOpenUpgradeSkillModel] = useState(false);
+    const [enableOnline, setEnableOnline] = useState<any>();
+    const [selectModel, setSelectModel] = useState<any>();
+    const [openToken, setOpenToken] = useState(false);
+    const [isFreedomChat, setIsFreedomChat] = useState(false);
+    const [openChatMask, setOpenChatMask] = useState(false);
+
+    const { messageData, setMessageData } = useChatMessage();
+    const [state, copyToClipboard] = useCopyToClipboard();
+    const navigate = useNavigate();
+
+    const { width } = useWindowSize();
 
     const dataRef: any = useRef(data);
     const timeOutRef: any = useRef(null);
@@ -128,6 +319,16 @@ export const Chat = ({
         const result = event.results[event.resultIndex][0].transcript;
         setMessage(`${message}${result}`);
     };
+
+    // 左边联动右边,右边不联动左边
+    useEffect(() => {
+        setEnableOnline(chatBotInfo.enableSearchInWeb);
+    }, [chatBotInfo.enableSearchInWeb]);
+
+    // 左边联动右边,右边不联动左边
+    useEffect(() => {
+        setSelectModel(chatBotInfo.modelProvider);
+    }, [chatBotInfo.modelProvider]);
 
     // 开始语音识别
     const startListening = () => {
@@ -152,6 +353,31 @@ export const Chat = ({
         };
     }, []);
 
+    const visibleTip = React.useMemo(() => {
+        if (isFreedomChat && openChatMask) {
+            return true;
+        } else {
+            return false;
+        }
+    }, [openChatMask, isFreedomChat]);
+
+    // mode share start
+    useEffect(() => {
+        if (shareKey && chatBotInfo && mode === 'share') {
+            shareChatBotList(shareKey).then((res) => {
+                const list = res.map((v: any) => ({
+                    ...v,
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar
+                }));
+
+                const chatBlocks = extractChatBlocks(list);
+                setData(chatBlocks);
+            });
+        }
+    }, [shareKey, chatBotInfo]);
+    // mode share end
+
     // mode test start
     // 获取会话
     React.useEffect(() => {
@@ -175,12 +401,15 @@ export const Chat = ({
                     robotName: chatBotInfo.name,
                     robotAvatar: chatBotInfo.avatar
                 }));
+
+                const chatBlocks = extractChatBlocks(list);
+
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -196,7 +425,7 @@ export const Chat = ({
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -244,6 +473,7 @@ export const Chat = ({
     // iframe 模式下获取历史记录
     React.useEffect(() => {
         if (mode === 'iframe') {
+            setConversationUid(jsCookie.get(conversationUniKey) || '');
             (async () => {
                 const res = await getShareChatHistory({
                     pageNo: 1,
@@ -256,12 +486,13 @@ export const Chat = ({
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar
                     })) || [];
+                const chatBlocks = extractChatBlocks(list);
                 const result = [
-                    ...list,
+                    ...chatBlocks,
                     {
                         robotName: chatBotInfo.name,
                         robotAvatar: chatBotInfo.avatar,
-                        answer: chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
                         isStatement: true
                     }
                 ];
@@ -271,6 +502,86 @@ export const Chat = ({
         }
     }, [mode, chatBotInfo]);
     // mode iframe end
+
+    // mode market start
+    // 初始设置为自由聊天
+    React.useEffect(() => {
+        if (mode === 'market') {
+            setIsFreedomChat(true);
+        }
+    }, [mode]);
+
+    React.useEffect(() => {
+        const r = data?.filter((v) => !v.isStatement).filter((v) => !v.isAds);
+        if (!r.length) {
+            setOpenChatMask(true);
+        } else {
+            setOpenChatMask(false);
+        }
+    }, [data]);
+
+    React.useEffect(() => {
+        if (mode === 'market' && uid) {
+            (async () => {
+                const res: IConversation = await conversation({ appUid: uid });
+                if (res) {
+                    setConversationUid(res.uid);
+                } else {
+                    setConversationUid('');
+                    setIsFinish(true);
+                    setData([]);
+                    dataRef.current = [];
+                }
+            })();
+        }
+    }, [mode, uid]);
+
+    React.useEffect(() => {
+        if (mode === 'market' && conversationUid) {
+            (async () => {
+                const res: any = await getChatHistory({ conversationUid, pageNo: 1, pageSize: 10000 });
+                const list = res.list.map((v: any) => ({
+                    ...v,
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar
+                }));
+                const chatBlocks = extractChatBlocks(list);
+                const result: any = [
+                    ...chatBlocks,
+                    {
+                        robotName: chatBotInfo.name,
+                        robotAvatar: chatBotInfo.avatar,
+                        answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                        isStatement: true
+                    }
+                ];
+                dataRef.current = result;
+                setData(result);
+                setIsFinish(true);
+            })();
+        }
+        if (mode === 'market' && !conversationUid) {
+            const result: any = [
+                {
+                    robotName: chatBotInfo.name,
+                    robotAvatar: chatBotInfo.avatar,
+                    answer: chatBotInfo.enableStatement && chatBotInfo.statement && convertTextWithLinks(chatBotInfo.statement),
+                    isStatement: true
+                }
+            ];
+            dataRef.current = result;
+            setData(result);
+            setIsFinish(true);
+        }
+    }, [mode, chatBotInfo]);
+
+    // 加载完历史再请求
+    useEffect(() => {
+        if (mode === 'market' && messageData && chatBotInfo && uid && isFinish) {
+            doFetch(messageData);
+        }
+    }, [mode, messageData, chatBotInfo, uid, isFinish]);
+    // mode market end
 
     React.useEffect(() => {
         // 清理语音识别对象
@@ -311,6 +622,18 @@ export const Chat = ({
         return <>{parts}</>;
     }
 
+    // 重试
+    const handleRetry = (index: number) => {
+        const data = dataRef.current;
+        const current = data[index];
+        doFetch(current.message);
+    };
+
+    // 例子
+    const handleExample = (q: string) => {
+        setMessage(q);
+    };
+
     React.useEffect(() => {
         if (isFetch && scrollRef?.current) {
             const scrollContainer = scrollRef.current;
@@ -319,20 +642,232 @@ export const Chat = ({
         }
     });
 
+    // 首次进入
+    React.useEffect(() => {
+        if (scrollRef?.current && data.length) {
+            setTimeout(() => {
+                const scrollContainer = scrollRef.current;
+                const contentElement = contentRef.current;
+                scrollContainer.scrollTop = contentElement.scrollHeight;
+            }, 1000);
+        }
+    }, [scrollRef?.current, data]);
+
+    // 处理技能
+    React.useEffect(() => {
+        if (mode === 'test' && chatBotInfo.skillWorkflowList) {
+            const copyData = _.cloneDeep(chatBotInfo.skillWorkflowList) || [];
+            if (copyData.length) {
+                setSkillWorkflowList([...copyData]);
+            } else {
+                if (chatBotInfo.uid) {
+                    getSkillList(chatBotInfo.uid).then((res) => {
+                        const appWorkFlowList =
+                            res?.['3']?.map((item: any) => ({
+                                name: item.appWorkflowSkillDTO?.name,
+                                description: item.appWorkflowSkillDTO?.desc,
+                                type: item.type,
+                                skillAppUid: item.appWorkflowSkillDTO?.skillAppUid,
+                                uid: item.uid,
+                                images: item.appWorkflowSkillDTO?.icon,
+                                appConfigId: item.appConfigId,
+                                appType: item.appWorkflowSkillDTO?.appType,
+                                defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
+                                copyWriting: item.appWorkflowSkillDTO?.copyWriting,
+                                disabled: item.disabled
+                            })) || [];
+
+                        const systemList =
+                            res?.['5']?.map((item: any) => ({
+                                name: item.systemHandlerSkillDTO?.name,
+                                description: item.systemHandlerSkillDTO?.desc,
+                                type: item.type,
+                                code: item.systemHandlerSkillDTO?.code,
+                                uid: item.uid,
+                                images: item.systemHandlerSkillDTO?.icon,
+                                appConfigId: item.appConfigId,
+                                copyWriting: item.systemHandlerSkillDTO?.copyWriting,
+                                disabled: item.disabled,
+                                usage: item.systemHandlerSkillDTO.usage
+                            })) || [];
+
+                        const mergedArray = [...appWorkFlowList, ...systemList];
+                        const enableList = mergedArray.filter((v) => !v.disabled);
+
+                        setSkillWorkflowList(enableList);
+                    });
+                }
+            }
+        } else {
+            if (chatBotInfo.uid) {
+                getSkillList(chatBotInfo.uid).then((res) => {
+                    const appWorkFlowList =
+                        res?.['3']?.map((item: any) => ({
+                            name: item.appWorkflowSkillDTO?.name,
+                            description: item.appWorkflowSkillDTO?.desc,
+                            type: item.type,
+                            skillAppUid: item.appWorkflowSkillDTO?.skillAppUid,
+                            uid: item.uid,
+                            images: item.appWorkflowSkillDTO?.icon,
+                            appConfigId: item.appConfigId,
+                            appType: item.appWorkflowSkillDTO?.appType,
+                            defaultPromptDesc: item.appWorkflowSkillDTO?.defaultPromptDesc,
+                            copyWriting: item.appWorkflowSkillDTO?.copyWriting,
+                            disabled: item.disabled
+                        })) || [];
+
+                    const systemList =
+                        res?.['5']?.map((item: any) => ({
+                            name: item.systemHandlerSkillDTO?.name,
+                            description: item.systemHandlerSkillDTO?.desc,
+                            type: item.type,
+                            code: item.systemHandlerSkillDTO?.code,
+                            uid: item.uid,
+                            images: item.systemHandlerSkillDTO?.icon,
+                            appConfigId: item.appConfigId,
+                            copyWriting: item.systemHandlerSkillDTO?.copyWriting,
+                            disabled: item.disabled,
+                            usage: item.systemHandlerSkillDTO.usage
+                        })) || [];
+
+                    const mergedArray = [...appWorkFlowList, ...systemList];
+                    const enableList = mergedArray.filter((v) => !v.disabled);
+
+                    setSkillWorkflowList(enableList);
+                });
+            }
+        }
+    }, [mode, chatBotInfo]);
+
     const handleKeyDown = async (event: any) => {
         // 按下 Shift + Enter 换行
         if (event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
-            setMessage(message + '\n');
+            if (!isFetch) {
+                setMessage(message + '\n');
+            }
         } else if (!event.shiftKey && event.keyCode === 13) {
             event.preventDefault();
             // 单独按回车键提交表单
-            await handleOnSend();
+            if (!isFetch) {
+                await handleOnSend();
+            }
         }
     };
 
-    const doFetch = async (message: string) => {
+    const handleSSEData = (eventData: any) => {
+        try {
+            const subString = eventData.substring(5);
+            const bufferObj = JSON.parse(subString);
+            if (bufferObj?.code === 200) {
+                if (env === 'development') {
+                    console.log(bufferObj, 'bufferObj');
+                }
+                if (mediumUid) {
+                    jsCookie.set(conversationUniKey, bufferObj.conversationUid);
+                }
+                setConversationUid(bufferObj.conversationUid);
+                if (bufferObj.type === 'context') {
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const content = JSON.parse(bufferObj.content);
+                    const idList = content.data.filter((v: any) => v.id);
+                    const notIdList = content.data.filter((v: any) => !v.id);
+
+                    // 处理文档（文档状态默认不更新）
+                    content.data = [...uniqBy(idList, 'id'), ...notIdList];
+                    copyData[copyData.length - 1].context = content ? [content] : [];
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+
+                if (bufferObj.type === 'i') {
+                    // 处理流程
+                    const copyData = [...dataRef.current].filter((v: any) => !v.isAds);
+                    const process = copyData[copyData.length - 1].process || [];
+                    const content = JSON.parse(bufferObj.content);
+
+                    // 处理链接
+                    if (content.showType === 'url' || content.showType === 'tips' || content.showType === 'img') {
+                        //判断时候copyData.process里时候有同样id的对象，有的话就替换，没有的话就插入
+                        const index = copyData[copyData.length - 1].process?.findIndex((v: any) => v.id === content.id);
+
+                        if (index > -1) {
+                            // 替换
+                            if (copyData[copyData.length - 1].isAds) {
+                                copyData[copyData.length - 2].process[index] = content;
+                            } else {
+                                copyData[copyData.length - 1].process[index] = content;
+                            }
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        } else {
+                            if (copyData[copyData.length - 1].isAds) {
+                                copyData[copyData.length - 2].process = [...process, content];
+                            } else {
+                                copyData[copyData.length - 1].process = [...process, content];
+                            }
+                            dataRef.current = copyData;
+                            setData(copyData);
+                        }
+                    }
+                }
+                if (bufferObj.type === 'm') {
+                    // 处理结论
+                    const copyData = [...dataRef.current];
+                    if (copyData[copyData.length - 1].isAds) {
+                        copyData[copyData.length - 2].answer = copyData[copyData.length - 2].answer + bufferObj.content;
+                        copyData[copyData.length - 2].isNew = true;
+                    } else {
+                        copyData[copyData.length - 1].answer = copyData[copyData.length - 1].answer + bufferObj.content;
+                        copyData[copyData.length - 1].isNew = true;
+                    }
+
+                    dataRef.current = copyData;
+                    setData(copyData);
+                }
+                if (bufferObj.type === 'ads-msg') {
+                    const newMessage: IHistory = {
+                        isAds: true,
+                        ads: bufferObj.content
+                    };
+                    const copyData = dataRef.current;
+                    copyData.push(newMessage);
+                    setData([...copyData]);
+                }
+            } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
+                // 不处理
+                return;
+            } else if (bufferObj?.code === 2008002007) {
+                // 处理token不足
+                const copyData = [...dataRef.current];
+                copyData[copyData.length - 1].answer = '当前使用的魔力值不足';
+                copyData[copyData.length - 1].status = 'ERROR';
+                copyData[copyData.length - 1].isNew = false;
+                setOpenToken(true);
+            } else {
+                console.log('error', bufferObj);
+                const copyData = [...dataRef.current]; // 使用dataRef.current代替data
+                if (copyData[copyData.length - 1].isAds) {
+                    copyData[copyData.length - 2].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
+                    copyData[copyData.length - 2].status = 'ERROR';
+                    copyData[copyData.length - 2].isNew = false;
+                } else {
+                    copyData[copyData.length - 1].answer = env === 'development' ? bufferObj.content : '机器人异常，请重试';
+                    copyData[copyData.length - 1].status = 'ERROR';
+                    copyData[copyData.length - 1].isNew = false;
+                }
+                dataRef.current = copyData;
+                setData(copyData);
+                setIsFetch(false);
+            }
+        } catch (e) {
+            console.log(e, 'error-JSON.parse异常');
+        }
+    };
+
+    const doFetch = async (message: string, isGoOn?: boolean) => {
         setMessage('');
+        setMessageData('');
         const newMessage: IHistory = {
             robotName: chatBotInfo.name,
             robotAvatar: chatBotInfo.avatar,
@@ -353,7 +888,9 @@ export const Chat = ({
                     scene: statisticsMode,
                     query: message,
                     mediumUid,
-                    conversationUid: jsCookie.get(conversationUniKey)
+                    conversationUid: jsCookie.get(conversationUniKey),
+                    modelType: selectModel,
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             if (mode === 'test') {
@@ -361,77 +898,56 @@ export const Chat = ({
                     appUid: appId,
                     scene: 'CHAT_TEST',
                     conversationUid,
-                    query: message
+                    query: message,
+                    modelType: selectModel,
+                    webSearch: isGoOn ? false : enableOnline
+                });
+            }
+            if (mode === 'market') {
+                resp = await marketMessageSSE({
+                    appUid: uid,
+                    conversationUid,
+                    query: message,
+                    modelType: selectModel,
+                    webSearch: isGoOn ? false : enableOnline
                 });
             }
             setIsFirst(false);
 
             const reader = resp.getReader();
             const textDecoder = new TextDecoder();
-            let outerJoins: any;
-            while (1) {
-                let joins = outerJoins;
+            let outerJoins = '';
+
+            while (true) {
                 const { done, value } = await reader.read();
                 if (done) {
                     const copyData = [...dataRef.current];
-                    copyData[dataRef.current.length - 1].isNew = false;
+                    if (copyData[copyData.length - 1].isAds) {
+                        copyData[dataRef.current.length - 2].isNew = false;
+                    } else {
+                        copyData[dataRef.current.length - 1].isNew = false;
+                    }
                     dataRef.current = copyData;
                     setData(copyData);
                     setIsFetch(false);
                     break;
                 }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((messages, i: number) => {
-                    if (i === 0 && joins) {
-                        messages = joins + messages;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (messages && messages.indexOf('}') === -1) {
-                            joins = messages;
-                            return;
-                        }
-                    }
-                    let bufferObj;
-                    if (messages?.startsWith('data:')) {
-                        bufferObj = messages.substring(5) && JSON.parse(messages.substring(5));
-                    }
-                    if (bufferObj?.code === 200) {
-                        jsCookie.set(conversationUniKey, bufferObj.conversationUid);
-                        setConversationUid(bufferObj.conversationUid);
-                        // 处理流程
-                        if (bufferObj.type === 'i') {
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].process = bufferObj.content;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                        if (bufferObj.type === 'm') {
-                            // 处理结论
-                            const copyData = [...dataRef.current];
-                            copyData[copyData.length - 1].answer = copyData[dataRef.current.length - 1].answer + bufferObj.content;
-                            copyData[copyData.length - 1].isNew = true;
-                            dataRef.current = copyData;
-                            setData(copyData);
-                        }
-                    } else if (bufferObj && bufferObj.code !== 200) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                });
-                outerJoins = joins;
+
+                const str = textDecoder.decode(value);
+                outerJoins += str;
+
+                // 查找事件结束标志，例如"}\n"
+                let eventEndIndex = outerJoins.indexOf('}\n');
+
+                while (eventEndIndex !== -1) {
+                    const eventData = outerJoins.slice(0, eventEndIndex + 1);
+                    handleSSEData(eventData);
+                    outerJoins = outerJoins.slice(eventEndIndex + 3);
+                    eventEndIndex = outerJoins.indexOf('}\n');
+                }
             }
         } catch (e: any) {
+            console.log('error', e);
             const copyData = [...dataRef.current]; // 使用dataRef.current代替data
             if (e.message === 'Request timeout') {
                 copyData[copyData.length - 1].answer = '机器人超时，请重试';
@@ -458,8 +974,11 @@ export const Chat = ({
 
     const handleClean = () => {
         setAnchorEl(null);
-        setData([]);
-        dataRef.current = [];
+
+        const copyData = _.cloneDeep(dataRef.current);
+        const newData = copyData.filter((v: any) => v.isStatement);
+        setData(newData);
+        dataRef.current = newData;
         setConversationUid('');
         jsCookie.remove(conversationUniKey);
     };
@@ -473,216 +992,555 @@ export const Chat = ({
         setAnchorEl(null);
     };
 
+    // 监听技能模型切换到4.0
+    useEffect(() => {
+        if (skillWorkflowList.length) {
+            setChatBotInfo({
+                ...chatBotInfo,
+                modelProvider: 'GPT4'
+            });
+        }
+    }, [skillWorkflowList.length]);
+
+    const handleShare = async () => {
+        const res = await shareChat({
+            conversationUid: conversationUid,
+            mediumUid: mediumUid,
+            scene: statisticsMode
+        });
+        if (res) {
+            copyToClipboard(`${window.location.origin}/share_cb/${res?.shareKey}?q=${res?.inviteCode}`);
+        }
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '把你的对话分享给朋友吧，还可以免费增加权益哦！',
+                variant: 'alert',
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+        return;
+    };
+
+    const goShow = useMemo(() => {
+        if (!isFetch && data.length) {
+            const data = dataRef.current.filter((v: any) => !v.isStatement).filter((v: any) => v.status !== 'ERROR');
+            const answer = data[data.length - 1]?.answer;
+            if (!answer || answer?.length < 200) return false;
+            // 对{x}做处理
+            const text = answer?.trim().replace(/\{(\d+)\}/g, '');
+            const lastChar = text.slice(-1);
+            const sentenceEndRegex = /[.?!。？！]/;
+            const result = sentenceEndRegex.test(lastChar);
+            return !result;
+        }
+    }, [isFetch, data]);
+
     return (
-        <div className="h-full flex flex-col overflow-y-hidden">
-            <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0`}>
-                {showSelect ? (
-                    <Popover
-                        content={
-                            <div>
-                                <div className="flex justify-center">切换机器人</div>
-                                {botList?.map((item, index) => (
+        <div className="h-full relative flex justify-center">
+            {mode === 'market' && width > 1300 && (
+                <div
+                    className="rounded-tl-lg rounded-bl-lg h-full  min-w-[231px] overflow-y-auto overflow-x-hidden bg-white"
+                    style={{ borderRight: '1px solid rgba(230,230,231,1)' }}
+                >
+                    <div className="h-full  px-[8px] flex flex-col">
+                        <div className="h-[44px] flex items-center text-lg font-bold">AI员工</div>
+                        <div className="bg-white rounded-md flex-1">
+                            {botList?.map((item, index) => (
+                                <>
                                     <div
                                         key={index}
-                                        className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
-                                            mediumUid === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                        className={`w-[220px] h-[75px] flex items-center justify-start cursor-pointer p-[8px] border-b-[1px] border-solid border-[rgba(230,230,231,1)] ${
+                                            (mediumUid || uid) === item.value ? 'shadow-lg' : ''
                                         }`}
                                         onClick={() => {
-                                            setMUid && setMUid(item.value);
+                                            setUid && setUid(item.value);
+                                            if (mode === 'market' && index === 0) {
+                                                setIsFreedomChat(true);
+                                            } else {
+                                                setIsFreedomChat(false);
+                                            }
                                         }}
                                     >
                                         <div className="w-[40px] h-[40px]">
-                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px]" />
+                                            <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
                                         </div>
-                                        <div className="ml-2">
-                                            <div className="text-lg">{item.name}</div>
-                                            <div className="text-sm w-[320px] text-[#9da3af] mt-1">{item.des}</div>
+                                        <div className="ml-2 h-full">
+                                            <div className="text-lg line-clamp-2">{item.name}</div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        }
-                        placement="bottom"
-                        trigger="click"
-                        open={open}
-                        onOpenChange={setOpen}
-                    >
-                        <div className="flex items-center justify-center cursor-pointer">
-                            <div className="w-[28px] h-[28px] flex justify-center items-center">
-                                <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
-                            </div>
-                            <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-
-                            {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
+                                </>
+                            ))}
                         </div>
-                    </Popover>
-                ) : (
-                    <div className="flex items-center justify-center cursor-pointer">
-                        <div className="w-[28px] h-[28px] flex justify-center items-center">
-                            <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
-                        </div>
-                        <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
-                    </div>
-                )}
-            </div>
-            <Divider variant={'fullWidth'} />
-            <div className="flex-grow flex justify-center  overflow-y-auto w-full">
-                <div className={'max-w-[768px]'}>
-                    <div
-                        style={{
-                            width: '100%',
-                            overflowX: 'hidden',
-                            height: '100%'
-                        }}
-                        ref={scrollRef}
-                    >
-                        <div ref={contentRef}>
-                            {chatBotInfo.enableIntroduction && (
-                                <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[12px] flex">
-                                    <div className="flex w-[56px] h-[56px] justify-center items-center">
-                                        <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
-                                    </div>
-                                    <div className="flex flex-col ml-3">
-                                        <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
-                                        <Typography align="left" variant="subtitle2" color={'#000'}>
-                                            {chatBotInfo.introduction}
-                                        </Typography>
-                                    </div>
-                                </Card>
-                            )}
-                            <CardContent className="!p-0">
-                                <ChatHistory theme={theme} data={data} />
-                            </CardContent>
+                        <div
+                            className="h-[28px] flex items-center justify-center text-[#673ab7] cursor-pointer"
+                            onClick={() => {
+                                navigate('/my-chat');
+                            }}
+                        >
+                            创作属于自己的数字员工
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="flex-shrink-0 flex justify-center w-full">
-                <div className="w-full max-w-[768px] p-[8px] ">
-                    <Grid container spacing={1} alignItems="center" className="px-0 sm:px-[12px] flex-nowrap">
-                        <Grid item className="!pl-0">
-                            <IconButton onClick={handleClickSort} size="large" aria-label="chat user details change">
-                                <MoreHorizTwoToneIcon />
-                            </IconButton>
-                            <Menu
-                                id="simple-menu"
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={Boolean(anchorEl)}
-                                onClose={handleCloseSort}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right'
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right'
-                                }}
-                            >
-                                <MenuItem onClick={handleClean}>
-                                    <CleaningServicesSharpIcon className="text-base" />
-                                    <span className="text-base ml-3">清除</span>
-                                </MenuItem>
-                            </Menu>
-                        </Grid>
-                        <Grid item xs={12} sm zeroMinWidth className="!pl-0">
-                            <OutlinedInput
-                                id="message-send"
-                                fullWidth
-                                multiline
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                placeholder="请输入(Shift+Enter换行)"
-                                className="!pt-0"
-                                onKeyDown={handleKeyDown}
-                                minRows={1}
-                                maxRows={3}
-                                endAdornment={
-                                    <>
-                                        <InputAdornment position="end">
-                                            {!isListening ? (
-                                                <Tooltip arrow placement="top" title={'语音输入'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={'default'}
-                                                        onClick={startListening}
-                                                        aria-label="voice"
-                                                        className="p-0"
-                                                    >
-                                                        <KeyboardVoiceIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                    <div
-                                                        onClick={stopListening}
-                                                        className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                    >
-                                                        <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                            {time}
-                                                        </div>
+            )}
+
+            <div className={`h-full flex flex-col  ${mode === 'market' ? 'rounded-tr-lg rounded-br-lg bg-white ' : ''}   w-full`}>
+                <div className="flex justify-center">
+                    <div className={`flex items-center p-[8px] justify-center h-[44px] flex-shrink-0 relative w-full max-w-[768px]`}>
+                        {showSelect ? (
+                            <Popover
+                                content={
+                                    <div className="h-[380px] overflow-y-auto">
+                                        <div className="flex justify-center">切换员工</div>
+                                        {botList?.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className={`flex items-center justify-center cursor-pointer mt-2 p-[8px] border-[1px] border-solid rounded-lg hover:border-[#673ab7] ${
+                                                    (mediumUid || uid) === item.value ? 'border-[#673ab7]' : 'border-[rgba(230,230,231,1)]'
+                                                }`}
+                                                onClick={() => {
+                                                    if (mode === 'iframe') {
+                                                        setMUid && setMUid(item.value);
+                                                        setOpen(false);
+                                                    }
+                                                    if (mode === 'market') {
+                                                        setUid && setUid(item.value);
+                                                        setOpen(false);
+                                                        if (index === 0) {
+                                                            setIsFreedomChat(true);
+                                                        } else {
+                                                            setIsFreedomChat(false);
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                <div className="w-[40px] h-[40px]">
+                                                    <img src={item.avatar} alt="" className="w-[40px] h-[40px] rounded-md" />
+                                                </div>
+                                                <div className="ml-2">
+                                                    <div className="text-lg">{item.name}</div>
+                                                    <div className="text-sm w-[260px] text-[#9da3af] mt-1 h-[60px] line-clamp-3">
+                                                        {item.des || '无'}
                                                     </div>
-                                                </Tooltip>
-                                            )}
-                                        </InputAdornment>
-                                        <InputAdornment position="end" className="relative">
-                                            {isFetch ? (
-                                                <Tooltip placement="top" arrow title={'请求中'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={message ? 'secondary' : 'default'}
-                                                        aria-label="send message"
-                                                    >
-                                                        <PendingIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            ) : (
-                                                <Tooltip placement="top" arrow title={'发送'}>
-                                                    <IconButton
-                                                        disableRipple
-                                                        color={message ? 'secondary' : 'default'}
-                                                        onClick={handleOnSend}
-                                                        aria-label="send message"
-                                                    >
-                                                        <SendIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            )}
-                                        </InputAdornment>
-                                    </>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 }
-                                aria-describedby="search-helper-text"
-                                inputProps={{ 'aria-label': 'weight', maxLength: 100 }}
-                            />
-                        </Grid>
-                    </Grid>
-                    <div>
-                        <div className="flex justify-end px-[24px]">
-                            <div className="text-right text-stone-600 mr-1 mt-1">{message?.length || 0}/100</div>
+                                placement="bottom"
+                                trigger="click"
+                                open={open}
+                                onOpenChange={setOpen}
+                            >
+                                <div className="flex items-center justify-center cursor-pointer">
+                                    <div className="w-[28px] h-[28px] flex justify-center items-center">
+                                        <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                                    </div>
+                                    <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+
+                                    {open ? <ExpandLessIcon className="ml-1 " /> : <ExpandMoreIcon className="ml-1" />}
+                                    <span className="text-xs ml-1 text-[#697586]">切换员工</span>
+                                </div>
+                            </Popover>
+                        ) : (
+                            <div className="flex items-center justify-center cursor-pointer">
+                                <div className="w-[28px] h-[28px] flex justify-center items-center">
+                                    <img className="w-[28px] h-[28px] rounded-md object-fill" src={chatBotInfo.avatar} alt="" />
+                                </div>
+                                <span className={'text-lg font-medium ml-2'}>{chatBotInfo.name}</span>
+                            </div>
+                        )}
+                        {conversationUid && mode !== 'share' && !isFetch && (
+                            <AntTooltip
+                                color={'#fa8c16'}
+                                arrow={true}
+                                placement={'left'}
+                                open={!isMobile && (mode === 'test' || mode === 'market')}
+                                title={
+                                    <span className="text-xs">
+                                        分享给朋友，
+                                        <br />
+                                        免费增加权益！
+                                    </span>
+                                }
+                            >
+                                <Tooltip
+                                    title={
+                                        <div>
+                                            把你的对话分享给朋友吧，
+                                            <br />
+                                            还可以免费增加权益哦！
+                                        </div>
+                                    }
+                                >
+                                    <svg
+                                        onClick={() => handleShare()}
+                                        className={`absolute ${
+                                            statisticsMode === 'SHARE_JS' && width <= 406 ? 'right-[53px]' : 'right-2'
+                                        }  text-[16px] cursor-pointer`}
+                                        stroke="currentColor"
+                                        fill="none"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        height="1em"
+                                        width="1em"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                        <polyline points="16 6 12 2 8 6"></polyline>
+                                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                                    </svg>
+                                </Tooltip>
+                            </AntTooltip>
+                        )}
+                    </div>
+                </div>
+                <Divider variant={'fullWidth'} />
+                <div className="flex-grow flex justify-center overflow-y-auto w-full relative" style={{ scrollbarGutter: 'stable' }}>
+                    <div className={'max-w-[768px] w-full'}>
+                        <div
+                            style={{
+                                width: '100%',
+                                overflowX: 'hidden',
+                                height: '100%'
+                            }}
+                            ref={scrollRef}
+                        >
+                            <div ref={contentRef}>
+                                {chatBotInfo.enableIntroduction && (
+                                    <Card className="bg-[#f2f3f5] mx-[12px] mt-[12px] p-[12px] flex">
+                                        <div className="flex w-[56px] h-[56px] justify-center items-center">
+                                            <img className="w-[56px] h-[56px] rounded-xl object-fill" src={chatBotInfo.avatar} alt="" />
+                                        </div>
+                                        <div className="flex flex-col ml-3">
+                                            <span className={'text-lg font-medium h-[28px]'}>{chatBotInfo.name}</span>
+                                            <Typography align="left" variant="subtitle2" color={'#000'}>
+                                                {chatBotInfo.introduction}
+                                            </Typography>
+                                        </div>
+                                    </Card>
+                                )}
+                                <CardContent className="!p-0">
+                                    <ChatHistory theme={theme} data={data} handleRetry={handleRetry} />
+                                    {visibleTip && <ChatTip handleExample={handleExample} />}
+                                </CardContent>
+                            </div>
                         </div>
                     </div>
-                    <div className="w-full flex justify-center">
-                        <div className="flex justify-center items-center">
-                            <svg
-                                version="1.1"
-                                id="Layer_1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                x="0px"
-                                y="0px"
-                                width="18px"
-                                height="18px"
-                                viewBox="0 0 18 18"
-                                enableBackground="new 0 0 24 24"
-                                xmlSpace="preserve"
-                            >
-                                <image
-                                    id="image0"
-                                    width="18"
-                                    height="18"
-                                    x="0"
-                                    y="0"
-                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                </div>
+                <div className={`${mode === 'market' ? 'mb-1' : ''} flex-shrink-0 flex justify-center w-full`}>
+                    <div className={'w-full max-w-[768px] p-[8px] relative'}>
+                        {goShow && (
+                            <div className="absolute top-0 inset-x-0 flex justify-center">
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    size="small"
+                                    className="w-[200px] rounded-3xl"
+                                    onClick={() => {
+                                        doFetch('继续', true);
+                                    }}
+                                >
+                                    继续
+                                </Button>
+                            </div>
+                        )}
+                        <div className="flex justify-between mb-[2px]">
+                            {skillWorkflowList && skillWorkflowList?.length > 0 ? (
+                                <Popover
+                                    placement="topLeft"
+                                    arrow={false}
+                                    open={skillOpen}
+                                    onOpenChange={(newOpen) => setSkillOpen(newOpen)}
+                                    content={
+                                        <div className="max-h-[260px] overflow-y-auto">
+                                            {skillWorkflowList.map((v: any, index: number) => (
+                                                <>
+                                                    <div className="flex flex-col w-[280px]" key={index}>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center">
+                                                                {v.images ? (
+                                                                    handleIcon(v.images, 'w-[18px] h-[18px]') || (
+                                                                        <img className="rounded w-[18px] h-[18px]" src={v.images} />
+                                                                    )
+                                                                ) : (
+                                                                    <svg
+                                                                        viewBox="0 0 1024 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="18"
+                                                                        height="18"
+                                                                    >
+                                                                        <path
+                                                                            d="M689.737143 650.496c8.996571-5.339429 18.797714-9.435429 29.220571-12.105143a28.233143 28.233143 0 0 1-0.219428-3.474286v-27.940571a27.940571 27.940571 0 0 1 55.881143 0v27.940571a28.196571 28.196571 0 0 1-0.219429 3.474286c10.386286 2.669714 20.224 6.765714 29.257143 12.105143a28.233143 28.233143 0 0 1 2.267428-2.596571l19.748572-19.748572a27.940571 27.940571 0 1 1 39.497143 39.497143l-19.748572 19.748571a28.16 28.16 0 0 1-2.56 2.304c5.302857 9.033143 9.435429 18.834286 12.068572 29.257143a28.233143 28.233143 0 0 1 3.474285-0.219428h27.940572a27.940571 27.940571 0 1 1 0 55.881143h-27.940572a28.16 28.16 0 0 1-3.474285-0.219429 111.067429 111.067429 0 0 1-12.068572 29.257143c0.877714 0.658286 1.755429 1.462857 2.56 2.267428l19.748572 19.748572a27.940571 27.940571 0 1 1-39.497143 39.497143l-19.748572-19.748572a28.233143 28.233143 0 0 1-2.304-2.56 111.067429 111.067429 0 0 1-29.257142 12.068572 28.196571 28.196571 0 0 1 0.256 3.474285v27.940572a27.940571 27.940571 0 1 1-55.881143 0v-27.940572c0-1.170286 0.073143-2.304 0.219428-3.474285a111.067429 111.067429 0 0 1-29.257143-12.068572 28.233143 28.233143 0 0 1-2.304 2.56l-19.748571 19.748572a27.940571 27.940571 0 1 1-39.497143-39.497143l19.748572-19.748572a28.269714 28.269714 0 0 1 2.596571-2.304 111.067429 111.067429 0 0 1-12.105143-29.257142 28.16 28.16 0 0 1-3.474286 0.256h-27.940571a27.940571 27.940571 0 0 1 0-55.881143h27.940571c1.170286 0 2.340571 0.073143 3.474286 0.219428 2.669714-10.422857 6.765714-20.224 12.105143-29.257143a28.16 28.16 0 0 1-2.596571-2.304l-19.748572-19.748571a27.940571 27.940571 0 1 1 39.497143-39.497143l19.748571 19.748572a28.233143 28.233143 0 0 1 2.304 2.596571zM914.285714 582.436571A233.947429 233.947429 0 0 0 746.678857 512a234.057143 234.057143 0 0 0-172.397714 75.446857h-11.995429v14.043429A233.691429 233.691429 0 0 0 512 746.678857c0 65.645714 26.953143 125.001143 70.436571 167.606857H182.857143a73.142857 73.142857 0 0 1-73.142857-73.142857V182.857143a73.142857 73.142857 0 0 1 73.142857-73.142857h658.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v399.579428z m-640.950857-197.485714l-37.924571 36.059429 106.057143 116.114285L512 374.747429l-35.328-38.729143-132.644571 126.354285-70.692572-77.421714z m0 201.142857l-37.924571 36.059429 106.057143 116.114286L512 575.890286l-35.328-38.729143-132.644571 126.354286-70.692572-77.421715z m288.950857-199.789714v50.249143h201.142857v-50.249143h-201.142857z m184.393143 416.219429a55.881143 55.881143 0 1 0 0-111.725715 55.881143 55.881143 0 0 0 0 111.725715z"
+                                                                            fill="#6580A9"
+                                                                            p-id="1616"
+                                                                        ></path>
+                                                                    </svg>
+                                                                )}
+                                                                <span className="line-clamp-1 text-base ml-1">{v.name}</span>
+                                                                <span>
+                                                                    {v.usage && (
+                                                                        <Tooltip
+                                                                            title={
+                                                                                <div>
+                                                                                    <div>使用示例</div>
+                                                                                    <div className="whitespace-pre-line">{v.usage}</div>
+                                                                                </div>
+                                                                            }
+                                                                            placement="top"
+                                                                        >
+                                                                            <div className="flex items-center cursor-pointer">
+                                                                                <HelpOutlineIcon className="text-base cursor-pointer" />
+                                                                            </div>
+                                                                        </Tooltip>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                            <BpCheckbox size="small" checked />
+                                                        </div>
+                                                        <div className="line-clamp-3 text-xs text-[#364152] h-[48px]">{v.description}</div>
+                                                    </div>
+                                                    {skillWorkflowList.length - 1 !== index && <Divider className="mt-[6px]" />}
+                                                </>
+                                            ))}
+                                        </div>
+                                    }
+                                    trigger="click"
+                                >
+                                    <div className="flex items-center cursor-pointer" onClick={() => setSkillOpen(!skillOpen)}>
+                                        <span className="text-sm">技能:</span>
+                                        <div className="flex items-center justify-start">
+                                            {skillWorkflowList &&
+                                                skillWorkflowList.slice(0, 5).map((item: any, index: number) =>
+                                                    !item.images ? (
+                                                        <svg
+                                                            key={index}
+                                                            viewBox="0 0 1024 1024"
+                                                            version="1.1"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="18"
+                                                            height="18"
+                                                        >
+                                                            <path
+                                                                d="M689.737143 650.496c8.996571-5.339429 18.797714-9.435429 29.220571-12.105143a28.233143 28.233143 0 0 1-0.219428-3.474286v-27.940571a27.940571 27.940571 0 0 1 55.881143 0v27.940571a28.196571 28.196571 0 0 1-0.219429 3.474286c10.386286 2.669714 20.224 6.765714 29.257143 12.105143a28.233143 28.233143 0 0 1 2.267428-2.596571l19.748572-19.748572a27.940571 27.940571 0 1 1 39.497143 39.497143l-19.748572 19.748571a28.16 28.16 0 0 1-2.56 2.304c5.302857 9.033143 9.435429 18.834286 12.068572 29.257143a28.233143 28.233143 0 0 1 3.474285-0.219428h27.940572a27.940571 27.940571 0 1 1 0 55.881143h-27.940572a28.16 28.16 0 0 1-3.474285-0.219429 111.067429 111.067429 0 0 1-12.068572 29.257143c0.877714 0.658286 1.755429 1.462857 2.56 2.267428l19.748572 19.748572a27.940571 27.940571 0 1 1-39.497143 39.497143l-19.748572-19.748572a28.233143 28.233143 0 0 1-2.304-2.56 111.067429 111.067429 0 0 1-29.257142 12.068572 28.196571 28.196571 0 0 1 0.256 3.474285v27.940572a27.940571 27.940571 0 1 1-55.881143 0v-27.940572c0-1.170286 0.073143-2.304 0.219428-3.474285a111.067429 111.067429 0 0 1-29.257143-12.068572 28.233143 28.233143 0 0 1-2.304 2.56l-19.748571 19.748572a27.940571 27.940571 0 1 1-39.497143-39.497143l19.748572-19.748572a28.269714 28.269714 0 0 1 2.596571-2.304 111.067429 111.067429 0 0 1-12.105143-29.257142 28.16 28.16 0 0 1-3.474286 0.256h-27.940571a27.940571 27.940571 0 0 1 0-55.881143h27.940571c1.170286 0 2.340571 0.073143 3.474286 0.219428 2.669714-10.422857 6.765714-20.224 12.105143-29.257143a28.16 28.16 0 0 1-2.596571-2.304l-19.748572-19.748571a27.940571 27.940571 0 1 1 39.497143-39.497143l19.748571 19.748572a28.233143 28.233143 0 0 1 2.304 2.596571zM914.285714 582.436571A233.947429 233.947429 0 0 0 746.678857 512a234.057143 234.057143 0 0 0-172.397714 75.446857h-11.995429v14.043429A233.691429 233.691429 0 0 0 512 746.678857c0 65.645714 26.953143 125.001143 70.436571 167.606857H182.857143a73.142857 73.142857 0 0 1-73.142857-73.142857V182.857143a73.142857 73.142857 0 0 1 73.142857-73.142857h658.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v399.579428z m-640.950857-197.485714l-37.924571 36.059429 106.057143 116.114285L512 374.747429l-35.328-38.729143-132.644571 126.354285-70.692572-77.421714z m0 201.142857l-37.924571 36.059429 106.057143 116.114286L512 575.890286l-35.328-38.729143-132.644571 126.354286-70.692572-77.421715z m288.950857-199.789714v50.249143h201.142857v-50.249143h-201.142857z m184.393143 416.219429a55.881143 55.881143 0 1 0 0-111.725715 55.881143 55.881143 0 0 0 0 111.725715z"
+                                                                fill="#6580A9"
+                                                                p-id="1616"
+                                                            ></path>
+                                                        </svg>
+                                                    ) : (
+                                                        handleIcon(item.images, 'w-[18px] h-[18px]') || (
+                                                            <img
+                                                                className="rounded ml-1"
+                                                                key={index}
+                                                                src={item.images}
+                                                                width={18}
+                                                                height={18}
+                                                            />
+                                                        )
+                                                    )
+                                                )}
+                                        </div>
+                                        {skillWorkflowList.length > 5 && <span>...</span>}
+                                        {skillOpen ? (
+                                            <ExpandLessIcon className="h-[18px] w-[18px]" />
+                                        ) : (
+                                            <ExpandMoreIcon className="h-[18px] w-[18px]" />
+                                        )}
+                                    </div>
+                                </Popover>
+                            ) : (
+                                <div />
+                            )}
+                            <div>
+                                <Select
+                                    style={{ width: 100, height: 23 }}
+                                    bordered={false}
+                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-1"
+                                    value={selectModel || 'GPT35'}
+                                    disabled={mode === 'iframe' || mode === 'share'}
+                                    rootClassName="modelSelect"
+                                    popupClassName="modelSelectPopup"
+                                    onChange={(value) => {
+                                        if (value === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                            setOpenUpgradeModel(true);
+                                            return;
+                                        }
+                                        if (value === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                            setOpenUpgradeModel(true);
+                                            return;
+                                        }
+                                        setSelectModel(value);
+                                    }}
+                                >
+                                    <Option value={'GPT35'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
+                                        默认模型3.5
+                                    </Option>
+                                    <Option value={'GPT4'}>默认模型4.0</Option>
+                                    <Option value={'QWEN'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
+                                        通义千问
+                                    </Option>
+                                </Select>
+                            </div>
+                        </div>
+                        <Grid container spacing={1} alignItems="center" className="px-0 flex-nowrap w-full ml-0">
+                            <Grid item xs={12} sm zeroMinWidth className="!pl-0">
+                                <OutlinedInput
+                                    id="message-send"
+                                    fullWidth
+                                    multiline
+                                    disabled={mode === 'share'}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="请输入想咨询的问题"
+                                    className="!pt-0"
+                                    onKeyDown={handleKeyDown}
+                                    onClick={(e) => {
+                                        // 判断当前人是否有权限使用
+                                        if (chatBotInfo.enableSearchInWeb && !permissions.includes('chat:config:websearch')) {
+                                            setOpenUpgradeOnline(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (chatBotInfo.modelProvider === 'GPT4' && !permissions.includes('chat:config:llm:gpt4')) {
+                                            setOpenUpgradeModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (chatBotInfo.modelProvider === 'QWEN' && !permissions.includes('chat:config:llm:qwen')) {
+                                            setOpenUpgradeModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                        if (skillWorkflowList?.length && !permissions.includes('chat:config:skills')) {
+                                            setOpenUpgradeSkillModel(true);
+                                            const dom = document.querySelector('#message-send') as HTMLTextAreaElement;
+                                            dom?.blur();
+                                            return;
+                                        }
+                                    }}
+                                    minRows={1}
+                                    maxRows={3}
+                                    endAdornment={
+                                        <>
+                                            <InputAdornment position="end">
+                                                {!isListening ? (
+                                                    <Tooltip arrow placement="top" title={'语音输入'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={'default'}
+                                                            onClick={startListening}
+                                                            aria-label="voice"
+                                                            className="p-0"
+                                                        >
+                                                            <KeyboardVoiceIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                        <div
+                                                            onClick={stopListening}
+                                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                        >
+                                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                                {time}
+                                                            </div>
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                            <InputAdornment position="end" className="relative">
+                                                {isFetch ? (
+                                                    <Tooltip placement="top" arrow title={'请求中'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            aria-label="send message"
+                                                        >
+                                                            <PendingIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip placement="top" arrow title={'发送'}>
+                                                        <IconButton
+                                                            disableRipple
+                                                            color={message ? 'secondary' : 'default'}
+                                                            onClick={handleOnSend}
+                                                            aria-label="send message"
+                                                        >
+                                                            <SendIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </InputAdornment>
+                                        </>
+                                    }
+                                    aria-describedby="search-helper-text"
+                                    inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
+                                />
+                            </Grid>
+                        </Grid>
+                        <div className="flex justify-between mt-1 items-center">
+                            <Tooltip title={'清除'} placement="top" arrow>
+                                <CleaningServicesSharpIcon
+                                    className="text-base cursor-pointer hover:text-[#673ab7]"
+                                    onClick={handleClean}
+                                />
+                            </Tooltip>
+                            <div />
+                            <div className="flex items-center">
+                                <div className="flex items-center justify-center">
+                                    <span className="mr-1 text-sm">联网查询</span>
+                                    <Switch
+                                        checked={!!enableOnline}
+                                        checkedChildren="开启"
+                                        unCheckedChildren="关闭"
+                                        disabled={mode === 'iframe' || mode === 'share' || !!chatBotInfo.enableSearchInWeb}
+                                        size={'small'}
+                                        onChange={(value) => {
+                                            if (value && !permissions.includes('chat:config:websearch')) {
+                                                setOpenUpgradeOnline(true);
+                                                return;
+                                            }
+                                            setEnableOnline(value);
+                                        }}
+                                    />
+                                </div>
+                                <div className="text-right text-stone-600 w-[55px] ml-2">{message?.length || 0}/200</div>
+                            </div>
+                        </div>
+                        {mode !== 'market' && (
+                            <div className="w-full flex justify-center">
+                                <div className="flex justify-center items-center">
+                                    <svg
+                                        version="1.1"
+                                        id="Layer_1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                                        x="0px"
+                                        y="0px"
+                                        width="18px"
+                                        height="18px"
+                                        viewBox="0 0 18 18"
+                                        enableBackground="new 0 0 24 24"
+                                        xmlSpace="preserve"
+                                    >
+                                        <image
+                                            id="image0"
+                                            width="18"
+                                            height="18"
+                                            x="0"
+                                            y="0"
+                                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -837,17 +1695,51 @@ export const Chat = ({
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                />
-                            </svg>
-                            <span className="text-[#596780] text-xs truncate leading-5 ml-1">
-                                <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
-                                    Powered by 魔法AI
-                                </a>
-                            </span>
-                        </div>
+                                        />
+                                    </svg>
+                                    <span className="text-[#596780] text-xs truncate leading-5 ml-1">
+                                        <a href="https://mofaai.com.cn" className="text-violet-500" target={'_blank'}>
+                                            Powered by 魔法AI
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            {mode === 'market' && (
+                <div className={`${width > 1300 ? 'min-w-[220px]' : 'min-w-[40px]'} h-full bg-[#f4f6f8] relative`}>
+                    <div
+                        className="bg-white absolute rounded-tr-lg rounded-br-lg p-2 top-[44px] cursor-pointer"
+                        onClick={() => setOpenChatMask(!openChatMask)}
+                    >
+                        {!openChatMask ? (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowLeftIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center text-[#673ab7] font-semibold">
+                                <KeyboardDoubleArrowRightIcon />
+                                <span>如</span>
+                                <span>何</span>
+                                <span>提</span>
+                                <span>问</span>
+                                <span>?</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔力值不足'} />
         </div>
     );
 };

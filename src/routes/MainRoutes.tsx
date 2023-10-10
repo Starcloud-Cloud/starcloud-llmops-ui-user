@@ -18,10 +18,23 @@ const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord'
 
 // pic
 const PictureCreate = Loadable(lazy(() => import('views/picture/create')));
+//智能抠图
+const SmartCutout = Loadable(lazy(() => import('views/picture/lintellgentMatting/components/smartCutout')));
+//删除背景文字
+const DelDebackGroundText = Loadable(lazy(() => import('views/picture/lintellgentMatting/components/delDebackGroundText')));
+//放大图片
+const EnlargementImage = Loadable(lazy(() => import('views/picture/imageProcessing/components/largementImage')));
+//放大图片清晰度
+const UpscaleImage = Loadable(lazy(() => import('views/picture/imageProcessing/components/upscaleImage')));
+//weShop
+const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
+//轮廓出图
+const ContourImage = Loadable(lazy(() => import('views/picture/contourImage')));
 
 // 聊天
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
 const CreateChat = Loadable(lazy(() => import('views/template/myChat/createChat')));
+const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
@@ -42,17 +55,21 @@ const MainRoutes = {
         },
         {
             path: '/appMarket',
-            element: <Market />,
-            children: [
-                {
-                    path: 'list',
-                    element: <MarketList />
-                },
-                {
-                    path: 'detail/:uid',
-                    element: <MarketDetail />
-                }
-            ]
+            element: <Market />
+            // children: [
+            //     {
+            //         path: 'list',
+            //         element: <MarketList />
+            //     },
+            //     {
+            //         path: 'detail/:uid',
+            //         element: <MarketDetail />
+            //     }
+            // ]
+        },
+        {
+            path: '/appMarketDetail/:uid',
+            element: <MarketDetail />
         },
         {
             path: '/template/createCenter',
@@ -75,6 +92,30 @@ const MainRoutes = {
             element: <PictureCreate />
         },
         {
+            path: '/smartImage',
+            element: <SmartCutout />
+        },
+        {
+            path: '/delImageText',
+            element: <DelDebackGroundText />
+        },
+        {
+            path: '/largementImage',
+            element: <EnlargementImage />
+        },
+        {
+            path: '/upscaleImage',
+            element: <UpscaleImage />
+        },
+        {
+            path: '/shopImage',
+            element: <WeShop />
+        },
+        {
+            path: '/contourImage',
+            element: <ContourImage />
+        },
+        {
             path: '/user/account-profile/profile',
             element: <AppUserAccountProfile />
         },
@@ -85,6 +126,10 @@ const MainRoutes = {
         {
             path: '/createChat',
             element: <CreateChat />
+        },
+        {
+            path: '/chatMarket',
+            element: <ChatMarket />
         }
     ]
 };

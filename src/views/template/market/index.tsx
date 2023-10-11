@@ -45,7 +45,7 @@ function TemplateMarket() {
             setAppList(res);
             const newData = _.cloneDeep(res);
             newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 6);
+                item.appList = item.appList.splice(0, 8);
             });
             setNewList(newData);
         });
@@ -101,7 +101,7 @@ function TemplateMarket() {
         } else {
             const newData = _.cloneDeep(appList);
             newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 6);
+                item.appList = item.appList.splice(0, 8);
             });
             setNewList(newData);
         }
@@ -243,11 +243,10 @@ function TemplateMarket() {
         //     }}
         // >
         <Box
-            maxWidth="1300px"
-            margin="0 auto"
             height="calc(100vh - 128px)"
             overflow="hidden"
             sx={{
+                padding: { xs: 0, sm: '0 20px' },
                 scrollbarGutter: 'stable',
                 '&:hover': {
                     overflow: 'scroll'
@@ -325,12 +324,12 @@ function TemplateMarket() {
                             spacing={2}
                         >
                             {item.appList.map((el: any, index: number) =>
-                                queryParams.category === 'ALL' && index < 6 ? (
-                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                queryParams.category === 'ALL' && index < 8 ? (
+                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                         <Template handleDetail={handleDetail} data={el} />
                                     </Grid>
                                 ) : queryParams.category !== 'ALL' ? (
-                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                         <Template handleDetail={handleDetail} data={el} />
                                     </Grid>
                                 ) : (

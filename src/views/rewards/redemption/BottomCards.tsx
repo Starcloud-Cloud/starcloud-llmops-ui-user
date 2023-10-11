@@ -98,7 +98,7 @@ const BottomCards: React.FC = () => {
             description: '分享一次送一次，无上限,社交媒体发布测评，截图认证可获取权益包',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送2魔法豆/2张图片',
+            endText: '送2魔法豆/1张图片',
             onClick: handleOpenShare
         },
         {
@@ -107,7 +107,7 @@ const BottomCards: React.FC = () => {
             description: '需要什么模板?哪些模板不满意？您的建议是我们改进的动力。',
             buttonText: '点击参加',
             Icon: PollIcon,
-            endText: '送2魔法豆/2张图片',
+            endText: '送2魔法豆/1张图片',
             onClick: () => window.open('http://ov9t0w4iwaq9xq9l.mikecrm.com/OX02r3z', '_blank')
         },
         {
@@ -116,7 +116,7 @@ const BottomCards: React.FC = () => {
             description: '一键关注，即可马上兑换',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送2魔法豆/2张图片',
+            endText: '送2魔法豆/1张图片',
             onClick: handleOpenFollow
         }
     ];

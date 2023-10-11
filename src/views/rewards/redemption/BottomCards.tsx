@@ -80,7 +80,7 @@ const BottomCards: React.FC = () => {
             description: '加入魔法AI官方社群即可获得相应权益包',
             buttonText: '点击加入',
             Icon: GroupAddIcon,
-            endText: '送2魔法豆/2张图片',
+            endText: '送2魔法豆/1张图片',
             onClick: handleOpenGroupAdd
         },
         {
@@ -89,7 +89,7 @@ const BottomCards: React.FC = () => {
             description: '注册一位获取一个权益包，无上限，发送链接邀请注册。每邀请三个获取额外权益包（联系客服）',
             buttonText: '复制链接',
             Icon: PersonAddIcon,
-            endText: '送2魔法豆/2张图片',
+            endText: '送10魔法豆/2张图片',
             onClick: handleInvite
         },
         {

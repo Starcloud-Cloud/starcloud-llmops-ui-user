@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Modal } from '@mui/material';
+import { Chip, Modal } from '@mui/material';
 
 // material-ui
 import {
@@ -34,6 +34,7 @@ type TableEnhancedCreateDataType = {
     validityUnit: string;
     expirationTime: number;
     id: number;
+    enabled: boolean;
 };
 
 function formatTime(timestamp: number): string {
@@ -55,7 +56,8 @@ function createData(
     benefitsList: string[],
     validity: number,
     validityUnit: string,
-    expirationTime: number
+    expirationTime: number,
+    enabled: boolean
 ) {
     uniqueId += 1;
     return {
@@ -65,7 +67,8 @@ function createData(
         benefitsList,
         validity,
         validityUnit,
-        expirationTime
+        expirationTime,
+        enabled
     };
 }
 
@@ -97,7 +100,7 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'benefitsName', numeric: false, disablePadding: true, label: '权益名称' },
+    { id: 'benefitsName', numeric: false, disablePadding: false, label: '权益名称' },
     { id: 'status', numeric: false, disablePadding: false, label: '权益状态' },
     { id: 'benefitsList', numeric: false, disablePadding: false, label: '创作额度' },
     { id: 'effectiveTime', numeric: true, disablePadding: false, label: '到账时间' },
@@ -116,7 +119,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'center'}
+                        align={'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
@@ -170,7 +173,8 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                             item.benefitsList.map((benefit) => `${benefit.name} · ${benefit.amount}`),
                             item.validity,
                             item.validityUnit,
-                            item.expirationTime
+                            item.expirationTime,
+                            item.enabled
                         )
                     );
 
@@ -298,10 +302,16 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         key={row.id}
                                         selected={isItemSelected}
                                     >
-                                        <TableCell sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
+                                        <TableCell align="center" sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
                                             {row.benefitsName}
                                         </TableCell>
-                                        <TableCell align="center">{row.validity ? '生效' : '无效'}</TableCell>
+                                        <TableCell align="center">
+                                            {row?.enabled ? (
+                                                <Chip label="生效中" size="small" color="primary" />
+                                            ) : (
+                                                <Chip size={'small'} label="已过期" />
+                                            )}
+                                        </TableCell>
                                         <TableCell align="center">
                                             {row.benefitsList.map((benefit, id) => (
                                                 <Fragment key={id}>
@@ -310,22 +320,22 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                                 </Fragment>
                                             ))}
                                         </TableCell>
-                                        <TableCell align="right">{formatTime(row.effectiveTime)}</TableCell>
-                                        <TableCell align="right">
+                                        <TableCell align="center">{formatTime(row.effectiveTime)}</TableCell>
+                                        <TableCell align="center">
                                             {row.validity} {row.validityUnit === 'MONTH' ? '月' : '年'}
                                         </TableCell>
-                                        <TableCell sx={{ pr: 3 }} align="right">
+                                        <TableCell sx={{ pr: 3 }} align="center">
                                             {formatTime(row.expirationTime)}
                                         </TableCell>
                                     </TableRow>
                                 );
                             })}
 
-                            {emptyRows > 0 && (
+                            {/* {emptyRows > 0 && (
                                 <TableRow>
                                     <TableCell colSpan={7} />
                                 </TableRow>
-                            )}
+                            )} */}
                         </TableBody>
                     </Table>
                 </TableContainer>

@@ -4,7 +4,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { RightOutlined } from '@ant-design/icons';
 import { Box, Typography, IconButton, Grid, InputAdornment, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import ScrollMenus from './ScrollMenu';
@@ -97,6 +97,7 @@ function TemplateMarket() {
                 icon: 'amazon',
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
+            scrollRef.current.scrollTop = 0;
             setNewList(newData1);
         } else {
             const newData = _.cloneDeep(appList);
@@ -223,7 +224,7 @@ function TemplateMarket() {
         fontSize: '12px',
         marginBottom: 2
     };
-
+    const scrollRef: any = useRef(null);
     return (
         // <Box
         //     sx={{
@@ -243,6 +244,7 @@ function TemplateMarket() {
         <Box
             height="calc(100vh - 128px)"
             overflow="hidden"
+            ref={scrollRef}
             sx={{
                 padding: { xs: 0, sm: '0 20px' },
                 scrollbarGutter: 'stable',
@@ -299,12 +301,12 @@ function TemplateMarket() {
                             </div>
                             {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
                                 <div
-                                    onClick={() =>
+                                    onClick={() => {
                                         changeCategory(
                                             item,
                                             menuList.findIndex((value) => value.code === item.code)
-                                        )
-                                    }
+                                        );
+                                    }}
                                     className="text-[#673ab7] cursor-pointer"
                                 >
                                     更多应用

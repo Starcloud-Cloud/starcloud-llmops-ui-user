@@ -13,7 +13,7 @@ export const getImgMeta = () => {
  * @param data
  */
 export const createText2Img = (data: any) => {
-    return request.post({ url: '/llm/image/generate', data });
+    return request.post({ url: '/llm/image/generate', data, timeout: 3 * 60 * 1000 });
 };
 
 /**

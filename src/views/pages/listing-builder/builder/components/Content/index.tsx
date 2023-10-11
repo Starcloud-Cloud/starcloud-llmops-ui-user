@@ -1,9 +1,25 @@
-import { Button, Card, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Switch, TextField, Tooltip } from '@mui/material';
+import {
+    Box,
+    Button,
+    Card,
+    FormControl,
+    Grid,
+    IconButton,
+    InputLabel,
+    LinearProgress,
+    MenuItem,
+    Select,
+    Slide,
+    Slider,
+    Switch,
+    TextField,
+    Tooltip
+} from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider } from 'antd';
+import { Input, Alert, Divider, Statistic, ConfigProvider } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -151,7 +167,195 @@ export const Content = () => {
 
     return (
         <div>
-            <Card className="h-[220px] rounded-t-none">打分</Card>
+            <Card className="h-[220px] rounded-t-none flex justify-center">
+                <div className="flex justify-around items-center w-full ">
+                    <div className="flex-1 flex justify-center">
+                        <div className="w-[80%]">
+                            <div className="flex flex-col items-center w-full">
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    className="w-full"
+                                    sx={{
+                                        height: '8px',
+                                        borderRadius: '8px'
+                                    }}
+                                />
+                                <div className="mt-2">
+                                    <Statistic value={1231412} />
+                                </div>
+                            </div>
+                            <div className="mt-2">
+                                <span className="font-semibold">Search Volume</span>
+                                <div className="w-[50%] mt-1">
+                                    <div className="flex">
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                        /
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                    </div>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={80}
+                                        sx={{
+                                            borderRadius: '4px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-2">
+                                <span className="font-semibold">Search Volume</span>
+                                <div className="w-[50%] mt-1">
+                                    <div className="flex">
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                        /
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                    </div>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={80}
+                                        sx={{
+                                            borderRadius: '4px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <Divider type={'vertical'} className="h-[80%]" />
+                    <div className="flex-1 flex justify-center">
+                        <div className="w-[80%]">
+                            <div className="flex flex-col items-center w-full">
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    className="w-full"
+                                    sx={{
+                                        height: '8px',
+                                        borderRadius: '8px'
+                                    }}
+                                />
+                                <div className="mt-2">
+                                    <Statistic value={1231412} />
+                                </div>
+                            </div>
+                            <div className="mt-2">
+                                <span className="font-semibold">Search Volume</span>
+                                <div className="w-[50%] mt-1">
+                                    <div className="flex">
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                        /
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                    </div>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={80}
+                                        sx={{
+                                            borderRadius: '4px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-2">
+                                <span className="font-semibold">Search Volume</span>
+                                <div className="w-[50%] mt-1">
+                                    <div className="flex">
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                        /
+                                        <ConfigProvider
+                                            theme={{
+                                                components: {
+                                                    Statistic: {
+                                                        contentFontSize: 12
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Statistic value={1231412} />
+                                        </ConfigProvider>
+                                    </div>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={80}
+                                        sx={{
+                                            borderRadius: '4px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Card>
             <Card className="p-5 mt-2">
                 <div className="flex justify-between">
                     <div className="flex items-center">

@@ -423,7 +423,7 @@ function ApplicationAnalysis({
                                     {row.status !== 'SUCCESS' ? (
                                         row.errorCode === '2008002007' ? (
                                             <Link onClick={() => navigate('/subscribe')} color="secondary" className="cursor-pointer">
-                                                魔力值不足，去升级
+                                                魔法豆不足，去升级
                                             </Link>
                                         ) : (
                                             <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>

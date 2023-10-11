@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import infoStore from 'store/entitlementAction';
 import Phone from 'ui-component/login/phone';
 import { getUserInfo } from 'api/login';
+import { isMobile } from 'react-device-detect';
 import React from 'react';
 
 interface MainStyleProps {
@@ -312,7 +313,7 @@ const MainLayout = () => {
     } | null>(null);
 
     const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
+        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat', '/appMarket'];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);
     }, [location]);
@@ -364,6 +365,26 @@ const MainLayout = () => {
             }
         })();
     }, []);
+    useEffect(() => {
+        if (localStorage.getItem('roleRouters')) {
+            let list: any = {};
+            JSON.parse(JSON.parse(localStorage.getItem('roleRouters') as string).v).map((item: any) => {
+                if (item.name === 'mofaai') {
+                    list = item;
+                }
+            });
+            list.children.map((item: any) => {
+                if (item.name === '应用市场') {
+                    item.children.map((el: any) => {
+                        if (el.path === 'appMarket/list') {
+                            localStorage.clear();
+                            window.location.href = 'https://mofaai.com.cn/login';
+                        }
+                    });
+                }
+            });
+        }
+    }, []);
     //绑定手机号
     const { use, setuse } = infoStore();
     useEffect(() => {
@@ -385,7 +406,26 @@ const MainLayout = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [layout, matchDownMd]
     );
-
+    // useEffect(() => {
+    //     if (localStorage.getItem('roleRouters')) {
+    //         let list: any = {};
+    //         JSON.parse(JSON.parse(localStorage.getItem('roleRouters') as string).v).map((item: any) => {
+    //             if (item.name === 'mofaai') {
+    //                 list = item;
+    //             }
+    //         });
+    //         list.children.map((item: any) => {
+    //             if (item.name === '应用市场') {
+    //                 item.children.map((el: any) => {
+    //                     if (el.path === 'appMarket') {
+    //                         localStorage.clear();
+    //                         window.location.href = 'http://localhost:3000/login';
+    //                     }
+    //                 });
+    //             }
+    //         });
+    //     }
+    // }, []);
     return (
         <div className="flex flex-col">
             {timeOutObj && (
@@ -397,10 +437,10 @@ const MainLayout = () => {
                             </span>
                         ) : timeOutObj?.type === 2 ? (
                             <span className="text-sm">
-                                当前魔力值权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
+                                当前魔法豆权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
                             </span>
                         ) : (
-                            <span className="text-sm">当前魔力值权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">当前魔法豆权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
                         )}
                         <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
                             立即续费
@@ -435,13 +475,20 @@ const MainLayout = () => {
                     <Main theme={theme} open={drawerOpen} layout={layout}>
                         {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                         {!isLarge ? (
-                            <Container className={'max-w-[1300px] h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                            <Container
+                                className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
+                                {...(!container && { sx: { px: { xs: 0 } } })}
+                            >
                                 {/* breadcrumb */}
                                 <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                 <Outlet />
                             </Container>
                         ) : (
-                            <Container maxWidth={false} className={'h-full'} {...(!container && { sx: { px: { xs: 0 } } })}>
+                            <Container
+                                maxWidth={false}
+                                className={`h-full ${isMobile && '!px-0'}`}
+                                {...(!container && { sx: { px: { xs: 0 } } })}
+                            >
                                 <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                 <Outlet />
                             </Container>

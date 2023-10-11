@@ -153,10 +153,10 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
-        description: '每天签到获取魔力值/图片使用数',
+        description: '每天签到获取魔法豆/图片使用数',
         monthPrice: '免费',
         yearPrice: '免费',
-        des: '适用于新用户体验，打卡获得魔力值',
+        des: '适用于新用户体验，打卡获得魔法豆',
         permission: [0, 1, 2, 4, 5, 6, 7, 8, 9],
         btnText: '免费使用'
     },
@@ -164,7 +164,7 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: '1000魔力值，100张图片',
+        description: '1000魔法豆，100张图片',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
@@ -178,7 +178,7 @@ const plans = [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: '3000魔力值，300张图片',
+        description: '3000魔法豆，300张图片',
         monthPrice: 99,
         yearPrice: 999,
         preMonthPrice: 83.25,
@@ -192,7 +192,7 @@ const plans = [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: '6个账号，无限魔力值创作，1000张图片',
+        description: '6个账号，无限魔法豆创作，1000张图片',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
@@ -217,7 +217,7 @@ const plans = [
 
 const planList = [
     [
-        '签到可免费获得2魔力值', // 0
+        '签到可免费获得2魔法豆', // 0
         '签到可免费获取图片2张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
@@ -232,7 +232,7 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>1000魔力值</span>
+            <span>1000魔法豆</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
@@ -241,7 +241,7 @@ const planList = [
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔力值'}>
+            <Tooltip title={'消耗30点魔法豆'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
@@ -261,7 +261,7 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>3000魔力值</span>
+            <span>3000魔法豆</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
@@ -270,7 +270,7 @@ const planList = [
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔力值'}>
+            <Tooltip title={'消耗30点魔法豆'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
@@ -290,7 +290,7 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>无限魔力值生成</span>
+            <span>无限魔法豆生成</span>
             <Tag color="#f50" className="ml-1">
                 无限
             </Tag>
@@ -487,9 +487,7 @@ const Price1 = () => {
                 <VipBar />
             </HeaderWrapper>
             <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
-                {/* TODO */}
-                {/* <div className="w-[96%]"> */}
-                <div className="w-[80%]">
+                <div className="w-[94%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
@@ -503,15 +501,10 @@ const Price1 = () => {
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
-                            // TODO;
-                            if (index === 1) {
-                                return;
-                            }
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
                             return (
-                                // TODO
-                                <Grid item xs={20} sm={10} md={5} key={index}>
+                                <Grid item xs={20} sm={10} md={4} key={index}>
                                     <MainCard
                                         boxShadow
                                         sx={{
@@ -521,29 +514,6 @@ const Price1 = () => {
                                         }}
                                     >
                                         <Grid container textAlign="center" spacing={gridSpacing}>
-                                            {/* <Grid item xs={12}>
-                                                <Box
-                                                    sx={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        borderRadius: '50%',
-                                                        width: 80,
-                                                        height: 80,
-                                                        background:
-                                                            theme.palette.mode === 'dark'
-                                                                ? theme.palette.dark[800]
-                                                                : theme.palette.primary.light,
-                                                        color: theme.palette.primary.main,
-                                                        '& > svg': {
-                                                            width: 35,
-                                                            height: 35
-                                                        }
-                                                    }}
-                                                >
-                                                    {plan.icon}
-                                                </Box>
-                                            </Grid> */}
                                             <Grid item xs={12}>
                                                 <Typography
                                                     variant="h6"
@@ -585,6 +555,7 @@ const Price1 = () => {
                                                     sx={{
                                                         fontSize: '2.1875rem',
                                                         fontWeight: 700,
+                                                        lineHeight: '1.2em',
                                                         '& > span': {
                                                             fontSize: '1.25rem',
                                                             fontWeight: 500

@@ -122,7 +122,13 @@ const Header = () => {
                 }
                 arrow={false}
             >
-                <Box display="flex" alignItems="center" sx={{ cursor: 'pointer', ml: '47px' }} onClick={handleClick}>
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    sx={{ cursor: 'pointer' }}
+                    onClick={handleClick}
+                    className="sm:ml-[47px] xs:ml-[20px]"
+                >
                     <QrCode2Icon />
                     <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
                         跨境卖家AI工具群

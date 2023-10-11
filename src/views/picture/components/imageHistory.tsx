@@ -8,7 +8,7 @@ import { history } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
 import ImageDetail from './detail';
 
-const ImageHistory = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+const ImageHistory = ({ open, scene, handleClose }: { open: boolean; scene: string; handleClose: () => void }) => {
     const columns: ColumnsType<any> = [
         { title: '类型', dataIndex: 'type' },
         {
@@ -62,7 +62,7 @@ const ImageHistory = ({ open, handleClose }: { open: boolean; handleClose: () =>
         onChange: onSelectChange
     };
     const getList = async () => {
-        const res = await history({ pageNo: 1, pageSize: 1000 });
+        const res = await history({ pageNo: 1, pageSize: 1000, scene });
         setTableData(res.list);
     };
     useEffect(() => {

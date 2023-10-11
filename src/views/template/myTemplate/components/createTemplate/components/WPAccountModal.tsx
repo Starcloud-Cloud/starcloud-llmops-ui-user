@@ -3,7 +3,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import { CardContent, IconButton, Button, Modal, Tabs, Tab, Box, Typography, Divider, Link, TextField } from '@mui/material';
 import { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { bindCreate } from 'api/chat';
+import { bindCreate, bindDelete } from 'api/chat';
+import { v4 as uuidv4 } from 'uuid';
+import copy from 'clipboard-copy';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -28,7 +32,7 @@ function a11yProps(index: number) {
         'aria-controls': `simple-tabpanel-${index}`
     };
 }
-const WeSetting = ({ name }: { name: string }) => {
+const WeSetting = ({ name, updateBtn }: { name: string; updateBtn: any }) => {
     return (
         <>
             <Typography sx={{ cursor: 'pointer' }} color="secondary" mb={1}>
@@ -37,7 +41,10 @@ const WeSetting = ({ name }: { name: string }) => {
             <Box display="flex" alignItems="center">
                 <Box width="10px" height="10px" borderRadius="50%" sx={{ backgroundColor: '#673ab7' }}></Box>
                 <Typography ml={2}>
-                    进入微信<span style={{ color: '#00e676', cursor: 'pointer' }}>「公众号后台」</span>
+                    进入微信
+                    <span style={{ color: '#00e676', cursor: 'pointer' }} onClick={() => window.open('https://mp.weixin.qq.com/')}>
+                        「公众号后台」
+                    </span>
                 </Typography>
             </Box>
             <Box display="flex">
@@ -76,20 +83,40 @@ const WeSetting = ({ name }: { name: string }) => {
                     )}
                     {name === '添加菜单' && (
                         <Typography ml="21px" fontSize="12px">
-                            https://chato.cn/b/jp1637w9331rmo8e?source=mp_reply
+                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_menu`}
                         </Typography>
                     )}
                     {name === '自动回复' && (
                         <Typography ml="21px" fontSize="12px">
-                            https://chato.cn/b/jp1637w9331rmo8e?source=mp_reply
+                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_reply`}
                         </Typography>
                     )}
                     <Box ml="21px" mt={1} display="flex">
-                        <Button size="small" color="secondary">
+                        <Button
+                            onClick={() => {
+                                copy(
+                                    name === '添加菜单'
+                                        ? `${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_menu`
+                                        : `${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_reply`
+                                );
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '复制成功',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        close: false,
+                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                        transition: 'SlideLeft'
+                                    })
+                                );
+                            }}
+                            size="small"
+                            color="secondary"
+                        >
                             复制链接
-                        </Button>
-                        <Button size="small" color="secondary">
-                            保存二维码
                         </Button>
                     </Box>
                 </Box>
@@ -97,17 +124,64 @@ const WeSetting = ({ name }: { name: string }) => {
         </>
     );
 };
-export default function WechatModal({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
+export default function WechatModal({
+    open,
+    updateBtn,
+    setOpen,
+    getUpdateBtn
+}: {
+    open: boolean;
+    updateBtn: any;
+    setOpen: (open: boolean) => void;
+    getUpdateBtn: () => void;
+}) {
     const [value, setValue] = useState(0);
+    const [idOpen, setIdOpen] = useState(false);
+    const [passwordOpen, setPasswordOpen] = useState(false);
+    const [numberOpen, setNumberOpen] = useState(false);
     const [query, setQuery] = useState({
         account: '',
         appId: '',
         appSecret: ''
     });
+    //部署
     const saveWechat = async () => {
-        const result = await bindCreate({
-            ...query
-        });
+        if (Object.values(query).every((value) => value !== '')) {
+            const result = await bindCreate({
+                appUid: updateBtn.appUid,
+                publishUid: updateBtn.uid,
+                name: uuidv4(),
+                ...query
+            });
+            getUpdateBtn();
+        } else {
+            setIdOpen(true);
+            setPasswordOpen(true);
+            setNumberOpen(true);
+        }
+    };
+    //取消部署
+    const delWP = async () => {
+        const result = await bindDelete(updateBtn?.channelMap[6][0]?.uid);
+        if (result) {
+            getUpdateBtn();
+        }
+    };
+    //复制
+    const message = () => {
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '复制成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false,
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                transition: 'SlideLeft'
+            })
+        );
     };
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -159,19 +233,26 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                         <Tab label="消息调用" {...a11yProps(1)} />
                     </Tabs>
                     <CustomTabPanel value={value} index={0}>
-                        <WeSetting name="添加菜单" />
+                        <WeSetting name="添加菜单" updateBtn={updateBtn} />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
-                        <WeSetting name="自动回复" />
+                        <WeSetting name="自动回复" updateBtn={updateBtn} />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
                         <Typography sx={{ cursor: 'pointer' }} color="secondary" mb={1}>
                             查看填写示意图
                         </Typography>
-                        {true ? (
+                        {!(updateBtn?.channelMap[6]?.length > 0) ? (
                             <div>
                                 <div>
-                                    进入微信 <span className="text-[#2AC74A] mt-[8px]">「公众号后台」</span> 复制开发信息
+                                    进入微信
+                                    <span
+                                        onClick={() => window.open('https://mp.weixin.qq.com/')}
+                                        className="text-[#2AC74A] mt-[8px] cursor-pointer"
+                                    >
+                                        「公众号后台」
+                                    </span>
+                                    复制开发信息
                                 </div>
                                 <div className="text-[12px] text-[#697586] mt-[8px]">{`路径：设置与开发 > 基本配置，启用开发者密码后，复制并填写在下方`}</div>
                                 <div className="text-[12px] text-[#EA0000] mt-[8px]">未认证公众号暂不支持</div>
@@ -184,8 +265,10 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                                     helperText=" "
                                     required
                                     name="appId"
+                                    error={idOpen && !query.appId}
                                     value={query.appId}
                                     onChange={(e) => {
+                                        setIdOpen(true);
                                         setQuery({
                                             ...query,
                                             appId: e.target.value
@@ -202,8 +285,10 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                                     fullWidth
                                     required
                                     name="appSecret"
+                                    error={passwordOpen && !query.appSecret}
                                     value={query.appSecret}
                                     onChange={(e) => {
+                                        setPasswordOpen(true);
                                         setQuery({
                                             ...query,
                                             appSecret: e.target.value
@@ -220,8 +305,10 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                                     fullWidth
                                     required
                                     name="account"
+                                    error={numberOpen && !query.account}
                                     value={query.account}
                                     onChange={(e) => {
+                                        setNumberOpen(true);
                                         setQuery({
                                             ...query,
                                             account: e.target.value
@@ -241,34 +328,51 @@ export default function WechatModal({ open, setOpen }: { open: boolean; setOpen:
                                 <div className="text-[#697586] my-[8px]">公众号后台启用后，请在微信公众号后台复制IP白名单</div>
                                 <div className="text-[#697586]">复制下方信息，在后台修改配置时粘贴</div>
                                 <div className="flex justify-between mt-[8px]">
-                                    <div>服务器地址（URL）：</div>
-                                    <Button size="small" color="secondary">
+                                    <div>服务器地址（URL）：{updateBtn?.channelMap[6][0]?.config?.url}</div>
+                                    <Button
+                                        onClick={() => {
+                                            copy(updateBtn?.channelMap[6][0]?.config?.url);
+                                            message();
+                                        }}
+                                        size="small"
+                                        color="secondary"
+                                    >
                                         复制
                                     </Button>
                                 </div>
                                 <div className="flex justify-between">
-                                    <div>令牌（Token）：</div>
-                                    <Button size="small" color="secondary">
+                                    <div>令牌（Token）：{updateBtn?.channelMap[6][0]?.config?.token}</div>
+                                    <Button
+                                        onClick={() => {
+                                            copy(updateBtn?.channelMap[6][0]?.config?.token);
+                                            message();
+                                        }}
+                                        size="small"
+                                        color="secondary"
+                                    >
                                         复制
                                     </Button>
                                 </div>
                                 <div className="flex justify-between">
-                                    <div>消息加解密密钥（EncodingAESKey）：</div>
-                                    <Button size="small" color="secondary">
+                                    <div>ip白名单：{updateBtn?.channelMap[6][0]?.config?.whitelist?.toString()}</div>
+                                    <Button
+                                        onClick={() => {
+                                            copy(updateBtn?.channelMap[6][0]?.config?.whitelist?.toString());
+                                            message();
+                                        }}
+                                        size="small"
+                                        color="secondary"
+                                    >
                                         复制
                                     </Button>
                                 </div>
-                                <div className="flex justify-between">
-                                    <div>ip白名单：</div>
-                                    <Button size="small" color="secondary">
-                                        复制
-                                    </Button>
-                                </div>
-                                <div className="flex justify-between">
+                                <div className="flex justify-between mb-[12px]">
                                     <div>消息加解密方式</div>
                                     <div>明文模式</div>
                                 </div>
-                                <Button variant="outlined">重新部署</Button>
+                                <Button onClick={delWP} size="small" color="secondary" variant="outlined">
+                                    重新部署
+                                </Button>
                             </div>
                         )}
                     </CustomTabPanel>

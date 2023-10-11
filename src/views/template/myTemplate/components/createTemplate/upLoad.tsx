@@ -995,7 +995,7 @@ function Upload({
                         </Grid>
                     )}
                     {upLoadList.map((item) =>
-                        item.title === '微信群聊' ? (
+                        item.title === '微信群聊' || item.title === '微信公众号' ? (
                             mode === 'CHAT' && (
                                 <Grid key={item.title} flex={1} item md={6} xs={12}>
                                     <SubCard
@@ -1310,7 +1310,9 @@ function Upload({
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
             <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} mode={mode} />
             {openWchat && <WechatModal open={openWchat} setOpen={setOpenWchat} value={phone} setValue={setPhone} handleOk={wechatOK} />}
-            {openWPAccount && <WPAccountModal open={openWPAccount} setOpen={setOpenWPAccount} />}
+            {openWPAccount && (
+                <WPAccountModal open={openWPAccount} setOpen={setOpenWPAccount} updateBtn={updateBtn} getUpdateBtn={getUpdateBtn} />
+            )}
         </Box>
     );
 }

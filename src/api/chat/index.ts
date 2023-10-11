@@ -333,3 +333,11 @@ export const disDoc = (params: any) => {
 export const bindCreate = (data: any) => {
     return request.post({ url: `/llm/wechat/bind/create`, data });
 };
+
+/**
+ * 取消绑定微信公众号
+ * @param shareKey
+ */
+export const bindDelete = (data: any) => {
+    return request.post({ url: `/llm/wechat/bind/delete/${data}` });
+};

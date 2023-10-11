@@ -336,7 +336,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     </div>
                 </MainCard>
             </Modal>
-            {historyOpen && <ImageHistory open={historyOpen} handleClose={() => setHistoryOpen(false)} />}
+            {historyOpen && <ImageHistory open={historyOpen} scene="IMAGE_UPSCALING" handleClose={() => setHistoryOpen(false)} />}
         </Card>
     );
 };

@@ -28,6 +28,6 @@ export const upscale = (data: any) => {
  * 图片历史记录
  * @returns
  */
-export const history = (params: any) => {
-    return request.get({ url: '/llm/image/history', params });
+export const history = (data: any) => {
+    return request.post({ url: '/llm/image/history', data });
 };

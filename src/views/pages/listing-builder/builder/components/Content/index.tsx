@@ -3,8 +3,7 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Divider } from 'antd';
-import { Input, Alert } from 'antd';
+import { Input, Alert, Divider } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -26,7 +25,7 @@ const defaultList = [
                 <br />
                 3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ {} # &lt; &gt; | * ; ^ ¬ ¦ Æ © ®）；
                 <br />
-                4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；{' '}
+                4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
                 <br />
                 5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
                 <br />
@@ -179,9 +178,9 @@ export const Content = () => {
                                 <div className="flex items-center ml-3 cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
                                     {!assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                     {!assistOpen ? (
-                                        <span className="text-[#505355] text-base font-semibold">收起辅助信息</span>
+                                        <span className="text-[#505355] text-sm font-semibold">收起辅助信息</span>
                                     ) : (
-                                        <span className="text-[#505355] text-base font-semibold">展开辅助信息</span>
+                                        <span className="text-[#505355] text-sm font-semibold">展开辅助信息</span>
                                     )}
                                 </div>
                             </div>
@@ -286,11 +285,11 @@ export const Content = () => {
                                                     label="Age"
                                                     // onChange={handleChange}
                                                 >
-                                                    <MenuItem value={10}>正式</MenuItem>
-                                                    <MenuItem value={20}>感性</MenuItem>
-                                                    <MenuItem value={20}>鼓吹</MenuItem>
-                                                    <MenuItem value={20}>有激情</MenuItem>
-                                                    <MenuItem value={20}>又爆发力</MenuItem>
+                                                    <MenuItem value={1}>正式</MenuItem>
+                                                    <MenuItem value={2}>感性</MenuItem>
+                                                    <MenuItem value={3}>鼓吹</MenuItem>
+                                                    <MenuItem value={4}>有激情</MenuItem>
+                                                    <MenuItem value={5}>又爆发力</MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </div>

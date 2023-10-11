@@ -325,3 +325,19 @@ export const upDoc = (params: any) => {
 export const disDoc = (params: any) => {
     return request.post({ url: `/llm/dataset-source-data/disable`, params });
 };
+
+/**
+ * 绑定微信公众号
+ * @param shareKey
+ */
+export const bindCreate = (data: any) => {
+    return request.post({ url: `/llm/wechat/bind/create`, data });
+};
+
+/**
+ * 取消绑定微信公众号
+ * @param shareKey
+ */
+export const bindDelete = (data: any) => {
+    return request.post({ url: `/llm/wechat/bind/delete/${data}` });
+};

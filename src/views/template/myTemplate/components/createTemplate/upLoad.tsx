@@ -59,6 +59,7 @@ import WechatModal from './components/wchatModal';
 import { SiteDrawerCode } from './components/SiteDrawerCode';
 import WeChatDrawer from './components/WeChatDrawer';
 import DomainModal from './components/DomainModal';
+import WPAccountModal from './components/WPAccountModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
 import userInfoStore from 'store/entitlementAction';
@@ -197,6 +198,23 @@ function Upload({
             ]
         },
         {
+            title: '微信公众号',
+            icon: 'weixingongzhonghao',
+            desc: '可在微信公众号后台配置，提供机器人服务',
+            enableValue: false,
+            comingSoon: false,
+            type: 5,
+            action: [
+                {
+                    title: '配置公众号',
+                    icon: 'historyOutlined',
+                    onclick: () => {
+                        setOpenWPAccount(true);
+                    }
+                }
+            ]
+        },
+        {
             title: 'API调用',
             icon: 'api',
             desc: '通过API，可直接进行调用或发出请求',
@@ -219,6 +237,7 @@ function Upload({
     const [openWchat, setOpenWchat] = useState(false);
     const [openWeDrawer, setOpenWeDrawer] = useState(false);
     const [botOpen, setBotOpen] = useState(false);
+    const [openWPAccount, setOpenWPAccount] = useState(false);
     //tabs
     const [tabValue, setTabValue] = useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -976,7 +995,7 @@ function Upload({
                         </Grid>
                     )}
                     {upLoadList.map((item) =>
-                        item.title === '微信群聊' ? (
+                        item.title === '微信群聊' || item.title === '微信公众号' ? (
                             mode === 'CHAT' && (
                                 <Grid key={item.title} flex={1} item md={6} xs={12}>
                                     <SubCard
@@ -1291,6 +1310,9 @@ function Upload({
             <DomainModal open={openDomain} setOpen={setOpenDomain} />
             <CopySiteModal open={openCopySite} setOpen={setOpenCopySite} uid={webMediumUid} mode={mode} />
             {openWchat && <WechatModal open={openWchat} setOpen={setOpenWchat} value={phone} setValue={setPhone} handleOk={wechatOK} />}
+            {openWPAccount && (
+                <WPAccountModal open={openWPAccount} setOpen={setOpenWPAccount} updateBtn={updateBtn} getUpdateBtn={getUpdateBtn} />
+            )}
         </Box>
     );
 }

@@ -1,25 +1,13 @@
 import { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
-import {
-    Card,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Autocomplete,
-    Chip,
-    OutlinedInput,
-    Box,
-    Stack,
-    FormHelperText
-} from '@mui/material';
+import { Card, TextField, Autocomplete, Chip, Stack } from '@mui/material';
+import { Select, Image } from 'antd';
 import { categoryTree } from 'api/template';
-import { Tree, Popover, TreeSelect } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { TreeSelect } from 'antd';
 import { t } from 'hooks/web/useI18n';
 import { Anyevent } from 'types/template';
 import { useFormik } from 'formik';
 import marketStore from 'store/market';
+import useUserStore from 'store/user';
 import * as yup from 'yup';
 import _ from 'lodash-es';
 const validationSchema = yup.object({
@@ -27,7 +15,9 @@ const validationSchema = yup.object({
     category: yup.string().required(t('myApp.isrequire'))
 });
 
-const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
+const Basis = forwardRef(({ initialValues, setValues, setDetail_icon }: Anyevent, ref) => {
+    const { Option } = Select;
+    const permissions = useUserStore((state) => state.permissions);
     const categoryList = marketStore((state) => state.categoryList);
     useImperativeHandle(ref, () => ({
         submit: () => {
@@ -51,6 +41,29 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
             setCateTree(newData);
         });
     }, []);
+    //选择icon
+    const [icons, setIcon] = useState<string | undefined>('');
+    useEffect(() => {
+        setDetail_icon(icons);
+    }, [icons]);
+    useEffect(() => {
+        if (formik.values.category) {
+            const data = categoryIcon.find((item) => {
+                const newData = formik.values.category.slice(0, formik.values.category?.lastIndexOf('_'));
+                return item.code === newData;
+            })?.icon;
+            setIcon(data);
+        }
+    }, [formik.values.category]);
+    const categoryIcon = [
+        { icon: 'hot', name: '热门', code: 'HOT' },
+        { icon: 'amazon', name: '亚马逊', code: 'AMAZON' },
+        { icon: 'website', name: '独立站', code: 'WEBSITE' },
+        { icon: 'social-media', name: '社交媒体', code: 'SOCIAL_MEDIA' },
+        { icon: 'email', name: '邮件营销', code: 'EMAIL' },
+        { icon: 'seo', name: 'SEO写作', code: 'SEO_WRITING' },
+        { icon: 'other', name: '其他应用', code: 'OTHER' }
+    ];
     return (
         <Card sx={{ overflow: 'visible' }}>
             <form>
@@ -137,6 +150,22 @@ const Basis = forwardRef(({ initialValues, setValues }: Anyevent, ref) => {
                         renderInput={(params: any) => <TextField name="tags" color="secondary" {...params} label={t('myApp.scense')} />}
                     />
                 </Stack>
+                {permissions.includes('app:operate:icon') && (
+                    <Select
+                        onChange={(e) => {
+                            setIcon(e);
+                        }}
+                        value={icons}
+                        className="h-[51px] mt-[16px] w-[100%]"
+                    >
+                        {categoryIcon.map((item) => (
+                            <Option value={item.icon} label="China">
+                                <Image width={20} src={require('../../../../../assets/images/category/' + item.icon + '.svg')} />
+                                <span className="ml-[10px]">{item.name}</span>
+                            </Option>
+                        ))}
+                    </Select>
+                )}
             </form>
         </Card>
     );

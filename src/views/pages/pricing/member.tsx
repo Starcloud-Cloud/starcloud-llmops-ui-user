@@ -626,7 +626,7 @@ const Price1 = () => {
                                         </div>
                                     </SwiperSlide>
                                 ))}
-                            </Swiper>{' '}
+                            </Swiper>
                         </div>
                     </div>
                 </div>

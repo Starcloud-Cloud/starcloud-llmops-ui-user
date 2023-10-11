@@ -365,6 +365,26 @@ const MainLayout = () => {
             }
         })();
     }, []);
+    useEffect(() => {
+        if (localStorage.getItem('roleRouters')) {
+            let list: any = {};
+            JSON.parse(JSON.parse(localStorage.getItem('roleRouters') as string).v).map((item: any) => {
+                if (item.name === 'mofaai') {
+                    list = item;
+                }
+            });
+            list.children.map((item: any) => {
+                if (item.name === '应用市场') {
+                    item.children.map((el: any) => {
+                        if (el.path === 'appMarket/list') {
+                            localStorage.clear();
+                            window.location.href = 'https://mofaai.com.cn/login';
+                        }
+                    });
+                }
+            });
+        }
+    }, []);
     //绑定手机号
     const { use, setuse } = infoStore();
     useEffect(() => {

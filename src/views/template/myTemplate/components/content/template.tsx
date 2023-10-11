@@ -21,24 +21,6 @@ function Template({ data, handleDetail }: any) {
                 p: 2
             }}
         >
-            {data?.icon && (
-                <Image
-                    onClick={() => handleDetail(data)}
-                    preview={false}
-                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
-                    height="2.25rem"
-                    src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
-                />
-            )}
-            {!data?.icon && data?.images && (
-                <Image
-                    onClick={() => handleDetail(data)}
-                    preview={false}
-                    className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
-                    height="2.25rem"
-                    src={data.images[0]}
-                />
-            )}
             <CardContent
                 sx={{
                     p: '0',
@@ -47,24 +29,45 @@ function Template({ data, handleDetail }: any) {
                     overflow: 'hidden'
                 }}
             >
-                <Tooltip placement="top" disableInteractive title={data.name}>
-                    <Typography
-                        onClick={() => handleDetail(data)}
-                        className="textnoWarp active cursor"
-                        gutterBottom
-                        variant="h3"
-                        sx={{ fontSize: '1.1rem' }}
-                        component="div"
-                        my={1}
-                    >
-                        {data.name}
-                    </Typography>
-                </Tooltip>
+                <div className="flex items-center">
+                    {data?.icon && (
+                        <Image
+                            onClick={() => handleDetail(data)}
+                            preview={false}
+                            className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
+                            height="20px"
+                            src={require('../../../../../assets/images/category/' + data?.icon + '.svg')}
+                        />
+                    )}
+                    {!data?.icon && data?.images && (
+                        <Image
+                            onClick={() => handleDetail(data)}
+                            preview={false}
+                            className="cursor-pointer rounded-lg overflow-hidden border border-solid border-slate-200"
+                            height="20px"
+                            src={data.images[0]}
+                        />
+                    )}
+                    <Tooltip placement="top" disableInteractive title={data.name}>
+                        <Typography
+                            onClick={() => handleDetail(data)}
+                            className=" ml-[5px] textnoWarp active cursor overflow-hidden line-clamp-1"
+                            gutterBottom
+                            variant="h3"
+                            sx={{ fontSize: '1.1rem' }}
+                            component="div"
+                            my={1}
+                        >
+                            {data.name}
+                        </Typography>
+                    </Tooltip>
+                </div>
+
                 <Tooltip placement="top" disableInteractive title={data.description}>
                     <Typography
                         sx={{ fontSize: '.8rem' }}
                         onClick={() => handleDetail(data)}
-                        className="line-clamp-2 cursor-pointer"
+                        className="line-clamp-5 cursor-pointer"
                         variant="body2"
                         lineHeight="1.1rem"
                     >

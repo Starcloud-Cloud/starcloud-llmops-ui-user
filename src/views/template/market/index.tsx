@@ -35,7 +35,7 @@ function TemplateMarket() {
     const [appList, setAppList] = useState<any[]>([]);
     const [newList, setNewList] = useState<any[]>([]);
     //类别选中
-    const [menuList, setMenuList] = useState<{ name: string; icon: string }[]>([]);
+    const [menuList, setMenuList] = useState<{ name: string; icon: string; code: string }[]>([]);
     const [active, setActive] = useState<number | string>(0);
     //类别树
     const [cateTree, setCateTree] = useState<any[]>([]);
@@ -97,8 +97,6 @@ function TemplateMarket() {
                 icon: 'amazon',
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
-            console.log(newData1);
-
             setNewList(newData1);
         } else {
             const newData = _.cloneDeep(appList);
@@ -157,6 +155,8 @@ function TemplateMarket() {
     };
     //切换category
     const changeCategory = (item: any, index: number) => {
+        console.log(active, index);
+
         if (active === index) {
             setActive(0);
             setQueryParams({
@@ -301,7 +301,15 @@ function TemplateMarket() {
                                 <span>{item.name}</span>
                             </div>
                             {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                <div onClick={() => changeCategory(item, index)} className="text-[#673ab7] cursor-pointer">
+                                <div
+                                    onClick={() =>
+                                        changeCategory(
+                                            item,
+                                            menuList.findIndex((value) => value.code === item.code)
+                                        )
+                                    }
+                                    className="text-[#673ab7] cursor-pointer"
+                                >
                                     更多应用
                                     <RightOutlined rev={undefined} />
                                 </div>

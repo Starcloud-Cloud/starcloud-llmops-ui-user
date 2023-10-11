@@ -74,7 +74,7 @@ export const Regulation = ({
 
     const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)({
         [`& .${tooltipClasses.tooltip}`]: {
-            maxWidth: 310
+            minWidth: 340
         }
     });
 
@@ -398,12 +398,29 @@ export const Regulation = ({
                             content={
                                 <div className="max-w-[230px] sm:max-w-[600px]">
                                     <div className="flex flex-wrap">
-                                        <Tag className="mb-1">角色</Tag>
-                                        <Tag className="mb-1">能力</Tag>
-                                        <Tag className="mb-1">说话风格</Tag>
-                                        <Tag className="mb-1">询问策略</Tag>
-                                        <Tag className="mb-1">回答身份</Tag>
-                                        <Tag className="mb-1">输出格式</Tag>
+                                        <Tag color={'blue'} className="mb-1">
+                                            角色
+                                        </Tag>
+                                        +
+                                        <Tag color={'blue'} className="mb-1 ml-2">
+                                            能力
+                                        </Tag>
+                                        +
+                                        <Tag color={'blue'} className="mb-1 ml-2">
+                                            说话风格
+                                        </Tag>
+                                        +
+                                        <Tag color={'blue'} className="mb-1 ml-2">
+                                            询问策略
+                                        </Tag>
+                                        +
+                                        <Tag color={'blue'} className="mb-1 ml-2">
+                                            回答身份
+                                        </Tag>
+                                        =
+                                        <Tag className="mb-1 ml-2" color={'red'}>
+                                            输出格式
+                                        </Tag>
                                     </div>
                                     <div>
                                         <Tabs size="small" defaultActiveKey="1" items={items} onChange={onChange} />

@@ -1,23 +1,10 @@
-import {
-    Box,
-    Grid,
-    Pagination,
-    TextField,
-    Typography,
-    Button,
-    OutlinedInput,
-    FormControl,
-    InputLabel,
-    Chip,
-    MenuItem,
-    Select
-} from '@mui/material';
-
+import { Box, Grid, Pagination, TextField, Typography, Button } from '@mui/material';
+import { TreeSelect } from 'antd';
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 
-import { recommends, appPage } from 'api/template/index';
+import { recommends, appPage, categoryTree } from 'api/template/index';
 
 import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +20,7 @@ import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
 import userInfoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
+import _ from 'lodash-es';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -77,10 +65,11 @@ function MyTemplate() {
         pageNo: 1,
         pageSize: 20
     });
+    const [cateTree, setCateTree] = useState<any[]>([]);
     const categoryList = marketStore((state) => state.categoryList);
-    const [queryParams, setQueryParams] = useState<{ name: string; categories: (string | null)[]; tags: (string | null)[] }>({
+    const [queryParams, setQueryParams] = useState<{ name: string; categories: string; tags: (string | null)[] }>({
         name: '',
-        categories: [],
+        categories: '',
         tags: []
     });
     const { totals, totalList, setTotals, setTotalList } = myApp();
@@ -103,7 +92,8 @@ function MyTemplate() {
             }
             if (newValue.categories && newValue.categories.length > 0) {
                 if (item.categories) {
-                    topicMatch = newValue.categories.some((topic) => item.categories.includes(topic));
+                    topicMatch = item.categories.includes(newValue.categories);
+                    // newValue.categories.some((topic) => item.categories.includes(topic));
                 } else {
                     topicMatch = false;
                 }
@@ -130,6 +120,14 @@ function MyTemplate() {
             setTotalList(res.list);
             setTotals(res.page.total);
             setNewApp(res.list.slice(0, pageQuery.pageSize));
+        });
+        //类别树
+        categoryTree().then((res) => {
+            const newData = _.cloneDeep(res);
+            newData.forEach((item: any) => {
+                item.disabled = true;
+            });
+            setCateTree(newData);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -175,7 +173,7 @@ function MyTemplate() {
                         fullWidth
                     />
                 </Grid>
-                <Grid item lg={3}>
+                {/* <Grid item lg={3}>
                     <FormControl fullWidth>
                         <InputLabel color="secondary" id="categories">
                             {t('myApp.categary')}
@@ -213,43 +211,50 @@ function MyTemplate() {
                             )}
                         </Select>
                     </FormControl>
-                </Grid>
-                {/* <Grid item lg={3}>
-                    <FormControl fullWidth>
-                        <InputLabel color="secondary" id="tags">
-                            {t('apply.tag')}
-                        </InputLabel>
-                        <Select
-                            labelId="tags"
-                            name="tags"
-                            multiple
-                            color="secondary"
-                            value={queryParams?.tags}
-                            onChange={(e) => {
-                                changeParams(e);
+                </Grid> */}
+                <Grid item lg={3}>
+                    <div className=" relative">
+                        <TreeSelect
+                            className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px] antdSel"
+                            showSearch
+                            style={{
+                                width: '100%'
+                            }}
+                            value={queryParams?.categories}
+                            dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
+                            placeholder="Please select"
+                            allowClear
+                            treeCheckable={false}
+                            treeDefaultExpandAll
+                            onChange={(data: string) => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    categories: data
+                                });
                                 clearTimeout(timeoutRef.current);
                                 timeoutRef.current = setTimeout(() => {
-                                    query(e.target);
+                                    query({ name: 'categories', value: data });
                                 }, 200);
                             }}
-                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                            renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected?.map((value) => (
-                                        <Chip key={value} label={value} />
-                                    ))}
-                                </Box>
-                            )}
-                            label={t('apply.tag')}
-                        >
-                            {categoryList?.map((item) => (
-                                <MenuItem key={item.code} value={item.code}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Grid> */}
+                            onClear={() => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    categories: ''
+                                });
+                                clearTimeout(timeoutRef.current);
+                                timeoutRef.current = setTimeout(() => {
+                                    query({ name: 'categories', value: '' });
+                                }, 200);
+                            }}
+                            fieldNames={{
+                                label: 'name',
+                                value: 'code'
+                            }}
+                            treeData={cateTree}
+                        />
+                        <span className=" block bg-[#f8fafc] px-[5px] absolute top-[-7px] left-5 text-[12px] text-[#697586]">类目*</span>
+                    </div>
+                </Grid>
             </Grid>
             <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>

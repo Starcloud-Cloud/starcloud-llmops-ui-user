@@ -96,7 +96,7 @@ function Perform({
     const mdRef: any = useRef([]);
     useEffect(() => {
         if (mdRef.current && mdRef.current.length > 0) {
-            config.steps?.map((item: any, index: number) => {
+            config?.steps?.map((item: any, index: number) => {
                 if (item.flowStep.response.style !== 'IMAGE') {
                     mdRef.current[index].scrollTop = mdRef.current[index].scrollHeight;
                 }

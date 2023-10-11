@@ -1,5 +1,6 @@
-import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress, Button } from '@mui/material';
-import { Image, Popconfirm } from 'antd';
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
+import { Image, Button, Popover } from 'antd';
+import { MoreOutlined, DeleteOutlined } from '@ant-design/icons';
 import DeleteIcon from '@mui/icons-material/Delete';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
@@ -280,7 +281,7 @@ function Deatail() {
                     <CircularProgress />
                 </div>
             )}
-            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
+            <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1, display: 'inline-block' }}>
                 <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
                     {t('market.all')}
                 </Link>
@@ -329,16 +330,21 @@ function Deatail() {
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
                 {permissions.includes('app:market:delete') && (
-                    <Popconfirm placement="top" title="请再次确认是否删除" onConfirm={delTemplate} okText="Yes" cancelText="No">
+                    <Popover
+                        placement="bottom"
+                        content={
+                            <Button onClick={delTemplate} danger icon={<DeleteOutlined rev={undefined} />}>
+                                删除模板
+                            </Button>
+                        }
+                        trigger="click"
+                    >
                         <Button
-                            startIcon={<DeleteIcon fontSize="small" />}
-                            variant="outlined"
                             className="absolute top-[16px] right-[16px]"
-                            color="error"
-                        >
-                            删除模板
-                        </Button>
-                    </Popconfirm>
+                            shape="circle"
+                            icon={<MoreOutlined rev={undefined} />}
+                        ></Button>
+                    </Popover>
                 )}
             </Box>
             <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />

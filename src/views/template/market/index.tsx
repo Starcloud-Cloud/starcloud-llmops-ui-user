@@ -155,8 +155,6 @@ function TemplateMarket() {
     };
     //切换category
     const changeCategory = (item: any, index: number) => {
-        console.log(active, index);
-
         if (active === index) {
             setActive(0);
             setQueryParams({

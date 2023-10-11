@@ -37,6 +37,7 @@ export interface Anyevent {
         tags: string[];
     };
     setValues: (data: { name: string; value: string | string[] }) => void;
+    setDetail_icon: (data: any) => void;
 }
 export type Rows = {
     field: string;

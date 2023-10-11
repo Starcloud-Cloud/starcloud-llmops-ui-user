@@ -237,6 +237,17 @@ function CreateDetail() {
             [data.name]: data.value
         });
     };
+    //设置icons
+    const setDetail_icon = (data: any) => {
+        detailRef.current = {
+            ..._.cloneDeep(detail),
+            icon: data
+        };
+        setDetail({
+            ..._.cloneDeep(detailRef.current),
+            icon: data
+        });
+    };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
         const newValue = _.cloneDeep(detail);
@@ -471,6 +482,7 @@ function CreateDetail() {
                                     tags: detail?.tags
                                 }}
                                 setValues={setData}
+                                setDetail_icon={setDetail_icon}
                             />
                         )}
                     </Grid>

@@ -35,7 +35,7 @@ function TemplateMarket() {
     const [appList, setAppList] = useState<any[]>([]);
     const [newList, setNewList] = useState<any[]>([]);
     //类别选中
-    const [menuList, setMenuList] = useState<{ name: string; icon: string }[]>([]);
+    const [menuList, setMenuList] = useState<{ name: string; icon: string; code: string }[]>([]);
     const [active, setActive] = useState<number | string>(0);
     //类别树
     const [cateTree, setCateTree] = useState<any[]>([]);
@@ -45,7 +45,7 @@ function TemplateMarket() {
             setAppList(res);
             const newData = _.cloneDeep(res);
             newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 6);
+                item.appList = item.appList.splice(0, 8);
             });
             setNewList(newData);
         });
@@ -97,13 +97,11 @@ function TemplateMarket() {
                 icon: 'amazon',
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
-            console.log(newData1);
-
             setNewList(newData1);
         } else {
             const newData = _.cloneDeep(appList);
             newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 6);
+                item.appList = item.appList.splice(0, 8);
             });
             setNewList(newData);
         }
@@ -243,11 +241,10 @@ function TemplateMarket() {
         //     }}
         // >
         <Box
-            maxWidth="1300px"
-            margin="0 auto"
             height="calc(100vh - 128px)"
             overflow="hidden"
             sx={{
+                padding: { xs: 0, sm: '0 20px' },
                 scrollbarGutter: 'stable',
                 '&:hover': {
                     overflow: 'scroll'
@@ -301,7 +298,15 @@ function TemplateMarket() {
                                 <span>{item.name}</span>
                             </div>
                             {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                <div onClick={() => changeCategory(item, index)} className="text-[#673ab7] cursor-pointer">
+                                <div
+                                    onClick={() =>
+                                        changeCategory(
+                                            item,
+                                            menuList.findIndex((value) => value.code === item.code)
+                                        )
+                                    }
+                                    className="text-[#673ab7] cursor-pointer"
+                                >
                                     更多应用
                                     <RightOutlined rev={undefined} />
                                 </div>
@@ -317,12 +322,12 @@ function TemplateMarket() {
                             spacing={2}
                         >
                             {item.appList.map((el: any, index: number) =>
-                                queryParams.category === 'ALL' && index < 6 ? (
-                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                queryParams.category === 'ALL' && index < 8 ? (
+                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                         <Template handleDetail={handleDetail} data={el} />
                                     </Grid>
                                 ) : queryParams.category !== 'ALL' ? (
-                                    <Grid flexShrink={0} lg={2} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                         <Template handleDetail={handleDetail} data={el} />
                                     </Grid>
                                 ) : (

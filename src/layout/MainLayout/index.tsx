@@ -313,7 +313,7 @@ const MainLayout = () => {
     } | null>(null);
 
     const isLarge = useMemo(() => {
-        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat'];
+        const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat', '/appMarket'];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);
     }, [location]);
@@ -364,6 +364,26 @@ const MainLayout = () => {
                 });
             }
         })();
+    }, []);
+    useEffect(() => {
+        if (localStorage.getItem('roleRouters')) {
+            let list: any = {};
+            JSON.parse(JSON.parse(localStorage.getItem('roleRouters') as string).v).map((item: any) => {
+                if (item.name === 'mofaai') {
+                    list = item;
+                }
+            });
+            list.children.map((item: any) => {
+                if (item.name === '应用市场') {
+                    item.children.map((el: any) => {
+                        if (el.path === 'appMarket/list') {
+                            localStorage.clear();
+                            window.location.href = 'https://mofaai.com.cn/login';
+                        }
+                    });
+                }
+            });
+        }
     }, []);
     //绑定手机号
     const { use, setuse } = infoStore();

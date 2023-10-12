@@ -27,6 +27,8 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { AiCustomModal } from '../AiCustomModal';
 import AddIcon from '@mui/icons-material/Add';
+import _ from 'lodash';
+import DeleteIcon from '@mui/icons-material/Delete';
 const { TextArea } = Input;
 
 const { Search } = Input;
@@ -132,7 +134,7 @@ const defaultList = [
 ];
 
 export const Content = () => {
-    const [list, setList] = React.useState(defaultList);
+    const [list, setList] = React.useState<any[]>(defaultList);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
     const [assistOpen, setAssistOpen] = React.useState(false);
@@ -191,6 +193,27 @@ export const Content = () => {
 
     const handleAddFiveDescription = () => {
         const r = list.filter((item) => item.type === 'des');
+        const index = r.length + 1;
+        const copyList = _.cloneDeep(list);
+        copyList.splice(-2, 0, {
+            title: `五点描述${index}`,
+            des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+            2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+            3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+            4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+            5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+            6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+            placeholder: `产品卖点描述${index}`,
+            type: 'des',
+            isOvertop: true
+        });
+        setList(copyList);
+    };
+
+    const handleDelFiveDescription = (index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList.splice(index, 1);
+        setList(copyList);
     };
 
     return (
@@ -736,7 +759,22 @@ export const Content = () => {
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
-                        {item.type === 'product-des' && <Divider />}
+                        {item.type === 'product-des' && (
+                            <>
+                                <div className="justify-center flex">
+                                    <Button
+                                        color="secondary"
+                                        size="small"
+                                        variant="text"
+                                        startIcon={<AddIcon />}
+                                        onClick={handleAddFiveDescription}
+                                    >
+                                        加5点描述
+                                    </Button>
+                                </div>
+                                <Divider />
+                            </>
+                        )}
                         <div className="mb-5" key={index}>
                             <div className="flex items-center text-lg justify-between mb-4">
                                 <div className="flex items-center">
@@ -802,8 +840,15 @@ export const Content = () => {
                                         <span className="text-[#bec2cc] cursor-pointer text-xs">200单词</span>
                                     </div>
                                     <div className="flex items-center">
-                                        <span>不计入已使用</span>
-                                        <Switch color={'secondary'} />
+                                        <div className="flex items-center">
+                                            <span>不计入已使用</span>
+                                            <Switch color={'secondary'} />
+                                        </div>
+                                        {item.isOvertop && (
+                                            <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>
+                                                <DeleteIcon className=" cursor-pointer text-sm" />
+                                            </IconButton>
+                                        )}
                                     </div>
                                 </div>
                                 <TextArea
@@ -819,13 +864,7 @@ export const Content = () => {
                                 </div>
                             </div>
                         </div>
-                        {item.type === 'product-des' && (
-                            <div className="justify-center flex">
-                                <Button color="secondary" size="small" variant="text" startIcon={<AddIcon />}>
-                                    加5点描述
-                                </Button>
-                            </div>
-                        )}
+
                         {(item.type === 'title' || item.type === 'product-des') && <Divider />}
                     </>
                 ))}

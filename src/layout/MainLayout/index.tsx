@@ -436,11 +436,9 @@ const MainLayout = () => {
                                 当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
                             </span>
                         ) : timeOutObj?.type === 2 ? (
-                            <span className="text-sm">
-                                当前魔法豆权益将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
-                            </span>
+                            <span className="text-sm">当前魔法豆将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
                         ) : (
-                            <span className="text-sm">当前魔法豆权益不足{timeOutObj?.num}字，为避免影响正常使用，请尽快购买升级</span>
+                            <span className="text-sm">当前魔法豆不足{timeOutObj?.num}，为避免影响正常使用，请尽快购买升级</span>
                         )}
                         <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
                             立即续费

@@ -148,7 +148,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     >
                         批量下载
                     </Button>
-                    {/* <Button
+                    <Button
                         startIcon={<HistoryIcon />}
                         onClick={() => setHistoryOpen(true)}
                         sx={{ ml: 1 }}
@@ -157,7 +157,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                         color="secondary"
                     >
                         历史记录
-                    </Button> */}
+                    </Button>
                 </div>
             </SubCard>
             <div className="flex flex-wrap gap-2">
@@ -298,7 +298,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     </div>
                 </MainCard>
             </Modal>
-            {historyOpen && <ImageHistory open={historyOpen} handleClose={() => setHistoryOpen(false)} />}
+            {historyOpen && <ImageHistory open={historyOpen} scene={scene} handleClose={() => setHistoryOpen(false)} />}
         </Card>
         // <div>
         //     <Grid container spacing={2}>

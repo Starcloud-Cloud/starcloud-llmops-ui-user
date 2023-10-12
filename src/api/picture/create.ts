@@ -21,7 +21,7 @@ export const createText2Img = (data: any) => {
  * @returns
  */
 export const getImgList = (data: any) => {
-    return request.post({ url: '/llm/image/history', data });
+    return request.post({ url: '/llm/app/log/historyImageRecords', data });
 };
 
 /**

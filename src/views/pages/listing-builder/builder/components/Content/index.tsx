@@ -9,8 +9,6 @@ import {
     LinearProgress,
     MenuItem,
     Select,
-    Slide,
-    Slider,
     Switch,
     TextField,
     Tooltip
@@ -19,7 +17,7 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Statistic, ConfigProvider } from 'antd';
+import { Input, Alert, Divider, Statistic, ConfigProvider, Rate } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -32,7 +30,7 @@ const { Search } = Input;
 
 const defaultList = [
     {
-        title: '标题 (0/200，建议80-200字符)',
+        title: '标题',
         des: (
             <span>
                 1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
@@ -52,7 +50,7 @@ const defaultList = [
         type: 'title'
     },
     {
-        title: '五点描述1 (0/250，建议250字符以内)',
+        title: '五点描述1',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -63,7 +61,7 @@ const defaultList = [
         type: 'des'
     },
     {
-        title: '五点描述2 (0/250，建议250字符以内)',
+        title: '五点描述2',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -74,7 +72,7 @@ const defaultList = [
         type: 'des'
     },
     {
-        title: '五点描述3 (0/250，建议250字符以内)',
+        title: '五点描述3',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -85,7 +83,7 @@ const defaultList = [
         type: 'des'
     },
     {
-        title: '五点描述4 (0/250，建议250字符以内)',
+        title: '五点描述4',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -96,7 +94,7 @@ const defaultList = [
         type: 'des'
     },
     {
-        title: '五点描述5 (0/250，建议250字符以内)',
+        title: '五点描述5',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -107,7 +105,7 @@ const defaultList = [
         type: 'des'
     },
     {
-        title: '产品描述 (0/2000，建议2000字符以内)',
+        title: '产品描述',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -118,7 +116,7 @@ const defaultList = [
         type: 'product-des'
     },
     {
-        title: '搜索词 (0/250，建议250字符以内)',
+        title: '搜索词',
         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
         2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
         3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
@@ -134,7 +132,7 @@ export const Content = () => {
     const [list, setList] = React.useState(defaultList);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
-    const [assistOpen, setAssistOpen] = React.useState(true);
+    const [assistOpen, setAssistOpen] = React.useState(false);
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -364,9 +362,17 @@ export const Content = () => {
                     </div>
                     <div className="flex items-center">
                         <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
-                        <div>
-                            <Button color="secondary" variant="contained" className="ml-3 w-[80px]" size="small">
-                                品牌检测
+                        {/* <Button startIcon={<ArrowDownwardIcon className="!text-sm" />} color="secondary" size="small" variant="contained">
+                            导入
+                        </Button> */}
+                        <div className="ml-2">
+                            <Button
+                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                color="secondary"
+                                size="small"
+                                variant="contained"
+                            >
+                                AI生成
                             </Button>
                         </div>
                     </div>
@@ -412,7 +418,7 @@ export const Content = () => {
                                             helperText={formik.touched.productFeatures && formik.errors.productFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 1 }} item md={12}>
+                                    <Grid sx={{ mt: 2 }} item md={12}>
                                         <TextField
                                             size="small"
                                             label={'客户特征'}
@@ -427,7 +433,7 @@ export const Content = () => {
                                             helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 1 }} item md={12}>
+                                    <Grid sx={{ mt: 2 }} item md={12}>
                                         <TextField
                                             size="small"
                                             label={'不希望出现的词汇'}
@@ -442,7 +448,7 @@ export const Content = () => {
                                             helperText={formik.touched.voidWord && formik.errors.voidWord}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 1 }} item md={12} className="grid gap-3 grid-cols-3">
+                                    <Grid sx={{ mt: 2 }} item md={12} className="grid gap-3 grid-cols-3">
                                         <div>
                                             <FormControl fullWidth>
                                                 <InputLabel size="small" id="demo-simple-select-label">
@@ -510,7 +516,11 @@ export const Content = () => {
                         {item.type === 'product-des' && <Divider />}
                         <div className="mb-5" key={index}>
                             <div className="flex items-center text-lg justify-between mb-4">
-                                <span className="text-[#505355] text-base font-semibold">{item.title}</span>
+                                <div className="flex items-center">
+                                    <span className="text-[#505355] text-base font-semibold">{item.title}</span>
+                                    <Divider type="vertical" />
+                                    <Rate allowHalf defaultValue={2.5} count={1} />
+                                </div>
                                 <div className="flex justify-center items-center">
                                     <Button
                                         startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
@@ -566,6 +576,8 @@ export const Content = () => {
                                                 <ReplayIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip>
+                                        <Divider type="vertical" />
+                                        <span className="text-[#bec2cc] cursor-pointer text-xs">10/200字</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span>不计入已使用</span>
@@ -589,6 +601,12 @@ export const Content = () => {
                     </>
                 ))}
             </Card>
+            {/* <AddAiModal
+                open={assistOpen}
+                handleClose={() => {
+                    setAssistOpen(true);
+                }}
+            /> */}
         </div>
     );
 };

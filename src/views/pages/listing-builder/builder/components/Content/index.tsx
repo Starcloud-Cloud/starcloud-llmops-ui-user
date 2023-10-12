@@ -17,13 +17,15 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Statistic, ConfigProvider, Rate } from 'antd';
+import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { AiCustomModal } from '../AiCustomModal';
 const { TextArea } = Input;
 
 const { Search } = Input;
@@ -133,6 +135,7 @@ export const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
     const [assistOpen, setAssistOpen] = React.useState(false);
+    const [aiCustomOpen, setAiCustomOpen] = React.useState(false);
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -162,6 +165,28 @@ export const Content = () => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEnableAi(event.target.checked);
     };
+
+    const items: MenuProps['items'] = [
+        {
+            key: '1',
+            label: (
+                <div className="flex items-center">
+                    <TipsAndUpdatesIcon className="!text-sm" color="secondary" />
+                    <span>根据已有关键词生成</span>
+                </div>
+            )
+        },
+        {
+            key: '2',
+            label: (
+                <div className="flex items-center">
+                    <TuneIcon className="!text-sm" color="secondary" />
+                    <span>高级自定义生成</span>
+                </div>
+            ),
+            onClick: () => setAiCustomOpen(true)
+        }
+    ];
 
     return (
         <div>
@@ -522,14 +547,16 @@ export const Content = () => {
                                     <Rate allowHalf defaultValue={2.5} count={1} />
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <Button
-                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                        color="secondary"
-                                        size="small"
-                                        variant="contained"
-                                    >
-                                        AI生成
-                                    </Button>
+                                    <Dropdown menu={{ items }}>
+                                        <Button
+                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                            color="secondary"
+                                            size="small"
+                                            variant="contained"
+                                        >
+                                            AI生成
+                                        </Button>
+                                    </Dropdown>
                                     <Button
                                         color="secondary"
                                         size="small"
@@ -607,6 +634,12 @@ export const Content = () => {
                     setAssistOpen(true);
                 }}
             /> */}
+            <AiCustomModal
+                open={aiCustomOpen}
+                handleClose={() => {
+                    setAiCustomOpen(false);
+                }}
+            />
         </div>
     );
 };

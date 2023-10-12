@@ -109,7 +109,7 @@ const ListingBuilder = () => {
             />
             <Divider />
             <div className="flex bg-[#f4f6f8] h-full">
-                <div className="w-[400px] h-full">
+                <div className="w-[500px] h-full">
                     <KeyWord />
                 </div>
                 <div className="flex-1 h-full ml-2">

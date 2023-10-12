@@ -26,6 +26,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { AiCustomModal } from '../AiCustomModal';
+import AddIcon from '@mui/icons-material/Add';
 const { TextArea } = Input;
 
 const { Search } = Input;
@@ -187,6 +188,10 @@ export const Content = () => {
             onClick: () => setAiCustomOpen(true)
         }
     ];
+
+    const handleAddFiveDescription = () => {
+        const r = list.filter((item) => item.type === 'des');
+    };
 
     return (
         <div>
@@ -814,6 +819,13 @@ export const Content = () => {
                                 </div>
                             </div>
                         </div>
+                        {item.type === 'product-des' && (
+                            <div className="justify-center flex">
+                                <Button color="secondary" size="small" variant="text" startIcon={<AddIcon />}>
+                                    加5点描述
+                                </Button>
+                            </div>
+                        )}
                         {(item.type === 'title' || item.type === 'product-des') && <Divider />}
                     </>
                 ))}

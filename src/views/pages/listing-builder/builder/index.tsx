@@ -25,8 +25,7 @@ const items: MenuProps['items'] = [
             <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
                 2nd menu item (disabled)
             </a>
-        ),
-        disabled: true
+        )
     },
     {
         key: '3',
@@ -34,12 +33,10 @@ const items: MenuProps['items'] = [
             <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
                 3rd menu item (disabled)
             </a>
-        ),
-        disabled: true
+        )
     },
     {
         key: '4',
-        danger: true,
         label: 'a danger item'
     }
 ];
@@ -109,7 +106,7 @@ const ListingBuilder = () => {
             />
             <Divider />
             <div className="flex bg-[#f4f6f8] h-full">
-                <div className="w-[500px] h-full">
+                <div className="w-[450px] h-full">
                     <KeyWord />
                 </div>
                 <div className="flex-1 h-full ml-2">

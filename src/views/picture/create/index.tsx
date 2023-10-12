@@ -61,7 +61,7 @@ const PictureCreate = () => {
         (async () => {
             const res = await getImgList({ pageNo, pageSize: 10, scene: 'WEB_IMAGE' });
             setImgList(
-                res.list.map((item: any) => ({
+                res?.list?.map((item: any) => ({
                     ...item.imageInfo,
                     createTime: item.createTime
                 })) || []
@@ -80,7 +80,7 @@ const PictureCreate = () => {
         const res = await getImgList({ pageNo: newPageNo, pageSize: 10, scene: 'WEB_IMAGE' });
         setImgList([
             ...imgList,
-            ...(res.list.map((item: any) => ({
+            ...(res?.list?.map((item: any) => ({
                 ...item.imageInfo,
                 createTime: item.createTime
             })) || [])

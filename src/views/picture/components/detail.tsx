@@ -14,12 +14,11 @@ const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: bool
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '80%',
+                    width: '90%',
                     top: '10%',
                     left: '50%',
                     transform: 'translate(-50%, 0)',
                     maxHeight: '80%',
-                    maxWidth: '1000px',
                     overflow: 'auto'
                 }}
                 title="图片历史记录"
@@ -46,7 +45,7 @@ const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: bool
                                 }}
                                 width="70%"
                                 preview={false}
-                                src={detailData?.images && detailData?.images[0].url}
+                                src={detailData?.images && detailData?.images[0]?.url}
                             />
                             <Chip className="absolute top-[0] left-[10px] text-[12px]" size="small" label="抠图后" variant="outlined" />
                         </div>

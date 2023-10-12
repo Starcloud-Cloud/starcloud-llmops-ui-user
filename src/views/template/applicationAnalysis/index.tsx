@@ -41,6 +41,7 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
+import ImageDetail from 'views/picture/components/detail';
 import DetailErr from '../../../ui-component/detailErr';
 import useUserStore from 'store/user';
 interface LogStatistics {
@@ -269,16 +270,22 @@ function ApplicationAnalysis({
         if (row.appMode === 'IMAGE') {
             detailImage({ conversationUid: row.uid }).then((res) => {
                 if (res) {
-                    setResult(res);
-                    setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
-                    setPicOpen(true);
+                    if (
+                        res.fromScene === 'IMAGE_REMOVE_BACKGROUND' ||
+                        res.fromScene === 'IMAGE_REMOVE_TEXT' ||
+                        res.fromScene === 'IMAGE_UPSCALING'
+                    ) {
+                        setDetailData(res.imageInfo);
+                        setDetailOpen(true);
+                    } else {
+                        setResult(res);
+                        setImgDetail(res.imageInfo || { images: [{ url: '' }], prompt: '', engine: '', width: 0, height: 0 });
+                        setPicOpen(true);
+                    }
                 }
             });
         }
     };
-    const [detail, setDetail] = useState<Detail[] | null>(null);
-    //图片弹框
-    const [picOpen, setPicOpen] = useState(false);
     const [ImgDetail, setImgDetail] = useState({
         images: [],
         prompt: '',
@@ -288,8 +295,14 @@ function ApplicationAnalysis({
         stylePreset: ''
     });
     const [currentIndex, setCurrentIndex] = useState(0);
+    //图片弹框
+    const [picOpen, setPicOpen] = useState(false);
     //执行弹窗
     const [exeOpen, setExeOpen] = useState(false);
+    const [detail, setDetail] = useState<Detail[] | null>(null);
+    //智能抠图弹窗
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailData, setDetailData] = useState<any>({});
     //接口请求出来的全部内容
     const [result, setResult] = useState<any>({});
     const [exeDetail, setExeDetail] = useState<any>({});
@@ -617,6 +630,7 @@ function ApplicationAnalysis({
                     </div>
                 </Drawer>
             )}
+            {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
         </Box>
     );
 }

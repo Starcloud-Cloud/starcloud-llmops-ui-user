@@ -29,7 +29,7 @@ interface Page {
 function TemplateMarket() {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList } = marketStore();
+    const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList, setCategoryTree } = marketStore();
     const [page, setPage] = useState<Page>({ pageNo: 1, pageSize: 30 });
     //应用列表
     const [appList, setAppList] = useState<any[]>([]);
@@ -56,6 +56,7 @@ function TemplateMarket() {
         //类别树
         categoryTree().then((res) => {
             setCateTree(res);
+            setCategoryTree(res);
         });
     }, []);
     const [queryParams, setQueryParams] = useState({

@@ -3,7 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { CardContent, IconButton, Button, Modal, Tabs, Tab, Box, Typography, Divider, Link, TextField } from '@mui/material';
 import { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { bindCreate, bindDelete } from 'api/chat';
+import { bindCreate, bindModify, bindDelete } from 'api/chat';
 import { v4 as uuidv4 } from 'uuid';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -139,6 +139,7 @@ export default function WechatModal({
     const [idOpen, setIdOpen] = useState(false);
     const [passwordOpen, setPasswordOpen] = useState(false);
     const [numberOpen, setNumberOpen] = useState(false);
+    const [resizeOpen, setRestOpen] = useState(false);
     const [query, setQuery] = useState({
         account: '',
         appId: '',
@@ -147,12 +148,22 @@ export default function WechatModal({
     //部署
     const saveWechat = async () => {
         if (Object.values(query).every((value) => value !== '')) {
-            const result = await bindCreate({
-                appUid: updateBtn.appUid,
-                publishUid: updateBtn.uid,
-                name: uuidv4(),
-                ...query
-            });
+            if (!resizeOpen) {
+                const result = await bindCreate({
+                    appUid: updateBtn.appUid,
+                    publishUid: updateBtn.uid,
+                    name: uuidv4(),
+                    ...query
+                });
+            } else {
+                await bindModify(updateBtn?.channelMap[6][0]?.uid, {
+                    appUid: updateBtn.appUid,
+                    publishUid: updateBtn.uid,
+                    name: uuidv4(),
+                    ...query
+                });
+            }
+            setRestOpen(false);
             getUpdateBtn();
         } else {
             setIdOpen(true);
@@ -162,10 +173,16 @@ export default function WechatModal({
     };
     //取消部署
     const delWP = async () => {
-        const result = await bindDelete(updateBtn?.channelMap[6][0]?.uid);
-        if (result) {
-            getUpdateBtn();
-        }
+        setQuery({
+            appId: updateBtn?.channelMap[6][0]?.config?.wxAppId,
+            appSecret: updateBtn?.channelMap[6][0]?.config?.appSecret,
+            account: updateBtn?.channelMap[6][0]?.config?.account
+        });
+        setRestOpen(true);
+        // const result = await bindDelete(updateBtn?.channelMap[6][0]?.uid);
+        // if (result) {
+        //     getUpdateBtn();
+        // }
     };
     //复制
     const message = () => {
@@ -242,7 +259,7 @@ export default function WechatModal({
                         <Typography sx={{ cursor: 'pointer' }} color="secondary" mb={1}>
                             查看填写示意图
                         </Typography>
-                        {!(updateBtn?.channelMap[6]?.length > 0) ? (
+                        {!(updateBtn?.channelMap[6]?.length > 0) || resizeOpen ? (
                             <div>
                                 <div>
                                     进入微信

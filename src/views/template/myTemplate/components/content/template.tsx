@@ -44,7 +44,7 @@ function Template({ data, handleDetail }: any) {
                 )}
                 <Tooltip placement="top" disableInteractive title={data.name}>
                     <Typography
-                        className=" ml-[5px] textnoWarp active cursor overflow-hidden line-clamp-1"
+                        className=" textnoWarp active cursor overflow-hidden line-clamp-2"
                         gutterBottom
                         variant="h3"
                         sx={{ fontSize: '1.1rem' }}
@@ -56,8 +56,8 @@ function Template({ data, handleDetail }: any) {
                 </Tooltip>
                 <Tooltip placement="top" disableInteractive title={data.description}>
                     <Typography
-                        sx={{ fontSize: '.8rem' }}
-                        className="text-xs line-clamp-4 text-[#15273799]"
+                        sx={{ fontSize: '.9rem' }}
+                        className="leading-[1.2rem] line-clamp-3 text-[#15273799]"
                         variant="body2"
                         lineHeight="1.1rem"
                     >

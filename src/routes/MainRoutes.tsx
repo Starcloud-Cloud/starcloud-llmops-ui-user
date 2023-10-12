@@ -26,6 +26,8 @@ const DelDebackGroundText = Loadable(lazy(() => import('views/picture/lintellgen
 const EnlargementImage = Loadable(lazy(() => import('views/picture/imageProcessing/components/largementImage')));
 //放大图片清晰度
 const UpscaleImage = Loadable(lazy(() => import('views/picture/imageProcessing/components/upscaleImage')));
+//历史记录
+const ImageHistory = Loadable(lazy(() => import('views/picture/components/imageHistory')));
 //weShop
 const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
 //轮廓出图
@@ -106,6 +108,10 @@ const MainRoutes = {
         {
             path: '/upscaleImage',
             element: <UpscaleImage />
+        },
+        {
+            path: '/imageHistory',
+            element: <ImageHistory />
         },
         {
             path: '/shopImage',

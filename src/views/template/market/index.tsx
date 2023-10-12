@@ -3,7 +3,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { RightOutlined } from '@ant-design/icons';
 import { Box, Typography, IconButton, Grid, InputAdornment, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
@@ -29,7 +29,9 @@ interface Page {
 function TemplateMarket() {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList, setCategoryTree } = marketStore();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const { total, templateList, newtemplateList, sorllList, setNewTemplate, setSorllList, categoryTrees, setCategoryTree } = marketStore();
     const [page, setPage] = useState<Page>({ pageNo: 1, pageSize: 30 });
     //应用列表
     const [appList, setAppList] = useState<any[]>([]);
@@ -43,11 +45,48 @@ function TemplateMarket() {
         //列表
         listGroupByCategory({ isHot: true }).then((res) => {
             setAppList(res);
-            const newData = _.cloneDeep(res);
-            newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 8);
-            });
-            setNewList(newData);
+            if (queryParams.category !== 'ALL') {
+                const newData = categoryTrees.filter((item) => {
+                    return item.code === queryParams.category;
+                })[0]?.children;
+                const newList = res.filter((item: any) => item.code === queryParams.category)[0]?.appList;
+                const changeList = newList ? _.cloneDeep(newList) : [];
+                newData?.forEach((item: any) => {
+                    item.appList = [];
+                    item.appList.push(
+                        ...(newList
+                            ? newList.filter((el: any) => {
+                                  if (changeList && item.code === el.category) {
+                                      changeList.splice(
+                                          changeList.findIndex((value: any) => value.code === el.category),
+                                          1
+                                      );
+                                  }
+                                  return item.code === el.category;
+                              })
+                            : [])
+                    );
+                });
+                const newData1 = _.cloneDeep(newData);
+                newData1?.push({
+                    sort: 9999,
+                    children: [],
+                    name: '其他',
+                    appList: [...changeList],
+                    code: 'OTHER',
+                    parentCode: 'AMAZON',
+                    icon: 'amazon',
+                    image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
+                });
+                scrollRef.current.scrollTop = 0;
+                setNewList(newData1);
+            } else {
+                const newData = _.cloneDeep(res);
+                newData.forEach((item: any) => {
+                    item.appList = item.appList.splice(0, 8);
+                });
+                setNewList(newData);
+            }
         });
         //类别
         categories().then((res) => {
@@ -59,19 +98,24 @@ function TemplateMarket() {
             setCategoryTree(res);
         });
     }, []);
+    useEffect(() => {
+        if (menuList.length > 0) {
+            setActive(searchParams.get('category') ? menuList.findIndex((item) => item.code === searchParams.get('category')) : 0);
+        }
+    }, [menuList]);
     const [queryParams, setQueryParams] = useState({
         name: '',
         sort: '',
-        category: 'ALL'
+        category: searchParams.get('category') || 'ALL'
     });
     useEffect(() => {
         if (queryParams.category !== 'ALL') {
             const newData = cateTree.filter((item) => {
                 return item.code === queryParams.category;
-            })[0].children;
+            })[0]?.children;
             const newList = appList.filter((item) => item.code === queryParams.category)[0]?.appList;
             const changeList = newList ? _.cloneDeep(newList) : [];
-            newData.forEach((item: any) => {
+            newData?.forEach((item: any) => {
                 item.appList = [];
                 item.appList.push(
                     ...(newList
@@ -88,7 +132,7 @@ function TemplateMarket() {
                 );
             });
             const newData1 = _.cloneDeep(newData);
-            newData1.push({
+            newData1?.push({
                 sort: 9999,
                 children: [],
                 name: '其他',
@@ -290,7 +334,7 @@ function TemplateMarket() {
                 ))}
             </ScrollMenu>
 
-            {newList.map((item, index) => (
+            {newList?.map((item, index) => (
                 <div key={index}>
                     {item.appList.length > 0 && (
                         <div className="flex justify-between items-center my-[24px]">
@@ -324,19 +368,11 @@ function TemplateMarket() {
                             overflow="hidden"
                             spacing={2}
                         >
-                            {item.appList.map((el: any, index: number) =>
-                                queryParams.category === 'ALL' && index < 8 ? (
-                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                        <Template handleDetail={handleDetail} data={el} />
-                                    </Grid>
-                                ) : queryParams.category !== 'ALL' ? (
-                                    <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                        <Template handleDetail={handleDetail} data={el} />
-                                    </Grid>
-                                ) : (
-                                    ''
-                                )
-                            )}
+                            {item.appList.map((el: any, index: number) => (
+                                <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                    <Template handleDetail={handleDetail} data={el} />
+                                </Grid>
+                            ))}
                         </Grid>
                     )}
                 </div>

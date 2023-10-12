@@ -4,8 +4,11 @@ import { Item } from 'types/template';
 import { useNavigate } from 'react-router-dom';
 import './textnoWarp.scss';
 import formatDate from 'hooks/useDate';
+import marketStore from 'store/market';
+import useCategory from 'hooks/useCategory';
 function MyselfTemplate({ appList }: { appList: Item[] }) {
     const navigate = useNavigate();
+    const { categoryTrees } = marketStore();
     return (
         <Grid container spacing={2}>
             {appList?.map((data) => (
@@ -38,7 +41,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                 </Tooltip>
                                 <Box mt={0.5} fontSize={12}>
                                     <Link color="secondary" href="#" fontSize={12} mr={0.5}>
-                                        #{data?.category}
+                                        #{useCategory(categoryTrees, data?.category)?.name}
                                     </Link>
                                 </Box>
                                 <Box fontSize={14} mt={0.5}>

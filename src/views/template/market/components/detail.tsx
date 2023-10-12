@@ -23,6 +23,7 @@ import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
+import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 function Deatail() {
@@ -206,6 +207,7 @@ function Deatail() {
             setAllLoading(false);
             detailRef.current = res;
             setDetailData(res);
+            // useCategory(res?.category);
         });
         if (ref.current !== null && ref.current.parentNode !== null) {
             const top: any = ref.current.parentNode;

@@ -335,6 +335,14 @@ export const bindCreate = (data: any) => {
 };
 
 /**
+ * 修改绑定微信公众号
+ * @param shareKey
+ */
+export const bindModify = (uid: any, data: any) => {
+    return request.post({ url: `/llm/wechat/bind/modify/${uid}`, data });
+};
+
+/**
  * 取消绑定微信公众号
  * @param shareKey
  */

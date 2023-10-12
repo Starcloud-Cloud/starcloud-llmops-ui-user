@@ -15,7 +15,6 @@ import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
 import JSZip from 'jszip';
 import SubCard from 'ui-component/cards/SubCard';
-import ImageHistory from '../../components/imageHistory';
 import ImageDetail from '../../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
@@ -122,8 +121,6 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                 console.error('Error downloading images:', error);
             });
     };
-    //生成的历史记录
-    const [historyOpen, setHistoryOpen] = useState(false);
     return (
         <Card className="h-full p-[16px]">
             <SubCard
@@ -150,7 +147,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     </Button>
                     <Button
                         startIcon={<HistoryIcon />}
-                        onClick={() => setHistoryOpen(true)}
+                        onClick={() => navigate('/imageHistory?scene=' + scene)}
                         sx={{ ml: 1 }}
                         size="small"
                         variant="contained"
@@ -298,7 +295,6 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     </div>
                 </MainCard>
             </Modal>
-            {historyOpen && <ImageHistory open={historyOpen} scene={scene} handleClose={() => setHistoryOpen(false)} />}
         </Card>
         // <div>
         //     <Grid container spacing={2}>

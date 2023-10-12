@@ -15,7 +15,6 @@ import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
 import JSZip from 'jszip';
 import SubCard from 'ui-component/cards/SubCard';
-import ImageHistory from '../../components/imageHistory';
 import ImageDetail from '../../components/detail';
 import { upscale } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
@@ -108,7 +107,6 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     }, [open]);
     //批量下载图片
     const batchDownload = () => {
-        console.log(sucImageList);
         const zip = new JSZip();
         const imageUrls = sucImageList.map((item) => item.images[0].url);
         // 异步加载图片并添加到压缩包
@@ -133,8 +131,6 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                 console.error('Error downloading images:', error);
             });
     };
-    //生成的历史记录
-    const [historyOpen, setHistoryOpen] = useState(false);
     return (
         <Card className="h-full p-[16px]">
             <SubCard
@@ -159,16 +155,16 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     >
                         批量下载
                     </Button>
-                    {/* <Button
+                    <Button
                         startIcon={<HistoryIcon />}
-                        onClick={() => setHistoryOpen(true)}
+                        onClick={() => navigate('/imageHistory?scene=IMAGE_UPSCALING')}
                         sx={{ ml: 1 }}
                         size="small"
                         variant="contained"
                         color="secondary"
                     >
                         历史记录
-                    </Button> */}
+                    </Button>
                 </div>
             </SubCard>
             <div className="flex flex-wrap gap-2">
@@ -336,7 +332,6 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     </div>
                 </MainCard>
             </Modal>
-            {historyOpen && <ImageHistory open={historyOpen} scene="IMAGE_UPSCALING" handleClose={() => setHistoryOpen(false)} />}
         </Card>
     );
 };

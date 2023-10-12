@@ -190,8 +190,8 @@ export const Content = () => {
 
     return (
         <div>
-            <Card className="h-[220px] rounded-t-none flex justify-center">
-                <div className="flex justify-around items-center w-full ">
+            <Card className="h-[320px] rounded-t-none flex justify-center flex-col">
+                <div className="flex justify-around items-center w-full">
                     <div className="flex-1 flex justify-center">
                         <div className="w-[80%]">
                             <div className="flex flex-col items-center w-full">
@@ -206,80 +206,6 @@ export const Content = () => {
                                 />
                                 <div className="mt-2">
                                     <Statistic value={1231412} />
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <span className="font-semibold">Search Volume</span>
-                                <div className="w-[50%] mt-1">
-                                    <div className="flex">
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                        /
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                    </div>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={80}
-                                        sx={{
-                                            borderRadius: '4px'
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <span className="font-semibold">Search Volume</span>
-                                <div className="w-[50%] mt-1">
-                                    <div className="flex">
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                        /
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                    </div>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={80}
-                                        sx={{
-                                            borderRadius: '4px'
-                                        }}
-                                    />
                                 </div>
                             </div>
                         </div>
@@ -301,79 +227,346 @@ export const Content = () => {
                                     <Statistic value={1231412} />
                                 </div>
                             </div>
-                            <div className="mt-2">
-                                <span className="font-semibold">Search Volume</span>
-                                <div className="w-[50%] mt-1">
-                                    <div className="flex">
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
+                        </div>
+                    </div>
+                </div>
+                <div className="flex w-full">
+                    <div className="flex justify-around items-center w-full flex-col">
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
                                                 }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                        /
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                    </div>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={80}
-                                        sx={{
-                                            borderRadius: '4px'
+                                            }
                                         }}
-                                    />
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
                                 </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
                             </div>
-                            <div className="mt-2">
-                                <span className="font-semibold">Search Volume</span>
-                                <div className="w-[50%] mt-1">
-                                    <div className="flex">
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
                                                 }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                        /
-                                        <ConfigProvider
-                                            theme={{
-                                                components: {
-                                                    Statistic: {
-                                                        contentFontSize: 12
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            <Statistic value={1231412} />
-                                        </ConfigProvider>
-                                    </div>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={80}
-                                        sx={{
-                                            borderRadius: '4px'
+                                            }
                                         }}
-                                    />
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
                                 </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-around items-center w-full flex-col">
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-around items-center w-full flex-col">
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 w-[80%]">
+                            <span className="font-semibold">Search Volume</span>
+                            <div className="w-full mt-1">
+                                <div className="flex">
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                    /
+                                    <ConfigProvider
+                                        theme={{
+                                            components: {
+                                                Statistic: {
+                                                    contentFontSize: 12
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Statistic value={1231412} />
+                                    </ConfigProvider>
+                                </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={80}
+                                    sx={{
+                                        borderRadius: '4px'
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -544,6 +737,10 @@ export const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" />
+                                    <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
+                                        高分建议
+                                    </Button>
+                                    <Divider type="vertical" />
                                     <Rate allowHalf defaultValue={2.5} count={1} />
                                 </div>
                                 <div className="flex justify-center items-center">
@@ -557,15 +754,6 @@ export const Content = () => {
                                             AI生成
                                         </Button>
                                     </Dropdown>
-                                    <Button
-                                        color="secondary"
-                                        size="small"
-                                        variant="outlined"
-                                        className="ml-2"
-                                        onClick={() => handleExpand(index)}
-                                    >
-                                        高分建议
-                                    </Button>
                                 </div>
                             </div>
                             {expandList.includes(index) && (
@@ -605,6 +793,8 @@ export const Content = () => {
                                         </Tooltip>
                                         <Divider type="vertical" />
                                         <span className="text-[#bec2cc] cursor-pointer text-xs">10/200字</span>
+                                        <Divider type="vertical" />
+                                        <span className="text-[#bec2cc] cursor-pointer text-xs">200单词</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span>不计入已使用</span>
@@ -628,12 +818,6 @@ export const Content = () => {
                     </>
                 ))}
             </Card>
-            {/* <AddAiModal
-                open={assistOpen}
-                handleClose={() => {
-                    setAssistOpen(true);
-                }}
-            /> */}
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

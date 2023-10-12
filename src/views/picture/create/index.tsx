@@ -59,8 +59,13 @@ const PictureCreate = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await getImgList({ pageNo, pageSize: 10, scene: 'WEB_IMAGE' });
-            setImgList(res.list || []);
+            const res = await getImgList({ pageNo, pageSize: 10, scenes: ['WEB_IMAGE'], status: 'SUCCESS' });
+            setImgList(
+                res?.list?.map((item: any) => ({
+                    ...item.imageInfo,
+                    createTime: item.createTime
+                })) || []
+            );
             setTotal(res.total || 0);
         })();
     }, []);
@@ -72,8 +77,14 @@ const PictureCreate = () => {
         }
         const newPageNo = pageNo + 1;
         setPageNo(newPageNo);
-        const res = await getImgList({ pageNo: newPageNo, pageSize: 10, scene: 'WEB_IMAGE' });
-        setImgList([...imgList, ...(res.list || [])]);
+        const res = await getImgList({ pageNo, pageSize: 10, scenes: ['WEB_IMAGE'], status: 'SUCCESS' });
+        setImgList([
+            ...imgList,
+            ...(res?.list?.map((item: any) => ({
+                ...item.imageInfo,
+                createTime: item.createTime
+            })) || [])
+        ]);
     };
 
     const images = useMemo(() => {

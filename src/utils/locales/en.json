@@ -556,7 +556,7 @@
     "delete": "Delete",
     "model": "Model Variable",
     "prompt": "Prompt",
-    "max_tokens": "Max Tokens",
+    "max_tokens": "Max Magic",
     "temperature": "Temperature",
     "n": "N",
     "copyFiend": "Copy the link and send it to a friend",
@@ -732,7 +732,7 @@
     "detail": "Detail"
   },
   "generateLog": {
-    "messageTotal": "Message Total",
+    "messageTotal": "Message Magic",
     "usertotal": "User Satisfaction",
     "TimeConsuming": "Average Time Consuming",
     "tokenTotal": "tokens Total",

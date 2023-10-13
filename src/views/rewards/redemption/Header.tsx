@@ -75,7 +75,7 @@ const RedemptionHeader = () => {
                     fontSize: { xs: '0.875rem !important', md: '1rem !important', xl: '1rem !important' }
                 }
             }}
-            title="注册即获取基础权益：10魔法豆 5张图片"
+            title="注册即获取基础权益：10魔法豆 5点作图"
         >
             <Card>
                 <CardMedia image={Card3} title="Card 3">

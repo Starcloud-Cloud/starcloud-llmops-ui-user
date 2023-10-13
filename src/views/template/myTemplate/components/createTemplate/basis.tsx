@@ -99,15 +99,14 @@ const Basis = forwardRef(({ initialValues, setValues, setDetail_icon }: Anyevent
                     }}
                     variant="outlined"
                 />
-                <div className=" relative mt-[16px]">
+                <div className="relative mt-[16px]">
                     <TreeSelect
                         status={!formik.values.category ? 'error' : ''}
-                        className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px]"
+                        className="bg-[#f8fafc]  h-[51px] rounded-[6px]"
                         showSearch
                         style={{ width: '100%' }}
                         value={formik.values.category}
                         dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
-                        placeholder="Please select"
                         allowClear
                         treeCheckable={false}
                         treeDefaultExpandAll

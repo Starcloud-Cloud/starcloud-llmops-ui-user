@@ -83,12 +83,12 @@ const WeSetting = ({ name, updateBtn }: { name: string; updateBtn: any }) => {
                     )}
                     {name === '添加菜单' && (
                         <Typography ml="21px" fontSize="12px">
-                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_menu`}
+                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[12]?.[0]?.mediumUid}`}
                         </Typography>
                     )}
                     {name === '自动回复' && (
                         <Typography ml="21px" fontSize="12px">
-                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_reply`}
+                            {`${window.location.origin}/cb_web/${updateBtn?.channelMap?.[13]?.[0]?.mediumUid}`}
                         </Typography>
                     )}
                     <Box ml="21px" mt={1} display="flex">
@@ -96,8 +96,8 @@ const WeSetting = ({ name, updateBtn }: { name: string; updateBtn: any }) => {
                             onClick={() => {
                                 copy(
                                     name === '添加菜单'
-                                        ? `${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_menu`
-                                        : `${window.location.origin}/cb_web/${updateBtn?.channelMap?.[2]?.[0]?.mediumUid}?source=mp_reply`
+                                        ? `${window.location.origin}/cb_web/${updateBtn?.channelMap[12][0]?.mediumUid}`
+                                        : `${window.location.origin}/cb_web/${updateBtn?.channelMap[13][0]?.mediumUid}`
                                 );
                                 dispatch(
                                     openSnackbar({

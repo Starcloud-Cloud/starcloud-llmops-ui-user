@@ -138,6 +138,10 @@ export const changeStatus = (data: any) => {
 export const channelCreate = (data: any) => {
     return request.post({ url: `/llm/app/publish/channel/create`, data });
 };
+// 微信公众号
+export const bindCreateUrl = (data: any) => {
+    return request.post({ url: `/llm/wechat/bind/createUrl`, data });
+};
 // 修改站点
 export const channelUpload = (data: any) => {
     return request.post({ url: `/llm/app/publish/channel/modify`, data });

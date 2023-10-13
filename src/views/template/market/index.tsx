@@ -83,7 +83,9 @@ function TemplateMarket() {
             } else {
                 const newData = _.cloneDeep(res);
                 newData.forEach((item: any) => {
-                    item.appList = item.appList.splice(0, 8);
+                    if (item.code !== 'HOT') {
+                        item.appList = item.appList?.splice(0, 8);
+                    }
                 });
                 setNewList(newData);
             }
@@ -142,14 +144,28 @@ function TemplateMarket() {
                 icon: 'amazon',
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
+            const filterData = newData1.map((item: any) => {
+                return {
+                    ...item,
+                    appList: item.appList.filter((el: any) => el.name?.toLowerCase().includes(queryParams.name.toLowerCase()))
+                };
+            });
             scrollRef.current.scrollTop = 0;
-            setNewList(newData1);
+            setNewList(filterData);
         } else {
             const newData = _.cloneDeep(appList);
-            newData.forEach((item: any) => {
-                item.appList = item.appList.splice(0, 8);
+            const filterData = newData.map((item: any) => {
+                return {
+                    ...item,
+                    appList: item.appList.filter((el: any) => el.name?.toLowerCase().includes(queryParams.name.toLowerCase()))
+                };
             });
-            setNewList(newData);
+            filterData.forEach((item: any) => {
+                if (item.code !== 'HOT') {
+                    item.appList = item.appList?.splice(0, 8);
+                }
+            });
+            setNewList(filterData);
         }
     }, [queryParams]);
     //title筛选
@@ -302,7 +318,7 @@ function TemplateMarket() {
                 <Typography variant="h2" lineHeight={1}>
                     {t('market.title')}
                 </Typography>
-                {/* <TextField
+                <TextField
                     size="small"
                     id="filled-start-adornment"
                     sx={{ width: '300px' }}
@@ -317,7 +333,7 @@ function TemplateMarket() {
                             </InputAdornment>
                         )
                     }}
-                /> */}
+                />
             </Box>
             <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                 {menuList?.map((item, index) => (
@@ -336,7 +352,7 @@ function TemplateMarket() {
 
             {newList?.map((item, index) => (
                 <div key={index}>
-                    {item.appList.length > 0 && (
+                    {item.appList?.length > 0 && (
                         <div className="flex justify-between items-center my-[24px]">
                             <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
                                 {queryParams.category === 'ALL' && (
@@ -365,11 +381,11 @@ function TemplateMarket() {
                             container
                             display="flex"
                             flexWrap={queryParams.category === 'ALL' ? 'nowrap' : 'wrap'}
-                            overflow="hidden"
+                            overflow={queryParams.category === 'ALL' && item.code === 'HOT' ? 'auto' : 'hidden'}
                             spacing={2}
                         >
                             {item.appList.map((el: any, index: number) => (
-                                <Grid flexShrink={0} xl={1.714} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                <Grid flexShrink={0} xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                     <Template handleDetail={handleDetail} data={el} />
                                 </Grid>
                             ))}

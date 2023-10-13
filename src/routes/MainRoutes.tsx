@@ -38,6 +38,7 @@ const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 
 // listing-builder
 const ListingBuilder = Loadable(lazy(() => import('views/pages/listing-builder/builder')));
+const ListingBuilderPage = Loadable(lazy(() => import('views/pages/listing-builder/page')));
 
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
@@ -133,6 +134,10 @@ const MainRoutes = {
         {
             path: '/listingBuilder',
             element: <ListingBuilder />
+        },
+        {
+            path: '/ListingBuilderPage',
+            element: <ListingBuilderPage />
         }
     ]
 };

@@ -210,7 +210,7 @@ function Upload({
                     title: '配置公众号',
                     icon: 'historyOutlined',
                     onclick: async () => {
-                        if (updateBtn?.channelMap[6]?.length == 0) {
+                        if (updateBtn?.channelMap[12]?.length == 0) {
                             await bindCreateUrl({
                                 appUid: updateBtn.appUid,
                                 name: updateBtn.name,

@@ -30,6 +30,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { useNavigate } from 'react-router-dom';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -132,6 +133,7 @@ const ListingBuilderPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const navigate = useNavigate();
 
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
@@ -310,7 +312,7 @@ const ListingBuilderPage: React.FC = () => {
                         批量导出
                     </Button>
                     <Divider type={'vertical'} />
-                    <Button color="secondary" startIcon={<AddIcon />}>
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => navigate('/listingBuilder')}>
                         新增Listing
                     </Button>
                 </div>

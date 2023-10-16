@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { SettingModal } from './components/SettingModal';
 import SvgIcon from '@mui/material/SvgIcon';
-import { COUNTRY_LIST } from '../data/countryList';
+import { COUNTRY_LIST } from '../data';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 

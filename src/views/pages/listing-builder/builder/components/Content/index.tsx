@@ -1,27 +1,11 @@
-import {
-    Box,
-    Button,
-    Card,
-    FormControl,
-    Grid,
-    IconButton,
-    InputLabel,
-    LinearProgress,
-    MenuItem,
-    Select,
-    Switch,
-    TextField,
-    Tooltip
-} from '@mui/material';
+import { Button, Card, IconButton, LinearProgress, Switch, Tooltip } from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React, { useEffect } from 'react';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -29,135 +13,25 @@ import { AiCustomModal } from '../AiCustomModal';
 import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useCaretPosition from 'hooks/useCaretPosition';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
-const { TextArea } = Input;
+import { AddAiModal } from '../AddAiModal/index';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import KeyWordTag from '../KeyWordTag';
+import { getCaretPosition } from 'utils/getCaretPosition';
+import { DEFAULT_LIST } from '../../../data/index';
 
 const { Search } = Input;
 
-const defaultList = [
-    {
-        title: '标题',
-        des: (
-            <span>
-                1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-                <br />
-                2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-                <br />
-                3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ {} # &lt; &gt; | * ; ^ ¬ ¦ Æ © ®）；
-                <br />
-                4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-                <br />
-                5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-                <br />
-                6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。
-            </span>
-        ),
-        placeholder: '为您的产品写一个标题',
-        type: ListingBuilderEnum.TITLE,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '五点描述1',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '产品卖点描述1',
-        type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '五点描述2',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '产品卖点描述2',
-        type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '五点描述3',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '产品卖点描述3',
-        type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '五点描述4',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '产品卖点描述4',
-        type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '五点描述5',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '产品卖点描述5',
-        type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '产品描述',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '请输入您的产品描述吧!',
-        type: ListingBuilderEnum.PRODUCT_DES,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    },
-    {
-        title: '搜索词',
-        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-        placeholder: '请添加产品的搜索词，用逗号或空格隔开!',
-        type: ListingBuilderEnum.SEARCH_WORD,
-        maxCharacter: 200,
-        character: 0,
-        word: 0
-    }
-];
+// 首字母转换为大写
+function capitalizeFirstLetterOfEachWord(str: string): string {
+    const words = str.split(' ');
+    const capitalizedWords = words.map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+    return capitalizedWords.join(' ');
+}
 
 const likeList = ['iphone pro', 'iphone', 'pro'];
 
@@ -171,31 +45,28 @@ type ListType = {
     word: number;
     isOvertop?: boolean;
     value?: string;
+    row: number;
 };
 
 export const Content = () => {
-    const [list, setList] = React.useState<ListType[]>(defaultList);
+    const [list, setList] = React.useState<ListType[]>(DEFAULT_LIST);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
     const [assistOpen, setAssistOpen] = React.useState(false);
     const [aiCustomOpen, setAiCustomOpen] = React.useState(false);
-
-    const textareaRef = React.useRef<any>(null);
-    const { x, y, getPosition, getSelection } = useCaretPosition(textareaRef);
+    const [x, setX] = React.useState(0);
+    const [y, setY] = React.useState(0);
 
     const handleInputChange = (e: any, index: number) => {
+        const { x, y } = getCaretPosition(e.target);
+        setX(x);
+        setY(y);
         const copyList = _.cloneDeep(list);
         copyList[index].value = e.target.value;
         copyList[index].character = e.target.value.length;
-        copyList[index].word = e.target.value.trim().split(' ').length;
+        copyList[index].word = e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length;
         setList(copyList);
     };
-
-    useEffect(() => {
-        if (textareaRef.current) {
-            getPosition(textareaRef);
-        }
-    }, []);
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -266,7 +137,8 @@ export const Content = () => {
             maxCharacter: 200,
             character: 0,
             word: 0,
-            value: ''
+            value: '',
+            row: 4
         });
         setList(copyList);
     };
@@ -274,6 +146,18 @@ export const Content = () => {
     const handleDelFiveDescription = (index: number) => {
         const copyList = _.cloneDeep(list);
         copyList.splice(index, 1);
+        setList(copyList);
+    };
+
+    const handleTurnUpcase = (index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList[index].value = capitalizeFirstLetterOfEachWord(copyList[index].value || '');
+        setList(copyList);
+    };
+
+    const handleTurnLowercase = (index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList[index].value = copyList[index].value?.toLowerCase();
         setList(copyList);
     };
 
@@ -662,15 +546,15 @@ export const Content = () => {
                 </div>
             </Card>
             <Card className="p-5 mt-2">
-                <div className="flex justify-between">
-                    <div className="flex items-center">
+                <div className="flex justify-end">
+                    {/* <div className="flex items-center">
                         <span>AI模式</span>
                         <Switch color={'secondary'} onChange={handleChange} checked={enableAi} />
-                    </div>
+                    </div> */}
                     <div className="flex items-center">
                         <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
                         {/* <Button startIcon={<ArrowDownwardIcon className="!text-sm" />} color="secondary" size="small" variant="contained">
-                            导入
+                            导入Listing
                         </Button> */}
                         <div className="ml-2">
                             <Button
@@ -678,6 +562,7 @@ export const Content = () => {
                                 color="secondary"
                                 size="small"
                                 variant="contained"
+                                onClick={() => setAssistOpen(true)}
                             >
                                 AI生成
                             </Button>
@@ -685,7 +570,7 @@ export const Content = () => {
                     </div>
                 </div>
             </Card>
-            {enableAi && (
+            {/* {enableAi && (
                 <Card className="p-5 mt-2">
                     <div>
                         <div className="flex justify-between items-center">
@@ -816,7 +701,7 @@ export const Content = () => {
                         </div>
                     )}
                 </Card>
-            )}
+            )} */}
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
@@ -870,17 +755,38 @@ export const Content = () => {
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">
                                             <IconButton size="small">
-                                                <span className="text-[#bec2cc] cursor-pointer text-xs">Aa</span>
+                                                <span
+                                                    className="text-[#bec2cc] cursor-pointer text-xs"
+                                                    onClick={() => handleTurnUpcase(index)}
+                                                >
+                                                    Aa
+                                                </span>
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip title={'大写转小写'} arrow placement="top">
+                                        <Tooltip title={'大写转小写'} arrow placement="top" onClick={() => handleTurnLowercase(index)}>
                                             <IconButton size="small">
                                                 <span className="text-[#bec2cc] cursor-pointer text-xs">ab</span>
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" />
                                         <Tooltip title={'复制'} arrow placement="top">
-                                            <IconButton size="small">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(item.value || '');
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                }}
+                                            >
                                                 <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip>
@@ -896,11 +802,11 @@ export const Content = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">
+                                        <span className="text-[#bec2cc]  text-xs">
                                             {item.character}/{item.maxCharacter}字
                                         </span>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">{item.word}单词</span>
+                                        <span className="text-[#bec2cc] text-xs">{item.word}单词</span>
                                     </div>
                                     <div className="flex items-center">
                                         <div className="flex items-center">
@@ -915,15 +821,12 @@ export const Content = () => {
                                     </div>
                                 </div>
                                 <textarea
-                                    rows={5}
-                                    ref={textareaRef}
+                                    rows={item.row}
                                     placeholder={item.placeholder}
                                     spellCheck="false"
                                     value={item.value}
                                     onChange={(e) => handleInputChange(e, index)}
-                                    onInput={() => getPosition(textareaRef)}
-                                    onClick={() => getPosition(textareaRef)}
-                                    className="rounded-none focus:shadow-none hover:border-[#e6e8ec]  focus:border-[#e6e8ec]  border-[#e6e8ec] border-l-0 border-r-0 text-sm p"
+                                    className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
                                 />
 
                                 <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
@@ -935,8 +838,9 @@ export const Content = () => {
                                     </Menu.Item>
                                 </Menu>
                                 <div className="flex px-4 py-3 items-center">
-                                    <div className="flex-1">
-                                        <span>建议关键词:</span>
+                                    <div className="flex-1 flex items-center">
+                                        <span className="mr-2">建议关键词:</span>
+                                        <KeyWordTag />
                                     </div>
                                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                 </div>
@@ -947,6 +851,12 @@ export const Content = () => {
                     </>
                 ))}
             </Card>
+            <AddAiModal
+                open={assistOpen}
+                handleClose={() => {
+                    setAssistOpen(false);
+                }}
+            />
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
-const getCaretPosition = (input: any, selection = 'selectionStart') => {
+export const getCaretPosition = (input: any, selection = 'selectionStart') => {
     const { scrollLeft, scrollTop } = input;
     const selectionPoint = input[selection] || input.selectionStart;
     const { height, width, left, top } = input.getBoundingClientRect();
@@ -32,39 +30,3 @@ const getCaretPosition = (input: any, selection = 'selectionStart') => {
         y
     };
 };
-
-const getSelectionPosition = (input: any) => {
-    const { y: startY, x: startX } = getCaretPosition(input, 'selectionStart');
-    const { x: endX } = getCaretPosition(input, 'selectionEnd');
-    const x = startX + (endX - startX) / 2;
-    const y = startY;
-    return {
-        x,
-        y
-    };
-};
-
-const useCaretPosition = (element: any) => {
-    const [x, setX] = useState(null);
-    const [y, setY] = useState(null);
-
-    const getPosition = (element: any) => {
-        if (element.current) {
-            const { x, y } = getCaretPosition(element.current);
-            setX(x);
-            setY(y);
-        }
-    };
-
-    const getSelection = (element: any) => {
-        if (element.current) {
-            const { x, y } = getSelectionPosition(element.current);
-            setX(x);
-            setY(y);
-        }
-    };
-
-    return { x, y, getPosition, getSelection };
-};
-
-export default useCaretPosition;

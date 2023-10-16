@@ -9,51 +9,46 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { SettingModal } from './components/SettingModal';
-
-const items: MenuProps['items'] = [
-    {
-        key: '1',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                1st menu item
-            </a>
-        )
-    },
-    {
-        key: '2',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                2nd menu item (disabled)
-            </a>
-        )
-    },
-    {
-        key: '3',
-        label: (
-            <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                3rd menu item (disabled)
-            </a>
-        )
-    },
-    {
-        key: '4',
-        label: 'a danger item'
-    }
-];
+import SvgIcon from '@mui/material/SvgIcon';
+import { COUNTRY_LIST } from '../data';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const ListingBuilder = () => {
     const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
     const [settingOpen, setSettingOpen] = React.useState(false);
+    const [dropdownOpen, setDropdownOpen] = React.useState(false);
+    const [country, setCountry] = React.useState({
+        icon: COUNTRY_LIST?.['0']?.icon,
+        label: COUNTRY_LIST?.['0']?.label
+    });
+
+    const onClick: MenuProps['onClick'] = ({ key }) => {
+        setCountry({
+            icon: COUNTRY_LIST?.[key]?.icon,
+            label: COUNTRY_LIST?.[key]?.label
+        });
+    };
 
     return (
         <Card className="h-full">
             <CardHeader
                 sx={{ padding: 2 }}
                 title={
-                    <div>
-                        <Dropdown menu={{ items }}>
-                            <a onClick={(e) => e.preventDefault()}>中国</a>
+                    <div className="w-[100px]">
+                        <Dropdown
+                            menu={{ items: COUNTRY_LIST, onClick }}
+                            open={dropdownOpen}
+                            onOpenChange={setDropdownOpen}
+                            arrow
+                            placement={'top'}
+                        >
+                            <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
+                                {country.icon}
+                                <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
+                                {dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </div>
                         </Dropdown>
                     </div>
                 }

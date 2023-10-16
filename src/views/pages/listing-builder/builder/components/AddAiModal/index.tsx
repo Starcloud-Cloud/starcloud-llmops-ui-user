@@ -33,6 +33,9 @@ function a11yProps(index: number) {
     };
 }
 
+/**
+ * AI批量生成填写信息
+ */
 export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
     const [tab, setTab] = useState(0);
     const formik = useFormik({
@@ -59,7 +62,7 @@ export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title={'新增'}
+                title={'AI生成'}
                 content={false}
                 className="sm:w-[700px] xs:w-[300px]"
                 secondary={
@@ -70,12 +73,23 @@ export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
             >
                 <CardContent
                     sx={{
-                        p: 1
+                        p: 3
                     }}
                 >
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-[#505355] text-base font-semibold">添加ASIN辅助信息帮助AI更贴切的生成您的Listing</span>
+                            <div className="flex items-center">
+                                <span>本月剩余次数1000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span className="text-sm">输入产品特征，添加关键词，再点击下方“AI生成标题”按钮来自动生成文案。</span>
+                        </div>
+                    </div>
                     <form onSubmit={formik.handleSubmit} className="mt-2">
                         <Grid container>
-                            <Grid sx={{ mt: 1 }} item md={12}>
+                            <Grid sx={{ mt: 2 }} item md={12}>
                                 <TextField
                                     size="small"
                                     label={'产品特征'}
@@ -90,7 +104,7 @@ export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
                                     helperText={formik.touched.productFeatures && formik.errors.productFeatures}
                                 />
                             </Grid>
-                            <Grid sx={{ mt: 1 }} item md={12}>
+                            <Grid sx={{ mt: 2 }} item md={12}>
                                 <TextField
                                     size="small"
                                     label={'客户特征'}
@@ -105,7 +119,7 @@ export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
                                     helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                 />
                             </Grid>
-                            <Grid sx={{ mt: 1 }} item md={12}>
+                            <Grid sx={{ mt: 2 }} item md={12}>
                                 <TextField
                                     size="small"
                                     label={'不希望出现的词汇'}
@@ -120,7 +134,7 @@ export const AddAiModal = ({ open, handleClose }: IAddAiModalProps) => {
                                     helperText={formik.touched.voidWord && formik.errors.voidWord}
                                 />
                             </Grid>
-                            <Grid sx={{ mt: 1 }} item md={12} className="grid gap-3 grid-cols-3">
+                            <Grid sx={{ mt: 2 }} item md={12} className="grid gap-3 grid-cols-3">
                                 <div>
                                     <FormControl fullWidth>
                                         <InputLabel size="small" id="demo-simple-select-label">

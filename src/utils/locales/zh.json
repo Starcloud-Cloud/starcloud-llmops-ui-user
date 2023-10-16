@@ -586,7 +586,7 @@
     "delete": "删除",
     "model": "模型变量",
     "prompt": "提示词",
-    "max_tokens": "最大魔法豆数",
+    "max_tokens": "最大魔法豆",
     "temperature": "温度",
     "n": "N",
     "copyFiend": "复制链接发送给好友",
@@ -793,7 +793,7 @@
     "messageTotal": "使用次数",
     "usertotal": "用户满意程度",
     "TimeConsuming": "平均耗时",
-    "tokenTotal": "消耗魔法豆数",
+    "tokenTotal": "消耗魔法豆",
     "name": "名称",
     "date": "时间",
     "search": "搜索"

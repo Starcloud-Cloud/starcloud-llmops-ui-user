@@ -1,5 +1,6 @@
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import History from '@mui/icons-material/History';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { IconButton } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
@@ -8,6 +9,7 @@ import { translateText } from 'api/picture/create';
 import imgLoading from 'assets/images/picture/loading.gif';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { downloadFile } from 'utils/download';
 import PicModal from '../Modal';
 import { IImageListType, IImageListTypeChildImages } from '../index';
@@ -24,7 +26,8 @@ export const PictureCreateContainer = ({
     setInputValue,
     setInputValueTranslate,
     fetchMoreData,
-    hasMore
+    hasMore,
+    mode
 }: {
     menuVisible?: boolean;
     imgList: IImageListType;
@@ -36,7 +39,9 @@ export const PictureCreateContainer = ({
     setInputValueTranslate: (flag: boolean) => void;
     fetchMoreData: any;
     hasMore: boolean;
+    mode?: string;
 }) => {
+    const navigate = useNavigate();
     const [hoveredIndex, setHoveredIndex] = useState<string | undefined>(undefined);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [currentImageList, setCurrentImageList] = useState<IImageListTypeChildImages[]>([]);
@@ -86,10 +91,17 @@ export const PictureCreateContainer = ({
 
     return (
         <div className="pcm_container" style={menuVisible ? {} : { width: '100%' }}>
-            <div>
+            <div className="flex justify-between">
                 <IconButton onClick={() => setMenuVisible(!menuVisible)} size="large" aria-label="chat menu collapse">
                     <MenuRoundedIcon />
                 </IconButton>
+                <div
+                    onClick={() => navigate('/imageHistory?scene=' + 'IMAGE_VARIANTS')}
+                    className="text-[#673ab7] text-[12px] flex items-center cursor-pointer"
+                >
+                    <History sx={{ fontSize: '14px' }} />
+                    <span>历史记录</span>
+                </div>
             </div>
             <div className="h-full">
                 <div

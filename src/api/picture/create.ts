@@ -12,6 +12,14 @@ export const getImgMeta = () => {
  * 文本生成图片
  * @param data
  */
+export const variantsImage = (data: any) => {
+    return request.post({ url: '/llm/image/variants', data, timeout: 3 * 60 * 1000 });
+};
+
+/**
+ * 图片裂变
+ * @param data
+ */
 export const createText2Img = (data: any) => {
     return request.post({ url: '/llm/image/generate', data, timeout: 3 * 60 * 1000 });
 };

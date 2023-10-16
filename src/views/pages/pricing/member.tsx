@@ -164,7 +164,7 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: '1000魔法豆，100张图片',
+        description: '1000魔法豆，100点作图',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
@@ -178,7 +178,7 @@ const plans = [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: '3000魔法豆，300张图片',
+        description: '3000魔法豆，300点作图',
         monthPrice: 99,
         yearPrice: 999,
         preMonthPrice: 83.25,
@@ -192,7 +192,7 @@ const plans = [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: '6个账号，无限魔法豆创作，1000张图片',
+        description: '6个账号，无限魔法豆创作，1000点作图',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
@@ -245,8 +245,18 @@ const planList = [
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
-        '5个自定义应用', // 3
-        '5个自定义机器人', // 3
+        <div className="flex items-center">
+            <span>5个自定义应用</span>
+            <Tooltip title={'可自定义提示词应用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
+        <div className="flex items-center">
+            <span>5个自定义机器人</span>
+            <Tooltip title={'可自定义自己的问答机器人'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
         <div className="flex items-center">
             <span>1个微信群机器人</span>
             <Tooltip title={'机器人可发布到微信群使用'}>
@@ -274,8 +284,18 @@ const planList = [
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
-        '20个自定义应用', // 3
-        '20个自定义机器人', // 3
+        <div className="flex items-center">
+            <span>20个自定义应用</span>
+            <Tooltip title={'可自定义提示词应用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
+        <div className="flex items-center">
+            <span>20个自定义机器人</span>
+            <Tooltip title={'可自定义自己的问答机器人'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
         <div className="flex items-center">
             <span>10个微信群机器人</span>
             <Tooltip title={'机器人可发布到微信群使用'}>

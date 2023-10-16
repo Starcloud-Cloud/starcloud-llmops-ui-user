@@ -32,6 +32,8 @@ const ImageHistory = Loadable(lazy(() => import('views/picture/components/imageH
 const WeShop = Loadable(lazy(() => import('views/picture/weShop')));
 //轮廓出图
 const ContourImage = Loadable(lazy(() => import('views/picture/contourImage')));
+//图片裂变
+const FissionImage = Loadable(lazy(() => import('views/picture/fissionImage')));
 
 // 聊天
 const MyChat = Loadable(lazy(() => import('views/template/myChat')));
@@ -124,6 +126,10 @@ const MainRoutes = {
         {
             path: '/contourImage',
             element: <ContourImage />
+        },
+        {
+            path: '/fissionImage',
+            element: <FissionImage />
         },
         {
             path: '/user/account-profile/profile',

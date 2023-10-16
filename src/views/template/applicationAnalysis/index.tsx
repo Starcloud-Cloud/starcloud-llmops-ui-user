@@ -273,7 +273,9 @@ function ApplicationAnalysis({
                     if (
                         res.fromScene === 'IMAGE_REMOVE_BACKGROUND' ||
                         res.fromScene === 'IMAGE_REMOVE_TEXT' ||
-                        res.fromScene === 'IMAGE_UPSCALING'
+                        res.fromScene === 'IMAGE_UPSCALING' ||
+                        res.fromScene === 'IMAGE_VARIANTS' ||
+                        res.fromScene === 'IMAGE_SKETCH'
                     ) {
                         setDetailData(res.imageInfo);
                         setDetailOpen(true);

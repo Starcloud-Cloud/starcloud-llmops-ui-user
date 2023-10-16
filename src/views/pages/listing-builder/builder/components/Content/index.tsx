@@ -30,6 +30,7 @@ import AddIcon from '@mui/icons-material/Add';
 import _ from 'lodash';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useCaretPosition from 'hooks/useCaretPosition';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 const { TextArea } = Input;
 
 const { Search } = Input;
@@ -53,102 +54,141 @@ const defaultList = [
             </span>
         ),
         placeholder: '为您的产品写一个标题',
-        type: 'title'
+        type: ListingBuilderEnum.TITLE,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '五点描述1',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '产品卖点描述1',
+        type: ListingBuilderEnum.FIVE_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '五点描述2',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '产品卖点描述2',
+        type: ListingBuilderEnum.FIVE_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '五点描述3',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '产品卖点描述3',
+        type: ListingBuilderEnum.FIVE_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '五点描述4',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '产品卖点描述4',
+        type: ListingBuilderEnum.FIVE_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '五点描述5',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '产品卖点描述5',
+        type: ListingBuilderEnum.FIVE_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '产品描述',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '请输入您的产品描述吧!',
+        type: ListingBuilderEnum.PRODUCT_DES,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
+    },
+    {
+        title: '搜索词',
+        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+        2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+        3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+        4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+        5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+        6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+        placeholder: '请添加产品的搜索词，用逗号或空格隔开!',
+        type: ListingBuilderEnum.SEARCH_WORD,
+        maxCharacter: 200,
+        character: 0,
+        word: 0
     }
-    // {
-    //     title: '五点描述1',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '产品卖点描述1',
-    //     type: 'des'
-    // },
-    // {
-    //     title: '五点描述2',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '产品卖点描述2',
-    //     type: 'des'
-    // },
-    // {
-    //     title: '五点描述3',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '产品卖点描述3',
-    //     type: 'des'
-    // },
-    // {
-    //     title: '五点描述4',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '产品卖点描述4',
-    //     type: 'des'
-    // },
-    // {
-    //     title: '五点描述5',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '产品卖点描述5',
-    //     type: 'des'
-    // },
-    // {
-    //     title: '产品描述',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '请输入您的产品描述吧!',
-    //     type: 'product-des'
-    // },
-    // {
-    //     title: '搜索词',
-    //     des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-    //     2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-    //     3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-    //     4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-    //     5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-    //     6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
-    //     placeholder: '请添加产品的搜索词，用逗号或空格隔开!',
-    //     type: 'search'
-    // }
 ];
 
 const likeList = ['iphone pro', 'iphone', 'pro'];
+
+type ListType = {
+    title: string;
+    des: JSX.Element | string;
+    placeholder: string;
+    type: ListingBuilderEnum;
+    maxCharacter: number;
+    character: number;
+    word: number;
+    isOvertop?: boolean;
+    value?: string;
+};
+
 export const Content = () => {
-    const [list, setList] = React.useState<any[]>(defaultList);
+    const [list, setList] = React.useState<ListType[]>(defaultList);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
     const [assistOpen, setAssistOpen] = React.useState(false);
     const [aiCustomOpen, setAiCustomOpen] = React.useState(false);
-    const [v, setV] = React.useState('');
 
     const textareaRef = React.useRef<any>(null);
     const { x, y, getPosition, getSelection } = useCaretPosition(textareaRef);
 
-    const handleInputChange = (e: any) => {
-        setV(e.target.value);
-        // 获取光标位置
+    const handleInputChange = (e: any, index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList[index].value = e.target.value;
+        copyList[index].character = e.target.value.length;
+        copyList[index].word = e.target.value.trim().split(' ').length;
+        setList(copyList);
     };
 
     useEffect(() => {
@@ -209,7 +249,7 @@ export const Content = () => {
     ];
 
     const handleAddFiveDescription = () => {
-        const r = list.filter((item) => item.type === 'des');
+        const r = list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES);
         const index = r.length + 1;
         const copyList = _.cloneDeep(list);
         copyList.splice(-2, 0, {
@@ -221,8 +261,12 @@ export const Content = () => {
             5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
             6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
             placeholder: `产品卖点描述${index}`,
-            type: 'des',
-            isOvertop: true
+            type: ListingBuilderEnum.FIVE_DES,
+            isOvertop: true,
+            maxCharacter: 200,
+            character: 0,
+            word: 0,
+            value: ''
         });
         setList(copyList);
     };
@@ -776,7 +820,7 @@ export const Content = () => {
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
-                        {item.type === 'product-des' && (
+                        {item.type === ListingBuilderEnum.PRODUCT_DES && (
                             <>
                                 <div className="justify-center flex">
                                     <Button
@@ -852,9 +896,11 @@ export const Content = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">10/200字</span>
+                                        <span className="text-[#bec2cc] cursor-pointer text-xs">
+                                            {item.character}/{item.maxCharacter}字
+                                        </span>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">200单词</span>
+                                        <span className="text-[#bec2cc] cursor-pointer text-xs">{item.word}单词</span>
                                     </div>
                                     <div className="flex items-center">
                                         <div className="flex items-center">
@@ -873,7 +919,8 @@ export const Content = () => {
                                     ref={textareaRef}
                                     placeholder={item.placeholder}
                                     spellCheck="false"
-                                    onChange={handleInputChange}
+                                    value={item.value}
+                                    onChange={(e) => handleInputChange(e, index)}
                                     onInput={() => getPosition(textareaRef)}
                                     onClick={() => getPosition(textareaRef)}
                                     className="rounded-none focus:shadow-none hover:border-[#e6e8ec]  focus:border-[#e6e8ec]  border-[#e6e8ec] border-l-0 border-r-0 text-sm p"
@@ -896,7 +943,7 @@ export const Content = () => {
                             </div>
                         </div>
 
-                        {(item.type === 'title' || item.type === 'product-des') && <Divider />}
+                        {(item.type === ListingBuilderEnum.TITLE || item.type === ListingBuilderEnum.PRODUCT_DES) && <Divider />}
                     </>
                 ))}
             </Card>

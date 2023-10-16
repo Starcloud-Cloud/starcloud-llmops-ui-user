@@ -31,3 +31,11 @@ export const upscale = (data: any) => {
 export const history = (data: any) => {
     return request.post({ url: '/llm/app/log/historyImageRecords', data });
 };
+
+/**
+ * 轮廓出图
+ * @returns
+ */
+export const sketchToImage = (data: any) => {
+    return request.post({ url: '/llm/image/sketchToImage', data });
+};

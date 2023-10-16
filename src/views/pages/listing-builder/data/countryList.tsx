@@ -190,13 +190,7 @@ export const COUNTRY_LIST: any = [
                         </g>
                     </symbol>
                 </defs>
-                <g fill="#606266">
-                    <g fill-rule="evenodd" stroke-width="1.33333px">
-                        <path fill="#FFFFFF" d="M0 0h640v480H0z" stroke-width="1.33333px"></path>
-                        <path fill="#009246" d="M0 0h213.3v480H0z" stroke-width="1.33333px"></path>
-                        <path fill="#CE2B37" d="M426.7 0H640v480H426.7z" stroke-width="1.33333px"></path>
-                    </g>
-                </g>
+                <use data-v-23d6874a="" xlinkHref="#icon-it" fill="#606266"></use>
             </svg>
         ),
         label: '意大利'

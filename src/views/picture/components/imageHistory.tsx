@@ -18,7 +18,9 @@ const ImageHistory = () => {
     const sceneList = [
         { label: '去除图片背景', value: 'IMAGE_REMOVE_BACKGROUND' },
         { label: '去除图片背景文字', value: 'IMAGE_REMOVE_TEXT' },
-        { label: '图片质量提升', value: 'IMAGE_UPSCALING' }
+        { label: '图片质量提升', value: 'IMAGE_UPSCALING' },
+        { label: '轮廓出图', value: 'IMAGE_SKETCH' },
+        { label: '图片裂变', value: 'IMAGE_VARIANTS' }
     ];
     const columns: ColumnsType<any> = [
         {
@@ -80,7 +82,7 @@ const ImageHistory = () => {
                     >
                         详情
                     </Button>
-                    <Button disabled={record.status === 'ERROR'} onClick={() => downLoad(record.imageInfo)} color="secondary">
+                    <Button disabled={record.status === 'ERROR'} onClick={() => downLoad(record)} color="secondary">
                         下载
                     </Button>
                 </>
@@ -111,7 +113,35 @@ const ImageHistory = () => {
     }, [query]);
     //下载图片
     const downLoad = (row: any) => {
-        downLoadImages(row.images[0].url, row.images[0].mediaType.split('/')[1]);
+        if (row?.imageInfo?.images?.length > 1) {
+            const zip = new JSZip();
+            const imageUrls = row?.imageInfo?.images.map((item: any) => item.url);
+            console.log(imageUrls);
+
+            // 异步加载图片并添加到压缩包
+            const promises = imageUrls.map(async (imageUrl: string, index: number) => {
+                const response = await fetch(imageUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                zip.file(`下载${index + 1}.jpg`, arrayBuffer);
+            });
+            // 等待所有图片添加完成后创建压缩包并下载
+            Promise.all(promises)
+                .then(() => {
+                    zip.generateAsync({ type: 'blob' }).then((content) => {
+                        const url = window.URL.createObjectURL(content);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'images.zip'; // 设置下载的文件名
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error downloading images:', error);
+                });
+        } else {
+            downLoadImages(row?.imageInfo?.images[0].url, row?.imageInfo?.images[0].mediaType.split('/')[1]);
+        }
     };
     const download = () => {
         const zip = new JSZip();

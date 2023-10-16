@@ -81,17 +81,13 @@ const ContourImage = () => {
     return (
         <div>
             <SubCard sx={{ mb: 3 }} contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'right', p: '10px !important' }}>
-                <Button
-                    startIcon={<History />}
+                <div
                     onClick={() => navigate('/imageHistory?scene=' + 'IMAGE_SKETCH')}
-                    sx={{ ml: 1 }}
-                    size="small"
-                    variant="contained"
-                    color="secondary"
+                    className="text-[#673ab7] text-[12px] flex items-center cursor-pointer"
                 >
-                    历史记录
-                </Button>
-                <span>历史记录</span>
+                    <History sx={{ fontSize: '14px' }} />
+                    <span>历史记录</span>
+                </div>
             </SubCard>
             <div className="h-full flex items-top justify-center gap-3">
                 <div>

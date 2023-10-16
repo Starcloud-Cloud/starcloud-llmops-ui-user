@@ -6,6 +6,7 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Slider } from '@mui/material';
+import { getAccessToken } from 'utils/auth';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -20,7 +21,7 @@ import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 import userInfoStore from 'store/entitlementAction';
 import { containsChineseCharactersAndSymbols, removeFalseProperties } from 'utils/validate';
-import { createText2Img, getImgMeta, translateText } from '../../../../api/picture/create';
+import { createText2Img, variantsImage, getImgMeta, translateText } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
 import { IImageListType } from '../index';
 import './index.scss';
@@ -101,6 +102,7 @@ type IPictureCreateMenuProps = {
     setIsFetch: (flag: boolean) => void;
     inputValueTranslate: boolean;
     setInputValueTranslate: (flag: boolean) => void;
+    mode?: string;
 };
 
 export type IParamsType = {
@@ -175,7 +177,8 @@ export const PictureCreateMenu = ({
     setIsFirst,
     setIsFetch,
     setInputValueTranslate,
-    inputValueTranslate
+    inputValueTranslate,
+    mode
 }: IPictureCreateMenuProps) => {
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
@@ -265,11 +268,30 @@ export const PictureCreateMenu = ({
     };
 
     const props: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        onChange(info) {
+            if (info.file.status === 'uploading') {
+                console.log(info);
+            } else if (info.file.status === 'done') {
+                setUploadFile(info?.file?.response?.data?.url);
+            }
+        },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        }
+    };
+    //模拟上传
+    const props1: UploadProps = {
         name: 'file',
-        multiple: true,
-        fileList: [],
         customRequest: async ({ file, onSuccess, onError }) => {
             try {
+                console.log(file, onSuccess);
+
                 // 模拟文件上传请求（这里使用了setTimeout来模拟异步请求）
                 getBase64(file as RcFile, (url) => {
                     setUploadFile(url);
@@ -284,6 +306,10 @@ export const PictureCreateMenu = ({
     };
 
     const handleCreate = async () => {
+        if (!uploadFile && mode === '裂变') {
+            PubSub.publish('global.error', { message: '请上传参考图', type: 'error' });
+            return false;
+        }
         if (!inputValue) {
             PubSub.publish('global.error', { message: '请填写创意描述', type: 'error' });
             return false;
@@ -340,17 +366,31 @@ export const PictureCreateMenu = ({
         }
 
         try {
-            const res = await createText2Img({
-                scene: 'WEB_IMAGE',
-                appUid: 'GENERATE_IMAGE',
-                imageRequest: removeFalseProperties(imageRequest)
-            });
-            const benefitsRes = await userBenefits();
-            setUserInfo(benefitsRes);
+            if (mode === '裂变') {
+                const res = await variantsImage({
+                    scene: 'IMAGE_VARIANTS',
+                    appUid: 'VARIANTS_IMAGE',
+                    imageRequest: removeFalseProperties(imageRequest)
+                });
+                const benefitsRes = await userBenefits();
+                setUserInfo(benefitsRes);
 
-            setIsFetch(false);
-            setIsFirst(false);
-            setImgList([res?.response, ...imgList] || []);
+                setIsFetch(false);
+                setIsFirst(false);
+                setImgList([res?.response, ...imgList] || []);
+            } else {
+                const res = await createText2Img({
+                    scene: 'WEB_IMAGE',
+                    appUid: 'GENERATE_IMAGE',
+                    imageRequest: removeFalseProperties(imageRequest)
+                });
+                const benefitsRes = await userBenefits();
+                setUserInfo(benefitsRes);
+
+                setIsFetch(false);
+                setIsFirst(false);
+                setImgList([res?.response, ...imgList] || []);
+            }
         } catch (e: any) {
             if (e?.code === 2008002007) {
                 setOpenToken(true);
@@ -391,7 +431,84 @@ export const PictureCreateMenu = ({
                             ))}
                         </div>
                     </Row>
-
+                    {mode === '裂变' && (
+                        <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
+                            <div className="flex items-center cursor-pointer justify-between">
+                                <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
+                                    <span className={'text-base font-medium'}>图像</span>
+                                    {!showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                                </div>
+                                {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
+                            </div>
+                            {!showImg && (
+                                <div className="mt-[15px]">
+                                    {uploadFile ? (
+                                        <div className="w-full justify-center flex flex-col items-center">
+                                            <Dragger {...props} className="w-full">
+                                                <div className="flex justify-center">
+                                                    <div className="h-[140px] w-[140px] overflow-hidden">
+                                                        <img
+                                                            className="upload_img h-[140px] object-cover aspect-square"
+                                                            src={uploadFile}
+                                                            alt={uploadFile}
+                                                            style={{
+                                                                filter: `blur(${imageStrength / 10}px)`
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </Dragger>
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    marginTop: '15px',
+                                                    justifyContent: 'center',
+                                                    flexDirection: 'column',
+                                                    width: '100%'
+                                                }}
+                                            >
+                                                <span className={'text-base font-medium'}>图像强度</span>
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        marginTop: '5px',
+                                                        justifyContent: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            width: '92%'
+                                                        }}
+                                                    >
+                                                        <Slider
+                                                            color="secondary"
+                                                            defaultValue={45}
+                                                            valueLabelDisplay="auto"
+                                                            aria-labelledby="discrete-slider-small-steps"
+                                                            step={1}
+                                                            min={0}
+                                                            max={100}
+                                                            onChange={(e, value, number) => setImageStrength(value as number)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Dragger {...props}>
+                                            <div>
+                                                <p className="ant-upload-drag-icon">
+                                                    <CloudUploadOutlinedIcon className="text-4xl" />
+                                                </p>
+                                                <p className="ant-upload-text">上传图片以创建变体</p>
+                                            </div>
+                                        </Dragger>
+                                    )}
+                                </div>
+                            )}
+                        </Row>
+                    )}
                     <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
                         <div className={'text-base font-medium flex items-center justify-between w-full'}>
                             <div className=" flex items-center">
@@ -635,110 +752,114 @@ export const PictureCreateMenu = ({
                                 </div>
                             </div>
                         </div>
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
-                            <div className={'text-base font-medium mt-[15px] w-full flex items-center'}>
-                                生成张数
-                                <MuiTooltip title="生成张数越多，耗时越久" arrow placement="top">
-                                    <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
-                                </MuiTooltip>
-                            </div>
-                            <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
-                                <Slider
-                                    sx={{
-                                        '& .MuiSlider-thumb': {
-                                            width: 14,
-                                            height: 14
-                                        }
-                                    }}
-                                    color="secondary"
-                                    defaultValue={samples}
-                                    valueLabelDisplay="auto"
-                                    aria-labelledby="discrete-slider-small-steps"
-                                    marks
-                                    step={1}
-                                    min={1}
-                                    max={8}
-                                    onChange={(e, value, number) => setSamples(value as number)}
-                                />
-                            </div>
-                        </div>
-                    </Row>
-                    <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
-                        <div className="flex items-center cursor-pointer justify-between">
-                            <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
-                                <span className={'text-base font-medium'}>图像</span>
-                                {showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-                            </div>
-                            {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
-                        </div>
-                        {showImg && (
-                            <div className="mt-[15px]">
-                                {uploadFile ? (
-                                    <div className="w-full justify-center flex flex-col items-center">
-                                        <Dragger {...props} className="w-full">
-                                            <div className="flex justify-center">
-                                                <div className="h-[140px] w-[140px] overflow-hidden">
-                                                    <img
-                                                        className="upload_img h-[140px] object-cover aspect-square"
-                                                        src={uploadFile}
-                                                        alt={uploadFile}
-                                                        style={{
-                                                            filter: `blur(${imageStrength / 10}px)`
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </Dragger>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                marginTop: '15px',
-                                                justifyContent: 'center',
-                                                flexDirection: 'column',
-                                                width: '100%'
-                                            }}
-                                        >
-                                            <span className={'text-base font-medium'}>图像强度</span>
-                                            <div
-                                                style={{
-                                                    display: 'flex',
-                                                    marginTop: '5px',
-                                                    justifyContent: 'center',
-                                                    width: '100%'
-                                                }}
-                                            >
-                                                <div
-                                                    style={{
-                                                        width: '92%'
-                                                    }}
-                                                >
-                                                    <Slider
-                                                        color="secondary"
-                                                        defaultValue={45}
-                                                        valueLabelDisplay="auto"
-                                                        aria-labelledby="discrete-slider-small-steps"
-                                                        step={1}
-                                                        min={0}
-                                                        max={100}
-                                                        onChange={(e, value, number) => setImageStrength(value as number)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <Dragger {...props}>
-                                        <div>
-                                            <p className="ant-upload-drag-icon">
-                                                <CloudUploadOutlinedIcon className="text-4xl" />
-                                            </p>
-                                            <p className="ant-upload-text">上传图片以创建变体</p>
-                                        </div>
-                                    </Dragger>
-                                )}
+                        {mode !== '裂变' && (
+                            <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', marginTop: '5px', justifyContent: 'center' }}>
+                                <div className={'text-base font-medium mt-[15px] w-full flex items-center'}>
+                                    生成张数
+                                    <MuiTooltip title="生成张数越多，耗时越久" arrow placement="top">
+                                        <HelpOutlineOutlinedIcon className="text-base ml-1 cursor-pointer" />
+                                    </MuiTooltip>
+                                </div>
+                                <div style={{ width: '92%', display: 'flex', marginTop: '5px' }}>
+                                    <Slider
+                                        sx={{
+                                            '& .MuiSlider-thumb': {
+                                                width: 14,
+                                                height: 14
+                                            }
+                                        }}
+                                        color="secondary"
+                                        defaultValue={samples}
+                                        valueLabelDisplay="auto"
+                                        aria-labelledby="discrete-slider-small-steps"
+                                        marks
+                                        step={1}
+                                        min={1}
+                                        max={8}
+                                        onChange={(e, value, number) => setSamples(value as number)}
+                                    />
+                                </div>
                             </div>
                         )}
                     </Row>
+                    {mode !== '裂变' && (
+                        <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
+                            <div className="flex items-center cursor-pointer justify-between">
+                                <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
+                                    <span className={'text-base font-medium'}>图像</span>
+                                    {showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                                </div>
+                                {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
+                            </div>
+                            {showImg && (
+                                <div className="mt-[15px]">
+                                    {uploadFile ? (
+                                        <div className="w-full justify-center flex flex-col items-center">
+                                            <Dragger {...props1} className="w-full">
+                                                <div className="flex justify-center">
+                                                    <div className="h-[140px] w-[140px] overflow-hidden">
+                                                        <img
+                                                            className="upload_img h-[140px] object-cover aspect-square"
+                                                            src={uploadFile}
+                                                            alt={uploadFile}
+                                                            style={{
+                                                                filter: `blur(${imageStrength / 10}px)`
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </Dragger>
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    marginTop: '15px',
+                                                    justifyContent: 'center',
+                                                    flexDirection: 'column',
+                                                    width: '100%'
+                                                }}
+                                            >
+                                                <span className={'text-base font-medium'}>图像强度</span>
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        marginTop: '5px',
+                                                        justifyContent: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            width: '92%'
+                                                        }}
+                                                    >
+                                                        <Slider
+                                                            color="secondary"
+                                                            defaultValue={45}
+                                                            valueLabelDisplay="auto"
+                                                            aria-labelledby="discrete-slider-small-steps"
+                                                            step={1}
+                                                            min={0}
+                                                            max={100}
+                                                            onChange={(e, value, number) => setImageStrength(value as number)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Dragger {...props1}>
+                                            <div>
+                                                <p className="ant-upload-drag-icon">
+                                                    <CloudUploadOutlinedIcon className="text-4xl" />
+                                                </p>
+                                                <p className="ant-upload-text">上传图片以创建变体</p>
+                                            </div>
+                                        </Dragger>
+                                    )}
+                                </div>
+                            )}
+                        </Row>
+                    )}
                     <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                         <span className={'text-base font-medium flex items-center'}>
                             高级

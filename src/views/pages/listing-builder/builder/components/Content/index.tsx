@@ -31,9 +31,23 @@ import _ from 'lodash';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useCaretPosition from 'hooks/useCaretPosition';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
-const { TextArea } = Input;
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { AddAiModal } from '../AddAiModal/index';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import KeyWordTag from '../KeyWordTag';
 
 const { Search } = Input;
+
+// 首字母转换为大写
+function capitalizeFirstLetterOfEachWord(str: string): string {
+    const words = str.split(' ');
+    const capitalizedWords = words.map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+    return capitalizedWords.join(' ');
+}
 
 const defaultList = [
     {
@@ -187,15 +201,9 @@ export const Content = () => {
         const copyList = _.cloneDeep(list);
         copyList[index].value = e.target.value;
         copyList[index].character = e.target.value.length;
-        copyList[index].word = e.target.value.trim().split(' ').length;
+        copyList[index].word = e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length;
         setList(copyList);
     };
-
-    useEffect(() => {
-        if (textareaRef.current) {
-            getPosition(textareaRef);
-        }
-    }, []);
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -274,6 +282,18 @@ export const Content = () => {
     const handleDelFiveDescription = (index: number) => {
         const copyList = _.cloneDeep(list);
         copyList.splice(index, 1);
+        setList(copyList);
+    };
+
+    const handleTurnUpcase = (index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList[index].value = capitalizeFirstLetterOfEachWord(copyList[index].value || '');
+        setList(copyList);
+    };
+
+    const handleTurnLowercase = (index: number) => {
+        const copyList = _.cloneDeep(list);
+        copyList[index].value = copyList[index].value?.toLowerCase();
         setList(copyList);
     };
 
@@ -662,15 +682,15 @@ export const Content = () => {
                 </div>
             </Card>
             <Card className="p-5 mt-2">
-                <div className="flex justify-between">
-                    <div className="flex items-center">
+                <div className="flex justify-end">
+                    {/* <div className="flex items-center">
                         <span>AI模式</span>
                         <Switch color={'secondary'} onChange={handleChange} checked={enableAi} />
-                    </div>
+                    </div> */}
                     <div className="flex items-center">
                         <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
                         {/* <Button startIcon={<ArrowDownwardIcon className="!text-sm" />} color="secondary" size="small" variant="contained">
-                            导入
+                            导入Listing
                         </Button> */}
                         <div className="ml-2">
                             <Button
@@ -678,6 +698,7 @@ export const Content = () => {
                                 color="secondary"
                                 size="small"
                                 variant="contained"
+                                onClick={() => setAssistOpen(true)}
                             >
                                 AI生成
                             </Button>
@@ -685,7 +706,7 @@ export const Content = () => {
                     </div>
                 </div>
             </Card>
-            {enableAi && (
+            {/* {enableAi && (
                 <Card className="p-5 mt-2">
                     <div>
                         <div className="flex justify-between items-center">
@@ -816,7 +837,7 @@ export const Content = () => {
                         </div>
                     )}
                 </Card>
-            )}
+            )} */}
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
@@ -870,17 +891,38 @@ export const Content = () => {
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">
                                             <IconButton size="small">
-                                                <span className="text-[#bec2cc] cursor-pointer text-xs">Aa</span>
+                                                <span
+                                                    className="text-[#bec2cc] cursor-pointer text-xs"
+                                                    onClick={() => handleTurnUpcase(index)}
+                                                >
+                                                    Aa
+                                                </span>
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip title={'大写转小写'} arrow placement="top">
+                                        <Tooltip title={'大写转小写'} arrow placement="top" onClick={() => handleTurnLowercase(index)}>
                                             <IconButton size="small">
                                                 <span className="text-[#bec2cc] cursor-pointer text-xs">ab</span>
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" />
                                         <Tooltip title={'复制'} arrow placement="top">
-                                            <IconButton size="small">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(item.value || '');
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                }}
+                                            >
                                                 <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip>
@@ -896,11 +938,11 @@ export const Content = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">
+                                        <span className="text-[#bec2cc]  text-xs">
                                             {item.character}/{item.maxCharacter}字
                                         </span>
                                         <Divider type="vertical" />
-                                        <span className="text-[#bec2cc] cursor-pointer text-xs">{item.word}单词</span>
+                                        <span className="text-[#bec2cc] text-xs">{item.word}单词</span>
                                     </div>
                                     <div className="flex items-center">
                                         <div className="flex items-center">
@@ -923,7 +965,7 @@ export const Content = () => {
                                     onChange={(e) => handleInputChange(e, index)}
                                     onInput={() => getPosition(textareaRef)}
                                     onClick={() => getPosition(textareaRef)}
-                                    className="rounded-none focus:shadow-none hover:border-[#e6e8ec]  focus:border-[#e6e8ec]  border-[#e6e8ec] border-l-0 border-r-0 text-sm p"
+                                    className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
                                 />
 
                                 <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
@@ -935,8 +977,9 @@ export const Content = () => {
                                     </Menu.Item>
                                 </Menu>
                                 <div className="flex px-4 py-3 items-center">
-                                    <div className="flex-1">
-                                        <span>建议关键词:</span>
+                                    <div className="flex-1 flex items-center">
+                                        <span className="mr-2">建议关键词:</span>
+                                        <KeyWordTag />
                                     </div>
                                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                 </div>
@@ -947,6 +990,12 @@ export const Content = () => {
                     </>
                 ))}
             </Card>
+            <AddAiModal
+                open={assistOpen}
+                handleClose={() => {
+                    setAssistOpen(false);
+                }}
+            />
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

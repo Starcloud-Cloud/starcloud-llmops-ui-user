@@ -26,9 +26,7 @@ const getCaretPosition = (input: any, selection = 'selectionStart') => {
     let y = top + spanY;
     const { lineHeight, paddingRight } = copyStyle;
     x = Math.min(x - scrollLeft, left + width - parseInt(paddingRight, 10));
-    console.log(y, scrollTop, top + height, lineHeight, window.scrollY);
     y = Math.min(y - scrollTop, top + height - parseInt(lineHeight, 10)) + window.scrollY;
-    console.log(y);
     return {
         x,
         y

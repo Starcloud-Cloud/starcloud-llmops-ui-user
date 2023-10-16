@@ -71,7 +71,8 @@ const defaultList = [
         type: ListingBuilderEnum.TITLE,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 3
     },
     {
         title: '五点描述1',
@@ -85,7 +86,8 @@ const defaultList = [
         type: ListingBuilderEnum.FIVE_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 4
     },
     {
         title: '五点描述2',
@@ -99,7 +101,8 @@ const defaultList = [
         type: ListingBuilderEnum.FIVE_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 4
     },
     {
         title: '五点描述3',
@@ -113,7 +116,8 @@ const defaultList = [
         type: ListingBuilderEnum.FIVE_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 4
     },
     {
         title: '五点描述4',
@@ -127,7 +131,8 @@ const defaultList = [
         type: ListingBuilderEnum.FIVE_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 4
     },
     {
         title: '五点描述5',
@@ -141,7 +146,8 @@ const defaultList = [
         type: ListingBuilderEnum.FIVE_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 4
     },
     {
         title: '产品描述',
@@ -155,7 +161,8 @@ const defaultList = [
         type: ListingBuilderEnum.PRODUCT_DES,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 7
     },
     {
         title: '搜索词',
@@ -169,7 +176,8 @@ const defaultList = [
         type: ListingBuilderEnum.SEARCH_WORD,
         maxCharacter: 200,
         character: 0,
-        word: 0
+        word: 0,
+        row: 5
     }
 ];
 
@@ -185,6 +193,7 @@ type ListType = {
     word: number;
     isOvertop?: boolean;
     value?: string;
+    row: number;
 };
 
 export const Content = () => {
@@ -274,7 +283,8 @@ export const Content = () => {
             maxCharacter: 200,
             character: 0,
             word: 0,
-            value: ''
+            value: '',
+            row: 4
         });
         setList(copyList);
     };
@@ -957,7 +967,7 @@ export const Content = () => {
                                     </div>
                                 </div>
                                 <textarea
-                                    rows={5}
+                                    rows={item.row}
                                     ref={textareaRef}
                                     placeholder={item.placeholder}
                                     spellCheck="false"

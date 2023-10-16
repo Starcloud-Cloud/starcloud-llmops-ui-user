@@ -21,6 +21,7 @@ import { t } from 'hooks/web/useI18n';
 import userInfoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
+import './index.css';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -215,6 +216,7 @@ function MyTemplate() {
                 <Grid item lg={3}>
                     <div className=" relative">
                         <TreeSelect
+                            placeholder="请选择类目"
                             className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px] antdSel"
                             showSearch
                             style={{
@@ -222,7 +224,6 @@ function MyTemplate() {
                             }}
                             value={queryParams?.categories}
                             dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
-                            placeholder="Please select"
                             allowClear
                             treeCheckable={false}
                             treeDefaultExpandAll
@@ -252,7 +253,9 @@ function MyTemplate() {
                             }}
                             treeData={cateTree}
                         />
-                        <span className=" block bg-[#f8fafc] px-[5px] absolute top-[-7px] left-5 text-[12px] text-[#697586]">类目*</span>
+                        <span className=" block bg-gradient-to-b from-[#F4F6F8] to-[#f8fafc] px-[5px] absolute top-[-7px] left-5 text-[12px] text-[#697586]">
+                            类目
+                        </span>
                     </div>
                 </Grid>
             </Grid>

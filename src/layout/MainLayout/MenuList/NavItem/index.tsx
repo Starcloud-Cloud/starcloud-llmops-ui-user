@@ -11,6 +11,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
 import ChatIcon from '@mui/icons-material/Chat';
+import HdOutlinedIcon from '@mui/icons-material/HdOutlined';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
@@ -53,6 +54,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         UpgradeIcon,
         ImageIcon,
         SmartToyIcon,
+        HdOutlinedIcon,
         ChatIcon,
         Groups2Icon,
         FormatShapesIcon

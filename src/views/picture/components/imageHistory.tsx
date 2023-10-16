@@ -48,7 +48,18 @@ const ImageHistory = () => {
             render: (_, record) => (
                 <Space size="middle">
                     {record?.imageInfo?.images?.map((item: any) => (
-                        <Image key={item.url} preview={false} width={50} height={50} src={item.url} />
+                        <Image
+                            className="cursor-pointer"
+                            onClick={() => {
+                                setDetailData(record.imageInfo);
+                                setDetailOpen(true);
+                            }}
+                            key={item.url}
+                            preview={false}
+                            width={50}
+                            height={50}
+                            src={item.url}
+                        />
                     ))}
                 </Space>
             )
@@ -76,6 +87,7 @@ const ImageHistory = () => {
             )
         }
     ];
+    const [loading, setLoading] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const onSelectChange = (newSelectedRowKeys: React.Key[], selected: any) => {
@@ -89,7 +101,9 @@ const ImageHistory = () => {
         })
     };
     const getList = async () => {
+        setLoading(true);
         const res = await history({ pageNo: 1, pageSize: 1000, ...query });
+        setLoading(false);
         setTableData(res.list);
     };
     useEffect(() => {
@@ -135,12 +149,13 @@ const ImageHistory = () => {
         <div>
             <Grid container spacing={2}>
                 <Grid item md={3} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+                    <FormControl color="secondary" fullWidth>
+                        <InputLabel id="demo-multiple-chip-label">类型</InputLabel>
                         <Select
                             labelId="demo-multiple-chip-label"
                             id="demo-multiple-chip"
                             multiple
+                            label="类型"
                             value={query.scenes}
                             onChange={(e: any) => {
                                 setQuery({
@@ -152,7 +167,7 @@ const ImageHistory = () => {
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((value) => (
-                                        <Chip size="small" key={value} label={value} />
+                                        <Chip size="small" key={value} label={sceneList.filter((item) => item.value === value)[0]?.label} />
                                     ))}
                                 </Box>
                             )}
@@ -166,9 +181,10 @@ const ImageHistory = () => {
                     </FormControl>
                 </Grid>
                 <Grid item md={3} xs={12}>
-                    <FormControl fullWidth>
+                    <FormControl color="secondary" fullWidth>
                         <InputLabel id="status">状态</InputLabel>
                         <Select
+                            color="secondary"
                             labelId="status"
                             value={query.status}
                             label="状态"
@@ -195,7 +211,7 @@ const ImageHistory = () => {
             >
                 批量下载
             </Button>
-            <Table rowKey={'uid'} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+            <Table rowKey={'uid'} loading={loading} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
             {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
         </div>
     );

@@ -776,7 +776,7 @@
     "mode": "模式",
     "name": "名称",
     "fromScene": "执行场景",
-    "totalAnswerTokens": "总消耗魔法豆数",
+    "totalAnswerTokens": "消耗魔法豆/消耗作图点",
     "messageCount": "消息总数",
     "feedbacksCount": "反馈总数",
     "totalElapsed": "执行总耗时",

@@ -29,6 +29,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
     const { setUserInfo }: any = userInfoStore();
+    const { categoryTrees } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>(null as unknown as Details);
@@ -207,7 +208,6 @@ function Deatail() {
             setAllLoading(false);
             detailRef.current = res;
             setDetailData(res);
-            // useCategory(res?.category);
         });
         if (ref.current !== null && ref.current.parentNode !== null) {
             const top: any = ref.current.parentNode;
@@ -287,7 +287,14 @@ function Deatail() {
                 <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
                     {t('market.all')}
                 </Link>
-                <Typography color="text.primary">{detailData?.category}</Typography>
+                <Link
+                    color="text.primary"
+                    sx={{ cursor: 'pointer' }}
+                    underline="hover"
+                    onClick={() => navigate('/appMarket?category=' + detailData?.category?.split('_')[0])}
+                >
+                    {useCategory(categoryTrees, detailData?.category)?.name}
+                </Link>
             </Breadcrumbs>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
@@ -306,7 +313,7 @@ function Deatail() {
                             </Typography>
                         </Box>
                         <Box>
-                            <span>#{detailData?.category}</span>
+                            <span>#{useCategory(categoryTrees, detailData?.category)?.name}</span>
                             {detailData?.tags?.map((el: any) => (
                                 <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
                             ))}

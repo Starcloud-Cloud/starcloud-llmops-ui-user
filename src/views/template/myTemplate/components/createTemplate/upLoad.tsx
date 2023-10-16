@@ -49,6 +49,7 @@ import {
     getLatest,
     changeStatus,
     channelCreate,
+    bindCreateUrl,
     addFriend,
     getLimit,
     createLimit,
@@ -208,7 +209,16 @@ function Upload({
                 {
                     title: '配置公众号',
                     icon: 'historyOutlined',
-                    onclick: () => {
+                    onclick: async () => {
+                        if (updateBtn?.channelMap[6]?.length == 0) {
+                            await bindCreateUrl({
+                                appUid: updateBtn.appUid,
+                                name: updateBtn.name,
+                                publishUid: updateBtn.uid,
+                                status: 0
+                            });
+                            getUpdateBtn();
+                        }
                         setOpenWPAccount(true);
                     }
                 }

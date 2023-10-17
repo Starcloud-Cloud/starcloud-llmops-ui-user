@@ -95,6 +95,18 @@ const ListingBuilder = () => {
                                     设置
                                 </Typography>
                             </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    setDelAnchorEl(null);
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <DeleteIcon />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    删除
+                                </Typography>
+                            </MenuItem>
                         </Menu>
                     </div>
                 }

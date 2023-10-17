@@ -20,27 +20,32 @@ export const KeyWord = () => {
             key: 'keyword'
         },
         {
-            title: '得分',
+            title: '分值',
             dataIndex: 'score',
             key: 'score'
         },
         {
-            title: 'volume',
+            title: '搜索量',
             dataIndex: 'search volume',
             key: 'search volume'
         },
         {
-            title: 'title',
+            title: '购买率',
             dataIndex: 'title',
             key: 'title'
         },
         {
-            title: 'comp',
+            title: '竞争度',
             dataIndex: 'comp',
             key: 'comp'
         },
         {
-            title: '使用',
+            title: '推荐值',
+            dataIndex: 'usage',
+            key: 'usage'
+        },
+        {
+            title: '使用分布',
             dataIndex: 'usage',
             key: 'usage'
         }
@@ -68,7 +73,7 @@ export const KeyWord = () => {
 
     return (
         <div className="h-full p-3 bg-white">
-            <div className="text-lg font-bold py-1">关键词</div>
+            {/* <div className="text-lg font-bold py-1">关键词</div> */}
             <div className="flex justify-between">
                 {/* <FormControl variant="outlined" className="flex-1">
                     <InputLabel size="small" htmlFor="outlined-adornment-password">
@@ -98,7 +103,7 @@ export const KeyWord = () => {
                     className="ml-2"
                     onClick={() => setOpen(true)}
                 >
-                    新增
+                    增加关键词
                 </Button>
                 <div>
                     <CSVLink

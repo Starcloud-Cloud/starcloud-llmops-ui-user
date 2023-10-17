@@ -41,6 +41,9 @@ function a11yProps(index: number) {
     };
 }
 
+/**
+ * 添加导入关键词弹窗
+ */
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
 

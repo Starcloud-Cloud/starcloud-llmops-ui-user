@@ -59,7 +59,7 @@ export const VipBar = ({ ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    登录/注册
+                                    免费使用
                                 </Button>
                             )}
                         </Stack>

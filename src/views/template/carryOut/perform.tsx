@@ -1,5 +1,6 @@
 import { Tooltip, IconButton, Button, Typography, Grid, Box, Card, CardContent, CircularProgress, TextField } from '@mui/material';
 import { Album, ErrorOutline, NotStarted, AutoAwesome, ContentPaste, InsertPhoto } from '@mui/icons-material';
+import { Select } from 'antd';
 import Zh from 'assets/images/icons/zhongwen.svg';
 import En from 'assets/images/icons/yingwen.svg';
 import { El } from 'types/template';
@@ -23,7 +24,10 @@ function Perform({
     changeanswer,
     history = false,
     isShows,
-    changeConfigs
+    changeConfigs,
+    aiModels,
+    aiModel,
+    setAiModel
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -105,10 +109,30 @@ function Perform({
     }, [config?.steps?.map((item: any) => item?.flowStep.response.answer)]);
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
+    const { Option } = Select;
     return (
         <Box>
+            {aiModels && (
+                <Select
+                    style={{ width: 100, height: 23 }}
+                    bordered={false}
+                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid mb-[16px]"
+                    rootClassName="modelSelect"
+                    popupClassName="modelSelectPopup"
+                    value={aiModel}
+                    onChange={(value) => {
+                        setAiModel(value);
+                    }}
+                >
+                    {aiModels.map((item: any) => (
+                        <Option key={item.value} value={item.value}>
+                            {item.label}
+                        </Option>
+                    ))}
+                </Select>
+            )}
             {config?.steps.length > 1 && (
-                <Box mb={1}>
+                <div>
                     <Button
                         disabled={allDisable() || history}
                         color="secondary"
@@ -123,7 +147,7 @@ function Perform({
                             <ErrorOutline />
                         </IconButton>
                     </Tooltip>
-                </Box>
+                </div>
             )}
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
@@ -363,7 +387,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
         JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
-        JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)
+        JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows) &&
+        JSON.stringify(prevProps?.aiModel) === JSON.stringify(nextProps?.aiModel)
     );
 };
 export default memo(Perform, arePropsEqual);

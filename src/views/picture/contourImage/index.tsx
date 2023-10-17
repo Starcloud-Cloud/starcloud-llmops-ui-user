@@ -1,4 +1,4 @@
-import { Button, TextField, IconButton } from '@mui/material';
+import { Card, Button, TextField } from '@mui/material';
 import { UndoRounded, CleaningServicesRounded, ArrowCircleDown, KeyboardBackspace, History } from '@mui/icons-material';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { useState, useEffect, useRef } from 'react';
@@ -79,7 +79,7 @@ const ContourImage = () => {
         setLines([]);
     };
     return (
-        <div>
+        <Card className="p-[16px] h-full">
             <SubCard sx={{ mb: 3 }} contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'right', p: '10px !important' }}>
                 <div
                     onClick={() => navigate('/imageHistory?scene=' + 'IMAGE_SKETCH')}
@@ -231,7 +231,7 @@ const ContourImage = () => {
                 )}
                 {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
             </div>
-        </div>
+        </Card>
     );
 };
 export default ContourImage;

@@ -7,7 +7,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import {
     delMarket,
-    marketDeatail
+    marketDeatail,
+    metadata
     // installTemplate
 } from 'api/template';
 import { dispatch } from 'store';
@@ -26,6 +27,15 @@ import _ from 'lodash-es';
 import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+interface Items {
+    label: string;
+    value: string;
+}
+interface AppModels {
+    aiModel?: Items[];
+    language?: Items[];
+    type?: Items[];
+}
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
     const { setUserInfo }: any = userInfoStore();
@@ -36,6 +46,10 @@ function Deatail() {
     const detailRef: any = useRef(null);
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    //类型 模型类型
+    const [appModels, setAppModel] = useState<AppModels>({});
+    const [aiModel, setAiModel] = useState('gpt-3.5-turbo');
+
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
@@ -60,6 +74,7 @@ function Deatail() {
             let resp: any = await executeMarket({
                 appUid: uid,
                 stepId: stepId,
+                aiModel,
                 appReqVO: detailRef.current,
                 conversationUid
             });
@@ -208,6 +223,9 @@ function Deatail() {
             setAllLoading(false);
             detailRef.current = res;
             setDetailData(res);
+        });
+        metadata().then((res) => {
+            setAppModel(res);
         });
         if (ref.current !== null && ref.current.parentNode !== null) {
             const top: any = ref.current.parentNode;
@@ -360,6 +378,11 @@ function Deatail() {
             <CarryOut
                 config={detailData}
                 isShows={isShows}
+                aiModel={aiModel}
+                setAiModel={(value: any) => {
+                    setAiModel(value);
+                }}
+                aiModels={appModels.aiModel}
                 changeConfigs={changeConfigs}
                 changeData={changeData}
                 variableChange={variableChange}

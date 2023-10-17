@@ -32,7 +32,7 @@ const ListingBuilder = () => {
     };
 
     return (
-        <Card className="h-full">
+        <Card>
             <CardHeader
                 sx={{ padding: 2 }}
                 title={

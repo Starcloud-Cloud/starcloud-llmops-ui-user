@@ -312,6 +312,12 @@ const MainLayout = () => {
         num?: number;
     } | null>(null);
 
+    const isFullPage = useMemo(() => {
+        const FULL_HEIGHT_URL = ['/listingBuilder'];
+        const path = location.pathname;
+        return FULL_HEIGHT_URL.includes(path);
+    }, [location]);
+
     const isLarge = useMemo(() => {
         const IS_LARGE_PATH = ['/textToImage', '/createApp', '/createChat', '/appMarket', '/listingBuilder'];
         const path = location.pathname;
@@ -470,7 +476,12 @@ const MainLayout = () => {
                     {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
 
                     {/* main content */}
-                    <Main theme={theme} open={drawerOpen} layout={layout}>
+                    <Main
+                        theme={theme}
+                        open={drawerOpen}
+                        layout={layout}
+                        // className={`${isFullPage ? 'max-h-[calc(100vh-88px)] overflow-hidden' : ''}`}
+                    >
                         {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                         {!isLarge ? (
                             <Container

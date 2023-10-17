@@ -72,7 +72,7 @@ const AppBar = ({ ...others }) => {
                             <Button
                                 component={RouterLink}
                                 to="/login"
-                                target="_blank"
+                                // target="_blank"
                                 disableElevation
                                 variant="contained"
                                 color="secondary"

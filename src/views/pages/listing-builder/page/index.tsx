@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, Card, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
 
 // material-ui
 import {
@@ -31,6 +31,7 @@ import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -70,10 +71,13 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '站点' },
-    { id: 'subject', numeric: false, disablePadding: false, label: '标题' },
+    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商品标题' },
+    { id: 'subject', numeric: false, disablePadding: false, label: '站点' },
     { id: 'body', numeric: false, disablePadding: false, label: 'ASIN' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '更新时间' },
+    { id: 'body', numeric: false, disablePadding: false, label: ' 状态' },
+    { id: 'body', numeric: false, disablePadding: false, label: '分值' },
+    { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
+    { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -124,7 +128,6 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 }
 
 // ==============================|| TABLE - ENHANCED ||============================== //
-let interval: any;
 
 const ListingBuilderPage: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
@@ -133,6 +136,8 @@ const ListingBuilderPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
+    const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
 
     const [total, setTotal] = useState(0);
@@ -210,20 +215,6 @@ const ListingBuilderPage: React.FC = () => {
         setPage(0);
     };
 
-    // Avoid a layout jump when reaching the last page with empty rows.
-    // const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-    const transformValue = (v: number) => {
-        switch (v) {
-            case 10:
-                return '支付成功';
-            case 20:
-                return '支付关闭';
-            case 0:
-                return '未支付';
-        }
-    };
-
     const [open, setOpen] = React.useState(false);
     const [payUrl, setPayUrl] = useState('');
     const [isTimeout, setIsTimeout] = useState(false);
@@ -239,64 +230,6 @@ const ListingBuilderPage: React.FC = () => {
         setOpen(false);
     };
 
-    const onRefresh = async () => {
-        const resOrder = await submitOrder({
-            orderId,
-            channelCode: 'alipay_pc',
-            channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-            displayMode: 'qr_code'
-        });
-        setPayUrl(resOrder.displayContent);
-        setIsTimeout(false);
-        interval = setInterval(() => {
-            getOrderIsPay({ orderId }).then((isPayRes) => {
-                if (isPayRes) {
-                    handleClose();
-                    setOpenPayDialog(true);
-                    setTimeout(() => {
-                        setOpenPayDialog(false);
-                        forceUpdate();
-                    }, 3000);
-                }
-            });
-        }, 1000);
-
-        setTimeout(() => {
-            clearInterval(interval);
-            setIsTimeout(true);
-        }, 5 * 60 * 1000);
-    };
-
-    const handlePay = async (id: string) => {
-        setOrderId(id);
-        const resOrder = await submitOrder({
-            orderId: id,
-            channelCode: 'alipay_pc',
-            channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-            displayMode: 'qr_code'
-        });
-        setPayUrl(resOrder.displayContent);
-        handleOpen();
-        interval = setInterval(() => {
-            getOrderIsPay({ orderId: id }).then((isPayRes) => {
-                if (isPayRes) {
-                    handleClose();
-                    clearInterval(interval);
-                    setOpenPayDialog(true);
-                    setTimeout(() => {
-                        setOpenPayDialog(false);
-                        forceUpdate();
-                    }, 3000);
-                }
-            });
-        }, 1000);
-
-        setTimeout(() => {
-            clearInterval(interval);
-            setIsTimeout(true);
-        }, 5 * 60 * 1000);
-    };
-
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
     return (
         <MainCard
@@ -304,17 +237,68 @@ const ListingBuilderPage: React.FC = () => {
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<DeleteIcon />}>
-                        批量删除
-                    </Button>
-                    <Divider type={'vertical'} />
-                    <Button color="secondary" startIcon={<CloudDownloadIcon />}>
-                        批量导出
-                    </Button>
-                    <Divider type={'vertical'} />
                     <Button color="secondary" startIcon={<AddIcon />} onClick={() => navigate('/listingBuilder')}>
                         新增Listing
                     </Button>
+                    <IconButton
+                        aria-label="more"
+                        id="long-button"
+                        aria-haspopup="true"
+                        className="ml-1"
+                        onClick={(e) => {
+                            setDelAnchorEl(e.currentTarget);
+                        }}
+                    >
+                        <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                        id="del-menu"
+                        MenuListProps={{
+                            'aria-labelledby': 'del-button'
+                        }}
+                        anchorEl={delAnchorEl}
+                        open={delOpen}
+                        onClose={() => {
+                            setDelAnchorEl(null);
+                        }}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                setDelAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <AddIcon />
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                批量AI生成Listing
+                            </Typography>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                setDelAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <DeleteIcon />
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                批量删除
+                            </Typography>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                setDelAnchorEl(null);
+                            }}
+                        >
+                            <ListItemIcon>
+                                <CloudDownloadIcon />
+                            </ListItemIcon>
+                            <Typography variant="inherit" noWrap>
+                                批量导出
+                            </Typography>
+                        </MenuItem>
+                    </Menu>
                 </div>
             }
         >
@@ -361,8 +345,13 @@ const ListingBuilderPage: React.FC = () => {
                                     <TableCell align="center">{row.merchantOrderId}</TableCell>
                                     <TableCell align="center">{row.subject}</TableCell>
                                     <TableCell align="center">{row.body}</TableCell>
+                                    <TableCell align="center">{row.body}</TableCell>
+                                    <TableCell align="center">{row.body}</TableCell>
                                     <TableCell align="center">
                                         {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {/* {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')} */}
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>

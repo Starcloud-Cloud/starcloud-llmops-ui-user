@@ -2,7 +2,7 @@ import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, Menu
 import SaveIcon from '@mui/icons-material/Save';
 import { KeyWord } from './components/Keyword';
 import { Content } from './components/Content';
-import { Dropdown, MenuProps } from 'antd';
+import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import React from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -55,10 +55,10 @@ const ListingBuilder = () => {
                 action={
                     <div>
                         <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained">
-                            保存
+                            保存草稿
                         </Button>
                         <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">
-                            同步
+                            同步到亚马逊
                         </Button>
                         <IconButton
                             aria-label="more"
@@ -95,15 +95,29 @@ const ListingBuilder = () => {
                                     设置
                                 </Typography>
                             </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    setDelAnchorEl(null);
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <DeleteIcon />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    批量删除
+                                </Typography>
+                            </MenuItem>
                         </Menu>
                     </div>
                 }
             />
             <Divider />
             <div className="flex bg-[#f4f6f8] h-full">
-                <div className="w-[450px] h-full">
-                    <KeyWord />
-                </div>
+                <Affix offsetTop={0}>
+                    <div className="w-[450px] h-screen">
+                        <KeyWord />
+                    </div>
+                </Affix>
                 <div className="flex-1 h-full ml-2">
                     <Content />
                 </div>

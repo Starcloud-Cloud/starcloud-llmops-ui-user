@@ -1,4 +1,17 @@
-import { Button, Card, IconButton, LinearProgress, Switch, Tooltip } from '@mui/material';
+import {
+    Button,
+    Card,
+    IconButton,
+    LinearProgress,
+    Switch,
+    Tooltip,
+    Grid,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
+} from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -22,6 +35,8 @@ import KeyWordTag from '../KeyWordTag';
 import { getCaretPosition } from 'utils/getCaretPosition';
 import { DEFAULT_LIST } from '../../../data/index';
 import { setPaymentCard } from '../../../../../../store/slices/cart';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const { Search } = Input;
 
@@ -262,16 +277,13 @@ export const Content = () => {
                 </div>
             </Card>
             <Card className="p-5 mt-2">
-                <div className="flex justify-end">
-                    {/* <div className="flex items-center">
+                <div className="flex justify-between">
+                    <div className="flex items-center">
                         <span>AI模式</span>
                         <Switch color={'secondary'} onChange={handleChange} checked={enableAi} />
-                    </div> */}
+                    </div>
                     <div className="flex items-center">
                         <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
-                        {/* <Button startIcon={<ArrowDownwardIcon className="!text-sm" />} color="secondary" size="small" variant="contained">
-                            导入Listing
-                        </Button> */}
                         <div className="ml-2">
                             <Button
                                 startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
@@ -286,7 +298,7 @@ export const Content = () => {
                     </div>
                 </div>
             </Card>
-            {/* {enableAi && (
+            {enableAi && (
                 <Card className="p-5 mt-2">
                     <div>
                         <div className="flex justify-between items-center">
@@ -417,7 +429,7 @@ export const Content = () => {
                         </div>
                     )}
                 </Card>
-            )} */}
+            )}
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
@@ -567,12 +579,6 @@ export const Content = () => {
                     </>
                 ))}
             </Card>
-            <AddAiModal
-                open={assistOpen}
-                handleClose={() => {
-                    setAssistOpen(false);
-                }}
-            />
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

@@ -45,12 +45,11 @@ import ImageDetail from 'views/picture/components/detail';
 import DetailErr from '../../../ui-component/detailErr';
 import useUserStore from 'store/user';
 interface LogStatistics {
-    messageCount: string;
     createDate: string;
-    elapsedAvg: number;
-    userCount: string;
-    tokens: string;
-    feedbackLikeCount: number;
+    completionCostPoints: number;
+    imageAvgElapsed: number;
+    completionAvgElapsed: number;
+    imageCostPoints: number;
 }
 interface Charts {
     title: string;
@@ -72,6 +71,8 @@ interface TableData {
     updateTime: number;
     errorCode?: string;
     errorMsg?: string;
+    tokens?: number;
+    costPoints?: number;
 }
 interface Date {
     label: string;
@@ -143,16 +144,17 @@ function ApplicationAnalysis({
         } else {
             res = await statisticsByAppUid({ ...queryParams, appUid });
         }
-        const message = res?.map((item: LogStatistics) => ({ y: item.messageCount, x: item.createDate }));
-        const userCount = res?.map((item: LogStatistics) => ({ y: item.feedbackLikeCount, x: item.createDate }));
-        const tokens = res?.map((item: LogStatistics) => ({ y: item.tokens, x: item.createDate }));
-        const elapsedAvg = res?.map((item: LogStatistics) => ({ y: item.elapsedAvg?.toFixed(2), x: item.createDate }));
+        const completionCostPoints = res?.map((item: LogStatistics) => ({ y: item.completionCostPoints, x: item.createDate }));
+        const imageAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.imageAvgElapsed?.toFixed(2), x: item.createDate }));
+        const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.createDate }));
+        const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.createDate }));
         const newList = [];
-        permissions.includes('log:app:analysis:usageCount') && newList.push({ title: t('generateLog.messageTotal'), data: message });
-        permissions.includes('log:app:analysis:usageToken') && newList.push({ title: t('generateLog.tokenTotal'), data: tokens });
-        permissions.includes('log:app:analysis:avgElapsed') &&
-            newList.push({ title: t('generateLog.TimeConsuming') + '(S)', data: elapsedAvg });
-        permissions.includes('log:app:analysis:userLike') && newList.push({ title: t('generateLog.usertotal'), data: userCount });
+        permissions.includes('log:app:analysis:completionCostPoints') &&
+            newList.push({ title: '生成/聊天消耗魔法豆数', data: completionCostPoints });
+        permissions.includes('log:app:analysis:imageCostPoints') && newList.push({ title: '生成图片消耗数', data: imageCostPoints });
+        permissions.includes('log:app:analysis:completionAvgElapsed') &&
+            newList.push({ title: '生成/聊天平均耗时(S)', data: completionAvgElapsed });
+        permissions.includes('log:app:analysis:imageAvgElapsed') && newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
         setGenerate(newList);
     };
     //时间
@@ -410,6 +412,11 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalAnswerTokens')}
                             </TableCell>
+                            {permissions.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    消耗总Token
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalElapsed')} (s)
                             </TableCell>
@@ -431,8 +438,9 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
-                                <TableCell align="center">{row.totalAnswerTokens + row.totalMessageTokens}</TableCell>
+                                <TableCell align="center">{row.costPoints}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
+                                {permissions.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (

@@ -13,7 +13,7 @@ function FormExecute({ item, onChange }: any) {
                     sx={mt}
                     size="small"
                     color="secondary"
-                    label={item.label}
+                    label={item.label === 'Max Tokens' ? '最大返回Tokens' : item.label === 'Temperature' ? '温度值' : item.label}
                     value={item.value}
                     id={item.field}
                     required
@@ -62,7 +62,7 @@ function FormExecute({ item, onChange }: any) {
                     required
                     id={item.field}
                     name={item.field}
-                    label={item.label}
+                    label={item.label === 'Model' ? '推荐模型' : item.label}
                     placeholder={item.defaultValue ? String(item.defaultValue) : ''}
                     error={!item.value && value}
                     helperText={!item.value && value ? `${item.label}必填` : item.description}

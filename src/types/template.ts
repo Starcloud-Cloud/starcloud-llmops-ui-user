@@ -18,6 +18,8 @@ export interface Details {
     description: string;
     category: string;
     icon?: string;
+    sort?: string;
+    type?: string;
     scenes: string[];
     tags: string[];
     example: string;
@@ -36,6 +38,9 @@ export interface Anyevent {
         category: string;
         tags: string[];
     };
+    appModel: { label: string; value: string }[] | undefined;
+    sort: undefined | string;
+    type: undefined | string;
     setValues: (data: { name: string; value: string | string[] }) => void;
     setDetail_icon: (data: any) => void;
 }

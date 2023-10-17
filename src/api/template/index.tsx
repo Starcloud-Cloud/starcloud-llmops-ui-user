@@ -48,6 +48,10 @@ export const appPage = (params: { pageNo: number; pageSize: number; mode?: strin
 export const del = (uid: string) => {
     return request.delete({ url: `/llm/app/delete/${uid}` });
 };
+//应用类型
+export const metadata = () => {
+    return request.get({ url: `/llm/app/metadata` });
+};
 
 //执行记录echart
 export const logStatistics = (data: any) => {

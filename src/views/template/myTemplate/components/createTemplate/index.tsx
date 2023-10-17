@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { Image } from 'antd';
 import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
-import { userBenefits } from 'api/template';
+import { userBenefits, metadata } from 'api/template';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
@@ -36,6 +36,15 @@ import { del } from 'api/template';
 import marketStore from 'store/market';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+interface Items {
+    label: string;
+    value: string;
+}
+interface AppModels {
+    aiModel?: Items[];
+    language?: Items[];
+    type?: Items[];
+}
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
@@ -71,6 +80,9 @@ function CreateDetail() {
     let conversationUid: undefined | string = undefined;
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    //类型 模型类型
+    const [appModels, setAppModel] = useState<AppModels>({});
+    const [aiModel, setAiModel] = useState('gpt-3.5-turbo');
     //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
@@ -90,6 +102,7 @@ function CreateDetail() {
                 appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
                 stepId: stepId,
                 appReqVO: detailRef.current,
+                aiModel,
                 conversationUid
             });
 
@@ -195,6 +208,9 @@ function CreateDetail() {
     };
     useEffect(() => {
         getList();
+        metadata().then((res) => {
+            setAppModel(res);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const getList = (data: string | null = null) => {
@@ -481,6 +497,9 @@ function CreateDetail() {
                                     category: detail?.category,
                                     tags: detail?.tags
                                 }}
+                                sort={detail?.sort}
+                                type={detail?.type}
+                                appModel={appModels?.type}
                                 setValues={setData}
                                 setDetail_icon={setDetail_icon}
                             />
@@ -524,6 +543,12 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
+                                    aiModel={aiModel}
+                                    setAiModel={(value: any) => {
+                                        setPerform(perform + 1);
+                                        setAiModel(value);
+                                    }}
+                                    aiModels={appModels.aiModel}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}
@@ -592,6 +617,12 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
+                                    aiModel={aiModel}
+                                    setAiModel={(value: any) => {
+                                        setPerform(perform + 1);
+                                        setAiModel(value);
+                                    }}
+                                    aiModels={appModels.aiModel}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}

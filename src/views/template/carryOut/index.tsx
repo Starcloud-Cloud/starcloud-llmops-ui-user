@@ -4,7 +4,20 @@ import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
-function CarryOut({ config, changeData, loadings, allExecute, variableChange, promptChange, changeanswer, isShows, changeConfigs }: any) {
+function CarryOut({
+    config,
+    changeData,
+    loadings,
+    allExecute,
+    variableChange,
+    promptChange,
+    changeanswer,
+    isShows,
+    changeConfigs,
+    aiModel,
+    setAiModel,
+    aiModels
+}: any) {
     return (
         <Box>
             <Grid container spacing={4}>
@@ -17,6 +30,9 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                             config={config?.workflowConfig}
                             changeConfigs={changeConfigs}
                             isShows={isShows}
+                            aiModel={aiModel}
+                            setAiModel={setAiModel}
+                            aiModels={aiModels}
                             changeSon={changeData}
                             loadings={loadings}
                             changeanswer={changeanswer}
@@ -49,7 +65,7 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                             {/* <Divider orientation="vertical" flexItem /> */}
                             {/* {t('market.plugVersion')}:3 */}
                             <Divider orientation="vertical" flexItem />
-                            {t('generate.createTime')}:{formatDate(config?.createTime)}
+                            更新时间:{formatDate(config?.updateTime)}
                         </Box>
                     </Box>
                 </Grid>

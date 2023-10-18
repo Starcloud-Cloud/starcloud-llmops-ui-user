@@ -76,21 +76,41 @@ export const Content = () => {
     const [y, setY] = React.useState(0);
     const [openKeyWordSelect, setOpenKeyWordSelect] = React.useState(false);
     const [keyWordSelectList, setKeyWordSelectList] = React.useState<any[]>([]);
+    const [hoverKey, setHoverKey] = React.useState(0);
+    const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
+    const [editIndex, setEditIndex] = React.useState(0);
 
+    const handleReplaceValue = (selectValue: string) => {
+        const newList = [...list];
+
+        const preValue = newList[editIndex].value;
+        const modifiedString = preValue?.slice(0, currentInputIndex - 1) + selectValue + preValue?.slice(currentInputIndex + 1);
+        // newList[index];
+    };
+
+    /**
+     * 处理命中
+     * @param e
+     */
     const handleHasKeyWork = (e: any) => {
+        const startIndex = e.target.selectionStart;
+        setCurrentInputIndex(startIndex);
         const value = e.target.value;
-        const filterKeyWord = keyWordList.filter((item, index) => {
-            if (item.includes(value[value.length - 1])) {
-                return item;
+        if (startIndex === 1 || value[startIndex - 2] === ' ') {
+            const filterKeyWord = keyWordList.filter((item, index) => {
+                if (item.includes(value[startIndex - 1])) {
+                    return item;
+                }
+            });
+            if (filterKeyWord.length > 0) {
+                setKeyWordSelectList(filterKeyWord);
+                const { x, y } = getCaretPosition(e.target);
+                setX(x);
+                setY(y);
+                setOpenKeyWordSelect(true);
+            } else {
+                setOpenKeyWordSelect(false);
             }
-        });
-        console.log(filterKeyWord, 'filterKeyWord');
-        if (filterKeyWord.length > 0) {
-            setKeyWordSelectList(filterKeyWord);
-            const { x, y } = getCaretPosition(e.target);
-            setX(x);
-            setY(y);
-            setOpenKeyWordSelect(true);
         } else {
             setOpenKeyWordSelect(false);
         }
@@ -99,6 +119,7 @@ export const Content = () => {
     const handleInputChange = React.useCallback((e: any, index: number) => {
         handleHasKeyWork(e);
 
+        setEditIndex(index);
         setList((prevList: any) => {
             const newList = [...prevList];
             newList[index] = {
@@ -582,15 +603,7 @@ export const Content = () => {
                                     handleInputChange={handleInputChange}
                                     index={index}
                                 />
-                                {openKeyWordSelect && (
-                                    <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
-                                        {keyWordSelectList.map((item, keyWordItemKey) => (
-                                            <Menu.Item key={keyWordItemKey} style={{ height: '30px', lineHeight: '30px', color: 'red' }}>
-                                                {item}
-                                            </Menu.Item>
-                                        ))}
-                                    </Menu>
-                                )}
+
                                 <div className="flex px-4 py-3 items-center">
                                     <div className="flex-1 flex items-center">
                                         <span className="mr-2">建议关键词:</span>
@@ -603,6 +616,26 @@ export const Content = () => {
                         {(item.type === ListingBuilderEnum.TITLE || item.type === ListingBuilderEnum.PRODUCT_DES) && <Divider />}
                     </>
                 ))}
+                {openKeyWordSelect && (
+                    <ul
+                        style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
+                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1"
+                        onKeyDown={(e) => {
+                            console.log(e);
+                        }}
+                    >
+                        {keyWordSelectList.map((item, keyWordItemKey) => (
+                            <li
+                                key={keyWordItemKey}
+                                style={{ height: '30px', lineHeight: '30px' }}
+                                className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
+                                onClick={() => handleReplaceValue(item)}
+                            >
+                                <span className="text-sm">{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </Card>
             <AiCustomModal
                 open={aiCustomOpen}

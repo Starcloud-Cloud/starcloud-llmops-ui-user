@@ -49,8 +49,6 @@ function capitalizeFirstLetterOfEachWord(str: string): string {
     return capitalizedWords.join(' ');
 }
 
-const likeList = ['iphone pro', 'iphone', 'pro'];
-
 type ListType = {
     title: string;
     des: JSX.Element | string;
@@ -65,19 +63,7 @@ type ListType = {
     btnText: string;
 };
 
-const InputField = React.memo(({ row, value, handleInputChange, placeholder, index }: any) => {
-    console.log(row, value, handleInputChange, placeholder, index);
-    return (
-        <textarea
-            rows={row}
-            placeholder={placeholder}
-            spellCheck="false"
-            value={value}
-            onChange={(e) => handleInputChange(e, index)}
-            className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
-        />
-    );
-});
+const keyWordList = ['iphone pro', 'iphone', 'pro'];
 
 export const Content = () => {
     const [list, setList] = React.useState<ListType[]>(DEFAULT_LIST);
@@ -88,18 +74,30 @@ export const Content = () => {
     const [scoreList, setScoreList] = React.useState(SCORE_LIST);
     const [x, setX] = React.useState(0);
     const [y, setY] = React.useState(0);
+    const [openKeyWordSelect, setOpenKeyWordSelect] = React.useState(false);
+    const [keyWordSelectList, setKeyWordSelectList] = React.useState<any[]>([]);
 
-    const handleDownloadClick = () => {
-        console.log(1, navigator && navigator.serviceWorker.controller);
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({ command: 'download' });
+    const handleHasKeyWork = (e: any) => {
+        const value = e.target.value;
+        const filterKeyWord = keyWordList.filter((item, index) => {
+            if (item.includes(value[value.length - 1])) {
+                return item;
+            }
+        });
+        console.log(filterKeyWord, 'filterKeyWord');
+        if (filterKeyWord.length > 0) {
+            setKeyWordSelectList(filterKeyWord);
+            const { x, y } = getCaretPosition(e.target);
+            setX(x);
+            setY(y);
+            setOpenKeyWordSelect(true);
+        } else {
+            setOpenKeyWordSelect(false);
         }
     };
 
     const handleInputChange = React.useCallback((e: any, index: number) => {
-        const { x, y } = getCaretPosition(e.target);
-        setX(x);
-        setY(y);
+        handleHasKeyWork(e);
 
         setList((prevList: any) => {
             const newList = [...prevList];
@@ -442,8 +440,7 @@ export const Content = () => {
                                             color="secondary"
                                             size="small"
                                             variant="contained"
-                                            // onClick={() => setAssistOpen(true)}
-                                            onClick={() => handleDownloadClick()}
+                                            onClick={() => setAssistOpen(true)}
                                         >
                                             AI生成(消耗x点)
                                         </Button>
@@ -585,14 +582,15 @@ export const Content = () => {
                                     handleInputChange={handleInputChange}
                                     index={index}
                                 />
-                                <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
-                                    <Menu.Item key="1" style={{ height: '30px', lineHeight: '30px', color: 'red' }}>
-                                        Navigation One
-                                    </Menu.Item>
-                                    <Menu.Item key="2" style={{ height: '30px', lineHeight: '30px' }}>
-                                        Navigation One
-                                    </Menu.Item>
-                                </Menu>
+                                {openKeyWordSelect && (
+                                    <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
+                                        {keyWordSelectList.map((item, keyWordItemKey) => (
+                                            <Menu.Item key={keyWordItemKey} style={{ height: '30px', lineHeight: '30px', color: 'red' }}>
+                                                {item}
+                                            </Menu.Item>
+                                        ))}
+                                    </Menu>
+                                )}
                                 <div className="flex px-4 py-3 items-center">
                                     <div className="flex-1 flex items-center">
                                         <span className="mr-2">建议关键词:</span>

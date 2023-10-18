@@ -386,14 +386,19 @@ const MainLayout = () => {
         }
     }, []);
     //绑定手机号
-    const { use, setuse, userInfo } = infoStore();
+    const { use, setuse, status, userInfo, setStatus } = infoStore();
     useEffect(() => {
-        console.log(userInfo?.benefits);
-
-        if (use?.mobile === '' && !use?.mobile) {
-            setPhoneOpen(true);
-        } else {
-            setPhoneOpen(false);
+        if (userInfo?.benefits) {
+            if (status) {
+                if (use?.mobile === '' && !use?.mobile) {
+                    setPhoneOpen(true);
+                } else {
+                    setPhoneOpen(false);
+                }
+                setStatus(false);
+            } else {
+                setStatus(true);
+            }
         }
     }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);
     const [phoneOpne, setPhoneOpen] = useState(false);

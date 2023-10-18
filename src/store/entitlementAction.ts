@@ -6,11 +6,14 @@ type UserInfo = {
         mobile?: string;
     };
     userInfo: null | any;
+    status: boolean;
     setUserInfo: (data: string | null) => void;
     setuse: (data: any) => void;
+    setStatus: (data: any) => void;
 };
 const userInfoStore = create<UserInfo>((set) => ({
     userInfo: null,
+    status: false,
     use: {},
     setUserInfo: (data) =>
         set(() => ({
@@ -19,6 +22,10 @@ const userInfoStore = create<UserInfo>((set) => ({
     setuse: (data) =>
         set(() => ({
             use: data
+        })),
+    setStatus: (data) =>
+        set(() => ({
+            status: data
         }))
 }));
 export default userInfoStore;

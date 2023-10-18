@@ -48,6 +48,7 @@ function Deatail() {
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
     //类型 模型类型
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
     const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo');
     const aimodeRef = useRef('gpt-3.5-turbo');
@@ -404,6 +405,10 @@ function Deatail() {
                         popupClassName="modelSelectPopup"
                         value={aiModels}
                         onChange={(value) => {
+                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                setOpenUpgradeModel(true);
+                                return;
+                            }
                             aimodeRef.current = value;
                             setAiModels(value);
                         }}
@@ -430,7 +435,10 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+            {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
+            {tokenOpen && (
+                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+            )}
         </Card>
     );
 }

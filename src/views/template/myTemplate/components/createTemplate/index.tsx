@@ -34,6 +34,7 @@ import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
 import { del } from 'api/template';
 import marketStore from 'store/market';
+import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Items {
@@ -241,6 +242,7 @@ function CreateDetail() {
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [perform, setPerform] = useState('perform');
     //设置name desc
     const setData = (data: any) => {
@@ -402,6 +404,7 @@ function CreateDetail() {
     const getStatus = (data: boolean) => {
         setflag(data);
     };
+    const permissions = useUserStore((state) => state.permissions);
     const { Option } = Select;
     return (
         <Card>
@@ -542,6 +545,10 @@ function CreateDetail() {
                                         popupClassName="modelSelectPopup"
                                         value={aiModel}
                                         onChange={(value) => {
+                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                setOpenUpgradeModel(true);
+                                                return;
+                                            }
                                             setPerform(perform + 1);
                                             setAiModel(value);
                                         }}
@@ -628,6 +635,10 @@ function CreateDetail() {
                                         popupClassName="modelSelectPopup"
                                         value={aiModel}
                                         onChange={(value) => {
+                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                setOpenUpgradeModel(true);
+                                                return;
+                                            }
                                             setPerform(perform + 1);
                                             setAiModel(value);
                                         }}
@@ -680,7 +691,10 @@ function CreateDetail() {
                     />
                 )}
             </TabPanel>
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+            {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
+            {tokenOpen && (
+                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+            )}
         </Card>
     );
 }

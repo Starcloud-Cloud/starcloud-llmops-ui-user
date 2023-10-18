@@ -35,25 +35,24 @@ const ListingBuilder = () => {
         <Card>
             <CardHeader
                 sx={{ padding: 2 }}
-                title={
-                    <div className="w-[100px]">
-                        <Dropdown
-                            menu={{ items: COUNTRY_LIST, onClick }}
-                            open={dropdownOpen}
-                            onOpenChange={setDropdownOpen}
-                            arrow
-                            placement={'top'}
-                        >
-                            <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
-                                {country.icon}
-                                <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
-                                {dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                            </div>
-                        </Dropdown>
-                    </div>
-                }
+                title={'Listing'}
                 action={
-                    <div>
+                    <div className="flex items-center">
+                        <div className="w-[100px]">
+                            <Dropdown
+                                menu={{ items: COUNTRY_LIST, onClick }}
+                                open={dropdownOpen}
+                                onOpenChange={setDropdownOpen}
+                                arrow
+                                placement={'top'}
+                            >
+                                <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
+                                    {country.icon}
+                                    <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
+                                    {dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </div>
+                            </Dropdown>
+                        </div>
                         <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained">
                             保存草稿
                         </Button>

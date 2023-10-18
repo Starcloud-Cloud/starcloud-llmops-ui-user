@@ -1,6 +1,6 @@
-import { MenuProps } from 'antd';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
+// 国家列表
 export const COUNTRY_LIST: any = [
     {
         key: '1',
@@ -2228,7 +2228,8 @@ export const DEFAULT_LIST = [
         maxCharacter: 200,
         character: 0,
         word: 0,
-        row: 3
+        row: 3,
+        btnText: 'AI生成标题'
     },
     {
         title: '五点描述1',
@@ -2240,10 +2241,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '产品卖点描述1',
         type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 4
+        row: 4,
+        btnText: 'AI生成描述'
     },
     {
         title: '五点描述2',
@@ -2255,10 +2257,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '产品卖点描述2',
         type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 4
+        row: 4,
+        btnText: 'AI生成描述'
     },
     {
         title: '五点描述3',
@@ -2270,10 +2273,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '产品卖点描述3',
         type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 4
+        row: 4,
+        btnText: 'AI生成描述'
     },
     {
         title: '五点描述4',
@@ -2285,10 +2289,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '产品卖点描述4',
         type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 4
+        row: 4,
+        btnText: 'AI生成描述'
     },
     {
         title: '五点描述5',
@@ -2300,10 +2305,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '产品卖点描述5',
         type: ListingBuilderEnum.FIVE_DES,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 4
+        row: 4,
+        btnText: 'AI生成描述'
     },
     {
         title: '产品描述',
@@ -2315,10 +2321,11 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '请输入您的产品描述吧!',
         type: ListingBuilderEnum.PRODUCT_DES,
-        maxCharacter: 200,
+        maxCharacter: 2000,
         character: 0,
         word: 0,
-        row: 7
+        row: 7,
+        btnText: 'AI生成描述'
     },
     {
         title: '搜索词',
@@ -2330,9 +2337,70 @@ export const DEFAULT_LIST = [
         6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
         placeholder: '请添加产品的搜索词，用逗号或空格隔开!',
         type: ListingBuilderEnum.SEARCH_WORD,
-        maxCharacter: 200,
+        maxCharacter: 250,
         character: 0,
         word: 0,
-        row: 5
+        row: 5,
+        btnText: '智能推荐'
+    }
+];
+
+// 打分规则
+export const SCORE_LIST = [
+    {
+        title: '标题:',
+        list: [
+            {
+                label: '标题不包含符合或表情',
+                value: 0
+            },
+            {
+                label: '标题包含150到200个字符',
+                value: 0
+            },
+            {
+                label: '标题中每个单词开头大写',
+                value: 0
+            }
+        ]
+    },
+    {
+        title: '5点描述:',
+        list: [
+            {
+                label: '每个要点包含150到200个字符',
+                value: 0
+            },
+            {
+                label: '五要点的第一个字母大写',
+                value: 0
+            },
+            {
+                label: '五要点不全是大写',
+                value: 0
+            }
+        ]
+    },
+    {
+        title: '产品描述:',
+        list: [
+            {
+                label: '产品描述1500到2000个字符',
+                value: 0
+            },
+            {
+                label: '描述不能包含，E-mail地址，网站网址，图片',
+                value: 0
+            }
+        ]
+    },
+    {
+        title: '搜索词:',
+        list: [
+            {
+                label: '250个字符以内',
+                value: 0
+            }
+        ]
     }
 ];

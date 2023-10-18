@@ -164,7 +164,7 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: '1000魔法豆，100点作图',
+        description: '3000魔法豆，300点作图',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
@@ -178,10 +178,10 @@ const plans = [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: '3000魔法豆，300点作图',
-        monthPrice: 99,
-        yearPrice: 999,
-        preMonthPrice: 83.25,
+        description: '10000魔法豆，1000点作图',
+        monthPrice: 199,
+        yearPrice: 1999,
+        preMonthPrice: 166.58,
         des: '适用于专业卖家',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         btnText: '立即购买',
@@ -192,7 +192,7 @@ const plans = [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: '6个账号，无限魔法豆创作，1000点作图',
+        description: '6个账号，25000魔法豆，2000点作图',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
@@ -232,12 +232,12 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>1000魔法豆</span>
+            <span>3000魔法豆</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
-        '生成图片100张', // 1
+        '生成图片300张', // 1
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
@@ -271,12 +271,12 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>3000魔法豆</span>
+            <span>10000魔法豆</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
-        '生成图片300张', // 1
+        '生成图片1000张', // 1
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
@@ -310,12 +310,12 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>无限魔法豆生成</span>
-            <Tag color="#f50" className="ml-1">
-                无限
-            </Tag>
-        </div>,
-        '生成图片1000张', // 1
+            <span>25000魔法豆</span>
+            <Tooltip title={'执行应用或聊天消耗一点'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>, // 0
+        '生成图片2000张', // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
         '无限自定义应用', // 4

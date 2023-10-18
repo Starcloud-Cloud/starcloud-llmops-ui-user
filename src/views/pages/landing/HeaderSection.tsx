@@ -196,7 +196,7 @@ const HeaderSection = () => {
                                             <Button
                                                 component={RouterLink}
                                                 to="/appMarket"
-                                                target="_blank"
+                                                // target="_blank"
                                                 size="large"
                                                 variant="contained"
                                                 color="secondary"

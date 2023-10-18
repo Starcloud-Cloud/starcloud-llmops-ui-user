@@ -72,12 +72,12 @@ const AppBar = ({ ...others }) => {
                             <Button
                                 component={RouterLink}
                                 to="/login"
-                                target="_blank"
+                                // target="_blank"
                                 disableElevation
                                 variant="contained"
                                 color="secondary"
                             >
-                                登录/注册
+                                免费使用
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'none', sm: 'none' } }}>

@@ -18,7 +18,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React from 'react';
+import React, { useEffect } from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -64,25 +64,52 @@ type ListType = {
     row: number;
 };
 
+const InputField = React.memo(({ row, value, handleInputChange, placeholder, index }: any) => {
+    console.log(row, value, handleInputChange, placeholder, index);
+    return (
+        <textarea
+            rows={row}
+            placeholder={placeholder}
+            spellCheck="false"
+            value={value}
+            onChange={(e) => handleInputChange(e, index)}
+            className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
+        />
+    );
+});
+
 export const Content = () => {
     const [list, setList] = React.useState<ListType[]>(DEFAULT_LIST);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
-    const [assistOpen, setAssistOpen] = React.useState(false);
+    const [assistOpen, setAssistOpen] = React.useState(true);
     const [aiCustomOpen, setAiCustomOpen] = React.useState(false);
     const [x, setX] = React.useState(0);
     const [y, setY] = React.useState(0);
 
-    const handleInputChange = (e: any, index: number) => {
+    const handleDownloadClick = () => {
+        console.log(1, navigator && navigator.serviceWorker.controller);
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ command: 'download' });
+        }
+    };
+
+    const handleInputChange = React.useCallback((e: any, index: number) => {
         const { x, y } = getCaretPosition(e.target);
         setX(x);
         setY(y);
-        const copyList = _.cloneDeep(list);
-        copyList[index].value = e.target.value;
-        copyList[index].character = e.target.value.length;
-        copyList[index].word = e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length;
-        setList(copyList);
-    };
+
+        setList((prevList: any) => {
+            const newList = [...prevList];
+            newList[index] = {
+                ...newList[index],
+                value: e.target.value,
+                character: e.target.value.length,
+                word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
+            };
+            return newList;
+        });
+    }, []);
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -284,17 +311,20 @@ export const Content = () => {
                     </div>
                     <div className="flex items-center">
                         <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
-                        <div className="ml-2">
-                            <Button
-                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                color="secondary"
-                                size="small"
-                                variant="contained"
-                                onClick={() => setAssistOpen(true)}
-                            >
-                                AI生成
-                            </Button>
-                        </div>
+                        {enableAi && (
+                            <div className="ml-2">
+                                <Button
+                                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                    color="secondary"
+                                    size="small"
+                                    variant="contained"
+                                    // onClick={() => setAssistOpen(true)}
+                                    onClick={() => handleDownloadClick()}
+                                >
+                                    AI生成
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Card>
@@ -461,16 +491,18 @@ export const Content = () => {
                                     <Rate allowHalf defaultValue={2.5} count={1} />
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <Dropdown menu={{ items }}>
-                                        <Button
-                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                            color="secondary"
-                                            size="small"
-                                            variant="contained"
-                                        >
-                                            AI生成
-                                        </Button>
-                                    </Dropdown>
+                                    {enableAi && (
+                                        <Dropdown menu={{ items }}>
+                                            <Button
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                AI生成
+                                            </Button>
+                                        </Dropdown>
+                                    )}
                                 </div>
                             </div>
                             {expandList.includes(index) && (
@@ -548,14 +580,15 @@ export const Content = () => {
                                         )}
                                     </div>
                                 </div>
-                                <textarea
+                                <InputField
                                     rows={item.row}
                                     placeholder={item.placeholder}
                                     spellCheck="false"
                                     value={item.value}
-                                    onChange={(e) => handleInputChange(e, index)}
-                                    className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
+                                    handleInputChange={handleInputChange}
+                                    index={index}
                                 />
+                                {/* <InputField row={item.} /> */}
 
                                 <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
                                     <Menu.Item key="1" style={{ height: '30px', lineHeight: '30px', color: 'red' }}>

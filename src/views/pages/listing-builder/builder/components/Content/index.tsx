@@ -36,6 +36,7 @@ import { DEFAULT_LIST, SCORE_LIST } from '../../../data/index';
 import { setPaymentCard } from '../../../../../../store/slices/cart';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FiledTextArea from './FiledTextArea';
 
 const { Search } = Input;
 
@@ -577,13 +578,12 @@ export const Content = () => {
                                         )}
                                     </div>
                                 </div>
-                                <textarea
+                                <FiledTextArea
                                     rows={item.row}
                                     placeholder={item.placeholder}
-                                    spellCheck="false"
                                     value={item.value}
-                                    onChange={(e) => handleInputChange(e, index)}
-                                    className="border-[#e6e8ec] border-l-0 border-r-0 text-sm"
+                                    handleInputChange={handleInputChange}
+                                    index={index}
                                 />
                                 <Menu style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }} mode="vertical">
                                     <Menu.Item key="1" style={{ height: '30px', lineHeight: '30px', color: 'red' }}>

@@ -1,4 +1,4 @@
-import {Button, Card, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography} from '@mui/material';
+import { Button, Card, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
 
 // material-ui
 import {
@@ -13,24 +13,24 @@ import {
     // Stack
     TableSortLabel
 } from '@mui/material';
-import {visuallyHidden} from '@mui/utils';
+import { visuallyHidden } from '@mui/utils';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import {getOrderIsPay, getOrderRecord, submitOrder} from 'api/vip';
-import React, {useEffect, useState} from 'react';
-import {ArrangementOrder, EnhancedTableHeadProps, KeyedObject} from 'types';
+import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
+import React, { useEffect, useState } from 'react';
+import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import {Divider} from 'antd';
+import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 type TableEnhancedCreateDataType = {
@@ -71,24 +71,17 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    {id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商品标题'},
-    {id: 'subject', numeric: false, disablePadding: false, label: '站点'},
-    {id: 'body', numeric: false, disablePadding: false, label: 'ASIN'},
-    {id: 'body', numeric: false, disablePadding: false, label: ' 状态'},
-    {id: 'body', numeric: false, disablePadding: false, label: '分值'},
-    {id: 'createTime', numeric: false, disablePadding: false, label: '创建时间'},
-    {id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间'},
-    {id: 'operate', numeric: false, disablePadding: false, label: '操作'}
+    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商品标题' },
+    { id: 'subject', numeric: false, disablePadding: false, label: '站点' },
+    { id: 'body', numeric: false, disablePadding: false, label: 'ASIN' },
+    { id: 'body', numeric: false, disablePadding: false, label: ' 状态' },
+    { id: 'body', numeric: false, disablePadding: false, label: '分值' },
+    { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
+    { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
+    { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
-function EnhancedTableHead({
-                               onSelectAllClick,
-                               order,
-                               orderBy,
-                               numSelected,
-                               rowCount,
-                               onRequestSort
-                           }: EnhancedTableHeadProps) {
+function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
     const createSortHandler = (property: string) => (event: React.SyntheticEvent) => {
         onRequestSort(event, property);
     };
@@ -113,7 +106,7 @@ function EnhancedTableHead({
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        sx={{pl: 3, whiteSpace: 'nowrap'}} // 加上 white-space: nowrap
+                        sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
                     >
                         <TableSortLabel
                             active={orderBy === headCell.id}
@@ -153,7 +146,7 @@ const ListingBuilderPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO = {pageNo: page + 1, pageSize: rowsPerPage};
+            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
             // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
             getOrderRecord(pageVO)
                 .then((res) => {
@@ -244,7 +237,7 @@ const ListingBuilderPage: React.FC = () => {
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon/>} onClick={() => navigate('/listingBuilder')}>
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => navigate('/listingBuilder')}>
                         新增Listing
                     </Button>
                     <IconButton
@@ -256,7 +249,7 @@ const ListingBuilderPage: React.FC = () => {
                             setDelAnchorEl(e.currentTarget);
                         }}
                     >
-                        <MoreVertIcon/>
+                        <MoreVertIcon />
                     </IconButton>
                     <Menu
                         id="del-menu"
@@ -275,7 +268,7 @@ const ListingBuilderPage: React.FC = () => {
                             }}
                         >
                             <ListItemIcon>
-                                <AddIcon/>
+                                <AddIcon />
                             </ListItemIcon>
                             <Typography variant="inherit" noWrap>
                                 批量AI生成Listing
@@ -287,7 +280,7 @@ const ListingBuilderPage: React.FC = () => {
                             }}
                         >
                             <ListItemIcon>
-                                <DeleteIcon/>
+                                <DeleteIcon />
                             </ListItemIcon>
                             <Typography variant="inherit" noWrap>
                                 批量删除
@@ -299,7 +292,7 @@ const ListingBuilderPage: React.FC = () => {
                             }}
                         >
                             <ListItemIcon>
-                                <CloudDownloadIcon/>
+                                <CloudDownloadIcon />
                             </ListItemIcon>
                             <Typography variant="inherit" noWrap>
                                 批量导出
@@ -310,7 +303,7 @@ const ListingBuilderPage: React.FC = () => {
             }
         >
             <TableContainer>
-                <Table sx={{minWidth: 750}} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}
@@ -363,19 +356,19 @@ const ListingBuilderPage: React.FC = () => {
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>
                                             <IconButton aria-label="delete" size="small">
-                                                <EditIcon className="text-base"/>
+                                                <EditIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type={'vertical'}/>
+                                        <Divider type={'vertical'} />
                                         <Tooltip title={'克隆'}>
                                             <IconButton aria-label="delete" size="small">
-                                                <ContentCopyIcon className="text-base"/>
+                                                <ContentCopyIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type={'vertical'}/>
+                                        <Divider type={'vertical'} />
                                         <Tooltip title={'删除'}>
                                             <IconButton aria-label="delete" size="small">
-                                                <DeleteIcon className="text-base"/>
+                                                <DeleteIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>

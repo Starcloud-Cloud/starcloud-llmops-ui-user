@@ -104,7 +104,7 @@ const ListingBuilder = () => {
                                     <DeleteIcon />
                                 </ListItemIcon>
                                 <Typography variant="inherit" noWrap>
-                                    批量删除
+                                    删除
                                 </Typography>
                             </MenuItem>
                         </Menu>

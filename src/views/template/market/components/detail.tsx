@@ -239,7 +239,22 @@ function Deatail() {
                                         defaultValue: item.flowStep.response.answer,
                                         answer: ''
                                     }
-                                }
+                                },
+                                variable: item.variable
+                                    ? {
+                                          variables: item.variable?.variables.map((el: any) => {
+                                              if (el.value) {
+                                                  return {
+                                                      ...el,
+                                                      defaultValue: el.value,
+                                                      value: ''
+                                                  };
+                                              } else {
+                                                  return el;
+                                              }
+                                          })
+                                      }
+                                    : null
                             };
                         })
                     }

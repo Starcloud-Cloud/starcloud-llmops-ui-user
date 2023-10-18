@@ -386,14 +386,16 @@ const MainLayout = () => {
         }
     }, []);
     //绑定手机号
-    const { use, setuse } = infoStore();
+    const { use, setuse, userInfo } = infoStore();
     useEffect(() => {
+        console.log(userInfo?.benefits);
+
         if (use?.mobile === '' && !use?.mobile) {
             setPhoneOpen(true);
         } else {
             setPhoneOpen(false);
         }
-    }, [use?.mobile, location]);
+    }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);
     const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 

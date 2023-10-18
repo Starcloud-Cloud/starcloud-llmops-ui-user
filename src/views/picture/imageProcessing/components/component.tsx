@@ -327,6 +327,9 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         <div>
                             <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="contained">
                                 {subTitle === '图片无损放大' ? '无损放大' : '提升质量'}
+                                <span className="text-xs opacity-50">
+                                    （消耗{imageList.filter((item: any) => item.response?.data?.url).length * 2}点作图）
+                                </span>
                             </Button>
                         </div>
                     </div>

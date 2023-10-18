@@ -14,7 +14,7 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import { Image } from 'antd';
+import { Image, Select } from 'antd';
 import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { userBenefits, metadata } from 'api/template';
 import { executeApp } from 'api/template/fetch';
@@ -402,6 +402,7 @@ function CreateDetail() {
     const getStatus = (data: boolean) => {
         setflag(data);
     };
+    const { Option } = Select;
     return (
         <Card>
             <CardHeader
@@ -510,7 +511,7 @@ function CreateDetail() {
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <div className="flex justify-between items-end">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                                     {detail?.icon && (
                                         <Image
@@ -521,11 +522,9 @@ function CreateDetail() {
                                         />
                                     )}
                                     <Box>
-                                        <Box>
-                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                                {detail?.name}
-                                            </Typography>
-                                        </Box>
+                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                            {detail?.name}
+                                        </Typography>
                                         <Box>
                                             <span>#{detail?.category}</span>
                                             {detail?.tags?.map((el: any) => (
@@ -534,7 +533,27 @@ function CreateDetail() {
                                         </Box>
                                     </Box>
                                 </Box>
-                            </Box>
+                                {appModels.aiModel && (
+                                    <Select
+                                        style={{ width: 100, height: 23 }}
+                                        bordered={false}
+                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                        rootClassName="modelSelect"
+                                        popupClassName="modelSelectPopup"
+                                        value={aiModel}
+                                        onChange={(value) => {
+                                            setPerform(perform + 1);
+                                            setAiModel(value);
+                                        }}
+                                    >
+                                        {appModels.aiModel.map((item: any) => (
+                                            <Option key={item.value} value={item.value}>
+                                                {item.label}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                )}
+                            </div>
                             <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
@@ -543,12 +562,6 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
-                                    aiModel={aiModel}
-                                    setAiModel={(value: any) => {
-                                        setPerform(perform + 1);
-                                        setAiModel(value);
-                                    }}
-                                    aiModels={appModels.aiModel}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}
@@ -584,7 +597,7 @@ function CreateDetail() {
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <div className="flex justify-between items-end">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                                     {detail?.icon && (
                                         <Image
@@ -595,11 +608,9 @@ function CreateDetail() {
                                         />
                                     )}
                                     <Box>
-                                        <Box>
-                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                                {detail?.name}
-                                            </Typography>
-                                        </Box>
+                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                            {detail?.name}
+                                        </Typography>
                                         <Box>
                                             <span>#{detail?.category}</span>
                                             {detail?.tags?.map((el: any) => (
@@ -608,7 +619,27 @@ function CreateDetail() {
                                         </Box>
                                     </Box>
                                 </Box>
-                            </Box>
+                                {appModels.aiModel && (
+                                    <Select
+                                        style={{ width: 100, height: 23 }}
+                                        bordered={false}
+                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                        rootClassName="modelSelect"
+                                        popupClassName="modelSelectPopup"
+                                        value={aiModel}
+                                        onChange={(value) => {
+                                            setPerform(perform + 1);
+                                            setAiModel(value);
+                                        }}
+                                    >
+                                        {appModels.aiModel.map((item: any) => (
+                                            <Option key={item.value} value={item.value}>
+                                                {item.label}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                )}
+                            </div>
                             <Divider sx={{ my: 1 }} />
                             <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
                                 {detail?.description}
@@ -617,12 +648,6 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
-                                    aiModel={aiModel}
-                                    setAiModel={(value: any) => {
-                                        setPerform(perform + 1);
-                                        setAiModel(value);
-                                    }}
-                                    aiModels={appModels.aiModel}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}

@@ -4,20 +4,7 @@ import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
-function CarryOut({
-    config,
-    changeData,
-    loadings,
-    allExecute,
-    variableChange,
-    promptChange,
-    changeanswer,
-    isShows,
-    changeConfigs,
-    aiModel,
-    setAiModel,
-    aiModels
-}: any) {
+function CarryOut({ config, changeData, loadings, allExecute, variableChange, promptChange, changeanswer, isShows, changeConfigs }: any) {
     return (
         <Box>
             <Grid container spacing={4}>
@@ -30,9 +17,6 @@ function CarryOut({
                             config={config?.workflowConfig}
                             changeConfigs={changeConfigs}
                             isShows={isShows}
-                            aiModel={aiModel}
-                            setAiModel={setAiModel}
-                            aiModels={aiModels}
                             changeSon={changeData}
                             loadings={loadings}
                             changeanswer={changeanswer}

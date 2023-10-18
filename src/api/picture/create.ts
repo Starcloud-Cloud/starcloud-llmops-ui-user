@@ -33,6 +33,13 @@ export const getImgList = (data: any) => {
 };
 
 /**
+ * 图片历史记录
+ * @returns
+ */
+export const history = (data: any) => {
+    return request.post({ url: '/llm/app/log/imageRecords', data });
+};
+/**
  * 翻译文本
  * @returns
  */

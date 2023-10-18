@@ -29,7 +29,7 @@ export const upscale = (data: any) => {
  * @returns
  */
 export const history = (data: any) => {
-    return request.post({ url: '/llm/app/log/historyImageRecords', data });
+    return request.post({ url: '/llm/app/log/imageRecords', data });
 };
 
 /**

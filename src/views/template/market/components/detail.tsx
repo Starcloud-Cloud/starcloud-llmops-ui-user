@@ -1,6 +1,7 @@
-import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-import { Image, Button, Popover } from 'antd';
-import { MoreOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress, IconButton } from '@mui/material';
+import { Image, Button, Popover, Select } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import { MoreVert } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
@@ -48,8 +49,8 @@ function Deatail() {
     const [tokenOpen, setTokenOpen] = useState(false);
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModel, setAiModel] = useState('gpt-3.5-turbo');
-
+    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo');
+    const aimodeRef = useRef('gpt-3.5-turbo');
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
@@ -74,7 +75,7 @@ function Deatail() {
             let resp: any = await executeMarket({
                 appUid: uid,
                 stepId: stepId,
-                aiModel,
+                aiModel: aimodeRef.current,
                 appReqVO: detailRef.current,
                 conversationUid
             });
@@ -221,8 +222,30 @@ function Deatail() {
     useEffect(() => {
         marketDeatail({ uid }).then((res: any) => {
             setAllLoading(false);
-            detailRef.current = res;
-            setDetailData(res);
+            if (res) {
+                const newRes = _.cloneDeep(res);
+                const result = {
+                    ...newRes,
+                    workflowConfig: {
+                        ...newRes.workflowConfig,
+                        steps: newRes.workflowConfig.steps.map((item: any) => {
+                            return {
+                                ...item,
+                                flowStep: {
+                                    ...item.flowStep,
+                                    response: {
+                                        ...item.flowStep.response,
+                                        defaultValue: item.flowStep.response.answer,
+                                        answer: ''
+                                    }
+                                }
+                            };
+                        })
+                    }
+                };
+                detailRef.current = result;
+                setDetailData(result);
+            }
         });
         metadata().then((res) => {
             setAppModel(res);
@@ -279,6 +302,7 @@ function Deatail() {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
     const [allLoading, setAllLoading] = useState(true);
+    const { Option } = Select;
     //过滤出category
     const categoryList = marketStore((state) => state.categoryList);
     return (
@@ -314,7 +338,7 @@ function Deatail() {
                     {useCategory(categoryTrees, detailData?.category)?.name}
                 </Link>
             </Breadcrumbs>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box display="flex" justifyContent="space-between" alignItems="end">
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                     {detailData?.icon && (
                         <Image
@@ -366,23 +390,36 @@ function Deatail() {
                         }
                         trigger="click"
                     >
-                        <Button
-                            className="absolute top-[16px] right-[16px]"
-                            shape="circle"
-                            icon={<MoreOutlined rev={undefined} />}
-                        ></Button>
+                        <IconButton className="absolute top-[16px] right-[16px]">
+                            <MoreVert />
+                        </IconButton>
                     </Popover>
+                )}
+                {appModels.aiModel && (
+                    <Select
+                        style={{ width: 100, height: 23 }}
+                        bordered={false}
+                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                        rootClassName="modelSelect"
+                        popupClassName="modelSelectPopup"
+                        value={aiModels}
+                        onChange={(value) => {
+                            aimodeRef.current = value;
+                            setAiModels(value);
+                        }}
+                    >
+                        {appModels.aiModel.map((item: any) => (
+                            <Option key={item.value} value={item.value}>
+                                {item.label}
+                            </Option>
+                        ))}
+                    </Select>
                 )}
             </Box>
             <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
                 config={detailData}
                 isShows={isShows}
-                aiModel={aiModel}
-                setAiModel={(value: any) => {
-                    setAiModel(value);
-                }}
-                aiModels={appModels.aiModel}
                 changeConfigs={changeConfigs}
                 changeData={changeData}
                 variableChange={variableChange}

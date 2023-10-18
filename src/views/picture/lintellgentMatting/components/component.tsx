@@ -290,6 +290,9 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                         <div>
                             <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="contained">
                                 抠图
+                                <span className="text-xs opacity-50">
+                                    （消耗{imageList.filter((item: any) => item.response?.data?.url).length * 2}点作图）
+                                </span>
                             </Button>
                         </div>
                     </div>

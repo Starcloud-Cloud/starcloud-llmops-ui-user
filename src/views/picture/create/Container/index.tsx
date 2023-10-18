@@ -2,7 +2,7 @@ import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutl
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import History from '@mui/icons-material/History';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { IconButton } from '@mui/material';
+import { IconButton, Button } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
 import { Divider, Space } from 'antd';
 import { translateText } from 'api/picture/create';
@@ -95,12 +95,16 @@ export const PictureCreateContainer = ({
                 <IconButton onClick={() => setMenuVisible(!menuVisible)} size="large" aria-label="chat menu collapse">
                     <MenuRoundedIcon />
                 </IconButton>
-                <div
-                    onClick={() => navigate('/imageHistory?scene=' + 'IMAGE_VARIANTS')}
-                    className="text-[#673ab7] text-[12px] flex items-center cursor-pointer"
-                >
-                    <History sx={{ fontSize: '14px' }} />
-                    <span>历史记录</span>
+                <div>
+                    <Button
+                        startIcon={<History />}
+                        onClick={() => navigate('/imageHistory?scene=IMAGE_VARIANTS')}
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                    >
+                        历史记录
+                    </Button>
                 </div>
             </div>
             <div className="h-full">

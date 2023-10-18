@@ -1,4 +1,4 @@
-import { Grid, Box, Button, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Chip } from '@mui/material';
+import { Grid, Box, Button, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Chip, Pagination } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Table, Space, Image, Tag } from 'antd';
@@ -102,15 +102,27 @@ const ImageHistory = () => {
             disabled: record.status === 'ERROR' // Column configuration not to be checked
         })
     };
+    const [pageQuery, setPage] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const [total, setTotal] = useState(0);
     const getList = async () => {
         setLoading(true);
-        const res = await history({ pageNo: 1, pageSize: 1000, ...query });
+        const res = await history({ ...pageQuery, ...query });
         setLoading(false);
         setTableData(res.list);
+        setTotal(res.total);
+    };
+    const paginationChange = (event: any, value: number) => {
+        setPage({
+            ...pageQuery,
+            pageNo: value
+        });
     };
     useEffect(() => {
         getList();
-    }, [query]);
+    }, [query, pageQuery.pageNo]);
     //下载图片
     const downLoad = (row: any) => {
         if (row?.imageInfo?.images?.length > 1) {
@@ -241,7 +253,15 @@ const ImageHistory = () => {
             >
                 批量下载
             </Button>
-            <Table rowKey={'uid'} loading={loading} rowSelection={rowSelection} columns={columns} dataSource={tableData} />
+            <Table
+                pagination={false}
+                rowKey={'uid'}
+                loading={loading}
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={tableData}
+            />
+            <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
             {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
         </div>
     );

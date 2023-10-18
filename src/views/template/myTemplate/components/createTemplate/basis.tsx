@@ -23,7 +23,12 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
     useImperativeHandle(ref, () => ({
         submit: () => {
             formik.handleSubmit();
-            return Object.values(formik.values).some((value) => !value);
+            const obj = {
+                category: _.cloneDeep(formik.values).category,
+                name: _.cloneDeep(formik.values).name,
+                tags: _.cloneDeep(formik.values).tags
+            };
+            return Object.values(obj).some((value) => !value);
         }
     }));
     const formik = useFormik({

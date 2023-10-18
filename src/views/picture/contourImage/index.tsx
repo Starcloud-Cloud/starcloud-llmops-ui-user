@@ -80,13 +80,24 @@ const ContourImage = () => {
     };
     return (
         <Card className="p-[16px] h-full">
-            <SubCard sx={{ mb: 3 }} contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'right', p: '10px !important' }}>
-                <div
-                    onClick={() => navigate('/imageHistory?scene=' + 'IMAGE_SKETCH')}
-                    className="text-[#673ab7] text-[12px] flex items-center cursor-pointer"
-                >
-                    <History sx={{ fontSize: '14px' }} />
-                    <span>历史记录</span>
+            <SubCard
+                sx={{ mb: 3 }}
+                contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+            >
+                <div>
+                    &nbsp;&nbsp;<span className="text-[#673ab7] font-[500]">轮廓出图</span>
+                </div>
+                <div>
+                    <Button
+                        startIcon={<History />}
+                        onClick={() => navigate('/imageHistory?scene=IMAGE_SKETCH')}
+                        sx={{ ml: 1 }}
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                    >
+                        历史记录
+                    </Button>
                 </div>
             </SubCard>
             <div className="h-full flex items-top justify-center gap-3">
@@ -185,10 +196,10 @@ const ContourImage = () => {
                             }
                         }}
                         color="secondary"
-                        variant="outlined"
+                        variant="contained"
                         fullWidth
                     >
-                        生成简笔画
+                        生成简笔画 <span className="text-xs opacity-50">（消耗2点作图）</span>
                     </Button>
                 </div>
                 {rightRes && (

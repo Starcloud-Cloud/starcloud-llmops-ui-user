@@ -2,7 +2,7 @@ import { Drawer, useMediaQuery, useTheme } from '@mui/material';
 import { Row } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { openDrawer } from 'store/slices/menu';
-import { getImgList } from '../../../api/picture/create';
+import { history } from '../../../api/picture/create';
 import useConfig from '../../../hooks/useConfig';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { appDrawerWidth as drawerWidth } from '../../../store/constant';
@@ -59,7 +59,7 @@ const PictureCreate = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await getImgList({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
+            const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
             setImgList(
                 res?.list?.map((item: any) => ({
                     ...item.imageInfo,
@@ -77,7 +77,7 @@ const PictureCreate = () => {
         }
         const newPageNo = pageNo + 1;
         setPageNo(newPageNo);
-        const res = await getImgList({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
+        const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
         setImgList([
             ...imgList,
             ...(res?.list?.map((item: any) => ({

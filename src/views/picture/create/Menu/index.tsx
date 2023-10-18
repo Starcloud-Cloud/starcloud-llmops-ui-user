@@ -190,6 +190,7 @@ export const PictureCreateMenu = ({
     const [strength, setStrength] = useState<number>();
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
+    const [showStyle, setShowStyle] = useState(false);
     const [imageStrength, setImageStrength] = useState(45);
     const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
     const [voidInputValueTranslate, setVoidInputValueTranslate] = useState(true);
@@ -408,31 +409,33 @@ export const PictureCreateMenu = ({
                         'overflow-x-hidden flex flex-col items-center pb-2 w-full h-[calc(100%-70px)] xs:overflow-y-auto lg:overflow-y-hidden  hover:overflow-y-auto'
                     }
                 >
-                    <Row className={'w-[100%] p-[16px] rounded-xl bg-white'}>
-                        <span className={'text-base font-medium flex items-center'}>风格模型</span>
-                        <div
-                            style={{ scrollbarGutter: 'stable' }}
-                            className={
-                                'grid gap-4 grid-cols-3 w-full h-[375px] mt-3  p-[4px] xs:overflow-y-auto lg:overflow-y-hidden hover:overflow-y-auto'
-                            }
-                        >
-                            {params?.stylePreset.map((item, index) => (
-                                <div key={index} className="w-full">
-                                    <img
-                                        src={item.image}
-                                        alt={item.label}
-                                        className={` w-[calc(100%-2px)] rounded cursor-pointer  ${
-                                            item.value === currentStyle ? 'outline outline-offset-2 outline-[#673ab7]' : ''
-                                        } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
-                                        onClick={() => setCurrentStyle(item.value)}
-                                    />
-                                    <span className="text-sm">{t(`textToImage.${item.label}`)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </Row>
+                    {mode !== '裂变' && (
+                        <Row className={'w-[100%] p-[16px] mb-[15px] rounded-xl bg-white'}>
+                            <span className={'text-base font-medium flex items-center'}>风格模型</span>
+                            <div
+                                style={{ scrollbarGutter: 'stable' }}
+                                className={
+                                    'grid gap-4 grid-cols-3 w-full h-[375px] mt-3  p-[4px] xs:overflow-y-auto lg:overflow-y-hidden hover:overflow-y-auto'
+                                }
+                            >
+                                {params?.stylePreset.map((item, index) => (
+                                    <div key={index} className="w-full">
+                                        <img
+                                            src={item.image}
+                                            alt={item.label}
+                                            className={` w-[calc(100%-2px)] rounded cursor-pointer  ${
+                                                item.value === currentStyle ? 'outline outline-offset-2 outline-[#673ab7]' : ''
+                                            } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
+                                            onClick={() => setCurrentStyle(item.value)}
+                                        />
+                                        <span className="text-sm">{t(`textToImage.${item.label}`)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </Row>
+                    )}
                     {mode === '裂变' && (
-                        <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
+                        <Row className={'w-[100%] p-[16px] rounded-xl bg-white flex flex-col'}>
                             <div className="flex items-center cursor-pointer justify-between">
                                 <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
                                     <span className={'text-base font-medium'}>图像</span>
@@ -860,6 +863,41 @@ export const PictureCreateMenu = ({
                             )}
                         </Row>
                     )}
+                    {mode === '裂变' && (
+                        <Row className={'w-[100%]  mt-[15px] p-[16px] rounded-xl bg-white'}>
+                            <div
+                                className="cursor-pointer flex"
+                                onClick={() => {
+                                    setShowStyle(!showStyle);
+                                }}
+                            >
+                                <span className={'text-base font-medium flex items-center'}>风格模型</span>
+                                {showStyle ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                            </div>
+                            {showStyle && (
+                                <div
+                                    style={{ scrollbarGutter: 'stable' }}
+                                    className={
+                                        'grid gap-4 grid-cols-3 w-full h-[375px] mt-3  p-[4px] xs:overflow-y-auto lg:overflow-y-hidden hover:overflow-y-auto'
+                                    }
+                                >
+                                    {params?.stylePreset.map((item, index) => (
+                                        <div key={index} className="w-full">
+                                            <img
+                                                src={item.image}
+                                                alt={item.label}
+                                                className={` w-[calc(100%-2px)] rounded cursor-pointer  ${
+                                                    item.value === currentStyle ? 'outline outline-offset-2 outline-[#673ab7]' : ''
+                                                } hover:outline hover:outline-offset-2 hover:outline-[#673ab7]`}
+                                                onClick={() => setCurrentStyle(item.value)}
+                                            />
+                                            <span className="text-sm">{t(`textToImage.${item.label}`)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </Row>
+                    )}
                     <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
                         <span className={'text-base font-medium flex items-center'}>
                             高级
@@ -953,7 +991,7 @@ export const PictureCreateMenu = ({
                     align={'middle'}
                 >
                     <Button variant="contained" color="secondary" style={{ width: '94%' }} onClick={() => handleCreate()}>
-                        生成
+                        生成 <span className="text-xs opacity-50">{mode !== '裂变' ? `（消耗${samples}点作图）` : '（消耗4点作图）'}</span>
                     </Button>
                 </Row>
             </Col>

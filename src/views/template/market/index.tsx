@@ -144,7 +144,7 @@ function TemplateMarket() {
                 icon: 'amazon',
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
-            const filterData = newData1.map((item: any) => {
+            const filterData = newData1?.map((item: any) => {
                 return {
                     ...item,
                     appList: item.appList.filter((el: any) => el.name?.toLowerCase().includes(queryParams.name.toLowerCase()))
@@ -380,7 +380,7 @@ function TemplateMarket() {
                         <Grid
                             container
                             display="flex"
-                            flexWrap={queryParams.category === 'ALL' ? 'nowrap' : 'wrap'}
+                            flexWrap={queryParams.category === 'ALL' && item.code !== 'HOT' ? 'nowrap' : 'wrap'}
                             overflow={queryParams.category === 'ALL' && item.code === 'HOT' ? 'auto' : 'hidden'}
                             spacing={2}
                         >

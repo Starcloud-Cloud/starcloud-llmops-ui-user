@@ -270,7 +270,7 @@ function ApplicationAnalysis({
     const categoryList = marketStore((state) => state.categoryList);
     const getDeList = (row: { appMode: string; uid: string }) => {
         if (row.appMode === 'IMAGE') {
-            detailImage({ conversationUid: row.uid }).then((res) => {
+            detailImage({ appConversationUid: row.uid }).then((res) => {
                 if (res) {
                     if (
                         res.fromScene === 'IMAGE_REMOVE_BACKGROUND' ||
@@ -468,7 +468,7 @@ function ApplicationAnalysis({
                                             if (row.appMode === 'IMAGE') {
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
-                                                detailApp({ conversationUid: row.uid }).then((res) => {
+                                                detailApp({ appConversationUid: row.uid }).then((res) => {
                                                     if (res) {
                                                         setExeDetail(res.appInfo);
                                                         setResult(res);
@@ -479,7 +479,7 @@ function ApplicationAnalysis({
                                             } else if (row.appMode === 'CHAT') {
                                                 setConversationUid(row.uid);
                                                 getChatRecord({
-                                                    conversationUid: row.uid,
+                                                    appConversationUid: row.uid,
                                                     pageNo: 1,
                                                     pageSize: 100,
                                                     fromScene: row.fromScene

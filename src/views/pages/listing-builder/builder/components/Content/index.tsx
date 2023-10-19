@@ -629,6 +629,7 @@ export const Content = () => {
                                     placeholder={item.placeholder}
                                     value={item.value}
                                     handleInputChange={handleInputChange}
+                                    highlightWordList={keyWordSelectList}
                                     index={index}
                                 />
                                 <div className="flex px-4 py-3 items-center">

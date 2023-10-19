@@ -1,9 +1,8 @@
 import React from 'react';
 
-const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index }: any) => {
-    const h_input = ['iphone', 'iphone pro'];
-    h_input.sort((a, b) => b.length - a.length);
-    const r = `(${h_input.join('|')})`;
+const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList }: any) => {
+    highlightWordList.sort((a: string, b: string) => b.length - a.length);
+    const r = `(${highlightWordList.join('|')})`;
     const pattern = new RegExp(r);
     const resultArray = value?.split(pattern);
 
@@ -13,7 +12,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index }: a
                 {resultArray?.map((item: any) => (
                     <pre
                         className={`${
-                            h_input.includes(item)
+                            highlightWordList.includes(item)
                                 ? 'text-transparent inline whitespace-pre-wrap text-sm font-[monospace] bg-red-400'
                                 : 'text-transparent inline whitespace-pre-wrap text-sm font-[monospace]'
                         }`}

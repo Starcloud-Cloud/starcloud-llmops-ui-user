@@ -199,7 +199,7 @@ const ContourImage = () => {
                         variant="contained"
                         fullWidth
                     >
-                        生成简笔画 <span className="text-xs opacity-50">（消耗2点作图）</span>
+                        生成简笔画 <span className="text-xs opacity-50">（消耗6点作图）</span>
                     </Button>
                 </div>
                 {rightRes && (

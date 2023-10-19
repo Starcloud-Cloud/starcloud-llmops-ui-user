@@ -9,6 +9,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import BrushIcon from '@mui/icons-material/Brush';
 import FourKIcon from '@mui/icons-material/FourK';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import ImageIcon from '@mui/icons-material/Image';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
@@ -63,7 +64,8 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         FormatShapesIcon,
         AltRouteIcon,
         BrushIcon,
-        FourKIcon
+        FourKIcon,
+        ManageAccountsIcon
     };
     const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 

@@ -26,6 +26,7 @@ import { getUserInfo } from 'api/login';
 import Link from 'assets/images/share/fenxianglianjie.svg';
 import register from 'assets/images/share/zhuce.svg';
 import Reward from 'assets/images/share/yaoqingjiangli.svg';
+import infoStore from 'store/entitlementAction';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -83,6 +84,7 @@ const SpaceEquity = () => {
             total: 5
         }
     ];
+    const { use } = infoStore();
     const [tableList, setTableList] = useState<any[]>([]);
     const [total, setTotal] = useState<number>(1);
     const [pageQuery, setPageQuery] = useState({
@@ -97,11 +99,11 @@ const SpaceEquity = () => {
     };
     const [inviteUrl, setInviteUrl] = useState('');
     const getList = async () => {
-        const result = await getUserInfo();
-        setInviteUrl(result.inviteUrl);
+        // const result = await getUserInfo();
+        // setInviteUrl(result.inviteUrl);
     };
     useEffect(() => {
-        getList();
+        // getList();
     }, [pageQuery.pageNo]);
     return (
         <Card sx={{ p: 2 }}>
@@ -195,7 +197,9 @@ const SpaceEquity = () => {
                                     </Typography>
                                 }
                             />
-                            <ListItemText primary={inviteUrl} />
+                            <ListItemText
+                                primary={window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
+                            />
                             <Button size="small" color="secondary" variant="outlined">
                                 复制文案及链接
                             </Button>

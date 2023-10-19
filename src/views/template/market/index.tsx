@@ -7,7 +7,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
-import ScrollMenus from './ScrollMenu';
 import { useTheme } from '@mui/material/styles';
 import { listGroupByCategory, categories, categoryTree } from 'api/template';
 import Template from 'views/template/myTemplate/components/content/template';
@@ -386,7 +385,7 @@ function TemplateMarket() {
                         >
                             {item.appList.map((el: any, index: number) => (
                                 <Grid flexShrink={0} xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                    <Template handleDetail={handleDetail} data={el} />
+                                    <Template like="market" handleDetail={handleDetail} data={el} />
                                 </Grid>
                             ))}
                         </Grid>

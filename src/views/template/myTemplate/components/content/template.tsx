@@ -1,10 +1,12 @@
 import { Card, CardContent, Box, Typography, Tooltip, Link } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
+import GradeIcon from '@mui/icons-material/Grade';
 import { Image } from 'antd';
 import marketStore from 'store/market';
 import './textnoWarp.scss';
 
-function Template({ data, handleDetail }: any) {
+function Template({ like, data, handleDetail }: any) {
     const { categoryList } = marketStore();
     return (
         <Card
@@ -65,11 +67,22 @@ function Template({ data, handleDetail }: any) {
                     </Typography>
                 </Tooltip>
             </CardContent>
-            <div className="w-7 h-7 rounded-full bg-[#673ab7] absolute right-3 bottom-3 arrow_btn hidden">
+            <div className="absolute right-3 bottom-3 w-7 h-7 rounded-full bg-[#673ab7] arrow_btn hidden">
                 <div className="w-full h-full flex justify-center items-center">
                     <ArrowForwardIcon fontSize="small" sx={{ color: '#fff' }} />
                 </div>
             </div>
+            {/* {like === 'market' && (
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    className="absolute left-[16px] bottom-[11px]"
+                >
+                    <GradeOutlinedIcon color="secondary" fontSize="small" />
+                    <GradeIcon color="secondary" fontSize="small" />
+                </div>
+            )} */}
             <Box position="absolute" left="16px" bottom="5px">
                 {data.categories &&
                     data.categories.map((item: string) => (

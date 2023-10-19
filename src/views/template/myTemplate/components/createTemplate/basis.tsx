@@ -1,5 +1,5 @@
 import { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
-import { Card, TextField, Autocomplete, Chip, Stack, FormControl, InputLabel, Select as Selects, MenuItem } from '@mui/material';
+import { Card, TextField, Autocomplete, Chip, Stack, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
 import { Select, Image } from 'antd';
 import { categoryTree } from 'api/template';
 import { TreeSelect } from 'antd';
@@ -105,23 +105,6 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
                     }}
                     variant="outlined"
                 />
-                {permissions.includes('app:operate:icon') && (
-                    <FormControl color="secondary" fullWidth className="mt-[16px]">
-                        <InputLabel id="type">类型</InputLabel>
-                        <Selects
-                            value={type}
-                            onChange={(e: any) => {
-                                setValues({ name: 'type', value: e.target.value });
-                            }}
-                            labelId="type"
-                            label="类型"
-                        >
-                            {appModel?.map((item) => (
-                                <MenuItem value={item.value}>{item.label}</MenuItem>
-                            ))}
-                        </Selects>
-                    </FormControl>
-                )}
                 <div className="relative mt-[16px]">
                     <TreeSelect
                         className="bg-[#f8fafc]  h-[51px] border border-solid rounded-[6px] antdSel"
@@ -153,43 +136,6 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
                         类目*
                     </span>
                 </div>
-                {permissions.includes('app:operate:icon') && (
-                    <TextField
-                        color="secondary"
-                        fullWidth
-                        required
-                        sx={{ mt: 2 }}
-                        InputLabelProps={{ shrink: true }}
-                        error={formik?.touched.name && Boolean(formik?.errors.name)}
-                        helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ''}
-                        label="排序"
-                        value={sort}
-                        type="number"
-                        onChange={(e: any) => {
-                            setValues({ name: 'sort', value: e.target.value });
-                        }}
-                        variant="outlined"
-                    />
-                )}
-                {permissions.includes('app:operate:icon') && (
-                    <div className="relative">
-                        <Select
-                            onChange={(e) => {
-                                setIcon(e);
-                            }}
-                            value={icons}
-                            className="h-[51px] mt-[16px] w-[100%] bg-[#f8fafc] border border-solid border-[#697586ad] rounded-[6px] antdSel"
-                        >
-                            {categoryIcon.map((item) => (
-                                <Option value={item.icon} label="China">
-                                    <Image width={20} src={require('../../../../../assets/images/category/' + item.icon + '.svg')} />
-                                    <span className="ml-[10px]">{item.name}</span>
-                                </Option>
-                            ))}
-                        </Select>
-                        <span className=" block bg-[#fff] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">图标*</span>
-                    </div>
-                )}
                 <Stack sx={{ mt: 2 }}>
                     <Autocomplete
                         multiple
@@ -208,6 +154,59 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
                         renderInput={(params: any) => <TextField name="tags" color="secondary" {...params} label={t('myApp.scense')} />}
                     />
                 </Stack>
+                {permissions.includes('app:operate:icon') && (
+                    <div>
+                        <Divider sx={{ mt: 2 }} />
+                        <FormControl color="secondary" fullWidth className="mt-[16px]">
+                            <InputLabel id="type">类型</InputLabel>
+                            <Selects
+                                value={type}
+                                onChange={(e: any) => {
+                                    setValues({ name: 'type', value: e.target.value });
+                                }}
+                                labelId="type"
+                                label="类型"
+                            >
+                                {appModel?.map((item) => (
+                                    <MenuItem value={item.value}>{item.label}</MenuItem>
+                                ))}
+                            </Selects>
+                        </FormControl>
+                        <TextField
+                            color="secondary"
+                            fullWidth
+                            required
+                            sx={{ mt: 2 }}
+                            InputLabelProps={{ shrink: true }}
+                            error={formik?.touched.name && Boolean(formik?.errors.name)}
+                            helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ''}
+                            label="应用市场排序"
+                            value={sort}
+                            type="number"
+                            onChange={(e: any) => {
+                                setValues({ name: 'sort', value: e.target.value });
+                            }}
+                            variant="outlined"
+                        />
+                        <div className="relative">
+                            <Select
+                                onChange={(e) => {
+                                    setIcon(e);
+                                }}
+                                value={icons}
+                                className="h-[51px] mt-[16px] w-[100%] bg-[#f8fafc] border border-solid border-[#697586ad] rounded-[6px] antdSel"
+                            >
+                                {categoryIcon.map((item) => (
+                                    <Option value={item.icon} label="China">
+                                        <Image width={20} src={require('../../../../../assets/images/category/' + item.icon + '.svg')} />
+                                        <span className="ml-[10px]">{item.name}</span>
+                                    </Option>
+                                ))}
+                            </Select>
+                            <span className=" block bg-[#fff] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">图标*</span>
+                        </div>
+                    </div>
+                )}
             </form>
         </Card>
     );

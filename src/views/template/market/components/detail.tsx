@@ -1,13 +1,9 @@
-import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress, IconButton } from '@mui/material';
-import { Image, Button, Popover, Select } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import { MoreVert } from '@mui/icons-material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
+import { Image, Select } from 'antd';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import {
-    delMarket,
     marketDeatail,
     metadata
     // installTemplate
@@ -275,22 +271,7 @@ function Deatail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const permissions = useUserStore((state) => state.permissions);
-    //删除模板
-    const delTemplate = async () => {
-        const res = await delMarket(detailData.uid);
-        navigate('/appMarket');
-        dispatch(
-            openSnackbar({
-                open: true,
-                message: '删除成功',
-                variant: 'alert',
-                alert: {
-                    color: 'success'
-                },
-                close: false
-            })
-        );
-    };
+
     // const iconStyle = {
     //     fontSize: '16px',
     //     display: 'inline-block',
@@ -346,7 +327,7 @@ function Deatail() {
                     {t('market.all')}
                 </Link>
                 <Link
-                    color="text.primary"
+                    color="secondary"
                     sx={{ cursor: 'pointer' }}
                     underline="hover"
                     onClick={() => navigate('/appMarket?category=' + detailData?.category?.split('_')[0])}
@@ -396,21 +377,6 @@ function Deatail() {
                 >
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
-                {permissions.includes('app:market:delete') && (
-                    <Popover
-                        placement="bottom"
-                        content={
-                            <Button onClick={delTemplate} danger icon={<DeleteOutlined rev={undefined} />}>
-                                删除模板
-                            </Button>
-                        }
-                        trigger="click"
-                    >
-                        <IconButton className="absolute top-[16px] right-[16px]">
-                            <MoreVert />
-                        </IconButton>
-                    </Popover>
-                )}
                 {appModels.aiModel && (
                     <Select
                         style={{ width: 100, height: 23 }}

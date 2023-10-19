@@ -3,6 +3,7 @@ import {
     Grid,
     Typography,
     Button,
+    IconButton,
     Chip,
     Dialog,
     DialogTitle,
@@ -23,7 +24,7 @@ import {
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 import { styled } from '@mui/material/styles';
 import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-import { InputNumber } from 'antd';
+import { InputNumber, Popover } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -36,7 +37,8 @@ import {
     HistoryOutlined,
     Error,
     Monitor,
-    Api
+    Api,
+    MoreVert
 } from '@mui/icons-material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useState, useEffect, useRef } from 'react';
@@ -53,7 +55,8 @@ import {
     addFriend,
     getLimit,
     createLimit,
-    modifyLimit
+    modifyLimit,
+    delMarket
 } from 'api/template';
 import CreateSiteModal from './components/CreateSiteModal';
 import WechatModal from './components/wchatModal';
@@ -378,6 +381,7 @@ function Upload({
         isFirstCreatePublishRecord: boolean;
         channelMap?: any;
         name?: string;
+        marketUid?: string;
     }>({
         needUpdate: false,
         showPublish: true,
@@ -601,7 +605,22 @@ function Upload({
         }
     };
     const permissions = useUserStore((state) => state.permissions);
-
+    //删除发布的模板
+    const delTemplate = async () => {
+        const res = await delMarket(updateBtn.marketUid);
+        getUpdateBtn();
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '删除成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                close: false
+            })
+        );
+    };
     return (
         <Box>
             <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
@@ -874,7 +893,7 @@ function Upload({
                 <Grid container display="flex" spacing={2}>
                     {(permissions.includes('chat.publish.market') || mode !== 'CHAT') && (
                         <Grid flex={1} item md={6} xs={12}>
-                            <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex' }}>
+                            <SubCard contentSX={{ minHeight: '120px', p: '20px', display: 'flex', position: 'relative' }}>
                                 <Box>
                                     <Box
                                         width="40px"
@@ -1001,6 +1020,21 @@ function Upload({
                                         </Box>
                                     </Box>
                                 </Box>
+                                {permissions.includes('app:market:delete') && updateBtn.marketUid && (
+                                    <Popover
+                                        placement="bottom"
+                                        content={
+                                            <Button onClick={delTemplate} color="error" variant="outlined">
+                                                删除模板
+                                            </Button>
+                                        }
+                                        trigger="click"
+                                    >
+                                        <IconButton className="absolute top-[20px] right-[20px]">
+                                            <MoreVert />
+                                        </IconButton>
+                                    </Popover>
+                                )}
                             </SubCard>
                         </Grid>
                     )}

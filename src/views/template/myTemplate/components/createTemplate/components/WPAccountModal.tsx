@@ -1,6 +1,7 @@
 // material-ui
 import CloseIcon from '@mui/icons-material/Close';
-import { CardContent, IconButton, Button, Modal, Tabs, Tab, Box, Typography, Divider, Link, TextField } from '@mui/material';
+import { CardContent, IconButton, Button, Modal, Tabs, Tab, Box, Typography, Divider, TextField } from '@mui/material';
+import { Image } from 'antd';
 import { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import { bindCreate, bindModify, bindDelete } from 'api/chat';
@@ -8,6 +9,10 @@ import { v4 as uuidv4 } from 'uuid';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import menu from 'assets/images/styles/menu.png';
+import chat from 'assets/images/styles/chat.png';
+import setting from 'assets/images/styles/setting.png';
+import weaccount from 'assets/images/styles/weaccout.png';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -32,10 +37,33 @@ function a11yProps(index: number) {
         'aria-controls': `simple-tabpanel-${index}`
     };
 }
-const WeSetting = ({ name, updateBtn }: { name: string; updateBtn: any }) => {
+const WeSetting = ({
+    name,
+    updateBtn,
+    setImage,
+    setImageOpen
+}: {
+    name: string;
+    updateBtn: any;
+    setImage: (data: number) => void;
+    setImageOpen: (data: boolean) => void;
+}) => {
     return (
         <>
-            <Typography sx={{ cursor: 'pointer' }} color="secondary" mb={1}>
+            <Typography
+                onClick={() => {
+                    if (name === '添加菜单') {
+                        setImage(1);
+                        setImageOpen(true);
+                    } else {
+                        setImage(2);
+                        setImageOpen(true);
+                    }
+                }}
+                sx={{ cursor: 'pointer' }}
+                color="secondary"
+                mb={1}
+            >
                 查看填写示意图
             </Typography>
             <Box display="flex" alignItems="center">
@@ -135,6 +163,8 @@ export default function WechatModal({
     setOpen: (open: boolean) => void;
     getUpdateBtn: () => void;
 }) {
+    const [imageOpen, setImageOpen] = useState(false);
+    const [image, setImage] = useState(1);
     const [value, setValue] = useState(0);
     const [idOpen, setIdOpen] = useState(false);
     const [passwordOpen, setPasswordOpen] = useState(false);
@@ -250,13 +280,21 @@ export default function WechatModal({
                         <Tab label="消息调用" {...a11yProps(1)} />
                     </Tabs>
                     <CustomTabPanel value={value} index={0}>
-                        <WeSetting name="添加菜单" updateBtn={updateBtn} />
+                        <WeSetting setImage={setImage} setImageOpen={setImageOpen} name="添加菜单" updateBtn={updateBtn} />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
-                        <WeSetting name="自动回复" updateBtn={updateBtn} />
+                        <WeSetting setImage={setImage} setImageOpen={setImageOpen} name="自动回复" updateBtn={updateBtn} />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
-                        <Typography sx={{ cursor: 'pointer' }} color="secondary" mb={1}>
+                        <Typography
+                            onClick={() => {
+                                setImage(3);
+                                setImageOpen(true);
+                            }}
+                            sx={{ cursor: 'pointer' }}
+                            color="secondary"
+                            mb={1}
+                        >
                             查看填写示意图
                         </Typography>
                         {!(updateBtn?.channelMap[6]?.length > 0) || resizeOpen ? (
@@ -313,26 +351,40 @@ export default function WechatModal({
                                     }}
                                     InputLabelProps={{ shrink: true }}
                                 />
-                                <TextField
-                                    sx={{ width: '60%' }}
-                                    label="公众号微信号-自动回复使用"
-                                    size="small"
-                                    color="secondary"
-                                    helperText=" "
-                                    fullWidth
-                                    required
-                                    name="account"
-                                    error={numberOpen && !query.account}
-                                    value={query.account}
-                                    onChange={(e) => {
-                                        setNumberOpen(true);
-                                        setQuery({
-                                            ...query,
-                                            account: e.target.value
-                                        });
-                                    }}
-                                    InputLabelProps={{ shrink: true }}
-                                />
+                                <div className="flex">
+                                    <TextField
+                                        sx={{ width: '60%' }}
+                                        label="公众号微信号-自动回复使用"
+                                        size="small"
+                                        color="secondary"
+                                        helperText=" "
+                                        fullWidth
+                                        required
+                                        name="account"
+                                        error={numberOpen && !query.account}
+                                        value={query.account}
+                                        onChange={(e) => {
+                                            setNumberOpen(true);
+                                            setQuery({
+                                                ...query,
+                                                account: e.target.value
+                                            });
+                                        }}
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                    <Typography
+                                        onClick={() => {
+                                            setImage(4);
+                                            setImageOpen(true);
+                                        }}
+                                        sx={{ cursor: 'pointer' }}
+                                        color="secondary"
+                                        ml={1}
+                                        mt="11px"
+                                    >
+                                        查看填写示意图
+                                    </Typography>
+                                </div>
                                 <div className="flex justify-end">
                                     <Button onClick={saveWechat} sx={{ width: '200px' }} color="secondary" variant="contained">
                                         提交
@@ -394,6 +446,53 @@ export default function WechatModal({
                         )}
                     </CustomTabPanel>
                 </CardContent>
+                <Modal
+                    open={imageOpen}
+                    onClose={() => {
+                        setImageOpen(false);
+                    }}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
+                    <MainCard
+                        style={{
+                            position: 'absolute',
+                            width: '80%',
+                            maxHeight: '80%',
+                            overflowY: 'auto',
+                            top: '10%',
+                            left: '50%',
+                            transform: 'translate(-50%, 0)'
+                        }}
+                        content={false}
+                        className="sm:w-[700px] xs:w-[300px]"
+                        secondary={
+                            <IconButton
+                                onClick={() => {
+                                    setImageOpen(false);
+                                }}
+                                size="large"
+                                aria-label="close modal"
+                            >
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        }
+                    >
+                        <CardContent sx={{ p: '0 !important' }}>
+                            <>
+                                {image === 1 ? (
+                                    <Image src={menu} preview={false} />
+                                ) : image === 2 ? (
+                                    <Image src={chat} preview={false} />
+                                ) : image === 3 ? (
+                                    <Image src={setting} preview={false} />
+                                ) : (
+                                    <Image src={weaccount} preview={false} />
+                                )}
+                            </>
+                        </CardContent>
+                    </MainCard>
+                </Modal>
             </MainCard>
         </Modal>
     );

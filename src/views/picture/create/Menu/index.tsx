@@ -191,8 +191,8 @@ export const PictureCreateMenu = ({
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
     const [showStyle, setShowStyle] = useState(false);
-    const [imageStrength, setImageStrength] = useState(45);
-    const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-beta-v2-2-2');
+    const [imageStrength, setImageStrength] = useState(0.5);
+    const [selectModel, setSelectModel] = useState<string>('stable-diffusion-xl-1024-v1-0');
     const [voidInputValueTranslate, setVoidInputValueTranslate] = useState(true);
     const [appOpen, setAppOpen] = useState(false);
     const [openToken, setOpenToken] = useState(false);
@@ -323,7 +323,7 @@ export const PictureCreateMenu = ({
             height: height,
             samples,
             stylePreset: currentStyle,
-            imageStrength: imageStrength / 100,
+            imageStrength: 1 - imageStrength,
             seed: seed,
             steps: step,
             negativePrompt: voidInputValue,
@@ -438,7 +438,7 @@ export const PictureCreateMenu = ({
                         <Row className={'w-[100%] p-[16px] rounded-xl bg-white flex flex-col'}>
                             <div className="flex items-center cursor-pointer justify-between">
                                 <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
-                                    <span className={'text-base font-medium'}>图像</span>
+                                    <span className={'text-base font-medium'}>参考图</span>
                                     {!showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                                 </div>
                                 {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
@@ -454,9 +454,9 @@ export const PictureCreateMenu = ({
                                                             className="upload_img h-[140px] object-cover aspect-square"
                                                             src={uploadFile}
                                                             alt={uploadFile}
-                                                            style={{
-                                                                filter: `blur(${imageStrength / 10}px)`
-                                                            }}
+                                                            // style={{
+                                                            //     filter: `blur(${imageStrength / 10}px)`
+                                                            // }}
                                                         />
                                                     </div>
                                                 </div>
@@ -470,14 +470,25 @@ export const PictureCreateMenu = ({
                                                     width: '100%'
                                                 }}
                                             >
-                                                <span className={'text-base font-medium'}>图像强度</span>
+                                                <div className="flex justify-between items-center">
+                                                    <span className={'text-base font-medium'}>生成图与原图相似度</span>
+                                                    <TextField
+                                                        type={'number'}
+                                                        size="small"
+                                                        className="w-[70px]"
+                                                        disabled
+                                                        value={imageStrength}
+                                                    />
+                                                </div>
                                                 <div
                                                     style={{
                                                         display: 'flex',
                                                         marginTop: '5px',
                                                         justifyContent: 'center',
+                                                        alignItems: 'center',
                                                         width: '100%'
                                                     }}
+                                                    className="flex-col"
                                                 >
                                                     <div
                                                         style={{
@@ -486,14 +497,18 @@ export const PictureCreateMenu = ({
                                                     >
                                                         <Slider
                                                             color="secondary"
-                                                            defaultValue={45}
+                                                            defaultValue={0.5}
                                                             valueLabelDisplay="auto"
                                                             aria-labelledby="discrete-slider-small-steps"
-                                                            step={1}
+                                                            step={0.1}
                                                             min={0}
-                                                            max={100}
+                                                            max={1}
                                                             onChange={(e, value, number) => setImageStrength(value as number)}
                                                         />
+                                                    </div>
+                                                    <div className="flex items-center justify-between w-full">
+                                                        <span>低</span>
+                                                        <span>高</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -789,7 +804,7 @@ export const PictureCreateMenu = ({
                         <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white flex flex-col'}>
                             <div className="flex items-center cursor-pointer justify-between">
                                 <div className="flex items-center cursor-pointer" onClick={() => setShowImg(!showImg)}>
-                                    <span className={'text-base font-medium'}>图像</span>
+                                    <span className={'text-base font-medium'}>参考图</span>
                                     {showImg ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                                 </div>
                                 {uploadFile && <DeleteOutlineIcon className="text-base" onClick={() => setUploadFile('')} />}
@@ -805,9 +820,9 @@ export const PictureCreateMenu = ({
                                                             className="upload_img h-[140px] object-cover aspect-square"
                                                             src={uploadFile}
                                                             alt={uploadFile}
-                                                            style={{
-                                                                filter: `blur(${imageStrength / 10}px)`
-                                                            }}
+                                                            // style={{
+                                                            //     filter: `blur(${imageStrength / 10}px)`
+                                                            // }}
                                                         />
                                                     </div>
                                                 </div>
@@ -821,14 +836,25 @@ export const PictureCreateMenu = ({
                                                     width: '100%'
                                                 }}
                                             >
-                                                <span className={'text-base font-medium'}>图像强度</span>
+                                                <div className="flex justify-between items-center">
+                                                    <span className={'text-base font-medium'}>生成图与原图相似度</span>
+                                                    <TextField
+                                                        type={'number'}
+                                                        size="small"
+                                                        className="w-[70px]"
+                                                        disabled
+                                                        value={imageStrength}
+                                                    />
+                                                </div>
                                                 <div
                                                     style={{
                                                         display: 'flex',
                                                         marginTop: '5px',
                                                         justifyContent: 'center',
+                                                        alignItems: 'center',
                                                         width: '100%'
                                                     }}
+                                                    className="flex-col"
                                                 >
                                                     <div
                                                         style={{
@@ -837,14 +863,18 @@ export const PictureCreateMenu = ({
                                                     >
                                                         <Slider
                                                             color="secondary"
-                                                            defaultValue={45}
+                                                            defaultValue={0.5}
                                                             valueLabelDisplay="auto"
                                                             aria-labelledby="discrete-slider-small-steps"
-                                                            step={1}
+                                                            step={0.1}
                                                             min={0}
-                                                            max={100}
+                                                            max={1}
                                                             onChange={(e, value, number) => setImageStrength(value as number)}
                                                         />
+                                                    </div>
+                                                    <div className="flex items-center justify-between w-full">
+                                                        <span>低</span>
+                                                        <span>高</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -952,6 +982,7 @@ export const PictureCreateMenu = ({
                                     <FormControl sx={{ width: '100%' }}>
                                         <InputLabel id="age-select">模型</InputLabel>
                                         <Select
+                                            disabled
                                             className="w-full"
                                             onChange={(e: any) => setSelectModel(e.target.value)}
                                             value={selectModel}

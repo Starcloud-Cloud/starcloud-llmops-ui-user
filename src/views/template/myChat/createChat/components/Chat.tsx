@@ -1273,7 +1273,7 @@ export const Chat = ({
                                     variant="outlined"
                                     color="secondary"
                                     size="small"
-                                    className="sm:w-[200px] xs:w-[120px] rounded-3xl"
+                                    className="sm:w-[160px] xs:w-[120px] rounded-3xl"
                                     onClick={() => {
                                         doFetch('继续', true);
                                     }}

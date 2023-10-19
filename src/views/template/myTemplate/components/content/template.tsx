@@ -72,17 +72,17 @@ function Template({ like, data, handleDetail }: any) {
                     <ArrowForwardIcon fontSize="small" sx={{ color: '#fff' }} />
                 </div>
             </div>
-            {like === 'market' && (
+            {/* {like === 'market' && (
                 <div
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
                     className="absolute left-[16px] bottom-[11px]"
                 >
-                    {/* <GradeOutlinedIcon color="secondary" fontSize="small" /> */}
+                    <GradeOutlinedIcon color="secondary" fontSize="small" />
                     <GradeIcon color="secondary" fontSize="small" />
                 </div>
-            )}
+            )} */}
             <Box position="absolute" left="16px" bottom="5px">
                 {data.categories &&
                     data.categories.map((item: string) => (

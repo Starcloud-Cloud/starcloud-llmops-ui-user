@@ -1,26 +1,10 @@
-import { Button, Card, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
+import { Button, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
 
-// material-ui
-import {
-    Box,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    // Stack
-    TableSortLabel
-} from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
-// import { CSVExport } from 'views/forms/tables/TableExports';
 
-// assets
-import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import dayjs from 'dayjs';
@@ -32,16 +16,36 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { getListingPage } from 'api/listing/build';
 
-type TableEnhancedCreateDataType = {
+export interface DraftConfig {}
+
+export interface ItemScore {
+    matchSearchers: number;
+    totalSearches: number;
+}
+
+export interface FiveDesc {}
+
+export interface TableEnhancedCreateDataType {
     id: number;
-    status: number;
-    amount: number;
-    body: string;
-    merchantOrderId: string;
-    subject: string;
-    createTime: number;
-};
+    uid: string;
+    title: string;
+    endpoint: string;
+    asin: string;
+    keywordResume?: any;
+    keywordMetaData?: any;
+    draftConfig: DraftConfig;
+    score?: any;
+    itemScore: ItemScore;
+    fiveDesc: FiveDesc;
+    productDesc: string;
+    searchTerm: string;
+    version: number;
+    status: string;
+    createTime: string;
+    updateTime: string;
+}
 
 // table filter
 function descendingComparator(a: KeyedObject, b: KeyedObject, orderBy: string) {
@@ -71,11 +75,11 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商品标题' },
-    { id: 'subject', numeric: false, disablePadding: false, label: '站点' },
-    { id: 'body', numeric: false, disablePadding: false, label: 'ASIN' },
-    { id: 'body', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'body', numeric: false, disablePadding: false, label: '分值' },
+    { id: 'title', numeric: false, disablePadding: false, label: '商品标题' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '站点' },
+    { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
+    { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
+    { id: 'score', numeric: false, disablePadding: false, label: '分值' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -106,20 +110,24 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
+                        sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id && (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                )}
+                            </TableSortLabel>
+                        ) : (
+                            headCell.label
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
@@ -147,16 +155,10 @@ const ListingBuilderPage: React.FC = () => {
     useEffect(() => {
         const fetchPageData = async () => {
             const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
-            // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
-            getOrderRecord(pageVO)
+            getListingPage(pageVO)
                 .then((res) => {
-                    // Once the data is fetched, map it and update rows state
                     const fetchedRows = res.list;
-                    console.log(fetchedRows, 'fetchedRows');
-
                     setRows([...fetchedRows]);
-
-                    // Update total
                     setTotal(res?.total);
                 })
                 .catch((error) => {
@@ -167,7 +169,6 @@ const ListingBuilderPage: React.FC = () => {
         fetchPageData();
     }, [page, rowsPerPage, count]);
 
-    // Add a new state for rows
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
@@ -215,21 +216,7 @@ const ListingBuilderPage: React.FC = () => {
         setPage(0);
     };
 
-    const [open, setOpen] = React.useState(false);
-    const [payUrl, setPayUrl] = useState('');
-    const [isTimeout, setIsTimeout] = useState(false);
-    const [openPayDialog, setOpenPayDialog] = useState(false);
-    const [orderId, setOrderId] = useState<string>();
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setPayUrl('');
-        setOpen(false);
-    };
-
+    console.log(selected, 'selected');
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
     return (
         <MainCard
@@ -320,6 +307,8 @@ const ListingBuilderPage: React.FC = () => {
                             if (typeof row === 'number') {
                                 return null; // 忽略数字类型的行
                             }
+                            console.log(row, 'row');
+
                             const isItemSelected = isSelected(row.id);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -337,16 +326,16 @@ const ListingBuilderPage: React.FC = () => {
                                         <Checkbox
                                             color="primary"
                                             checked={isItemSelected}
-                                            // inputProps={{
-                                            //     'aria-labelledby': labelId
-                                            // }}
+                                            inputProps={{
+                                                'aria-labelledby': labelId
+                                            }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                    <TableCell align="center">{row.subject}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
+                                    <TableCell align="center">{row.title}</TableCell>
+                                    <TableCell align="center">{row.endpoint}</TableCell>
+                                    <TableCell align="center">{row.asin}</TableCell>
+                                    <TableCell align="center">{row.status}</TableCell>
+                                    <TableCell align="center">{row.score}</TableCell>
                                     <TableCell align="center">
                                         {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>

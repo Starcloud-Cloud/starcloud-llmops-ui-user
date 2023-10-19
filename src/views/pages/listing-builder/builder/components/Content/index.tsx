@@ -33,7 +33,6 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getCaretPosition } from 'utils/getCaretPosition';
 import { DEFAULT_LIST, SCORE_LIST } from '../../../data/index';
-import { setPaymentCard } from '../../../../../../store/slices/cart';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
@@ -80,18 +79,47 @@ export const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
 
+    const ulRef = React.useRef<any>(null);
+    React.useEffect(() => {
+        if (openKeyWordSelect) {
+            // 绑定键盘事件
+            const handleKeyDown = (e: any) => {
+                const { key } = e;
+                if (key === 'ArrowUp' || key === 'ArrowDown') {
+                    e.preventDefault(); // 防止滚动页面
+                    const newIndex = key === 'ArrowUp' ? Math.max(0, hoverKey - 1) : Math.min(keyWordSelectList.length - 1, hoverKey + 1);
+                    setHoverKey(newIndex);
+                } else if (key === 'Enter') {
+                    e.preventDefault(); // 防止滚动页面
+                    if (hoverKey !== null) {
+                        handleReplaceValue(keyWordSelectList[hoverKey]);
+                    }
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+
+            // 在组件卸载时解绑键盘事件
+            return () => {
+                document.removeEventListener('keydown', handleKeyDown);
+            };
+        }
+    }, [openKeyWordSelect]);
+
     const handleReplaceValue = (selectValue: string) => {
         const newList = [...list];
-
         const preValue = newList[editIndex].value;
         const modifiedString = preValue?.slice(0, currentInputIndex - 1) + selectValue + preValue?.slice(currentInputIndex + 1);
-        // newList[index];
+        newList[editIndex] = {
+            ...newList[editIndex],
+            value: modifiedString,
+            character: modifiedString.length,
+            word: modifiedString.trim() === '' ? 0 : modifiedString.trim().split(' ').length
+        };
+        setList(newList);
+        setOpenKeyWordSelect(false);
     };
 
-    /**
-     * 处理命中
-     * @param e
-     */
     const handleHasKeyWork = (e: any) => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
@@ -603,7 +631,6 @@ export const Content = () => {
                                     handleInputChange={handleInputChange}
                                     index={index}
                                 />
-
                                 <div className="flex px-4 py-3 items-center">
                                     <div className="flex-1 flex items-center">
                                         <span className="mr-2">建议关键词:</span>
@@ -618,17 +645,17 @@ export const Content = () => {
                 ))}
                 {openKeyWordSelect && (
                     <ul
+                        ref={ulRef}
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1"
-                        onKeyDown={(e) => {
-                            console.log(e);
-                        }}
+                        // onKeyDown={handleKeyDown}
                     >
                         {keyWordSelectList.map((item, keyWordItemKey) => (
                             <li
                                 key={keyWordItemKey}
                                 style={{ height: '30px', lineHeight: '30px' }}
                                 className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
+                                onMouseEnter={() => setHoverKey(keyWordItemKey)}
                                 onClick={() => handleReplaceValue(item)}
                             >
                                 <span className="text-sm">{item}</span>

@@ -412,11 +412,6 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalAnswerTokens')}
                             </TableCell>
-                            {permissions.includes('log:app:page:adminColumns') && (
-                                <TableCell sx={{ minWidth: '100px' }} align="center">
-                                    消耗总Token
-                                </TableCell>
-                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalElapsed')} (s)
                             </TableCell>
@@ -429,7 +424,14 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '150px' }} align="center">
                                 更新时间
                             </TableCell>
-                            <TableCell sx={{ minWidth: '50px' }} align="center"></TableCell>
+                            {permissions.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    消耗总Token
+                                </TableCell>
+                            )}
+                            <TableCell sx={{ minWidth: '50px' }} align="center">
+                                操作
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -440,26 +442,38 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 <TableCell align="center">{row.costPoints}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
-                                {permissions.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (
                                         row.errorCode === '2008002007' ? (
-                                            <Link onClick={() => navigate('/subscribe')} color="secondary" className="cursor-pointer">
+                                            <Link
+                                                onClick={() =>
+                                                    window.open(window.location.protocol + '//' + window.location.host + '/subscribe')
+                                                }
+                                                color="secondary"
+                                                className="cursor-pointer"
+                                            >
                                                 魔法豆不足，去升级
                                             </Link>
                                         ) : (
-                                            <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>
-                                                <Tag className="cursor-pointer" color={row.status === 'SUCCESS' ? 'success' : 'error'}>
-                                                    失败
-                                                </Tag>
-                                            </Tooltip>
+                                            <>
+                                                <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>
+                                                    <Tag className="cursor-pointer" color="error">
+                                                        失败
+                                                    </Tag>
+                                                </Tooltip>
+                                                <span className="hidden">{row.errorCode}</span>
+                                            </>
                                         )
                                     ) : (
-                                        <Tag color="success">成功</Tag>
+                                        <>
+                                            <Tag color="success">成功</Tag>
+                                            <span className="hidden"></span>
+                                        </>
                                     )}
                                 </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
+                                {permissions.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"

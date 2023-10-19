@@ -57,7 +57,7 @@ const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: bool
                 }
             >
                 <CardContent sx={{ p: 2, height: '100%', position: 'relative' }}>
-                    <div className="min-h-[300px] flex items-center bg-[#fff]">
+                    <div className="min-h-[300px] flex items-top bg-[#fff]">
                         <div className="w-[50%] min-h-[300px] flex justify-center items-center border-r border-solid border-[#E8E8E8] relative">
                             <Image width="70%" preview={false} src={detailData?.originalUrl} />
                             <Chip className="absolute top-[0] right-[10px] text-[12px]" size="small" label="原图" variant="outlined" />

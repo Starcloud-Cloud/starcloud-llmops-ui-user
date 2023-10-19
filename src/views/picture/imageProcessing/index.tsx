@@ -1,5 +1,6 @@
 import { Card, CardMedia, CardContent, Typography, Chip } from '@mui/material';
-import { Image, Slider } from 'antd';
+import { ConfigProvider, Image, Slider } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import px from 'assets/images/styles/px.jpeg';
@@ -31,17 +32,40 @@ const ImageMatting = () => {
                             src={px}
                             alt=""
                         />
-                        <Slider
-                            trackStyle={{ background: 'transparent' }}
-                            railStyle={{ background: 'transparent' }}
-                            className="absolute left-0 right-0 top-0 bottom-0 m-auto"
-                            tooltip={{ open: false }}
-                            onChange={(value: number) => {
-                                setDragDistance(value);
+                        <ConfigProvider
+                            theme={{
+                                components: {
+                                    Slider: {
+                                        handleSize: 24,
+                                        handleSizeHover: 24,
+                                        handleLineWidth: 0,
+                                        handleLineWidthHover: 0
+                                    }
+                                }
                             }}
-                            value={dragDistance}
-                        />
-                        <div className="absolute w-0.5 bg-gray-100 h-full top-0" style={{ left: dragDistance + '%' }}></div>
+                        >
+                            <Slider
+                                trackStyle={{ background: 'transparent' }}
+                                railStyle={{ background: 'transparent' }}
+                                handleStyle={{ zIndex: 100, opacity: 0.1 }}
+                                className="absolute left-0 right-0 top-0 bottom-0 m-auto z-1"
+                                tooltip={{ open: false }}
+                                onChange={(value: number) => {
+                                    setDragDistance(value);
+                                }}
+                                value={dragDistance}
+                            />
+                        </ConfigProvider>
+
+                        <div
+                            className="flex justify-center items-center absolute w-0.5 bg-gray-100 h-full top-0"
+                            style={{ left: dragDistance + '%' }}
+                        >
+                            <div className="w-[29px] h-[29px] flex rounded-full bg-[#fff] border border-solid border-[#673ab7]">
+                                <LeftOutlined rev={undefined} />
+                                <RightOutlined rev={undefined} />
+                            </div>
+                        </div>
                     </div>
                     <CardContent>
                         <Typography gutterBottom variant="h3">

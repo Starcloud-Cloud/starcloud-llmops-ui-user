@@ -31,6 +31,7 @@ import Phone from 'ui-component/login/phone';
 import { getUserInfo } from 'api/login';
 import { isMobile } from 'react-device-detect';
 import React from 'react';
+import { ListingProvider } from 'contexts/ListingContext';
 
 interface MainStyleProps {
     theme: Theme;
@@ -428,91 +429,95 @@ const MainLayout = () => {
     //     }
     // }, []);
     return (
-        <div className="flex flex-col">
-            {timeOutObj && (
-                <div className="flex justify-center bg-[#f4f6f8] py-1">
-                    <div className="flex items-center">
-                        {timeOutObj?.type === 1 ? (
-                            <span className="text-sm">
-                                当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
-                            </span>
-                        ) : timeOutObj?.type === 2 ? (
-                            <span className="text-sm">当前魔法豆将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级</span>
-                        ) : (
-                            <span className="text-sm">当前魔法豆不足{timeOutObj?.num}，为避免影响正常使用，请尽快购买升级</span>
-                        )}
-                        <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
-                            立即续费
-                        </Button>
-                        <div className="flex items-center" onClick={() => setTimeOutObj(null)}>
-                            <CloseIcon className="text-base ml-3 cursor-pointer" />
+        <ListingProvider>
+            <div className="flex flex-col">
+                {timeOutObj && (
+                    <div className="flex justify-center bg-[#f4f6f8] py-1">
+                        <div className="flex items-center">
+                            {timeOutObj?.type === 1 ? (
+                                <span className="text-sm">
+                                    当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
+                                </span>
+                            ) : timeOutObj?.type === 2 ? (
+                                <span className="text-sm">
+                                    当前魔法豆将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
+                                </span>
+                            ) : (
+                                <span className="text-sm">当前魔法豆不足{timeOutObj?.num}，为避免影响正常使用，请尽快购买升级</span>
+                            )}
+                            <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
+                                立即续费
+                            </Button>
+                            <div className="flex items-center" onClick={() => setTimeOutObj(null)}>
+                                <CloseIcon className="text-base ml-3 cursor-pointer" />
+                            </div>
                         </div>
                     </div>
+                )}
+                <div className="relative flex-1">
+                    <Box sx={{ display: 'flex' }}>
+                        <CssBaseline />
+                        {/* header */}
+                        <AppBar
+                            enableColorOnDark
+                            position="absolute"
+                            color="inherit"
+                            elevation={0}
+                            sx={{ bgcolor: theme.palette.background.default }}
+                        >
+                            {header}
+                        </AppBar>
+
+                        {/* horizontal menu-list bar */}
+                        {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
+
+                        {/* drawer */}
+                        {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
+
+                        {/* main content */}
+                        <Main theme={theme} open={drawerOpen} layout={layout}>
+                            {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
+                            {!isLarge ? (
+                                <Container
+                                    className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
+                                    {...(!container && { sx: { px: { xs: 0 } } })}
+                                >
+                                    {/* breadcrumb */}
+                                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                    <Outlet />
+                                </Container>
+                            ) : (
+                                <Container
+                                    maxWidth={false}
+                                    className={`h-full ${isMobile && '!px-0'}`}
+                                    {...(!container && { sx: { px: { xs: 0 } } })}
+                                >
+                                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                    <Outlet />
+                                </Container>
+                            )}
+                            <ChatLink navigate={navigate} />
+                            {phoneOpne && (
+                                <Phone
+                                    phoneOpne={phoneOpne}
+                                    title="绑定手机号"
+                                    submitText="绑定"
+                                    onClose={() => {
+                                        setPhoneOpen(false);
+                                    }}
+                                    emits={async () => {
+                                        setPhoneOpen(false);
+                                        const result = await getUserInfo();
+                                        setuse(result);
+                                    }}
+                                />
+                            )}
+                        </Main>
+                        {/*<Customization />*/}
+                    </Box>
                 </div>
-            )}
-            <div className="relative flex-1">
-                <Box sx={{ display: 'flex' }}>
-                    <CssBaseline />
-                    {/* header */}
-                    <AppBar
-                        enableColorOnDark
-                        position="absolute"
-                        color="inherit"
-                        elevation={0}
-                        sx={{ bgcolor: theme.palette.background.default }}
-                    >
-                        {header}
-                    </AppBar>
-
-                    {/* horizontal menu-list bar */}
-                    {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
-
-                    {/* drawer */}
-                    {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
-
-                    {/* main content */}
-                    <Main theme={theme} open={drawerOpen} layout={layout}>
-                        {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
-                        {!isLarge ? (
-                            <Container
-                                className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
-                                {...(!container && { sx: { px: { xs: 0 } } })}
-                            >
-                                {/* breadcrumb */}
-                                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                                <Outlet />
-                            </Container>
-                        ) : (
-                            <Container
-                                maxWidth={false}
-                                className={`h-full ${isMobile && '!px-0'}`}
-                                {...(!container && { sx: { px: { xs: 0 } } })}
-                            >
-                                <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                                <Outlet />
-                            </Container>
-                        )}
-                        <ChatLink navigate={navigate} />
-                        {phoneOpne && (
-                            <Phone
-                                phoneOpne={phoneOpne}
-                                title="绑定手机号"
-                                submitText="绑定"
-                                onClose={() => {
-                                    setPhoneOpen(false);
-                                }}
-                                emits={async () => {
-                                    setPhoneOpen(false);
-                                    const result = await getUserInfo();
-                                    setuse(result);
-                                }}
-                            />
-                        )}
-                    </Main>
-                    {/*<Customization />*/}
-                </Box>
             </div>
-        </div>
+        </ListingProvider>
     );
 };
 

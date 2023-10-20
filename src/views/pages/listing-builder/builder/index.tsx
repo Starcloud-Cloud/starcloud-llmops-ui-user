@@ -28,6 +28,9 @@ const ListingBuilder = () => {
     const createListing = async () => {
         const res = await createDraft({ endpoint: 'US' });
     };
+    useEffect(() => {
+        createListing();
+    }, []);
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({

@@ -3,7 +3,7 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 // 国家列表
 export const COUNTRY_LIST: any = [
     {
-        key: '1',
+        key: 'US',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: '16px', height: '12px' }} width="640" height="480">
                 <defs>
@@ -38,7 +38,7 @@ export const COUNTRY_LIST: any = [
         label: '美国站'
     },
     {
-        key: '2',
+        key: 'JP',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -77,7 +77,7 @@ export const COUNTRY_LIST: any = [
         label: '日本站'
     },
     {
-        key: '3',
+        key: 'UK',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -122,7 +122,7 @@ export const COUNTRY_LIST: any = [
         label: '英国站'
     },
     {
-        key: '4',
+        key: 'DE',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -144,10 +144,10 @@ export const COUNTRY_LIST: any = [
                 <use data-v-23d6874a="" xlinkHref="#icon-de" fill="#606266"></use>
             </svg>
         ),
-        label: '德国'
+        label: '德国站'
     },
     {
-        key: '4',
+        key: 'FR',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -169,10 +169,10 @@ export const COUNTRY_LIST: any = [
                 <use data-v-23d6874a="" xlinkHref="#icon-fr" fill="#606266"></use>
             </svg>
         ),
-        label: '法国'
+        label: '法国站'
     },
     {
-        key: '5',
+        key: 'IT',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -197,7 +197,7 @@ export const COUNTRY_LIST: any = [
         label: '意大利'
     },
     {
-        key: '6',
+        key: 'ES',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -2136,7 +2136,7 @@ export const COUNTRY_LIST: any = [
         label: '西班牙'
     },
     {
-        key: '7',
+        key: 'CA',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -2162,7 +2162,7 @@ export const COUNTRY_LIST: any = [
         label: '加拿大'
     },
     {
-        key: '8',
+        key: 'IN',
         icon: (
             <svg
                 xmlnsXlink="http://www.w3.org/1999/xlink"

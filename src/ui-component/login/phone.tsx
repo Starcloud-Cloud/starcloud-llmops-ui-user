@@ -77,7 +77,7 @@ const Phone = ({
                 title={title}
                 content={false}
             >
-                <IconButton
+                {/* <IconButton
                     onClick={() => onClose()}
                     size="large"
                     aria-label="close modal"
@@ -88,7 +88,7 @@ const Phone = ({
                     }}
                 >
                     <CloseIcon fontSize="small" />
-                </IconButton>
+                </IconButton> */}
                 <CardContent sx={{ p: '16px !important' }}>
                     <Formik
                         initialValues={{

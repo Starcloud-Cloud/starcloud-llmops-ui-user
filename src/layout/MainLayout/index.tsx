@@ -386,7 +386,13 @@ const MainLayout = () => {
         }
     }, []);
     //绑定手机号
-    const { use, setuse, status, userInfo, setStatus } = infoStore();
+    const { use, setuse, status, userInfo, setUserInfo, setStatus } = infoStore();
+    useEffect(() => {
+        return () => {
+            setStatus(false);
+            setUserInfo(null);
+        };
+    }, []);
     useEffect(() => {
         if (userInfo?.benefits) {
             if (status) {

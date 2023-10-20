@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
 
 type CountryType = {
@@ -17,6 +18,18 @@ type ListingContextType = {
 const ListingContext = createContext<ListingContextType | null>(null);
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const queryUid = searchParams.get('uid');
+    const queryVersion = searchParams.get('version');
+
+    useEffect(() => {
+        if (queryVersion && queryUid) {
+            setVersion(Number(queryVersion));
+            setUid(queryUid);
+        }
+    }, [queryUid, queryVersion]);
+
     const [uid, setUid] = useState('');
     const [version, setVersion] = useState(0);
     const [country, setCountry] = useState({

@@ -3,18 +3,17 @@ import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
 
-import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
+import { getListingDetail } from 'api/listing/build';
+import { useListing } from 'contexts/ListingContext';
 
 type TableEnhancedCreateDataType = {
-    id: number;
-    status: number;
-    amount: number;
-    body: string;
-    merchantOrderId: string;
-    subject: string;
-    createTime: number;
+    keyword: string;
+    searches: number;
+    searchWeeklyRank: number;
+    month: string;
+    updatedTime: string;
 };
 
 // table filter
@@ -45,9 +44,9 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: true, label: '关键词' },
-    { id: 'subject', numeric: false, disablePadding: true, label: '分值' },
-    { id: 'body', numeric: false, disablePadding: true, label: '搜索量' },
+    { id: 'keyword', numeric: false, disablePadding: true, label: '关键词' },
+    { id: 'score', numeric: false, disablePadding: true, label: '分值' },
+    { id: 'searches', numeric: false, disablePadding: true, label: '搜索量' },
     { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
@@ -105,27 +104,17 @@ export const KeywordList: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<any[]>([]);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-
-    const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
+    const { version, uid } = useListing();
+
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
-            // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
-            getOrderRecord(pageVO)
+            getListingDetail(uid, version)
                 .then((res) => {
-                    // Once the data is fetched, map it and update rows state
-                    const fetchedRows = res.list;
-                    console.log(fetchedRows, 'fetchedRows');
-
+                    const fetchedRows = res.keywordMetaData;
                     setRows([...fetchedRows]);
-
-                    // Update total
-                    setTotal(res?.total);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -133,7 +122,7 @@ export const KeywordList: React.FC = () => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage, count]);
+    }, [count]);
 
     // Add a new state for rows
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
@@ -149,20 +138,20 @@ export const KeywordList: React.FC = () => {
             if (selected.length > 0) {
                 setSelected([]);
             } else {
-                // const newSelectedId: string[] = rows.map((n) => n.benefitsName);
-                // setSelected(newSelectedId);
+                const newSelectedId: string[] = rows.map((n) => n.keyword);
+                setSelected(newSelectedId);
             }
             return;
         }
         setSelected([]);
     };
 
-    const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (event: React.MouseEvent<unknown>, keyword: string) => {
+        const selectedIndex = selected.indexOf(keyword);
         let newSelected: any[] = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, keyword);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -174,7 +163,7 @@ export const KeywordList: React.FC = () => {
         setSelected(newSelected);
     };
 
-    const isSelected = (id: number) => selected.indexOf(id) !== -1;
+    const isSelected = (keyword: string) => selected.indexOf(keyword) !== -1;
     return (
         <MainCard content={false}>
             <TableContainer component={Paper}>
@@ -195,14 +184,13 @@ export const KeywordList: React.FC = () => {
                             if (typeof row === 'number') {
                                 return null; // 忽略数字类型的行
                             }
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(row.keyword);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
                                 <TableRow
                                     hover
-                                    key={row.id}
-                                    onClick={(event) => handleClick(event, row.id)}
+                                    key={row.keyword}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
@@ -213,16 +201,17 @@ export const KeywordList: React.FC = () => {
                                             size={'small'}
                                             color="primary"
                                             checked={isItemSelected}
+                                            onClick={(event) => handleClick(event, row.keyword)}
                                             inputProps={{
                                                 'aria-labelledby': labelId
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                    <TableCell align="center">{row.subject}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
+                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{row.keyword}</TableCell>
                                 </TableRow>
                             );
                         })}

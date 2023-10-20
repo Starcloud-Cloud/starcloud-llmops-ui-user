@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { TabPanel } from 'views/template/myChat/createChat';
 import { addKey, saveListing } from 'api/listing/build';
 import { useListing } from 'contexts/ListingContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -25,6 +26,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [tab, setTab] = useState(0);
     const [keyWord, setKeyWord] = useState<string>('');
     const { uid, setVersion, setUid, country, version } = useListing();
+    const navigate = useNavigate();
 
     const handleOk = async () => {
         const lines = keyWord.split('\n');
@@ -32,8 +34,10 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             const res = addKey({ uid, version, addKey: lines });
         } else {
             const res = await saveListing({ keys: lines, endpoint: 'US' });
+            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
             setVersion(res.version);
             setUid(res.uid);
+            handleClose();
         }
     };
 

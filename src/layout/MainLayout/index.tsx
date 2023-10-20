@@ -436,12 +436,12 @@ const MainLayout = () => {
     // }, []);
     return (
         <div className="flex flex-col">
-            <div className="flex justify-center bg-[#f4f6f8] py-1">
+            {/* <div className="flex justify-center bg-[#f4f6f8] py-1">
                 <div className="flex items-center">
                     <ErrorOutlineIcon className="text-base text-[red]" />
                     <span className="text-sm ml-1">系统通知：应用升级中，可能会影响您的使用，请稍后再试！</span>
                 </div>
-            </div>
+            </div> */}
             {timeOutObj && (
                 <div className="flex justify-center bg-[#f4f6f8] py-1">
                     <div className="flex items-center">

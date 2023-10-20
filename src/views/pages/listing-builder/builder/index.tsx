@@ -41,7 +41,7 @@ const ListingBuilder = () => {
         const data = {
             uid,
             version,
-            asin: country.key,
+            endpoint: country.key,
             draftConfig: {
                 enableAi: true,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length

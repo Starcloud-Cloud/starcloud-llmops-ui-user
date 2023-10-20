@@ -99,7 +99,6 @@ export const Content = () => {
             };
 
             document.addEventListener('keydown', handleKeyDown);
-
             // 在组件卸载时解绑键盘事件
             return () => {
                 document.removeEventListener('keydown', handleKeyDown);

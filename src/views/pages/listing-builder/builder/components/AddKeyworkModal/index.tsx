@@ -33,7 +33,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
         if (uid) {
             const res = addKey({ uid, version, addKey: lines });
         } else {
-            const res = await saveListing({ keys: lines, endpoint: 'US' });
+            const res = await saveListing({ keys: lines, endpoint: country.key });
             navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
             setVersion(res.version);
             setUid(res.uid);

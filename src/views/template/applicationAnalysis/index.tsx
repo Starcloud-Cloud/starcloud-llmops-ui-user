@@ -50,6 +50,8 @@ interface LogStatistics {
     imageAvgElapsed: number;
     completionAvgElapsed: number;
     imageCostPoints: number;
+    completionTokens: number;
+    chatTokens: number;
 }
 interface Charts {
     title: string;
@@ -148,6 +150,8 @@ function ApplicationAnalysis({
         const imageAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.imageAvgElapsed?.toFixed(2), x: item.createDate }));
         const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.createDate }));
         const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.createDate }));
+        const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.createDate }));
+        const chatTokens = res?.map((item: LogStatistics) => ({ y: item.chatTokens, x: item.createDate }));
         const newList = [];
         permissions.includes('log:app:analysis:completionCostPoints') &&
             newList.push({ title: '生成/聊天消耗魔法豆数', data: completionCostPoints });
@@ -155,6 +159,10 @@ function ApplicationAnalysis({
         permissions.includes('log:app:analysis:completionAvgElapsed') &&
             newList.push({ title: '生成/聊天平均耗时(S)', data: completionAvgElapsed });
         permissions.includes('log:app:analysis:imageAvgElapsed') && newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
+        setGenerate(newList);
+        permissions.includes('log:app:analysis:completionTokens') && newList.push({ title: '生成消耗Tokens', data: completionTokens });
+        setGenerate(newList);
+        permissions.includes('log:app:analysis:chatTokens') && newList.push({ title: '聊天消耗Tokens', data: chatTokens });
         setGenerate(newList);
     };
     //时间

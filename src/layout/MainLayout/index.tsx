@@ -395,7 +395,6 @@ const MainLayout = () => {
                 } else {
                     setPhoneOpen(false);
                 }
-                setStatus(false);
             } else {
                 setStatus(true);
             }

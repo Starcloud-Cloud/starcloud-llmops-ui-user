@@ -11,7 +11,10 @@ import { EyeOutlined } from '@ant-design/icons';
 import ImageDetail from '../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
 import SubCard from 'ui-component/cards/SubCard';
+import { userBenefits } from 'api/template';
+import userInfoStore from 'store/entitlementAction';
 const ContourImage = () => {
+    const { setUserInfo }: any = userInfoStore();
     const navigate = useNavigate();
     const [descOpen, setDescOpen] = useState(false);
     const [desc, setDesc] = useState('');
@@ -190,6 +193,9 @@ const ContourImage = () => {
                                 if (res) {
                                     setLoading(false);
                                     setResult(res.response);
+                                    userBenefits().then((res) => {
+                                        setUserInfo(res);
+                                    });
                                 }
                             } else {
                                 setDescOpen(true);

@@ -4,6 +4,7 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import { COUNTRY_LIST, DEFAULT_LIST } from 'views/pages/listing-builder/data';
 
 type CountryType = {
+    key: string;
     icon: string;
     label: string;
 };
@@ -30,6 +31,8 @@ type ListingContextType = {
     setCountry: (country: CountryType) => void;
     list: ListType[];
     setList: (list: any) => void;
+    enableAi: boolean;
+    setEnableAi: (enableAi: boolean) => void;
 };
 
 const ListingContext = createContext<ListingContextType | null>(null);
@@ -38,10 +41,12 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const [uid, setUid] = useState('');
     const [version, setVersion] = useState(0);
     const [country, setCountry] = useState({
+        key: COUNTRY_LIST?.['0']?.key,
         icon: COUNTRY_LIST?.['0']?.icon,
         label: COUNTRY_LIST?.['0']?.label
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
+    const [enableAi, setEnableAi] = useState(true);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -56,7 +61,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     }, [queryUid, queryVersion]);
 
     return (
-        <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry, list, setList }}>
+        <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry, list, setList, enableAi, setEnableAi }}>
             {children}
         </ListingContext.Provider>
     );

@@ -25,6 +25,7 @@ const ListingBuilder = () => {
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({
+            key,
             icon: COUNTRY_LIST?.[key]?.icon,
             label: COUNTRY_LIST?.[key]?.label
         });
@@ -40,6 +41,7 @@ const ListingBuilder = () => {
         const data = {
             uid,
             version,
+            asin: country.key,
             draftConfig: {
                 enableAi: true,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
@@ -61,6 +63,7 @@ const ListingBuilder = () => {
                     <div className="flex items-center">
                         <div className="w-[100px]">
                             <Dropdown
+                                disabled={uid !== ''}
                                 menu={{ items: COUNTRY_LIST, onClick }}
                                 open={dropdownOpen}
                                 onOpenChange={setDropdownOpen}
@@ -70,7 +73,7 @@ const ListingBuilder = () => {
                                 <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
                                     {country.icon}
                                     <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
-                                    {dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                    {!uid && (dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
                                 </div>
                             </Dropdown>
                         </div>

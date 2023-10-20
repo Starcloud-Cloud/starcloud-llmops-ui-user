@@ -67,7 +67,7 @@ const keyWordList = ['iphone pro', 'iphone', 'pro'];
 
 export const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
-    const [enableAi, setEnableAi] = React.useState(true);
+
     const [assistOpen, setAssistOpen] = React.useState(true);
     const [aiCustomOpen, setAiCustomOpen] = React.useState(false);
     const [scoreList, setScoreList] = React.useState(SCORE_LIST);
@@ -78,7 +78,7 @@ export const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
-    const { list, setList } = useListing();
+    const { list, setList, enableAi, setEnableAi } = useListing();
 
     const ulRef = React.useRef<any>(null);
     React.useEffect(() => {
@@ -428,6 +428,21 @@ export const Content = () => {
                                             helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                         />
                                     </Grid>
+                                    <Grid sx={{ mt: 2 }} item md={12}>
+                                        <TextField
+                                            size="small"
+                                            label={'品牌名称'}
+                                            fullWidth
+                                            id="voidWord"
+                                            name="voidWord"
+                                            color="secondary"
+                                            InputLabelProps={{ shrink: true }}
+                                            value={formik.values.voidWord}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
+                                            helperText={formik.touched.voidWord && formik.errors.voidWord}
+                                        />
+                                    </Grid>
                                     <Grid sx={{ mt: 2 }} item md={12} className="grid gap-3 grid-cols-3">
                                         <div>
                                             <FormControl fullWidth>
@@ -448,24 +463,30 @@ export const Content = () => {
                                             </FormControl>
                                         </div>
                                         <div>
-                                            <TextField
-                                                size="small"
-                                                label={'品牌名称'}
-                                                fullWidth
-                                                id="voidWord"
-                                                name="voidWord"
-                                                color="secondary"
-                                                InputLabelProps={{ shrink: true }}
-                                                value={formik.values.voidWord}
-                                                onChange={formik.handleChange}
-                                                error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
-                                                helperText={formik.touched.voidWord && formik.errors.voidWord}
-                                            />
+                                            <FormControl fullWidth>
+                                                <InputLabel size="small" id="demo-simple-select-label">
+                                                    语言
+                                                </InputLabel>
+                                                <Select
+                                                    size="small"
+                                                    labelId="demo-simple-select-label"
+                                                    id="demo-simple-select"
+                                                    // value={age}
+                                                    label="Age"
+                                                    // onChange={handleChange}
+                                                >
+                                                    <MenuItem value={1}>正式</MenuItem>
+                                                    <MenuItem value={2}>感性</MenuItem>
+                                                    <MenuItem value={3}>鼓吹</MenuItem>
+                                                    <MenuItem value={4}>有激情</MenuItem>
+                                                    <MenuItem value={5}>又爆发力</MenuItem>
+                                                </Select>
+                                            </FormControl>
                                         </div>
                                         <div>
                                             <FormControl fullWidth>
                                                 <InputLabel size="small" id="demo-simple-select-label">
-                                                    语言风格
+                                                    风格
                                                 </InputLabel>
                                                 <Select
                                                     size="small"
@@ -484,13 +505,14 @@ export const Content = () => {
                                             </FormControl>
                                         </div>
                                     </Grid>
-                                    <Grid sx={{ mt: 2, textAlign: 'right' }} item md={12}>
+                                    <Grid sx={{ mt: 2, textAlign: 'center' }} item md={12}>
                                         <Button
                                             startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
                                             color="secondary"
                                             size="small"
                                             variant="contained"
                                             onClick={() => setAssistOpen(true)}
+                                            className="w-[300px]"
                                         >
                                             AI生成(消耗x点)
                                         </Button>

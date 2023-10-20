@@ -50,10 +50,18 @@ interface LogStatistics {
     imageAvgElapsed: number;
     completionAvgElapsed: number;
     imageCostPoints: number;
+    completionTokens: number;
+    chatTokens: number;
+    imageSuccessCount: number;
+    completionSuccessCount: number;
 }
 interface Charts {
     title: string;
     data: { x: string; y: string | number }[];
+    key?: boolean;
+    name?: string;
+    subTitle?: string;
+    successData?: { x: string; y: string | number }[];
 }
 interface TableData {
     uid: string;
@@ -144,17 +152,54 @@ function ApplicationAnalysis({
         } else {
             res = await statisticsByAppUid({ ...queryParams, appUid });
         }
+        const completionSuccessCount = res?.map((item: LogStatistics) => ({ y: item.completionSuccessCount, x: item.createDate }));
         const completionCostPoints = res?.map((item: LogStatistics) => ({ y: item.completionCostPoints, x: item.createDate }));
         const imageAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.imageAvgElapsed?.toFixed(2), x: item.createDate }));
         const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.createDate }));
+        const imageSuccessCount = res?.map((item: LogStatistics) => ({ y: item.imageSuccessCount, x: item.createDate }));
         const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.createDate }));
+        const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.createDate }));
+        const chatTokens = res?.map((item: LogStatistics) => ({ y: item.chatTokens, x: item.createDate }));
         const newList = [];
         permissions.includes('log:app:analysis:completionCostPoints') &&
-            newList.push({ title: '生成/聊天消耗魔法豆数', data: completionCostPoints });
-        permissions.includes('log:app:analysis:imageCostPoints') && newList.push({ title: '生成图片消耗数', data: imageCostPoints });
+            newList.push({
+                title:
+                    type === 'GENERATE_RECORD'
+                        ? '生成/聊天消耗魔法豆数'
+                        : type === 'APP_ANALYSIS'
+                        ? '生成消耗魔法豆数'
+                        : '聊天消耗魔法豆数',
+                subTitle: '全部消耗的魔法豆数',
+                name: '执行成功次数',
+                data: completionCostPoints,
+                successData: completionSuccessCount,
+                key: true
+            });
+        permissions.includes('log:app:analysis:imageCostPoints') &&
+            type === 'GENERATE_RECORD' &&
+            newList.push({
+                title: '生成图片消耗数',
+                subTitle: '全部消耗的图片数',
+                name: '图片成功次数',
+                data: imageCostPoints,
+                successData: imageSuccessCount,
+                key: true
+            });
         permissions.includes('log:app:analysis:completionAvgElapsed') &&
-            newList.push({ title: '生成/聊天平均耗时(S)', data: completionAvgElapsed });
-        permissions.includes('log:app:analysis:imageAvgElapsed') && newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
+            newList.push({
+                title:
+                    type === 'GENERATE_RECORD' ? '生成/聊天平均耗时(S)' : type === 'APP_ANALYSIS' ? '生成平均耗时(S)' : '聊天平均耗时(S)',
+                data: completionAvgElapsed
+            });
+        permissions.includes('log:app:analysis:imageAvgElapsed') &&
+            type === 'GENERATE_RECORD' &&
+            newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
+        permissions.includes('log:app:analysis:completionTokens') &&
+            (type === 'APP_ANALYSIS' || type === 'GENERATE_RECORD') &&
+            newList.push({ title: '生成消耗Tokens', data: completionTokens });
+        permissions.includes('log:app:analysis:chatTokens') &&
+            (type === 'CHAT_ANALYSIS' || type === 'GENERATE_RECORD') &&
+            newList.push({ title: '聊天消耗Tokens', data: chatTokens });
         setGenerate(newList);
     };
     //时间
@@ -196,7 +241,7 @@ function ApplicationAnalysis({
         });
     };
     //封装的echarts
-    const list = (item: Charts): Props => {
+    const list = (item: Charts, key?: boolean): Props => {
         return {
             height: 200,
             type: 'area',
@@ -252,7 +297,12 @@ function ApplicationAnalysis({
                     }
                 }
             },
-            series: [{ name: '', data: item.data }]
+            series: key
+                ? [
+                      { name: item.subTitle, data: item.data },
+                      { name: item.name, data: item.successData as any[] }
+                  ]
+                : [{ name: '', data: item.data }]
         };
     };
     //搜索
@@ -391,7 +441,7 @@ function ApplicationAnalysis({
                             <Typography variant="h4" gutterBottom>
                                 {item.title}
                             </Typography>
-                            <Chart {...list(item)} />
+                            {item.key ? <Chart {...list(item, true)} /> : <Chart {...list(item)} />}
                         </SubCard>
                     </Grid>
                 ))}

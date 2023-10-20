@@ -18,8 +18,11 @@ import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import { upscale } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
+import { userBenefits } from 'api/template';
+import userInfoStore from 'store/entitlementAction';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
+    const { setUserInfo }: any = userInfoStore();
     //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
     //抠图完成的图片
@@ -84,9 +87,12 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
         setSucImageList(suRef.current);
         for (let index = 0; index < imageList.length; index++) {
             if (imageList[index].response?.data?.url) {
-                showFn(imageList[index], index + sucIndex);
+                await showFn(imageList[index], index + sucIndex);
             }
         }
+        userBenefits().then((res) => {
+            setUserInfo(res);
+        });
     };
     const showFn = async (item: any, index: number) => {
         const res = await upscale({

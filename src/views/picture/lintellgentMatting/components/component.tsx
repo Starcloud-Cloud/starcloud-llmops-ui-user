@@ -17,11 +17,14 @@ import JSZip from 'jszip';
 import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
+import { userBenefits } from 'api/template';
+import userInfoStore from 'store/entitlementAction';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
     const [scale, setScale] = useState<number | null>(100);
     const navigate = useNavigate();
+    const { setUserInfo }: any = userInfoStore();
     //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
     //抠图完成的图片
@@ -75,9 +78,12 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
         setSucImageList(suRef.current);
         for (let index = 0; index < imageList.length; index++) {
             if (imageList[index].response?.data?.url) {
-                showFn(imageList[index], index + sucIndex);
+                await showFn(imageList[index], index + sucIndex);
             }
         }
+        userBenefits().then((res) => {
+            setUserInfo(res);
+        });
     };
     const showFn = async (item: any, index: number) => {
         const res = await save({

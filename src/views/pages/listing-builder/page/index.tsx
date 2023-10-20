@@ -16,7 +16,10 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { getListingPage } from 'api/listing/build';
+import { delListing, getListingPage } from 'api/listing/build';
+import { Confirm } from 'ui-component/Confirm';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 export interface DraftConfig {}
 
@@ -43,8 +46,8 @@ export interface TableEnhancedCreateDataType {
     searchTerm: string;
     version: number;
     status: string;
-    createTime: string;
-    updateTime: string;
+    createTime: number;
+    updateTime: number;
 }
 
 // table filter
@@ -139,12 +142,14 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 const ListingBuilderPage: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
-    const [orderBy, setOrderBy] = useState('calories');
+    const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
+    const [delVisible, setDelVisible] = useState(false);
+
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
 
@@ -154,8 +159,12 @@ const ListingBuilderPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
-            getListingPage(pageVO)
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            if (orderBy) {
+                pageVO.sortField = orderBy;
+                pageVO.asc = order === 'asc';
+            }
+            getListingPage({ ...pageVO })
                 .then((res) => {
                     const fetchedRows = res.list;
                     setRows([...fetchedRows]);
@@ -167,7 +176,7 @@ const ListingBuilderPage: React.FC = () => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage, count]);
+    }, [page, rowsPerPage, count, order, orderBy]);
 
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
 
@@ -182,8 +191,8 @@ const ListingBuilderPage: React.FC = () => {
             if (selected.length > 0) {
                 setSelected([]);
             } else {
-                // const newSelectedId: string[] = rows.map((n) => n.benefitsName);
-                // setSelected(newSelectedId);
+                const newSelectedId: number[] = rows.map((n) => n.id);
+                setSelected(newSelectedId);
             }
             return;
         }
@@ -191,11 +200,11 @@ const ListingBuilderPage: React.FC = () => {
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedIndex = selected.indexOf(name);
+        const selectedIndex = selected.indexOf(id);
         let newSelected: any[] = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -218,13 +227,37 @@ const ListingBuilderPage: React.FC = () => {
 
     console.log(selected, 'selected');
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+    const delDraft = async () => {
+        const res = await delListing(selected);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            setDelVisible(false);
+            forceUpdate();
+        }
+    };
+
+    const addListing = async () => {
+        navigate('/listingBuilder');
+    };
+
     return (
         <MainCard
             content={false}
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => navigate('/listingBuilder')}>
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()}>
                         新增Listing
                     </Button>
                     <IconButton
@@ -300,10 +333,7 @@ const ListingBuilderPage: React.FC = () => {
                         rowCount={rows.length}
                     />
                     <TableBody>
-                        {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
-                            getComparator(order, orderBy)
-                        ).map((row, index) => {
+                        {rows.map((row, index) => {
                             if (typeof row === 'number') {
                                 return null; // 忽略数字类型的行
                             }
@@ -316,7 +346,6 @@ const ListingBuilderPage: React.FC = () => {
                                 <TableRow
                                     hover
                                     key={row.id}
-                                    onClick={(event) => handleClick(event, row.id)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
@@ -324,6 +353,7 @@ const ListingBuilderPage: React.FC = () => {
                                 >
                                     <TableCell padding="checkbox">
                                         <Checkbox
+                                            onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
                                             checked={isItemSelected}
                                             inputProps={{
@@ -356,7 +386,7 @@ const ListingBuilderPage: React.FC = () => {
                                         </Tooltip>
                                         <Divider type={'vertical'} />
                                         <Tooltip title={'删除'}>
-                                            <IconButton aria-label="delete" size="small">
+                                            <IconButton aria-label="delete" size="small" onClick={() => setDelVisible(true)}>
                                                 <DeleteIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
@@ -379,6 +409,7 @@ const ListingBuilderPage: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
+            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
         </MainCard>
     );
 };

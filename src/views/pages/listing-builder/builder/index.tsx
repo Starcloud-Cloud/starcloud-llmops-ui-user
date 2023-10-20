@@ -4,15 +4,15 @@ import { KeyWord } from './components/Keyword';
 import { Content } from './components/Content';
 import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import React from 'react';
+import React, { useEffect } from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { SettingModal } from './components/SettingModal';
-import SvgIcon from '@mui/material/SvgIcon';
 import { COUNTRY_LIST } from '../data';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { createDraft } from 'api/listing/build';
 
 const ListingBuilder = () => {
     const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -23,6 +23,11 @@ const ListingBuilder = () => {
         icon: COUNTRY_LIST?.['0']?.icon,
         label: COUNTRY_LIST?.['0']?.label
     });
+
+    // TODO
+    const createListing = async () => {
+        const res = await createDraft({ endpoint: 'US' });
+    };
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({

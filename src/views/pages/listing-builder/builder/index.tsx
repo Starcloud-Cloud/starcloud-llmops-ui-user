@@ -13,19 +13,43 @@ import { COUNTRY_LIST } from '../data';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useListing } from 'contexts/ListingContext';
+import { saveListing } from 'api/listing/build';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 const ListingBuilder = () => {
     const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
     const [settingOpen, setSettingOpen] = React.useState(false);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
-    const { country, setCountry } = useListing();
+    const { country, setCountry, uid, version, list } = useListing();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({
             icon: COUNTRY_LIST?.[key]?.icon,
             label: COUNTRY_LIST?.[key]?.label
         });
+    };
+
+    const handleSave = async () => {
+        const result = list
+            .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+            .reduce((acc: any, obj, index) => {
+                acc[index + 1] = obj.value;
+                return acc;
+            }, {});
+        const data = {
+            uid,
+            version,
+            draftConfig: {
+                enableAi: true,
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+            },
+            title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+            productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+            searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+            fiveDesc: result
+        };
+        const res = await saveListing(data);
     };
 
     return (
@@ -50,7 +74,7 @@ const ListingBuilder = () => {
                                 </div>
                             </Dropdown>
                         </div>
-                        <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained">
+                        <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained" onClick={() => handleSave()}>
                             保存草稿
                         </Button>
                         <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">

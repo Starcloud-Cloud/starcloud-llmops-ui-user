@@ -36,6 +36,7 @@ import { DEFAULT_LIST, SCORE_LIST } from '../../../data/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
+import { useListing } from 'contexts/ListingContext';
 
 const { Search } = Input;
 
@@ -65,7 +66,6 @@ type ListType = {
 const keyWordList = ['iphone pro', 'iphone', 'pro'];
 
 export const Content = () => {
-    const [list, setList] = React.useState<ListType[]>(DEFAULT_LIST);
     const [expandList, setExpandList] = React.useState<number[]>([]);
     const [enableAi, setEnableAi] = React.useState(true);
     const [assistOpen, setAssistOpen] = React.useState(true);
@@ -78,6 +78,7 @@ export const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
+    const { list, setList } = useListing();
 
     const ulRef = React.useRef<any>(null);
     React.useEffect(() => {

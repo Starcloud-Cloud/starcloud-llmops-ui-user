@@ -1,11 +1,26 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
+import { COUNTRY_LIST, DEFAULT_LIST } from 'views/pages/listing-builder/data';
 
 type CountryType = {
     icon: string;
     label: string;
 };
+type ListType = {
+    title: string;
+    des: JSX.Element | string;
+    placeholder: string;
+    type: ListingBuilderEnum;
+    maxCharacter: number;
+    character: number;
+    word: number;
+    isOvertop?: boolean;
+    value?: string;
+    row: number;
+    btnText: string;
+};
+
 type ListingContextType = {
     uid: string;
     setUid: (uid: string) => void;
@@ -13,11 +28,21 @@ type ListingContextType = {
     setVersion: (version: number) => void;
     country: CountryType;
     setCountry: (country: CountryType) => void;
+    list: ListType[];
+    setList: (list: any) => void;
 };
 
 const ListingContext = createContext<ListingContextType | null>(null);
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
+    const [uid, setUid] = useState('');
+    const [version, setVersion] = useState(0);
+    const [country, setCountry] = useState({
+        icon: COUNTRY_LIST?.['0']?.icon,
+        label: COUNTRY_LIST?.['0']?.label
+    });
+    const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
+
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const queryUid = searchParams.get('uid');
@@ -30,14 +55,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [queryUid, queryVersion]);
 
-    const [uid, setUid] = useState('');
-    const [version, setVersion] = useState(0);
-    const [country, setCountry] = useState({
-        icon: COUNTRY_LIST?.['0']?.icon,
-        label: COUNTRY_LIST?.['0']?.label
-    });
-
-    return <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry }}>{children}</ListingContext.Provider>;
+    return (
+        <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry, list, setList }}>
+            {children}
+        </ListingContext.Provider>
+    );
 };
 
 export const useListing = () => {

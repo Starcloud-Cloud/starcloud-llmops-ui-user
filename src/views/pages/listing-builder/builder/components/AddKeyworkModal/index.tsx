@@ -3,7 +3,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import { TabPanel } from 'views/template/myChat/createChat';
-import { addKey } from 'api/listing/build';
+import { addKey, saveListing } from 'api/listing/build';
+import { useListing } from 'contexts/ListingContext';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -23,9 +24,17 @@ function a11yProps(index: number) {
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
     const [keyWord, setKeyWord] = useState<string>('');
+    const { uid, setVersion, setUid, country, version } = useListing();
 
-    const handleOk = () => {
-        const res = addKey({ uid: '', version: '', addKey: [] });
+    const handleOk = async () => {
+        const lines = keyWord.split('\n');
+        if (uid) {
+            const res = addKey({ uid, version, addKey: lines });
+        } else {
+            const res = await saveListing({ keys: lines, endpoint: 'US' });
+            setVersion(res.version);
+            setUid(res.uid);
+        }
     };
 
     return (

@@ -12,25 +12,14 @@ import { SettingModal } from './components/SettingModal';
 import { COUNTRY_LIST } from '../data';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { createDraft } from 'api/listing/build';
+import { useListing } from 'contexts/ListingContext';
 
 const ListingBuilder = () => {
     const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
     const [settingOpen, setSettingOpen] = React.useState(false);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
-    const [country, setCountry] = React.useState({
-        icon: COUNTRY_LIST?.['0']?.icon,
-        label: COUNTRY_LIST?.['0']?.label
-    });
-
-    // TODO
-    const createListing = async () => {
-        const res = await createDraft({ endpoint: 'US' });
-    };
-    useEffect(() => {
-        createListing();
-    }, []);
+    const { country, setCountry } = useListing();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({

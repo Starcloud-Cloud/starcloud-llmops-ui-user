@@ -71,19 +71,16 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-    const handleSave = async () => {
+    const handleSave = () => {
         const sucIndex = suRef.current.length;
         suRef.current.push(...imageList);
         setOpen(false);
         setSucImageList(suRef.current);
         for (let index = 0; index < imageList.length; index++) {
             if (imageList[index].response?.data?.url) {
-                await showFn(imageList[index], index + sucIndex);
+                showFn(imageList[index], index + sucIndex);
             }
         }
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
     };
     const showFn = async (item: any, index: number) => {
         const res = await save({
@@ -95,6 +92,9 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
         });
         suRef.current.splice(index, 1, res.response);
         setSucImageList(_.cloneDeep(suRef.current));
+        userBenefits().then((res) => {
+            setUserInfo(res);
+        });
     };
     useEffect(() => {
         if (!open) {
@@ -104,12 +104,14 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     //批量下载图片
     const batchDownload = () => {
         const zip = new JSZip();
-        const imageUrls = sucImageList.map((item) => item.images[0].url);
+        const imageUrls = sucImageList.map((item) => {
+            return { url: item.images[0].url, uuid: item.images[0].uuid, type: item.images[0].mediaType?.split('/')[1] };
+        });
         // 异步加载图片并添加到压缩包
         const promises = imageUrls.map(async (imageUrl, index) => {
-            const response = await fetch(imageUrl);
+            const response = await fetch(imageUrl.url);
             const arrayBuffer = await response.arrayBuffer();
-            zip.file(`下载${index + 1}.jpg`, arrayBuffer);
+            zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
         });
         // 等待所有图片添加完成后创建压缩包并下载
         Promise.all(promises)
@@ -195,7 +197,11 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                                 <div
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        downLoadImages(item?.images[0].url, item?.images[0].mediaType.split('/')[1]);
+                                                        downLoadImages(
+                                                            item?.images[0].url,
+                                                            item?.images[0].mediaType.split('/')[1],
+                                                            item?.images[0].uuid
+                                                        );
                                                     }}
                                                     className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"
                                                 >

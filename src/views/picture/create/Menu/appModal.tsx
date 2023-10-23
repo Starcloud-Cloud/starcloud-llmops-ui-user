@@ -68,7 +68,7 @@ const AppModal = ({
     setOpen: (data: boolean) => void;
     emits: (data: any) => void;
 }) => {
-    const { setUserInfo }: any = userInfoStore();
+    const { userInfo, setUserInfo }: any = userInfoStore();
     useEffect(() => {
         if (open && tags.length > 0) {
             const fn = async () => {
@@ -77,7 +77,7 @@ const AppModal = ({
             };
             fn();
         }
-    }, [open, tags]);
+    }, [open, ...tags]);
     const [appValue, setAppValue] = useState('');
     const [appList, setAppList] = useState<any[]>([]);
     const [detail, setDetail] = useState<Details>({
@@ -218,7 +218,7 @@ const AppModal = ({
                     newShow[index] = true;
                     setIsShow(newShow);
                     userBenefits().then((res) => {
-                        setUserInfo(res);
+                        setUserInfos(res);
                     });
                     if (
                         isAllExecute &&
@@ -292,6 +292,10 @@ const AppModal = ({
             }
         };
         fetchData();
+    };
+    useEffect(() => {}, [userInfo]);
+    const setUserInfos = (res: any) => {
+        setUserInfo(res);
     };
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {

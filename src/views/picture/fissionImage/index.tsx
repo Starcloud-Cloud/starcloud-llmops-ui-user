@@ -29,6 +29,7 @@ export type IImageListTypeChild = {
 };
 
 const PictureCreate = () => {
+    const [loading, setLoading] = useState(false);
     const theme = useTheme();
     const [menuVisible, setMenuVisible] = useState<boolean>(true);
     const size = useWindowSize();
@@ -56,35 +57,34 @@ const PictureCreate = () => {
             dispatch(openDrawer(true));
         };
     }, []);
-
-    useEffect(() => {
-        (async () => {
-            const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
-            setImgList(
-                res?.list?.map((item: any) => ({
-                    ...item.imageInfo,
-                    createTime: item.createTime
-                })) || []
-            );
-            setTotal(res.total || 0);
-        })();
-    }, []);
+    // useEffect(() => {
+    //     (async () => {
+    //         const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
+    //         setImgList(
+    //             res?.list?.map((item: any) => ({
+    //                 ...item.imageInfo,
+    //                 createTime: item.createTime
+    //             })) || []
+    //         );
+    //         setTotal(res.total || 0);
+    //     })();
+    // }, []);
 
     const fetchMoreData = async () => {
-        if (imgList.length >= total) {
-            setHasMore(false);
-            return;
-        }
-        const newPageNo = pageNo + 1;
-        setPageNo(newPageNo);
-        const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
-        setImgList([
-            ...imgList,
-            ...(res?.list?.map((item: any) => ({
-                ...item.imageInfo,
-                createTime: item.createTime
-            })) || [])
-        ]);
+        // if (imgList.length >= total) {
+        //     setHasMore(false);
+        //     return;
+        // }
+        // const newPageNo = pageNo + 1;
+        // setPageNo(newPageNo);
+        // const res = await history({ pageNo, pageSize: 10, scenes: ['IMAGE_VARIANTS'], status: 'SUCCESS' });
+        // setImgList([
+        //     ...imgList,
+        //     ...(res?.list?.map((item: any) => ({
+        //         ...item.imageInfo,
+        //         createTime: item.createTime
+        //     })) || [])
+        // ]);
     };
 
     const images = useMemo(() => {
@@ -146,6 +146,7 @@ const PictureCreate = () => {
                 >
                     <PictureCreateMenu
                         menuVisible={menuVisible}
+                        setLoading={(data) => setLoading(data)}
                         setMenuVisible={setMenuVisible}
                         setImgList={setImgList}
                         imgList={imgList}
@@ -166,6 +167,7 @@ const PictureCreate = () => {
                 </Drawer>
                 <PictureCreateContainer
                     fetchMoreData={fetchMoreData}
+                    loading={loading}
                     hasMore={hasMore}
                     menuVisible={menuVisible}
                     imgList={images as any}
@@ -185,6 +187,7 @@ const PictureCreate = () => {
         <Row className="justify-between h-full">
             <PictureCreateMenu
                 menuVisible={menuVisible}
+                setLoading={(data) => setLoading(data)}
                 setMenuVisible={setMenuVisible}
                 setImgList={setImgList}
                 imgList={imgList}
@@ -204,6 +207,7 @@ const PictureCreate = () => {
             />
             <PictureCreateContainer
                 fetchMoreData={fetchMoreData}
+                loading={loading}
                 hasMore={hasMore}
                 menuVisible={menuVisible}
                 imgList={images as any}

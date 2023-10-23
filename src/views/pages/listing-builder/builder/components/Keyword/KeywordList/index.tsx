@@ -10,6 +10,7 @@ import { useListing } from 'contexts/ListingContext';
 
 type TableEnhancedCreateDataType = {
     keyword: string;
+    score: number;
     searches: number;
     searchWeeklyRank: number;
     month: string;
@@ -50,7 +51,7 @@ const headCells = [
     { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'body', numeric: false, disablePadding: true, label: '使用分布' }
+    { id: 'use', numeric: false, disablePadding: true, label: '使用分布' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -211,6 +212,8 @@ export const KeywordList: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{row.score}</TableCell>
+                                    <TableCell align="center">{row.searches}</TableCell>
                                     <TableCell align="center">{row.keyword}</TableCell>
                                     <TableCell align="center">{row.keyword}</TableCell>
                                     <TableCell align="center">{row.keyword}</TableCell>

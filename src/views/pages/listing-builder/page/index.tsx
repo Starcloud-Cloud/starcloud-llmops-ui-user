@@ -203,7 +203,6 @@ const ListingBuilderPage: React.FC = () => {
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     const delDraft = async () => {
-        console.log(selected, 'selected');
         const data = delType === 0 ? [row?.id] : selected;
         const res = await delListing(data);
         if (res) {
@@ -345,8 +344,12 @@ const ListingBuilderPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">{row.title}</TableCell>
                                     <TableCell align="center">
-                                        {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
-                                        {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
+                                        <div className="flex items-center">
+                                            {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
+                                            <span className="ml-1">
+                                                {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
+                                            </span>
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">{row.asin}</TableCell>
                                     <TableCell align="center">{row.status}</TableCell>
@@ -355,7 +358,7 @@ const ListingBuilderPage: React.FC = () => {
                                         {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {/* {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')} */}
+                                        {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>

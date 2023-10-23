@@ -4,19 +4,22 @@ import { KeyWord } from './components/Keyword';
 import { Content } from './components/Content';
 import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import React, { useEffect } from 'react';
+import React from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { SettingModal } from './components/SettingModal';
 import { COUNTRY_LIST } from '../data';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useListing } from 'contexts/ListingContext';
-import { saveListing } from 'api/listing/build';
+import { delListing, saveListing } from 'api/listing/build';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import { isMobile } from 'react-device-detect';
 import { TabPanel } from 'views/template/myChat/createChat';
+import { Confirm } from 'ui-component/Confirm';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { useNavigate } from 'react-router-dom';
 
 function a11yProps(index: number) {
     return {
@@ -31,7 +34,9 @@ const ListingBuilder = () => {
     const [settingOpen, setSettingOpen] = React.useState(false);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
+    const [open, setOpen] = React.useState(false);
     const { country, setCountry, uid, version, list } = useListing();
+    const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         setCountry({
@@ -39,6 +44,24 @@ const ListingBuilder = () => {
             icon: COUNTRY_LIST?.[key]?.icon,
             label: COUNTRY_LIST?.[key]?.label
         });
+    };
+
+    const handleDel = async () => {
+        const res = await delListing([version]);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            navigate('/chatMarket');
+        }
     };
 
     const handleSave = async () => {
@@ -115,20 +138,8 @@ const ListingBuilder = () => {
                                 setDelAnchorEl(null);
                             }}
                         >
-                            {/* <MenuItem
-                                onClick={() => {
-                                    setDelAnchorEl(null);
-                                    setSettingOpen(true);
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <SettingsIcon />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    设置
-                                </Typography>
-                            </MenuItem> */}
                             <MenuItem
+                                disabled={!uid}
                                 onClick={() => {
                                     setDelAnchorEl(null);
                                 }}
@@ -185,6 +196,13 @@ const ListingBuilder = () => {
                 handleClose={() => {
                     setSettingOpen(false);
                 }}
+            />
+            <Confirm
+                open={open}
+                handleClose={() => {
+                    setOpen(false);
+                }}
+                handleOk={handleDel}
             />
         </Card>
     );

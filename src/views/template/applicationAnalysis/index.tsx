@@ -81,6 +81,7 @@ interface TableData {
     errorMsg?: string;
     tokens?: number;
     costPoints?: number;
+    userLevels?: string[];
 }
 interface Date {
     label: string;
@@ -479,6 +480,11 @@ function ApplicationAnalysis({
                                     消耗总Token
                                 </TableCell>
                             )}
+                            {permissions.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    用户等级
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '50px' }} align="center">
                                 操作
                             </TableCell>
@@ -524,6 +530,45 @@ function ApplicationAnalysis({
                                 </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
                                 {permissions.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
+                                {permissions.includes('log:app:page:adminColumns') && (
+                                    <TableCell align="center">
+                                        {row.userLevels?.map((item) => (
+                                            <p className="mt-[5px]">
+                                                <Tag
+                                                    color={
+                                                        item === 'MOFAAI_FREE'
+                                                            ? 'processing'
+                                                            : item === 'MOFAAI_BASIC'
+                                                            ? 'processing'
+                                                            : item === 'MOFAAI_PLUS'
+                                                            ? '#673ab7'
+                                                            : item === 'MOFAAI_PRO'
+                                                            ? 'warning'
+                                                            : item === 'MOFAAI_ADMIN'
+                                                            ? 'error'
+                                                            : item === 'MOFAAI_DEV'
+                                                            ? 'error'
+                                                            : 'processing'
+                                                    }
+                                                >
+                                                    {item === 'MOFAAI_FREE'
+                                                        ? '免费版'
+                                                        : item === 'MOFAAI_BASIC'
+                                                        ? '基础版'
+                                                        : item === 'MOFAAI_PLUS'
+                                                        ? '高级版'
+                                                        : item === 'MOFAAI_PRO'
+                                                        ? '团队版'
+                                                        : item === 'MOFAAI_ADMIN'
+                                                        ? '管理员'
+                                                        : item === 'MOFAAI_DEV'
+                                                        ? '运营'
+                                                        : item}
+                                                </Tag>
+                                            </p>
+                                        ))}
+                                    </TableCell>
+                                )}
                                 <TableCell align="center">
                                     <Button
                                         color="secondary"

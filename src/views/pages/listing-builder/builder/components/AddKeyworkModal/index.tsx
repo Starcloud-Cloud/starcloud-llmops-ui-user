@@ -1,37 +1,15 @@
 import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, Tab, Tabs, TextField } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { InboxOutlined } from '@ant-design/icons';
-import type { UploadProps } from 'antd';
-import { message, Upload } from 'antd';
 import { useState } from 'react';
 import { TabPanel } from 'views/template/myChat/createChat';
+import { addKey, saveListing } from 'api/listing/build';
+import { useListing } from 'contexts/ListingContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type IAddKeywordModalProps = {
     open: boolean;
     handleClose: () => void;
-};
-
-const { Dragger } = Upload;
-
-const props: UploadProps = {
-    name: 'file',
-    multiple: true,
-    action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
-    onChange(info) {
-        const { status } = info.file;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-    onDrop(e) {
-        console.log('Dropped files', e.dataTransfer.files);
-    }
 };
 
 function a11yProps(index: number) {
@@ -46,6 +24,22 @@ function a11yProps(index: number) {
  */
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
+    const [keyWord, setKeyWord] = useState<string>('');
+    const { uid, setVersion, setUid, country, version } = useListing();
+    const navigate = useNavigate();
+
+    const handleOk = async () => {
+        const lines = keyWord.split('\n');
+        if (uid) {
+            const res = addKey({ uid, version, addKey: lines });
+        } else {
+            const res = await saveListing({ keys: lines, endpoint: country.key });
+            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+            setVersion(res.version);
+            setUid(res.uid);
+            handleClose();
+        }
+    };
 
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -81,24 +75,22 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                         <Tab label="导入" {...a11yProps(1)} />
                     </Tabs>
                     <TabPanel value={tab} index={0}>
-                        <TextField multiline rows={4} label={'关键词'} className="w-full" />
+                        <TextField
+                            multiline
+                            rows={4}
+                            label={'关键词'}
+                            className="w-full"
+                            onChange={(e) => {
+                                setKeyWord(e.target.value);
+                            }}
+                        />
                     </TabPanel>
-                    <TabPanel value={tab} index={1}>
-                        <Dragger {...props}>
-                            <p className="ant-upload-drag-icon">
-                                <InboxOutlined rev={undefined} />
-                            </p>
-                            <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                            <p className="ant-upload-hint">
-                                Support for a single or bulk upload. Strictly prohibited from uploading company data or other banned files.
-                            </p>
-                        </Dragger>
-                    </TabPanel>
+                    <TabPanel value={tab} index={1}></TabPanel>
                 </CardContent>
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" color="secondary" onClick={() => {}}>
+                        <Button variant="contained" type="button" color="secondary" onClick={handleOk}>
                             确认
                         </Button>
                     </Grid>

@@ -1,26 +1,10 @@
-import { Button, Card, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
+import { Button, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
 
-// material-ui
-import {
-    Box,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    // Stack
-    TableSortLabel
-} from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
-// import { CSVExport } from 'views/forms/tables/TableExports';
 
-// assets
-import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import dayjs from 'dayjs';
@@ -32,50 +16,47 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { delListing, getListingPage } from 'api/listing/build';
+import { Confirm } from 'ui-component/Confirm';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { COUNTRY_LIST } from '../data';
 
-type TableEnhancedCreateDataType = {
+export interface DraftConfig {}
+
+export interface ItemScore {
+    matchSearchers: number;
+    totalSearches: number;
+}
+
+export interface FiveDesc {}
+
+export interface TableEnhancedCreateDataType {
     id: number;
-    status: number;
-    amount: number;
-    body: string;
-    merchantOrderId: string;
-    subject: string;
+    uid: string;
+    title: string;
+    endpoint: string;
+    asin: string;
+    keywordResume?: any;
+    keywordMetaData?: any;
+    draftConfig: DraftConfig;
+    score?: any;
+    itemScore: ItemScore;
+    fiveDesc: FiveDesc;
+    productDesc: string;
+    searchTerm: string;
+    version: number;
+    status: string;
     createTime: number;
-};
-
-// table filter
-function descendingComparator(a: KeyedObject, b: KeyedObject, orderBy: string) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getComparator(order: ArrangementOrder, orderBy: string) {
-    return order === 'desc'
-        ? (a: KeyedObject, b: KeyedObject) => descendingComparator(a, b, orderBy)
-        : (a: KeyedObject, b: KeyedObject) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedObject, b: KeyedObject) => number) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0] as TableEnhancedCreateDataType, b[0] as TableEnhancedCreateDataType);
-        if (order !== 0) return order;
-        return (a[1] as number) - (b[1] as number);
-    });
-    return stabilizedThis.map((el) => el[0]);
+    updateTime: number;
 }
 
 const headCells = [
-    { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商品标题' },
-    { id: 'subject', numeric: false, disablePadding: false, label: '站点' },
-    { id: 'body', numeric: false, disablePadding: false, label: 'ASIN' },
-    { id: 'body', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'body', numeric: false, disablePadding: false, label: '分值' },
+    { id: 'title', numeric: false, disablePadding: false, label: '商品标题' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '站点' },
+    { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
+    { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
+    { id: 'score', numeric: false, disablePadding: false, label: '分值' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -106,20 +87,24 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        sx={{ pl: 3, whiteSpace: 'nowrap' }} // 加上 white-space: nowrap
+                        sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id && (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                )}
+                            </TableSortLabel>
+                        ) : (
+                            headCell.label
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
@@ -131,12 +116,16 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 const ListingBuilderPage: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
-    const [orderBy, setOrderBy] = useState('calories');
+    const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
+    const [delVisible, setDelVisible] = useState(false);
+    const [delType, setDelType] = useState(0); //0.单个 1.多个
+    const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
+
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
 
@@ -146,17 +135,15 @@ const ListingBuilderPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
-            // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
-            getOrderRecord(pageVO)
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            if (orderBy) {
+                pageVO.sortField = orderBy;
+                pageVO.asc = order === 'asc';
+            }
+            getListingPage({ ...pageVO })
                 .then((res) => {
-                    // Once the data is fetched, map it and update rows state
                     const fetchedRows = res.list;
-                    console.log(fetchedRows, 'fetchedRows');
-
                     setRows([...fetchedRows]);
-
-                    // Update total
                     setTotal(res?.total);
                 })
                 .catch((error) => {
@@ -165,9 +152,8 @@ const ListingBuilderPage: React.FC = () => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage, count]);
+    }, [page, rowsPerPage, count, order, orderBy]);
 
-    // Add a new state for rows
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
@@ -181,8 +167,8 @@ const ListingBuilderPage: React.FC = () => {
             if (selected.length > 0) {
                 setSelected([]);
             } else {
-                // const newSelectedId: string[] = rows.map((n) => n.benefitsName);
-                // setSelected(newSelectedId);
+                const newSelectedId: number[] = rows.map((n) => n.id);
+                setSelected(newSelectedId);
             }
             return;
         }
@@ -190,11 +176,11 @@ const ListingBuilderPage: React.FC = () => {
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedIndex = selected.indexOf(name);
+        const selectedIndex = selected.indexOf(id);
         let newSelected: any[] = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -202,7 +188,6 @@ const ListingBuilderPage: React.FC = () => {
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
         }
-
         setSelected(newSelected);
     };
 
@@ -215,29 +200,43 @@ const ListingBuilderPage: React.FC = () => {
         setPage(0);
     };
 
-    const [open, setOpen] = React.useState(false);
-    const [payUrl, setPayUrl] = useState('');
-    const [isTimeout, setIsTimeout] = useState(false);
-    const [openPayDialog, setOpenPayDialog] = useState(false);
-    const [orderId, setOrderId] = useState<string>();
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setPayUrl('');
-        setOpen(false);
-    };
-
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+    const delDraft = async () => {
+        const data = delType === 0 ? [row?.id] : selected;
+        const res = await delListing(data);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            setDelVisible(false);
+            forceUpdate();
+        }
+    };
+
+    const addListing = async () => {
+        navigate('/listingBuilder');
+    };
+
+    const handleEdit = async (uid: string, version: number) => {
+        navigate('/listingBuilder?uid=' + uid + '&version=' + version);
+    };
+
     return (
         <MainCard
             content={false}
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => navigate('/listingBuilder')}>
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()}>
                         新增Listing
                     </Button>
                     <IconButton
@@ -277,6 +276,8 @@ const ListingBuilderPage: React.FC = () => {
                         <MenuItem
                             onClick={() => {
                                 setDelAnchorEl(null);
+                                setDelVisible(true);
+                                setDelType(2);
                             }}
                         >
                             <ListItemIcon>
@@ -313,13 +314,12 @@ const ListingBuilderPage: React.FC = () => {
                         rowCount={rows.length}
                     />
                     <TableBody>
-                        {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
-                            getComparator(order, orderBy)
-                        ).map((row, index) => {
+                        {rows.map((row, index) => {
                             if (typeof row === 'number') {
                                 return null; // 忽略数字类型的行
                             }
+                            console.log(row, 'row');
+
                             const isItemSelected = isSelected(row.id);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -327,7 +327,6 @@ const ListingBuilderPage: React.FC = () => {
                                 <TableRow
                                     hover
                                     key={row.id}
-                                    onClick={(event) => handleClick(event, row.id)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
@@ -335,27 +334,41 @@ const ListingBuilderPage: React.FC = () => {
                                 >
                                     <TableCell padding="checkbox">
                                         <Checkbox
+                                            onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
                                             checked={isItemSelected}
-                                            // inputProps={{
-                                            //     'aria-labelledby': labelId
-                                            // }}
+                                            inputProps={{
+                                                'aria-labelledby': labelId
+                                            }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                    <TableCell align="center">{row.subject}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
-                                    <TableCell align="center">{row.body}</TableCell>
+                                    <TableCell align="center">{row.title}</TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center">
+                                            {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
+                                            <span className="ml-1">
+                                                {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell align="center">{row.asin}</TableCell>
+                                    <TableCell align="center">{row.status}</TableCell>
+                                    <TableCell align="center">{row.score}</TableCell>
                                     <TableCell align="center">
                                         {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {/* {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')} */}
+                                        {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>
-                                            <IconButton aria-label="delete" size="small">
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    handleEdit(row.uid, row.version);
+                                                }}
+                                            >
                                                 <EditIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
@@ -367,7 +380,15 @@ const ListingBuilderPage: React.FC = () => {
                                         </Tooltip>
                                         <Divider type={'vertical'} />
                                         <Tooltip title={'删除'}>
-                                            <IconButton aria-label="delete" size="small">
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    setDelType(0);
+                                                    setDelVisible(true);
+                                                    setRow(row);
+                                                }}
+                                            >
                                                 <DeleteIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
@@ -390,6 +411,7 @@ const ListingBuilderPage: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
+            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
         </MainCard>
     );
 };

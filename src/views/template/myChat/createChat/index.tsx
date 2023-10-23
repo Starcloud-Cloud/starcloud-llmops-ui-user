@@ -373,7 +373,7 @@ function CreateDetail() {
                         component={Link}
                         label={
                             <Box display="flex" alignItems="center">
-                                机器人发布
+                                对外发布
                                 {flag && <ErrorIcon color="warning" sx={{ fontSize: '14px' }} />}
                             </Box>
                         }

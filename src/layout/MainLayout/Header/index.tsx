@@ -25,6 +25,7 @@ import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
 import { useNavigate } from 'react-router-dom';
+import { DownLoadBtn } from './DownloadBtn';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -145,6 +146,7 @@ const Header = () => {
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />
             </Box> */}
+            {/* <DownLoadBtn /> */}
             <Button
                 className="mr-10"
                 color={'secondary'}

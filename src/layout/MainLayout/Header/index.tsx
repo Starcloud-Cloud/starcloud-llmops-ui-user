@@ -137,6 +137,7 @@ const Header = () => {
                     <KeyboardArrowDownIcon />
                 </Box>
             </Popover>
+            <PayBtn />
             {/* header search */}
             <SearchSection />
             <Box sx={{ flexGrow: 1 }} />
@@ -147,7 +148,6 @@ const Header = () => {
                 <MegaMenuSection />
             </Box> */}
             {/* <DownLoadBtn /> */}
-            <PayBtn />
 
             <Button
                 className="mr-10"

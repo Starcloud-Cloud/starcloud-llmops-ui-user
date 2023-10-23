@@ -89,7 +89,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
     };
 
     const handleDisabled = (data: any) => {
-        // 系统的通过这个判断 // TODO别的后面再加
+        // 系统的通过这个判断
         if (data.type === 'system') {
             const codeList = workflowList.map((v: any) => v.code);
             return codeList.includes(data.code);

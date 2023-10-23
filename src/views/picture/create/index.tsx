@@ -16,6 +16,7 @@ export type IImageListTypeChildImages = {
     uuid: string;
     url: string;
     mediaType?: string;
+    seed?: number;
 };
 export type IImageListTypeChild = {
     prompt: string;
@@ -33,8 +34,8 @@ const PictureCreate = () => {
     const [menuVisible, setMenuVisible] = useState<boolean>(true);
     const size = useWindowSize();
     const [imgList, setImgList] = useState<IImageListType>([]);
-    const [width, setWidth] = useState(512);
-    const [height, setHeight] = useState(512);
+    const [width, setWidth] = useState(1024);
+    const [height, setHeight] = useState(1024);
     const [samples, setSamples] = useState(2);
     const [inputValue, setInputValue] = useState('');
     const [isFirst, setIsFirst] = useState(true);

@@ -330,7 +330,16 @@ function Deatail() {
                     color="secondary"
                     sx={{ cursor: 'pointer' }}
                     underline="hover"
-                    onClick={() => navigate('/appMarket?category=' + detailData?.category?.split('_')[0])}
+                    onClick={() => {
+                        console.log(detailData?.category);
+                        if (detailData?.category.startsWith('SEO_WRITING')) {
+                            navigate('/appMarket?category=SEO_WRITING');
+                        } else if (detailData?.category.startsWith('SOCIAL_MEDIA')) {
+                            navigate('/appMarket?category=SOCIAL_MEDIA');
+                        } else {
+                            navigate('/appMarket?category=' + detailData?.category?.split('_')[0]);
+                        }
+                    }}
                 >
                     {useCategory(categoryTrees, detailData?.category)?.name}
                 </Link>

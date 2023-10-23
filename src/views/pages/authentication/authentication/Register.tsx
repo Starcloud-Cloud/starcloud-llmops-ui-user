@@ -27,7 +27,7 @@ const items: AuthSliderProps[] = [
         description: '集成了300+跨境工作的预训练应用，10S生成文案'
     },
     {
-        title: '自由绘图成',
+        title: '自由绘图',
         description: '一步生成精美图片，快速抠图，提升图片质量'
     },
     {

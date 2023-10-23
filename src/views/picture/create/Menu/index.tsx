@@ -34,48 +34,38 @@ const { Dragger } = Upload;
 const marks = [
     {
         value: 1,
-        label: '7:4',
-        data: '896x512'
+        label: '16:9',
+        data: '1024x576'
     },
     {
         value: 2,
-        label: '3:2',
-        data: '768x512'
+        label: '4:3',
+        data: '1024x768'
     },
     {
         value: 3,
-        label: '4:3',
-        data: '683x512'
+        label: '8:7',
+        data: ' 1024x896'
     },
     {
         value: 4,
-        label: '5:4',
-        data: '640x512'
+        label: '1:1',
+        data: '1024x1024'
     },
     {
         value: 5,
-        label: '1:1',
-        data: '512x512'
+        label: '7:8',
+        data: '896x1024'
     },
     {
         value: 6,
-        label: '4:5',
-        data: '512x640'
+        label: '3:4',
+        data: '768x1024'
     },
     {
         value: 7,
-        label: '3:4',
-        data: '512x683'
-    },
-    {
-        value: 8,
-        label: '2:3',
-        data: '512x768'
-    },
-    {
-        value: 9,
-        label: '4:7',
-        data: '512x896'
+        label: '9:16',
+        data: '576x1024'
     }
 ];
 
@@ -186,7 +176,7 @@ export const PictureCreateMenu = ({
     const [params, setParams] = useState<null | IParamsType>(null);
     const [currentStyle, setCurrentStyle] = useState('');
     const [seed, setSeed] = useState<number>();
-    const [step, setStep] = useState<number>();
+    const [step, setStep] = useState<number>(30);
     const [strength, setStrength] = useState<number>();
     const [uploadFile, setUploadFile] = useState<string>('');
     const [showImg, setShowImg] = useState(false);
@@ -754,12 +744,12 @@ export const PictureCreateMenu = ({
                                         }}
                                         color="secondary"
                                         aria-label="Always visible"
-                                        defaultValue={5}
+                                        defaultValue={4}
                                         step={1}
                                         marks={marks}
                                         valueLabelDisplay="auto"
                                         min={1}
-                                        max={9}
+                                        max={7}
                                         valueLabelFormat={valueLabelFormat}
                                         onChange={(e, value, number) => {
                                             const data = marks.find((v) => v?.value === value)?.data;
@@ -813,7 +803,7 @@ export const PictureCreateMenu = ({
                                 <div className="mt-[15px]">
                                     {uploadFile ? (
                                         <div className="w-full justify-center flex flex-col items-center">
-                                            <Dragger {...props1} className="w-full">
+                                            <Dragger {...props} className="w-full">
                                                 <div className="flex justify-center">
                                                     <div className="h-[140px] w-[140px] overflow-hidden">
                                                         <img
@@ -880,7 +870,7 @@ export const PictureCreateMenu = ({
                                             </div>
                                         </div>
                                     ) : (
-                                        <Dragger {...props1}>
+                                        <Dragger {...props}>
                                             <div>
                                                 <p className="ant-upload-drag-icon">
                                                     <CloudUploadOutlinedIcon className="text-4xl" />
@@ -964,7 +954,7 @@ export const PictureCreateMenu = ({
                                     onChange={(e) => setStrength(e.target.value as unknown as number)}
                                 />
                                 <TextField
-                                    defaultValue={50}
+                                    defaultValue={30}
                                     type={'number'}
                                     label="采样步骤"
                                     fullWidth

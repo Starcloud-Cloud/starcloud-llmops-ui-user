@@ -25,7 +25,7 @@ import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
 import { useNavigate } from 'react-router-dom';
-import { DownLoadBtn } from './DownloadBtn';
+import { DownLoadBtn, PayBtn } from './DownloadBtn';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -147,6 +147,8 @@ const Header = () => {
                 <MegaMenuSection />
             </Box> */}
             {/* <DownLoadBtn /> */}
+            <PayBtn />
+
             <Button
                 className="mr-10"
                 color={'secondary'}
@@ -159,7 +161,7 @@ const Header = () => {
             >
                 {t('EntitlementCard.ppFreegrades')}
             </Button>
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <FormControlLabel
                     value={navType === 'light'}
                     onChange={(e: any) => onChangeMenuType(e.target?.checked ? 'light' : 'dark')}
@@ -170,7 +172,7 @@ const Header = () => {
                         '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
                     }}
                 />
-            </Box>
+            </Box> */}
 
             {/* live customization & localization */}
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

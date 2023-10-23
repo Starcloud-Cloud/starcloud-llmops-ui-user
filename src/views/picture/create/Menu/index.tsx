@@ -87,6 +87,7 @@ const { TextArea } = Input;
 
 type IPictureCreateMenuProps = {
     menuVisible: boolean;
+    setLoading?: (data: boolean) => void;
     setMenuVisible: (menuVisible: boolean) => void;
     setImgList: (imgList: IImageListType) => void;
     imgList: IImageListType;
@@ -164,6 +165,7 @@ const getBase64 = (img: RcFile, callback: (url: string) => void) => {
 export const PictureCreateMenu = ({
     setMenuVisible,
     menuVisible,
+    setLoading,
     setImgList,
     imgList,
     width,
@@ -315,6 +317,9 @@ export const PictureCreateMenu = ({
             PubSub.publish('global.error', { message: '请填写创意描述', type: 'error' });
             return false;
         }
+        if (mode === '裂变') {
+            setLoading && setLoading(true);
+        }
         setIsFetch(true);
 
         const imageRequest = {
@@ -396,6 +401,7 @@ export const PictureCreateMenu = ({
             if (e?.code === 2008002007) {
                 setOpenToken(true);
             }
+            setLoading && setLoading(false);
             setIsFetch(false);
         }
     };

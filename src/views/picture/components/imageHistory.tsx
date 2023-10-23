@@ -127,14 +127,14 @@ const ImageHistory = () => {
     const downLoad = (row: any) => {
         if (row?.imageInfo?.images?.length > 1) {
             const zip = new JSZip();
-            const imageUrls = row?.imageInfo?.images.map((item: any) => item.url);
-            console.log(imageUrls);
-
+            const imageUrls = row?.imageInfo?.images.map((item: any) => {
+                return { url: item.url, uuid: item.uuid, type: item.mediaType?.split('/')[1] };
+            });
             // 异步加载图片并添加到压缩包
-            const promises = imageUrls.map(async (imageUrl: string, index: number) => {
-                const response = await fetch(imageUrl);
+            const promises = imageUrls.map(async (imageUrl: any, index: number) => {
+                const response = await fetch(imageUrl.url);
                 const arrayBuffer = await response.arrayBuffer();
-                zip.file(`下载${index + 1}.jpg`, arrayBuffer);
+                zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
             });
             // 等待所有图片添加完成后创建压缩包并下载
             Promise.all(promises)
@@ -152,7 +152,11 @@ const ImageHistory = () => {
                     console.error('Error downloading images:', error);
                 });
         } else {
-            downLoadImages(row?.imageInfo?.images[0].url, row?.imageInfo?.images[0].mediaType.split('/')[1]);
+            downLoadImages(
+                row?.imageInfo?.images[0].url,
+                row?.imageInfo?.images[0].mediaType.split('/')[1],
+                row?.imageInfo?.images[0].uuid
+            );
         }
     };
     const download = () => {
@@ -161,12 +165,18 @@ const ImageHistory = () => {
             .filter((item: any) => {
                 return selectedRowKeys.includes(item.uid);
             })
-            .map((item: any) => item?.imageInfo?.images[0]?.url);
+            .map((item: any) => {
+                return {
+                    url: item?.imageInfo?.images[0]?.url,
+                    uuid: item?.imageInfo?.images[0]?.uuid,
+                    type: item?.imageInfo?.images[0]?.mediaType?.split('/')[1]
+                };
+            });
         // 异步加载图片并添加到压缩包
         const promises = newData.map(async (imageUrl, index) => {
-            const response = await fetch(imageUrl);
+            const response = await fetch(imageUrl.url);
             const arrayBuffer = await response.arrayBuffer();
-            zip.file(`下载${index + 1}.jpg`, arrayBuffer);
+            zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
         });
         // 等待所有图片添加完成后创建压缩包并下载
         Promise.all(promises)

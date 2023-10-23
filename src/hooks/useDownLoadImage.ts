@@ -1,4 +1,4 @@
-const downLoadImages = (url: string, type: string) => {
+const downLoadImages = (url: string, type: string, uuid: string) => {
     fetch(url)
         .then((response: any) => {
             if (response.ok) {
@@ -11,7 +11,7 @@ const downLoadImages = (url: string, type: string) => {
             // 创建一个临时链接的<a>标签
             const link = document.createElement('a');
             link.href = url;
-            link.download = '下载.' + type; // 设置下载的文件名
+            link.download = uuid + type; // 设置下载的文件名
             link.click();
             // 释放临时链接的资源
             window.URL.revokeObjectURL(url);

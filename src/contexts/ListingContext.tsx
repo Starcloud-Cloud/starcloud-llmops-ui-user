@@ -20,6 +20,7 @@ type ListType = {
     value?: string;
     row: number;
     btnText: string;
+    keyword: { text: string; num: number }[];
 };
 
 type ListingContextType = {
@@ -47,6 +48,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
     const [enableAi, setEnableAi] = useState(true);
+    const [keywordList, setKeywordList] = useState<any[]>([]);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);

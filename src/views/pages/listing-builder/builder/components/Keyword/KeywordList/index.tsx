@@ -46,10 +46,10 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 
 const headCells = [
     { id: 'keyword', numeric: false, disablePadding: true, label: '关键词' },
-    { id: 'score', numeric: false, disablePadding: true, label: '分值' },
+    // { id: 'score', numeric: false, disablePadding: true, label: '分值' },
     { id: 'searches', numeric: false, disablePadding: true, label: '搜索量' },
-    { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
-    { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
+    // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
+    // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
     { id: 'use', numeric: false, disablePadding: true, label: '使用分布' }
 ];
@@ -104,12 +104,32 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
+const defaultData = [
+    {
+        keyword: 'iphone',
+        score: 0,
+        searches: 0,
+        searchWeeklyRank: 0,
+        month: 'month'
+        // updatedTime: 'updatedTime'
+    },
+    {
+        keyword: 'iphone pro',
+        score: 0,
+        searches: 0,
+        searchWeeklyRank: 0,
+        month: 'month'
+        // updatedTime: 'updatedTime'
+    }
+];
+
 export const KeywordList: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<any[]>([]);
     const [count, setCount] = useState(0);
     const { version, uid } = useListing();
+    const [rows, setRows] = useState<any[]>(defaultData);
 
     const forceUpdate = () => setCount((pre) => pre + 1);
 
@@ -126,9 +146,6 @@ export const KeywordList: React.FC = () => {
                 });
         }
     }, [count, version, uid]);
-
-    // Add a new state for rows
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -170,7 +187,7 @@ export const KeywordList: React.FC = () => {
     return (
         <MainCard content={false}>
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 750 }} size={'small'}>
+                <Table size={'small'}>
                     <EnhancedTableHead
                         size="small"
                         numSelected={selected.length}
@@ -212,12 +229,12 @@ export const KeywordList: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{row.score}</TableCell>
+                                    {/* <TableCell align="center">{row.score}</TableCell> */}
                                     <TableCell align="center">{row.searches}</TableCell>
+                                    {/* <TableCell align="center">{row.keyword}</TableCell> */}
+                                    {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="center">{}</TableCell>
                                 </TableRow>
                             );
                         })}

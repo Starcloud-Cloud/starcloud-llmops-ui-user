@@ -17,7 +17,7 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu, FloatButton } from 'antd';
+import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React, { useEffect } from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -48,22 +48,6 @@ function capitalizeFirstLetterOfEachWord(str: string): string {
     });
     return capitalizedWords.join(' ');
 }
-
-type ListType = {
-    title: string;
-    des: JSX.Element | string;
-    placeholder: string;
-    type: ListingBuilderEnum;
-    maxCharacter: number;
-    character: number;
-    word: number;
-    isOvertop?: boolean;
-    value?: string;
-    row: number;
-    btnText: string;
-};
-
-const keyWordList = ['iphone pro', 'iphone', 'pro'];
 
 export const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
@@ -120,12 +104,12 @@ export const Content = () => {
         setOpenKeyWordSelect(false);
     };
 
-    const handleHasKeyWork = (e: any) => {
+    const handleHasKeyWork = (e: any, keyword: string[]) => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
         const value = e.target.value;
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
-            const filterKeyWord = keyWordList.filter((item, index) => {
+            const filterKeyWord = keyword.filter((item, index) => {
                 if (item.includes(value[startIndex - 1])) {
                     return item;
                 }
@@ -144,8 +128,8 @@ export const Content = () => {
         }
     };
 
-    const handleInputChange = React.useCallback((e: any, index: number) => {
-        handleHasKeyWork(e);
+    const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
+        handleHasKeyWork(e, keyword);
 
         setEditIndex(index);
         setList((prevList: any) => {
@@ -231,7 +215,8 @@ export const Content = () => {
             word: 0,
             value: '',
             row: 4,
-            btnText: 'AI生成五点描述'
+            btnText: 'AI生成五点描述',
+            keyword: []
         });
         setList(copyList);
     };
@@ -654,13 +639,34 @@ export const Content = () => {
                                     rows={item.row}
                                     placeholder={item.placeholder}
                                     value={item.value}
-                                    handleInputChange={handleInputChange}
+                                    handleInputChange={(e: any) =>
+                                        handleInputChange(
+                                            e,
+                                            index,
+                                            item.keyword?.map((v) => v.text)
+                                        )
+                                    }
                                     highlightWordList={keyWordSelectList}
                                     index={index}
+                                    type={item.type}
                                 />
                                 <div className="flex px-4 py-3 items-center">
                                     <div className="flex-1 flex items-center">
-                                        <span className="mr-2">建议关键词:</span>
+                                        <span className="mr-2 flex items-center">
+                                            建议关键词:
+                                            <div className="ml-2 flex items-center">
+                                                {item.keyword.map((itemKeyword, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={`${
+                                                            itemKeyword?.num > 0 ? 'bg-[#ffaca6] ml-1 line-through px-1' : 'ml-1 px-1'
+                                                        }`}
+                                                    >
+                                                        <span>{itemKeyword.text}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </span>
                                     </div>
                                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                 </div>
@@ -675,7 +681,6 @@ export const Content = () => {
                         ref={ulRef}
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1"
-                        // onKeyDown={handleKeyDown}
                     >
                         {keyWordSelectList.map((item, keyWordItemKey) => (
                             <li

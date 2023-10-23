@@ -138,6 +138,10 @@ export default function PicModal({
                                     <span className="text-lg font-medium">模型:</span>
                                     <span className="text-base">{engine}</span>
                                 </div>
+                                <div className="flex flex-col  mt-3">
+                                    <span className="text-lg font-medium">种子:</span>
+                                    <span className="text-base">{currentImageList[currentIndex].seed}</span>
+                                </div>
                                 {stylePreset && (
                                     <div className="flex flex-col  mt-3">
                                         <span className="text-lg font-medium">风格:</span>

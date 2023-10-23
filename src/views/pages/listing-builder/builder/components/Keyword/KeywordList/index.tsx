@@ -74,6 +74,9 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 </TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
+                        component="th"
+                        scope="row"
+                        width={150}
                         key={headCell.id}
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -109,8 +112,9 @@ export const KeywordList: React.FC = () => {
 
     const forceUpdate = () => setCount((pre) => pre + 1);
 
+    // 获取详情
     useEffect(() => {
-        const fetchPageData = async () => {
+        if (uid && version !== undefined) {
             getListingDetail(uid, version)
                 .then((res) => {
                     const fetchedRows = res.keywordMetaData;
@@ -119,10 +123,8 @@ export const KeywordList: React.FC = () => {
                 .catch((error) => {
                     console.error(error);
                 });
-        };
-
-        fetchPageData();
-    }, [count]);
+        }
+    }, [count, version, uid]);
 
     // Add a new state for rows
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
@@ -169,6 +171,7 @@ export const KeywordList: React.FC = () => {
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 750 }} size={'small'}>
                     <EnhancedTableHead
+                        size="small"
                         numSelected={selected.length}
                         order={order}
                         orderBy={orderBy}

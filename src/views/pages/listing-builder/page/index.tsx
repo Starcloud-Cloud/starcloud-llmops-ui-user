@@ -20,6 +20,7 @@ import { delListing, getListingPage } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { COUNTRY_LIST } from '../data';
 
 export interface DraftConfig {}
 
@@ -48,33 +49,6 @@ export interface TableEnhancedCreateDataType {
     status: string;
     createTime: number;
     updateTime: number;
-}
-
-// table filter
-function descendingComparator(a: KeyedObject, b: KeyedObject, orderBy: string) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getComparator(order: ArrangementOrder, orderBy: string) {
-    return order === 'desc'
-        ? (a: KeyedObject, b: KeyedObject) => descendingComparator(a, b, orderBy)
-        : (a: KeyedObject, b: KeyedObject) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedObject, b: KeyedObject) => number) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0] as TableEnhancedCreateDataType, b[0] as TableEnhancedCreateDataType);
-        if (order !== 0) return order;
-        return (a[1] as number) - (b[1] as number);
-    });
-    return stabilizedThis.map((el) => el[0]);
 }
 
 const headCells = [
@@ -149,6 +123,8 @@ const ListingBuilderPage: React.FC = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
+    const [delType, setDelType] = useState(0); //0.单个 1.多个
+    const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -212,7 +188,6 @@ const ListingBuilderPage: React.FC = () => {
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
         }
-
         setSelected(newSelected);
     };
 
@@ -225,11 +200,12 @@ const ListingBuilderPage: React.FC = () => {
         setPage(0);
     };
 
-    console.log(selected, 'selected');
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     const delDraft = async () => {
-        const res = await delListing(selected);
+        console.log(selected, 'selected');
+        const data = delType === 0 ? [row?.id] : selected;
+        const res = await delListing(data);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -249,6 +225,10 @@ const ListingBuilderPage: React.FC = () => {
 
     const addListing = async () => {
         navigate('/listingBuilder');
+    };
+
+    const handleEdit = async (uid: string, version: number) => {
+        navigate('/listingBuilder?uid=' + uid + '&version=' + version);
     };
 
     return (
@@ -297,6 +277,8 @@ const ListingBuilderPage: React.FC = () => {
                         <MenuItem
                             onClick={() => {
                                 setDelAnchorEl(null);
+                                setDelVisible(true);
+                                setDelType(2);
                             }}
                         >
                             <ListItemIcon>
@@ -362,7 +344,10 @@ const ListingBuilderPage: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="center">{row.title}</TableCell>
-                                    <TableCell align="center">{row.endpoint}</TableCell>
+                                    <TableCell align="center">
+                                        {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
+                                        {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
+                                    </TableCell>
                                     <TableCell align="center">{row.asin}</TableCell>
                                     <TableCell align="center">{row.status}</TableCell>
                                     <TableCell align="center">{row.score}</TableCell>
@@ -374,7 +359,13 @@ const ListingBuilderPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>
-                                            <IconButton aria-label="delete" size="small">
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    handleEdit(row.uid, row.version);
+                                                }}
+                                            >
                                                 <EditIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
@@ -386,7 +377,15 @@ const ListingBuilderPage: React.FC = () => {
                                         </Tooltip>
                                         <Divider type={'vertical'} />
                                         <Tooltip title={'删除'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => setDelVisible(true)}>
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    setDelType(0);
+                                                    setDelVisible(true);
+                                                    setRow(row);
+                                                }}
+                                            >
                                                 <DeleteIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>

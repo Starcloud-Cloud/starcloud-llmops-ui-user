@@ -1,4 +1,4 @@
-import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tabs, Tab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { KeyWord } from './components/Keyword';
 import { Content } from './components/Content';
@@ -15,12 +15,22 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useListing } from 'contexts/ListingContext';
 import { saveListing } from 'api/listing/build';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
+import { isMobile } from 'react-device-detect';
+import { TabPanel } from 'views/template/myChat/createChat';
+
+function a11yProps(index: number) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`
+    };
+}
 
 const ListingBuilder = () => {
     const [delAnchorEl, setDelAnchorEl] = React.useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
     const [settingOpen, setSettingOpen] = React.useState(false);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
+    const [tab, setTab] = React.useState(0);
     const { country, setCountry, uid, version, list } = useListing();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -105,7 +115,7 @@ const ListingBuilder = () => {
                                 setDelAnchorEl(null);
                             }}
                         >
-                            <MenuItem
+                            {/* <MenuItem
                                 onClick={() => {
                                     setDelAnchorEl(null);
                                     setSettingOpen(true);
@@ -117,7 +127,7 @@ const ListingBuilder = () => {
                                 <Typography variant="inherit" noWrap>
                                     设置
                                 </Typography>
-                            </MenuItem>
+                            </MenuItem> */}
                             <MenuItem
                                 onClick={() => {
                                     setDelAnchorEl(null);
@@ -135,16 +145,41 @@ const ListingBuilder = () => {
                 }
             />
             <Divider />
-            <div className="flex bg-[#f4f6f8] h-full">
-                <Affix offsetTop={0}>
-                    <div className="w-[450px] h-screen">
-                        <KeyWord />
+            {isMobile ? (
+                <>
+                    <Tabs
+                        value={tab}
+                        onChange={(e, v) => {
+                            setTab(v);
+                        }}
+                        aria-label="basic tabs example"
+                    >
+                        <Tab label="新增" {...a11yProps(0)} />
+                        <Tab label="导入" {...a11yProps(1)} />
+                    </Tabs>
+                    <TabPanel value={tab} index={0}>
+                        <div className="w-[450px] h-screen">
+                            <KeyWord />
+                        </div>
+                    </TabPanel>
+                    <TabPanel value={tab} index={1}>
+                        <div className="flex-1 h-full ml-2">
+                            <Content />
+                        </div>
+                    </TabPanel>
+                </>
+            ) : (
+                <div className="flex bg-[#f4f6f8] h-full">
+                    <Affix offsetTop={0}>
+                        <div className="w-[450px] h-screen">
+                            <KeyWord />
+                        </div>
+                    </Affix>
+                    <div className="flex-1 h-full ml-2">
+                        <Content />
                     </div>
-                </Affix>
-                <div className="flex-1 h-full ml-2">
-                    <Content />
                 </div>
-            </div>
+            )}
             <SettingModal
                 open={settingOpen}
                 handleClose={() => {

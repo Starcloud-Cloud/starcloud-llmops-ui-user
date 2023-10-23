@@ -258,7 +258,7 @@ export const Content = () => {
         <div>
             <Card className="rounded-t-none flex justify-center flex-col p-5" title="Listing优化">
                 <div className="text-lg font-bold py-1">Listing优化</div>
-                <div className="grid grid-cols-2 gap-2 w-full">
+                <div className="grid xl:grid-cols-2 xs:grid-cols-1 gap-2 w-full">
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
@@ -308,7 +308,7 @@ export const Content = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-4 gap-4 w-full">
+                <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1 gap-4 w-full">
                     {scoreList?.map((item, index) => (
                         <div className="flex  items-center w-full flex-col" key={index}>
                             <div className="mt-2  w-full">
@@ -317,7 +317,7 @@ export const Content = () => {
                                     <>
                                         <div className="w-full py-1" key={i}>
                                             <div className="flex justify-between items-center">
-                                                <span>{v.label}</span>
+                                                <span className="flex-[80%]">{v.label}</span>
                                                 {v.value ? (
                                                     <svg
                                                         className="h-[14px] w-[14px]"
@@ -362,13 +362,17 @@ export const Content = () => {
                 </div>
             </Card>
             <Card className="p-5 mt-2">
-                <div className="flex justify-between">
+                <div className="flex justify-between flex-[30%] flex-wrap">
                     <div className="flex items-center">
                         <span>AI模式</span>
                         <Switch color={'secondary'} onChange={handleChange} checked={enableAi} />
                     </div>
-                    <div className="flex items-center">
-                        <Search className="w-[400px]" placeholder="输入ASIN，一键获取亚马逊Listing内容" enterButton="获取Listing" />
+                    <div className="flex items-center justify-end flex-[70%]">
+                        <Search
+                            className="lg:w-full xl:w-[70%]"
+                            placeholder="输入ASIN，一键获取亚马逊Listing内容"
+                            enterButton="获取Listing"
+                        />
                     </div>
                 </div>
             </Card>
@@ -397,11 +401,11 @@ export const Content = () => {
                         <div>
                             <form onSubmit={formik.handleSubmit} className="mt-2">
                                 <Grid container>
-                                    <Grid sx={{ mt: 1 }} item md={12}>
+                                    <Grid sx={{ mt: 1 }} item className="w-full">
                                         <TextField
                                             size="small"
-                                            label={'产品特征'}
                                             fullWidth
+                                            label={'*产品特征'}
                                             id="productFeatures"
                                             name="productFeatures"
                                             color="secondary"
@@ -412,7 +416,7 @@ export const Content = () => {
                                             helperText={formik.touched.productFeatures && formik.errors.productFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item md={12}>
+                                    <Grid sx={{ mt: 2 }} item className="w-full">
                                         <TextField
                                             size="small"
                                             label={'客户特征'}
@@ -427,7 +431,7 @@ export const Content = () => {
                                             helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item md={12}>
+                                    <Grid sx={{ mt: 2 }} item className="w-full">
                                         <TextField
                                             size="small"
                                             label={'品牌名称'}
@@ -442,7 +446,7 @@ export const Content = () => {
                                             helperText={formik.touched.voidWord && formik.errors.voidWord}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item md={12} className="grid gap-3 grid-cols-3">
+                                    <Grid sx={{ mt: 2 }} item className="grid gap-3 grid-cols-3 w-full">
                                         <div>
                                             <FormControl fullWidth>
                                                 <InputLabel size="small" id="demo-simple-select-label">
@@ -577,7 +581,7 @@ export const Content = () => {
                                 </div>
                             )}
                             <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
-                                <div className="flex justify-between items-center px-4">
+                                <div className="flex justify-between items-center px-4 flex-wrap">
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">
                                             <IconButton size="small">

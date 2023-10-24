@@ -9,7 +9,6 @@ import formatDate from 'hooks/useDate';
 import ImageDetail from './detail';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import _ from 'lodash-es';
-
 const ImageHistory = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -127,12 +126,22 @@ const ImageHistory = () => {
     //下载图片
     const downLoad = (row: any) => {
         if (row?.imageInfo?.images?.length > 1) {
-            const imageUrls = row?.imageInfo?.images.map((item: any) => {
-                return { url: item.url, uuid: row.fromScene, type: item.mediaType?.split('/')[1] };
+            const imageUrls = row?.imageInfo?.images.map((item: any, index: number) => {
+                return {
+                    url: item.url,
+                    uuid: row.fromScene,
+                    time: formatDate(row?.imageInfo?.finishTime + index * 1000),
+                    type: item.mediaType?.split('/')[1]
+                };
             });
             downAllImages(imageUrls);
         } else {
-            downLoadImages(row?.imageInfo?.images[0].url, row?.imageInfo?.images[0].mediaType.split('/')[1], row?.fromScene);
+            downLoadImages(
+                row?.imageInfo?.images[0].url,
+                row?.imageInfo?.images[0].mediaType.split('/')[1],
+                row?.fromScene,
+                formatDate(row?.imageInfo?.finishTime)
+            );
         }
     };
     //批量下载
@@ -143,10 +152,11 @@ const ImageHistory = () => {
             })
             .map((item: any) => {
                 if (item?.imageInfo?.images?.length > 1) {
-                    const newList = item?.imageInfo?.images?.map((el: any) => {
+                    const newList = item?.imageInfo?.images?.map((el: any, index: number) => {
                         return {
                             url: el?.url,
                             uuid: item.fromScene,
+                            time: formatDate(item?.imageInfo?.finishTime + index * 1000),
                             type: el?.mediaType?.split('/')[1]
                         };
                     });
@@ -155,6 +165,7 @@ const ImageHistory = () => {
                     return {
                         url: item?.imageInfo?.images[0]?.url,
                         uuid: item?.fromScene,
+                        time: formatDate(item?.imageInfo?.finishTime),
                         type: item?.imageInfo?.images[0]?.mediaType?.split('/')[1]
                     };
                 }

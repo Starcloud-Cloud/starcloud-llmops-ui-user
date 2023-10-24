@@ -5,9 +5,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import background from 'assets/images/styles/background.jpeg';
 import backgrounds from 'assets/images/styles/backgrounds.jpeg';
+import backgroundText from 'assets/images/styles/backgroundText.png';
+import backgroundTexts from 'assets/images/styles/backgroundTexts.png';
 const LintellgentMatting = () => {
     const navigate = useNavigate();
     const [dragDistance, setDragDistance] = useState(50);
+    const [dragDistances, setDragDistances] = useState(50);
     return (
         <div className="h-full w-full flex items-center justify-center">
             <div className="flex gap-10">
@@ -79,12 +82,62 @@ const LintellgentMatting = () => {
                         </Typography>
                     </CardContent>
                 </Card>
-                <Card onClick={() => navigate('/delImageText')} sx={{ width: 400, textAlign: 'center', cursor: 'pointer' }}>
-                    <CardMedia
-                        sx={{ height: 224 }}
-                        image="https://linkfoxai-ailab-prod.oss-cn-shenzhen.aliyuncs.com/UPLOAD/example/cutout-by-select.png"
-                        title="green iguana"
-                    />
+                <Card
+                    onClick={(e: any) => {
+                        if (e.target.tagName === 'IMG') {
+                            navigate('/delImageText');
+                        }
+                    }}
+                    sx={{ width: 400, textAlign: 'center', cursor: 'pointer' }}
+                >
+                    <div className="h-[267px] relative">
+                        <img
+                            className="absolute object-left left-0 object-cover h-[100%] select-none"
+                            style={{ width: `${dragDistances}%` }}
+                            src={backgroundText}
+                            alt=""
+                        />
+                        <img
+                            className="absolute object-right right-0 object-cover h-[100%] select-none"
+                            style={{ width: `calc(100% - (${dragDistances}%))` }}
+                            src={backgroundTexts}
+                            alt=""
+                        />
+                        <ConfigProvider
+                            theme={{
+                                components: {
+                                    Slider: {
+                                        handleSize: 24,
+                                        handleSizeHover: 24,
+                                        handleLineWidth: 0,
+                                        handleLineWidthHover: 0
+                                    }
+                                }
+                            }}
+                        >
+                            <Slider
+                                trackStyle={{ background: 'transparent' }}
+                                railStyle={{ background: 'transparent' }}
+                                handleStyle={{ zIndex: 100, opacity: 0.1 }}
+                                className="absolute left-0 right-0 top-0 bottom-0 m-auto z-1"
+                                tooltip={{ open: false }}
+                                onChange={(value: number) => {
+                                    setDragDistances(value);
+                                }}
+                                value={dragDistances}
+                            />
+                        </ConfigProvider>
+
+                        <div
+                            className="flex justify-center items-center absolute w-0.5 bg-gray-100 h-full top-0"
+                            style={{ left: dragDistances + '%' }}
+                        >
+                            <div className="w-[29px] h-[29px] flex rounded-full bg-[#fff] border border-solid border-[#673ab7]">
+                                <LeftOutlined rev={undefined} />
+                                <RightOutlined rev={undefined} />
+                            </div>
+                        </div>
+                    </div>
                     <CardContent>
                         <Typography gutterBottom variant="h3" component="div">
                             批量自动去除背景文字

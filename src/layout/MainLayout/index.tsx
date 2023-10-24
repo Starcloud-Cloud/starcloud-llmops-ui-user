@@ -369,7 +369,7 @@ const MainLayout = () => {
     }, []);
 
     //绑定手机号
-    const { use, setuse, status, userInfo, setUserInfo, setStatus } = infoStore();
+    const { use, setuse, status, setStatus, userInfo, setUserInfo, twoUser, setTwoUser } = infoStore();
     useEffect(() => {
         return () => {
             setStatus(false);
@@ -379,13 +379,14 @@ const MainLayout = () => {
     useEffect(() => {
         if (userInfo?.benefits) {
             if (status) {
-                if (use?.mobile === '' && !use?.mobile) {
+                if (use?.mobile === '' && !use?.mobile && JSON.stringify(twoUser) !== JSON.stringify(userInfo?.benefits)) {
                     setPhoneOpen(true);
                 } else {
                     setPhoneOpen(false);
                 }
             } else {
                 setStatus(true);
+                setTwoUser(userInfo?.benefits);
             }
         }
     }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);

@@ -45,6 +45,10 @@ type ListingContextType = {
     setEnableAi: (enableAi: boolean) => void;
     setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
     keywordHighlight: keywordHighlightType | null;
+    setUpdate: (update: object) => void;
+    update: object;
+    setDetail: (detail: any) => void;
+    detail: any;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
@@ -57,9 +61,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
     const [enableAi, setEnableAi] = useState(true);
-    // 高亮数据
     const [keywordHighlight, setKeywordHighlight] = useState<keywordHighlightType | null>(null);
-    const [keywordList, setKeywordList] = useState<any[]>([]);
+    const [detail, setDetail] = useState<any>(null);
+    const [update, setUpdate] = useState<object>({});
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -87,7 +91,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 enableAi,
                 setEnableAi,
                 keywordHighlight,
-                setKeywordHighlight
+                setKeywordHighlight,
+                setDetail,
+                detail,
+                setUpdate,
+                update
             }}
         >
             {children}

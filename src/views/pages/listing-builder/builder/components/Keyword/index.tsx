@@ -5,9 +5,12 @@ import AddIcon from '@mui/icons-material/Add';
 import { KeywordList } from './KeywordList';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useListing } from 'contexts/ListingContext';
 
 export const KeyWord = () => {
+    const { detail } = useListing();
     const [open, setOpen] = React.useState(false);
+    const [selected, setSelected] = React.useState<any[]>([]);
 
     const handleClose = () => {
         setOpen(false);
@@ -30,7 +33,9 @@ export const KeyWord = () => {
             </div>
             <div className={'flex justify-between items-center'}>
                 <div className={'flex items-center'}>
-                    <span className={'mr-3'}>总共N个词/选中N个词</span>
+                    <span className={'mr-3'}>
+                        总共{detail?.keywordResume?.length}个词/选中{selected?.length}个词
+                    </span>
                     <Button variant={'text'} color={'secondary'} startIcon={<VisibilityOffIcon />}>
                         隐藏已使用
                     </Button>
@@ -40,7 +45,7 @@ export const KeyWord = () => {
                 </Button>
             </div>
             <div className="mt-3">
-                <KeywordList />
+                <KeywordList selected={selected} setSelected={setSelected} />
             </div>
             <AddKeywordModal open={open} handleClose={handleClose} />
         </div>

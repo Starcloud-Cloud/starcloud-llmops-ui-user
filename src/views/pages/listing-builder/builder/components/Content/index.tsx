@@ -62,9 +62,29 @@ export const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
-    const { list, setList, enableAi, setEnableAi, keywordHighlight } = useListing();
+
+    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail } = useListing();
 
     const ulRef = React.useRef<any>(null);
+
+    React.useEffect(() => {
+        const scoreListDefault = SCORE_LIST;
+        if (detail?.itemScore) {
+            scoreListDefault[0].list[0].value = detail.itemScore.withoutSpecialChat;
+            scoreListDefault[0].list[1].value = detail.itemScore.titleLength;
+            scoreListDefault[0].list[2].value = detail.itemScore.titleUppercase;
+
+            scoreListDefault[1].list[0].value = detail.itemScore.fiveDescLength;
+            scoreListDefault[1].list[1].value = detail.itemScore.allUppercase;
+            scoreListDefault[1].list[2].value = detail.itemScore.partUppercase;
+
+            scoreListDefault[2].list[0].value = detail.itemScore.productLength;
+            scoreListDefault[2].list[1].value = detail.itemScore.withoutUrl;
+
+            scoreListDefault[3].list[0].value = detail.itemScore.searchTermLength;
+        }
+    }, [detail, scoreList]);
+
     React.useEffect(() => {
         if (openKeyWordSelect) {
             // 绑定键盘事件

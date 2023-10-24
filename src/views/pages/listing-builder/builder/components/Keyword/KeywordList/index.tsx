@@ -65,6 +65,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
+                        size="small"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
@@ -83,18 +84,22 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+                        {headCell.id !== 'keyword' ? (
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id ? (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                ) : null}
+                            </TableSortLabel>
+                        ) : (
+                            headCell.label
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
@@ -104,48 +109,31 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-const defaultData = [
-    {
-        keyword: 'iphone',
-        score: 0,
-        searches: 0,
-        searchWeeklyRank: 0,
-        month: 'month'
-        // updatedTime: 'updatedTime'
-    },
-    {
-        keyword: 'iphone pro',
-        score: 0,
-        searches: 0,
-        searchWeeklyRank: 0,
-        month: 'month'
-        // updatedTime: 'updatedTime'
-    }
-];
-
-export const KeywordList: React.FC = () => {
+export const KeywordList = ({ selected, setSelected }: any) => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
-    const [selected, setSelected] = useState<any[]>([]);
-    const [count, setCount] = useState(0);
-    const { version, uid } = useListing();
-    const [rows, setRows] = useState<any[]>(defaultData);
 
-    const forceUpdate = () => setCount((pre) => pre + 1);
+    const [rows, setRows] = useState<any[]>([]);
+
+    const { version, uid, setUpdate, update, setDetail } = useListing();
 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
             getListingDetail(uid, version)
-                .then((res) => {
-                    const fetchedRows = res.keywordMetaData;
+                .then((res: any) => {
+                    setDetail(res);
+                    const fetchedRows = res.keywordMetaData || [];
                     setRows([...fetchedRows]);
+                    if (res.status === 'ANALYSIS') {
+                        setUpdate({});
+                    }
                 })
-                .catch((error) => {
+                .catch((error: any) => {
                     console.error(error);
                 });
         }
-    }, [count, version, uid]);
+    }, [update, version, uid]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';

@@ -1,6 +1,8 @@
          
 .btn-grad {
   background-image: linear-gradient(to right, #DA22FF 0%, #9733EE  51%, #DA22FF  100%);
+  height: 30.75px;
+
   padding: 6px 10px;
   text-align: center;
   text-transform: uppercase;
@@ -11,7 +13,7 @@
   border-radius: 4px;
   display: block;
   border: none;
-  margin-right: 8px;
+  margin-left: 8px;
   cursor: pointer;
 }
 
@@ -20,4 +22,3 @@
   color: #fff;
   text-decoration: none;
 }
-         

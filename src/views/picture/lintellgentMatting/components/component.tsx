@@ -19,6 +19,7 @@ import downLoadImages from 'hooks/useDownLoadImage';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { downAllImages } from 'hooks/useDownLoadImage';
+import formatDate from 'hooks/useDate';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
@@ -112,12 +113,19 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     //批量下载图片
     const batchDownload = () => {
         const imageUrls = sucImageList
-            .map((item) => {
+            .map((item, index: number) => {
                 if (item?.images[0]?.url && item?.images[0]?.url !== 'error') {
-                    return { url: item.images[0].url, uuid: item.fromScene, type: item.images[0].mediaType?.split('/')[1] };
+                    return {
+                        url: item.images[0].url,
+                        uuid: item.fromScene,
+                        time: formatDate(detailData?.finishTime + index * 1000),
+                        type: item.images[0].mediaType?.split('/')[1]
+                    };
                 }
             })
             .filter((value) => value !== undefined);
+        console.log(imageUrls);
+
         downAllImages(imageUrls);
     };
     return (
@@ -191,7 +199,8 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                                         downLoadImages(
                                                             item?.images[0].url,
                                                             item?.images[0].mediaType.split('/')[1],
-                                                            item?.fromScene
+                                                            item?.fromScene,
+                                                            formatDate(item?.finishTime)
                                                         );
                                                     }}
                                                     className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"

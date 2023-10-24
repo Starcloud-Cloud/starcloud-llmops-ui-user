@@ -289,20 +289,24 @@ const ContourImage = () => {
                                 setLoading(true);
                                 setRightRes(true);
                                 const result = !inputValueTranslate ? await setTranslation('zh', 'en') : null;
-                                const res = await sketchToImage({
-                                    imageRequest: {
-                                        sketchImage: stageRef.current.toDataURL(),
-                                        prompt: result || desc
-                                    },
-                                    scene: 'IMAGE_SKETCH',
-                                    appUid: 'SKETCH_TO_IMAGE'
-                                });
-                                if (res) {
-                                    setLoading(false);
-                                    setResult(res.response);
-                                    userBenefits().then((res) => {
-                                        setUserInfo(res);
+                                try {
+                                    const res = await sketchToImage({
+                                        imageRequest: {
+                                            sketchImage: stageRef.current.toDataURL(),
+                                            prompt: result || desc
+                                        },
+                                        scene: 'IMAGE_SKETCH',
+                                        appUid: 'SKETCH_TO_IMAGE'
                                     });
+                                    if (res) {
+                                        setLoading(false);
+                                        setResult(res.response);
+                                        userBenefits().then((res) => {
+                                            setUserInfo(res);
+                                        });
+                                    }
+                                } catch (err) {
+                                    setLoading(false);
                                 }
                             } else {
                                 setDescOpen(true);
@@ -343,7 +347,7 @@ const ContourImage = () => {
                                                     downLoadImages(
                                                         result?.images[0].url,
                                                         result?.images[0].mediaType.split('/')[1],
-                                                        result?.images[0].uuid
+                                                        result?.fromScene
                                                     );
                                                 }}
                                                 className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"

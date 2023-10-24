@@ -13,13 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from 'utils/auth';
 import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
-import JSZip from 'jszip';
 import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import { upscale } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
+import { downAllImages } from 'hooks/useDownLoadImage';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
     const { setUserInfo }: any = userInfoStore();
@@ -92,19 +92,27 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
         }
     };
     const showFn = async (item: any, index: number) => {
-        const res = await upscale({
-            scene: 'IMAGE_UPSCALING',
-            appUid: 'UPSCALING_IMAGE',
-            imageRequest: {
-                initImage: item.response?.data?.url,
-                magnification: subTitle === '图片无损放大' ? magnification : 1
-            }
-        });
-        suRef.current.splice(index, 1, res.response);
-        setSucImageList(_.cloneDeep(suRef.current));
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
+        try {
+            const res = await upscale({
+                scene: 'IMAGE_UPSCALING',
+                appUid: 'UPSCALING_IMAGE',
+                imageRequest: {
+                    initImage: item.response?.data?.url,
+                    magnification: subTitle === '图片无损放大' ? magnification : 1
+                }
+            });
+            suRef.current.splice(index, 1, res.response);
+            setSucImageList(_.cloneDeep(suRef.current));
+            userBenefits().then((res) => {
+                setUserInfo(res);
+            });
+        } catch (err) {
+            suRef.current.splice(index, 1, { images: [{ url: 'error' }] });
+            setSucImageList(_.cloneDeep(suRef.current));
+            userBenefits().then((res) => {
+                setUserInfo(res);
+            });
+        }
     };
     useEffect(() => {
         if (!open) {
@@ -113,31 +121,14 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     }, [open]);
     //批量下载图片
     const batchDownload = () => {
-        const zip = new JSZip();
-        const imageUrls = sucImageList.map((item) => {
-            return { url: item.images[0].url, uuid: item.images[0].uuid, type: item.images[0].mediaType?.split('/')[1] };
-        });
-        // 异步加载图片并添加到压缩包
-        const promises = imageUrls.map(async (imageUrl, index) => {
-            const response = await fetch(imageUrl.url);
-            const arrayBuffer = await response.arrayBuffer();
-            zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
-        });
-        // 等待所有图片添加完成后创建压缩包并下载
-        Promise.all(promises)
-            .then(() => {
-                zip.generateAsync({ type: 'blob' }).then((content) => {
-                    const url = window.URL.createObjectURL(content);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'images.zip'; // 设置下载的文件名
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
+        const imageUrls = sucImageList
+            .map((item) => {
+                if (item?.images[0]?.url && item?.images[0]?.url !== 'error') {
+                    return { url: item.images[0].url, uuid: item.fromScene, type: item.images[0].mediaType?.split('/')[1] };
+                }
             })
-            .catch((error) => {
-                console.error('Error downloading images:', error);
-            });
+            .filter((value) => value !== undefined);
+        downAllImages(imageUrls);
     };
     return (
         <Card className="h-full p-[16px]">
@@ -194,7 +185,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                     height={240}
                                     preview={{
                                         visible: false,
-                                        mask: (
+                                        mask: item?.images && item?.images[0].url !== 'error' && (
                                             <div
                                                 className="w-full h-full flex justify-center items-center relative"
                                                 onClick={() => {
@@ -210,7 +201,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                                         downLoadImages(
                                                             item?.images[0].url,
                                                             item?.images[0].mediaType.split('/')[1],
-                                                            item?.images[0].uuid
+                                                            item?.fromScene
                                                         );
                                                     }}
                                                     className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"

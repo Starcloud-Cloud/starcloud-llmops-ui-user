@@ -1,6 +1,6 @@
 import { useListing } from 'contexts/ListingContext';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 const mergeArray = (arr: any[]) => {
@@ -32,10 +32,14 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight } = useListing();
 
-    highlightWordList.sort((a: string, b: string) => b.length - a.length);
-    const r = `(${highlightWordList.join('|')})`;
-    const pattern = new RegExp(r);
-    const resultArray = value?.split(pattern).filter((item: string) => item !== '');
+    const resultArray = useMemo(() => {
+        const copyHighlightWordList = [...highlightWordList];
+        copyHighlightWordList.sort((a: string, b: string) => b.length - a.length);
+        const r = `(${copyHighlightWordList.join('|')})`;
+        const pattern = new RegExp(r);
+        const resultArray = value?.split(pattern).filter((item: string) => item !== '');
+        return resultArray;
+    }, [highlightWordList, value]);
 
     useEffect(() => {
         const copyList = _.clone(list);
@@ -96,5 +100,4 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
     );
 };
 
-// export default React.memo(FiledTextArea);
-export default FiledTextArea;
+export default React.memo(FiledTextArea);

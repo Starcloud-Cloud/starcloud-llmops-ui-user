@@ -66,6 +66,7 @@ export const Content = () => {
     const { list, setList, enableAi, setEnableAi, keywordHighlight, detail } = useListing();
 
     const ulRef = React.useRef<any>(null);
+    const hoverKeyRef = React.useRef<any>(null);
 
     React.useEffect(() => {
         const scoreListDefault = SCORE_LIST;
@@ -82,6 +83,7 @@ export const Content = () => {
             scoreListDefault[2].list[1].value = detail.itemScore.withoutUrl;
 
             scoreListDefault[3].list[0].value = detail.itemScore.searchTermLength;
+            setScoreList(scoreListDefault);
         }
     }, [detail, scoreList]);
 
@@ -94,10 +96,12 @@ export const Content = () => {
                     e.preventDefault(); // 防止滚动页面
                     const newIndex = key === 'ArrowUp' ? Math.max(0, hoverKey - 1) : Math.min(keyWordSelectList.length - 1, hoverKey + 1);
                     setHoverKey(newIndex);
+                    hoverKeyRef.current = newIndex;
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
-                    if (hoverKey !== null) {
-                        handleReplaceValue(keyWordSelectList[hoverKey]);
+                    if (hoverKeyRef.current !== undefined) {
+                        console.log(hoverKey, 'hoverKey');
+                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
                     }
                 }
             };
@@ -122,6 +126,8 @@ export const Content = () => {
         };
         setList(newList);
         setOpenKeyWordSelect(false);
+        setHoverKey(0);
+        hoverKeyRef.current = 0;
     };
 
     const handleHasKeyWork = (e: any, keyword: string[]) => {
@@ -134,8 +140,9 @@ export const Content = () => {
                     return item;
                 }
             });
+            console.log(filterKeyWord, 'filterKeyWord');
             if (filterKeyWord.length > 0) {
-                setKeyWordSelectList(filterKeyWord);
+                setKeyWordSelectList([...filterKeyWord]);
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
                 setY(y);
@@ -727,7 +734,10 @@ export const Content = () => {
                                 key={keyWordItemKey}
                                 style={{ height: '30px', lineHeight: '30px' }}
                                 className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
-                                onMouseEnter={() => setHoverKey(keyWordItemKey)}
+                                onMouseEnter={() => {
+                                    setHoverKey(keyWordItemKey);
+                                    hoverKeyRef.current = keyWordItemKey;
+                                }}
                                 onClick={() => handleReplaceValue(item)}
                             >
                                 <span className="text-sm">{item}</span>

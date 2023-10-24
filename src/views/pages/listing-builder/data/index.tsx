@@ -2231,8 +2231,8 @@ export const DEFAULT_LIST = [
         row: 3,
         btnText: 'AI生成标题',
         keyword: [
-            { text: 'iphone', num: 0 },
-            { text: 'iphone pro', num: 0 }
+            { text: 'iphone', recommend: 0 },
+            { text: 'iphone pro', recommend: 0 }
         ]
     },
     {

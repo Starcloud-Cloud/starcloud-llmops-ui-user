@@ -32,7 +32,7 @@ import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getCaretPosition } from 'utils/getCaretPosition';
-import { DEFAULT_LIST, SCORE_LIST } from '../../../data/index';
+import { SCORE_LIST } from '../../../data/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
@@ -62,7 +62,7 @@ export const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
-    const { list, setList, enableAi, setEnableAi } = useListing();
+    const { list, setList, enableAi, setEnableAi, keywordHighlight } = useListing();
 
     const ulRef = React.useRef<any>(null);
     React.useEffect(() => {
@@ -659,10 +659,22 @@ export const Content = () => {
                                                     <div
                                                         key={index}
                                                         className={`${
-                                                            itemKeyword?.num > 0 ? 'bg-[#ffaca6] ml-1 line-through px-1' : 'ml-1 px-1'
+                                                            keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                ? 'bg-[#ffaca6] ml-1 line-through px-1'
+                                                                : 'ml-1 px-1'
                                                         }`}
                                                     >
                                                         <span>{itemKeyword.text}</span>
+                                                        {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
+                                                            <span>
+                                                                (
+                                                                {
+                                                                    keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)
+                                                                        ?.num
+                                                                }
+                                                                )
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>

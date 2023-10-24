@@ -20,8 +20,17 @@ type ListType = {
     value?: string;
     row: number;
     btnText: string;
-    keyword: { text: string; num: number }[];
+    keyword: { text: string; recommend: number }[];
 };
+
+const ListingContext = createContext<ListingContextType | null>(null);
+
+type keywordHighlightType = {
+    text: string;
+    num: number;
+    type: ListingBuilderEnum;
+    fiveType?: string;
+}[];
 
 type ListingContextType = {
     uid: string;
@@ -34,9 +43,9 @@ type ListingContextType = {
     setList: (list: any) => void;
     enableAi: boolean;
     setEnableAi: (enableAi: boolean) => void;
+    setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
+    keywordHighlight: keywordHighlightType | null;
 };
-
-const ListingContext = createContext<ListingContextType | null>(null);
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
     const [uid, setUid] = useState('');
@@ -48,6 +57,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
     const [enableAi, setEnableAi] = useState(true);
+    // 高亮数据
+    const [keywordHighlight, setKeywordHighlight] = useState<keywordHighlightType | null>(null);
     const [keywordList, setKeywordList] = useState<any[]>([]);
 
     const location = useLocation();
@@ -63,7 +74,22 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     }, [queryUid, queryVersion]);
 
     return (
-        <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry, list, setList, enableAi, setEnableAi }}>
+        <ListingContext.Provider
+            value={{
+                uid,
+                setUid,
+                version,
+                setVersion,
+                country,
+                setCountry,
+                list,
+                setList,
+                enableAi,
+                setEnableAi,
+                keywordHighlight,
+                setKeywordHighlight
+            }}
+        >
             {children}
         </ListingContext.Provider>
     );

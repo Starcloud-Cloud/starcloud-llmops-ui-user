@@ -1,3 +1,6 @@
+import { getGrade } from 'api/listing/build';
+import _ from 'lodash';
+import { debounce } from 'lodash-es';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
@@ -77,6 +80,53 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             setUid(queryUid);
         }
     }, [queryUid, queryVersion]);
+
+    // 回显推荐关键词 & 是否开启
+    useEffect(() => {
+        if (detail?.draftConfig) {
+            const copyList = _.cloneDeep(list);
+            // 标题
+            copyList[0].enable = !detail.draftConfig.titleConfig.ignoreUse;
+            copyList[0].keyword = detail.draftConfig.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
+
+            //描述
+            copyList[detail.draftConfig?.fiveDescNum + 1].enable = !detail.draftConfig.productDescConfig.ignoreUse;
+            copyList[detail?.draftConfig.fiveDescNum + 1].keyword =
+                detail.draftConfig.productDescConfig.recommendKeys?.map((item: any) => ({
+                    text: item.keyword,
+                    recommend: 1
+                })) || [];
+
+            // 搜索
+            copyList[detail.draftConfig?.fiveDescNum + 2].enable = !detail.draftConfig?.searchTermConfig?.ignoreUse;
+            copyList[detail.draftConfig?.fiveDescNum + 2].keyword =
+                detail.draftConfig?.searchTermConfig.recommendKeys?.map((item: any) => ({
+                    text: item.keyword,
+                    recommend: 1
+                })) || [];
+
+            // // 5点描述
+            Object.keys(detail?.draftConfig?.fiveDescConfig).forEach((key) => {
+                const index = Number(key);
+                copyList[index].enable = !detail.draftConfig?.fiveDescConfig[key]?.ignoreUse;
+                copyList[index].keyword =
+                    detail.draftConfig?.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
+                        text: item.keyword
+                    })) || [];
+            });
+            setList(copyList);
+        }
+    }, [detail]);
+
+    useEffect(() => {
+        // const timer = setTimeout(() => {
+        //     getGrade({}).then((res) => {});
+        // }, 500);
+        // return () => {
+        //     // 在每次状态变化时，清除之前的计时器
+        //     clearTimeout(timer);
+        // };
+    }, [list]);
 
     return (
         <ListingContext.Provider

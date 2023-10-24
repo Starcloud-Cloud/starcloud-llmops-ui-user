@@ -17,9 +17,9 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
+import { Input, Alert, Divider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React, { useEffect } from 'react';
+import React from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -134,13 +134,13 @@ export const Content = () => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
         const value = e.target.value;
+        // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             const filterKeyWord = keyword.filter((item, index) => {
                 if (item.includes(value[startIndex - 1])) {
                     return item;
                 }
             });
-            console.log(filterKeyWord, 'filterKeyWord');
             if (filterKeyWord.length > 0) {
                 setKeyWordSelectList([...filterKeyWord]);
                 const { x, y } = getCaretPosition(e.target);

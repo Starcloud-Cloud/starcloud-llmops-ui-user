@@ -115,7 +115,7 @@ export const KeywordList = ({ selected, setSelected }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight } = useListing();
 
     // 获取详情
     useEffect(() => {

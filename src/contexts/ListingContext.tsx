@@ -20,6 +20,7 @@ type ListType = {
     value?: string;
     row: number;
     btnText: string;
+    enable: boolean;
     keyword: { text: string; recommend: number }[];
 };
 

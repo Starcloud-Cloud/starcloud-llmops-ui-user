@@ -1,14 +1,5 @@
 import request from 'utils/axios';
 
-// /**
-//  * 创建草稿
-//  * @param data
-//  * @returns
-//  */
-// export const createDraft = (data: any) => {
-//     return request.put({ url: '/listing/draft/create', data });
-// };
-
 /**
  * 新增关键词
  * @param data

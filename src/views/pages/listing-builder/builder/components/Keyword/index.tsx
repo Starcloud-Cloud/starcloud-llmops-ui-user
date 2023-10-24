@@ -6,14 +6,35 @@ import { KeywordList } from './KeywordList';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useListing } from 'contexts/ListingContext';
+import { delKey } from 'api/listing/build';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 export const KeyWord = () => {
-    const { detail } = useListing();
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState<any[]>([]);
+    const { detail, setUpdate } = useListing();
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleDel = async () => {
+        const res = await delKey(selected);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '删除成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            setUpdate({});
+        }
     };
 
     return (
@@ -40,7 +61,7 @@ export const KeyWord = () => {
                         隐藏已使用
                     </Button>
                 </div>
-                <Button variant={'text'} color={'secondary'} startIcon={<DeleteIcon />}>
+                <Button variant={'text'} color={'secondary'} startIcon={<DeleteIcon />} onClick={() => handleDel()}>
                     删除
                 </Button>
             </div>

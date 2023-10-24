@@ -236,6 +236,7 @@ export const Content = () => {
             value: '',
             row: 4,
             btnText: 'AI生成五点描述',
+            enable: true,
             keyword: []
         });
         setList(copyList);
@@ -256,6 +257,13 @@ export const Content = () => {
     const handleTurnLowercase = (index: number) => {
         const copyList = _.cloneDeep(list);
         copyList[index].value = copyList[index].value?.toLowerCase();
+        setList(copyList);
+    };
+
+    const handleSwitch = (e: any, index: number) => {
+        const value = e.target.checked;
+        const copyList = _.cloneDeep(list);
+        copyList[index].enable = !value;
         setList(copyList);
     };
 
@@ -646,7 +654,7 @@ export const Content = () => {
                                     <div className="flex items-center">
                                         <div className="flex items-center">
                                             <span>不计入已使用</span>
-                                            <Switch color={'secondary'} />
+                                            <Switch checked={!item.enable} color={'secondary'} onChange={(e) => handleSwitch(e, index)} />
                                         </div>
                                         {item.isOvertop && (
                                             <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>

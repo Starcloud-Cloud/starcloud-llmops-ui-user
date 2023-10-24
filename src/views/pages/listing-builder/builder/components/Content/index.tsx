@@ -701,7 +701,7 @@ export const Content = () => {
                                                         }`}
                                                     >
                                                         <span>{itemKeyword.text}</span>
-                                                        {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
+                                                        {/* {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
                                                             <span>
                                                                 (
                                                                 {
@@ -710,7 +710,7 @@ export const Content = () => {
                                                                 }
                                                                 )
                                                             </span>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                 ))}
                                             </div>

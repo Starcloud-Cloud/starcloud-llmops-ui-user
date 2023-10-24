@@ -7,6 +7,12 @@ import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { getListingDetail } from 'api/listing/build';
 import { useListing } from 'contexts/ListingContext';
+import { fontWeight } from '@mui/system';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Popover, Rate } from 'antd';
+import _ from 'lodash';
 
 type TableEnhancedCreateDataType = {
     keyword: string;
@@ -15,6 +21,7 @@ type TableEnhancedCreateDataType = {
     searchWeeklyRank: number;
     month: string;
     updatedTime: string;
+    use: any[];
 };
 
 // table filter
@@ -135,6 +142,20 @@ export const KeywordList = ({ selected, setSelected }: any) => {
         }
     }, [update, version, uid]);
 
+    useEffect(() => {
+        if (keywordHighlight?.length) {
+            rows.forEach((item) => {
+                keywordHighlight.forEach((item1) => {
+                    if (item1.text === item.keyword) {
+                        item.use = [];
+                        item.use.push(item1);
+                    }
+                });
+            });
+        }
+        setRows([...rows]);
+    }, [keywordHighlight, rows]);
+
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -172,6 +193,77 @@ export const KeywordList = ({ selected, setSelected }: any) => {
     };
 
     const isSelected = (keyword: string) => selected.indexOf(keyword) !== -1;
+
+    const keywordUseModal = (use: any[]) => {
+        const filterTitle = use?.filter((item) => item.type === ListingBuilderEnum.TITLE) || [];
+        const filterProduct = use?.filter((item) => item.type === ListingBuilderEnum.PRODUCT_DES) || [];
+        const filterSearch = use?.filter((item) => item.type === ListingBuilderEnum.SEARCH_WORD) || [];
+        const filterFive = use
+            ?.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+            .map((item) => ({ ...item, index: +item.fiveType.slice(9) }));
+        const sortedFive = _.sortBy(filterFive, ['index']);
+
+        console.log(filterFive);
+        return (
+            <div>
+                <div>
+                    <span>标题：</span>
+                    <span>{filterTitle?.[0]?.num}</span>
+                </div>
+                {sortedFive.map((item) => (
+                    <div>
+                        <span>{`五点描述${item.index}`}:</span>
+                        <span>{item?.num}</span>
+                    </div>
+                ))}
+                <div>
+                    <span>产品描述:</span>
+                    <span>{filterProduct?.[0]?.num}</span>
+                </div>
+                <div>
+                    <span>搜索词:</span>
+                    <span>{filterSearch?.[0]?.num}</span>
+                </div>
+            </div>
+        );
+    };
+
+    const handleUse = (use: any[]) => {
+        const filterNotFive = use?.filter((item) => item.type !== ListingBuilderEnum.FIVE_DES) || [];
+        const filterFive = use?.filter((item) => item.type === ListingBuilderEnum.FIVE_DES) || [];
+
+        switch (filterNotFive.length + filterFive.length) {
+            case 0:
+                return null;
+            case 1:
+                return (
+                    <Popover content={() => keywordUseModal(use)} title="使用分布">
+                        <CheckCircleIcon />
+                    </Popover>
+                );
+            case 2:
+                return (
+                    <Popover content={<div>1</div>} title="Title">
+                        <RadioButtonUncheckedIcon />
+                    </Popover>
+                );
+            case 3:
+                return (
+                    <Popover content={<div>1</div>} title="Title">
+                        <Rate allowHalf />
+                    </Popover>
+                );
+            case 4:
+                return (
+                    <Popover content={<div>1</div>} title="Title">
+                        <Rate />
+                    </Popover>
+                );
+            default:
+                break;
+        }
+    };
+
     return (
         <MainCard content={false}>
             <TableContainer component={Paper}>
@@ -222,7 +314,7 @@ export const KeywordList = ({ selected, setSelected }: any) => {
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{}</TableCell>
+                                    <TableCell align="center">{handleUse(row.use)}</TableCell>
                                 </TableRow>
                             );
                         })}

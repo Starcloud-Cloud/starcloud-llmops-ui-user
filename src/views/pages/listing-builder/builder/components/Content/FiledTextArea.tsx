@@ -26,7 +26,7 @@ const mergeArray = (arr: any[]) => {
 
 const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type }: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
-    const { list, setKeywordHighlight } = useListing();
+    const { list, setKeywordHighlight, keywordHighlight } = useListing();
     const copyHighlightWordList = highlightWordList.map((item: any) => item.text);
 
     const resultArray = useMemo(() => {
@@ -39,7 +39,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
 
     useEffect(() => {
         const copyList = _.clone(list);
-        const data: any = [];
+        const data: any[] = keywordHighlight ? [...keywordHighlight] : [];
         resultArray?.map((item: string) => {
             copyList[index].keyword.forEach((item1) => {
                 if (item1.text === item) {

@@ -5,22 +5,18 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 const mergeArray = (arr: any[]) => {
     const mergedArray = [];
-    // 创建一个对象用于存储合并后的数据
     const mergedData: any = {};
 
     arr.forEach((item) => {
         const key = item.five_des ? `${item.type}-${item.text}-${item.five_des}` : `${item.type}-${item.text}`;
 
         if (!mergedData[key]) {
-            // 如果当前 key 不存在，创建一个新的对象
             mergedData[key] = { ...item };
         } else {
-            // 如果 key 已存在，将 num 相加
             mergedData[key].num += item.num;
         }
     });
 
-    // 将合并后的对象转为数组
     for (const key in mergedData) {
         mergedArray.push(mergedData[key]);
     }
@@ -31,9 +27,9 @@ const mergeArray = (arr: any[]) => {
 const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type }: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight } = useListing();
+    const copyHighlightWordList = highlightWordList.map((item: any) => item.text);
 
     const resultArray = useMemo(() => {
-        const copyHighlightWordList = [...highlightWordList];
         copyHighlightWordList.sort((a: string, b: string) => b.length - a.length);
         const r = `(${copyHighlightWordList.join('|')})`;
         const pattern = new RegExp(r);
@@ -78,7 +74,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
                 {resultArray?.map((item: any) => (
                     <pre
                         className={`${
-                            highlightWordList.includes(item)
+                            copyHighlightWordList.includes(item)
                                 ? 'text-transparent inline whitespace-pre-wrap text-sm font-[monospace] bg-[#ffaca6]'
                                 : 'text-transparent inline whitespace-pre-wrap text-sm font-[monospace]'
                         }`}

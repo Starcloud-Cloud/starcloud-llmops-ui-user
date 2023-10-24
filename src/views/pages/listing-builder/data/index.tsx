@@ -2231,10 +2231,7 @@ export const DEFAULT_LIST = [
         row: 3,
         btnText: 'AI生成标题',
         enable: true,
-        keyword: [
-            { text: 'iphone', recommend: 0 },
-            { text: 'iphone pro', recommend: 0 }
-        ]
+        keyword: []
     },
     {
         title: '五点描述1',

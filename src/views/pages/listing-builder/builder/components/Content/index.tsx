@@ -681,7 +681,8 @@ export const Content = () => {
                                             item.keyword?.map((v) => v.text)
                                         )
                                     }
-                                    highlightWordList={keyWordSelectList}
+                                    highlightWordList={item.keyword}
+                                    // highlightWordList={keyWordSelectList}
                                     index={index}
                                     type={item.type}
                                 />

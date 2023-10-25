@@ -678,7 +678,8 @@ export const Content = () => {
                                         handleInputChange(
                                             e,
                                             index,
-                                            item.keyword?.map((v) => v.text)
+                                            // item.keyword?.map((v) => v.text)
+                                            detail?.keywordMetaData?.map((v: any) => v.keyword)
                                         )
                                     }
                                     highlightWordList={item.keyword}

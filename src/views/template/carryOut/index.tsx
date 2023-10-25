@@ -1,10 +1,13 @@
 import { Box, Grid, Typography, Divider } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import { t } from 'hooks/web/useI18n';
 import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
 function CarryOut({ config, changeData, loadings, allExecute, variableChange, promptChange, changeanswer, isShows, changeConfigs }: any) {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     return (
         <Box>
             <Grid container spacing={4}>
@@ -49,7 +52,9 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                             {/* <Divider orientation="vertical" flexItem /> */}
                             {/* {t('market.plugVersion')}:3 */}
                             <Divider orientation="vertical" flexItem />
-                            更新时间:{formatDate(config?.updateTime)}
+                            {searchParams.get('type') === 'collect'
+                                ? `收藏时间:${formatDate(config?.favoriteTime)}`
+                                : `更新时间:${formatDate(config?.updateTime)}`}
                         </Box>
                     </Box>
                 </Grid>

@@ -7,7 +7,6 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
-const MarketList = Loadable(lazy(() => import('views/template/market/components/list')));
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));
@@ -43,7 +42,8 @@ const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 // listing-builder
 const ListingBuilder = Loadable(lazy(() => import('views/pages/listing-builder/builder')));
 const ListingBuilderPage = Loadable(lazy(() => import('views/pages/listing-builder/page')));
-
+//拓展词搜索
+const TermSearch = Loadable(lazy(() => import('views/pages/termSearch')));
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 
@@ -154,6 +154,10 @@ const MainRoutes = {
         {
             path: '/ListingBuilderPage',
             element: <ListingBuilderPage />
+        },
+        {
+            path: '/termSearch',
+            element: <TermSearch />
         }
     ]
 };

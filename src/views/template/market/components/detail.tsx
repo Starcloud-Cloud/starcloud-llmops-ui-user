@@ -8,6 +8,7 @@ import {
     metadata
     // installTemplate
 } from 'api/template';
+import { favoriteGetMarketInfo, favoriteCollect, favoriteCancel } from 'api/template/collect';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { executeMarket } from 'api/template/fetch';
@@ -15,7 +16,7 @@ import CarryOut from 'views/template/carryOut';
 import { Execute, Details } from 'types/template';
 import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
@@ -24,6 +25,7 @@ import _ from 'lodash-es';
 import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { GradeOutlined, Grade } from '@mui/icons-material';
 interface Items {
     label: string;
     value: string;
@@ -38,6 +40,8 @@ function Deatail() {
     const { setUserInfo }: any = userInfoStore();
     const { categoryTrees } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     const navigate = useNavigate();
     const [detailData, setDetailData] = useState<Details>(null as unknown as Details);
     const detailRef: any = useRef(null);
@@ -216,49 +220,63 @@ function Deatail() {
             })
         );
     };
+    const [active, setActive] = useState(false);
     useEffect(() => {
-        marketDeatail({ uid }).then((res: any) => {
-            setAllLoading(false);
-            if (res) {
-                const newRes = _.cloneDeep(res);
-                const result = {
-                    ...newRes,
-                    workflowConfig: {
-                        ...newRes.workflowConfig,
-                        steps: newRes.workflowConfig.steps.map((item: any) => {
-                            return {
-                                ...item,
-                                flowStep: {
-                                    ...item.flowStep,
-                                    response: {
-                                        ...item.flowStep.response,
-                                        defaultValue: item.flowStep.response.answer,
-                                        answer: ''
-                                    }
-                                },
-                                variable: item.variable
-                                    ? {
-                                          variables: item.variable?.variables.map((el: any) => {
-                                              if (el.value) {
-                                                  return {
-                                                      ...el,
-                                                      defaultValue: el.value,
-                                                      value: ''
-                                                  };
-                                              } else {
-                                                  return el;
-                                              }
-                                          })
-                                      }
-                                    : null
-                            };
-                        })
-                    }
-                };
-                detailRef.current = result;
-                setDetailData(result);
+        if (searchParams.get('type') === 'collect') {
+            favoriteGetMarketInfo({ uid }).then((res) => {
+                setAllLoading(false);
+                setPlholder(res);
+            });
+        } else {
+            marketDeatail({ uid }).then((res: any) => {
+                if (res) {
+                    setAllLoading(false);
+                    setPlholder(res);
+                }
+            });
+        }
+        const setPlholder = (res: any) => {
+            const newRes = _.cloneDeep(res);
+            if (newRes.isFavorite) {
+                setActive(true);
             }
-        });
+            const result = {
+                ...newRes,
+                workflowConfig: {
+                    ...newRes.workflowConfig,
+                    steps: newRes.workflowConfig.steps.map((item: any) => {
+                        return {
+                            ...item,
+                            flowStep: {
+                                ...item.flowStep,
+                                response: {
+                                    ...item.flowStep.response,
+                                    defaultValue: item.flowStep.response.answer,
+                                    answer: ''
+                                }
+                            },
+                            variable: item.variable
+                                ? {
+                                      variables: item.variable?.variables.map((el: any) => {
+                                          if (el.value) {
+                                              return {
+                                                  ...el,
+                                                  defaultValue: el.value,
+                                                  value: ''
+                                              };
+                                          } else {
+                                              return el;
+                                          }
+                                      })
+                                  }
+                                : null
+                        };
+                    })
+                }
+            };
+            detailRef.current = result;
+            setDetailData(result);
+        };
         metadata().then((res) => {
             setAppModel(res);
         });
@@ -304,6 +322,59 @@ function Deatail() {
     const categoryList = marketStore((state) => state.categoryList);
     return (
         <Card ref={ref} elevation={2} sx={{ padding: 2, position: 'relative' }}>
+            <div className="absolute right-[20px] top-[20px]">
+                {!active ? (
+                    <div
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                            favoriteCollect({ marketUid: detailRef.current?.uid }).then((res) => {
+                                if (res) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '收藏成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            close: false
+                                        })
+                                    );
+                                }
+                            });
+                            setActive(true);
+                            e.stopPropagation();
+                        }}
+                    >
+                        <GradeOutlined color="secondary" />
+                    </div>
+                ) : (
+                    <div
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                            favoriteCancel({ marketUid: detailRef.current?.uid }).then((res) => {
+                                if (res) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '取消收藏成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            close: false
+                                        })
+                                    );
+                                }
+                            });
+                            setActive(false);
+                            e.stopPropagation();
+                        }}
+                    >
+                        <Grade sx={{ color: '#ecc94b99' }} />
+                    </div>
+                )}
+            </div>
             {allLoading && (
                 <div
                     style={{
@@ -323,9 +394,15 @@ function Deatail() {
                 </div>
             )}
             <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1, display: 'inline-block' }}>
-                <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
-                    {t('market.all')}
-                </Link>
+                {searchParams.get('type') !== 'collect' ? (
+                    <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/appMarket')}>
+                        {t('market.all')}
+                    </Link>
+                ) : (
+                    <Link sx={{ cursor: 'pointer' }} underline="hover" color="inherit" onClick={() => navigate('/collect')}>
+                        收藏
+                    </Link>
+                )}
                 <Link
                     color="secondary"
                     sx={{ cursor: 'pointer' }}

@@ -37,6 +37,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
+import { getListingByAsin } from 'api/listing/build';
 
 const { Search } = Input;
 
@@ -63,7 +64,7 @@ export const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
 
-    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail } = useListing();
+    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country } = useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
@@ -284,6 +285,15 @@ export const Content = () => {
         // 处理逻辑
     };
 
+    // 所搜
+    const handleSearch = async (value: any) => {
+        console.log(value);
+        await getListingByAsin({
+            asin: value,
+            marketName: country.key
+        });
+    };
+
     return (
         <div>
             <Card className="rounded-t-none flex justify-center flex-col p-3" title={list?.[0]?.value || 'Listing草稿'}>
@@ -399,6 +409,7 @@ export const Content = () => {
                     </div>
                     <div className="flex items-center justify-end flex-[70%]">
                         <Search
+                            onSearch={handleSearch}
                             className="lg:w-full xl:w-[70%]"
                             placeholder="输入ASIN，一键获取亚马逊Listing内容"
                             enterButton="获取Listing"

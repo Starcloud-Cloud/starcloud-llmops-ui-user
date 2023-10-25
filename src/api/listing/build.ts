@@ -69,15 +69,20 @@ export const importDict = (data: any) => {
 
 // 克隆
 export const draftClone = (data: any) => {
-    return request.post({ url: 'listing/draft/clone', data });
+    return request.post({ url: '/listing/draft/clone', data });
 };
 
 // 导出
 export const draftExport = (data: any) => {
-    return request.get({ url: 'listing/draft/export', params: data });
+    return request.get({ url: '/listing/draft/export', params: data });
 };
 
 // 词库列表
 export const getListingDict = (data: any) => {
     return request.get({ url: '/listing/dict/page', params: data });
+};
+
+//通过ASIN获取词库
+export const getListingByAsin = (data: any) => {
+    return request.get({ url: '/listing/KeywordMetadata/Listing', params: data });
 };

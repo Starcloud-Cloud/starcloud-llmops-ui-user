@@ -307,10 +307,14 @@ const Content = () => {
             ],
             description: null
         };
-        const copyList = _.cloneDeep(list);
+        let copyList: any[] = _.cloneDeep(list);
         copyList[0].value = res.title;
-        // copyList[2]?.value = res.description;
         const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
+        copyList[productIndex].value = res.description;
+        res.features?.forEach((item, index) => {
+            copyList[index + 1].value = item;
+        });
+        setList(copyList);
     };
 
     return (

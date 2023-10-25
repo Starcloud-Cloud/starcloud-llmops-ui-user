@@ -2,7 +2,19 @@ import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { RightOutlined } from '@ant-design/icons';
-import { Box, Typography, IconButton, Grid, InputAdornment, TextField, Tabs, Tab } from '@mui/material';
+import {
+    Box,
+    Typography,
+    IconButton,
+    Grid,
+    InputAdornment,
+    TextField,
+    Tabs,
+    Tab,
+    FormControl,
+    InputLabel,
+    OutlinedInput
+} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { t } from 'hooks/web/useI18n';
@@ -133,6 +145,9 @@ function TemplateMarket() {
         category: searchParams.get('category') || 'ALL'
     });
     useEffect(() => {
+        searchList();
+    }, [queryParams]);
+    const searchList = () => {
         if (queryParams.category !== 'ALL') {
             const newData = cateTree.filter((item) => {
                 return item.code === queryParams.category;
@@ -193,14 +208,22 @@ function TemplateMarket() {
             });
             setNewList(filterData);
         }
-    }, [queryParams]);
+    };
     //title筛选
+    const timer: any = useRef(null);
+    const [marketTitle, setMarketTitle] = useState('');
     const handleChange = (event: any) => {
         const { name, value } = event.target;
-        setQueryParams({
-            ...queryParams,
-            [name]: value
-        });
+        setMarketTitle(value);
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => {
+            // @ts-ignore
+            _hmt.push(['_trackEvent', '应用市场', '搜索', '搜索词', value]);
+            setQueryParams({
+                ...queryParams,
+                [name]: value
+            });
+        }, 300);
     };
     //当用户更改了筛选触发的逻辑
     const handleSearch = () => {
@@ -351,22 +374,21 @@ function TemplateMarket() {
                 <Typography variant="h2" lineHeight={1}>
                     {t('market.title')}
                 </Typography>
-                <TextField
-                    size="small"
-                    id="filled-start-adornment"
-                    sx={{ width: '300px' }}
-                    placeholder={t('market.place')}
-                    name="name"
-                    value={queryParams.name}
-                    onChange={handleChange}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
+                <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
+                    <OutlinedInput
+                        name="name"
+                        value={marketTitle}
+                        onChange={handleChange}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton size="small" onClick={searchList} edge="end">
+                                    <SearchIcon />
+                                </IconButton>
                             </InputAdornment>
-                        )
-                    }}
-                />
+                        }
+                        placeholder={t('market.place')}
+                    />
+                </FormControl>
             </Box>
             <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                 {menuList?.map((item, index) => (
@@ -482,7 +504,7 @@ function TemplateMarket() {
                                             }}
                                             className="absolute right-0 top-[-10px] text-[#673ab7] cursor-pointer"
                                         >
-                                            更多收藏应用
+                                            更多收藏
                                             <RightOutlined rev={undefined} />
                                         </div>
                                     </div>

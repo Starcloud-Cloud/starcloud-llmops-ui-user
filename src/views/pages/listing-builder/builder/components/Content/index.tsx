@@ -641,7 +641,7 @@ export const Content = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'撤回'} arrow placement="top">
+                                        {/* <Tooltip title={'撤回'} arrow placement="top">
                                             <IconButton size="small">
                                                 <RefreshIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
@@ -650,7 +650,7 @@ export const Content = () => {
                                             <IconButton size="small">
                                                 <ReplayIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
-                                        </Tooltip>
+                                        </Tooltip> */}
                                         <Divider type="vertical" style={{ marginInline: '4px' }} />
                                         <span className="text-[#bec2cc]  text-xs">
                                             {item.character}/{item.maxCharacter}字
@@ -682,7 +682,7 @@ export const Content = () => {
                                         )
                                     }
                                     highlightWordList={item.keyword}
-                                    // highlightWordList={keyWordSelectList}
+                                    highlightAllWordList={detail.keywordMetaData}
                                     index={index}
                                     type={item.type}
                                 />
@@ -731,9 +731,9 @@ export const Content = () => {
                     <ul
                         ref={ulRef}
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
-                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1"
+                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
-                        {keyWordSelectList.map((item, keyWordItemKey) => (
+                        {detail?.keywordResume?.map((item: string, keyWordItemKey: number) => (
                             <li
                                 key={keyWordItemKey}
                                 style={{ height: '30px', lineHeight: '30px' }}

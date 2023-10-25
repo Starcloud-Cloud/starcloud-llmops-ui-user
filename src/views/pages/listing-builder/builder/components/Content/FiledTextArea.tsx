@@ -24,7 +24,7 @@ const mergeArray = (arr: any[]) => {
     return mergedArray;
 };
 
-const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type }: any) => {
+const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type, highlightAllWordList }: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight, keywordHighlight } = useListing();
     const copyHighlightWordList = highlightWordList.map((item: any) => item.text);

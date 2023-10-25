@@ -346,7 +346,7 @@ function Deatail() {
                             e.stopPropagation();
                         }}
                     >
-                        <GradeOutlined color="secondary" />
+                        <GradeOutlined sx={{ color: '#0003' }} />
                     </div>
                 ) : (
                     <div

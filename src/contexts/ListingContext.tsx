@@ -19,7 +19,7 @@ export type ListType = {
     character: number;
     word: number;
     isOvertop?: boolean;
-    value?: string;
+    value: string;
     row: number;
     btnText: string;
     enable: boolean;

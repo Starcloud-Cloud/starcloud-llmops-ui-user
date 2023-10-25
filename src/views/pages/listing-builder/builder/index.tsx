@@ -4,7 +4,7 @@ import { KeyWord } from './components/Keyword';
 import { Content } from './components/Content';
 import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import React from 'react';
+import React, { useRef } from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SettingModal } from './components/SettingModal';
@@ -20,6 +20,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 function a11yProps(index: number) {
     return {
@@ -197,6 +198,7 @@ const ListingBuilder = () => {
                     setSettingOpen(false);
                 }}
             />
+
             <Confirm
                 open={open}
                 handleClose={() => {

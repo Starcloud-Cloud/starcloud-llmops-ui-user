@@ -38,6 +38,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
 import { getListingByAsin } from 'api/listing/build';
+import { set } from 'date-fns';
 
 const { Search } = Input;
 
@@ -287,11 +288,37 @@ export const Content = () => {
 
     // 所搜
     const handleSearch = async (value: any) => {
-        console.log(value);
-        await getListingByAsin({
-            asin: value,
-            marketName: country.key
-        });
+        // const res = await getListingByAsin({
+        //     asin: value,
+        //     marketName: country.key
+        // });
+        const res = {
+            market: 'GLOBAL',
+            asin: 'B08RYQR1CJ',
+            imgUrls: [
+                'https://images-na.ssl-images-amazon.com/images/I/41Jj+ixqgFL.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/41HoSBUctCL.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/51CATaXh+ZL.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/41RIFOzGg0L.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/318E3Iwxe+L.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/41TlyeP9kmL.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/51tqGaEVYzL.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/41HNbEScSSL.jpg'
+            ],
+            title: 'Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper Makeup Organizer PU Leather Washable Waterproof (Pink)',
+            features: [
+                '✅【WATERPROOF MATERIAL】 Cosmetic case made of high-quality PU leather material, the surface is waterproof and washable, easy to clean; no worries for leakage when traveling',
+                '✅【LIGHT WEIGHT & ROOMY】 9 x 6 x 4.5 inch; this makeup bag is light-weighted and perfect for holding all kinds of beauty essentials, enough to hold everything securely you need for your travel',
+                '✅【UNIQUE DESIGN】 Makeup bag with wide durable handle and sturdy zipper, portable and easy to carry; can be used as a make up organizer, toiletry wash bag, pencil case and daily handbag. Suitable for outdoor, business trip, camping, travel, gym room, indoor, house-held storage',
+                '✅【VERSATILE MAKEUP BAG】Ideal for travel, business trip, vacation, gym, camping, toiletry organization and outdoor activity; its a functional makeup bag, cosmetic bag, travel organizer bag',
+                '✅【SERVICE GUARANTEE】Please feel free to contact us whenever you meet any problem; we provide lifetime warranty and customer service'
+            ],
+            description: null
+        };
+        const copyList = _.cloneDeep(list);
+        copyList[0].value = res.title;
+        // copyList[2]?.value = res.description;
+        const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
     };
 
     return (

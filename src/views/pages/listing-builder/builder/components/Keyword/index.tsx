@@ -1,5 +1,5 @@
-import { Button } from '@mui/material';
-import React from 'react';
+import { Button, SwipeableDrawer } from '@mui/material';
+import React, { useRef } from 'react';
 import { AddKeywordModal } from '../AddKeyworkModal';
 import AddIcon from '@mui/icons-material/Add';
 import { KeywordList } from './KeywordList';
@@ -12,12 +12,20 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { Confirm } from 'ui-component/Confirm';
 
+const containerStyle: React.CSSProperties = {
+    position: 'relative',
+    overflow: 'hidden',
+    background: '#fff'
+};
+
 export const KeyWord = () => {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
     const [delOpen, setDelOpen] = React.useState(false);
     const { detail, setUpdate, uid, version } = useListing();
+
+    const containerRef = useRef<any>(null);
 
     const handleClose = () => {
         setOpen(false);
@@ -48,7 +56,7 @@ export const KeyWord = () => {
     };
 
     return (
-        <div className="h-full p-3 bg-white">
+        <div className="h-full p-3 bg-white" style={containerStyle}>
             <div className="flex justify-between items-center">
                 <div className="text-lg font-bold py-1">关键词</div>
                 <div className="flex justify-between">
@@ -94,6 +102,7 @@ export const KeyWord = () => {
             <div>
                 <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} />
             </div>
+
             <AddKeywordModal open={open} handleClose={handleClose} />
             <Confirm open={delOpen} handleOk={handleDel} handleClose={() => setDelOpen(false)} />
         </div>

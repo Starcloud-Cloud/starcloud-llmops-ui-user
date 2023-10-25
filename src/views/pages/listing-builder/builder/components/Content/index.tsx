@@ -276,7 +276,7 @@ export const Content = () => {
 
     return (
         <div>
-            <Card className="rounded-t-none flex justify-center flex-col p-5" title="Listing优化">
+            <Card className="rounded-t-none flex justify-center flex-col p-3" title={list?.[0]?.value || 'Listing草稿'}>
                 <div className="text-lg font-bold py-1">Listing优化</div>
                 <div className="grid xl:grid-cols-2 xs:grid-cols-1 gap-2 w-full">
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
@@ -332,11 +332,11 @@ export const Content = () => {
                     {scoreList?.map((item, index) => (
                         <div className="flex  items-center w-full flex-col" key={index}>
                             <div className="mt-2  w-full">
-                                <span className="font-semibold">{item.title}</span>
+                                <span className="font-semibold text-base">{item.title}</span>
                                 {item.list.map((v, i) => (
                                     <>
                                         <div className="w-full py-1" key={i}>
-                                            <div className="flex justify-between items-center">
+                                            <div className="flex justify-between items-center h-[30px]">
                                                 <span className="flex-[80%]">{v.label}</span>
                                                 {v.value ? (
                                                     <svg
@@ -640,7 +640,7 @@ export const Content = () => {
                                                 <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                        {/* <Divider type="vertical" style={{ marginInline: '4px' }} /> */}
                                         {/* <Tooltip title={'撤回'} arrow placement="top">
                                             <IconButton size="small">
                                                 <RefreshIcon className="text-[#bec2cc] cursor-pointer text-sm" />

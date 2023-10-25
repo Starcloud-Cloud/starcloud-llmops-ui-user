@@ -364,7 +364,7 @@ const WorkflowCreateModal = ({
                         left: '50%',
                         transform: 'translate(-50%, -50%)'
                     }}
-                    className="xl:w-[880px] xs:w-[350px] sm:w-[450px]"
+                    className="xl:w-[880px] xs:w-[350px] sm:w-[420px]"
                     title="新增技能"
                     content={false}
                     secondary={

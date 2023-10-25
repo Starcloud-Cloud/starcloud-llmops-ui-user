@@ -91,7 +91,7 @@ const ListingBuilder = () => {
         <Card>
             <CardHeader
                 sx={{ padding: 2 }}
-                title={'Listing'}
+                title={list?.[0]?.value || 'Listing草稿'}
                 action={
                     <div className="flex items-center">
                         <div className="w-[100px]">

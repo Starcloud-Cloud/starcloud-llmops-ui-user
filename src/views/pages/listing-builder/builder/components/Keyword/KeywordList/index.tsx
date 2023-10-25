@@ -3,11 +3,10 @@ import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { getListingDetail } from 'api/listing/build';
 import { useListing } from 'contexts/ListingContext';
-import { fontWeight } from '@mui/system';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -87,7 +86,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         scope="row"
                         width={150}
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'center'}
+                        align={'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
@@ -116,7 +115,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-export const KeywordList = ({ selected, setSelected }: any) => {
+export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
 
@@ -142,6 +141,26 @@ export const KeywordList = ({ selected, setSelected }: any) => {
         }
     }, [update, version, uid]);
 
+    // TODO 简化
+    const pageList = useMemo(() => {
+        let newData: any[] = [];
+        if (hiddenUse && keywordHighlight.flat().filter((item) => item).length > 0) {
+            rows.forEach((item) => {
+                keywordHighlight
+                    .flat()
+                    .filter((item) => item)
+                    .forEach((item1) => {
+                        if (item1.text !== item.keyword) {
+                            newData.push(item);
+                        }
+                    });
+            });
+            return newData;
+        } else {
+            return rows;
+        }
+    }, [hiddenUse, rows]);
+
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -153,7 +172,7 @@ export const KeywordList = ({ selected, setSelected }: any) => {
             if (selected.length > 0) {
                 setSelected([]);
             } else {
-                const newSelectedId: string[] = rows.map((n) => n.keyword);
+                const newSelectedId: string[] = pageList?.map((n) => n.keyword);
                 setSelected(newSelectedId);
             }
             return;
@@ -230,25 +249,25 @@ export const KeywordList = ({ selected, setSelected }: any) => {
                 case 1:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <CheckCircleIcon />
+                            <RadioButtonUncheckedIcon />
                         </Popover>
                     );
                 case 2:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <RadioButtonUncheckedIcon />
+                            <CheckCircleIcon />
                         </Popover>
                     );
                 case 3:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate allowHalf />
+                            <Rate allowHalf count={1} />
                         </Popover>
                     );
                 case 4:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate />
+                            <Rate count={1} />
                         </Popover>
                     );
                 default:
@@ -269,11 +288,11 @@ export const KeywordList = ({ selected, setSelected }: any) => {
                         orderBy={orderBy}
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
+                        rowCount={pageList.length}
                     />
                     <TableBody>
                         {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
+                            pageList.filter((row) => typeof row !== 'number'),
                             getComparator(order, orderBy)
                         ).map((row, index) => {
                             if (typeof row === 'number') {
@@ -302,13 +321,21 @@ export const KeywordList = ({ selected, setSelected }: any) => {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.keyword}
+                                    </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
-                                    <TableCell align="center">{row.searches}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.searches}
+                                    </TableCell>
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
-                                    <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{handleUse(row.keyword)}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.keyword}
+                                    </TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {handleUse(row.keyword)}
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}

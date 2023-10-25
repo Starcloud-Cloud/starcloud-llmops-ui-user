@@ -146,7 +146,7 @@ function TemplateMarket() {
     });
     useEffect(() => {
         searchList();
-    }, [queryParams.category]);
+    }, [queryParams]);
     const searchList = () => {
         if (queryParams.category !== 'ALL') {
             const newData = cateTree.filter((item) => {
@@ -210,12 +210,20 @@ function TemplateMarket() {
         }
     };
     //title筛选
+    const timer: any = useRef(null);
+    const [marketTitle, setMarketTitle] = useState('');
     const handleChange = (event: any) => {
         const { name, value } = event.target;
-        setQueryParams({
-            ...queryParams,
-            [name]: value
-        });
+        setMarketTitle(value);
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => {
+            // @ts-ignore
+            _hmt.push(['_trackEvent', '应用市场', '搜索', '搜索词', value]);
+            setQueryParams({
+                ...queryParams,
+                [name]: value
+            });
+        }, 300);
     };
     //当用户更改了筛选触发的逻辑
     const handleSearch = () => {
@@ -369,7 +377,7 @@ function TemplateMarket() {
                 <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
                     <OutlinedInput
                         name="name"
-                        value={queryParams.name}
+                        value={marketTitle}
                         onChange={handleChange}
                         endAdornment={
                             <InputAdornment position="end">

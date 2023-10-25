@@ -19,7 +19,7 @@ import downLoadImages from 'hooks/useDownLoadImage';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { downAllImages } from 'hooks/useDownLoadImage';
-import formatDate from 'hooks/useDate';
+import { formatNumber } from 'hooks/useDate';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
@@ -118,7 +118,11 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     return {
                         url: item.images[0].url,
                         uuid: item.fromScene,
-                        time: formatDate(detailData?.finishTime + index * 1000),
+                        time: formatNumber(
+                            detailData?.finishTime + index * 1000
+                                ? detailData?.finishTime + index * 1000
+                                : new Date().getTime() + index * 1000
+                        ),
                         type: item.images[0].mediaType?.split('/')[1]
                     };
                 }
@@ -200,7 +204,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                                             item?.images[0].url,
                                                             item?.images[0].mediaType.split('/')[1],
                                                             item?.fromScene,
-                                                            formatDate(item?.finishTime)
+                                                            formatNumber(item?.finishTime ? item?.finishTime : new Date().getTime())
                                                         );
                                                     }}
                                                     className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"

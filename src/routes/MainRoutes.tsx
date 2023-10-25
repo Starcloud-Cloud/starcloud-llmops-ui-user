@@ -7,7 +7,6 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
-const MarketList = Loadable(lazy(() => import('views/template/market/components/list')));
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
 const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));

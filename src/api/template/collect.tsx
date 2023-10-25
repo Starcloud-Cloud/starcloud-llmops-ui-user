@@ -11,3 +11,7 @@ export const favoriteCollect = (data: any) => {
 export const favoriteCancel = (data: any) => {
     return request.post({ url: '/llm/app/favorite/cancel', data });
 };
+//模板市场详情
+export const favoriteGetMarketInfo = (data: any) => {
+    return request.post({ url: '/llm/app/favorite/getMarketInfo', data });
+};

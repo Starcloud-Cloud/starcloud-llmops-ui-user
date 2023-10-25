@@ -5,7 +5,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import downLoadImages from 'hooks/useDownLoadImage';
 import { Image } from 'antd';
 import { downAllImages } from 'hooks/useDownLoadImage';
-import formatDate from 'hooks/useDate';
+import { formatNumber } from 'hooks/useDate';
 const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: boolean; detailData: any; handleClose: () => void }) => {
     //下载图片
     const downLoadImage = () => {
@@ -14,7 +14,9 @@ const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: bool
                 return {
                     url: item.url,
                     uuid: detailData.fromScene,
-                    time: formatDate(detailData?.finishTime + index * 1000),
+                    time: formatNumber(
+                        detailData?.finishTime ? detailData?.finishTime + index * 1000 : new Date().getTime() + index * 1000
+                    ),
                     type: item.mediaType?.split('/')[1]
                 };
             });
@@ -24,7 +26,7 @@ const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: bool
                 detailData?.images[0].url,
                 detailData?.images[0].mediaType.split('/')[1],
                 detailData?.fromScene,
-                formatDate(detailData?.finishTime)
+                formatNumber(detailData?.finishTime ? detailData?.finishTime : new Date().getTime())
             );
         }
     };

@@ -64,30 +64,30 @@ const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
 
-    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country } = useListing();
+    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country, handleReGrade, itemScore } = useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
 
     // 设置头部分数
     React.useEffect(() => {
-        const scoreListDefault = SCORE_LIST;
-        if (detail?.itemScore) {
-            scoreListDefault[0].list[0].value = detail.itemScore.withoutSpecialChat;
-            scoreListDefault[0].list[1].value = detail.itemScore.titleLength;
-            scoreListDefault[0].list[2].value = detail.itemScore.titleUppercase;
+        const scoreListDefault = _.cloneDeepWith(scoreList);
+        if (itemScore) {
+            scoreListDefault[0].list[0].value = itemScore.withoutSpecialChat;
+            scoreListDefault[0].list[1].value = itemScore.titleLength;
+            scoreListDefault[0].list[2].value = itemScore.titleUppercase;
 
-            scoreListDefault[1].list[0].value = detail.itemScore.fiveDescLength;
-            scoreListDefault[1].list[1].value = detail.itemScore.allUppercase;
-            scoreListDefault[1].list[2].value = detail.itemScore.partUppercase;
+            scoreListDefault[1].list[0].value = itemScore.fiveDescLength;
+            scoreListDefault[1].list[1].value = itemScore.allUppercase;
+            scoreListDefault[1].list[2].value = itemScore.partUppercase;
 
-            scoreListDefault[2].list[0].value = detail.itemScore.productLength;
-            scoreListDefault[2].list[1].value = detail.itemScore.withoutUrl;
+            scoreListDefault[2].list[0].value = itemScore.productLength;
+            scoreListDefault[2].list[1].value = itemScore.withoutUrl;
 
-            scoreListDefault[3].list[0].value = detail.itemScore.searchTermLength;
-            setScoreList(scoreListDefault);
+            scoreListDefault[3].list[0].value = itemScore.searchTermLength;
+            setScoreList([...scoreListDefault]);
         }
-    }, [detail]);
+    }, [itemScore]);
 
     React.useEffect(() => {
         if (openKeyWordSelect) {
@@ -126,6 +126,7 @@ const Content = () => {
             word: modifiedString.trim() === '' ? 0 : modifiedString.trim().split(' ').length
         };
         setList(newList);
+        handleReGrade();
         setOpenKeyWordSelect(false);
         setHoverKey(0);
         hoverKeyRef.current = 0;
@@ -157,7 +158,7 @@ const Content = () => {
     };
 
     const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
-        const newKeyword = keyword.map((v: any) => v.keyword) || [];
+        const newKeyword = keyword?.map((v: any) => v.keyword) || [];
         handleHasKeyWork(e, newKeyword);
 
         setEditIndex(index);
@@ -171,6 +172,7 @@ const Content = () => {
             };
             return newList;
         });
+        handleReGrade();
     }, []);
 
     const handleExpand = (key: number) => {
@@ -614,7 +616,7 @@ const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    <Rate allowHalf defaultValue={item.grade} count={1} disabled />
+                                    <Rate allowHalf value={item.grade} count={1} disabled />
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议
@@ -718,7 +720,7 @@ const Content = () => {
                                     rows={item.row}
                                     placeholder={item.placeholder}
                                     value={item.value}
-                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData)}
+                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
                                     highlightWordList={item.keyword}
                                     highlightAllWordList={detail?.keywordMetaData || []}
                                     index={index}

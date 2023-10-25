@@ -121,7 +121,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore } = useListing();
 
     // 获取详情
     useEffect(() => {
@@ -129,6 +129,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
             getListingDetail(uid, version)
                 .then((res: any) => {
                     setDetail(res);
+                    setItemScore(res.itemScore);
                     const fetchedRows = res.keywordMetaData || [];
                     setRows([...fetchedRows]);
                     if (res.status === 'ANALYSIS') {

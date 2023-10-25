@@ -132,7 +132,7 @@ function Template({ like, data, handleDetail }: any) {
                         }}
                         className="absolute left-[16px] bottom-[11px]"
                     >
-                        <GradeOutlinedIcon color="secondary" fontSize="small" />
+                        <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
                     </div>
                 ))}
             {like === 'collect' &&
@@ -159,7 +159,7 @@ function Template({ like, data, handleDetail }: any) {
                         }}
                         className="absolute left-[16px] bottom-[11px]"
                     >
-                        <GradeOutlinedIcon color="secondary" fontSize="small" />
+                        <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
                     </div>
                 ) : (
                     <div

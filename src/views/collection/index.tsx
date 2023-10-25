@@ -1,7 +1,7 @@
 import { TextField, InputAdornment, Grid, FormControl, OutlinedInput, IconButton } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import Template from 'views/template/myTemplate/components/content/template';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { favoriteList } from 'api/template/collect';
 const Collection = () => {
@@ -18,6 +18,15 @@ const Collection = () => {
         );
         setNewList(newData);
     };
+    const timer: any = useRef(null);
+    useEffect(() => {
+        if (collectList.length > 0) {
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => {
+                searchList();
+            }, 300);
+        }
+    }, [value]);
     useEffect(() => {
         favoriteList({}).then((res) => {
             setNewList(res);

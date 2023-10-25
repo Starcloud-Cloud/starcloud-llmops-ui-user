@@ -682,7 +682,7 @@ export const Content = () => {
                                         )
                                     }
                                     highlightWordList={item.keyword}
-                                    highlightAllWordList={detail.keywordMetaData}
+                                    highlightAllWordList={detail?.keywordMetaData || []}
                                     index={index}
                                     type={item.type}
                                 />

@@ -24,11 +24,13 @@ const mergeArray = (arr: any[]) => {
     return mergedArray;
 };
 
+// 所有关键词都高亮
 const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type, highlightAllWordList }: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight, keywordHighlight } = useListing();
-    const copyHighlightWordList = highlightWordList.map((item: any) => item.text);
+    const copyHighlightWordList = highlightAllWordList.map((item: any) => item.keyword);
 
+    // 该文本的关键字数组
     const resultArray = useMemo(() => {
         copyHighlightWordList.sort((a: string, b: string) => b.length - a.length);
         const r = `(${copyHighlightWordList.join('|')})`;
@@ -38,16 +40,16 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
     }, [highlightWordList, value]);
 
     useEffect(() => {
-        const copyList = _.clone(list);
+        const copyList = _.clone(highlightAllWordList);
         const data: any[] = [];
         resultArray?.map((item: string) => {
-            copyList[index].keyword.forEach((item1) => {
-                if (item1.text === item) {
+            copyList.forEach((item1: any) => {
+                if (item1.keyword === item) {
                     if (type !== ListingBuilderEnum.FIVE_DES) {
-                        data.push({ text: item1.text, type, num: 1 });
+                        data.push({ text: item1.keyword, type, num: 1 });
                     } else {
                         data.push({
-                            text: item1.text,
+                            text: item1.keyword,
                             type,
                             num: 1,
                             fiveType: `${ListingBuilderEnum.FIVE_DES}_${index}`

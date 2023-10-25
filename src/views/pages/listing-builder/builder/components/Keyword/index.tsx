@@ -1,4 +1,4 @@
-import { Button, SwipeableDrawer } from '@mui/material';
+import { Button } from '@mui/material';
 import React, { useRef } from 'react';
 import { AddKeywordModal } from '../AddKeyworkModal';
 import AddIcon from '@mui/icons-material/Add';

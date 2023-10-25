@@ -159,16 +159,24 @@ export const Content = () => {
         handleHasKeyWork(e, keyword);
 
         setEditIndex(index);
-        setList((prevList: any) => {
-            const newList = [...prevList];
-            newList[index] = {
-                ...newList[index],
-                value: e.target.value,
-                character: e.target.value.length,
-                word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
-            };
-            return newList;
-        });
+        // setList((prevList: any) => {
+        //     const newList = [...prevList];
+        //     newList[index] = {
+        //         ...newList[index],
+        //         value: e.target.value,
+        //         character: e.target.value.length,
+        //         word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
+        //     };
+        //     return newList;
+        // });
+        const copyList = _.cloneDeep(list);
+        copyList[index] = {
+            ...copyList[index],
+            value: e.target.value,
+            character: e.target.value.length,
+            word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
+        };
+        setList(copyList);
     }, []);
 
     const handleExpand = (key: number) => {
@@ -679,7 +687,6 @@ export const Content = () => {
                                         handleInputChange(
                                             e,
                                             index,
-                                            // item.keyword?.map((v) => v.text)
                                             detail?.keywordMetaData?.map((v: any) => v.keyword)
                                         )
                                     }

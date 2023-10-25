@@ -10,7 +10,7 @@ type CountryType = {
     icon: string;
     label: string;
 };
-type ListType = {
+export type ListType = {
     title: string;
     des: JSX.Element | string;
     placeholder: string;

@@ -86,11 +86,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         if (detail?.draftConfig) {
             const copyList = _.cloneDeep(list);
             // 标题
-            copyList[0].enable = !detail.draftConfig.titleConfig.ignoreUse;
+            copyList[0].enable = !detail.draftConfig.titleConfig?.ignoreUse;
             copyList[0].keyword = detail.draftConfig.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
 
             //描述
-            copyList[detail.draftConfig?.fiveDescNum + 1].enable = !detail.draftConfig.productDescConfig.ignoreUse;
+            copyList[detail.draftConfig?.fiveDescNum + 1].enable = !detail.draftConfig.productDescConfig?.ignoreUse;
             copyList[detail?.draftConfig.fiveDescNum + 1].keyword =
                 detail.draftConfig.productDescConfig.recommendKeys?.map((item: any) => ({
                     text: item.keyword,
@@ -121,31 +121,31 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const handleStar = (type: ListingBuilderEnum, num: number) => {
         if (type === ListingBuilderEnum.TITLE) {
             if (num === 0 || num === 1) {
-                return 1;
+                return 0;
             }
-            if (num === 2) {
+            if (num === 0.5) {
                 return 2;
             }
             if (num === 3) {
-                return 2;
+                return 1;
             }
         }
         if (type === ListingBuilderEnum.PRODUCT_DES) {
             if (num === 0 || num === 1) {
-                return 1;
+                return 0;
             }
 
             if (num === 2) {
-                return 3;
+                return 1;
             }
         }
         if (type === ListingBuilderEnum.SEARCH_WORD) {
             if (num === 0) {
-                return 1;
+                return 0;
             }
 
             if (num === 1) {
-                return 3;
+                return 1;
             }
         }
     };

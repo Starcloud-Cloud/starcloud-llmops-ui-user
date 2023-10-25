@@ -38,7 +38,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
 import { getListingByAsin } from 'api/listing/build';
-import { set } from 'date-fns';
 
 const { Search } = Input;
 
@@ -385,7 +384,7 @@ export const Content = () => {
                                         <div className="w-full py-1" key={i}>
                                             <div className="flex justify-between items-center h-[30px]">
                                                 <span className="flex-[80%]">{v.label}</span>
-                                                {v.value ? (
+                                                {!v.value ? (
                                                     <svg
                                                         className="h-[14px] w-[14px]"
                                                         viewBox="0 0 1098 1024"
@@ -618,7 +617,7 @@ export const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    <Rate allowHalf defaultValue={2.5} count={1} disabled />
+                                    <Rate allowHalf defaultValue={item.grade} count={1} disabled />
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议

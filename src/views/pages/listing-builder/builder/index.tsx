@@ -86,6 +86,20 @@ const ListingBuilder = () => {
             fiveDesc: result
         };
         const res = await saveListing(data);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            navigate('/listingBuilderPage');
+        }
     };
 
     return (

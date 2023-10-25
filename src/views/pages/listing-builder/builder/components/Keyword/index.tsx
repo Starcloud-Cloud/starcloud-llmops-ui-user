@@ -103,7 +103,7 @@ export const KeyWord = () => {
                 <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} />
             </div>
 
-            <AddKeywordModal open={open} handleClose={handleClose} />
+            {open && <AddKeywordModal open={open} handleClose={handleClose} />}
             <Confirm open={delOpen} handleOk={handleDel} handleClose={() => setDelOpen(false)} />
         </div>
     );

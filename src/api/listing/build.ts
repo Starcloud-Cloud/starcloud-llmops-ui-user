@@ -1,14 +1,5 @@
 import request from 'utils/axios';
 
-// /**
-//  * 创建草稿
-//  * @param data
-//  * @returns
-//  */
-// export const createDraft = (data: any) => {
-//     return request.put({ url: '/listing/draft/create', data });
-// };
-
 /**
  * 新增关键词
  * @param data
@@ -60,4 +51,18 @@ export const saveListing = (data: any) => {
  */
 export const delListing = (data: any) => {
     return request.delete({ url: '/listing/draft/delete', data });
+};
+
+/**
+ * 评分
+ * @param data
+ * @returns
+ */
+export const getGrade = (data: any) => {
+    return request.put({ url: '/listing/draft/score', data });
+};
+
+//导入词库
+export const importDict = (data: any) => {
+    return request.put({ url: '/listing/draft/import/dict', data });
 };

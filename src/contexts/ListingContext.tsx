@@ -1,3 +1,5 @@
+import { getGrade } from 'api/listing/build';
+import _ from 'lodash';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
@@ -20,8 +22,18 @@ type ListType = {
     value?: string;
     row: number;
     btnText: string;
-    keyword: { text: string; num: number }[];
+    enable: boolean;
+    keyword: { text: string; recommend: number }[];
 };
+
+const ListingContext = createContext<ListingContextType | null>(null);
+
+type keywordHighlightType = {
+    text: string;
+    num: number;
+    type: ListingBuilderEnum;
+    fiveType?: string;
+}[][];
 
 type ListingContextType = {
     uid: string;
@@ -34,9 +46,13 @@ type ListingContextType = {
     setList: (list: any) => void;
     enableAi: boolean;
     setEnableAi: (enableAi: boolean) => void;
+    setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
+    keywordHighlight: keywordHighlightType;
+    setUpdate: (update: object) => void;
+    update: object;
+    setDetail: (detail: any) => void;
+    detail: any;
 };
-
-const ListingContext = createContext<ListingContextType | null>(null);
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
     const [uid, setUid] = useState('');
@@ -48,7 +64,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
     const [enableAi, setEnableAi] = useState(true);
-    const [keywordList, setKeywordList] = useState<any[]>([]);
+    const [keywordHighlight, setKeywordHighlight] = useState<keywordHighlightType | []>([]);
+    const [detail, setDetail] = useState<any>(null);
+    const [update, setUpdate] = useState<object>({});
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -62,8 +80,97 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [queryUid, queryVersion]);
 
+    // 回显推荐关键词 & 是否开启
+    useEffect(() => {
+        if (detail?.draftConfig) {
+            const copyList = _.cloneDeep(list);
+            // 标题
+            copyList[0].enable = !detail.draftConfig.titleConfig.ignoreUse;
+            copyList[0].keyword = detail.draftConfig.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
+
+            //描述
+            copyList[detail.draftConfig?.fiveDescNum + 1].enable = !detail.draftConfig.productDescConfig.ignoreUse;
+            copyList[detail?.draftConfig.fiveDescNum + 1].keyword =
+                detail.draftConfig.productDescConfig.recommendKeys?.map((item: any) => ({
+                    text: item.keyword,
+                    recommend: 1
+                })) || [];
+
+            // 搜索
+            copyList[detail.draftConfig?.fiveDescNum + 2].enable = !detail.draftConfig?.searchTermConfig?.ignoreUse;
+            copyList[detail.draftConfig?.fiveDescNum + 2].keyword =
+                detail.draftConfig?.searchTermConfig.recommendKeys?.map((item: any) => ({
+                    text: item.keyword,
+                    recommend: 1
+                })) || [];
+
+            // // 5点描述
+            Object.keys(detail?.draftConfig?.fiveDescConfig).forEach((key) => {
+                const index = Number(key);
+                copyList[index].enable = !detail.draftConfig?.fiveDescConfig[key]?.ignoreUse;
+                copyList[index].keyword =
+                    detail.draftConfig?.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
+                        text: item.keyword
+                    })) || [];
+            });
+            setList(copyList);
+        }
+    }, [detail]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const result = list
+                .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+                .reduce((acc: any, obj, index) => {
+                    acc[index + 1] = obj.value;
+                    return acc;
+                }, {});
+            const data = {
+                uid,
+                version,
+                endpoint: country.key,
+                draftConfig: {
+                    enableAi: true,
+                    fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+                },
+                title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+                productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+                searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+                fiveDesc: result
+            };
+            getGrade(data).then((res) => {
+                const copyDetail = _.cloneDeep(detail);
+                copyDetail.itemScore = res.itemScore;
+                setDetail(copyDetail);
+            });
+        }, 500);
+        return () => {
+            // 在每次状态变化时，清除之前的计时器
+            clearTimeout(timer);
+        };
+    }, [list]);
+
     return (
-        <ListingContext.Provider value={{ uid, setUid, version, setVersion, country, setCountry, list, setList, enableAi, setEnableAi }}>
+        <ListingContext.Provider
+            value={{
+                uid,
+                setUid,
+                version,
+                setVersion,
+                country,
+                setCountry,
+                list,
+                setList,
+                enableAi,
+                setEnableAi,
+                keywordHighlight,
+                setKeywordHighlight,
+                setDetail,
+                detail,
+                setUpdate,
+                update
+            }}
+        >
             {children}
         </ListingContext.Provider>
     );

@@ -25,13 +25,14 @@ function a11yProps(index: number) {
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
     const [keyWord, setKeyWord] = useState<string>('');
-    const { uid, setVersion, setUid, country, version } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate } = useListing();
     const navigate = useNavigate();
 
     const handleOk = async () => {
         const lines = keyWord.split('\n');
         if (uid) {
             const res = addKey({ uid, version, addKey: lines });
+            setUpdate({});
         } else {
             const res = await saveListing({ keys: lines, endpoint: country.key });
             navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);

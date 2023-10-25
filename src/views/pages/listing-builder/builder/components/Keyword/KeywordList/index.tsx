@@ -3,10 +3,15 @@ import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { getListingDetail } from 'api/listing/build';
 import { useListing } from 'contexts/ListingContext';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Popover, Rate } from 'antd';
+import _ from 'lodash';
 
 type TableEnhancedCreateDataType = {
     keyword: string;
@@ -15,6 +20,7 @@ type TableEnhancedCreateDataType = {
     searchWeeklyRank: number;
     month: string;
     updatedTime: string;
+    use: any[];
 };
 
 // table filter
@@ -65,6 +71,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
+                        size="small"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
@@ -79,22 +86,26 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         scope="row"
                         width={150}
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'center'}
+                        align={'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+                        {headCell.id !== 'keyword' ? (
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id ? (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                ) : null}
+                            </TableSortLabel>
+                        ) : (
+                            headCell.label
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
@@ -104,48 +115,51 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-const defaultData = [
-    {
-        keyword: 'iphone',
-        score: 0,
-        searches: 0,
-        searchWeeklyRank: 0,
-        month: 'month'
-        // updatedTime: 'updatedTime'
-    },
-    {
-        keyword: 'iphone pro',
-        score: 0,
-        searches: 0,
-        searchWeeklyRank: 0,
-        month: 'month'
-        // updatedTime: 'updatedTime'
-    }
-];
-
-export const KeywordList: React.FC = () => {
+export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
-    const [selected, setSelected] = useState<any[]>([]);
-    const [count, setCount] = useState(0);
-    const { version, uid } = useListing();
-    const [rows, setRows] = useState<any[]>(defaultData);
 
-    const forceUpdate = () => setCount((pre) => pre + 1);
+    const [rows, setRows] = useState<any[]>([]);
+
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight } = useListing();
 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
             getListingDetail(uid, version)
-                .then((res) => {
-                    const fetchedRows = res.keywordMetaData;
+                .then((res: any) => {
+                    setDetail(res);
+                    const fetchedRows = res.keywordMetaData || [];
                     setRows([...fetchedRows]);
+                    if (res.status === 'ANALYSIS') {
+                        setUpdate({});
+                    }
                 })
-                .catch((error) => {
+                .catch((error: any) => {
                     console.error(error);
                 });
         }
-    }, [count, version, uid]);
+    }, [update, version, uid]);
+
+    // TODO 简化
+    const pageList = useMemo(() => {
+        let newData: any[] = [];
+        if (hiddenUse && keywordHighlight.flat().filter((item) => item).length > 0) {
+            rows.forEach((item) => {
+                keywordHighlight
+                    .flat()
+                    .filter((item) => item)
+                    .forEach((item1) => {
+                        if (item1.text !== item.keyword) {
+                            newData.push(item);
+                        }
+                    });
+            });
+            return newData;
+        } else {
+            return rows;
+        }
+    }, [hiddenUse, rows]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -158,7 +172,7 @@ export const KeywordList: React.FC = () => {
             if (selected.length > 0) {
                 setSelected([]);
             } else {
-                const newSelectedId: string[] = rows.map((n) => n.keyword);
+                const newSelectedId: string[] = pageList?.map((n) => n.keyword);
                 setSelected(newSelectedId);
             }
             return;
@@ -184,6 +198,85 @@ export const KeywordList: React.FC = () => {
     };
 
     const isSelected = (keyword: string) => selected.indexOf(keyword) !== -1;
+
+    const keywordUseModal = (keyword: string) => {
+        const filterTitle =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.TITLE && item?.text === keyword) || [];
+        const filterProduct =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.PRODUCT_DES && item?.text === keyword) || [];
+        const filterSearch =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.SEARCH_WORD && item?.text === keyword) || [];
+        const filterFive = keywordHighlight
+            ?.flat()
+            ?.filter((item) => item?.type === ListingBuilderEnum.FIVE_DES && item?.text === keyword)
+            .map((item) => ({ ...item, index: +item!.fiveType!.slice(9) }));
+        const sortedFive = _.sortBy(filterFive, ['index']);
+
+        return (
+            <div>
+                <div>
+                    <span>标题：</span>
+                    <span>{filterTitle?.[0]?.num}</span>
+                </div>
+                {sortedFive.map((item) => (
+                    <div>
+                        <span>{`五点描述${item.index}`}:</span>
+                        <span>{item?.num}</span>
+                    </div>
+                ))}
+                <div>
+                    <span>产品描述:</span>
+                    <span>{filterProduct?.[0]?.num}</span>
+                </div>
+                <div>
+                    <span>搜索词:</span>
+                    <span>{filterSearch?.[0]?.num}</span>
+                </div>
+            </div>
+        );
+    };
+
+    const handleUse = React.useCallback(
+        (keyword: string) => {
+            const filterNotFive =
+                keywordHighlight.flat()?.filter((item) => item?.type !== ListingBuilderEnum.FIVE_DES && item?.text === keyword) || [];
+            const filterFive =
+                keywordHighlight.flat()?.filter((item) => item?.type === ListingBuilderEnum.FIVE_DES && item?.text === keyword) || [];
+
+            switch (filterNotFive.length + filterFive.length) {
+                case 0:
+                    return null;
+                case 1:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <RadioButtonUncheckedIcon />
+                        </Popover>
+                    );
+                case 2:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <CheckCircleIcon />
+                        </Popover>
+                    );
+                case 3:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <Rate allowHalf count={1} />
+                        </Popover>
+                    );
+                case 4:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <Rate count={1} />
+                        </Popover>
+                    );
+                default:
+                    break;
+            }
+        },
+        [keywordHighlight]
+    );
+
     return (
         <MainCard content={false}>
             <TableContainer component={Paper}>
@@ -195,11 +288,11 @@ export const KeywordList: React.FC = () => {
                         orderBy={orderBy}
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
+                        rowCount={pageList.length}
                     />
                     <TableBody>
                         {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
+                            pageList.filter((row) => typeof row !== 'number'),
                             getComparator(order, orderBy)
                         ).map((row, index) => {
                             if (typeof row === 'number') {
@@ -228,13 +321,21 @@ export const KeywordList: React.FC = () => {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.keyword}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.keyword}
+                                    </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
-                                    <TableCell align="center">{row.searches}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.searches}
+                                    </TableCell>
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
-                                    <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{}</TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {row.keyword}
+                                    </TableCell>
+                                    <TableCell align="left" className="py-[6px] px-0">
+                                        {handleUse(row.keyword)}
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}

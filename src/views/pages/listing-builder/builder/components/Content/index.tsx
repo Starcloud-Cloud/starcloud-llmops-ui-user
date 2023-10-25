@@ -17,9 +17,9 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Statistic, ConfigProvider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
+import { Input, Alert, Divider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React, { useEffect } from 'react';
+import React from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -32,7 +32,7 @@ import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getCaretPosition } from 'utils/getCaretPosition';
-import { DEFAULT_LIST, SCORE_LIST } from '../../../data/index';
+import { SCORE_LIST } from '../../../data/index';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
@@ -62,9 +62,31 @@ export const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
-    const { list, setList, enableAi, setEnableAi } = useListing();
+
+    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail } = useListing();
 
     const ulRef = React.useRef<any>(null);
+    const hoverKeyRef = React.useRef<any>(null);
+
+    React.useEffect(() => {
+        const scoreListDefault = SCORE_LIST;
+        if (detail?.itemScore) {
+            scoreListDefault[0].list[0].value = detail.itemScore.withoutSpecialChat;
+            scoreListDefault[0].list[1].value = detail.itemScore.titleLength;
+            scoreListDefault[0].list[2].value = detail.itemScore.titleUppercase;
+
+            scoreListDefault[1].list[0].value = detail.itemScore.fiveDescLength;
+            scoreListDefault[1].list[1].value = detail.itemScore.allUppercase;
+            scoreListDefault[1].list[2].value = detail.itemScore.partUppercase;
+
+            scoreListDefault[2].list[0].value = detail.itemScore.productLength;
+            scoreListDefault[2].list[1].value = detail.itemScore.withoutUrl;
+
+            scoreListDefault[3].list[0].value = detail.itemScore.searchTermLength;
+            setScoreList(scoreListDefault);
+        }
+    }, [detail, scoreList]);
+
     React.useEffect(() => {
         if (openKeyWordSelect) {
             // 绑定键盘事件
@@ -74,10 +96,12 @@ export const Content = () => {
                     e.preventDefault(); // 防止滚动页面
                     const newIndex = key === 'ArrowUp' ? Math.max(0, hoverKey - 1) : Math.min(keyWordSelectList.length - 1, hoverKey + 1);
                     setHoverKey(newIndex);
+                    hoverKeyRef.current = newIndex;
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
-                    if (hoverKey !== null) {
-                        handleReplaceValue(keyWordSelectList[hoverKey]);
+                    if (hoverKeyRef.current !== undefined) {
+                        console.log(hoverKey, 'hoverKey');
+                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
                     }
                 }
             };
@@ -102,12 +126,15 @@ export const Content = () => {
         };
         setList(newList);
         setOpenKeyWordSelect(false);
+        setHoverKey(0);
+        hoverKeyRef.current = 0;
     };
 
     const handleHasKeyWork = (e: any, keyword: string[]) => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
         const value = e.target.value;
+        // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             const filterKeyWord = keyword.filter((item, index) => {
                 if (item.includes(value[startIndex - 1])) {
@@ -115,7 +142,7 @@ export const Content = () => {
                 }
             });
             if (filterKeyWord.length > 0) {
-                setKeyWordSelectList(filterKeyWord);
+                setKeyWordSelectList([...filterKeyWord]);
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
                 setY(y);
@@ -216,6 +243,7 @@ export const Content = () => {
             value: '',
             row: 4,
             btnText: 'AI生成五点描述',
+            enable: true,
             keyword: []
         });
         setList(copyList);
@@ -239,9 +267,17 @@ export const Content = () => {
         setList(copyList);
     };
 
+    const handleSwitch = (e: any, index: number) => {
+        const value = e.target.checked;
+        const copyList = _.cloneDeep(list);
+        copyList[index].enable = !value;
+        setList(copyList);
+        // 处理逻辑
+    };
+
     return (
         <div>
-            <Card className="rounded-t-none flex justify-center flex-col p-5" title="Listing优化">
+            <Card className="rounded-t-none flex justify-center flex-col p-3" title={list?.[0]?.value || 'Listing草稿'}>
                 <div className="text-lg font-bold py-1">Listing优化</div>
                 <div className="grid xl:grid-cols-2 xs:grid-cols-1 gap-2 w-full">
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
@@ -297,11 +333,11 @@ export const Content = () => {
                     {scoreList?.map((item, index) => (
                         <div className="flex  items-center w-full flex-col" key={index}>
                             <div className="mt-2  w-full">
-                                <span className="font-semibold">{item.title}</span>
+                                <span className="font-semibold text-base">{item.title}</span>
                                 {item.list.map((v, i) => (
                                     <>
                                         <div className="w-full py-1" key={i}>
-                                            <div className="flex justify-between items-center">
+                                            <div className="flex justify-between items-center h-[30px]">
                                                 <span className="flex-[80%]">{v.label}</span>
                                                 {v.value ? (
                                                     <svg
@@ -605,8 +641,8 @@ export const Content = () => {
                                                 <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'撤回'} arrow placement="top">
+                                        {/* <Divider type="vertical" style={{ marginInline: '4px' }} /> */}
+                                        {/* <Tooltip title={'撤回'} arrow placement="top">
                                             <IconButton size="small">
                                                 <RefreshIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
@@ -615,7 +651,7 @@ export const Content = () => {
                                             <IconButton size="small">
                                                 <ReplayIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
-                                        </Tooltip>
+                                        </Tooltip> */}
                                         <Divider type="vertical" style={{ marginInline: '4px' }} />
                                         <span className="text-[#bec2cc]  text-xs">
                                             {item.character}/{item.maxCharacter}字
@@ -626,7 +662,7 @@ export const Content = () => {
                                     <div className="flex items-center">
                                         <div className="flex items-center">
                                             <span>不计入已使用</span>
-                                            <Switch color={'secondary'} />
+                                            <Switch checked={!item.enable} color={'secondary'} onChange={(e) => handleSwitch(e, index)} />
                                         </div>
                                         {item.isOvertop && (
                                             <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>
@@ -643,10 +679,12 @@ export const Content = () => {
                                         handleInputChange(
                                             e,
                                             index,
-                                            item.keyword?.map((v) => v.text)
+                                            // item.keyword?.map((v) => v.text)
+                                            detail?.keywordMetaData?.map((v: any) => v.keyword)
                                         )
                                     }
-                                    highlightWordList={keyWordSelectList}
+                                    highlightWordList={item.keyword}
+                                    highlightAllWordList={detail?.keywordMetaData || []}
                                     index={index}
                                     type={item.type}
                                 />
@@ -659,10 +697,25 @@ export const Content = () => {
                                                     <div
                                                         key={index}
                                                         className={`${
-                                                            itemKeyword?.num > 0 ? 'bg-[#ffaca6] ml-1 line-through px-1' : 'ml-1 px-1'
+                                                            keywordHighlight
+                                                                ?.flat()
+                                                                ?.filter((item) => item !== undefined)
+                                                                .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                ? 'bg-[#ffaca6] ml-1 line-through px-1'
+                                                                : 'ml-1 px-1'
                                                         }`}
                                                     >
                                                         <span>{itemKeyword.text}</span>
+                                                        {/* {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
+                                                            <span>
+                                                                (
+                                                                {
+                                                                    keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)
+                                                                        ?.num
+                                                                }
+                                                                )
+                                                            </span>
+                                                        )} */}
                                                     </div>
                                                 ))}
                                             </div>
@@ -680,14 +733,17 @@ export const Content = () => {
                     <ul
                         ref={ulRef}
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
-                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1"
+                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
-                        {keyWordSelectList.map((item, keyWordItemKey) => (
+                        {detail?.keywordResume?.map((item: string, keyWordItemKey: number) => (
                             <li
                                 key={keyWordItemKey}
                                 style={{ height: '30px', lineHeight: '30px' }}
                                 className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
-                                onMouseEnter={() => setHoverKey(keyWordItemKey)}
+                                onMouseEnter={() => {
+                                    setHoverKey(keyWordItemKey);
+                                    hoverKeyRef.current = keyWordItemKey;
+                                }}
                                 onClick={() => handleReplaceValue(item)}
                             >
                                 <span className="text-sm">{item}</span>

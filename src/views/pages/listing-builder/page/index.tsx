@@ -49,6 +49,7 @@ export interface TableEnhancedCreateDataType {
     status: string;
     createTime: number;
     updateTime: number;
+    matchSearchers: number;
 }
 
 const headCells = [
@@ -56,7 +57,7 @@ const headCells = [
     { id: 'endpoint', numeric: false, disablePadding: false, label: '站点' },
     { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'score', numeric: false, disablePadding: false, label: '分值' },
+    { id: 'score', numeric: false, disablePadding: false, label: '分值/搜索量' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -230,16 +231,58 @@ const ListingBuilderPage: React.FC = () => {
         navigate('/listingBuilder?uid=' + uid + '&version=' + version);
     };
 
+    const handleTransfer = (key: string) => {
+        switch (key) {
+            case 'ANALYSIS':
+                return '分析中';
+            case 'ANALYSIS_ERROR':
+                return '分析失败';
+            case 'ANALYSIS_END':
+                return '分析结束';
+            case 'EXECUTING':
+                return '执行中';
+            case 'EXECUTE_ERROR':
+                return '执行失败';
+            case 'EXECUTED':
+                return '执行结束';
+        }
+    };
+
     return (
         <MainCard
             content={false}
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()}>
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()} variant="contained" size="small">
                         新增Listing
                     </Button>
-                    <IconButton
+                    <Button
+                        disabled={selected.length === 0}
+                        className="ml-1"
+                        size="small"
+                        color="secondary"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => {
+                            setDelVisible(true);
+                            setDelType(2);
+                        }}
+                        variant="contained"
+                    >
+                        批量删除
+                    </Button>
+                    <Button
+                        disabled={selected.length === 0}
+                        className="ml-1"
+                        color="secondary"
+                        startIcon={<CloudDownloadIcon />}
+                        onClick={() => {}}
+                        variant="contained"
+                        size="small"
+                    >
+                        批量导出
+                    </Button>
+                    {/* <IconButton
                         aria-label="more"
                         id="long-button"
                         aria-haspopup="true"
@@ -299,7 +342,7 @@ const ListingBuilderPage: React.FC = () => {
                                 批量导出
                             </Typography>
                         </MenuItem>
-                    </Menu>
+                    </Menu> */}
                 </div>
             }
         >
@@ -352,8 +395,10 @@ const ListingBuilderPage: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">{row.asin}</TableCell>
-                                    <TableCell align="center">{row.status}</TableCell>
-                                    <TableCell align="center">{row.score}</TableCell>
+                                    <TableCell align="center">{handleTransfer(row.status)}</TableCell>
+                                    <TableCell align="center">
+                                        {row.score || 0}/{row?.matchSearchers || 0}
+                                    </TableCell>
                                     <TableCell align="center">
                                         {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </TableCell>

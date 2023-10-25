@@ -74,7 +74,7 @@ function Deatail() {
         }
         const fetchData = async () => {
             let resp: any = await executeMarket({
-                appUid: uid,
+                appUid: detailRef.current?.uid,
                 stepId: stepId,
                 aiModel: aimodeRef.current,
                 appReqVO: detailRef.current,

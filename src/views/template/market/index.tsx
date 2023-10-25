@@ -487,7 +487,7 @@ function TemplateMarket() {
                                     <div className="relative">
                                         <Grid
                                             container
-                                            className="max-h-[492px] overflow-hidden"
+                                            className="min-h-[178px] max-h-[492px] overflow-hidden"
                                             display="flex"
                                             flexWrap={'wrap'}
                                             spacing={2}
@@ -498,15 +498,17 @@ function TemplateMarket() {
                                                 </Grid>
                                             ))}
                                         </Grid>
-                                        <div
-                                            onClick={() => {
-                                                navigate('/collect');
-                                            }}
-                                            className="absolute right-0 top-[-10px] text-[#673ab7] cursor-pointer"
-                                        >
-                                            更多收藏
-                                            <RightOutlined rev={undefined} />
-                                        </div>
+                                        {collectList.length > 0 && (
+                                            <div
+                                                onClick={() => {
+                                                    navigate('/collect');
+                                                }}
+                                                className="absolute right-0 top-[-10px] text-[#673ab7] cursor-pointer"
+                                            >
+                                                更多收藏
+                                                <RightOutlined rev={undefined} />
+                                            </div>
+                                        )}
                                     </div>
                                 </CustomTabPanel>
                             </>

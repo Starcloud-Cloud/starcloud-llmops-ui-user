@@ -76,3 +76,8 @@ export const draftClone = (data: any) => {
 export const draftExport = (data: any) => {
     return request.get({ url: 'listing/draft/export', params: data });
 };
+
+// 词库列表
+export const getListingDict = (data: any) => {
+    return request.get({ url: '/listing/dict/page', params: data });
+};

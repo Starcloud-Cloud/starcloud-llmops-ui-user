@@ -1,9 +1,23 @@
-import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, Tab, Tabs, TextField } from '@mui/material';
+import {
+    Button,
+    CardActions,
+    CardContent,
+    Checkbox,
+    Divider,
+    FormControlLabel,
+    FormGroup,
+    Grid,
+    IconButton,
+    Modal,
+    Tab,
+    Tabs,
+    TextField
+} from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TabPanel } from 'views/template/myChat/createChat';
-import { addKey, saveListing } from 'api/listing/build';
+import { addKey, getListingDict, importDict, saveListing } from 'api/listing/build';
 import { useListing } from 'contexts/ListingContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -25,21 +39,52 @@ function a11yProps(index: number) {
 export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
     const [keyWord, setKeyWord] = useState<string>('');
+    const [dictList, setDictList] = useState([]);
+    const [checked, setChecked] = useState<any[]>([]);
     const { uid, setVersion, setUid, country, version, setUpdate } = useListing();
     const navigate = useNavigate();
 
     const handleOk = async () => {
-        const lines = keyWord.split('\n');
-        if (uid) {
-            const res = addKey({ uid, version, addKey: lines });
-            setUpdate({});
+        if (tab === 0) {
+            const lines = keyWord.split('\n');
+            if (uid) {
+                const res = addKey({ uid, version, addKey: lines });
+                setUpdate({});
+                handleClose();
+            } else {
+                const res = await saveListing({ keys: lines, endpoint: country.key });
+                navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                setVersion(res.version);
+                setUid(res.uid);
+                handleClose();
+            }
         } else {
-            const res = await saveListing({ keys: lines, endpoint: country.key });
-            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
-            setVersion(res.version);
-            setUid(res.uid);
+            const res = await importDict({
+                uid,
+                version,
+                dictUid: checked
+            });
             handleClose();
+            setUpdate({});
         }
+    };
+
+    useEffect(() => {
+        // TODO 条数
+        getListingDict({ pageNo: 1, pageSize: 100, endpoint: country.key }).then((res) => {
+            setDictList(res.list);
+        });
+    }, [country]);
+
+    const handleChange = (e: any) => {
+        const copyChecked = [...checked];
+        const index = checked.findIndex((item) => item === e.target.value);
+        if (index > -1) {
+            copyChecked.splice(index, 1);
+        } else {
+            copyChecked.push(e.target.value);
+        }
+        setChecked(copyChecked);
     };
 
     return (
@@ -86,7 +131,17 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             }}
                         />
                     </TabPanel>
-                    <TabPanel value={tab} index={1}></TabPanel>
+                    <TabPanel value={tab} index={1}>
+                        <div className="text-base font-semibold">选择词库</div>
+                        {dictList.map((item: any, index) => (
+                            <FormGroup key={index}>
+                                <FormControlLabel
+                                    control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
+                                    label={item.name}
+                                />
+                            </FormGroup>
+                        ))}
+                    </TabPanel>
                 </CardContent>
                 <Divider />
                 <CardActions>

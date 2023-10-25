@@ -113,9 +113,9 @@ const ListingBuilder = () => {
                         <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained" onClick={() => handleSave()}>
                             保存草稿
                         </Button>
-                        <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">
+                        {/* <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">
                             同步到亚马逊
-                        </Button>
+                        </Button> */}
                         <IconButton
                             aria-label="more"
                             id="long-button"

@@ -16,7 +16,7 @@ import {
     DialogContent,
     IconButton
 } from '@mui/material';
-import List from 'views/template/market/components/list';
+// import List from 'views/template/market/components/list';
 
 // third-party
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
@@ -204,7 +204,8 @@ const SearchSection = () => {
                     </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ height: '500px', overflowY: 'auto' }}>
-                    <List />
+                    {/* <List /> */}
+                    <div>弹框</div>
                 </DialogContent>
             </Dialog>
         </>

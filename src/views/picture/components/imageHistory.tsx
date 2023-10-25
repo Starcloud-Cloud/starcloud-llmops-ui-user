@@ -5,7 +5,7 @@ import { Table, Space, Image, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { history } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
-import formatDate from 'hooks/useDate';
+import formatDate, { formatNumber } from 'hooks/useDate';
 import ImageDetail from './detail';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import _ from 'lodash-es';
@@ -130,7 +130,9 @@ const ImageHistory = () => {
                 return {
                     url: item.url,
                     uuid: row.fromScene,
-                    time: formatDate(row?.imageInfo?.finishTime + index * 1000),
+                    time: formatNumber(
+                        row?.imageInfo?.finishTime ? row?.imageInfo?.finishTime + index * 1000 : new Date().getTime() + index * 1000
+                    ),
                     type: item.mediaType?.split('/')[1]
                 };
             });
@@ -140,7 +142,7 @@ const ImageHistory = () => {
                 row?.imageInfo?.images[0].url,
                 row?.imageInfo?.images[0].mediaType.split('/')[1],
                 row?.fromScene,
-                formatDate(row?.imageInfo?.finishTime)
+                formatNumber(row?.imageInfo?.finishTime ? row?.imageInfo?.finishTime : new Date().getTime())
             );
         }
     };
@@ -156,7 +158,11 @@ const ImageHistory = () => {
                         return {
                             url: el?.url,
                             uuid: item.fromScene,
-                            time: formatDate(item?.imageInfo?.finishTime + index * 1000),
+                            time: formatNumber(
+                                item?.imageInfo?.finishTime
+                                    ? item?.imageInfo?.finishTime + index * 1000
+                                    : new Date().getTime() + index * 1000
+                            ),
                             type: el?.mediaType?.split('/')[1]
                         };
                     });
@@ -165,7 +171,7 @@ const ImageHistory = () => {
                     return {
                         url: item?.imageInfo?.images[0]?.url,
                         uuid: item?.fromScene,
-                        time: formatDate(item?.imageInfo?.finishTime),
+                        time: formatNumber(item?.imageInfo?.finishTime ? item?.imageInfo?.finishTime : new Date().getTime()),
                         type: item?.imageInfo?.images[0]?.mediaType?.split('/')[1]
                     };
                 }

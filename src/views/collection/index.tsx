@@ -2,11 +2,13 @@ import { TextField, InputAdornment, Grid } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import Template from 'views/template/myTemplate/components/content/template';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { favoriteList } from 'api/template/collect';
 const Collection = () => {
+    const navigate = useNavigate();
     const [collectList, setCollectList] = useState<any[]>([]);
     const handleDetail = (data: any) => {
-        console.log(data);
+        navigate(`/appMarketDetail/${data.favoriteUid}?type=collect`);
     };
     useEffect(() => {
         favoriteList({}).then((res) => {

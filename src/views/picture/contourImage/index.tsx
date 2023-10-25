@@ -16,7 +16,7 @@ import { getImgMeta } from 'api/picture/create';
 import { translateText } from 'api/picture/create';
 import userInfoStore from 'store/entitlementAction';
 import AppModal from '../create/Menu/appModal';
-import formatDate from 'hooks/useDate';
+import { formatNumber } from 'hooks/useDate';
 const ContourImage = () => {
     const { setUserInfo }: any = userInfoStore();
     const navigate = useNavigate();
@@ -349,7 +349,7 @@ const ContourImage = () => {
                                                         result?.images[0].url,
                                                         result?.images[0].mediaType.split('/')[1],
                                                         result?.fromScene,
-                                                        formatDate(result?.finishTime)
+                                                        formatNumber(result?.finishTime ? result?.finishTime : new Date().getTime())
                                                     );
                                                 }}
                                                 className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"

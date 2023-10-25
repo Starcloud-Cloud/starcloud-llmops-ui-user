@@ -2230,10 +2230,8 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 3,
         btnText: 'AI生成标题',
-        keyword: [
-            { text: 'iphone', num: 0 },
-            { text: 'iphone pro', num: 0 }
-        ]
+        enable: true,
+        keyword: []
     },
     {
         title: '五点描述1',
@@ -2250,6 +2248,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 4,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2267,6 +2266,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 4,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2284,6 +2284,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 4,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2301,6 +2302,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 4,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2318,6 +2320,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 4,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2335,6 +2338,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 7,
         btnText: 'AI生成描述',
+        enable: true,
         keyword: []
     },
     {
@@ -2352,6 +2356,7 @@ export const DEFAULT_LIST = [
         word: 0,
         row: 5,
         btnText: '智能推荐',
+        enable: true,
         keyword: []
     }
 ];

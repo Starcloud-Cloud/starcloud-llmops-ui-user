@@ -16,7 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { delListing, getListingPage } from 'api/listing/build';
+import { delListing, draftClone, getListingPage } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -248,6 +248,27 @@ const ListingBuilderPage: React.FC = () => {
         }
     };
 
+    const doClone = async (row: any) => {
+        const res = await draftClone({
+            version: row.version,
+            uid: row.uid
+        });
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            forceUpdate();
+        }
+    };
+
     return (
         <MainCard
             content={false}
@@ -419,7 +440,7 @@ const ListingBuilderPage: React.FC = () => {
                                         </Tooltip>
                                         <Divider type={'vertical'} />
                                         <Tooltip title={'克隆'}>
-                                            <IconButton aria-label="delete" size="small">
+                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <ContentCopyIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>

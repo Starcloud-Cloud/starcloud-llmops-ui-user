@@ -24,6 +24,7 @@ export type ListType = {
     btnText: string;
     enable: boolean;
     keyword: { text: string; recommend: number }[];
+    grade: number;
 };
 
 const ListingContext = createContext<ListingContextType | null>(null);
@@ -117,38 +118,102 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [detail]);
 
+    const handleStar = (type: ListingBuilderEnum, num: number) => {
+        if (type === ListingBuilderEnum.TITLE) {
+            if (num === 0 || num === 1) {
+                return 1;
+            }
+            if (num === 2) {
+                return 2;
+            }
+            if (num === 3) {
+                return 2;
+            }
+        }
+        if (type === ListingBuilderEnum.PRODUCT_DES) {
+            if (num === 0 || num === 1) {
+                return 1;
+            }
+
+            if (num === 2) {
+                return 3;
+            }
+        }
+        if (type === ListingBuilderEnum.SEARCH_WORD) {
+            if (num === 0) {
+                return 1;
+            }
+
+            if (num === 1) {
+                return 3;
+            }
+        }
+    };
+
+    // 匹配星号的分数
     useEffect(() => {
-        const timer = setTimeout(() => {
-            const result = list
-                .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
-                .reduce((acc: any, obj, index) => {
-                    acc[index + 1] = obj.value;
-                    return acc;
-                }, {});
-            const data = {
-                uid,
-                version,
-                endpoint: country.key,
-                draftConfig: {
-                    enableAi: true,
-                    fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
-                },
-                title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
-                productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
-                searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-                fiveDesc: result
-            };
-            getGrade(data).then((res) => {
-                const copyDetail = _.cloneDeep(detail);
-                copyDetail.itemScore = res.itemScore;
-                setDetail(copyDetail);
-            });
-        }, 500);
-        return () => {
-            // 在每次状态变化时，清除之前的计时器
-            clearTimeout(timer);
-        };
-    }, [list]);
+        if (detail && list.length) {
+            let titleGrade = 0;
+            if (detail.itemScore.withoutSpecialChat) {
+                titleGrade++;
+            }
+            if (detail.itemScore.titleLength) {
+                titleGrade++;
+            }
+            if (detail.itemScore.titleUppercase) {
+                titleGrade++;
+            }
+            let desGrade = 0;
+            if (detail.itemScore.productLength) {
+                desGrade++;
+            }
+            if (detail.itemScore.withoutUrl) {
+                desGrade++;
+            }
+            let searchGrade = 0;
+            if (detail.itemScore.searchTermLength) {
+                searchGrade++;
+            }
+            const copyList = _.cloneDeep(list);
+            copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
+            copyList[detail?.draftConfig.fiveDescNum + 1].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
+            copyList[detail?.draftConfig.fiveDescNum + 2].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
+            setList(copyList);
+        }
+    }, [detail, list]);
+
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         const result = list
+    //             .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+    //             .reduce((acc: any, obj, index) => {
+    //                 acc[index + 1] = obj.value;
+    //                 return acc;
+    //             }, {});
+    //         const data = {
+    //             uid,
+    //             version,
+    //             endpoint: country.key,
+    //             draftConfig: {
+    //                 enableAi: true,
+    //                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+    //             },
+    //             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+    //             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+    //             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+    //             fiveDesc: result
+    //         };
+    //         getGrade(data).then((res) => {
+    //             const copyDetail = _.cloneDeep(detail);
+    //             copyDetail.itemScore = res.itemScore;
+    //             setDetail(copyDetail);
+    //         });
+    //     }, 500);
+    //     return () => {
+    //         // 在每次状态变化时，清除之前的计时器
+    //         clearTimeout(timer);
+    //     };
+    // }, [list]);
 
     return (
         <ListingContext.Provider

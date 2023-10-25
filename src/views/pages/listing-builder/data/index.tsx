@@ -2231,7 +2231,8 @@ export const DEFAULT_LIST = [
         row: 3,
         btnText: 'AI生成标题',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '五点描述1',
@@ -2249,7 +2250,8 @@ export const DEFAULT_LIST = [
         row: 4,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '五点描述2',
@@ -2267,7 +2269,8 @@ export const DEFAULT_LIST = [
         row: 4,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '五点描述3',
@@ -2285,7 +2288,8 @@ export const DEFAULT_LIST = [
         row: 4,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '五点描述4',
@@ -2303,7 +2307,8 @@ export const DEFAULT_LIST = [
         row: 4,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '五点描述5',
@@ -2321,7 +2326,8 @@ export const DEFAULT_LIST = [
         row: 4,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '产品描述',
@@ -2339,7 +2345,8 @@ export const DEFAULT_LIST = [
         row: 7,
         btnText: 'AI生成描述',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     },
     {
         title: '搜索词',
@@ -2357,7 +2364,8 @@ export const DEFAULT_LIST = [
         row: 5,
         btnText: '智能推荐',
         enable: true,
-        keyword: []
+        keyword: [],
+        grade: 0
     }
 ];
 

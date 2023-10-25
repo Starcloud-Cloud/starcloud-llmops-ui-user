@@ -66,3 +66,13 @@ export const getGrade = (data: any) => {
 export const importDict = (data: any) => {
     return request.put({ url: '/listing/draft/import/dict', data });
 };
+
+// 克隆
+export const draftClone = (data: any) => {
+    return request.post({ url: 'listing/draft/clone', data });
+};
+
+// 导出
+export const draftExport = (data: any) => {
+    return request.get({ url: 'listing/draft/export', params: data });
+};

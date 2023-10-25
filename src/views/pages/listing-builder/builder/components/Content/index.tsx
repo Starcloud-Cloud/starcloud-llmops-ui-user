@@ -252,7 +252,8 @@ export const Content = () => {
             row: 4,
             btnText: 'AI生成五点描述',
             enable: true,
-            keyword: []
+            keyword: [],
+            grade: 0
         });
         setList(copyList);
     };
@@ -610,7 +611,7 @@ export const Content = () => {
                                 </div>
                             )}
                             <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
-                                <div className="flex justify-between items-center px-4 flex-wrap">
+                                <div className="flex justify-between items-center px-4 flex-wrap py-1">
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">
                                             <IconButton size="small">
@@ -668,10 +669,10 @@ export const Content = () => {
                                         <span className="text-[#bec2cc] text-xs">{item.word}单词</span>
                                     </div>
                                     <div className="flex items-center">
-                                        <div className="flex items-center">
+                                        {/* <div className="flex items-center">
                                             <span>不计入已使用</span>
                                             <Switch checked={!item.enable} color={'secondary'} onChange={(e) => handleSwitch(e, index)} />
-                                        </div>
+                                        </div> */}
                                         {item.isOvertop && (
                                             <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>
                                                 <DeleteIcon className=" cursor-pointer text-sm" />

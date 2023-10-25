@@ -142,25 +142,6 @@ export const KeywordList = ({ selected, setSelected }: any) => {
         }
     }, [update, version, uid]);
 
-    console.log('keywordHighlight', keywordHighlight);
-
-    // useEffect(() => {
-    //     if (keywordHighlight.flat().filter((item) => !item)?.length) {
-    //         rows.forEach((item) => {
-    //             keywordHighlight
-    //                 .flat()
-    //                 .filter((item) => item !== undefined)
-    //                 .forEach((item1) => {
-    //                     if (item1.text === item.keyword) {
-    //                         item.use = [];
-    //                         item.use.push(item1);
-    //                     }
-    //                 });
-    //         });
-    //     }
-    //     setRows([...rows]);
-    // }, [keywordHighlight, rows]);
-
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');

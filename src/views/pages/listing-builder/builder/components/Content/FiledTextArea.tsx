@@ -39,7 +39,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
 
     useEffect(() => {
         const copyList = _.clone(list);
-        const data: any[] = keywordHighlight ? [...keywordHighlight] : [];
+        const data: any[] = [];
         resultArray?.map((item: string) => {
             copyList[index].keyword.forEach((item1) => {
                 if (item1.text === item) {
@@ -61,7 +61,9 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
 
     useEffect(() => {
         const result = mergeArray(currentList);
-        setKeywordHighlight(result);
+        const copyKeywordHighlight = _.clone(keywordHighlight);
+        copyKeywordHighlight[index] = result;
+        setKeywordHighlight(copyKeywordHighlight);
     }, [currentList]);
 
     const handleChange = (e: any) => {

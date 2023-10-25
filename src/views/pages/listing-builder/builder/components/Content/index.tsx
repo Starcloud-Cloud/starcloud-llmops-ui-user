@@ -695,7 +695,10 @@ export const Content = () => {
                                                     <div
                                                         key={index}
                                                         className={`${
-                                                            keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                            keywordHighlight
+                                                                ?.flat()
+                                                                ?.filter((item) => item !== undefined)
+                                                                .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
                                                                 ? 'bg-[#ffaca6] ml-1 line-through px-1'
                                                                 : 'ml-1 px-1'
                                                         }`}

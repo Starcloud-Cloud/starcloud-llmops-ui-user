@@ -33,7 +33,7 @@ type keywordHighlightType = {
     num: number;
     type: ListingBuilderEnum;
     fiveType?: string;
-}[];
+}[][];
 
 type ListingContextType = {
     uid: string;
@@ -47,7 +47,7 @@ type ListingContextType = {
     enableAi: boolean;
     setEnableAi: (enableAi: boolean) => void;
     setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
-    keywordHighlight: keywordHighlightType | null;
+    keywordHighlight: keywordHighlightType;
     setUpdate: (update: object) => void;
     update: object;
     setDetail: (detail: any) => void;
@@ -64,7 +64,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     });
     const [list, setList] = useState<ListType[]>(DEFAULT_LIST);
     const [enableAi, setEnableAi] = useState(true);
-    const [keywordHighlight, setKeywordHighlight] = useState<keywordHighlightType | null>(null);
+    const [keywordHighlight, setKeywordHighlight] = useState<keywordHighlightType | []>([]);
     const [detail, setDetail] = useState<any>(null);
     const [update, setUpdate] = useState<object>({});
 

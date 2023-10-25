@@ -142,19 +142,24 @@ export const KeywordList = ({ selected, setSelected }: any) => {
         }
     }, [update, version, uid]);
 
-    useEffect(() => {
-        if (keywordHighlight?.length) {
-            rows.forEach((item) => {
-                keywordHighlight.forEach((item1) => {
-                    if (item1.text === item.keyword) {
-                        item.use = [];
-                        item.use.push(item1);
-                    }
-                });
-            });
-        }
-        setRows([...rows]);
-    }, [keywordHighlight, rows]);
+    console.log('keywordHighlight', keywordHighlight);
+
+    // useEffect(() => {
+    //     if (keywordHighlight.flat().filter((item) => !item)?.length) {
+    //         rows.forEach((item) => {
+    //             keywordHighlight
+    //                 .flat()
+    //                 .filter((item) => item !== undefined)
+    //                 .forEach((item1) => {
+    //                     if (item1.text === item.keyword) {
+    //                         item.use = [];
+    //                         item.use.push(item1);
+    //                     }
+    //                 });
+    //         });
+    //     }
+    //     setRows([...rows]);
+    // }, [keywordHighlight, rows]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -194,16 +199,19 @@ export const KeywordList = ({ selected, setSelected }: any) => {
 
     const isSelected = (keyword: string) => selected.indexOf(keyword) !== -1;
 
-    const keywordUseModal = (use: any[]) => {
-        const filterTitle = use?.filter((item) => item.type === ListingBuilderEnum.TITLE) || [];
-        const filterProduct = use?.filter((item) => item.type === ListingBuilderEnum.PRODUCT_DES) || [];
-        const filterSearch = use?.filter((item) => item.type === ListingBuilderEnum.SEARCH_WORD) || [];
-        const filterFive = use
-            ?.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
-            .map((item) => ({ ...item, index: +item.fiveType.slice(9) }));
+    const keywordUseModal = (keyword: string) => {
+        const filterTitle =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.TITLE && item?.text === keyword) || [];
+        const filterProduct =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.PRODUCT_DES && item?.text === keyword) || [];
+        const filterSearch =
+            keywordHighlight?.flat()?.filter((item) => item?.type === ListingBuilderEnum.SEARCH_WORD && item?.text === keyword) || [];
+        const filterFive = keywordHighlight
+            ?.flat()
+            ?.filter((item) => item?.type === ListingBuilderEnum.FIVE_DES && item?.text === keyword)
+            .map((item) => ({ ...item, index: +item!.fiveType!.slice(9) }));
         const sortedFive = _.sortBy(filterFive, ['index']);
 
-        console.log(filterFive);
         return (
             <div>
                 <div>
@@ -228,41 +236,46 @@ export const KeywordList = ({ selected, setSelected }: any) => {
         );
     };
 
-    const handleUse = (use: any[]) => {
-        const filterNotFive = use?.filter((item) => item.type !== ListingBuilderEnum.FIVE_DES) || [];
-        const filterFive = use?.filter((item) => item.type === ListingBuilderEnum.FIVE_DES) || [];
+    const handleUse = React.useCallback(
+        (keyword: string) => {
+            const filterNotFive =
+                keywordHighlight.flat()?.filter((item) => item?.type !== ListingBuilderEnum.FIVE_DES && item?.text === keyword) || [];
+            const filterFive =
+                keywordHighlight.flat()?.filter((item) => item?.type === ListingBuilderEnum.FIVE_DES && item?.text === keyword) || [];
 
-        switch (filterNotFive.length + filterFive.length) {
-            case 0:
-                return null;
-            case 1:
-                return (
-                    <Popover content={() => keywordUseModal(use)} title="使用分布">
-                        <CheckCircleIcon />
-                    </Popover>
-                );
-            case 2:
-                return (
-                    <Popover content={<div>1</div>} title="Title">
-                        <RadioButtonUncheckedIcon />
-                    </Popover>
-                );
-            case 3:
-                return (
-                    <Popover content={<div>1</div>} title="Title">
-                        <Rate allowHalf />
-                    </Popover>
-                );
-            case 4:
-                return (
-                    <Popover content={<div>1</div>} title="Title">
-                        <Rate />
-                    </Popover>
-                );
-            default:
-                break;
-        }
-    };
+            switch (filterNotFive.length + filterFive.length) {
+                case 0:
+                    return null;
+                case 1:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <CheckCircleIcon />
+                        </Popover>
+                    );
+                case 2:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <RadioButtonUncheckedIcon />
+                        </Popover>
+                    );
+                case 3:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <Rate allowHalf />
+                        </Popover>
+                    );
+                case 4:
+                    return (
+                        <Popover content={() => keywordUseModal(keyword)} title="使用分布">
+                            <Rate />
+                        </Popover>
+                    );
+                default:
+                    break;
+            }
+        },
+        [keywordHighlight]
+    );
 
     return (
         <MainCard content={false}>
@@ -314,7 +327,7 @@ export const KeywordList = ({ selected, setSelected }: any) => {
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
                                     <TableCell align="center">{row.keyword}</TableCell>
-                                    <TableCell align="center">{handleUse(row.use)}</TableCell>
+                                    <TableCell align="center">{handleUse(row.keyword)}</TableCell>
                                 </TableRow>
                             );
                         })}

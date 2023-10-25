@@ -18,7 +18,7 @@ const containerStyle: React.CSSProperties = {
     background: '#fff'
 };
 
-export const KeyWord = () => {
+const KeyWord = () => {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
@@ -108,3 +108,5 @@ export const KeyWord = () => {
         </div>
     );
 };
+
+export default React.memo(KeyWord);

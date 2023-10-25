@@ -100,4 +100,5 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
     );
 };
 
-export default React.memo(FiledTextArea);
+// export default React.memo(FiledTextArea);
+export default FiledTextArea;

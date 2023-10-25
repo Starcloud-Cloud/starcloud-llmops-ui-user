@@ -50,7 +50,7 @@ function capitalizeFirstLetterOfEachWord(str: string): string {
     return capitalizedWords.join(' ');
 }
 
-export const Content = () => {
+const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
 
     const [assistOpen, setAssistOpen] = React.useState(true);
@@ -69,6 +69,7 @@ export const Content = () => {
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
 
+    // 设置头部分数
     React.useEffect(() => {
         const scoreListDefault = SCORE_LIST;
         if (detail?.itemScore) {
@@ -86,7 +87,7 @@ export const Content = () => {
             scoreListDefault[3].list[0].value = detail.itemScore.searchTermLength;
             setScoreList(scoreListDefault);
         }
-    }, [detail, scoreList]);
+    }, [detail]);
 
     React.useEffect(() => {
         if (openKeyWordSelect) {
@@ -101,7 +102,6 @@ export const Content = () => {
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
-                        console.log(hoverKey, 'hoverKey');
                         handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
                     }
                 }
@@ -157,27 +157,20 @@ export const Content = () => {
     };
 
     const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
-        handleHasKeyWork(e, keyword);
+        const newKeyword = keyword.map((v: any) => v.keyword) || [];
+        handleHasKeyWork(e, newKeyword);
 
         setEditIndex(index);
-        // setList((prevList: any) => {
-        //     const newList = [...prevList];
-        //     newList[index] = {
-        //         ...newList[index],
-        //         value: e.target.value,
-        //         character: e.target.value.length,
-        //         word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
-        //     };
-        //     return newList;
-        // });
-        const copyList = _.cloneDeep(list);
-        copyList[index] = {
-            ...copyList[index],
-            value: e.target.value,
-            character: e.target.value.length,
-            word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
-        };
-        setList(copyList);
+        setList((prevList: any) => {
+            const newList = [...prevList];
+            newList[index] = {
+                ...newList[index],
+                value: e.target.value,
+                character: e.target.value.length,
+                word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
+            };
+            return newList;
+        });
     }, []);
 
     const handleExpand = (key: number) => {
@@ -721,13 +714,7 @@ export const Content = () => {
                                     rows={item.row}
                                     placeholder={item.placeholder}
                                     value={item.value}
-                                    handleInputChange={(e: any) =>
-                                        handleInputChange(
-                                            e,
-                                            index,
-                                            detail?.keywordMetaData?.map((v: any) => v.keyword)
-                                        )
-                                    }
+                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData)}
                                     highlightWordList={item.keyword}
                                     highlightAllWordList={detail?.keywordMetaData || []}
                                     index={index}
@@ -809,3 +796,5 @@ export const Content = () => {
         </div>
     );
 };
+
+export default React.memo(Content);

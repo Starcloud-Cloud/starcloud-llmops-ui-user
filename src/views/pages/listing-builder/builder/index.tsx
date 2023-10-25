@@ -1,7 +1,7 @@
 import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tabs, Tab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-import { KeyWord } from './components/Keyword';
-import { Content } from './components/Content';
+import KeyWord from './components/Keyword';
+import Content from './components/Content';
 import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import React, { useRef } from 'react';
@@ -20,7 +20,6 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 function a11yProps(index: number) {
     return {

@@ -81,39 +81,54 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [queryUid, queryVersion]);
 
-    // 回显推荐关键词 & 是否开启
+    // 回显推荐关键词 & 是否开启 & 文本
     useEffect(() => {
-        if (detail?.draftConfig) {
+        if (detail && list) {
+            console.log(detail.title);
             const copyList = _.cloneDeep(list);
+
+            const newDetail = detail.draftConfig;
+
             // 标题
-            copyList[0].enable = !detail.draftConfig.titleConfig?.ignoreUse;
-            copyList[0].keyword = detail.draftConfig.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
+            copyList[0].enable = !newDetail.titleConfig?.ignoreUse;
+            copyList[0].keyword = newDetail.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
+            copyList[0].value = detail.title;
 
             //描述
-            copyList[detail.draftConfig?.fiveDescNum + 1].enable = !detail.draftConfig.productDescConfig?.ignoreUse;
-            copyList[detail?.draftConfig.fiveDescNum + 1].keyword =
-                detail.draftConfig.productDescConfig.recommendKeys?.map((item: any) => ({
+            const descIndex = newDetail.fiveDescNum + 1;
+            copyList[descIndex].enable = !newDetail.productDescConfig?.ignoreUse;
+            copyList[descIndex].keyword =
+                newDetail.productDescConfig?.recommendKeys?.map((item: any) => ({
                     text: item.keyword,
                     recommend: 1
                 })) || [];
+            copyList[descIndex].value = detail.productDesc;
 
             // 搜索
-            copyList[detail.draftConfig?.fiveDescNum + 2].enable = !detail.draftConfig?.searchTermConfig?.ignoreUse;
-            copyList[detail.draftConfig?.fiveDescNum + 2].keyword =
-                detail.draftConfig?.searchTermConfig.recommendKeys?.map((item: any) => ({
+            const searchIndex = newDetail.fiveDescNum + 2;
+            copyList[searchIndex].enable = !newDetail.searchTermConfig?.ignoreUse;
+            copyList[searchIndex].keyword =
+                newDetail.searchTermConfig.recommendKeys?.map((item: any) => ({
                     text: item.keyword,
                     recommend: 1
                 })) || [];
+            copyList[searchIndex].value = detail.searchTerm;
 
             // // 5点描述
-            Object.keys(detail?.draftConfig?.fiveDescConfig).forEach((key) => {
+            Object.keys(newDetail.fiveDescConfig).forEach((key) => {
                 const index = Number(key);
-                copyList[index].enable = !detail.draftConfig?.fiveDescConfig[key]?.ignoreUse;
+                copyList[index].enable = !newDetail.fiveDescConfig[key]?.ignoreUse;
                 copyList[index].keyword =
-                    detail.draftConfig?.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
+                    newDetail.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
                         text: item.keyword
                     })) || [];
             });
+            Object.keys(detail.fiveDesc)?.forEach((key) => {
+                const index = Number(key);
+                copyList[index].value = detail.fiveDesc[index];
+            });
+
+            handleGrade(detail, copyList);
             setList(copyList);
         }
     }, [detail]);
@@ -150,8 +165,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     };
 
-    // 匹配星号的分数
-    useEffect(() => {
+    // 处理上面分数
+    const handleGrade = (detail: any, copyList: ListType[]) => {
         if (detail && list.length) {
             let titleGrade = 0;
             if (detail.itemScore.withoutSpecialChat) {
@@ -174,13 +189,13 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             if (detail.itemScore.searchTermLength) {
                 searchGrade++;
             }
-            const copyList = _.cloneDeep(list);
+
             copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
             copyList[detail?.draftConfig.fiveDescNum + 1].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
             copyList[detail?.draftConfig.fiveDescNum + 2].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
             setList(copyList);
         }
-    }, [detail, list]);
+    };
 
     // useEffect(() => {
     //     const timer = setTimeout(() => {

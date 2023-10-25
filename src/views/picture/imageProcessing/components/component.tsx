@@ -4,7 +4,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import HistoryIcon from '@mui/icons-material/History';
 import MainCard from 'ui-component/cards/MainCard';
-import { Upload, Image, Radio } from 'antd';
+import { Upload, Image, Radio, Tooltip } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import type { UploadProps } from 'antd';
 import { PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
@@ -13,13 +13,14 @@ import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from 'utils/auth';
 import imgLoading from 'assets/images/picture/loading.gif';
 import _ from 'lodash-es';
-import JSZip from 'jszip';
 import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import { upscale } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
 import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
+import { downAllImages } from 'hooks/useDownLoadImage';
+import formatDate from 'hooks/useDate';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
     const { setUserInfo }: any = userInfoStore();
@@ -77,6 +78,14 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const disMagn = (num: number) => {
         return imageList.some((item: any) => item?.response?.data?.width * num * item?.response?.data?.height * num > 4194304);
     };
+    const uplace = (num: number) => {
+        if (imageList.length > 0) {
+            const newData = imageList.sort((a: any, b: any) => b?.response?.data?.width * num - a?.response?.data?.height * num)[0];
+            return newData?.response?.data?.width * num + '*' + newData?.response?.data?.height * num;
+        } else {
+            return '还未上传图片';
+        }
+    };
     useEffect(() => {
         setDiskey(diskey + 1);
     }, [imageList]);
@@ -92,19 +101,27 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
         }
     };
     const showFn = async (item: any, index: number) => {
-        const res = await upscale({
-            scene: 'IMAGE_UPSCALING',
-            appUid: 'UPSCALING_IMAGE',
-            imageRequest: {
-                initImage: item.response?.data?.url,
-                magnification: subTitle === '图片无损放大' ? magnification : 1
-            }
-        });
-        suRef.current.splice(index, 1, res.response);
-        setSucImageList(_.cloneDeep(suRef.current));
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
+        try {
+            const res = await upscale({
+                scene: 'IMAGE_UPSCALING',
+                appUid: 'UPSCALING_IMAGE',
+                imageRequest: {
+                    initImage: item.response?.data?.url,
+                    magnification: subTitle === '图片无损放大' ? magnification : 1
+                }
+            });
+            suRef.current.splice(index, 1, res.response);
+            setSucImageList(_.cloneDeep(suRef.current));
+            userBenefits().then((res) => {
+                setUserInfo(res);
+            });
+        } catch (err) {
+            suRef.current.splice(index, 1, { images: [{ url: 'error' }] });
+            setSucImageList(_.cloneDeep(suRef.current));
+            userBenefits().then((res) => {
+                setUserInfo(res);
+            });
+        }
     };
     useEffect(() => {
         if (!open) {
@@ -113,31 +130,19 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     }, [open]);
     //批量下载图片
     const batchDownload = () => {
-        const zip = new JSZip();
-        const imageUrls = sucImageList.map((item) => {
-            return { url: item.images[0].url, uuid: item.images[0].uuid, type: item.images[0].mediaType?.split('/')[1] };
-        });
-        // 异步加载图片并添加到压缩包
-        const promises = imageUrls.map(async (imageUrl, index) => {
-            const response = await fetch(imageUrl.url);
-            const arrayBuffer = await response.arrayBuffer();
-            zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
-        });
-        // 等待所有图片添加完成后创建压缩包并下载
-        Promise.all(promises)
-            .then(() => {
-                zip.generateAsync({ type: 'blob' }).then((content) => {
-                    const url = window.URL.createObjectURL(content);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'images.zip'; // 设置下载的文件名
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
+        const imageUrls = sucImageList
+            .map((item, index: number) => {
+                if (item?.images[0]?.url && item?.images[0]?.url !== 'error') {
+                    return {
+                        url: item.images[0].url,
+                        uuid: item.fromScene,
+                        time: formatDate(item.finishTime + index * 1000),
+                        type: item.images[0].mediaType?.split('/')[1]
+                    };
+                }
             })
-            .catch((error) => {
-                console.error('Error downloading images:', error);
-            });
+            .filter((value) => value !== undefined);
+        downAllImages(imageUrls);
     };
     return (
         <Card className="h-full p-[16px]">
@@ -194,7 +199,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                     height={240}
                                     preview={{
                                         visible: false,
-                                        mask: (
+                                        mask: item?.images && item?.images[0].url !== 'error' && (
                                             <div
                                                 className="w-full h-full flex justify-center items-center relative"
                                                 onClick={() => {
@@ -210,7 +215,8 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                                         downLoadImages(
                                                             item?.images[0].url,
                                                             item?.images[0].mediaType.split('/')[1],
-                                                            item?.images[0].uuid
+                                                            item?.fromScene,
+                                                            formatDate(item?.finishTime)
                                                         );
                                                     }}
                                                     className="absolute right-[5px] bottom-[5px] w-[30px] h-[30px] flex justify-center items-center rounded-md bg-[#ccc] border-rou border border-solid border-[#ccc] hover:border-[#673ab7]"
@@ -318,18 +324,26 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                     }}
                                     value={magnification}
                                 >
-                                    <Radio.Button disabled={Boolean(disMagn(2))} value={2}>
-                                        X2
-                                    </Radio.Button>
-                                    <Radio.Button disabled={Boolean(disMagn(4))} value={4}>
-                                        x4
-                                    </Radio.Button>
-                                    <Radio.Button disabled={Boolean(disMagn(6))} value={6}>
-                                        X6
-                                    </Radio.Button>
-                                    <Radio.Button disabled={Boolean(disMagn(8))} value={8}>
-                                        X8
-                                    </Radio.Button>
+                                    <Tooltip zIndex={9999} placement="top" title={uplace(2)}>
+                                        <Radio.Button disabled={Boolean(disMagn(2))} value={2}>
+                                            X2
+                                        </Radio.Button>
+                                    </Tooltip>
+                                    <Tooltip zIndex={9999} placement="top" title={uplace(4)}>
+                                        <Radio.Button disabled={Boolean(disMagn(4))} value={4}>
+                                            x4
+                                        </Radio.Button>
+                                    </Tooltip>
+                                    <Tooltip zIndex={9999} placement="top" title={uplace(6)}>
+                                        <Radio.Button disabled={Boolean(disMagn(6))} value={6}>
+                                            X6
+                                        </Radio.Button>
+                                    </Tooltip>
+                                    <Tooltip zIndex={9999} placement="top" title={uplace(8)}>
+                                        <Radio.Button disabled={Boolean(disMagn(8))} value={8}>
+                                            X8
+                                        </Radio.Button>
+                                    </Tooltip>
                                 </Radio.Group>
 
                                 <span className="text-[#697586] text-[12px] mt-[8px]">(选择需要放大的倍数)</span>
@@ -346,7 +360,18 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                             <div className="text-sm leading-4">支持多张图片同时上传，仅支持 JPG/PNG/WEBP 格式图片</div>
                         </div>
                         <div>
-                            <Button onClick={handleSave} className="ml-[8px]" size="small" color="secondary" variant="contained">
+                            <Button
+                                disabled={
+                                    imageList.some(
+                                        (item: any) => item?.response?.data?.width * 2 * item?.response?.data?.height * 2 > 4194304
+                                    ) || imageList.length === 0
+                                }
+                                onClick={handleSave}
+                                className="ml-[8px]"
+                                size="small"
+                                color="secondary"
+                                variant="contained"
+                            >
                                 {subTitle === '图片无损放大' ? '无损放大' : '提升质量'}
                                 <span className="text-xs opacity-50">
                                     （消耗{imageList.filter((item: any) => item.response?.data?.url).length * 2}点作图）

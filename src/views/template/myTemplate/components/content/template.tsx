@@ -4,10 +4,19 @@ import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import { Image } from 'antd';
 import marketStore from 'store/market';
+import { favoriteCollect, favoriteCancel } from 'api/template/collect';
 import './textnoWarp.scss';
-
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { useEffect, useState } from 'react';
 function Template({ like, data, handleDetail }: any) {
     const { categoryList } = marketStore();
+    const [active, setActive] = useState(false);
+    useEffect(() => {
+        if (data.likeCount === 1) {
+            setActive(true);
+        }
+    }, []);
     return (
         <Card
             onClick={() => handleDetail(data)}
@@ -72,17 +81,59 @@ function Template({ like, data, handleDetail }: any) {
                     <ArrowForwardIcon fontSize="small" sx={{ color: '#fff' }} />
                 </div>
             </div>
-            {/* {like === 'market' && (
-                <div
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    className="absolute left-[16px] bottom-[11px]"
-                >
-                    <GradeOutlinedIcon color="secondary" fontSize="small" />
-                    <GradeIcon color="secondary" fontSize="small" />
-                </div>
-            )} */}
+            {/* {like === 'market' ||
+                (like === 'collect' &&
+                    (!active ? (
+                        <div
+                            onClick={(e) => {
+                                favoriteCollect({ marketUid: data.uid }).then((res) => {
+                                    if (res) {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '收藏成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                    }
+                                });
+                                setActive(true);
+                                e.stopPropagation();
+                            }}
+                            className="absolute left-[16px] bottom-[11px]"
+                        >
+                            <GradeOutlinedIcon color="secondary" fontSize="small" />
+                        </div>
+                    ) : (
+                        <div
+                            onClick={(e) => {
+                                favoriteCancel({ marketUid: data.uid }).then((res) => {
+                                    if (res) {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '取消收藏成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                    }
+                                });
+                                setActive(false);
+                                e.stopPropagation();
+                            }}
+                            className="absolute left-[16px] bottom-[11px]"
+                        >
+                            <GradeIcon color="warning" fontSize="small" />
+                        </div>
+                    )))} */}
             <Box position="absolute" left="16px" bottom="5px">
                 {data.categories &&
                     data.categories.map((item: string) => (

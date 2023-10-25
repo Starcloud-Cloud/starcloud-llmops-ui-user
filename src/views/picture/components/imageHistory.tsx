@@ -7,8 +7,8 @@ import { history } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
 import formatDate from 'hooks/useDate';
 import ImageDetail from './detail';
-import JSZip from 'jszip';
-
+import { downAllImages } from 'hooks/useDownLoadImage';
+import _ from 'lodash-es';
 const ImageHistory = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -126,73 +126,51 @@ const ImageHistory = () => {
     //下载图片
     const downLoad = (row: any) => {
         if (row?.imageInfo?.images?.length > 1) {
-            const zip = new JSZip();
-            const imageUrls = row?.imageInfo?.images.map((item: any) => {
-                return { url: item.url, uuid: item.uuid, type: item.mediaType?.split('/')[1] };
+            const imageUrls = row?.imageInfo?.images.map((item: any, index: number) => {
+                return {
+                    url: item.url,
+                    uuid: row.fromScene,
+                    time: formatDate(row?.imageInfo?.finishTime + index * 1000),
+                    type: item.mediaType?.split('/')[1]
+                };
             });
-            // 异步加载图片并添加到压缩包
-            const promises = imageUrls.map(async (imageUrl: any, index: number) => {
-                const response = await fetch(imageUrl.url);
-                const arrayBuffer = await response.arrayBuffer();
-                zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
-            });
-            // 等待所有图片添加完成后创建压缩包并下载
-            Promise.all(promises)
-                .then(() => {
-                    zip.generateAsync({ type: 'blob' }).then((content) => {
-                        const url = window.URL.createObjectURL(content);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'images.zip'; // 设置下载的文件名
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error downloading images:', error);
-                });
+            downAllImages(imageUrls);
         } else {
             downLoadImages(
                 row?.imageInfo?.images[0].url,
                 row?.imageInfo?.images[0].mediaType.split('/')[1],
-                row?.imageInfo?.images[0].uuid
+                row?.fromScene,
+                formatDate(row?.imageInfo?.finishTime)
             );
         }
     };
+    //批量下载
     const download = () => {
-        const zip = new JSZip();
-        const newData = tableData
+        const newData = _.cloneDeep(tableData)
             .filter((item: any) => {
                 return selectedRowKeys.includes(item.uid);
             })
             .map((item: any) => {
-                return {
-                    url: item?.imageInfo?.images[0]?.url,
-                    uuid: item?.imageInfo?.images[0]?.uuid,
-                    type: item?.imageInfo?.images[0]?.mediaType?.split('/')[1]
-                };
+                if (item?.imageInfo?.images?.length > 1) {
+                    const newList = item?.imageInfo?.images?.map((el: any, index: number) => {
+                        return {
+                            url: el?.url,
+                            uuid: item.fromScene,
+                            time: formatDate(item?.imageInfo?.finishTime + index * 1000),
+                            type: el?.mediaType?.split('/')[1]
+                        };
+                    });
+                    return newList;
+                } else {
+                    return {
+                        url: item?.imageInfo?.images[0]?.url,
+                        uuid: item?.fromScene,
+                        time: formatDate(item?.imageInfo?.finishTime),
+                        type: item?.imageInfo?.images[0]?.mediaType?.split('/')[1]
+                    };
+                }
             });
-        // 异步加载图片并添加到压缩包
-        const promises = newData.map(async (imageUrl, index) => {
-            const response = await fetch(imageUrl.url);
-            const arrayBuffer = await response.arrayBuffer();
-            zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
-        });
-        // 等待所有图片添加完成后创建压缩包并下载
-        Promise.all(promises)
-            .then(() => {
-                zip.generateAsync({ type: 'blob' }).then((content) => {
-                    const url = window.URL.createObjectURL(content);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'images.zip'; // 设置下载的文件名
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
-            })
-            .catch((error) => {
-                console.error('Error downloading images:', error);
-            });
+        downAllImages(newData.flat(1));
     };
     //图片详情
     const [detailOpen, setDetailOpen] = useState(false);

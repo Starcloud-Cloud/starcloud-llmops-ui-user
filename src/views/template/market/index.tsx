@@ -10,7 +10,6 @@ import marketStore from 'store/market';
 import { useTheme } from '@mui/material/styles';
 import { listGroupByCategory, categories, categoryTree } from 'api/template';
 import Template from 'views/template/myTemplate/components/content/template';
-
 import _ from 'lodash-es';
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';

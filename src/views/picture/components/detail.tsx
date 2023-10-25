@@ -4,38 +4,28 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import MainCard from 'ui-component/cards/MainCard';
 import downLoadImages from 'hooks/useDownLoadImage';
 import { Image } from 'antd';
-import JSZip from 'jszip';
+import { downAllImages } from 'hooks/useDownLoadImage';
+import formatDate from 'hooks/useDate';
 const ImageDetail = ({ detailOpen, detailData, handleClose }: { detailOpen: boolean; detailData: any; handleClose: () => void }) => {
     //下载图片
     const downLoadImage = () => {
         if (detailData?.images?.length > 1) {
-            const zip = new JSZip();
-            const imageUrls = detailData.images.map((item: any) => {
-                return { url: item.url, uuid: item.uuid, type: item.mediaType?.split('/')[1] };
+            const imageUrls = detailData.images.map((item: any, index: number) => {
+                return {
+                    url: item.url,
+                    uuid: detailData.fromScene,
+                    time: formatDate(detailData?.finishTime + index * 1000),
+                    type: item.mediaType?.split('/')[1]
+                };
             });
-            // 异步加载图片并添加到压缩包
-            const promises = imageUrls.map(async (imageUrl: any) => {
-                const response = await fetch(imageUrl.url);
-                const arrayBuffer = await response.arrayBuffer();
-                zip.file(imageUrl.uuid + `.${imageUrl.type}`, arrayBuffer);
-            });
-            // 等待所有图片添加完成后创建压缩包并下载
-            Promise.all(promises)
-                .then(() => {
-                    zip.generateAsync({ type: 'blob' }).then((content) => {
-                        const url = window.URL.createObjectURL(content);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'images.zip'; // 设置下载的文件名
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error downloading images:', error);
-                });
+            downAllImages(imageUrls);
         } else {
-            downLoadImages(detailData?.images[0].url, detailData?.images[0].mediaType.split('/')[1], detailData?.images[0].uuid);
+            downLoadImages(
+                detailData?.images[0].url,
+                detailData?.images[0].mediaType.split('/')[1],
+                detailData?.fromScene,
+                formatDate(detailData?.finishTime)
+            );
         }
     };
     return (

@@ -174,8 +174,10 @@ const Content = () => {
             otherList = newList;
             return newList;
         });
-
         handleReGrade(otherList);
+
+        // const debouncedHandleReGrade = _.debounce(() => handleReGrade(otherList), 500);
+        // debouncedHandleReGrade();
     }, []);
 
     const handleExpand = (key: number) => {

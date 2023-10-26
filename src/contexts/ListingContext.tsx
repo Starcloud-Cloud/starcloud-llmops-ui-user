@@ -227,36 +227,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             const copyList = _.cloneDeep(list);
             handleGrade(res.itemScore, copyList);
             setList(copyList);
-
-            // if (itemScore && list.length) {
-            //     let titleGrade = 0;
-            //     if (itemScore.withoutSpecialChat) {
-            //         titleGrade++;
-            //     }
-            //     if (itemScore.titleLength) {
-            //         titleGrade++;
-            //     }
-            //     if (itemScore.titleUppercase) {
-            //         titleGrade++;
-            //     }
-            //     let desGrade = 0;
-            //     if (itemScore.productLength) {
-            //         desGrade++;
-            //     }
-            //     if (itemScore.withoutUrl) {
-            //         desGrade++;
-            //     }
-            //     let searchGrade = 0;
-            //     if (itemScore.searchTermLength) {
-            //         searchGrade++;
-            //     }
-
-            //     console.log(handleStar(ListingBuilderEnum.TITLE, titleGrade), ' handleStar(ListingBuilderEnum.TITLE, titleGrade)');
-            //     copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
-            //     copyList[copyList.length - 2].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
-            //     copyList[copyList.length - 1].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
-            //     setList(copyList);
-            // }
         });
     };
 

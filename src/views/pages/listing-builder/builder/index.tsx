@@ -196,7 +196,7 @@ const ListingBuilder = () => {
             ) : (
                 <div className="flex bg-[#f4f6f8] h-full">
                     <Affix offsetTop={0}>
-                        <div className="w-[450px] h-screen">
+                        <div className="w-[400px] h-screen">
                             <KeyWord />
                         </div>
                     </Affix>

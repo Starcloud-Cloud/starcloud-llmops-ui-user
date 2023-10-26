@@ -11,7 +11,7 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Popover, Rate } from 'antd';
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 type TableEnhancedCreateDataType = {
     keyword: string;

@@ -86,3 +86,8 @@ export const getListingDict = (data: any) => {
 export const getListingByAsin = (data: any) => {
     return request.get({ url: '/listing/KeywordMetadata/Listing', params: data });
 };
+
+// 只能推荐
+export const getRecommend = (data: any) => {
+    return request.get({ url: `/listing/draft/recommend/${data.uid}/${data.version}` });
+};

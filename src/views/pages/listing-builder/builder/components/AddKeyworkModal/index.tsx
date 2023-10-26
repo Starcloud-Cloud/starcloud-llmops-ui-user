@@ -89,7 +89,20 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     };
 
     return (
-        <Drawer placement="left" closable={false} onClose={handleClose} open={open} getContainer={false}>
+        <Drawer
+            placement="left"
+            closable={false}
+            onClose={handleClose}
+            open={open}
+            getContainer={false}
+            bodyStyle={{ padding: '0 4px' }}
+            maskClosable={false}
+        >
+            <div className="absolute right-1 top-1 z-10">
+                <IconButton onClick={handleClose} size="small">
+                    <CloseIcon className="cursor-pointer" />
+                </IconButton>
+            </div>
             <CardContent
                 sx={{
                     p: 1
@@ -106,23 +119,34 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     <Tab label="导入" {...a11yProps(1)} />
                 </Tabs>
                 <TabPanel value={tab} index={0}>
-                    <TextField
-                        multiline
-                        rows={4}
-                        label={'关键词'}
-                        className="w-full"
-                        onChange={(e) => {
-                            setKeyWord(e.target.value);
-                        }}
-                    />
+                    <div className="h-[390px]">
+                        <TextField
+                            multiline
+                            rows={11}
+                            label={'关键词'}
+                            placeholder={`
+请输入关键词，一行一个词组
+最多2000个关键词
+超过则系统自动截取前2000`}
+                            className="w-full"
+                            onChange={(e) => {
+                                setKeyWord(e.target.value);
+                            }}
+                        />
+                    </div>
                 </TabPanel>
                 <TabPanel value={tab} index={1}>
-                    <div className="text-base font-semibold">选择词库</div>
-                    {dictList.map((item: any, index) => (
-                        <FormGroup key={index}>
-                            <FormControlLabel control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />} label={item.name} />
-                        </FormGroup>
-                    ))}
+                    <div className="h-[390px] overflow-y-auto">
+                        <div className="text-base font-semibold">选择词库</div>
+                        {dictList.map((item: any, index) => (
+                            <FormGroup key={index}>
+                                <FormControlLabel
+                                    control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
+                                    label={item.name}
+                                />
+                            </FormGroup>
+                        ))}
+                    </div>
                 </TabPanel>
             </CardContent>
             <Divider />

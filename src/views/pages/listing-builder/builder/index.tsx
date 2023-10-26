@@ -35,7 +35,7 @@ const ListingBuilder = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
     const [open, setOpen] = React.useState(false);
-    const { country, setCountry, uid, version, list } = useListing();
+    const { country, setCountry, uid, version, list, detail } = useListing();
     const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -110,7 +110,7 @@ const ListingBuilder = () => {
                     <div className="flex items-center">
                         <div className="w-[100px]">
                             <Dropdown
-                                disabled={uid !== ''}
+                                disabled={detail?.keywordResume?.length > 0}
                                 menu={{ items: COUNTRY_LIST, onClick }}
                                 open={dropdownOpen}
                                 onOpenChange={setDropdownOpen}
@@ -120,7 +120,7 @@ const ListingBuilder = () => {
                                 <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
                                     {country.icon}
                                     <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
-                                    {!uid && (dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+                                    {!detail?.keywordResume?.length && (dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
                                 </div>
                             </Dropdown>
                         </div>

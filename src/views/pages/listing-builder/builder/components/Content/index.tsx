@@ -1,23 +1,21 @@
 import {
     Button,
     Card,
-    IconButton,
-    LinearProgress,
-    Switch,
-    Tooltip,
-    Grid,
-    TextField,
+    Divider as MuiDivider,
     FormControl,
+    Grid,
+    IconButton,
     InputLabel,
-    Select,
+    LinearProgress,
     MenuItem,
-    Divider as MuiDivider
+    Select,
+    Switch,
+    TextField,
+    Tooltip
 } from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import ReplayIcon from '@mui/icons-material/Replay';
-import { Input, Alert, Divider, Rate, Dropdown, MenuProps, Menu, FloatButton, Tag } from 'antd';
+import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Rate } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -25,7 +23,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { AiCustomModal } from '../AiCustomModal';
 import AddIcon from '@mui/icons-material/Add';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import copy from 'clipboard-copy';
@@ -37,7 +35,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
-import { getListingByAsin } from 'api/listing/build';
+import { getRecommend } from 'api/listing/build';
 
 const { Search } = Input;
 
@@ -64,7 +62,8 @@ const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
 
-    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country, handleReGrade, itemScore } = useListing();
+    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country, handleReGrade, itemScore, version, uid } =
+        useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
@@ -322,6 +321,12 @@ const Content = () => {
             copyList[index + 1].value = item;
         });
         setList(copyList);
+    };
+
+    const handleSearchWord = async () => {
+        const res = await getRecommend({ version, uid });
+        if (res) {
+        }
     };
 
     return (
@@ -628,22 +633,53 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    {enableAi &&
-                                        ((item.type === ListingBuilderEnum.FIVE_DES && index === 1) ||
-                                            item.type === ListingBuilderEnum.TITLE ||
-                                            item.type === ListingBuilderEnum.PRODUCT_DES ||
-                                            item.type === ListingBuilderEnum.SEARCH_WORD) && (
-                                            <Dropdown menu={{ items }}>
-                                                <Button
-                                                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                                    color="secondary"
-                                                    size="small"
-                                                    variant="contained"
-                                                >
-                                                    {item.btnText}
-                                                </Button>
-                                            </Dropdown>
-                                        )}
+                                    {item.type === ListingBuilderEnum.SEARCH_WORD ? (
+                                        <Button
+                                            onClick={handleSearchWord}
+                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                            color="secondary"
+                                            size="small"
+                                            variant="contained"
+                                        >
+                                            {item.btnText}
+                                        </Button>
+                                    ) : (
+                                        <Dropdown menu={{ items }}>
+                                            <Button
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                {item.btnText}
+                                            </Button>
+                                        </Dropdown>
+                                    )}
+                                    {/*{(enableAi &&*/}
+                                    {/*    ((item.type === ListingBuilderEnum.FIVE_DES && index === 1) ||*/}
+                                    {/*        item.type === ListingBuilderEnum.TITLE ||*/}
+                                    {/*        item.type === ListingBuilderEnum.PRODUCT_DES || (*/}
+                                    {/*            <Dropdown menu={{ items }}>*/}
+                                    {/*                <Button*/}
+                                    {/*                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
+                                    {/*                    color="secondary"*/}
+                                    {/*                    size="small"*/}
+                                    {/*                    variant="contained"*/}
+                                    {/*                >*/}
+                                    {/*                    {item.btnText}*/}
+                                    {/*                </Button>*/}
+                                    {/*            </Dropdown>*/}
+                                    {/*        ))) ||*/}
+                                    {/*    (item.type === ListingBuilderEnum.SEARCH_WORD && (*/}
+                                    {/*        <Button*/}
+                                    {/*            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
+                                    {/*            color="secondary"*/}
+                                    {/*            size="small"*/}
+                                    {/*            variant="contained"*/}
+                                    {/*        >*/}
+                                    {/*            {item.btnText}*/}
+                                    {/*        </Button>*/}
+                                    {/*    ))}*/}
                                 </div>
                             </div>
                             {expandList.includes(index) && (

@@ -1,5 +1,5 @@
 import { useListing } from 'contexts/ListingContext';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 

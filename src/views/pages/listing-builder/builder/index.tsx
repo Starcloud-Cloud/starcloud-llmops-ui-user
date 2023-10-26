@@ -35,7 +35,7 @@ const ListingBuilder = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
     const [open, setOpen] = React.useState(false);
-    const { country, setCountry, uid, version, list, detail } = useListing();
+    const { country, setCountry, uid, version, list, detail, setVersion, setUid } = useListing();
     const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -61,7 +61,7 @@ const ListingBuilder = () => {
                     close: false
                 })
             );
-            navigate('/chatMarket');
+            navigate('/listingBuilderPage');
         }
     };
 
@@ -98,7 +98,9 @@ const ListingBuilder = () => {
                     close: false
                 })
             );
-            navigate('/listingBuilderPage');
+            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+            setVersion(res.version);
+            setUid(res.uid);
         }
     };
 

@@ -86,7 +86,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [queryUid, queryVersion]);
 
-    console.log(detail, list);
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
     useEffect(() => {
         if (detail && detail.draftConfig && list.length) {

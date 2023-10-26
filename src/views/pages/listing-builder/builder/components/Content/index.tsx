@@ -174,9 +174,6 @@ const Content = () => {
             return newList;
         });
         handleReGrade(otherList);
-
-        // const debouncedHandleReGrade = _.debounce(() => handleReGrade(otherList), 500);
-        // debouncedHandleReGrade();
     }, []);
 
     const handleExpand = (key: number) => {
@@ -323,9 +320,12 @@ const Content = () => {
         setList(copyList);
     };
 
-    const handleSearchWord = async () => {
-        const res = await getRecommend({ version, uid });
-        if (res) {
+    const handleClick = async (item: any, index: number) => {
+        // 智能推荐
+        if (index === list.length - 1) {
+            const res = await getRecommend({ version, uid });
+            if (res) {
+            }
         }
     };
 
@@ -633,7 +633,16 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    {item.type === ListingBuilderEnum.SEARCH_WORD ? (
+                                    <Button
+                                        onClick={() => handleClick(item, index)}
+                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                        color="secondary"
+                                        size="small"
+                                        variant="contained"
+                                    >
+                                        {item.btnText}
+                                    </Button>
+                                    {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}
                                             startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
@@ -654,32 +663,7 @@ const Content = () => {
                                                 {item.btnText}
                                             </Button>
                                         </Dropdown>
-                                    )}
-                                    {/*{(enableAi &&*/}
-                                    {/*    ((item.type === ListingBuilderEnum.FIVE_DES && index === 1) ||*/}
-                                    {/*        item.type === ListingBuilderEnum.TITLE ||*/}
-                                    {/*        item.type === ListingBuilderEnum.PRODUCT_DES || (*/}
-                                    {/*            <Dropdown menu={{ items }}>*/}
-                                    {/*                <Button*/}
-                                    {/*                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
-                                    {/*                    color="secondary"*/}
-                                    {/*                    size="small"*/}
-                                    {/*                    variant="contained"*/}
-                                    {/*                >*/}
-                                    {/*                    {item.btnText}*/}
-                                    {/*                </Button>*/}
-                                    {/*            </Dropdown>*/}
-                                    {/*        ))) ||*/}
-                                    {/*    (item.type === ListingBuilderEnum.SEARCH_WORD && (*/}
-                                    {/*        <Button*/}
-                                    {/*            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
-                                    {/*            color="secondary"*/}
-                                    {/*            size="small"*/}
-                                    {/*            variant="contained"*/}
-                                    {/*        >*/}
-                                    {/*            {item.btnText}*/}
-                                    {/*        </Button>*/}
-                                    {/*    ))}*/}
+                                    )} */}
                                 </div>
                             </div>
                             {expandList.includes(index) && (

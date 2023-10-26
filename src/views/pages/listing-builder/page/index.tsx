@@ -275,7 +275,7 @@ const ListingBuilderPage: React.FC = () => {
     };
 
     const doExport = async () => {
-        axios({
+        await axios({
             url: `${base_url}/listing/draft/export`,
             method: 'post',
             data: selected,

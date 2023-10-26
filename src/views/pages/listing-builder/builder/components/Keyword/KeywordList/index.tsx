@@ -179,9 +179,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 setRows(data);
             });
         }
-    }, [keywordHighlight, rows]);
+    }, [keywordHighlight]);
 
-    // TODO 简化
     const pageList = useMemo(() => {
         let newData: any[] = [];
         if (hiddenUse && keywordHighlight.flat().filter((item) => item).length > 0) {

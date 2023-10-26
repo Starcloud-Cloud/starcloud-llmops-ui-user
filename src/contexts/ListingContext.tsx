@@ -53,7 +53,7 @@ type ListingContextType = {
     update: object;
     setDetail: (detail: any) => void;
     detail: any;
-    handleReGrade: () => void;
+    handleReGrade: (list: any[]) => void;
     setItemScore: (itemScore: any) => void;
     itemScore: any;
 };
@@ -194,13 +194,14 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 searchGrade++;
             }
 
+            console.log(handleStar(ListingBuilderEnum.TITLE, titleGrade), ' handleStar(ListingBuilderEnum.TITLE, titleGrade)');
             copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
             copyList[copyList.length - 2].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
             copyList[copyList.length - 1].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
         }
     };
 
-    const handleReGrade = () => {
+    const handleReGrade = (list: ListType[]) => {
         const result = list
             .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
             .reduce((acc: any, obj, index) => {
@@ -222,43 +223,42 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         };
         getGrade(data).then((res) => {
             setItemScore({ ...res.itemScore });
-            handleGrade(detail.itemScore, list);
+            // 触发列表星星更新
+            const copyList = _.cloneDeep(list);
+            handleGrade(res.itemScore, copyList);
+            setList(copyList);
+
+            // if (itemScore && list.length) {
+            //     let titleGrade = 0;
+            //     if (itemScore.withoutSpecialChat) {
+            //         titleGrade++;
+            //     }
+            //     if (itemScore.titleLength) {
+            //         titleGrade++;
+            //     }
+            //     if (itemScore.titleUppercase) {
+            //         titleGrade++;
+            //     }
+            //     let desGrade = 0;
+            //     if (itemScore.productLength) {
+            //         desGrade++;
+            //     }
+            //     if (itemScore.withoutUrl) {
+            //         desGrade++;
+            //     }
+            //     let searchGrade = 0;
+            //     if (itemScore.searchTermLength) {
+            //         searchGrade++;
+            //     }
+
+            //     console.log(handleStar(ListingBuilderEnum.TITLE, titleGrade), ' handleStar(ListingBuilderEnum.TITLE, titleGrade)');
+            //     copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
+            //     copyList[copyList.length - 2].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
+            //     copyList[copyList.length - 1].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
+            //     setList(copyList);
+            // }
         });
     };
-
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         const result = list
-    //             .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
-    //             .reduce((acc: any, obj, index) => {
-    //                 acc[index + 1] = obj.value;
-    //                 return acc;
-    //             }, {});
-    //         const data = {
-    //             uid,
-    //             version,
-    //             endpoint: country.key,
-    //             draftConfig: {
-    //                 enableAi: true,
-    //                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
-    //             },
-    //             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
-    //             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
-    //             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-    //             fiveDesc: result
-    //         };
-    //         getGrade(data).then((res) => {
-    //             const copyDetail = _.cloneDeep(detail);
-    //             copyDetail.itemScore = res.itemScore;
-    //             // FIXME: 临时解决方案
-    //             // setDetail(copyDetail);
-    //         });
-    //     }, 500);
-    //     return () => {
-    //         // 在每次状态变化时，清除之前的计时器
-    //         clearTimeout(timer);
-    //     };
-    // }, [list]);
 
     return (
         <ListingContext.Provider

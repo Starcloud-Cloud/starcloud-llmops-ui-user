@@ -126,7 +126,7 @@ const Content = () => {
             word: modifiedString.trim() === '' ? 0 : modifiedString.trim().split(' ').length
         };
         setList(newList);
-        handleReGrade();
+        handleReGrade(newList);
         setOpenKeyWordSelect(false);
         setHoverKey(0);
         hoverKeyRef.current = 0;
@@ -158,6 +158,7 @@ const Content = () => {
     };
 
     const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
+        let otherList: any[] = [];
         const newKeyword = keyword?.map((v: any) => v.keyword) || [];
         handleHasKeyWork(e, newKeyword);
 
@@ -170,9 +171,11 @@ const Content = () => {
                 character: e.target.value.length,
                 word: e.target.value.trim() === '' ? 0 : e.target.value.trim().split(' ').length
             };
+            otherList = newList;
             return newList;
         });
-        handleReGrade();
+
+        handleReGrade(otherList);
     }, []);
 
     const handleExpand = (key: number) => {

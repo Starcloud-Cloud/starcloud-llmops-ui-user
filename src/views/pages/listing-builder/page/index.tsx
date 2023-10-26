@@ -278,9 +278,7 @@ const ListingBuilderPage: React.FC = () => {
         axios({
             url: `${base_url}/listing/draft/export`,
             method: 'post',
-            data: {
-                ids: selected
-            },
+            data: selected,
             responseType: 'blob', // 将响应数据视为二进制数据流
             headers: {
                 Authorization: 'Bearer ' + getAccessToken()

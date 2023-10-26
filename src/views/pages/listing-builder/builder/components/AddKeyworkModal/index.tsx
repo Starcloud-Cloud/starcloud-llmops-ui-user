@@ -80,8 +80,16 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                 endpoint: country.key
             });
             if (res) {
-                handleClose();
-                setUpdate({});
+                if (res) {
+                    setVersion(res.version);
+                    setUid(res.uid);
+                    handleClose();
+                    if (uid) {
+                        // 更新
+                        setUpdate({ type: 1 });
+                    }
+                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                }
             }
         }
     };

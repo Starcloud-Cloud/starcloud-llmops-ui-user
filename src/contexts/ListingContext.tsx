@@ -1,4 +1,5 @@
 import { getGrade } from 'api/listing/build';
+import { de } from 'date-fns/locale';
 import _ from 'lodash';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -50,7 +51,7 @@ type ListingContextType = {
     setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
     keywordHighlight: keywordHighlightType;
     setUpdate: (update: object) => void;
-    update: object;
+    update: any;
     setDetail: (detail: any) => void;
     detail: any;
     handleReGrade: (list: any[]) => void;
@@ -85,6 +86,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
         }
     }, [queryUid, queryVersion]);
 
+    console.log(detail, list);
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
     useEffect(() => {
         if (detail && detail.draftConfig && list.length) {
@@ -112,25 +114,27 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             const searchIndex = newDetail.fiveDescNum + 2;
             copyList[searchIndex].enable = !newDetail.searchTermConfig?.ignoreUse;
             copyList[searchIndex].keyword =
-                newDetail.searchTermConfig.recommendKeys?.map((item: any) => ({
+                newDetail.searchTermConfig?.recommendKeys?.map((item: any) => ({
                     text: item.keyword,
                     recommend: 1
                 })) || [];
             copyList[searchIndex].value = detail.searchTerm;
 
             // // 5点描述
-            Object.keys(newDetail.fiveDescConfig).forEach((key) => {
-                const index = Number(key);
-                copyList[index].enable = !newDetail.fiveDescConfig[key]?.ignoreUse;
-                copyList[index].keyword =
-                    newDetail.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
-                        text: item.keyword
-                    })) || [];
-            });
-            Object.keys(detail.fiveDesc)?.forEach((key) => {
-                const index = Number(key);
-                copyList[index].value = detail.fiveDesc[index];
-            });
+            newDetail.fiveDescConfig &&
+                Object.keys(newDetail.fiveDescConfig).forEach((key) => {
+                    const index = Number(key);
+                    copyList[index].enable = !newDetail?.fiveDescConfig[key]?.ignoreUse;
+                    copyList[index].keyword =
+                        newDetail.fiveDescConfig[key]?.recommendKeys?.map((item: any) => ({
+                            text: item.keyword
+                        })) || [];
+                });
+            detail.fiveDesc &&
+                Object.keys(detail.fiveDesc)?.forEach((key) => {
+                    const index = Number(key);
+                    copyList[index].value = detail?.fiveDesc?.[index];
+                });
 
             handleGrade(detail.itemScore, copyList);
             setList(copyList);
@@ -194,7 +198,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 searchGrade++;
             }
 
-            console.log(handleStar(ListingBuilderEnum.TITLE, titleGrade), ' handleStar(ListingBuilderEnum.TITLE, titleGrade)');
             copyList[0].grade = handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
             copyList[copyList.length - 2].grade = handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
             copyList[copyList.length - 1].grade = handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;

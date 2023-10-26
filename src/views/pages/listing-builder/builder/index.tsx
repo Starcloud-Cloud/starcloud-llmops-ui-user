@@ -39,10 +39,11 @@ const ListingBuilder = () => {
     const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
+        const current = COUNTRY_LIST.find((item: any) => item.key === key);
         setCountry({
             key,
-            icon: COUNTRY_LIST?.[key]?.icon,
-            label: COUNTRY_LIST?.[key]?.label
+            icon: current?.icon,
+            label: current?.label
         });
     };
 

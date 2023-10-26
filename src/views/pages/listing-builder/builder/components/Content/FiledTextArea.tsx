@@ -37,7 +37,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
         const pattern = new RegExp(r);
         const resultArray = value?.split(pattern).filter((item: string) => item !== '');
         return resultArray;
-    }, [highlightWordList, value]);
+    }, [highlightAllWordList, value]);
 
     useEffect(() => {
         const copyList = _.clone(highlightAllWordList);

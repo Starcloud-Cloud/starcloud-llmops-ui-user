@@ -12,6 +12,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Popover, Rate } from 'antd';
 import _ from 'lodash-es';
+import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
 
 type TableEnhancedCreateDataType = {
     keyword: string;
@@ -121,19 +122,40 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry } = useListing();
 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
             getListingDetail(uid, version)
                 .then((res: any) => {
-                    setDetail(res);
-                    setItemScore(res.itemScore);
+                    // 设置站点
+                    const current = COUNTRY_LIST.find((item: any) => item.key === res.endpoint);
+                    setCountry({
+                        key: res.endpoint,
+                        icon: current?.icon,
+                        label: current?.label
+                    });
                     const fetchedRows = res.keywordMetaData || [];
                     setRows([...fetchedRows]);
-                    if (res.status === 'ANALYSIS') {
-                        setUpdate({});
+                    if (update?.type === 1) {
+                        // 只做详情标签的更新(lis列表和右侧分布)和打分的跟新
+                        setDetail((pre: any) => ({
+                            ...pre,
+                            keywordMetaData: res.keywordMetaData,
+                            keywordResume: res.keywordResume,
+                            draftConfig: res.draftConfig
+                        }));
+                        setItemScore(res.itemScore);
+                        if (res.status === 'ANALYSIS') {
+                            setUpdate({ type: 1 });
+                        }
+                    } else {
+                        setDetail(res);
+                        setItemScore(res.itemScore);
+                        if (res.status === 'ANALYSIS') {
+                            setUpdate({});
+                        }
                     }
                 })
                 .catch((error: any) => {

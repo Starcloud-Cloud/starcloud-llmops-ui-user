@@ -42,16 +42,29 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail } = useListing();
     const navigate = useNavigate();
 
+    // 添加关键词
     const handleOk = async () => {
         if (tab === 0) {
             const lines = keyWord.split('\n');
             if (uid) {
-                const res = addKey({ uid, version, addKey: lines });
-                setUpdate({});
-                handleClose();
+                // 如果站点一样就就新增
+                if (detail.endpoint === country.key) {
+                    const res = await addKey({ uid, version, addKey: lines });
+                    if (res) {
+                        handleClose();
+                        setUpdate({ type: 1 });
+                    }
+                } else {
+                    // 修改了站点所属
+                    const res = await saveListing({ keys: lines, endpoint: country.key });
+                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                    setVersion(res.version);
+                    setUid(res.uid);
+                    handleClose();
+                }
             } else {
                 const res = await saveListing({ keys: lines, endpoint: country.key });
                 navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
@@ -65,8 +78,10 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                 version,
                 dictUid: checked
             });
-            handleClose();
-            setUpdate({});
+            if (res) {
+                handleClose();
+                setUpdate({});
+            }
         }
     };
 

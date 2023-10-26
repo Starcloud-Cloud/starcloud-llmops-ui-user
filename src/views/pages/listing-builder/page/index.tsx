@@ -439,7 +439,7 @@ const ListingBuilderPage: React.FC = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type={'vertical'} />
-                                        <Tooltip title={'克隆'}>
+                                        <Tooltip title={'复制'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <ContentCopyIcon className="text-base" />
                                             </IconButton>

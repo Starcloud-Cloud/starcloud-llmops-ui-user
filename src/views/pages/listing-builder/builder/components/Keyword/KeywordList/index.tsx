@@ -163,6 +163,23 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 });
         }
     }, [update, version, uid]);
+    // 计算use总使用量
+    useEffect(() => {
+        if (keywordHighlight.flat()?.filter((item) => !item).length && rows.length) {
+            const data: any[] = [];
+            rows.forEach((item) => {
+                const num = keywordHighlight
+                    ?.flat()
+                    ?.filter((item1) => item1?.text === item?.keyword)
+                    ?.reduce((acc, obj) => acc + (obj.num || 0), 0);
+                data.push({
+                    ...item,
+                    use: num
+                });
+                setRows(data);
+            });
+        }
+    }, [keywordHighlight, rows]);
 
     // TODO 简化
     const pageList = useMemo(() => {

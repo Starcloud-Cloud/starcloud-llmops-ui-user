@@ -51,7 +51,8 @@ const KeyWord = () => {
             );
             setDelOpen(false);
             setSelected([]);
-            setUpdate({});
+            // 只更新关键词和打分
+            setUpdate({ type: 1 });
         }
     };
 

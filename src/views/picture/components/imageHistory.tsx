@@ -33,6 +33,10 @@ const ImageHistory = () => {
                         ? '去除图片背景文字'
                         : row.fromScene === 'IMAGE_UPSCALING'
                         ? '图片质量提升'
+                        : row.fromScene === 'IMAGE_SKETCH'
+                        ? '轮廓出图'
+                        : row.fromScene === 'IMAGE_VARIANTS'
+                        ? '图片裂变'
                         : ''}
                 </span>
             )

@@ -100,7 +100,7 @@ const KeyWord = () => {
                     </Button>
                 )}
             </div>
-            <div>
+            <div className="max-h-[calc(100vh-100px)] overflow-y-auto">
                 <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} />
             </div>
 

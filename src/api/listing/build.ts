@@ -74,7 +74,7 @@ export const draftClone = (data: any) => {
 
 // 导出
 export const draftExport = (data: any) => {
-    return request.get({ url: '/listing/draft/export', params: data });
+    return request.post({ url: '/listing/draft/export', data });
 };
 
 // 词库列表

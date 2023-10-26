@@ -76,7 +76,8 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             const res = await importDict({
                 uid,
                 version,
-                dictUid: checked
+                dictUid: checked,
+                endpoint: country.key
             });
             if (res) {
                 handleClose();

@@ -319,7 +319,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
     return (
         <MainCard content={false}>
             <TableContainer component={Paper}>
-                <Table size={'small'}>
+                <Table size={'small'} stickyHeader>
                     <EnhancedTableHead
                         size="small"
                         numSelected={selected.length}

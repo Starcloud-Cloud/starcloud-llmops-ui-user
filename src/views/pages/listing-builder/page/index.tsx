@@ -16,11 +16,15 @@ import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { delListing, draftClone, getListingPage } from 'api/listing/build';
+import { delListing, draftClone, draftExport, getListingPage } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { COUNTRY_LIST } from '../data';
+import { config } from 'utils/axios/config';
+import axios from 'axios';
+import { getAccessToken } from 'utils/auth';
+const { result_code, base_url, share_base_url, request_timeout } = config;
 
 export interface DraftConfig {}
 
@@ -220,6 +224,7 @@ const ListingBuilderPage: React.FC = () => {
             );
             setDelVisible(false);
             forceUpdate();
+            setSelected([]);
         }
     };
 
@@ -269,6 +274,40 @@ const ListingBuilderPage: React.FC = () => {
         }
     };
 
+    const doExport = async () => {
+        axios({
+            url: `${base_url}/listing/draft/export`,
+            method: 'post',
+            data: {
+                ids: selected
+            },
+            responseType: 'blob', // 将响应数据视为二进制数据流
+            headers: {
+                Authorization: 'Bearer ' + getAccessToken()
+            }
+        })
+            .then((response) => {
+                // 创建一个blob对象
+                const blob = new Blob([response.data], { type: response.headers['content-type'] });
+
+                // 创建一个a标签用于下载
+                const downloadLink = document.createElement('a');
+                downloadLink.href = window.URL.createObjectURL(blob);
+                downloadLink.setAttribute('download', `listing-${new Date().getTime()}.xls`); // 设置下载文件的名称
+                document.body.appendChild(downloadLink);
+
+                // 触发点击事件以开始下载
+                downloadLink.click();
+
+                // 移除下载链接
+                document.body.removeChild(downloadLink);
+                setSelected([]);
+            })
+            .catch((error) => {
+                console.error('下载文件时发生错误:', error);
+            });
+    };
+
     return (
         <MainCard
             content={false}
@@ -297,7 +336,7 @@ const ListingBuilderPage: React.FC = () => {
                         className="ml-1"
                         color="secondary"
                         startIcon={<CloudDownloadIcon />}
-                        onClick={() => {}}
+                        onClick={() => doExport()}
                         variant="contained"
                         size="small"
                     >
@@ -368,7 +407,7 @@ const ListingBuilderPage: React.FC = () => {
             }
         >
             <TableContainer>
-                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                <Table sx={{ minWidth: 1100 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}
@@ -438,13 +477,13 @@ const ListingBuilderPage: React.FC = () => {
                                                 <EditIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type={'vertical'} />
+                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'复制'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <ContentCopyIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type={'vertical'} />
+                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'删除'}>
                                             <IconButton
                                                 aria-label="delete"

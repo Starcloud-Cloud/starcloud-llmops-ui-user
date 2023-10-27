@@ -1,8 +1,10 @@
-import { Button, Select, Divider, Tag, Input, Table, Tooltip } from 'antd';
+import { Button, Select, Divider, Tag, Input, Table, Popover, Tooltip, Image } from 'antd';
 import { ArrowDownOutlined, BarChartOutlined, MoreOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import React, { useState } from 'react';
-import Chart, { Props } from 'react-apexcharts';
+import React, { useEffect, useState } from 'react';
+import * as echarts from 'echarts';
+import ResultFilter from './component/resultFilter';
+import AddLexicon from './component/addLexicon';
 const TermSearch = () => {
     const [tags, setTags] = useState<string[]>([]);
     const handleClose = (removedTag: string) => {
@@ -20,7 +22,7 @@ const TermSearch = () => {
     const rowSelection = {
         selectedRowKeys,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            setSelectedRowKeys(selectedRowKeys);
         }
     };
     const columns: ColumnsType<any> = [
@@ -86,6 +88,67 @@ const TermSearch = () => {
                 >
                     <div className="cursor-default">相关ASIN</div>
                 </Tooltip>
+            ),
+            width: 150,
+            render: (_, row) => (
+                <div className="w-[150px]">
+                    <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：3</div>
+                    <div className="flex w-[118px] h-[58px] overflow-x-auto items-center">
+                        <div className="shrink-0 border border-solid border-transparent hover:border-[#673ab7] rounded cursor-pointer overflow-hidden">
+                            <Popover
+                                content={
+                                    <div className="w-[400px] h-[500px] drop-shadow-sm rounded">
+                                        <Image
+                                            width={400}
+                                            className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
+                                            src="https://m.media-amazon.com/images/I/41cdd3tNtBL._AC_US200_.jpg"
+                                            preview={false}
+                                        />
+                                        <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">
+                                            Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper Makeup Organizer PU Leather
+                                            Washable Waterproof (Light Blue)Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper
+                                            Makeup Organizer PU Leather Washable Waterproof (Light Blue)
+                                        </div>
+                                        <div className="flex justify-between items-center text-[#95999e]">
+                                            <div>
+                                                流量占比：<span className="text-[#673ab7]">4.30%</span>
+                                            </div>
+                                            <div>
+                                                价格：<span className="text-[#673ab7]">$7.9</span>
+                                            </div>
+                                            <div>
+                                                评论数(评分)：<span className="text-[#673ab7]">450(4.5)</span>
+                                            </div>
+                                        </div>
+                                        <div className="mt-[10px]">
+                                            <Tag className="cursor-pointer" color="warning">
+                                                广告洞察
+                                            </Tag>
+                                            <Tag className="cursor-pointer" color="warning">
+                                                查流量来源
+                                            </Tag>
+                                            <Tag className="cursor-pointer" color="warning">
+                                                关联流量
+                                            </Tag>
+                                            <Tag className="cursor-pointer" color="warning">
+                                                加入产品库
+                                            </Tag>
+                                        </div>
+                                    </div>
+                                }
+                                placement="right"
+                                trigger="hover"
+                            >
+                                <Image
+                                    width={46}
+                                    height={46}
+                                    preview={false}
+                                    src="https://m.media-amazon.com/images/I/41cdd3tNtBL._AC_US200_.jpg"
+                                />
+                            </Popover>
+                        </div>
+                    </div>
+                </div>
             )
         },
         {
@@ -107,11 +170,9 @@ const TermSearch = () => {
                 </Tooltip>
             ),
             width: 200,
-            render: (_, row) => (
-                <div className="w-[200px] h-full relative">
-                    <div className="absolute top-[-50px]">
-                        <Chart {...echarts()} />
-                    </div>
+            render: (_, row, index) => (
+                <div className="w-[200px] relative">
+                    <div className="absolute top-[-20px] left-[-30px] w-[200px] h-[100px]" id={'chart' + index}></div>
                 </div>
             )
         },
@@ -325,7 +386,6 @@ const TermSearch = () => {
         },
         {
             title: '操作',
-            fixed: true,
             width: 60,
             render: (_, row) => (
                 <>
@@ -336,120 +396,63 @@ const TermSearch = () => {
             )
         }
     ];
-    const data: any[] = [];
-    for (let i = 0; i < 46; i++) {
-        data.push({
-            key: i,
-            name: `Edward King ${i}`,
-            age: 32,
-            address: `London, Park Lane no. ${i}`
-        });
-    }
-    const echarts = (): Props => {
-        return {
-            width: '100%',
-            height: '100%',
-            type: 'area',
-            options: {
-                tooltip: {
-                    x: {
-                        show: false
-                    }
-                    // custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-                    //     console.log(series, seriesIndex, dataPointIndex);
-
-                    //     // 在这里自定义你的提示内容和样式
-                    //     return `<div style="background-color: #333; color: #fff; padding: 10px;position:relative">
-                    //       <div style="position:absolute top:-100px">
-                    //       Series:${series[seriesIndex][dataPointIndex]}
-                    //       </div>
-
-                    //     </div>`;
-                    // }
-                },
-                chart: {
-                    id: '1',
-                    toolbar: {
-                        show: false
-                    },
-                    zoom: {
-                        enabled: false
-                    },
-                    sparkline: {
-                        enabled: false
-                    },
-                    offsetX: -20
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 1
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.5,
-                        opacityTo: 0,
-                        stops: [0, 80, 100]
-                    }
-                },
-                legend: {
-                    show: false
-                },
-                grid: {
-                    show: false
-                },
-                yaxis: {
-                    labels: {
-                        show: false
-                    },
-                    axisBorder: {
-                        show: false
-                    }
-                },
-                xaxis: {
-                    labels: {
-                        show: false
-                    },
-                    axisBorder: {
-                        show: false
-                    }
-                }
+    const getChartsList = (index: number) => {
+        const chartContainer = document.getElementById('chart' + index);
+        const myChart = echarts.init(chartContainer);
+        const options = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                show: false
             },
+            yAxis: {
+                type: 'value',
+                show: false
+            },
+            // tooltip: {
+            //     trigger: 'axis'
+            // },
             series: [
                 {
-                    data: [
-                        { x: '2021年11月10日', y: 7870 },
-                        { x: '2021年11月11日', y: 20 },
-                        { x: '2021年11月12日', y: 30 }
-                    ]
+                    name: 'aaa',
+                    data: [0, 932, 901, 1, 1290, 1330, 1320],
+                    type: 'line',
+                    smooth: true,
+                    symbolSize: 0,
+                    sampling: 'average',
+                    itemStyle: {
+                        color: '#fedcdc'
+                    },
+                    areaStyle: {
+                        color: '#fedcdc'
+                    }
                 },
                 {
-                    data: [
-                        { x: '2021年11月10日', y: 222 },
-                        { x: '2021年11月11日', y: '55555' },
-                        { x: '2021年11月12日', y: '40%' }
-                    ]
-                },
-                {
-                    data: [
-                        { x: '2021年11月10日', y: 8888 },
-                        { x: '2021年11月11日', y: 7777 },
-                        { x: '2021年11月12日', y: 9999 }
-                    ]
+                    name: 'bbb',
+                    data: [932, 0, 901, 100, 9, 0],
+                    type: 'line',
+                    smooth: true,
+                    symbolSize: 0
                 }
             ]
         };
+        myChart.setOption(options);
     };
+    //表格
+    const data: any[] = [{ keywords: '1111' }, { keywords: '222' }];
+    useEffect(() => {
+        data.map((item, index) => {
+            getChartsList(index);
+        });
+    }, []);
+    //弹框
+    const [open, setOpen] = useState(false);
     return (
-        <div className="h-full overflow-hidden">
-            <div className="flex px-[50px] mt-[50px] mb-[20px]">
+        <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
+            <div className="flex justify-center bg-[#fff] py-[50px]">
                 <div className="w-[990px]">
-                    <div className="min-h-[42px] border border-solid border-[#673ab7] rounded">
-                        <div className=" min-h-[32px] flex items-center flex-wrap flex-1">
+                    <div className="min-h-[44px] border border-solid border-[#673ab7] rounded">
+                        <div className=" min-h-[42px] flex items-center flex-wrap flex-1">
                             <Select
                                 bordered={false}
                                 className="w-[110px]"
@@ -508,9 +511,12 @@ const TermSearch = () => {
                 </div>
                 <Button className="ml-[21px]">查询历史</Button>
             </div>
-            <div className="bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
+            <ResultFilter />
+            <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button>加入词库</Button>
+                    <Button onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
+                        加入词库
+                    </Button>
                     <Button className="mx-[10px]">导出</Button>
                     <span className="text-[#7b7e81]">
                         搜索结果数：<span className="text-[#673ab7] font-[600]">1,603</span>
@@ -536,7 +542,17 @@ const TermSearch = () => {
                     <Button>确定</Button>
                 </div>
             </div>
-            <Table scroll={{ x: '1300px' }} rowKey={'key'} rowSelection={rowSelection} columns={columns} dataSource={data} />
+            <Table
+                loading={loading}
+                sticky={{ offsetHeader: 0 }}
+                scroll={{ x: '1300px' }}
+                pagination={false}
+                rowKey={'keywords'}
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={data}
+            />
+            <AddLexicon open={open} setOpen={setOpen} />
         </div>
     );
 };

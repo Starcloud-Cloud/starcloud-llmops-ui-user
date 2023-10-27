@@ -160,15 +160,15 @@ const Content = () => {
                     }
                 } else {
                     let list = [];
-                    const current = copyItemScore.fiveDescScore[index];
+                    const current = copyItemScore?.fiveDescScore?.[index];
                     list.push(
                         {
                             label: '包含150到200个字符',
-                            value: current.fiveDescLength
+                            value: current?.fiveDescLength
                         },
                         {
                             label: '第一个字母大写',
-                            value: current.starUppercase
+                            value: current?.starUppercase
                         }
                     );
                     return list.map((item) => getItemGradeComp(item));

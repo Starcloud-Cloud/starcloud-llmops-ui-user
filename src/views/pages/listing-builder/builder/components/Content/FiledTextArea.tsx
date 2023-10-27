@@ -61,12 +61,12 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
         setCurrentList(data);
     }, [resultArray]);
 
-    useEffect(() => {
-        const result = mergeArray(currentList);
-        const copyKeywordHighlight = _.clone(keywordHighlight);
-        copyKeywordHighlight[index] = result;
-        setKeywordHighlight(copyKeywordHighlight);
-    }, [currentList]);
+    // useEffect(() => {
+    //     const result = mergeArray(currentList);
+    //     const copyKeywordHighlight = _.clone(keywordHighlight);
+    //     copyKeywordHighlight[index] = result;
+    //     setKeywordHighlight(copyKeywordHighlight);
+    // }, [currentList]);
 
     const handleChange = (e: any) => {
         handleInputChange(e, index);

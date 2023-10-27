@@ -57,6 +57,7 @@ type ListingContextType = {
     handleSumGrade: (index: number, type: ListingBuilderEnum) => any;
     setItemScore: (itemScore: any) => void;
     itemScore: any;
+    fiveLen: number;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
@@ -226,7 +227,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     return handleStar(ListingBuilderEnum.PRODUCT_DES, searchGrade) || 0;
                 }
             } else {
-                const currentFiveDes = copyItemScore.fiveDescScore[index];
+                const currentFiveDes = copyItemScore?.fiveDescScore?.[index];
                 let fiveGrade = 0;
                 if (currentFiveDes?.fiveDescLength) {
                     fiveGrade++;
@@ -288,7 +289,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 handleReGrade,
                 handleSumGrade,
                 setItemScore,
-                itemScore
+                itemScore,
+                fiveLen
             }}
         >
             {children}

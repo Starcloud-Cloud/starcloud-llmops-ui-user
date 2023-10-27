@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Rate } from 'antd';
+import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Popover, Rate } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -74,7 +74,8 @@ const Content = () => {
         itemScore,
         version,
         uid,
-        handleSumGrade
+        handleSumGrade,
+        fiveLen
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
@@ -83,7 +84,7 @@ const Content = () => {
 
     // 设置头部分数
     React.useEffect(() => {
-        const scoreListDefault = _.cloneDeepWith(scoreList);
+        const scoreListDefault = _.cloneDeep(scoreList);
         if (itemScore) {
             scoreListDefault[0].list[0].value = itemScore.withoutSpecialChat;
             scoreListDefault[0].list[1].value = itemScore.titleLength;
@@ -100,6 +101,39 @@ const Content = () => {
             setScoreList([...scoreListDefault]);
         }
     }, [itemScore]);
+
+    const handleGradeItem = (index: number, type: ListingBuilderEnum) => {
+        const scoreListCopy = _.cloneDeep(scoreList);
+        const copyItemScore = _.cloneDeep(itemScore);
+        if (type !== ListingBuilderEnum.FIVE_DES) {
+            if (index === 0) {
+                return scoreListCopy[0];
+            }
+            if (index == fiveLen - 1) {
+                return scoreListCopy[3];
+            }
+            if (index == fiveLen - 2) {
+                return scoreListCopy[2];
+            }
+        } else {
+            let list = [];
+            const current = copyItemScore.fiveDescScore[index];
+            list.push(
+                {
+                    label: '包含150到200个字符',
+                    value: current.fiveDescLength
+                },
+                {
+                    label: '第一个字母大写',
+                    value: current.starUppercase
+                }
+            );
+            return {
+                title: `五点描述${index}`,
+                list
+            };
+        }
+    };
 
     React.useEffect(() => {
         if (openKeyWordSelect) {
@@ -659,7 +693,9 @@ const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
+                                    <Popover content={<div>1</div>} title="打分">
+                                        <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
+                                    </Popover>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议

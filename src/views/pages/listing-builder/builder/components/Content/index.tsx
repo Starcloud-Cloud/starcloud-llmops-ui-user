@@ -79,6 +79,7 @@ const Content = () => {
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
+    const timeoutRef = React.useRef<any>(null);
 
     // 设置头部分数
     React.useEffect(() => {
@@ -107,7 +108,14 @@ const Content = () => {
                 const { key } = e;
                 if (key === 'ArrowUp' || key === 'ArrowDown') {
                     e.preventDefault(); // 防止滚动页面
-                    const newIndex = key === 'ArrowUp' ? Math.max(0, hoverKey - 1) : Math.min(keyWordSelectList.length - 1, hoverKey + 1);
+                    console.log(
+                        Math.max(0, hoverKeyRef.current - 1),
+                        Math.min(detail?.keywordMetaData.length - 1, hoverKeyRef.current + 1)
+                    );
+                    const newIndex =
+                        key === 'ArrowUp'
+                            ? Math.max(0, hoverKeyRef.current - 1)
+                            : Math.min(detail?.keywordMetaData.length - 1, hoverKeyRef.current + 1);
                     setHoverKey(newIndex);
                     hoverKeyRef.current = newIndex;
                 } else if (key === 'Enter') {
@@ -137,7 +145,11 @@ const Content = () => {
             word: modifiedString.trim() === '' ? 0 : modifiedString.trim().split(' ').length
         };
         setList(newList);
-        handleReGrade(newList);
+
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            handleReGrade(newList);
+        }, 200);
         setOpenKeyWordSelect(false);
         setHoverKey(0);
         hoverKeyRef.current = 0;
@@ -185,8 +197,11 @@ const Content = () => {
             otherList = newList;
             return newList;
         });
-        console.log(otherList, 'otherList');
-        handleReGrade(otherList);
+
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            handleReGrade(otherList);
+        }, 200);
     }, []);
 
     const handleExpand = (key: number) => {
@@ -338,6 +353,14 @@ const Content = () => {
         if (index === list.length - 1) {
             const res = await getRecommend({ version, uid });
             if (res) {
+                setList((pre: any[]) => {
+                    const copyPre = [...pre];
+                    copyPre[index] = {
+                        ...copyPre[index],
+                        value: res
+                    };
+                    return copyPre;
+                });
             }
         }
     };
@@ -647,7 +670,7 @@ const Content = () => {
                                 </div>
                                 <div className="flex justify-center items-center">
                                     <Button
-                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD}
+                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
                                         onClick={() => handleClick(item, index)}
                                         startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
                                         color="secondary"
@@ -770,7 +793,7 @@ const Content = () => {
                                         <span className="mr-2 flex items-center">
                                             建议关键词:
                                             <div className="ml-2 flex items-center">
-                                                {item.keyword.map((itemKeyword, index) => (
+                                                {item?.keyword?.map((itemKeyword, index) => (
                                                     <div
                                                         key={index}
                                                         className={`${

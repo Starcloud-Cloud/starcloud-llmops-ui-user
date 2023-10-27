@@ -148,8 +148,8 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             multiline
                             rows={11}
                             label={'关键词'}
-                            placeholder={`
-请输入关键词，一行一个词组
+                            InputLabelProps={{ shrink: true }}
+                            placeholder={`请输入关键词，一行一个词组
 最多2000个关键词
 超过则系统自动截取前2000`}
                             className="w-full"

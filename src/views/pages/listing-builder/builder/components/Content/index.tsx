@@ -617,7 +617,7 @@ const Content = () => {
                                             helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item className="w-full">
+                                    <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
                                         <TextField
                                             size="small"
                                             label={'品牌名称'}
@@ -631,26 +631,24 @@ const Content = () => {
                                             error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
                                             helperText={formik.touched.voidWord && formik.errors.voidWord}
                                         />
+                                        <FormControl fullWidth>
+                                            <InputLabel size="small" id="demo-simple-select-label">
+                                                显示品牌名称
+                                            </InputLabel>
+                                            <Select
+                                                size="small"
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                // value={age}
+                                                label="Age"
+                                                // onChange={handleChange}
+                                            >
+                                                <MenuItem value={10}>展示在标题开头</MenuItem>
+                                                <MenuItem value={20}>展示在标题结尾</MenuItem>
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item className="grid gap-3 grid-cols-3 w-full">
-                                        <div>
-                                            <FormControl fullWidth>
-                                                <InputLabel size="small" id="demo-simple-select-label">
-                                                    显示品牌名称
-                                                </InputLabel>
-                                                <Select
-                                                    size="small"
-                                                    labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
-                                                >
-                                                    <MenuItem value={10}>展示在标题开头</MenuItem>
-                                                    <MenuItem value={20}>展示在标题结尾</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </div>
+                                    <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
                                         <div>
                                             <FormControl fullWidth>
                                                 <InputLabel size="small" id="demo-simple-select-label">

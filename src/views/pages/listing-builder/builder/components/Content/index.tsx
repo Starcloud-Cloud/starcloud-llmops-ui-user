@@ -83,7 +83,6 @@ const Content = () => {
     const [x, setX] = React.useState(0);
     const [y, setY] = React.useState(0);
     const [openKeyWordSelect, setOpenKeyWordSelect] = React.useState(false);
-    const [keyWordSelectList, setKeyWordSelectList] = React.useState<any[]>([]);
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
@@ -231,7 +230,9 @@ const Content = () => {
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
-                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
+                        handleReplaceValue(
+                            detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord))[hoverKeyRef.current || 0]
+                        );
                     }
                 }
             };
@@ -242,7 +243,7 @@ const Content = () => {
                 document.removeEventListener('keydown', handleKeyDown);
             };
         }
-    }, [openKeyWordSelect]);
+    }, [openKeyWordSelect, detail, currentWord]);
 
     const handleReplaceValue = (selectValue: string) => {
         const newList = [...list];
@@ -271,15 +272,15 @@ const Content = () => {
         const value = e.target.value;
         const word = findCurrentWord(value, startIndex);
         setCurrentWord(word);
-        // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
-            const filterKeyWord = keyword.filter((item, index) => {
-                if (item.includes(value[startIndex - 1])) {
-                    return item;
-                }
-            });
+            // const filterKeyWord = keyword.filter((item, index) => {
+            //     if (item.includes(value[startIndex - 1])) {
+            //         return item;
+            //     }
+            // });
+
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
             if (filterKeyWord.length > 0) {
-                setKeyWordSelectList([...filterKeyWord]);
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
                 setY(y);
@@ -292,7 +293,7 @@ const Content = () => {
         }
     };
 
-    const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
+    const handleInputChange = (e: any, index: number, keyword: string[]) => {
         let otherList: any[] = [];
         const newKeyword = keyword?.map((v: any) => v.keyword) || [];
         handleHasKeyWork(e, newKeyword);
@@ -314,7 +315,7 @@ const Content = () => {
         timeoutRef.current = setTimeout(() => {
             handleReGrade(otherList);
         }, 200);
-    }, []);
+    };
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -889,12 +890,11 @@ const Content = () => {
                                         <span className="mr-2 flex items-center">
                                             建议关键词:
                                             <div className="ml-2 flex items-center">
-                                                {item?.keyword?.map((itemKeyword, index) => (
+                                                {item?.keyword?.map((itemKeyword, keywordIndex) => (
                                                     <div
-                                                        key={index}
+                                                        key={keywordIndex}
                                                         className={`${
-                                                            keywordHighlight
-                                                                ?.flat()
+                                                            keywordHighlight[index]
                                                                 ?.filter((item) => item !== undefined)
                                                                 .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
                                                                 ? 'bg-[#ffaca6] ml-1 line-through px-1'

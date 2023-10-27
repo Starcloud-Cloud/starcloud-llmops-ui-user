@@ -168,6 +168,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 });
         }
     }, [update, version, uid]);
+
     // 计算use总使用量
     useEffect(() => {
         if (keywordHighlight.flat()?.filter((item) => !item).length && rows.length) {

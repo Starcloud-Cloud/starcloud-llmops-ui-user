@@ -94,8 +94,35 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
     useEffect(() => {
         if (detail && detail.draftConfig && list.length) {
-            console.log(detail.title);
             const copyList = _.cloneDeep(list);
+            const resultNum = detail.draftConfig.fiveDescNum - 5;
+            if (detail.draftConfig.fiveDescNum > 5) {
+                // @ts-ignore
+                [...Array(2).keys()].forEach((v) => {
+                    copyList.splice(-2, 0, {
+                        title: `五点描述${5 + v + 1}`,
+                        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+                    2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+                    3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+                    4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+                    5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+                    6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+                        placeholder: `产品卖点描述${5 + v + 1}`,
+                        type: ListingBuilderEnum.FIVE_DES,
+                        isOvertop: true,
+                        maxCharacter: 200,
+                        character: 0,
+                        word: 0,
+                        value: '',
+                        row: 4,
+                        btnText: 'AI生成五点描述',
+                        enable: true,
+                        keyword: [],
+                        grade: 0
+                    });
+                });
+            }
+            console.log(copyList, 'copyList');
 
             const newDetail = detail.draftConfig;
 

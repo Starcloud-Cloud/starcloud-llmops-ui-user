@@ -62,8 +62,20 @@ const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
 
-    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country, handleReGrade, itemScore, version, uid } =
-        useListing();
+    const {
+        list,
+        setList,
+        enableAi,
+        setEnableAi,
+        keywordHighlight,
+        detail,
+        country,
+        handleReGrade,
+        itemScore,
+        version,
+        uid,
+        handleSumGrade
+    } = useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
@@ -173,6 +185,7 @@ const Content = () => {
             otherList = newList;
             return newList;
         });
+        console.log(otherList, 'otherList');
         handleReGrade(otherList);
     }, []);
 
@@ -626,7 +639,8 @@ const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    <Rate allowHalf value={item.grade} count={1} disabled />
+                                    {/* <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled /> */}
+                                    {/* <Rate allowHalf count={1} disabled /> */}
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议

@@ -152,7 +152,12 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                         }
                     } else {
                         setDetail(res);
-                        setItemScore(res.itemScore);
+                        setItemScore({
+                            ...res.itemScore,
+                            score: res.score,
+                            matchSearchers: res.matchSearchers,
+                            totalSearches: res.totalSearches
+                        });
                         if (res.status === 'ANALYSIS') {
                             setUpdate({});
                         }

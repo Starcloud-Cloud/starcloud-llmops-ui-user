@@ -15,9 +15,9 @@ import {
 } from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Rate } from 'antd';
+import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Popover, Rate } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React from 'react';
+import React, { useEffect } from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -48,6 +48,32 @@ function capitalizeFirstLetterOfEachWord(str: string): string {
     return capitalizedWords.join(' ');
 }
 
+const findCurrentWord = (input: string, index: number) => {
+    let currentWord = '';
+    // 将字符串按空格分割成单词数组
+    let words = input.split(' ');
+
+    // 记录当前位置
+    let currentPosition = 0;
+
+    // 遍历单词数组，判断索引6处的字符位于哪个单词上
+    for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        let wordLength = word.length;
+
+        // 判断当前位置是否在当前单词的范围内
+        if (currentPosition + wordLength >= index) {
+            console.log('索引6处的字符位于单词:', word);
+            currentWord = word;
+            break;
+        }
+
+        // 更新当前位置
+        currentPosition += wordLength + 1; // 加1是为了考虑空格的长度
+    }
+    return currentWord;
+};
+
 const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
 
@@ -61,16 +87,31 @@ const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
+    const [currentWord, setCurrentWord] = React.useState('');
 
-    const { list, setList, enableAi, setEnableAi, keywordHighlight, detail, country, handleReGrade, itemScore, version, uid } =
-        useListing();
+    const {
+        list,
+        setList,
+        enableAi,
+        setEnableAi,
+        keywordHighlight,
+        detail,
+        country,
+        handleReGrade,
+        itemScore,
+        version,
+        uid,
+        handleSumGrade,
+        fiveLen
+    } = useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
+    const timeoutRef = React.useRef<any>(null);
 
     // 设置头部分数
     React.useEffect(() => {
-        const scoreListDefault = _.cloneDeepWith(scoreList);
+        const scoreListDefault = _.cloneDeep(scoreList);
         if (itemScore) {
             scoreListDefault[0].list[0].value = itemScore.withoutSpecialChat;
             scoreListDefault[0].list[1].value = itemScore.titleLength;
@@ -88,6 +129,91 @@ const Content = () => {
         }
     }, [itemScore]);
 
+    const getItemGradeComp = (v: any) => {
+        return (
+            <div className="flex justify-between items-center h-[30px]">
+                <span className="flex-[80%]">{v.label}</span>
+                {!v.value ? (
+                    <svg
+                        className="h-[14px] w-[14px]"
+                        viewBox="0 0 1098 1024"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        p-id="11931"
+                        width="32"
+                        height="32"
+                    >
+                        <path
+                            d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                            fill="#FB6547"
+                            p-id="11932"
+                        ></path>
+                    </svg>
+                ) : (
+                    <svg
+                        className="h-[14px] w-[14px]"
+                        viewBox="0 0 1024 1024"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        p-id="21700"
+                        width="16"
+                        height="16"
+                    >
+                        <path
+                            d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                            fill="#673ab7"
+                            p-id="21701"
+                        ></path>
+                    </svg>
+                )}
+            </div>
+        );
+    };
+
+    const handleGradeItem = React.useCallback(
+        (index: number, type: ListingBuilderEnum) => {
+            if (itemScore && Object.keys(itemScore).length) {
+                const scoreListCopy = _.cloneDeep(scoreList);
+                const copyItemScore = _.cloneDeep(itemScore);
+                if (type !== ListingBuilderEnum.FIVE_DES) {
+                    if (index === 0) {
+                        return scoreListCopy[0].list.map((item) => getItemGradeComp(item));
+                    }
+                    if (index === fiveLen + 1) {
+                        return scoreListCopy[2].list.map((item) => getItemGradeComp(item));
+                    }
+                    if (index === fiveLen + 2) {
+                        return scoreListCopy[3].list.map((item) => getItemGradeComp(item));
+                    }
+                } else {
+                    let list = [];
+                    const current = copyItemScore?.fiveDescScore?.[index];
+                    list.push(
+                        {
+                            label: '包含150到200个字符',
+                            value: current?.fiveDescLength
+                        },
+                        {
+                            label: '第一个字母大写',
+                            value: current?.starUppercase
+                        }
+                    );
+                    return list.map((item) => getItemGradeComp(item));
+                }
+            }
+        },
+        [itemScore]
+    );
+
+    useEffect(() => {
+        const filerList = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
+        if (!filerList?.length || !currentWord) {
+            setOpenKeyWordSelect(false);
+            setHoverKey(0);
+            hoverKeyRef.current = 0;
+        }
+    }, [detail?.keywordResume, currentWord]);
+
     React.useEffect(() => {
         if (openKeyWordSelect) {
             // 绑定键盘事件
@@ -95,7 +221,11 @@ const Content = () => {
                 const { key } = e;
                 if (key === 'ArrowUp' || key === 'ArrowDown') {
                     e.preventDefault(); // 防止滚动页面
-                    const newIndex = key === 'ArrowUp' ? Math.max(0, hoverKey - 1) : Math.min(keyWordSelectList.length - 1, hoverKey + 1);
+                    console.log(Math.max(0, hoverKeyRef.current - 1), Math.min(detail?.keywordResume.length - 1, hoverKeyRef.current + 1));
+                    const newIndex =
+                        key === 'ArrowUp'
+                            ? Math.max(0, hoverKeyRef.current - 1)
+                            : Math.min(detail?.keywordResume.length - 1, hoverKeyRef.current + 1);
                     setHoverKey(newIndex);
                     hoverKeyRef.current = newIndex;
                 } else if (key === 'Enter') {
@@ -125,7 +255,11 @@ const Content = () => {
             word: modifiedString.trim() === '' ? 0 : modifiedString.trim().split(' ').length
         };
         setList(newList);
-        handleReGrade(newList);
+
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            handleReGrade(newList);
+        }, 200);
         setOpenKeyWordSelect(false);
         setHoverKey(0);
         hoverKeyRef.current = 0;
@@ -135,6 +269,8 @@ const Content = () => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
         const value = e.target.value;
+        const word = findCurrentWord(value, startIndex);
+        setCurrentWord(word);
         // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             const filterKeyWord = keyword.filter((item, index) => {
@@ -152,7 +288,7 @@ const Content = () => {
                 setOpenKeyWordSelect(false);
             }
         } else {
-            setOpenKeyWordSelect(false);
+            // setOpenKeyWordSelect(false);
         }
     };
 
@@ -173,10 +309,11 @@ const Content = () => {
             otherList = newList;
             return newList;
         });
-        handleReGrade(otherList);
 
-        // const debouncedHandleReGrade = _.debounce(() => handleReGrade(otherList), 500);
-        // debouncedHandleReGrade();
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            handleReGrade(otherList);
+        }, 200);
     }, []);
 
     const handleExpand = (key: number) => {
@@ -323,9 +460,20 @@ const Content = () => {
         setList(copyList);
     };
 
-    const handleSearchWord = async () => {
-        const res = await getRecommend({ version, uid });
-        if (res) {
+    const handleClick = async (item: any, index: number) => {
+        // 智能推荐
+        if (index === list.length - 1) {
+            const res = await getRecommend({ version, uid });
+            if (res) {
+                setList((pre: any[]) => {
+                    const copyPre = [...pre];
+                    copyPre[index] = {
+                        ...copyPre[index],
+                        value: res
+                    };
+                    return copyPre;
+                });
+            }
         }
     };
 
@@ -337,19 +485,19 @@ const Content = () => {
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
-                                <span className="text-lg font-semibold">Listing Quality Score</span>
+                                <span className="text-lg font-semibold">List质量分</span>
                                 <Tooltip title={'这是一条广告'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">8.8</span>
-                                <span className="text-base">/10</span>
+                                <span className="text-2xl font-semibold">{itemScore?.score}</span>
+                                <span className="text-base">/9</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={80}
+                                value={(itemScore?.score / 9) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -361,19 +509,19 @@ const Content = () => {
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
-                                <span className="text-lg font-semibold">Listing Quality Score</span>
+                                <span className="text-lg font-semibold">搜索量预估</span>
                                 <Tooltip title={'这是一条广告'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">8.8</span>
-                                <span className="text-base">/10</span>
+                                <span className="text-2xl font-semibold">{itemScore?.matchSearchers}</span>
+                                <span className="text-base">/{itemScore?.totalSearches}</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={80}
+                                value={(itemScore?.matchSearchers / itemScore?.totalSearches) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -522,25 +670,7 @@ const Content = () => {
                                             helperText={formik.touched.voidWord && formik.errors.voidWord}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item className="grid gap-3 grid-cols-3 w-full">
-                                        <div>
-                                            <FormControl fullWidth>
-                                                <InputLabel size="small" id="demo-simple-select-label">
-                                                    显示品牌名称
-                                                </InputLabel>
-                                                <Select
-                                                    size="small"
-                                                    labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
-                                                >
-                                                    <MenuItem value={10}>展示在标题开头</MenuItem>
-                                                    <MenuItem value={20}>展示在标题结尾</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </div>
+                                    <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
                                         <div>
                                             <FormControl fullWidth>
                                                 <InputLabel size="small" id="demo-simple-select-label">
@@ -626,14 +756,26 @@ const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    <Rate allowHalf value={item.grade} count={1} disabled />
+                                    <Popover content={handleGradeItem(index, item.type)} title="打分">
+                                        <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
+                                    </Popover>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    {item.type === ListingBuilderEnum.SEARCH_WORD ? (
+                                    <Button
+                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
+                                        onClick={() => handleClick(item, index)}
+                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                        color="secondary"
+                                        size="small"
+                                        variant="contained"
+                                    >
+                                        {item.btnText}
+                                    </Button>
+                                    {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}
                                             startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
@@ -654,32 +796,7 @@ const Content = () => {
                                                 {item.btnText}
                                             </Button>
                                         </Dropdown>
-                                    )}
-                                    {/*{(enableAi &&*/}
-                                    {/*    ((item.type === ListingBuilderEnum.FIVE_DES && index === 1) ||*/}
-                                    {/*        item.type === ListingBuilderEnum.TITLE ||*/}
-                                    {/*        item.type === ListingBuilderEnum.PRODUCT_DES || (*/}
-                                    {/*            <Dropdown menu={{ items }}>*/}
-                                    {/*                <Button*/}
-                                    {/*                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
-                                    {/*                    color="secondary"*/}
-                                    {/*                    size="small"*/}
-                                    {/*                    variant="contained"*/}
-                                    {/*                >*/}
-                                    {/*                    {item.btnText}*/}
-                                    {/*                </Button>*/}
-                                    {/*            </Dropdown>*/}
-                                    {/*        ))) ||*/}
-                                    {/*    (item.type === ListingBuilderEnum.SEARCH_WORD && (*/}
-                                    {/*        <Button*/}
-                                    {/*            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}*/}
-                                    {/*            color="secondary"*/}
-                                    {/*            size="small"*/}
-                                    {/*            variant="contained"*/}
-                                    {/*        >*/}
-                                    {/*            {item.btnText}*/}
-                                    {/*        </Button>*/}
-                                    {/*    ))}*/}
+                                    )} */}
                                 </div>
                             </div>
                             {expandList.includes(index) && (
@@ -772,7 +889,7 @@ const Content = () => {
                                         <span className="mr-2 flex items-center">
                                             建议关键词:
                                             <div className="ml-2 flex items-center">
-                                                {item.keyword.map((itemKeyword, index) => (
+                                                {item?.keyword?.map((itemKeyword, index) => (
                                                     <div
                                                         key={index}
                                                         className={`${
@@ -814,20 +931,22 @@ const Content = () => {
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
-                        {detail?.keywordResume?.map((item: string, keyWordItemKey: number) => (
-                            <li
-                                key={keyWordItemKey}
-                                style={{ height: '30px', lineHeight: '30px' }}
-                                className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
-                                onMouseEnter={() => {
-                                    setHoverKey(keyWordItemKey);
-                                    hoverKeyRef.current = keyWordItemKey;
-                                }}
-                                onClick={() => handleReplaceValue(item)}
-                            >
-                                <span className="text-sm">{item}</span>
-                            </li>
-                        ))}
+                        {detail?.keywordResume
+                            .filter((item: string) => item?.startsWith(currentWord))
+                            ?.map((item: string, keyWordItemKey: number) => (
+                                <li
+                                    key={keyWordItemKey}
+                                    style={{ height: '30px', lineHeight: '30px' }}
+                                    className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
+                                    onMouseEnter={() => {
+                                        setHoverKey(keyWordItemKey);
+                                        hoverKeyRef.current = keyWordItemKey;
+                                    }}
+                                    onClick={() => handleReplaceValue(item)}
+                                >
+                                    <span className="text-sm">{item}</span>
+                                </li>
+                            ))}
                     </ul>
                 )}
             </Card>

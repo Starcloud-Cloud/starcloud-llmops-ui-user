@@ -20,6 +20,11 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import axios from 'axios';
+import { config } from 'utils/axios/config';
+import { getAccessToken } from 'utils/auth';
+const { base_url } = config;
 
 function a11yProps(index: number) {
     return {
@@ -35,7 +40,7 @@ const ListingBuilder = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
     const [open, setOpen] = React.useState(false);
-    const { country, setCountry, uid, version, list, detail } = useListing();
+    const { country, setCountry, uid, version, list, detail, setVersion, setUid } = useListing();
     const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -61,8 +66,39 @@ const ListingBuilder = () => {
                     close: false
                 })
             );
-            navigate('/chatMarket');
+            navigate('/listingBuilderPage');
         }
+    };
+
+    const doExport = async () => {
+        await axios({
+            url: `${base_url}/listing/draft/export`,
+            method: 'post',
+            data: [detail?.id],
+            responseType: 'blob', // 将响应数据视为二进制数据流
+            headers: {
+                Authorization: 'Bearer ' + getAccessToken()
+            }
+        })
+            .then((response) => {
+                // 创建一个blob对象
+                const blob = new Blob([response.data], { type: response.headers['content-type'] });
+
+                // 创建一个a标签用于下载
+                const downloadLink = document.createElement('a');
+                downloadLink.href = window.URL.createObjectURL(blob);
+                downloadLink.setAttribute('download', `listing-${new Date().getTime()}.xls`); // 设置下载文件的名称
+                document.body.appendChild(downloadLink);
+
+                // 触发点击事件以开始下载
+                downloadLink.click();
+
+                // 移除下载链接
+                document.body.removeChild(downloadLink);
+            })
+            .catch((error) => {
+                console.error('下载文件时发生错误:', error);
+            });
     };
 
     const handleSave = async () => {
@@ -98,7 +134,9 @@ const ListingBuilder = () => {
                     close: false
                 })
             );
-            navigate('/listingBuilderPage');
+            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+            setVersion(res.version);
+            setUid(res.uid);
         }
     };
 
@@ -157,6 +195,7 @@ const ListingBuilder = () => {
                                 disabled={!uid}
                                 onClick={() => {
                                     setDelAnchorEl(null);
+                                    setOpen(true);
                                 }}
                             >
                                 <ListItemIcon>
@@ -164,6 +203,20 @@ const ListingBuilder = () => {
                                 </ListItemIcon>
                                 <Typography variant="inherit" noWrap>
                                     删除
+                                </Typography>
+                            </MenuItem>
+                            <MenuItem
+                                disabled={!uid}
+                                onClick={() => {
+                                    setDelAnchorEl(null);
+                                    doExport();
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <CloudDownloadIcon />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    导出
                                 </Typography>
                             </MenuItem>
                         </Menu>

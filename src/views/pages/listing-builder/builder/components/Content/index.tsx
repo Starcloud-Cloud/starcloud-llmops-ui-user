@@ -485,19 +485,19 @@ const Content = () => {
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
-                                <span className="text-lg font-semibold">Listing Quality Score</span>
+                                <span className="text-lg font-semibold">List质量分</span>
                                 <Tooltip title={'这是一条广告'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">8.8</span>
-                                <span className="text-base">/10</span>
+                                <span className="text-2xl font-semibold">{itemScore?.score}</span>
+                                <span className="text-base">/9</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={80}
+                                value={(itemScore?.score / 9) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -509,19 +509,19 @@ const Content = () => {
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
-                                <span className="text-lg font-semibold">Listing Quality Score</span>
+                                <span className="text-lg font-semibold">搜索量预估</span>
                                 <Tooltip title={'这是一条广告'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">8.8</span>
-                                <span className="text-base">/10</span>
+                                <span className="text-2xl font-semibold">{itemScore?.matchSearchers}</span>
+                                <span className="text-base">/{itemScore?.totalSearches}</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={80}
+                                value={(itemScore?.matchSearchers / itemScore?.totalSearches) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',

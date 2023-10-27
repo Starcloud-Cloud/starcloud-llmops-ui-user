@@ -263,7 +263,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             fiveDesc: result
         };
         getGrade(data).then((res) => {
-            setItemScore({ ...res.itemScore });
+            setItemScore({ ...res.itemScore, score: res.score, matchSearchers: res.matchSearchers, totalSearches: res.totalSearches });
         });
     };
 

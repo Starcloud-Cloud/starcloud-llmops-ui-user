@@ -29,6 +29,8 @@ import './index.scss';
 import AppModal from './appModal';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const { Dragger } = Upload;
 
@@ -272,7 +274,21 @@ export const PictureCreateMenu = ({
             if (info.file.status === 'uploading') {
                 console.log(info);
             } else if (info.file.status === 'done') {
-                setUploadFile(info?.file?.response?.data?.url);
+                if (info?.file?.response?.data?.width > 1024 || info?.file?.response?.data?.height > 1024) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '上传图片超过最大限制，必须小于等1024*1024',
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
+                } else {
+                    setUploadFile(info?.file?.response?.data?.url);
+                }
             }
         },
         onDrop(e) {

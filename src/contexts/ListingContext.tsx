@@ -1,5 +1,4 @@
 import { getGrade } from 'api/listing/build';
-import { de } from 'date-fns/locale';
 import _ from 'lodash';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -180,7 +179,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 return 0;
             }
 
-            if (num === 1) {
+            if (num === 2) {
                 return 1;
             }
         }
@@ -235,6 +234,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 if (currentFiveDes?.starUppercase) {
                     fiveGrade++;
                 }
+                console.log(fiveGrade, index);
                 return handleStar(ListingBuilderEnum.FIVE_DES, fiveGrade) || 0;
             }
         } else {

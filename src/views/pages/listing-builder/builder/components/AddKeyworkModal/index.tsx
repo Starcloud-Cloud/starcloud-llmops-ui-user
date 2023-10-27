@@ -166,7 +166,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             <FormGroup key={index}>
                                 <FormControlLabel
                                     control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
-                                    label={item.name}
+                                    label={`${item.name}(${item.count})`}
                                 />
                             </FormGroup>
                         ))}

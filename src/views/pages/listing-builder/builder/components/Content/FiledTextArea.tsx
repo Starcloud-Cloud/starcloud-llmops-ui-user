@@ -61,12 +61,12 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
         setCurrentList(data);
     }, [resultArray]);
 
-    // useEffect(() => {
-    //     const result = mergeArray(currentList);
-    //     const copyKeywordHighlight = _.clone(keywordHighlight);
-    //     copyKeywordHighlight[index] = result;
-    //     setKeywordHighlight(copyKeywordHighlight);
-    // }, [currentList]);
+    useEffect(() => {
+        const result = mergeArray(currentList);
+        const copyKeywordHighlight = _.clone(keywordHighlight);
+        copyKeywordHighlight[index] = result;
+        // setKeywordHighlight(copyKeywordHighlight);
+    }, [currentList]);
 
     const handleChange = (e: any) => {
         handleInputChange(e, index);
@@ -100,5 +100,4 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
     );
 };
 
-// export default React.memo(FiledTextArea);
-export default FiledTextArea;
+export default React.memo(FiledTextArea);

@@ -639,8 +639,7 @@ const Content = () => {
                                 <div className="flex items-center">
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                    {/* <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled /> */}
-                                    {/* <Rate allowHalf count={1} disabled /> */}
+                                    <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
                                         高分建议
@@ -648,6 +647,7 @@ const Content = () => {
                                 </div>
                                 <div className="flex justify-center items-center">
                                     <Button
+                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD}
                                         onClick={() => handleClick(item, index)}
                                         startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
                                         color="secondary"

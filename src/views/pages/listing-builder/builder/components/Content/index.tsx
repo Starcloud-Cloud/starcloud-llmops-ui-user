@@ -17,7 +17,7 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Popover, Rate } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import React from 'react';
+import React, { useEffect } from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -48,6 +48,32 @@ function capitalizeFirstLetterOfEachWord(str: string): string {
     return capitalizedWords.join(' ');
 }
 
+const findCurrentWord = (input: string, index: number) => {
+    let currentWord = '';
+    // 将字符串按空格分割成单词数组
+    let words = input.split(' ');
+
+    // 记录当前位置
+    let currentPosition = 0;
+
+    // 遍历单词数组，判断索引6处的字符位于哪个单词上
+    for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        let wordLength = word.length;
+
+        // 判断当前位置是否在当前单词的范围内
+        if (currentPosition + wordLength >= index) {
+            console.log('索引6处的字符位于单词:', word);
+            currentWord = word;
+            break;
+        }
+
+        // 更新当前位置
+        currentPosition += wordLength + 1; // 加1是为了考虑空格的长度
+    }
+    return currentWord;
+};
+
 const Content = () => {
     const [expandList, setExpandList] = React.useState<number[]>([]);
 
@@ -61,6 +87,7 @@ const Content = () => {
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
+    const [currentWord, setCurrentWord] = React.useState('');
 
     const {
         list,
@@ -178,6 +205,15 @@ const Content = () => {
         [itemScore]
     );
 
+    useEffect(() => {
+        const filerList = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
+        if (!filerList?.length || !currentWord) {
+            setOpenKeyWordSelect(false);
+            setHoverKey(0);
+            hoverKeyRef.current = 0;
+        }
+    }, [detail?.keywordResume, currentWord]);
+
     React.useEffect(() => {
         if (openKeyWordSelect) {
             // 绑定键盘事件
@@ -233,6 +269,8 @@ const Content = () => {
         const startIndex = e.target.selectionStart;
         setCurrentInputIndex(startIndex);
         const value = e.target.value;
+        const word = findCurrentWord(value, startIndex);
+        setCurrentWord(word);
         // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             const filterKeyWord = keyword.filter((item, index) => {
@@ -250,7 +288,7 @@ const Content = () => {
                 setOpenKeyWordSelect(false);
             }
         } else {
-            setOpenKeyWordSelect(false);
+            // setOpenKeyWordSelect(false);
         }
     };
 
@@ -617,7 +655,7 @@ const Content = () => {
                                             helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
                                         />
                                     </Grid>
-                                    <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
+                                    <Grid sx={{ mt: 2 }} item className="w-full">
                                         <TextField
                                             size="small"
                                             label={'品牌名称'}
@@ -631,22 +669,6 @@ const Content = () => {
                                             error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
                                             helperText={formik.touched.voidWord && formik.errors.voidWord}
                                         />
-                                        <FormControl fullWidth>
-                                            <InputLabel size="small" id="demo-simple-select-label">
-                                                显示品牌名称
-                                            </InputLabel>
-                                            <Select
-                                                size="small"
-                                                labelId="demo-simple-select-label"
-                                                id="demo-simple-select"
-                                                // value={age}
-                                                label="Age"
-                                                // onChange={handleChange}
-                                            >
-                                                <MenuItem value={10}>展示在标题开头</MenuItem>
-                                                <MenuItem value={20}>展示在标题结尾</MenuItem>
-                                            </Select>
-                                        </FormControl>
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
                                         <div>
@@ -909,20 +931,22 @@ const Content = () => {
                         style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
-                        {detail?.keywordResume?.map((item: string, keyWordItemKey: number) => (
-                            <li
-                                key={keyWordItemKey}
-                                style={{ height: '30px', lineHeight: '30px' }}
-                                className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
-                                onMouseEnter={() => {
-                                    setHoverKey(keyWordItemKey);
-                                    hoverKeyRef.current = keyWordItemKey;
-                                }}
-                                onClick={() => handleReplaceValue(item)}
-                            >
-                                <span className="text-sm">{item}</span>
-                            </li>
-                        ))}
+                        {detail?.keywordResume
+                            .filter((item: string) => item?.startsWith(currentWord))
+                            ?.map((item: string, keyWordItemKey: number) => (
+                                <li
+                                    key={keyWordItemKey}
+                                    style={{ height: '30px', lineHeight: '30px' }}
+                                    className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
+                                    onMouseEnter={() => {
+                                        setHoverKey(keyWordItemKey);
+                                        hoverKeyRef.current = keyWordItemKey;
+                                    }}
+                                    onClick={() => handleReplaceValue(item)}
+                                >
+                                    <span className="text-sm">{item}</span>
+                                </li>
+                            ))}
                     </ul>
                 )}
             </Card>

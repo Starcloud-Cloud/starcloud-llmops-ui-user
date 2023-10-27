@@ -39,34 +39,6 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
         return resultArray;
     }, [highlightAllWordList, value]);
 
-    // useEffect(() => {
-    //     const copyList = _.clone(highlightAllWordList);
-    //     const data: any[] = [];
-    //     resultArray?.map((item: string) => {
-    //         copyList.forEach((item1: any) => {
-    //             if (item1.keyword === item) {
-    //                 if (type !== ListingBuilderEnum.FIVE_DES) {
-    //                     data.push({ text: item1.keyword, type, num: 1 });
-    //                 } else {
-    //                     data.push({
-    //                         text: item1.keyword,
-    //                         type,
-    //                         num: 1,
-    //                         fiveType: `${ListingBuilderEnum.FIVE_DES}_${index}`
-    //                     });
-    //                 }
-    //             }
-    //         });
-    //     });
-    //     setCurrentList(data);
-    // }, [resultArray]);
-
-    // useEffect(() => {
-    //     const result = mergeArray(currentList);
-    //     const copyKeywordHighlight = _.cloneDeep(keywordHighlight);
-    //     copyKeywordHighlight[index] = result;
-    //     // setKeywordHighlight(copyKeywordHighlight);
-    // }, [currentList]);
     useEffect(() => {
         const copyList = _.clone(highlightAllWordList);
         const data: any[] = [];

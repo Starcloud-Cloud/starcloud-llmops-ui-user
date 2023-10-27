@@ -118,7 +118,7 @@ const Content = () => {
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
-                        handleReplaceValue(detail?.keywordResume[hoverKeyRef.current || 0]);
+                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
                     }
                 }
             };

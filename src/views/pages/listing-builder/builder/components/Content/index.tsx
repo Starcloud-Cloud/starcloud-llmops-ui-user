@@ -160,7 +160,6 @@ const Content = () => {
                     }
                 } else {
                     let list = [];
-                    console.log(copyItemScore.fiveDescScore, index);
                     const current = copyItemScore.fiveDescScore[index];
                     list.push(
                         {

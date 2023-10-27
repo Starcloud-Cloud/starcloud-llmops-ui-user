@@ -235,7 +235,7 @@ export const PictureCreateMenu = ({
     }, []);
 
     useEffect(() => {
-        if (params?.examplePrompt) {
+        if (params?.examplePrompt && mode !== '裂变') {
             const randomIndex = Math.floor(Math.random() * params?.examplePrompt.length);
             translateText({
                 textList: [params?.examplePrompt?.[randomIndex].value],
@@ -526,7 +526,7 @@ export const PictureCreateMenu = ({
                     <Row className={'w-[100%] p-[16px] rounded-xl bg-white mt-[15px] relative p_textarea'}>
                         <div className={'text-base font-medium flex items-center justify-between w-full'}>
                             <div className=" flex items-center">
-                                <div className="flex items-center justify-between">创意描述</div>
+                                <div className="flex items-center justify-between">{mode === '裂变' ? '强化内容描述' : '创意描述'}</div>
                                 {!inputValueTranslate ? (
                                     <MuiTooltip title="翻译成英文" arrow placement="top">
                                         <svg
@@ -582,9 +582,11 @@ export const PictureCreateMenu = ({
                                 <Button color="secondary" size="small" variant="text" onClick={() => setAppOpen(true)}>
                                     一键AI生成
                                 </Button>
-                                <MuiTooltip title="随机生成描述示例" arrow placement="top">
-                                    <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
-                                </MuiTooltip>
+                                {mode !== '裂变' && (
+                                    <MuiTooltip title="随机生成描述示例" arrow placement="top">
+                                        <CasinoIcon className="cursor-pointer text-base" onClick={onDice} />
+                                    </MuiTooltip>
+                                )}
                             </div>
                         </div>
                         <TextArea
@@ -598,7 +600,7 @@ export const PictureCreateMenu = ({
                                 }
                             }}
                             value={inputValue}
-                            placeholder={'请输入你的创意'}
+                            placeholder={mode === '裂变' ? '输入图片中想要强化/突出的内容的描述，例如：突出西装领' : '请输入你的创意'}
                             // maxLength={800}
                             // showCount
                         />

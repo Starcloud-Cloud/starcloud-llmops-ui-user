@@ -108,20 +108,17 @@ const Content = () => {
                 const { key } = e;
                 if (key === 'ArrowUp' || key === 'ArrowDown') {
                     e.preventDefault(); // 防止滚动页面
-                    console.log(
-                        Math.max(0, hoverKeyRef.current - 1),
-                        Math.min(detail?.keywordMetaData.length - 1, hoverKeyRef.current + 1)
-                    );
+                    console.log(Math.max(0, hoverKeyRef.current - 1), Math.min(detail?.keywordResume.length - 1, hoverKeyRef.current + 1));
                     const newIndex =
                         key === 'ArrowUp'
                             ? Math.max(0, hoverKeyRef.current - 1)
-                            : Math.min(detail?.keywordMetaData.length - 1, hoverKeyRef.current + 1);
+                            : Math.min(detail?.keywordResume.length - 1, hoverKeyRef.current + 1);
                     setHoverKey(newIndex);
                     hoverKeyRef.current = newIndex;
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
-                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
+                        handleReplaceValue(detail?.keywordResume[hoverKeyRef.current || 0]);
                     }
                 }
             };

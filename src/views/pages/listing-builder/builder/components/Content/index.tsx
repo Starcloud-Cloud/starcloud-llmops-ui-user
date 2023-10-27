@@ -152,11 +152,11 @@ const Content = () => {
                     if (index === 0) {
                         return scoreListCopy[0].list.map((item) => getItemGradeComp(item));
                     }
-                    if (index == fiveLen - 1) {
-                        return scoreListCopy[3].list.map((item) => getItemGradeComp(item));
-                    }
-                    if (index == fiveLen - 2) {
+                    if (index === fiveLen + 1) {
                         return scoreListCopy[2].list.map((item) => getItemGradeComp(item));
+                    }
+                    if (index === fiveLen + 2) {
+                        return scoreListCopy[3].list.map((item) => getItemGradeComp(item));
                     }
                 } else {
                     let list = [];

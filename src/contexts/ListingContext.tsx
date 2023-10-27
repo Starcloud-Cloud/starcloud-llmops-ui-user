@@ -220,11 +220,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 if (index === 0) {
                     return handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
                 }
-                if (index === fiveLen - 1) {
-                    return handleStar(ListingBuilderEnum.SEARCH_WORD, desGrade) || 0;
-                }
-                if (index === fiveLen - 2) {
+                if (index === fiveLen + 1) {
                     return handleStar(ListingBuilderEnum.PRODUCT_DES, searchGrade) || 0;
+                }
+                if (index === fiveLen + 2) {
+                    return handleStar(ListingBuilderEnum.SEARCH_WORD, desGrade) || 0;
                 }
             } else {
                 const currentFiveDes = copyItemScore?.fiveDescScore?.[index];

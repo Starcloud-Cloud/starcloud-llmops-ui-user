@@ -92,7 +92,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
 
     const fiveLen = useMemo(() => {
         return list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length || 0;
-    }, []);
+    }, [list]);
 
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
     useEffect(() => {

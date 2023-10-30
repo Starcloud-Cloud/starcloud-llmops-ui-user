@@ -180,6 +180,7 @@ const Content = () => {
                     if (index === 0) {
                         return scoreListCopy[0].list.map((item) => getItemGradeComp(item));
                     }
+                    console.log(fiveLen, index);
                     if (index === fiveLen + 1) {
                         return scoreListCopy[2].list.map((item) => getItemGradeComp(item));
                     }

@@ -21,6 +21,7 @@ import { addKey, getListingDict, importDict, saveListing } from 'api/listing/bui
 import { useListing } from 'contexts/ListingContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Drawer } from 'antd';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -158,18 +159,34 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             }}
                         />
                     </div>
+                    <div className="flex items-center mt-4">
+                        <HelpOutlineIcon className="text-base mr-1" />
+                        <span className="text-[#999]">不知道关键词如何来？可使用拓展流量词</span>
+                    </div>
                 </TabPanel>
                 <TabPanel value={tab} index={1}>
                     <div className="h-[390px] overflow-y-auto">
                         <div className="text-base font-semibold">选择词库</div>
-                        {dictList.map((item: any, index) => (
-                            <FormGroup key={index}>
-                                <FormControlLabel
-                                    control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
-                                    label={`${item.name}(${item.count})`}
-                                />
-                            </FormGroup>
-                        ))}
+                        {dictList.length > 0 ? (
+                            dictList.map((item: any, index) => (
+                                <FormGroup key={index}>
+                                    <FormControlLabel
+                                        control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
+                                        label={
+                                            <div className="flex items-center">
+                                                {country.icon}
+                                                <span className="pl-1">{`${item.name}(${item.count})`} </span>
+                                            </div>
+                                        }
+                                    />
+                                </FormGroup>
+                            ))
+                        ) : (
+                            <div className="flex items-center mt-4">
+                                <HelpOutlineIcon className="text-base mr-1 s text-[#999]" />
+                                <span className="text-[#999]"> 还没有关键词词库？ 创建关键词词库，方便维护自己的关键词</span>
+                            </div>
+                        )}
                     </div>
                 </TabPanel>
             </CardContent>

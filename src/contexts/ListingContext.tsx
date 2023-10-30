@@ -1,6 +1,6 @@
 import { getGrade } from 'api/listing/build';
 import _ from 'lodash';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import { COUNTRY_LIST, DEFAULT_LIST } from 'views/pages/listing-builder/data';
@@ -47,7 +47,7 @@ type ListingContextType = {
     setList: (list: any) => void;
     enableAi: boolean;
     setEnableAi: (enableAi: boolean) => void;
-    setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
+    setKeywordHighlight: (keywordHighlight: any) => void;
     keywordHighlight: keywordHighlightType;
     setUpdate: (update: object) => void;
     update: any;
@@ -58,6 +58,7 @@ type ListingContextType = {
     setItemScore: (itemScore: any) => void;
     itemScore: any;
     fiveLen: number;
+    keywordHighlightRef: any;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
@@ -79,6 +80,12 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const searchParams = new URLSearchParams(location.search);
     const queryUid = searchParams.get('uid');
     const queryVersion = searchParams.get('version');
+
+    const keywordHighlightRef = useRef<any>(null);
+
+    // useEffect(() => {
+    //     keywordHighlightRef.current = keywordHighlight;
+    // }, [keywordHighlight]);
 
     useEffect(() => {
         if (queryVersion && queryUid) {
@@ -317,7 +324,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 handleSumGrade,
                 setItemScore,
                 itemScore,
-                fiveLen
+                fiveLen,
+                keywordHighlightRef
             }}
         >
             {children}

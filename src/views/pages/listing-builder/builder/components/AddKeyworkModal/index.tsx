@@ -21,6 +21,8 @@ import { addKey, getListingDict, importDict, saveListing } from 'api/listing/bui
 import { useListing } from 'contexts/ListingContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Drawer } from 'antd';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -42,11 +44,31 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate, detail } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail, list } = useListing();
     const navigate = useNavigate();
 
     // 添加关键词
     const handleOk = async () => {
+        const result = list
+            .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+            .reduce((acc: any, obj, index) => {
+                acc[index + 1] = obj.value;
+                return acc;
+            }, {});
+        const data = {
+            uid,
+            version,
+            endpoint: country.key,
+            draftConfig: {
+                enableAi: true,
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+            },
+            title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+            productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+            searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+            fiveDesc: result
+        };
+
         if (tab === 0) {
             const lines = keyWord.split('\n');
             if (uid) {
@@ -59,14 +81,14 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     }
                 } else {
                     // 修改了站点所属
-                    const res = await saveListing({ keys: lines, endpoint: country.key });
+                    const res = await saveListing({ ...data, keys: lines });
                     navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
                     setVersion(res.version);
                     setUid(res.uid);
                     handleClose();
                 }
             } else {
-                const res = await saveListing({ keys: lines, endpoint: country.key });
+                const res = await saveListing({ ...data, keys: lines });
                 navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
                 setVersion(res.version);
                 setUid(res.uid);
@@ -74,10 +96,8 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             }
         } else {
             const res = await importDict({
-                uid,
-                version,
-                dictUid: checked,
-                endpoint: country.key
+                ...data,
+                version
             });
             if (res) {
                 if (res) {
@@ -158,18 +178,34 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             }}
                         />
                     </div>
+                    <div className="flex items-center mt-4">
+                        <HelpOutlineIcon className="text-base mr-1" />
+                        <span className="text-[#999]">不知道关键词如何来？可使用拓展流量词</span>
+                    </div>
                 </TabPanel>
                 <TabPanel value={tab} index={1}>
                     <div className="h-[390px] overflow-y-auto">
                         <div className="text-base font-semibold">选择词库</div>
-                        {dictList.map((item: any, index) => (
-                            <FormGroup key={index}>
-                                <FormControlLabel
-                                    control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
-                                    label={`${item.name}(${item.count})`}
-                                />
-                            </FormGroup>
-                        ))}
+                        {dictList.length > 0 ? (
+                            dictList.map((item: any, index) => (
+                                <FormGroup key={index}>
+                                    <FormControlLabel
+                                        control={<Checkbox value={item.uid} onChange={(e) => handleChange(e)} />}
+                                        label={
+                                            <div className="flex items-center">
+                                                {country.icon}
+                                                <span className="pl-1">{`${item.name}(${item.count})`} </span>
+                                            </div>
+                                        }
+                                    />
+                                </FormGroup>
+                            ))
+                        ) : (
+                            <div className="flex items-center mt-4">
+                                <HelpOutlineIcon className="text-base mr-1 s text-[#999]" />
+                                <span className="text-[#999]"> 还没有关键词词库？ 创建关键词词库，方便维护自己的关键词</span>
+                            </div>
+                        )}
                     </div>
                 </TabPanel>
             </CardContent>

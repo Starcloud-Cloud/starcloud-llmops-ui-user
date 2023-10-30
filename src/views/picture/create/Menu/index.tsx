@@ -1,4 +1,4 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, Tooltip } from '@mui/material';
 import { Col, Input, Row } from 'antd';
 
 import CasinoIcon from '@mui/icons-material/Casino';
@@ -28,6 +28,9 @@ import './index.scss';
 
 import AppModal from './appModal';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const { Dragger } = Upload;
 
@@ -450,9 +453,9 @@ export const PictureCreateMenu = ({
                                                             className="upload_img h-[140px] object-cover aspect-square"
                                                             src={uploadFile}
                                                             alt={uploadFile}
-                                                            // style={{
-                                                            //     filter: `blur(${imageStrength / 10}px)`
-                                                            // }}
+                                                            style={{
+                                                                filter: `blur(${((1 - imageStrength) * 100) / 10}px)`
+                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -471,7 +474,12 @@ export const PictureCreateMenu = ({
                                                     <TextField
                                                         type={'number'}
                                                         size="small"
-                                                        className="w-[70px]"
+                                                        className="w-[50px]"
+                                                        sx={{
+                                                            input: {
+                                                                padding: '5px !important'
+                                                            }
+                                                        }}
                                                         disabled
                                                         value={imageStrength}
                                                     />
@@ -516,6 +524,7 @@ export const PictureCreateMenu = ({
                                                     <CloudUploadOutlinedIcon className="text-4xl" />
                                                 </p>
                                                 <p className="ant-upload-text">上传图片以创建变体</p>
+                                                <p className="ant-upload-text text-xs">最大上传大小1024*1024</p>
                                             </div>
                                         </Dragger>
                                     )}
@@ -818,9 +827,9 @@ export const PictureCreateMenu = ({
                                                             className="upload_img h-[140px] object-cover aspect-square"
                                                             src={uploadFile}
                                                             alt={uploadFile}
-                                                            // style={{
-                                                            //     filter: `blur(${imageStrength / 10}px)`
-                                                            // }}
+                                                            style={{
+                                                                filter: `blur(${((1 - imageStrength) * 100) / 10}px)`
+                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -839,9 +848,14 @@ export const PictureCreateMenu = ({
                                                     <TextField
                                                         type={'number'}
                                                         size="small"
-                                                        className="w-[70px]"
+                                                        className="w-[50px]"
                                                         disabled
                                                         value={imageStrength}
+                                                        sx={{
+                                                            input: {
+                                                                padding: '5px !important'
+                                                            }
+                                                        }}
                                                     />
                                                 </div>
                                                 <div
@@ -884,6 +898,7 @@ export const PictureCreateMenu = ({
                                                     <CloudUploadOutlinedIcon className="text-4xl" />
                                                 </p>
                                                 <p className="ant-upload-text">上传图片以创建变体</p>
+                                                <p className="ant-upload-text text-xs">最大上传大小1024*1024</p>
                                             </div>
                                         </Dragger>
                                     )}
@@ -927,14 +942,25 @@ export const PictureCreateMenu = ({
                         </Row>
                     )}
                     <Row className={'w-[100%] mt-[15px] p-[16px] rounded-xl bg-white'}>
-                        <span className={'text-base font-medium flex items-center'}>
-                            高级
-                            {visible ? (
-                                <VisibilityOutlinedIcon className={'cursor-pointer ml-1 text-lg'} onClick={() => setVisible(!visible)} />
-                            ) : (
-                                <VisibilityOffOutlinedIcon className={'cursor-pointer ml-1 text-lg'} onClick={() => setVisible(!visible)} />
-                            )}
-                        </span>
+                        <div className="flex justify-between items-center w-full">
+                            <span className={'text-base font-medium flex items-center'}>
+                                高级
+                                {visible ? (
+                                    <VisibilityOutlinedIcon
+                                        className={'cursor-pointer ml-1 text-lg'}
+                                        onClick={() => setVisible(!visible)}
+                                    />
+                                ) : (
+                                    <VisibilityOffOutlinedIcon
+                                        className={'cursor-pointer ml-1 text-lg'}
+                                        onClick={() => setVisible(!visible)}
+                                    />
+                                )}
+                            </span>
+                            <Tooltip title={'宽高范围为1-1024'}>
+                                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                            </Tooltip>
+                        </div>
                         {visible && (
                             <div className={'px-1 mt-[15px] grid grid-cols-2 gap-4'}>
                                 <TextField
@@ -943,7 +969,19 @@ export const PictureCreateMenu = ({
                                     label="宽度"
                                     fullWidth
                                     autoComplete="given-name"
-                                    onChange={(e) => setWidth(e.target.value as unknown as number)}
+                                    inputProps={{
+                                        max: 1024,
+                                        min: 1
+                                    }}
+                                    onChange={(e) => {
+                                        if ((e.target.value as unknown as number) > 1024) {
+                                            setWidth(1024);
+                                        } else if ((e.target.value as unknown as number) < 0) {
+                                            setWidth(1);
+                                        } else {
+                                            setWidth(e.target.value as unknown as number);
+                                        }
+                                    }}
                                 />
                                 <TextField
                                     value={height}
@@ -951,7 +989,19 @@ export const PictureCreateMenu = ({
                                     label="高度"
                                     fullWidth
                                     autoComplete="given-name"
-                                    onChange={(e) => setHeight(e.target.value as unknown as number)}
+                                    inputProps={{
+                                        max: 1024,
+                                        min: 1
+                                    }}
+                                    onChange={(e) => {
+                                        if ((e.target.value as unknown as number) > 1024) {
+                                            setHeight(1024);
+                                        } else if ((e.target.value as unknown as number) < 0) {
+                                            setHeight(1);
+                                        } else {
+                                            setHeight(e.target.value as unknown as number);
+                                        }
+                                    }}
                                 />
                                 <TextField
                                     type={'number'}
@@ -1024,7 +1074,11 @@ export const PictureCreateMenu = ({
                     </Button>
                 </Row>
             </Col>
-            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔法豆不足'} />
+            <PermissionUpgradeModal
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前当前魔法豆不足，升级会员，立享五折优惠！使用的魔法豆不足'}
+            />
         </>
     );
 };

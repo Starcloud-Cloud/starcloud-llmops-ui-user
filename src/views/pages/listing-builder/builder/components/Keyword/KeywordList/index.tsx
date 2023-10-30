@@ -122,7 +122,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list } = useListing();
 
     // 获取详情
     useEffect(() => {
@@ -166,17 +166,21 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 .catch((error: any) => {
                     console.error(error);
                 });
+        } else {
+            // 初始化分数
+            handleReGrade(list);
         }
     }, [update, version, uid]);
+
     // 计算use总使用量
     useEffect(() => {
-        if (keywordHighlight.flat()?.filter((item) => !item).length && rows.length) {
+        if (keywordHighlight.flat()?.filter((item) => item).length && rows.length) {
             const data: any[] = [];
             rows.forEach((item) => {
                 const num = keywordHighlight
                     ?.flat()
-                    ?.filter((item1) => item1?.text === item?.keyword)
-                    ?.reduce((acc, obj) => acc + (obj.num || 0), 0);
+                    ?.filter((item1: any) => item1?.text === item?.keyword)
+                    ?.reduce((acc: any, obj: any) => acc + (obj.num || 0), 0);
                 data.push({
                     ...item,
                     use: num
@@ -189,17 +193,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
     const pageList = useMemo(() => {
         let newData: any[] = [];
         if (hiddenUse && keywordHighlight.flat().filter((item) => item).length > 0) {
-            rows.forEach((item) => {
-                keywordHighlight
-                    .flat()
-                    .filter((item) => item)
-                    .forEach((item1) => {
-                        if (item1.text !== item.keyword) {
-                            newData.push(item);
-                        }
-                    });
-            });
-            return newData;
+            return rows.filter((item) => keywordHighlight.flat().some((v) => v && v.text === item.keyword));
         } else {
             return rows;
         }

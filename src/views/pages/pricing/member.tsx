@@ -148,7 +148,7 @@ const recommendList = [
     }
 ];
 
-const plans = [
+const plansDefault = (value: number) => [
     {
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
@@ -164,7 +164,7 @@ const plans = [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: '3000魔法豆，300点作图',
+        description: value === 1 ? '3000魔法豆，300点作图' : '36000魔法豆，3600点作图',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
@@ -178,7 +178,7 @@ const plans = [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: '10000魔法豆，1000点作图',
+        description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
         monthPrice: 199,
         yearPrice: 1999,
         preMonthPrice: 166.58,
@@ -192,7 +192,7 @@ const plans = [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: '6个账号，25000魔法豆，2000点作图',
+        description: value === 1 ? '6个账号，25000魔法豆，2000点作图' : '6个账号，300000魔法豆，24000点作图',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
@@ -215,7 +215,7 @@ const plans = [
     }
 ];
 
-const planList = [
+const planListDefault = (value: number) => [
     [
         '签到可免费获得2魔法豆', // 0
         '签到可免费获取图片1张', // 1
@@ -232,12 +232,12 @@ const planList = [
     ],
     [
         <div className="flex items-center">
-            <span>3000魔法豆</span>
+            <span>{value === 1 ? '3000魔法豆' : '36000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
-        '生成图片300张', // 1
+        `生成图片${value === 1 ? 300 : 3600}张`, // 1
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
@@ -263,20 +263,31 @@ const planList = [
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
-        '多渠道发布机器人客服', // 3
-        '上传信息库/文档问答', // 4
+        <div className="flex items-center">
+            <span>多渠道发布机器人客服</span>
+            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
+        <div className="flex items-center">
+            <span>上传信息库/文档问答</span>
+            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
+
         '每个机器人5个文档上传', // 4
         'Google/Amazon联网查询', // 5
         '1个机器人插件扩展' // 6
     ],
     [
         <div className="flex items-center">
-            <span>10000魔法豆</span>
+            <span>{value === 1 ? '10000魔法豆' : '120000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
-        '生成图片1000张', // 1
+        `生成图片${value === 1 ? 1000 : 12000}张`, // 1
         'GPT-3.5/开源模型', // 2
         <div className="flex items-center">
             <span>GPT-4</span>
@@ -302,8 +313,18 @@ const planList = [
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>,
-        '多渠道发布机器人客服', // 3
-        '上传信息库/文档问答', // 4
+        <div className="flex items-center">
+            <span>多渠道发布机器人客服</span>
+            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
+        <div className="flex items-center">
+            <span>上传信息库/文档问答</span>
+            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            </Tooltip>
+        </div>,
         '每个机器人20个文档上传', // 4
         'Google/Amazon联网查询', // 5
         '3个机器人插件扩展' // 6
@@ -311,11 +332,12 @@ const planList = [
     [
         <div className="flex items-center">
             <span>25000魔法豆</span>
+            <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
             </Tooltip>
         </div>, // 0
-        '生成图片2000张', // 1
+        `生成图片${value === 1 ? 2000 : 24000}张`, // 1
         'GPT-3.5/开源模型', // 2
         'GPT-4', // 3
         '无限自定义应用', // 4
@@ -342,6 +364,9 @@ const planList = [
 let interval: any;
 
 const Price1 = () => {
+    const [planList, setPlanList] = useState(planListDefault(1));
+    const [plans, setPlans] = useState(plansDefault(1));
+
     const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
@@ -376,6 +401,18 @@ const Price1 = () => {
     const [isTimeout, setIsTimeout] = useState(false);
 
     const [orderId, setOrderId] = useState('');
+
+    useEffect(() => {
+        if (value === '1') {
+            setPlanList(planListDefault(1));
+            setPlans(plansDefault(1));
+        }
+
+        if (value === '2') {
+            setPlanList(planListDefault(2));
+            setPlans(plansDefault(2));
+        }
+    }, [value]);
 
     const handleOpen = () => {
         setOpen(true);

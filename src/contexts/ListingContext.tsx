@@ -1,6 +1,6 @@
 import { getGrade } from 'api/listing/build';
 import _ from 'lodash';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import { COUNTRY_LIST, DEFAULT_LIST } from 'views/pages/listing-builder/data';
@@ -47,7 +47,7 @@ type ListingContextType = {
     setList: (list: any) => void;
     enableAi: boolean;
     setEnableAi: (enableAi: boolean) => void;
-    setKeywordHighlight: (keywordHighlight: keywordHighlightType) => void;
+    setKeywordHighlight: (keywordHighlight: any) => void;
     keywordHighlight: keywordHighlightType;
     setUpdate: (update: object) => void;
     update: any;
@@ -58,6 +58,7 @@ type ListingContextType = {
     setItemScore: (itemScore: any) => void;
     itemScore: any;
     fiveLen: number;
+    keywordHighlightRef: any;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
@@ -80,6 +81,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const queryUid = searchParams.get('uid');
     const queryVersion = searchParams.get('version');
 
+    const keywordHighlightRef = useRef<any>(null);
+
     useEffect(() => {
         if (queryVersion && queryUid) {
             setVersion(Number(queryVersion));
@@ -89,14 +92,39 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
 
     const fiveLen = useMemo(() => {
         return list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length || 0;
-    }, []);
+    }, [list]);
 
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
     useEffect(() => {
         if (detail && detail.draftConfig && list.length) {
-            console.log(detail.title);
             const copyList = _.cloneDeep(list);
-
+            const resultNum = detail.draftConfig.fiveDescNum - 5;
+            if (detail.draftConfig.fiveDescNum > 5) {
+                // @ts-ignore
+                [...Array(resultNum).keys()].forEach((v) => {
+                    copyList.splice(-2, 0, {
+                        title: `五点描述${5 + v + 1}`,
+                        des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
+                    2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
+                    3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
+                    4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
+                    5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
+                    6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+                        placeholder: `产品卖点描述${5 + v + 1}`,
+                        type: ListingBuilderEnum.FIVE_DES,
+                        isOvertop: true,
+                        maxCharacter: 200,
+                        character: 0,
+                        word: 0,
+                        value: '',
+                        row: 4,
+                        btnText: 'AI生成五点描述',
+                        enable: true,
+                        keyword: [],
+                        grade: 0
+                    });
+                });
+            }
             const newDetail = detail.draftConfig;
 
             // 标题
@@ -179,8 +207,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             if (num === 0 || num === 1) {
                 return 0;
             }
-
             if (num === 2) {
+                return 0.5;
+            }
+
+            if (num === 3) {
                 return 1;
             }
         }
@@ -221,10 +252,10 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     return handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
                 }
                 if (index === fiveLen + 1) {
-                    return handleStar(ListingBuilderEnum.PRODUCT_DES, searchGrade) || 0;
+                    return handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
                 }
                 if (index === fiveLen + 2) {
-                    return handleStar(ListingBuilderEnum.SEARCH_WORD, desGrade) || 0;
+                    return handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
                 }
             } else {
                 const currentFiveDes = copyItemScore?.fiveDescScore?.[index];
@@ -233,6 +264,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     fiveGrade++;
                 }
                 if (currentFiveDes?.starUppercase) {
+                    fiveGrade++;
+                }
+                if (currentFiveDes?.hasLowercase) {
                     fiveGrade++;
                 }
                 return handleStar(ListingBuilderEnum.FIVE_DES, fiveGrade) || 0;
@@ -290,7 +324,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 handleSumGrade,
                 setItemScore,
                 itemScore,
-                fiveLen
+                fiveLen,
+                keywordHighlightRef
             }}
         >
             {children}

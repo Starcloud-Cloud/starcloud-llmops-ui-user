@@ -25,9 +25,19 @@ const mergeArray = (arr: any[]) => {
 };
 
 // 所有关键词都高亮
-const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, highlightWordList, type, highlightAllWordList }: any) => {
+const FiledTextArea = ({
+    rows,
+    value,
+    handleInputChange,
+    placeholder,
+    index,
+    highlightWordList,
+    type,
+    highlightAllWordList,
+    handleClick
+}: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
-    const { list, setKeywordHighlight, keywordHighlight } = useListing();
+    const { list, setKeywordHighlight, keywordHighlight, keywordHighlightRef } = useListing();
     const copyHighlightWordList = highlightAllWordList.map((item: any) => item.keyword);
 
     // 该文本的关键字数组
@@ -63,10 +73,10 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
 
     useEffect(() => {
         const result = mergeArray(currentList);
-        const copyKeywordHighlight = _.cloneDeep(keywordHighlight);
-
+        const copyKeywordHighlight = _.cloneDeep(keywordHighlightRef.current || []);
         if (!_.isEqual(copyKeywordHighlight[index], result)) {
             copyKeywordHighlight[index] = result;
+            keywordHighlightRef.current = copyKeywordHighlight;
             setKeywordHighlight(copyKeywordHighlight);
         }
     }, [currentList]);
@@ -98,6 +108,7 @@ const FiledTextArea = ({ rows, value, handleInputChange, placeholder, index, hig
                 onChange={(e) => handleChange(e)}
                 style={{ background: 'none' }}
                 className="border-[#e6e8ec] border-l-0 border-r-0 text-sm relative z-10 w-full"
+                onClick={handleClick}
             />
         </div>
     );

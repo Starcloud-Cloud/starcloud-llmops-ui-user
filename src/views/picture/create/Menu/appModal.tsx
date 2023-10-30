@@ -475,7 +475,11 @@ const AppModal = ({
                         </Box>
                     </CardContent>
                 </MainCard>
-                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+                <PermissionUpgradeModal
+                    open={tokenOpen}
+                    handleClose={() => setTokenOpen(false)}
+                    title={'当前使当前魔法豆不足，升级会员，立享五折优惠！的魔法豆不足'}
+                />
             </Box>
         </Modal>
     );

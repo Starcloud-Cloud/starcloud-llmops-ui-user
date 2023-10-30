@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Popover, Rate } from 'antd';
+import { Alert, Divider, Dropdown, FloatButton, Input, MenuProps, Modal, Popover, Rate, Spin } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import React, { useEffect } from 'react';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -36,6 +36,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
 import { getRecommend } from 'api/listing/build';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import imgLoading from 'assets/images/picture/loading.gif';
 
 const { Search } = Input;
 
@@ -83,11 +85,12 @@ const Content = () => {
     const [x, setX] = React.useState(0);
     const [y, setY] = React.useState(0);
     const [openKeyWordSelect, setOpenKeyWordSelect] = React.useState(false);
-    const [keyWordSelectList, setKeyWordSelectList] = React.useState<any[]>([]);
     const [hoverKey, setHoverKey] = React.useState(0);
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
     const [currentWord, setCurrentWord] = React.useState('');
+    const [allLoading, setAllLoading] = React.useState(false);
+    const [activeIndex, setActiveIndex] = React.useState<number | undefined>(undefined);
 
     const {
         list,
@@ -128,6 +131,36 @@ const Content = () => {
             setScoreList([...scoreListDefault]);
         }
     }, [itemScore]);
+
+    const fiveDesGrade = (index: number) => {
+        const copyItemScore = _.cloneDeep(itemScore);
+        if (copyItemScore?.fiveDescScore) {
+            let list: any[] = [];
+            Object.keys(copyItemScore?.fiveDescScore).forEach((i) => {
+                if (index === 0) {
+                    list.push({
+                        label: `五点描述${i} 包含150到200个字符`,
+                        value: copyItemScore?.fiveDescScore[i].fiveDescLength
+                    });
+                }
+                if (index === 1) {
+                    list.push({
+                        label: `五点描述${i} 第一个字母大写`,
+                        value: copyItemScore?.fiveDescScore[i].starUppercase
+                    });
+                }
+                if (index === 2) {
+                    list.push({
+                        label: `五点描述${i} 不全是大写`,
+                        value: copyItemScore?.fiveDescScore[i].hasLowercase
+                    });
+                }
+            });
+            return list.map((item) => getItemGradeComp(item));
+        } else {
+            return null;
+        }
+    };
 
     const getItemGradeComp = (v: any) => {
         return (
@@ -196,13 +229,17 @@ const Content = () => {
                         {
                             label: '第一个字母大写',
                             value: current?.starUppercase
+                        },
+                        {
+                            label: '不全是大写',
+                            value: current?.hasLowercase
                         }
                     );
                     return list.map((item) => getItemGradeComp(item));
                 }
             }
         },
-        [itemScore]
+        [itemScore, scoreList, fiveLen]
     );
 
     useEffect(() => {
@@ -231,7 +268,9 @@ const Content = () => {
                 } else if (key === 'Enter') {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
-                        handleReplaceValue(keyWordSelectList[hoverKeyRef.current || 0]);
+                        handleReplaceValue(
+                            detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord))[hoverKeyRef.current || 0]
+                        );
                     }
                 }
             };
@@ -242,12 +281,15 @@ const Content = () => {
                 document.removeEventListener('keydown', handleKeyDown);
             };
         }
-    }, [openKeyWordSelect]);
+    }, [openKeyWordSelect, detail, currentWord]);
 
     const handleReplaceValue = (selectValue: string) => {
         const newList = [...list];
         const preValue = newList[editIndex].value;
-        const modifiedString = preValue?.slice(0, currentInputIndex - 1) + selectValue + preValue?.slice(currentInputIndex + 1);
+        const modifiedString =
+            preValue?.slice(0, currentInputIndex - currentWord.length) +
+            selectValue +
+            preValue?.slice(currentInputIndex + currentWord.length);
         newList[editIndex] = {
             ...newList[editIndex],
             value: modifiedString,
@@ -271,15 +313,10 @@ const Content = () => {
         const value = e.target.value;
         const word = findCurrentWord(value, startIndex);
         setCurrentWord(word);
-        // TODO 字符同样
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
-            const filterKeyWord = keyword.filter((item, index) => {
-                if (item.includes(value[startIndex - 1])) {
-                    return item;
-                }
-            });
-            if (filterKeyWord.length > 0) {
-                setKeyWordSelectList([...filterKeyWord]);
+            // const filterKeyWord = keyword.filter((item, index) => {
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(word)) || [];
+            if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
                 setY(y);
@@ -288,11 +325,13 @@ const Content = () => {
                 setOpenKeyWordSelect(false);
             }
         } else {
-            // setOpenKeyWordSelect(false);
+            const { x, y } = getCaretPosition(e.target);
+            setX(x);
+            setY(y);
         }
     };
 
-    const handleInputChange = React.useCallback((e: any, index: number, keyword: string[]) => {
+    const handleInputChange = (e: any, index: number, keyword: string[]) => {
         let otherList: any[] = [];
         const newKeyword = keyword?.map((v: any) => v.keyword) || [];
         handleHasKeyWork(e, newKeyword);
@@ -314,7 +353,7 @@ const Content = () => {
         timeoutRef.current = setTimeout(() => {
             handleReGrade(otherList);
         }, 200);
-    }, []);
+    };
 
     const handleExpand = (key: number) => {
         const index = expandList.findIndex((v) => v === key);
@@ -421,8 +460,8 @@ const Content = () => {
         // 处理逻辑
     };
 
-    // 所搜
-    const handleSearch = async (value: any) => {
+    const typeSearchList = async (value: string) => {
+        setAllLoading(true);
         // const res = await getListingByAsin({
         //     asin: value,
         //     marketName: country.key
@@ -458,6 +497,29 @@ const Content = () => {
             copyList[index + 1].value = item;
         });
         setList(copyList);
+        setTimeout(() => {
+            setAllLoading(false);
+        }, 3000);
+    };
+
+    // 所搜
+    const handleSearch = async (value: any) => {
+        const someList = list.some((item) => item.value);
+        if (someList) {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: <ExclamationCircleFilled rev={undefined} />,
+                content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库,是否继续',
+                onOk: async () => {
+                    await typeSearchList(value);
+                },
+                onCancel() {
+                    console.log('Cancel');
+                }
+            });
+        } else {
+            await typeSearchList(value);
+        }
     };
 
     const handleClick = async (item: any, index: number) => {
@@ -515,13 +577,13 @@ const Content = () => {
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">{itemScore?.matchSearchers}</span>
-                                <span className="text-base">/{itemScore?.totalSearches}</span>
+                                <span className="text-2xl font-semibold">{itemScore?.matchSearchers || 0}</span>
+                                <span className="text-base">/{itemScore?.totalSearches || 0}</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={(itemScore?.matchSearchers / itemScore?.totalSearches) * 100}
+                                value={((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -541,38 +603,82 @@ const Content = () => {
                                         <div className="w-full py-1" key={i}>
                                             <div className="flex justify-between items-center h-[30px]">
                                                 <span className="flex-[80%]">{v.label}</span>
-                                                {!v.value ? (
-                                                    <svg
-                                                        className="h-[14px] w-[14px]"
-                                                        viewBox="0 0 1098 1024"
-                                                        version="1.1"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        p-id="11931"
-                                                        width="32"
-                                                        height="32"
-                                                    >
-                                                        <path
-                                                            d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
-                                                            fill="#FB6547"
-                                                            p-id="11932"
-                                                        ></path>
-                                                    </svg>
+                                                {item.title.includes('5点描述') ? (
+                                                    <Popover content={fiveDesGrade(i)} title="打分">
+                                                        {!v.value ? (
+                                                            <svg
+                                                                className={`h-[14px] w-[14px] ${
+                                                                    item.title.includes('5点描述') && 'cursor-pointer'
+                                                                }`}
+                                                                viewBox="0 0 1098 1024"
+                                                                version="1.1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                p-id="11931"
+                                                                width="32"
+                                                                height="32"
+                                                            >
+                                                                <path
+                                                                    d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                                                    fill="#FB6547"
+                                                                    p-id="11932"
+                                                                ></path>
+                                                            </svg>
+                                                        ) : (
+                                                            <svg
+                                                                className={`h-[14px] w-[14px] ${
+                                                                    item.title.includes('5点描述') && 'cursor-pointer'
+                                                                }`}
+                                                                viewBox="0 0 1024 1024"
+                                                                version="1.1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                p-id="21700"
+                                                                width="16"
+                                                                height="16"
+                                                            >
+                                                                <path
+                                                                    d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                                                    fill="#673ab7"
+                                                                    p-id="21701"
+                                                                ></path>
+                                                            </svg>
+                                                        )}
+                                                    </Popover>
                                                 ) : (
-                                                    <svg
-                                                        className="h-[14px] w-[14px]"
-                                                        viewBox="0 0 1024 1024"
-                                                        version="1.1"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        p-id="21700"
-                                                        width="16"
-                                                        height="16"
-                                                    >
-                                                        <path
-                                                            d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
-                                                            fill="#673ab7"
-                                                            p-id="21701"
-                                                        ></path>
-                                                    </svg>
+                                                    <>
+                                                        {!v.value ? (
+                                                            <svg
+                                                                className={`h-[14px] w-[14px]`}
+                                                                viewBox="0 0 1098 1024"
+                                                                version="1.1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                p-id="11931"
+                                                                width="32"
+                                                                height="32"
+                                                            >
+                                                                <path
+                                                                    d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                                                    fill="#FB6547"
+                                                                    p-id="11932"
+                                                                ></path>
+                                                            </svg>
+                                                        ) : (
+                                                            <svg
+                                                                className={`h-[14px] w-[14px]`}
+                                                                viewBox="0 0 1024 1024"
+                                                                version="1.1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                p-id="21700"
+                                                                width="16"
+                                                                height="16"
+                                                            >
+                                                                <path
+                                                                    d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                                                    fill="#673ab7"
+                                                                    p-id="21701"
+                                                                ></path>
+                                                            </svg>
+                                                        )}
+                                                    </>
                                                 )}
                                             </div>
                                         </div>
@@ -594,7 +700,7 @@ const Content = () => {
                         <Search
                             onSearch={handleSearch}
                             className="lg:w-full xl:w-[70%]"
-                            placeholder="输入ASIN，一键获取亚马逊Listing内容"
+                            placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
                             enterButton="获取Listing"
                         />
                     </div>
@@ -732,6 +838,7 @@ const Content = () => {
                     )}
                 </Card>
             )}
+            {/* <Spin tip="Loading..." size={'large'} spinning={allLoading} indicator={<img width={60} src={imgLoading} />}> */}
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
@@ -804,7 +911,11 @@ const Content = () => {
                                     <Alert description={item.des} type="error" />
                                 </div>
                             )}
-                            <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
+                            <div
+                                className={`flex flex-col border border-solid border-[#e6e8ec] rounded ${
+                                    item.type === ListingBuilderEnum.SEARCH_WORD && 'border-b-0'
+                                } `}
+                            >
                                 <div className="flex justify-between items-center px-4 flex-wrap py-1">
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">
@@ -879,30 +990,38 @@ const Content = () => {
                                     placeholder={item.placeholder}
                                     value={item.value}
                                     handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
+                                    handleClick={() => {
+                                        if (index === activeIndex) {
+                                            setActiveIndex(index);
+                                        } else {
+                                            setOpenKeyWordSelect(false);
+                                            setActiveIndex(index);
+                                        }
+                                    }}
                                     highlightWordList={item.keyword}
                                     highlightAllWordList={detail?.keywordMetaData || []}
                                     index={index}
                                     type={item.type}
                                 />
-                                <div className="flex px-4 py-3 items-center">
-                                    <div className="flex-1 flex items-center">
-                                        <span className="mr-2 flex items-center">
-                                            建议关键词:
-                                            <div className="ml-2 flex items-center">
-                                                {item?.keyword?.map((itemKeyword, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className={`${
-                                                            keywordHighlight
-                                                                ?.flat()
-                                                                ?.filter((item) => item !== undefined)
-                                                                .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
-                                                                ? 'bg-[#ffaca6] ml-1 line-through px-1'
-                                                                : 'ml-1 px-1'
-                                                        }`}
-                                                    >
-                                                        <span>{itemKeyword.text}</span>
-                                                        {/* {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
+                                {item.type !== ListingBuilderEnum.SEARCH_WORD && (
+                                    <div className="flex px-4 py-3 items-center">
+                                        <div className="flex-1 flex items-center">
+                                            <span className="mr-2 flex items-center">
+                                                建议关键词:
+                                                <div className="ml-2 flex items-center">
+                                                    {item?.keyword?.map((itemKeyword, keywordIndex) => (
+                                                        <div
+                                                            key={keywordIndex}
+                                                            className={`${
+                                                                keywordHighlight[index]
+                                                                    ?.filter((item) => item !== undefined)
+                                                                    .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                    ? 'bg-[#ffaca6] ml-1 line-through px-1'
+                                                                    : 'ml-1 px-1'
+                                                            }`}
+                                                        >
+                                                            <span>{itemKeyword.text}</span>
+                                                            {/* {keywordHighlight?.find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num && (
                                                             <span>
                                                                 (
                                                                 {
@@ -912,13 +1031,14 @@ const Content = () => {
                                                                 )
                                                             </span>
                                                         )} */}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                     </div>
-                                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                                </div>
+                                )}
                             </div>
                         </div>
 
@@ -950,6 +1070,7 @@ const Content = () => {
                     </ul>
                 )}
             </Card>
+            {/* </Spin> */}
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

@@ -21,6 +21,8 @@ import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import { formatNumber } from 'hooks/useDate';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
     const { setUserInfo }: any = userInfoStore();
@@ -38,7 +40,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const imageprops: UploadProps = {
         name: 'image',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },
@@ -57,13 +59,34 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                     setImageList(newValue);
                 }
             } else if (info.file.status === 'done') {
-                const newValue = _.cloneDeep(imageList);
-                newValue.forEach((value, index) => {
-                    if (value.uid === info.file.uid) {
-                        newValue.splice(index, 1, info.file);
-                        setImageList(newValue);
-                    }
-                });
+                if (info?.file?.response?.code !== 0) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: info?.file?.response?.msg,
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false
+                        })
+                    );
+                    const newValue = _.cloneDeep(imageList);
+                    newValue.forEach((value, index) => {
+                        if (value.uid === info.file.uid) {
+                            newValue.splice(index, 1);
+                            setImageList(newValue);
+                        }
+                    });
+                } else {
+                    const newValue = _.cloneDeep(imageList);
+                    newValue.forEach((value, index) => {
+                        if (value.uid === info.file.uid) {
+                            newValue.splice(index, 1, info.file);
+                            setImageList(newValue);
+                        }
+                    });
+                }
             }
         },
         onDrop(e) {

@@ -524,6 +524,7 @@ export const PictureCreateMenu = ({
                                                     <CloudUploadOutlinedIcon className="text-4xl" />
                                                 </p>
                                                 <p className="ant-upload-text">上传图片以创建变体</p>
+                                                <p className="ant-upload-text text-xs">最大上传大小1024*1024</p>
                                             </div>
                                         </Dragger>
                                     )}
@@ -897,6 +898,7 @@ export const PictureCreateMenu = ({
                                                     <CloudUploadOutlinedIcon className="text-4xl" />
                                                 </p>
                                                 <p className="ant-upload-text">上传图片以创建变体</p>
+                                                <p className="ant-upload-text text-xs">最大上传大小1024*1024</p>
                                             </div>
                                         </Dragger>
                                     )}

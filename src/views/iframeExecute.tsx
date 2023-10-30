@@ -287,7 +287,11 @@ const IframeExecute = () => {
                 }}
                 source="myApp"
             />
-            <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+            <PermissionUpgradeModal
+                open={tokenOpen}
+                handleClose={() => setTokenOpen(false)}
+                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+            />
         </Card>
     );
 };

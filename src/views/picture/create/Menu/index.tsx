@@ -1072,7 +1072,11 @@ export const PictureCreateMenu = ({
                     </Button>
                 </Row>
             </Col>
-            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使用的魔法豆不足'} />
+            <PermissionUpgradeModal
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前当前魔法豆不足，升级会员，立享五折优惠！使用的魔法豆不足'}
+            />
         </>
     );
 };

@@ -504,7 +504,11 @@ function Deatail() {
             />
             {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
             {tokenOpen && (
-                <PermissionUpgradeModal open={tokenOpen} handleClose={() => setTokenOpen(false)} title={'当前使用的魔法豆不足'} />
+                <PermissionUpgradeModal
+                    open={tokenOpen}
+                    handleClose={() => setTokenOpen(false)}
+                    title={'当前使用当前魔法豆不足，升级会员，立享五折优惠！魔法豆不足'}
+                />
             )}
         </Card>
     );

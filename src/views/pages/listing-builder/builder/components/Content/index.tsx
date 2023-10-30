@@ -243,7 +243,7 @@ const Content = () => {
     );
 
     useEffect(() => {
-        const filerList = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
+        const filerList = detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()));
         if (!filerList?.length || !currentWord) {
             setOpenKeyWordSelect(false);
             setHoverKey(0);
@@ -269,7 +269,9 @@ const Content = () => {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
                         handleReplaceValue(
-                            detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord))[hoverKeyRef.current || 0]
+                            detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))[
+                                hoverKeyRef.current || 0
+                            ]
                         );
                     }
                 }
@@ -315,7 +317,7 @@ const Content = () => {
         setCurrentWord(word);
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             // const filterKeyWord = keyword.filter((item, index) => {
-            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(word)) || [];
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.toLowerCase().startsWith(word.toLowerCase())) || [];
             if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
@@ -1015,7 +1017,10 @@ const Content = () => {
                                                             className={`${
                                                                 keywordHighlight[index]
                                                                     ?.filter((item) => item !== undefined)
-                                                                    .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                    .find(
+                                                                        (itemKeyH) =>
+                                                                            itemKeyH.text.toLowerCase() === itemKeyword.text.toLowerCase()
+                                                                    )?.num
                                                                     ? 'bg-[#ffaca6] ml-1 line-through px-1'
                                                                     : 'ml-1 px-1'
                                                             }`}
@@ -1052,7 +1057,7 @@ const Content = () => {
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
                         {detail?.keywordResume
-                            .filter((item: string) => item?.startsWith(currentWord))
+                            .filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))
                             ?.map((item: string, keyWordItemKey: number) => (
                                 <li
                                     key={keyWordItemKey}

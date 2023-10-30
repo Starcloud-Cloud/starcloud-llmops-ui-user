@@ -207,8 +207,11 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             if (num === 0 || num === 1) {
                 return 0;
             }
-
             if (num === 2) {
+                return 0.5;
+            }
+
+            if (num === 3) {
                 return 1;
             }
         }
@@ -261,6 +264,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     fiveGrade++;
                 }
                 if (currentFiveDes?.starUppercase) {
+                    fiveGrade++;
+                }
+                if (currentFiveDes?.hasLowercase) {
                     fiveGrade++;
                 }
                 return handleStar(ListingBuilderEnum.FIVE_DES, fiveGrade) || 0;

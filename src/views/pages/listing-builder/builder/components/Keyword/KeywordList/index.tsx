@@ -122,7 +122,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list } = useListing();
 
     // 获取详情
     useEffect(() => {
@@ -166,6 +166,9 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 .catch((error: any) => {
                     console.error(error);
                 });
+        } else {
+            // 初始化分数
+            handleReGrade(list);
         }
     }, [update, version, uid]);
 

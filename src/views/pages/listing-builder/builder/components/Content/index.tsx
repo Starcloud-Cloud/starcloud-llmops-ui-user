@@ -1006,7 +1006,7 @@ const Content = () => {
                                 {item.type !== ListingBuilderEnum.SEARCH_WORD && (
                                     <div className="flex px-4 py-3 items-center">
                                         <div className="flex-1 flex items-center">
-                                            <span className="mr-2 flex items-center">
+                                            <span className="mr-2 flex items-center text-[#999]">
                                                 建议关键词:
                                                 <div className="ml-2 flex items-center">
                                                     {item?.keyword?.map((itemKeyword, keywordIndex) => (

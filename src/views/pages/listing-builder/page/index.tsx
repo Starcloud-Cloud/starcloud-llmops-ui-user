@@ -59,8 +59,8 @@ export interface TableEnhancedCreateDataType {
 const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '商品标题' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '站点' },
-    { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
-    { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
+    // { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
+    // { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
     { id: 'score', numeric: false, disablePadding: false, label: '分值/搜索量' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
@@ -443,17 +443,21 @@ const ListingBuilderPage: React.FC = () => {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{row.title}</TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center">
+                                        <Tooltip title={row.title}>
+                                            <span className="line-clamp-1 w-[250px] mx-auto">{row.title}</span>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center justify-center">
                                             {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
                                             <span className="ml-1">
                                                 {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
                                             </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">{row.asin}</TableCell>
-                                    <TableCell align="center">{handleTransfer(row.status)}</TableCell>
+                                    {/* <TableCell align="center">{row.asin}</TableCell> */}
+                                    {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
                                     <TableCell align="center">
                                         {row.score || 0}/{row?.matchSearchers || 0}
                                     </TableCell>

@@ -360,7 +360,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                         />
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0">
-                                        {row.keyword}
+                                        <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
                                     </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
                                     <TableCell align="left" className="py-[6px] px-0">
@@ -371,7 +371,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                     {/* <TableCell align="left" className="py-[6px] px-0">
                                         {row.keyword}
                                     </TableCell> */}
-                                    <TableCell align="left" className="py-[6px] px-0">
+                                    <TableCell align="center" className="py-[6px] px-0">
                                         {handleUse(row.keyword)}
                                     </TableCell>
                                 </TableRow>

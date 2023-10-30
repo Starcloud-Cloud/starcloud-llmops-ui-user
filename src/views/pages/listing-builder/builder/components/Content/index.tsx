@@ -584,7 +584,7 @@ const Content = () => {
 
                             <LinearProgress
                                 variant="determinate"
-                                value={(itemScore?.matchSearchers / itemScore?.totalSearches) * 100}
+                                value={((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',

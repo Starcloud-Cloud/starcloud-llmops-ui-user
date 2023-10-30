@@ -44,6 +44,8 @@ const ListingBuilder = Loadable(lazy(() => import('views/pages/listing-builder/b
 const ListingBuilderPage = Loadable(lazy(() => import('views/pages/listing-builder/page')));
 //拓展词搜索
 const TermSearch = Loadable(lazy(() => import('views/pages/termSearch')));
+//词库
+const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 
@@ -158,6 +160,10 @@ const MainRoutes = {
         {
             path: '/termSearch',
             element: <TermSearch />
+        },
+        {
+            path: '/thesaurus',
+            element: <Thesaurus />
         }
     ]
 };

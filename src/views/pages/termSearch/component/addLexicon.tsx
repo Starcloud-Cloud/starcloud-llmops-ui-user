@@ -3,7 +3,8 @@ import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { Modal, IconButton, CardContent, TextField, CardActions, Grid, Divider as Dividers, Button as Buttons } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { KeywordMetadataBasic, KeywordMetadataAdd } from 'api/listing/termSerch';
 const AddLexicon = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) => void }) => {
     const [lexiconList, setLexiconList] = useState<any[]>([]);
     const optionsWithDisabled = [
@@ -11,6 +12,9 @@ const AddLexicon = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
         { label: 'Pear', value: 'Pear' },
         { label: 'Orange', value: 'Orange', disabled: false }
     ];
+    useEffect(() => {
+        // KeywordMetadataBasic().then((res) => {});
+    }, []);
     return (
         <Modal open={open} onClose={() => setOpen(false)}>
             <MainCard

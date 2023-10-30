@@ -107,7 +107,7 @@ const FiledTextArea = ({
                 value={value}
                 onChange={(e) => handleChange(e)}
                 style={{ background: 'none' }}
-                className="border-[#e6e8ec] border-l-0 border-r-0 text-sm relative z-10 w-full"
+                className="border-[#e6e8ec] border-l-0 border-r-0 text-sm relative z-10 w-full resize-none"
                 onClick={handleClick}
             />
         </div>

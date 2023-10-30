@@ -813,7 +813,11 @@ const Content = () => {
                                     <Alert description={item.des} type="error" />
                                 </div>
                             )}
-                            <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
+                            <div
+                                className={`flex flex-col border border-solid border-[#e6e8ec] rounded ${
+                                    item.type === ListingBuilderEnum.SEARCH_WORD && 'border-b-0'
+                                } `}
+                            >
                                 <div className="flex justify-between items-center px-4 flex-wrap py-1">
                                     <div className="flex items-center">
                                         <Tooltip title={'首字母大写'} arrow placement="top">

@@ -22,6 +22,7 @@ import { useListing } from 'contexts/ListingContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Drawer } from 'antd';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 type IAddKeywordModalProps = {
     open: boolean;
@@ -43,11 +44,31 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate, detail } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail, list } = useListing();
     const navigate = useNavigate();
 
     // 添加关键词
     const handleOk = async () => {
+        const result = list
+            .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+            .reduce((acc: any, obj, index) => {
+                acc[index + 1] = obj.value;
+                return acc;
+            }, {});
+        const data = {
+            uid,
+            version,
+            endpoint: country.key,
+            draftConfig: {
+                enableAi: true,
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+            },
+            title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+            productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+            searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+            fiveDesc: result
+        };
+
         if (tab === 0) {
             const lines = keyWord.split('\n');
             if (uid) {
@@ -60,14 +81,14 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     }
                 } else {
                     // 修改了站点所属
-                    const res = await saveListing({ keys: lines, endpoint: country.key });
+                    const res = await saveListing({ ...data, keys: lines });
                     navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
                     setVersion(res.version);
                     setUid(res.uid);
                     handleClose();
                 }
             } else {
-                const res = await saveListing({ keys: lines, endpoint: country.key });
+                const res = await saveListing({ ...data, keys: lines });
                 navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
                 setVersion(res.version);
                 setUid(res.uid);
@@ -75,10 +96,8 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             }
         } else {
             const res = await importDict({
-                uid,
-                version,
-                dictUid: checked,
-                endpoint: country.key
+                ...data,
+                version
             });
             if (res) {
                 if (res) {

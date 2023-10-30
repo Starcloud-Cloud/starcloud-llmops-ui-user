@@ -10,7 +10,7 @@ import Logo from 'ui-component/Logo';
 // ==============================|| MAIN LOGO ||============================== //
 
 const LogoSection = () => (
-    <Link component={RouterLink} to={DASHBOARD_PATH} aria-label="theme-logo" sx={{ textDecoration: 'none' }}>
+    <Link component={RouterLink} to={'/'} aria-label="theme-logo" sx={{ textDecoration: 'none' }}>
         <Logo />
     </Link>
 );

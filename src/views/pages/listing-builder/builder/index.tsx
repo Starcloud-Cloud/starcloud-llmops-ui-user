@@ -4,7 +4,7 @@ import KeyWord from './components/Keyword';
 import Content from './components/Content';
 import { Affix, Dropdown, MenuProps } from 'antd';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SettingModal } from './components/SettingModal';
@@ -24,6 +24,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import axios from 'axios';
 import { config } from 'utils/axios/config';
 import { getAccessToken } from 'utils/auth';
+import { DEFAULT_LIST } from 'views/pages/listing-builder/data';
 const { base_url } = config;
 
 function a11yProps(index: number) {
@@ -40,7 +41,21 @@ const ListingBuilder = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
     const [open, setOpen] = React.useState(false);
-    const { country, setCountry, uid, version, list, detail, setVersion, setUid } = useListing();
+    const {
+        country,
+        setCountry,
+        uid,
+        version,
+        list,
+        detail,
+        setVersion,
+        setUid,
+        setList,
+        setEnableAi,
+        setKeywordHighlight,
+        setDetail,
+        setItemScore
+    } = useListing();
     const navigate = useNavigate();
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -69,6 +84,18 @@ const ListingBuilder = () => {
             navigate('/listingBuilderPage');
         }
     };
+
+    useEffect(() => {
+        return () => {
+            setUid('');
+            setVersion(0);
+            setList(DEFAULT_LIST);
+            setEnableAi(true);
+            setKeywordHighlight([]);
+            setDetail(null);
+            setItemScore({});
+        };
+    }, []);
 
     const doExport = async () => {
         await axios({

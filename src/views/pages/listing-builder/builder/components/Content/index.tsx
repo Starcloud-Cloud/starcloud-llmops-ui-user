@@ -89,6 +89,7 @@ const Content = () => {
     const [editIndex, setEditIndex] = React.useState(0);
     const [currentWord, setCurrentWord] = React.useState('');
     const [allLoading, setAllLoading] = React.useState(false);
+    const [activeIndex, setActiveIndex] = React.useState<number | undefined>(undefined);
 
     const {
         list,
@@ -180,7 +181,6 @@ const Content = () => {
                     if (index === 0) {
                         return scoreListCopy[0].list.map((item) => getItemGradeComp(item));
                     }
-                    console.log(fiveLen, index);
                     if (index === fiveLen + 1) {
                         return scoreListCopy[2].list.map((item) => getItemGradeComp(item));
                     }
@@ -251,7 +251,10 @@ const Content = () => {
     const handleReplaceValue = (selectValue: string) => {
         const newList = [...list];
         const preValue = newList[editIndex].value;
-        const modifiedString = preValue?.slice(0, currentInputIndex - 1) + selectValue + preValue?.slice(currentInputIndex + 1);
+        const modifiedString =
+            preValue?.slice(0, currentInputIndex - currentWord.length) +
+            selectValue +
+            preValue?.slice(currentInputIndex + currentWord.length);
         newList[editIndex] = {
             ...newList[editIndex],
             value: modifiedString,
@@ -277,12 +280,7 @@ const Content = () => {
         setCurrentWord(word);
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             // const filterKeyWord = keyword.filter((item, index) => {
-            //     if (item.includes(value[startIndex - 1])) {
-            //         return item;
-            //     }
-            // });
-
-            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord)) || [];
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(word)) || [];
             if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
@@ -292,7 +290,9 @@ const Content = () => {
                 setOpenKeyWordSelect(false);
             }
         } else {
-            // setOpenKeyWordSelect(false);
+            const { x, y } = getCaretPosition(e.target);
+            setX(x);
+            setY(y);
         }
     };
 
@@ -317,7 +317,7 @@ const Content = () => {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
             handleReGrade(otherList);
-        }, 500);
+        }, 200);
     };
 
     const handleExpand = (key: number) => {
@@ -740,51 +740,51 @@ const Content = () => {
                     )}
                 </Card>
             )}
-            <Spin tip="Loading..." size={'large'} spinning={allLoading} indicator={<img width={60} src={imgLoading} />}>
-                <Card className="mt-2 p-5">
-                    {list.map((item, index) => (
-                        <>
-                            {item.type === ListingBuilderEnum.PRODUCT_DES && (
-                                <>
-                                    <div className="justify-center flex">
-                                        <Button
-                                            color="secondary"
-                                            size="small"
-                                            variant="text"
-                                            startIcon={<AddIcon />}
-                                            onClick={handleAddFiveDescription}
-                                        >
-                                            加5点描述
-                                        </Button>
-                                    </div>
-                                    <Divider />
-                                </>
-                            )}
-                            <div className="mb-5" key={index}>
-                                <div className="flex items-center text-lg justify-between mb-4">
-                                    <div className="flex items-center">
-                                        <span className="text-[#505355] text-base font-semibold">{item.title}</span>
-                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                        <Popover content={handleGradeItem(index, item.type)} title="打分">
-                                            <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
-                                        </Popover>
-                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                        <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
-                                            高分建议
-                                        </Button>
-                                    </div>
-                                    <div className="flex justify-center items-center">
-                                        <Button
-                                            disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
-                                            onClick={() => handleClick(item, index)}
-                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                            color="secondary"
-                                            size="small"
-                                            variant="contained"
-                                        >
-                                            {item.btnText}
-                                        </Button>
-                                        {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
+            {/* <Spin tip="Loading..." size={'large'} spinning={allLoading} indicator={<img width={60} src={imgLoading} />}> */}
+            <Card className="mt-2 p-5">
+                {list.map((item, index) => (
+                    <>
+                        {item.type === ListingBuilderEnum.PRODUCT_DES && (
+                            <>
+                                <div className="justify-center flex">
+                                    <Button
+                                        color="secondary"
+                                        size="small"
+                                        variant="text"
+                                        startIcon={<AddIcon />}
+                                        onClick={handleAddFiveDescription}
+                                    >
+                                        加5点描述
+                                    </Button>
+                                </div>
+                                <Divider />
+                            </>
+                        )}
+                        <div className="mb-5" key={index}>
+                            <div className="flex items-center text-lg justify-between mb-4">
+                                <div className="flex items-center">
+                                    <span className="text-[#505355] text-base font-semibold">{item.title}</span>
+                                    <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                    <Popover content={handleGradeItem(index, item.type)} title="打分">
+                                        <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
+                                    </Popover>
+                                    <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                    <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
+                                        高分建议
+                                    </Button>
+                                </div>
+                                <div className="flex justify-center items-center">
+                                    <Button
+                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
+                                        onClick={() => handleClick(item, index)}
+                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                        color="secondary"
+                                        size="small"
+                                        variant="contained"
+                                    >
+                                        {item.btnText}
+                                    </Button>
+                                    {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}
                                             startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
@@ -806,55 +806,55 @@ const Content = () => {
                                             </Button>
                                         </Dropdown>
                                     )} */}
-                                    </div>
                                 </div>
-                                {expandList.includes(index) && (
-                                    <div className="mb-4">
-                                        <Alert description={item.des} type="error" />
-                                    </div>
-                                )}
-                                <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
-                                    <div className="flex justify-between items-center px-4 flex-wrap py-1">
-                                        <div className="flex items-center">
-                                            <Tooltip title={'首字母大写'} arrow placement="top">
-                                                <IconButton size="small">
-                                                    <span
-                                                        className="text-[#bec2cc] cursor-pointer text-xs"
-                                                        onClick={() => handleTurnUpcase(index)}
-                                                    >
-                                                        Aa
-                                                    </span>
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title={'大写转小写'} arrow placement="top" onClick={() => handleTurnLowercase(index)}>
-                                                <IconButton size="small">
-                                                    <span className="text-[#bec2cc] cursor-pointer text-xs">ab</span>
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                            <Tooltip title={'复制'} arrow placement="top">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => {
-                                                        copy(item.value || '');
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '复制成功',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'success'
-                                                                },
-                                                                close: false
-                                                            })
-                                                        );
-                                                    }}
+                            </div>
+                            {expandList.includes(index) && (
+                                <div className="mb-4">
+                                    <Alert description={item.des} type="error" />
+                                </div>
+                            )}
+                            <div className="flex flex-col border border-solid border-[#e6e8ec] rounded">
+                                <div className="flex justify-between items-center px-4 flex-wrap py-1">
+                                    <div className="flex items-center">
+                                        <Tooltip title={'首字母大写'} arrow placement="top">
+                                            <IconButton size="small">
+                                                <span
+                                                    className="text-[#bec2cc] cursor-pointer text-xs"
+                                                    onClick={() => handleTurnUpcase(index)}
                                                 >
-                                                    <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            {/* <Divider type="vertical" style={{ marginInline: '4px' }} /> */}
-                                            {/* <Tooltip title={'撤回'} arrow placement="top">
+                                                    Aa
+                                                </span>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title={'大写转小写'} arrow placement="top" onClick={() => handleTurnLowercase(index)}>
+                                            <IconButton size="small">
+                                                <span className="text-[#bec2cc] cursor-pointer text-xs">ab</span>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                        <Tooltip title={'复制'} arrow placement="top">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(item.value || '');
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                <ContentCopyIcon className="text-[#bec2cc] cursor-pointer text-sm" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        {/* <Divider type="vertical" style={{ marginInline: '4px' }} /> */}
+                                        {/* <Tooltip title={'撤回'} arrow placement="top">
                                             <IconButton size="small">
                                                 <RefreshIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
@@ -864,35 +864,44 @@ const Content = () => {
                                                 <ReplayIcon className="text-[#bec2cc] cursor-pointer text-sm" />
                                             </IconButton>
                                         </Tooltip> */}
-                                            <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                            <span className="text-[#bec2cc]  text-xs">
-                                                {item.character}/{item.maxCharacter}字
-                                            </span>
-                                            <Divider type="vertical" style={{ marginInline: '4px' }} />
-                                            <span className="text-[#bec2cc] text-xs">{item.word}单词</span>
-                                        </div>
-                                        <div className="flex items-center">
-                                            {/* <div className="flex items-center">
+                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                        <span className="text-[#bec2cc]  text-xs">
+                                            {item.character}/{item.maxCharacter}字
+                                        </span>
+                                        <Divider type="vertical" style={{ marginInline: '4px' }} />
+                                        <span className="text-[#bec2cc] text-xs">{item.word}单词</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        {/* <div className="flex items-center">
                                             <span>不计入已使用</span>
                                             <Switch checked={!item.enable} color={'secondary'} onChange={(e) => handleSwitch(e, index)} />
                                         </div> */}
-                                            {item.isOvertop && (
-                                                <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>
-                                                    <DeleteIcon className=" cursor-pointer text-sm" />
-                                                </IconButton>
-                                            )}
-                                        </div>
+                                        {item.isOvertop && (
+                                            <IconButton size="small" onClick={() => handleDelFiveDescription(index)}>
+                                                <DeleteIcon className=" cursor-pointer text-sm" />
+                                            </IconButton>
+                                        )}
                                     </div>
-                                    <FiledTextArea
-                                        rows={item.row}
-                                        placeholder={item.placeholder}
-                                        value={item.value}
-                                        handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
-                                        highlightWordList={item.keyword}
-                                        highlightAllWordList={detail?.keywordMetaData || []}
-                                        index={index}
-                                        type={item.type}
-                                    />
+                                </div>
+                                <FiledTextArea
+                                    rows={item.row}
+                                    placeholder={item.placeholder}
+                                    value={item.value}
+                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
+                                    handleClick={() => {
+                                        if (index === activeIndex) {
+                                            setActiveIndex(index);
+                                        } else {
+                                            setOpenKeyWordSelect(false);
+                                            setActiveIndex(index);
+                                        }
+                                    }}
+                                    highlightWordList={item.keyword}
+                                    highlightAllWordList={detail?.keywordMetaData || []}
+                                    index={index}
+                                    type={item.type}
+                                />
+                                {item.type !== ListingBuilderEnum.SEARCH_WORD && (
                                     <div className="flex px-4 py-3 items-center">
                                         <div className="flex-1 flex items-center">
                                             <span className="mr-2 flex items-center">
@@ -927,38 +936,39 @@ const Content = () => {
                                         </div>
                                         <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                     </div>
-                                </div>
+                                )}
                             </div>
+                        </div>
 
-                            {(item.type === ListingBuilderEnum.TITLE || item.type === ListingBuilderEnum.PRODUCT_DES) && <Divider />}
-                        </>
-                    ))}
-                    {openKeyWordSelect && (
-                        <ul
-                            ref={ulRef}
-                            style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
-                            className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
-                        >
-                            {detail?.keywordResume
-                                .filter((item: string) => item?.startsWith(currentWord))
-                                ?.map((item: string, keyWordItemKey: number) => (
-                                    <li
-                                        key={keyWordItemKey}
-                                        style={{ height: '30px', lineHeight: '30px' }}
-                                        className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
-                                        onMouseEnter={() => {
-                                            setHoverKey(keyWordItemKey);
-                                            hoverKeyRef.current = keyWordItemKey;
-                                        }}
-                                        onClick={() => handleReplaceValue(item)}
-                                    >
-                                        <span className="text-sm">{item}</span>
-                                    </li>
-                                ))}
-                        </ul>
-                    )}
-                </Card>
-            </Spin>
+                        {(item.type === ListingBuilderEnum.TITLE || item.type === ListingBuilderEnum.PRODUCT_DES) && <Divider />}
+                    </>
+                ))}
+                {openKeyWordSelect && (
+                    <ul
+                        ref={ulRef}
+                        style={{ position: 'absolute', left: `${x}px`, top: `${y}px` }}
+                        className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
+                    >
+                        {detail?.keywordResume
+                            .filter((item: string) => item?.startsWith(currentWord))
+                            ?.map((item: string, keyWordItemKey: number) => (
+                                <li
+                                    key={keyWordItemKey}
+                                    style={{ height: '30px', lineHeight: '30px' }}
+                                    className={`${hoverKey === keyWordItemKey ? 'list-none bg-[#f4f6f8]' : 'list-none'}`}
+                                    onMouseEnter={() => {
+                                        setHoverKey(keyWordItemKey);
+                                        hoverKeyRef.current = keyWordItemKey;
+                                    }}
+                                    onClick={() => handleReplaceValue(item)}
+                                >
+                                    <span className="text-sm">{item}</span>
+                                </li>
+                            ))}
+                    </ul>
+                )}
+            </Card>
+            {/* </Spin> */}
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

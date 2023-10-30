@@ -217,7 +217,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     // 处理上面分数
     const handleSumGrade = (index: number, type: ListingBuilderEnum) => {
         const copyItemScore = _.cloneDeep(itemScore);
-        console.log(itemScore, 'itemScore');
 
         if (copyItemScore && Object.keys(copyItemScore).length) {
             let titleGrade = 0;

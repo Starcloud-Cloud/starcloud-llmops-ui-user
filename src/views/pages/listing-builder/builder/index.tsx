@@ -54,7 +54,8 @@ const ListingBuilder = () => {
         setEnableAi,
         setKeywordHighlight,
         setDetail,
-        setItemScore
+        setItemScore,
+        setUpdate
     } = useListing();
     const navigate = useNavigate();
 
@@ -164,6 +165,7 @@ const ListingBuilder = () => {
             navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
             setVersion(res.version);
             setUid(res.uid);
+            setUpdate({});
         }
     };
 

@@ -101,7 +101,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             const resultNum = detail.draftConfig.fiveDescNum - 5;
             if (detail.draftConfig.fiveDescNum > 5) {
                 // @ts-ignore
-                [...Array(2).keys()].forEach((v) => {
+                [...Array(resultNum).keys()].forEach((v) => {
                     copyList.splice(-2, 0, {
                         title: `五点描述${5 + v + 1}`,
                         des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
@@ -252,10 +252,10 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     return handleStar(ListingBuilderEnum.TITLE, titleGrade) || 0;
                 }
                 if (index === fiveLen + 1) {
-                    return handleStar(ListingBuilderEnum.PRODUCT_DES, searchGrade) || 0;
+                    return handleStar(ListingBuilderEnum.PRODUCT_DES, desGrade) || 0;
                 }
                 if (index === fiveLen + 2) {
-                    return handleStar(ListingBuilderEnum.SEARCH_WORD, desGrade) || 0;
+                    return handleStar(ListingBuilderEnum.SEARCH_WORD, searchGrade) || 0;
                 }
             } else {
                 const currentFiveDes = copyItemScore?.fiveDescScore?.[index];

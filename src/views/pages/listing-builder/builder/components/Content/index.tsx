@@ -136,24 +136,23 @@ const Content = () => {
         const copyItemScore = _.cloneDeep(itemScore);
         if (copyItemScore?.fiveDescScore) {
             let list: any[] = [];
-            const copyItemScore = _.cloneDeep(itemScore);
-            Object.keys(copyItemScore?.fiveDescScore).forEach((item: any, i) => {
+            Object.keys(copyItemScore?.fiveDescScore).forEach((i) => {
                 if (index === 0) {
                     list.push({
-                        label: `五点描述${i + 1} 包含150到200个字符`,
-                        value: item.fiveDescLength
+                        label: `五点描述${i} 包含150到200个字符`,
+                        value: copyItemScore?.fiveDescScore[i].fiveDescLength
                     });
                 }
                 if (index === 1) {
                     list.push({
-                        label: `五点描述${i + 1} 第一个字母大写`,
-                        value: item.starUppercase
+                        label: `五点描述${i} 第一个字母大写`,
+                        value: copyItemScore?.fiveDescScore[i].starUppercase
                     });
                 }
                 if (index === 2) {
                     list.push({
-                        label: `五点描述${i + 1} 不全是大写`,
-                        value: item.hasLowercase
+                        label: `五点描述${i} 不全是大写`,
+                        value: copyItemScore?.fiveDescScore[i].hasLowercase
                     });
                 }
             });

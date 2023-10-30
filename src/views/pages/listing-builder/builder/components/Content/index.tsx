@@ -203,7 +203,7 @@ const Content = () => {
                 }
             }
         },
-        [itemScore]
+        [itemScore, scoreList, fiveLen]
     );
 
     useEffect(() => {
@@ -281,8 +281,8 @@ const Content = () => {
             //     }
             // });
 
-            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
-            if (filterKeyWord.length > 0) {
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord)) || [];
+            if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
                 setY(y);
@@ -316,7 +316,7 @@ const Content = () => {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
             handleReGrade(otherList);
-        }, 200);
+        }, 500);
     };
 
     const handleExpand = (key: number) => {

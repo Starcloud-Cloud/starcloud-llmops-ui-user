@@ -83,10 +83,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
 
     const keywordHighlightRef = useRef<any>(null);
 
-    // useEffect(() => {
-    //     keywordHighlightRef.current = keywordHighlight;
-    // }, [keywordHighlight]);
-
     useEffect(() => {
         if (queryVersion && queryUid) {
             setVersion(Number(queryVersion));
@@ -129,8 +125,6 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     });
                 });
             }
-            console.log(copyList, 'copyList');
-
             const newDetail = detail.draftConfig;
 
             // 标题
@@ -223,6 +217,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     // 处理上面分数
     const handleSumGrade = (index: number, type: ListingBuilderEnum) => {
         const copyItemScore = _.cloneDeep(itemScore);
+        console.log(itemScore, 'itemScore');
 
         if (copyItemScore && Object.keys(copyItemScore).length) {
             let titleGrade = 0;

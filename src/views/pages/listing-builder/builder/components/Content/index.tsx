@@ -999,23 +999,36 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
-                                        <Button
-                                            className="!cursor-pointer !pointer-events-auto"
-                                            disabled={
-                                                (item.type === ListingBuilderEnum.SEARCH_WORD
-                                                    ? item.type === ListingBuilderEnum.SEARCH_WORD && !uid
-                                                    : !productFeature || !detail.keywordMetaData.length) || loadingList.length > 0
-                                            }
-                                            onClick={() => handleClick(item, index)}
-                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                            color="secondary"
-                                            size="small"
-                                            variant="contained"
-                                        >
-                                            {item.btnText}
-                                        </Button>
-                                    </Tooltip>
+                                    {enableAi && item.type !== ListingBuilderEnum.SEARCH_WORD && (
+                                        <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto"
+                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
+                                                onClick={() => handleClick(item, index)}
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                {item.btnText}
+                                            </Button>
+                                        </Tooltip>
+                                    )}
+                                    {item.type === ListingBuilderEnum.SEARCH_WORD && (
+                                        <Tooltip title="请输入关键词" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto"
+                                                disabled={!detail?.keywordMetaData?.length}
+                                                onClick={() => handleClick(item, index)}
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                {item.btnText}
+                                            </Button>
+                                        </Tooltip>
+                                    )}
                                     {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}

@@ -1,6 +1,17 @@
 import { Button, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
 
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
+import {
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TableSortLabel,
+    CircularProgress
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -11,7 +22,7 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider } from 'antd';
+import { Divider, Progress } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +35,7 @@ import { COUNTRY_LIST } from '../data';
 import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
+import { CircularProgressWithLabel } from 'ui-component/CircularProgressWithLabel';
 const { result_code, base_url, share_base_url, request_timeout } = config;
 
 export interface DraftConfig {}
@@ -54,6 +66,8 @@ export interface TableEnhancedCreateDataType {
     createTime: number;
     updateTime: number;
     matchSearchers: number;
+    searchersProportion: number;
+    scoreProportion: number;
 }
 
 const headCells = [
@@ -405,7 +419,7 @@ const ListingBuilderPage: React.FC = () => {
             }
         >
             <TableContainer>
-                <Table sx={{ minWidth: 1100 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                <Table sx={{ minWidth: 1200 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}
@@ -445,7 +459,7 @@ const ListingBuilderPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.title}>
-                                            <span className="line-clamp-1 w-[250px] mx-auto">{row.title}</span>
+                                            <span className="line-clamp-1 w-[450px] mx-auto">{row.title}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
@@ -459,13 +473,28 @@ const ListingBuilderPage: React.FC = () => {
                                     {/* <TableCell align="center">{row.asin}</TableCell> */}
                                     {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
                                     <TableCell align="center">
-                                        {row.score || 0}/{row?.matchSearchers || 0}
+                                        <div className="flex items-center justify-center">
+                                            <div className="flex flex-col">
+                                                <div className="text-xs">{row?.scoreProportion?.toFixed(1) || 0.0}</div>
+                                                <div className="text-sm">{row.score || 0}/9 </div>
+                                            </div>
+                                            <Divider type={'vertical'} />
+                                            <div>
+                                                <Progress type="circle" percent={row?.searchersProportion * 100} size={25} />
+                                            </div>
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={'编辑'}>

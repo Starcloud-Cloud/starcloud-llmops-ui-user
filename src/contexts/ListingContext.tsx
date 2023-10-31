@@ -63,7 +63,7 @@ type ListingContextType = {
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
     const [uid, setUid] = useState('');
-    const [version, setVersion] = useState<number | undefined>();
+    const [version, setVersion] = useState<number | undefined>(1);
     const [country, setCountry] = useState({
         key: COUNTRY_LIST?.['0']?.key,
         icon: COUNTRY_LIST?.['0']?.icon,

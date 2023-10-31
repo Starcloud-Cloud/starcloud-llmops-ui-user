@@ -1,4 +1,4 @@
-import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tabs, Tab } from '@mui/material';
+import { Button, Card, CardHeader, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography, Tabs, Tab, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import KeyWord from './components/Keyword';
 import Content from './components/Content';
@@ -25,6 +25,7 @@ import axios from 'axios';
 import { config } from 'utils/axios/config';
 import { getAccessToken } from 'utils/auth';
 import { DEFAULT_LIST } from 'views/pages/listing-builder/data';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 const { base_url } = config;
 
 function a11yProps(index: number) {
@@ -89,7 +90,7 @@ const ListingBuilder = () => {
     useEffect(() => {
         return () => {
             setUid('');
-            setVersion(0);
+            setVersion(1);
             setList(DEFAULT_LIST);
             setEnableAi(true);
             setKeywordHighlight([]);
@@ -176,7 +177,10 @@ const ListingBuilder = () => {
                 title={list?.[0]?.value || 'Listing草稿'}
                 action={
                     <div className="flex items-center">
-                        <div className="w-[100px]">
+                        <div className="w-[130px] flex items-center">
+                            <Tooltip title={'删除关键词后可重新选择'} placement="top" arrow>
+                                <HelpOutlineIcon className="text-sm mr-1 cursor-pointer" />
+                            </Tooltip>
                             <Dropdown
                                 disabled={detail?.keywordResume?.length > 0}
                                 menu={{ items: COUNTRY_LIST, onClick }}

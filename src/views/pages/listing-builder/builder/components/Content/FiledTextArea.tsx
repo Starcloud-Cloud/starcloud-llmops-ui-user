@@ -46,7 +46,7 @@ const FiledTextArea = ({
         const r = `(${copyHighlightWordList.join('|')})`;
         const pattern = new RegExp(r);
         const resultArray = value
-            .toLowerCase()
+            ?.toLowerCase()
             ?.split(pattern)
             .filter((item: string) => item !== '');
         return resultArray;

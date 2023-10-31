@@ -56,7 +56,8 @@ const ListingBuilder = () => {
         setKeywordHighlight,
         setDetail,
         setItemScore,
-        setUpdate
+        setUpdate,
+        listingParam
     } = useListing();
     const navigate = useNavigate();
 
@@ -143,7 +144,8 @@ const ListingBuilder = () => {
             endpoint: country.key,
             draftConfig: {
                 enableAi: true,
-                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
+                aiConfigDTO: listingParam
             },
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,

@@ -108,7 +108,8 @@ const Content = () => {
         version,
         uid,
         handleSumGrade,
-        fiveLen
+        fiveLen,
+        setListingParam
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
@@ -389,11 +390,20 @@ const Content = () => {
             targetLanguage: '',
             writingStyle: ''
         },
-        validationSchema: yup.object({
-            productFeatures: yup.string().required('标题是必填的')
-        }),
         onSubmit: async (values) => {}
     });
+
+    useEffect(() => {
+        setListingParam({ ...formik.values });
+    }, [formik.values]);
+
+    useEffect(() => {
+        if (detail?.draftConfig?.aiConfigDTO) {
+            formik.setValues({
+                ...detail.draftConfig.aiConfigDTO
+            });
+        }
+    }, [detail]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEnableAi(event.target.checked);
@@ -609,7 +619,10 @@ const Content = () => {
             Modal.confirm({
                 title: '温馨提示',
                 icon: <ExclamationCircleFilled rev={undefined} />,
-                content: 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                content:
+                    item.type === ListingBuilderEnum.SEARCH_WORD
+                        ? '智能推荐后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续'
+                        : 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
                 onOk: () => {
                     doAiWrite(item, index);
                 },

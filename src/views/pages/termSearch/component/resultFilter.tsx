@@ -1,7 +1,15 @@
-import { Row, Col, InputNumber, Input, Popover, Button, Radio } from 'antd';
+import { Row, Col, InputNumber, Input, Popover, Button, Radio, Checkbox } from 'antd';
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => {
+const ResultFilter = ({
+    filterTable,
+    type,
+    getExtended
+}: {
+    filterTable: (data: any) => void;
+    type: number;
+    getExtended: (data: number) => void;
+}) => {
     const [filteOpen, setFilteOpen] = useState(true);
     const searchList = [
         {
@@ -161,10 +169,11 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
 
             亚马逊系统会根据Listing的表现在某个关键词下优质、好价的产品上标注Amazon's Choice`,
             addonAfter: '',
-            type: 'radio'
+            type: 'checkbox'
         },
         {
             title: '排除关键词',
+            key: 'excludeKeywords',
             desc: `支持多个关键词或词组输入查询，多词用英文逗号,或空格隔开，如: child, kids
 
             添加后的筛选结果中不会有任何包含该关键词或该词组的结果出现
@@ -175,6 +184,7 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
         },
         {
             title: '包含关键词',
+            key: 'includeKeywords',
             desc: `支持多个关键词或词组输入查询，多词用英文逗号,或空格隔开，如: child, kids
 
             广泛匹配：输入后筛选结果中可以匹配拼写错误，单复数，相似关键字、不讲究顺序等等
@@ -219,7 +229,7 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
                                             <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
                                         </Popover>
                                     </div>
-                                    {item?.type !== 'radio' ? (
+                                    {item?.type !== 'checkbox' ? (
                                         <div className="flex items-center mb-[30px]">
                                             <InputNumber
                                                 min={0}
@@ -280,7 +290,17 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
                                             />
                                         </div>
                                     ) : (
-                                        <Radio>仅AC推荐词</Radio>
+                                        <Checkbox
+                                            checked={searchWord.ac}
+                                            onChange={(e) => {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    ac: e.target.checked
+                                                });
+                                            }}
+                                        >
+                                            仅AC推荐词
+                                        </Checkbox>
                                     )}
                                 </Col>
                             ) : (
@@ -298,7 +318,16 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
                                         </Popover>
                                     </div>
                                     <div className="flex mb-[30px]">
-                                        <Input placeholder="请输入关键词，多个以逗号区分" />
+                                        <Input
+                                            value={searchWord[item.key]}
+                                            onChange={(e) => {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.key]: e.target.value
+                                                });
+                                            }}
+                                            placeholder="请输入关键词，多个以逗号区分"
+                                        />
                                     </div>
                                 </Col>
                             )
@@ -314,7 +343,14 @@ const ResultFilter = ({ filterTable }: { filterTable: (data: any) => void }) => 
                         >
                             开始筛选
                         </Button>
-                        <Button className="ml-[60px]" icon={<SyncOutlined rev={undefined} />}>
+                        <Button
+                            onClick={() => {
+                                setSearchWord({});
+                                filterTable({});
+                            }}
+                            className="ml-[60px]"
+                            icon={<SyncOutlined rev={undefined} />}
+                        >
                             重置条件
                         </Button>
                     </div>

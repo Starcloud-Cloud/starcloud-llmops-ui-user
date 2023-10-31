@@ -59,11 +59,13 @@ type ListingContextType = {
     itemScore: any;
     fiveLen: number;
     keywordHighlightRef: any;
+    setListingParam: (listingParam: any) => any;
+    listingParam: any;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
     const [uid, setUid] = useState('');
-    const [version, setVersion] = useState<number | undefined>();
+    const [version, setVersion] = useState<number | undefined>(1);
     const [country, setCountry] = useState({
         key: COUNTRY_LIST?.['0']?.key,
         icon: COUNTRY_LIST?.['0']?.icon,
@@ -75,6 +77,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const [detail, setDetail] = useState<any>(null);
     const [update, setUpdate] = useState<any>({});
     const [itemScore, setItemScore] = useState<any>({});
+    const [listingParam, setListingParam] = useState<any>({}); //
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -325,7 +328,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 setItemScore,
                 itemScore,
                 fiveLen,
-                keywordHighlightRef
+                keywordHighlightRef,
+                setListingParam,
+                listingParam
             }}
         >
             {children}

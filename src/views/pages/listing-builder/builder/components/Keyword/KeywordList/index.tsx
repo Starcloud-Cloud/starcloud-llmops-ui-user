@@ -253,22 +253,22 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
         return (
             <div>
                 <div>
-                    <span>标题：</span>
-                    <span>{filterTitle?.[0]?.num}</span>
+                    <span>标&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;题：</span>
+                    <span>{filterTitle?.[0]?.num || 0}次</span>
                 </div>
                 {sortedFive.map((item) => (
                     <div>
-                        <span>{`五点描述${item.index}`}:</span>
-                        <span>{item?.num}</span>
+                        <span>{`五点描述${item.index}`}：</span>
+                        <span>{item?.num || 0}次</span>
                     </div>
                 ))}
                 <div>
-                    <span>产品描述:</span>
-                    <span>{filterProduct?.[0]?.num}</span>
+                    <span>产品描述：</span>
+                    <span>{filterProduct?.[0]?.num || 0}次</span>
                 </div>
                 <div>
-                    <span>搜索词:</span>
-                    <span>{filterSearch?.[0]?.num}</span>
+                    <span>搜&nbsp;&nbsp;索&nbsp;&nbsp;词：</span>
+                    <span>{filterSearch?.[0]?.num || 0}次</span>
                 </div>
             </div>
         );
@@ -287,25 +287,25 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 case 1:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <RadioButtonUncheckedIcon />
+                            <RadioButtonUncheckedIcon className="cursor-pointer text-base" />
                         </Popover>
                     );
                 case 2:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <CheckCircleIcon />
+                            <CheckCircleIcon className="cursor-pointer text-base" />
                         </Popover>
                     );
                 case 3:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate allowHalf count={1} />
+                            <Rate className="!cursor-pointer text-base" allowHalf value={0.5} disabled count={1} />
                         </Popover>
                     );
                 case 4:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate count={1} />
+                            <Rate className="!cursor-pointer text-base" disabled value={1} count={1} />
                         </Popover>
                     );
                 default:
@@ -372,7 +372,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                         {row.keyword}
                                     </TableCell> */}
                                     <TableCell align="center" className="py-[6px] px-0">
-                                        {handleUse(row.keyword)}
+                                        <div className="flex items-center justify-center">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>
                             );

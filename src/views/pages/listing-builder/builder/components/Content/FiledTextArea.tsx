@@ -38,14 +38,17 @@ const FiledTextArea = ({
 }: any) => {
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight, keywordHighlight, keywordHighlightRef } = useListing();
-    const copyHighlightWordList = highlightAllWordList.map((item: any) => item.keyword);
+    const copyHighlightWordList = highlightAllWordList.map((item: any) => item.keyword.toLowerCase());
 
     // 该文本的关键字数组
     const resultArray = useMemo(() => {
         copyHighlightWordList.sort((a: string, b: string) => b.length - a.length);
         const r = `(${copyHighlightWordList.join('|')})`;
         const pattern = new RegExp(r);
-        const resultArray = value?.split(pattern).filter((item: string) => item !== '');
+        const resultArray = value
+            .toLowerCase()
+            ?.split(pattern)
+            .filter((item: string) => item !== '');
         return resultArray;
     }, [highlightAllWordList, value]);
 

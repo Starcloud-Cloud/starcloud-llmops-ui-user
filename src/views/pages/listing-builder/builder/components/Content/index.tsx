@@ -555,13 +555,13 @@ const Content = () => {
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">{itemScore?.score}</span>
+                                <span className="text-2xl font-semibold">{itemScore?.score || 0}</span>
                                 <span className="text-base">/9</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={(itemScore?.score / 9) * 100}
+                                value={((itemScore?.score || 0) / 9) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -585,7 +585,11 @@ const Content = () => {
 
                             <LinearProgress
                                 variant="determinate"
-                                value={((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100}
+                                value={
+                                    !itemScore?.totalSearches
+                                        ? 0
+                                        : ((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100
+                                }
                                 className="w-full"
                                 sx={{
                                     height: '8px',

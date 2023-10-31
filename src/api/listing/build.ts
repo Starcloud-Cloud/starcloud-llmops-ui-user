@@ -91,3 +91,8 @@ export const getListingByAsin = (data: any) => {
 export const getRecommend = (data: any) => {
     return request.get({ url: `/listing/draft/recommend/${data.uid}/${data.version}` });
 };
+
+// 获取元数据
+export const getMetadata = () => {
+    return request.post({ url: `/llm/listing/execute/metadata` });
+};

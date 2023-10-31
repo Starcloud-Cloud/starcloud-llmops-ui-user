@@ -35,9 +35,10 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
-import { getRecommend } from 'api/listing/build';
+import { getListingByAsin, getMetadata, getRecommend } from 'api/listing/build';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import imgLoading from 'assets/images/picture/loading.gif';
+import { fetchRequestCanCancel } from 'utils/fetch';
 
 const { Search } = Input;
 
@@ -89,8 +90,10 @@ const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
     const [currentWord, setCurrentWord] = React.useState('');
-    const [allLoading, setAllLoading] = React.useState(false);
     const [activeIndex, setActiveIndex] = React.useState<number | undefined>(undefined);
+    const [mateList, setMateList] = React.useState<any>();
+    const [productFeature, setProductFeature] = React.useState('');
+    const [loadingList, setLoadingList] = React.useState<any[]>([]);
 
     const {
         list,
@@ -161,6 +164,13 @@ const Content = () => {
             return null;
         }
     };
+
+    useEffect(() => {
+        (async () => {
+            const res = await getMetadata();
+            setMateList(res);
+        })();
+    }, []);
 
     const getItemGradeComp = (v: any) => {
         return (
@@ -369,12 +379,11 @@ const Content = () => {
 
     const formik = useFormik({
         initialValues: {
-            productFeatures: '',
-            clientFeatures: '',
-            voidWord: '',
-            showNamePosition: '',
-            name: '',
-            style: ''
+            productFeature: '',
+            customerFeature: '',
+            brandName: '',
+            targetLanguage: '',
+            writingStyle: ''
         },
         validationSchema: yup.object({
             productFeatures: yup.string().required('标题是必填的')
@@ -463,45 +472,22 @@ const Content = () => {
     };
 
     const typeSearchList = async (value: string) => {
-        setAllLoading(true);
-        // const res = await getListingByAsin({
-        //     asin: value,
-        //     marketName: country.key
-        // });
-        const res = {
-            market: 'GLOBAL',
-            asin: 'B08RYQR1CJ',
-            imgUrls: [
-                'https://images-na.ssl-images-amazon.com/images/I/41Jj+ixqgFL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41HoSBUctCL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/51CATaXh+ZL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41RIFOzGg0L.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/318E3Iwxe+L.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41TlyeP9kmL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/51tqGaEVYzL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41HNbEScSSL.jpg'
-            ],
-            title: 'Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper Makeup Organizer PU Leather Washable Waterproof (Pink)',
-            features: [
-                '✅【WATERPROOF MATERIAL】 Cosmetic case made of high-quality PU leather material, the surface is waterproof and washable, easy to clean; no worries for leakage when traveling',
-                '✅【LIGHT WEIGHT & ROOMY】 9 x 6 x 4.5 inch; this makeup bag is light-weighted and perfect for holding all kinds of beauty essentials, enough to hold everything securely you need for your travel',
-                '✅【UNIQUE DESIGN】 Makeup bag with wide durable handle and sturdy zipper, portable and easy to carry; can be used as a make up organizer, toiletry wash bag, pencil case and daily handbag. Suitable for outdoor, business trip, camping, travel, gym room, indoor, house-held storage',
-                '✅【VERSATILE MAKEUP BAG】Ideal for travel, business trip, vacation, gym, camping, toiletry organization and outdoor activity; its a functional makeup bag, cosmetic bag, travel organizer bag',
-                '✅【SERVICE GUARANTEE】Please feel free to contact us whenever you meet any problem; we provide lifetime warranty and customer service'
-            ],
-            description: null
-        };
+        const indexList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD).map((item, index) => index);
+        setLoadingList(indexList);
+
+        const res = await getListingByAsin({
+            asin: value,
+            marketName: country.key
+        });
+        setLoadingList([]);
         let copyList: any[] = _.cloneDeep(list);
         copyList[0].value = res.title;
         const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
         copyList[productIndex].value = res.description;
-        res.features?.forEach((item, index) => {
+        res.features?.forEach((item: any, index: number) => {
             copyList[index + 1].value = item;
         });
         setList(copyList);
-        setTimeout(() => {
-            setAllLoading(false);
-        }, 3000);
     };
 
     // 所搜
@@ -511,9 +497,9 @@ const Content = () => {
             Modal.confirm({
                 title: '温馨提示',
                 icon: <ExclamationCircleFilled rev={undefined} />,
-                content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库,是否继续',
-                onOk: async () => {
-                    await typeSearchList(value);
+                content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    typeSearchList(value);
                 },
                 onCancel() {
                     console.log('Cancel');
@@ -524,9 +510,17 @@ const Content = () => {
         }
     };
 
-    const handleClick = async (item: any, index: number) => {
+    const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
+        setLoadingList([index]);
+        // 清空当前value
+        setList((preList: any) => {
+            const copyPreList = _.cloneDeep(preList);
+            copyPreList[index].value = '';
+            return copyPreList;
+        });
         // 智能推荐
-        if (index === list.length - 1) {
+        if (item.type === ListingBuilderEnum.SEARCH_WORD) {
+            setLoadingList([]);
             const res = await getRecommend({ version, uid });
             if (res) {
                 setList((pre: any[]) => {
@@ -538,6 +532,101 @@ const Content = () => {
                     return copyPre;
                 });
             }
+        } else {
+            const { promise, controller } = fetchRequestCanCancel('/llm/listing/execute/asyncExecute', 'post', {
+                listingType:
+                    item.type === ListingBuilderEnum.TITLE
+                        ? 'TITLE'
+                        : item.type === ListingBuilderEnum.FIVE_DES
+                        ? 'BULLET_POINT'
+                        : 'PRODUCT_DESCRIPTION',
+                keywords: item.keyword.map((item: any) => item.text),
+                ...formik.values,
+                draftUid: uid,
+                title: list[0].value,
+                bulletPoints: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES).map((item) => item.value)
+            });
+            let resp: any = await promise;
+            // controllerRef.current = controller;
+
+            const reader = resp.getReader();
+            const textDecoder = new TextDecoder();
+            let outerJoins = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    console.log(isAll, 'isAll');
+                    if (isAll) {
+                        const filterList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD);
+                        const length = filterList.length;
+                        console.log(length, 'length');
+                        if (index < length - 1) {
+                            doAiWrite(filterList[index + 1], index + 1, true);
+                        }
+                    }
+                    break;
+                }
+                const str = textDecoder.decode(value);
+                outerJoins += str;
+
+                // 查找事件结束标志，例如"}\n"
+                let eventEndIndex = outerJoins.indexOf('}\n');
+
+                while (eventEndIndex !== -1) {
+                    const eventData = outerJoins.slice(0, eventEndIndex + 1);
+                    const subString = eventData.substring(5);
+                    const bufferObj = JSON.parse(subString);
+                    if (bufferObj.type === 'm') {
+                        setLoadingList([]);
+                        setList((preList: any) => {
+                            const copyPreList = _.cloneDeep(preList);
+                            copyPreList[index].value = copyPreList[index].value + bufferObj.content;
+                            return copyPreList;
+                        });
+                    }
+                    outerJoins = outerJoins.slice(eventEndIndex + 3);
+                    eventEndIndex = outerJoins.indexOf('}\n');
+                }
+            }
+        }
+    };
+
+    const handleClick = async (item: any, index: number) => {
+        if (list[index].value) {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: <ExclamationCircleFilled rev={undefined} />,
+                content: 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    doAiWrite(item, index);
+                },
+                onCancel() {
+                    console.log('Cancel');
+                }
+            });
+        } else {
+            await doAiWrite(item, index);
+        }
+    };
+
+    // 循环遍历
+    const handleAIGenerateAll = () => {
+        const hasValue = list.some((item) => item.value);
+        if (hasValue) {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: <ExclamationCircleFilled rev={undefined} />,
+                content: 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    doAiWrite(list[0], 0, true);
+                },
+                onCancel() {
+                    console.log('Cancel');
+                }
+            });
+        } else {
+            doAiWrite(list[0], 0, true);
         }
     };
 
@@ -742,14 +831,17 @@ const Content = () => {
                                             size="small"
                                             fullWidth
                                             label={'*产品特征'}
-                                            id="productFeatures"
-                                            name="productFeatures"
+                                            id="productFeature"
+                                            name="productFeature"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.productFeatures}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.productFeatures && Boolean(formik.errors.productFeatures)}
-                                            helperText={formik.touched.productFeatures && formik.errors.productFeatures}
+                                            value={formik.values.productFeature}
+                                            onChange={(e) => {
+                                                setProductFeature(e.target.value);
+                                                formik.handleChange(e);
+                                            }}
+                                            error={formik.touched.productFeature && Boolean(formik.errors.productFeature)}
+                                            helperText={formik.touched.productFeature && formik.errors.productFeature}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="w-full">
@@ -757,14 +849,14 @@ const Content = () => {
                                             size="small"
                                             label={'客户特征'}
                                             fullWidth
-                                            id="clientFeatures"
-                                            name="clientFeatures"
+                                            id="customerFeature"
+                                            name="customerFeature"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.clientFeatures}
+                                            value={formik.values.customerFeature}
                                             onChange={formik.handleChange}
-                                            error={formik.touched.clientFeatures && Boolean(formik.errors.clientFeatures)}
-                                            helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
+                                            error={formik.touched.customerFeature && Boolean(formik.errors.customerFeature)}
+                                            helperText={formik.touched.customerFeature && formik.errors.customerFeature}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="w-full">
@@ -772,14 +864,14 @@ const Content = () => {
                                             size="small"
                                             label={'品牌名称'}
                                             fullWidth
-                                            id="voidWord"
-                                            name="voidWord"
+                                            id="brandName"
+                                            name="brandName"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.voidWord}
+                                            value={formik.values.brandName}
                                             onChange={formik.handleChange}
-                                            error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
-                                            helperText={formik.touched.voidWord && formik.errors.voidWord}
+                                            error={formik.touched.brandName && Boolean(formik.errors.brandName)}
+                                            helperText={formik.touched.brandName && formik.errors.brandName}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
@@ -791,16 +883,18 @@ const Content = () => {
                                                 <Select
                                                     size="small"
                                                     labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
+                                                    label="targetLanguage"
+                                                    id="targetLanguage"
+                                                    name="targetLanguage"
+                                                    value={formik.values.targetLanguage}
+                                                    onChange={formik.handleChange}
+                                                    error={formik.touched.targetLanguage && Boolean(formik.errors.targetLanguage)}
                                                 >
-                                                    <MenuItem value={1}>正式</MenuItem>
-                                                    <MenuItem value={2}>感性</MenuItem>
-                                                    <MenuItem value={3}>鼓吹</MenuItem>
-                                                    <MenuItem value={4}>有激情</MenuItem>
-                                                    <MenuItem value={5}>又爆发力</MenuItem>
+                                                    {mateList?.targetLanguage.map((item: any, index: number) => (
+                                                        <MenuItem value={item.value} key={index}>
+                                                            {item.label}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </div>
@@ -812,31 +906,36 @@ const Content = () => {
                                                 <Select
                                                     size="small"
                                                     labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
+                                                    label="writingStyle"
+                                                    id="writingStyle"
+                                                    name="writingStyle"
+                                                    value={formik.values.writingStyle}
+                                                    onChange={formik.handleChange}
+                                                    error={formik.touched.writingStyle && Boolean(formik.errors.writingStyle)}
                                                 >
-                                                    <MenuItem value={1}>正式</MenuItem>
-                                                    <MenuItem value={2}>感性</MenuItem>
-                                                    <MenuItem value={3}>鼓吹</MenuItem>
-                                                    <MenuItem value={4}>有激情</MenuItem>
-                                                    <MenuItem value={5}>又爆发力</MenuItem>
+                                                    {mateList?.writingStyle.map((item: any, index: number) => (
+                                                        <MenuItem value={item.value} key={index}>
+                                                            {item.label}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </div>
                                     </Grid>
                                     <Grid sx={{ mt: 2, textAlign: 'center' }} item md={12}>
-                                        <Button
-                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                            color="secondary"
-                                            size="small"
-                                            variant="contained"
-                                            onClick={() => setAssistOpen(true)}
-                                            className="w-[300px]"
-                                        >
-                                            AI生成(消耗x点)
-                                        </Button>
+                                        <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto w-[300px]"
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                disabled={!productFeature || !detail.keywordMetaData.length || loadingList.length > 0}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                                onClick={() => handleAIGenerateAll()}
+                                            >
+                                                AI生成(消耗x点)
+                                            </Button>
+                                        </Tooltip>
                                     </Grid>
                                 </Grid>
                             </form>
@@ -844,7 +943,6 @@ const Content = () => {
                     )}
                 </Card>
             )}
-            {/* <Spin tip="Loading..." size={'large'} spinning={allLoading} indicator={<img width={60} src={imgLoading} />}> */}
             <Card className="mt-2 p-5">
                 {list.map((item, index) => (
                     <>
@@ -878,16 +976,23 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <Button
-                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
-                                        onClick={() => handleClick(item, index)}
-                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                        color="secondary"
-                                        size="small"
-                                        variant="contained"
-                                    >
-                                        {item.btnText}
-                                    </Button>
+                                    <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                        <Button
+                                            className="!cursor-pointer !pointer-events-auto"
+                                            disabled={
+                                                (item.type === ListingBuilderEnum.SEARCH_WORD
+                                                    ? item.type === ListingBuilderEnum.SEARCH_WORD && !uid
+                                                    : !productFeature || !detail.keywordMetaData.length) || loadingList.length > 0
+                                            }
+                                            onClick={() => handleClick(item, index)}
+                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                            color="secondary"
+                                            size="small"
+                                            variant="contained"
+                                        >
+                                            {item.btnText}
+                                        </Button>
+                                    </Tooltip>
                                     {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}
@@ -991,24 +1096,31 @@ const Content = () => {
                                         )}
                                     </div>
                                 </div>
-                                <FiledTextArea
-                                    rows={item.row}
-                                    placeholder={item.placeholder}
-                                    value={item.value}
-                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
-                                    handleClick={() => {
-                                        if (index === activeIndex) {
-                                            setActiveIndex(index);
-                                        } else {
-                                            setOpenKeyWordSelect(false);
-                                            setActiveIndex(index);
-                                        }
-                                    }}
-                                    highlightWordList={item.keyword}
-                                    highlightAllWordList={detail?.keywordMetaData || []}
-                                    index={index}
-                                    type={item.type}
-                                />
+                                <Spin
+                                    tip="思考中..."
+                                    size={'large'}
+                                    spinning={loadingList.includes(index)}
+                                    indicator={<img width={60} src={imgLoading} />}
+                                >
+                                    <FiledTextArea
+                                        rows={item.row}
+                                        placeholder={item.placeholder}
+                                        value={item.value}
+                                        handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
+                                        handleClick={() => {
+                                            if (index === activeIndex) {
+                                                setActiveIndex(index);
+                                            } else {
+                                                setOpenKeyWordSelect(false);
+                                                setActiveIndex(index);
+                                            }
+                                        }}
+                                        highlightWordList={item.keyword}
+                                        highlightAllWordList={detail?.keywordMetaData || []}
+                                        index={index}
+                                        type={item.type}
+                                    />
+                                </Spin>
                                 {item.type !== ListingBuilderEnum.SEARCH_WORD && (
                                     <div className="flex px-4 py-3 items-center">
                                         <div className="flex-1 flex items-center">
@@ -1079,7 +1191,6 @@ const Content = () => {
                     </ul>
                 )}
             </Card>
-            {/* </Spin> */}
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

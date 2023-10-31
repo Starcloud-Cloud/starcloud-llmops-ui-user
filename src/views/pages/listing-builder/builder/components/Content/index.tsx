@@ -243,7 +243,7 @@ const Content = () => {
     );
 
     useEffect(() => {
-        const filerList = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
+        const filerList = detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()));
         if (!filerList?.length || !currentWord) {
             setOpenKeyWordSelect(false);
             setHoverKey(0);
@@ -269,7 +269,9 @@ const Content = () => {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
                         handleReplaceValue(
-                            detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord))[hoverKeyRef.current || 0]
+                            detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))[
+                                hoverKeyRef.current || 0
+                            ]
                         );
                     }
                 }
@@ -315,7 +317,7 @@ const Content = () => {
         setCurrentWord(word);
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             // const filterKeyWord = keyword.filter((item, index) => {
-            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(word)) || [];
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.toLowerCase().startsWith(word.toLowerCase())) || [];
             if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
@@ -553,13 +555,13 @@ const Content = () => {
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">{itemScore?.score}</span>
+                                <span className="text-2xl font-semibold">{itemScore?.score || 0}</span>
                                 <span className="text-base">/9</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={(itemScore?.score / 9) * 100}
+                                value={((itemScore?.score || 0) / 9) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -583,7 +585,11 @@ const Content = () => {
 
                             <LinearProgress
                                 variant="determinate"
-                                value={((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100}
+                                value={
+                                    !itemScore?.totalSearches
+                                        ? 0
+                                        : ((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100
+                                }
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -1006,7 +1012,7 @@ const Content = () => {
                                 {item.type !== ListingBuilderEnum.SEARCH_WORD && (
                                     <div className="flex px-4 py-3 items-center">
                                         <div className="flex-1 flex items-center">
-                                            <span className="mr-2 flex items-center">
+                                            <span className="mr-2 flex items-center text-[#999]">
                                                 建议关键词:
                                                 <div className="ml-2 flex items-center">
                                                     {item?.keyword?.map((itemKeyword, keywordIndex) => (
@@ -1015,7 +1021,10 @@ const Content = () => {
                                                             className={`${
                                                                 keywordHighlight[index]
                                                                     ?.filter((item) => item !== undefined)
-                                                                    .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                    .find(
+                                                                        (itemKeyH) =>
+                                                                            itemKeyH.text.toLowerCase() === itemKeyword.text.toLowerCase()
+                                                                    )?.num
                                                                     ? 'bg-[#ffaca6] ml-1 line-through px-1'
                                                                     : 'ml-1 px-1'
                                                             }`}
@@ -1052,7 +1061,7 @@ const Content = () => {
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
                         {detail?.keywordResume
-                            .filter((item: string) => item?.startsWith(currentWord))
+                            .filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))
                             ?.map((item: string, keyWordItemKey: number) => (
                                 <li
                                     key={keyWordItemKey}

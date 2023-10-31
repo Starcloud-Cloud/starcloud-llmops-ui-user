@@ -1,10 +1,27 @@
 import { Button, Select, Tag, Table, Popover, Tooltip, Image } from 'antd';
+import { Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
-import { ArrowDownOutlined, BarChartOutlined, MoreOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import * as echarts from 'echarts';
 import AddLexicon from './addLexicon';
-const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean; pageQuery: any; total: number; tableData: any[] }) => {
+const TermTable = ({
+    loading,
+    pageQuery,
+    total,
+    tableData,
+    type,
+    setPageQuery,
+    getExtended
+}: {
+    loading: boolean;
+    pageQuery: any;
+    total: number;
+    tableData: any[];
+    type: number;
+    setPageQuery: (data: any) => void;
+    getExtended: (data: number) => void;
+}) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const rowSelection = {
         selectedRowKeys,
@@ -30,7 +47,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                 </span>
             ),
             width: 130,
-            dataIndex: 'keyword'
+            render: (_, row) => (
+                <>
+                    <span className="border-b border-dashed border-[#d4d8dd] cursor-pointer">{row.keywords}</span>
+                    <div className="text-[#95999e] text-[13px]">{row.keywordCn}</div>
+                </>
+            )
         },
         {
             title: (
@@ -58,7 +80,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                 </Tooltip>
             ),
             width: 90,
-            dataIndex: 'address'
+            render: (_, row) => (
+                <div className="">
+                    <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
+                    <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
+                </div>
+            )
         },
         {
             title: (
@@ -79,60 +106,64 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
             width: 150,
             render: (_, row) => (
                 <div className="w-[150px]">
-                    <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：3</div>
+                    <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
                     <div className="flex w-[118px] h-[58px] overflow-x-auto items-center">
-                        <div className="shrink-0 border border-solid border-transparent hover:border-[#673ab7] rounded cursor-pointer overflow-hidden">
-                            <Popover
-                                content={
-                                    <div className="w-[400px] h-[500px] drop-shadow-sm rounded">
-                                        <Image
-                                            width={400}
-                                            className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
-                                            src="https://m.media-amazon.com/images/I/41cdd3tNtBL._AC_US200_.jpg"
-                                            preview={false}
-                                        />
-                                        <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">
-                                            Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper Makeup Organizer PU Leather
-                                            Washable Waterproof (Light Blue)Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper
-                                            Makeup Organizer PU Leather Washable Waterproof (Light Blue)
-                                        </div>
-                                        <div className="flex justify-between items-center text-[#95999e]">
-                                            <div>
-                                                流量占比：<span className="text-[#673ab7]">4.30%</span>
+                        <div className="shrink-0 cursor-pointer">
+                            {row.relationVariationsItems?.map((item: any) => (
+                                <Popover
+                                    content={
+                                        <div className="w-[400px] h-[500px] drop-shadow-sm rounded">
+                                            <Image
+                                                width={400}
+                                                className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
+                                                src={item.imageUrl}
+                                                preview={false}
+                                            />
+                                            <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">{item.title}</div>
+                                            <div className="flex justify-between items-center text-[#95999e]">
+                                                <div>
+                                                    流量占比：
+                                                    <span className="text-[#673ab7]">{(item.trafficPercentage * 100)?.toFixed(2)}%</span>
+                                                </div>
+                                                <div>
+                                                    价格：<span className="text-[#673ab7]">${item.price}</span>
+                                                </div>
+                                                <div>
+                                                    评论数(评分)：
+                                                    <span className="text-[#673ab7]">
+                                                        {item.reviews}({item.rating})
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                价格：<span className="text-[#673ab7]">$7.9</span>
-                                            </div>
-                                            <div>
-                                                评论数(评分)：<span className="text-[#673ab7]">450(4.5)</span>
+                                            <div className="mt-[10px]">
+                                                <Tag className="cursor-pointer" color="warning">
+                                                    广告洞察
+                                                </Tag>
+                                                <Tag className="cursor-pointer" color="warning">
+                                                    查流量来源
+                                                </Tag>
+                                                <Tag className="cursor-pointer" color="warning">
+                                                    关联流量
+                                                </Tag>
+                                                <Tag className="cursor-pointer" color="warning">
+                                                    加入产品库
+                                                </Tag>
                                             </div>
                                         </div>
-                                        <div className="mt-[10px]">
-                                            <Tag className="cursor-pointer" color="warning">
-                                                广告洞察
-                                            </Tag>
-                                            <Tag className="cursor-pointer" color="warning">
-                                                查流量来源
-                                            </Tag>
-                                            <Tag className="cursor-pointer" color="warning">
-                                                关联流量
-                                            </Tag>
-                                            <Tag className="cursor-pointer" color="warning">
-                                                加入产品库
-                                            </Tag>
-                                        </div>
-                                    </div>
-                                }
-                                placement="right"
-                                trigger="hover"
-                            >
-                                <Image
-                                    width={46}
-                                    height={46}
-                                    preview={false}
-                                    src="https://m.media-amazon.com/images/I/41cdd3tNtBL._AC_US200_.jpg"
-                                />
-                            </Popover>
+                                    }
+                                    placement="right"
+                                    trigger="hover"
+                                >
+                                    <Image
+                                        className="border border-solid border-transparent hover:border-[#673ab7] rounded overflow-hidden"
+                                        key={item.asin}
+                                        width={46}
+                                        height={46}
+                                        preview={false}
+                                        src={item.imageUrl}
+                                    />
+                                </Popover>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -158,8 +189,8 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
             ),
             width: 200,
             render: (_, row, index) => (
-                <div className="w-[200px] relative">
-                    <div className="absolute top-[-20px] left-[-30px] w-[200px] h-[100px]" id={'chart' + index}></div>
+                <div className="w-[168px] relative">
+                    <div className="absolute top-[-20px] left-0 w-[168px] h-[100px]" id={'chart' + index}></div>
                 </div>
             )
         },
@@ -180,7 +211,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">ABA周排名</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            render: (_, row) => <span className="border-b border-dashed border-[#9fa3a8]">{row.searchesRank}</span>
         },
         {
             title: (
@@ -202,7 +233,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">月搜索量</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            render: (_, row) => (
+                <>
+                    <span className="border-b border-dashed border-[#9fa3a8]">{row.searches}</span>
+                    <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30).toString())}</div>
+                </>
+            )
         },
         {
             title: (
@@ -227,7 +263,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">月购买量</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            render: (_, row) => (
+                <>
+                    <span>{row.purchases}</span>
+                    <div className="text-[#95999e] text-[13px]">{parseInt((row.purchaseRate * 100)?.toFixed(2) + '%')}</div>
+                </>
+            )
         },
         {
             title: (
@@ -247,7 +288,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">SPR</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            dataIndex: 'cprExact'
         },
         {
             title: (
@@ -266,7 +307,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">标题密度</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            dataIndex: 'titleDensityExact'
         },
         {
             title: (
@@ -286,7 +327,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">商品数</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            dataIndex: 'products'
         },
         {
             title: (
@@ -305,7 +346,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">供需比</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            dataIndex: 'supplyDemandRatio'
         },
         {
             title: (
@@ -321,7 +362,7 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">广告竞品数</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            dataIndex: 'latest7daysAds'
         },
         {
             title: (
@@ -347,7 +388,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">点击集中度</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
+            render: (_, row) => (
+                <>
+                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.top3ClickingRate * 100)?.toFixed(1) + '%'}</span>
+                    <div className="text-[#95999e] text-[13px]">{(row.top3ConversionRate * 100)?.toFixed(1) + '%'}</div>
+                </>
+            )
         },
         {
             title: (
@@ -369,27 +415,27 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     <div className="cursor-default">PPC竞价</div>
                 </Tooltip>
             ),
-            dataIndex: 'address'
-        },
-        {
-            title: '操作',
-            width: 60,
             render: (_, row) => (
                 <>
-                    <Button type="text" shape="circle" icon={<BarChartOutlined rev={undefined} />}></Button>
-                    <Button type="text" shape="circle" icon={<MoreOutlined rev={undefined} />}></Button>
-                    <Button type="text" shape="circle" icon={<DeleteOutlined rev={undefined} />}></Button>
+                    <span className="border-b border-dashed border-[#9fa3a8]">${row.top3ClickingRate?.toFixed(2)}</span>
+                    <div className="text-[#95999e] text-[13px]">{row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
                 </>
             )
         }
     ];
-    const getChartsList = (index: number) => {
+    const getChartsList = (index: number, Axis: string[], rankList: number[], searchList: number[]) => {
         const chartContainer = document.getElementById('chart' + index);
         const myChart = echarts.init(chartContainer);
         const options = {
+            grid: {
+                left: '0%',
+                right: '0%',
+                top: '0%',
+                bottom: '0%'
+            },
             xAxis: {
                 type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                data: Axis,
                 show: false
             },
             yAxis: {
@@ -403,11 +449,14 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
             },
             series: [
                 {
-                    name: 'aaa',
-                    data: [0, 932, 901, 1, 1290, 1330, 1320],
+                    name: '月搜索量',
+                    data: searchList,
                     type: 'line',
                     smooth: true,
                     symbolSize: 0,
+                    lineStyle: {
+                        width: 0.5
+                    },
                     itemStyle: {
                         color: '#fedcdc'
                     },
@@ -416,9 +465,12 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                     }
                 },
                 {
-                    name: 'bbb',
-                    data: [932, 0, 901, 100, 9, 0],
+                    name: 'ABA排名',
+                    data: rankList,
                     type: 'line',
+                    lineStyle: {
+                        width: 0.5
+                    },
                     smooth: true,
                     symbolSize: 0
                 }
@@ -429,10 +481,18 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
     //弹框
     const [open, setOpen] = useState(false);
     useEffect(() => {
-        tableData.map((item, index) => {
-            getChartsList(index);
+        tableData?.map((item: any, index: number) => {
+            const Axis: any[] = [];
+            const rankList: any[] = [];
+            const searchList: any[] = [];
+            item.searchesTrend?.map((el: any) => {
+                Axis.push(`${el?.month?.slice(0, 4)}年${el?.month?.slice(4, 2)}`);
+                rankList.push(el?.searchRank);
+                searchList.push(el?.searches);
+            });
+            getChartsList(index, Axis, rankList, searchList);
         });
-    }, []);
+    }, [JSON.stringify(tableData)]);
 
     return (
         <>
@@ -449,21 +509,46 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                 <div>
                     <Select
                         className="w-[140px] h-[36px]"
-                        defaultValue="流量占比"
+                        value={pageQuery.orderColumn}
+                        onChange={(data) =>
+                            setPageQuery({
+                                ...pageQuery,
+                                orderColumn: data
+                            })
+                        }
                         options={[
-                            { label: '流量占比', value: '流量占比' },
-                            { label: '相关ASIN', value: '相关ASIN' }
+                            { label: '流量占比', value: 12 },
+                            { label: '相关ASIN', value: 20 },
+                            { label: 'ABA周排名', value: 4 },
+                            { label: '月搜索量', value: 5 },
+                            { label: '月购买量', value: 6 },
+                            { label: '月购买量', value: 6 },
+                            { label: '购买率', value: 7 },
+                            { label: 'SPR', value: 16 },
+                            { label: '标题密度', value: 15 },
+                            { label: '商品数', value: 8 },
+                            { label: '供需比', value: 9 },
+                            { label: '广告竞品数', value: 10 },
+                            { label: '点击集中度', value: 19 },
+                            { label: 'PPC竞价', value: 11 }
                         ]}
                     ></Select>
                     <Select
                         className="w-[80px] h-[36px] mx-[10px]"
+                        value={pageQuery.desc}
+                        onChange={(data) =>
+                            setPageQuery({
+                                ...pageQuery,
+                                desc: data
+                            })
+                        }
                         defaultValue="倒序"
                         options={[
-                            { label: '升序', value: '升序' },
-                            { label: '降序', value: '降序' }
+                            { label: '升序', value: false },
+                            { label: '降序', value: true }
                         ]}
                     ></Select>
-                    <Button>确定</Button>
+                    <Button onClick={() => getExtended(type)}>确定</Button>
                 </div>
             </div>
             <Table
@@ -471,11 +556,25 @@ const TermTable = ({ loading, pageQuery, total, tableData }: { loading: boolean;
                 sticky={{ offsetHeader: 0 }}
                 scroll={{ x: '1300px' }}
                 pagination={false}
-                rowKey={'id'}
+                rowKey={'keywords'}
                 rowSelection={rowSelection}
                 columns={columns}
                 dataSource={tableData}
             />
+            {total > 50 && (
+                <div className="mt-[20px]">
+                    <Pagination
+                        page={pageQuery.pag}
+                        count={Math.ceil(total / pageQuery.size)}
+                        onChange={(e: any, value: number) => {
+                            setPageQuery({
+                                ...pageQuery,
+                                page: value
+                            });
+                        }}
+                    />
+                </div>
+            )}
             <AddLexicon open={open} setOpen={setOpen} />
         </>
     );

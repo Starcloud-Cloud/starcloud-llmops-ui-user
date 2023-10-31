@@ -23,7 +23,7 @@ const TermSearch = () => {
     const [queryAsin, setQueryAsin] = useState<any>({
         month: '最近30天',
         market: 1,
-        asinList: []
+        asinList: ['B098T9ZFB5', 'B09JW5FNVX', 'B0B71DH45N', 'B07MHHM31K', 'B08RYQR1CJ']
     });
     const [asinData, setAsinData] = useState<any>({});
     const getAsin = async () => {
@@ -34,6 +34,9 @@ const TermSearch = () => {
         setAsinData(result);
         setAsinOpen(true);
     };
+    useEffect(() => {
+        getAsin();
+    }, []);
 
     //根据ASIN获取拓展词变体
     const [pageQuery, setPageQuery] = useState({
@@ -42,10 +45,24 @@ const TermSearch = () => {
         desc: true, //升降序
         orderColumn: 12 //排序的字段
     });
+    useEffect(() => {
+        if (type !== 0) {
+            getExtended(type);
+        }
+    }, [pageQuery.page]);
+    //搜索结果过滤的值
+    const [searchResult, setSearchResult] = useState<any>(null);
+    //变体类型
+    const [type, setType] = useState(0);
     const getExtended = async (num: number) => {
         const { month, market } = queryAsin;
+        setLoading(true);
+        setAsinOpen(false);
         const result = await KeywordMetadataExtendAsin({
             ...pageQuery,
+            ...searchResult,
+            excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
+            includeKeywords: searchResult?.includeKeywords ? searchResult.includeKeywords.split(',') : undefined,
             market,
             month: market === '最近30天' ? '' : month,
             queryVariations: num === 1 ? true : false,
@@ -53,19 +70,14 @@ const TermSearch = () => {
             originAsinList: queryAsin.asinList,
             filterDeletedKeywords: false
         });
-        console.log(result);
+        setLoading(false);
+        setTotal(result.total);
+        setTableData(result.items);
     };
 
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [tableData, setTableData] = useState<any[]>([]);
-    const getList = async () => {
-        setLoading(true);
-        const result = await KeywordMetadataPage(pageQuery);
-        setLoading(false);
-        setTotal(result.total);
-        setTableData(result.list);
-    };
     //获取日期
     const getPreviousMonthDate = (monthsAgo: number, flag?: boolean) => {
         const currentDate = new Date();
@@ -81,11 +93,13 @@ const TermSearch = () => {
     };
     //结果筛选
     const filterTable = (data: any) => {
-        console.log(data);
+        setSearchResult(data);
     };
     useEffect(() => {
-        // getList();
-    }, []);
+        if (searchResult) {
+            getExtended(type);
+        }
+    }, [searchResult]);
     return (
         <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
             <div className="flex justify-center bg-[#fff] py-[50px]">
@@ -159,7 +173,7 @@ const TermSearch = () => {
                         </div>
                     </div>
                     <div className="mt-[14px] flex items-center justify-end">
-                        <p className="text-[13px] text-[#9fa3a8] mr-[6%]">
+                        <p className="text-[13px] text-[#9fa3a8] mr-[5%]">
                             示例ASIN：
                             <span
                                 onClick={() =>
@@ -183,17 +197,27 @@ const TermSearch = () => {
                         >
                             清除
                         </Button>
-                        <Button onClick={getAsin} className="ml-[10px]">
-                            立即查询
-                        </Button>
                     </div>
                 </div>
-                <Button className="ml-[21px]">查询历史</Button>
+
+                <Button type="primary" onClick={getAsin} className="ml-[10px]">
+                    立即查询
+                </Button>
             </div>
-            <ResultFilter filterTable={filterTable} />
-            <TermTable pageQuery={pageQuery} loading={loading} total={total} tableData={tableData} />
+            {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} />}
+            {type !== 0 && (
+                <TermTable
+                    pageQuery={pageQuery}
+                    loading={loading}
+                    total={total}
+                    tableData={tableData}
+                    setPageQuery={setPageQuery}
+                    type={type}
+                    getExtended={getExtended}
+                />
+            )}
             {asinOpen && (
-                <Modal open={asinOpen} onClose={() => setAsinOpen(false)}>
+                <Modal open={asinOpen}>
                     <MainCard
                         style={{
                             position: 'absolute',
@@ -237,6 +261,7 @@ const TermSearch = () => {
                                 </div>
                                 <div
                                     onClick={() => {
+                                        setType(1);
                                         getExtended(1);
                                     }}
                                     className="text-[#673ab7] font-[600] cursor-pointer border-b border-dashed border-[#2a2b2c]"
@@ -267,6 +292,7 @@ const TermSearch = () => {
                                 </div>
                                 <div
                                     onClick={() => {
+                                        setType(2);
                                         getExtended(2);
                                     }}
                                     className="text-[#673ab7] font-[600] cursor-pointer border-b border-dashed border-[#2a2b2c]"
@@ -297,6 +323,7 @@ const TermSearch = () => {
                                 </div>
                                 <div
                                     onClick={() => {
+                                        setType(3);
                                         getExtended(3);
                                     }}
                                     className="text-[#673ab7] font-[600] cursor-pointer border-b border-dashed border-[#2a2b2c]"
@@ -308,6 +335,7 @@ const TermSearch = () => {
                                 <Button
                                     type="primary"
                                     onClick={() => {
+                                        setType(1);
                                         getExtended(1);
                                     }}
                                 >
@@ -316,6 +344,7 @@ const TermSearch = () => {
                                 <Button
                                     type="primary"
                                     onClick={() => {
+                                        setType(2);
                                         getExtended(2);
                                     }}
                                 >
@@ -324,6 +353,7 @@ const TermSearch = () => {
                                 <Button
                                     type="primary"
                                     onClick={() => {
+                                        setType(3);
                                         getExtended(3);
                                     }}
                                 >

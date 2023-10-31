@@ -4,16 +4,57 @@ import { Modal, IconButton, CardContent, TextField, CardActions, Grid, Divider a
 import { Close } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
-import { KeywordMetadataBasic, KeywordMetadataAdd } from 'api/listing/termSerch';
-const AddLexicon = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) => void }) => {
+import { dictPage, dictAdd, dictCreate } from 'api/listing/termSerch';
+const AddLexicon = ({
+    open,
+    queryAsin,
+    selectedRowKeys,
+    setOpen
+}: {
+    open: boolean;
+    queryAsin: any;
+    selectedRowKeys: any;
+    setOpen: (data: boolean) => void;
+}) => {
+    //选中的值
     const [lexiconList, setLexiconList] = useState<any[]>([]);
-    const optionsWithDisabled = [
-        { label: 'Apple', value: 'Apple' },
-        { label: 'Pear', value: 'Pear' },
-        { label: 'Orange', value: 'Orange', disabled: false }
-    ];
+    //词库列表
+    const [lexiconItem, setLexiconItem] = useState<any[]>([]);
+    const addlexicon = async () => {
+        await dictCreate({
+            name: value,
+            endpoint:
+                queryAsin.market === 1
+                    ? 'US'
+                    : queryAsin.market === 6
+                    ? 'JP'
+                    : queryAsin.market === 3
+                    ? 'UK'
+                    : queryAsin.market === 4
+                    ? 'DE'
+                    : queryAsin.market === 5
+                    ? 'FR'
+                    : queryAsin.market === 35691
+                    ? 'IT'
+                    : queryAsin.market === 44551
+                    ? 'ES'
+                    : queryAsin.market === 7
+                    ? 'CA'
+                    : 'IN'
+        });
+        getList();
+    };
+    const [value, setValue] = useState('');
+    const getList = () => {
+        dictPage({
+            pageNo: 1,
+            pageSize: 100
+        }).then((res) => {
+            setLexiconItem(res.list);
+        });
+    };
     useEffect(() => {
-        // KeywordMetadataBasic().then((res) => {});
+        getList();
     }, []);
     return (
         <Modal open={open} onClose={() => setOpen(false)}>
@@ -38,15 +79,32 @@ const AddLexicon = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
                 <CardContent>
                     <div className="font-600 text-[#000] text-base mb-[14px]">选择关键词词库</div>
                     <Checkbox.Group
-                        options={optionsWithDisabled}
+                        options={lexiconItem}
                         defaultValue={lexiconList}
                         onChange={(checkedValues: CheckboxValueType[]) => setLexiconList(checkedValues)}
                     />
                     <Divider />
                     <div className="font-600 text-[#000] text-base mb-[14px]">创建新词库</div>
                     <div className="flex items-center">
-                        <TextField className="w-[300px]" placeholder="新建词库名称" variant="standard" size="small" color="secondary" />
-                        <Button className="ml-[30px]" type="primary">
+                        <TextField
+                            value={value}
+                            onChange={(e: any) => {
+                                setValue(e.target.value);
+                            }}
+                            className="w-[300px]"
+                            placeholder="新建词库名称"
+                            variant="standard"
+                            size="small"
+                            color="secondary"
+                        />
+                        <Button
+                            onClick={() => {
+                                addlexicon();
+                            }}
+                            disabled={!value}
+                            className="ml-[30px]"
+                            type="primary"
+                        >
                             新建
                         </Button>
                     </div>
@@ -58,10 +116,11 @@ const AddLexicon = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
                             variant="contained"
                             color="secondary"
                             onClick={() => {
+                                dictAdd();
                                 setOpen(false);
                             }}
                         >
-                            保存
+                            已确认，提交吧！
                         </Buttons>
                     </Grid>
                 </CardActions>

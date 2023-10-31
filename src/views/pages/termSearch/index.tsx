@@ -208,6 +208,7 @@ const TermSearch = () => {
             {type !== 0 && (
                 <TermTable
                     pageQuery={pageQuery}
+                    queryAsin={queryAsin}
                     loading={loading}
                     total={total}
                     tableData={tableData}

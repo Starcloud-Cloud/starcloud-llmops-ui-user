@@ -1,11 +1,15 @@
 import request from 'utils/axios';
 //新增关键词
-export const KeywordMetadataAdd = (data: any) => {
-    return request.put({ url: '/listing/KeywordMetadata/add', data });
+export const dictAdd = (uid: string, data: any) => {
+    return request.put({ url: '/listing/dict/add/' + uid, data });
 };
-//获取关键词列表
-export const KeywordMetadataBasic = () => {
-    return request.get({ url: '/listing/KeywordMetadata/basic' });
+//新增关键词库
+export const dictCreate = (data: any) => {
+    return request.put({ url: '/listing/dict/create', data });
+};
+//获取词库列表
+export const dictPage = (params: any) => {
+    return request.get({ url: '/listing/dict/page', params });
 };
 //分页查询关键词列表
 export const KeywordMetadataPage = (params: any) => {

@@ -5,9 +5,13 @@ import { ArrowDownOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import * as echarts from 'echarts';
 import AddLexicon from './addLexicon';
+import copy from 'clipboard-copy';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 const TermTable = ({
     loading,
     pageQuery,
+    queryAsin,
     total,
     tableData,
     type,
@@ -16,6 +20,7 @@ const TermTable = ({
 }: {
     loading: boolean;
     pageQuery: any;
+    queryAsin: any;
     total: number;
     tableData: any[];
     type: number;
@@ -49,7 +54,68 @@ const TermTable = ({
             width: 130,
             render: (_, row) => (
                 <>
-                    <span className="border-b border-dashed border-[#d4d8dd] cursor-pointer">{row.keywords}</span>
+                    <Popover
+                        placement="right"
+                        content={
+                            <div className="w-[630px] h-[280px] rounded flex flex-wrap gap-4">
+                                {row.gkDatas?.map((item: any, index: number) => (
+                                    <div>
+                                        <Popover
+                                            placement="top"
+                                            content={
+                                                <div className="w-[330px] ">
+                                                    <div className="my-[10px] line-clamp-2 text-sm">{item.asinTitle}</div>
+                                                    <div className="flex justify-between items-center text-[#95999e]">
+                                                        <div>
+                                                            价格：<span className="text-[#673ab7]">${item.asinPrice}</span>
+                                                        </div>
+                                                        <div>
+                                                            评论数(评分)：
+                                                            <span className="text-[#673ab7]">
+                                                                {item.asinReviews}({item.asinRating})
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        >
+                                            <div className=" w-[110px] p-[10px] border border-solid rounded border-[#d4d8dd] hover:border-[#673ab7] overflow-hidden cursor-pointer">
+                                                <Image width={90} src={item.asinImage} preview={false} />
+                                            </div>
+                                        </Popover>
+
+                                        <div className="text-[#95999e] text-center">第{index + 1}位</div>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                        trigger="hover"
+                    >
+                        <Tooltip placement="top" title="点击复制">
+                            <span
+                                className="border-b border-dashed border-[#d4d8dd] cursor-pointer"
+                                onClick={() => {
+                                    copy(row.keywords);
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '复制成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            close: false,
+                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                            transition: 'SlideLeft'
+                                        })
+                                    );
+                                }}
+                            >
+                                {row.keywords}
+                            </span>
+                        </Tooltip>
+                    </Popover>
+
                     <div className="text-[#95999e] text-[13px]">{row.keywordCn}</div>
                 </>
             )
@@ -83,7 +149,9 @@ const TermTable = ({
             render: (_, row) => (
                 <div className="">
                     <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
-                    <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
+                    <Tooltip placement="top" title="预计周曝光量">
+                        <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
+                    </Tooltip>
                 </div>
             )
         },
@@ -236,7 +304,9 @@ const TermTable = ({
             render: (_, row) => (
                 <>
                     <span className="border-b border-dashed border-[#9fa3a8]">{row.searches}</span>
-                    <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30).toString())}</div>
+                    <Tooltip placement="top" title="日均">
+                        <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30).toString())}</div>
+                    </Tooltip>
                 </>
             )
         },
@@ -362,7 +432,11 @@ const TermTable = ({
                     <div className="cursor-default">广告竞品数</div>
                 </Tooltip>
             ),
-            dataIndex: 'latest7daysAds'
+            render: (_, row) => (
+                <Tooltip placement="top" title="近7天广告竞品数">
+                    <div>{row.latest7daysAds}</div>
+                </Tooltip>
+            )
         },
         {
             title: (
@@ -389,10 +463,10 @@ const TermTable = ({
                 </Tooltip>
             ),
             render: (_, row) => (
-                <>
+                <div>
                     <span className="border-b border-dashed border-[#9fa3a8]">{(row.top3ClickingRate * 100)?.toFixed(1) + '%'}</span>
                     <div className="text-[#95999e] text-[13px]">{(row.top3ConversionRate * 100)?.toFixed(1) + '%'}</div>
-                </>
+                </div>
             )
         },
         {
@@ -416,10 +490,10 @@ const TermTable = ({
                 </Tooltip>
             ),
             render: (_, row) => (
-                <>
+                <div>
                     <span className="border-b border-dashed border-[#9fa3a8]">${row.top3ClickingRate?.toFixed(2)}</span>
                     <div className="text-[#95999e] text-[13px]">{row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
-                </>
+                </div>
             )
         }
     ];
@@ -575,7 +649,7 @@ const TermTable = ({
                     />
                 </div>
             )}
-            <AddLexicon open={open} setOpen={setOpen} />
+            {open && <AddLexicon open={open} queryAsin={queryAsin} setOpen={setOpen} />}
         </>
     );
 };

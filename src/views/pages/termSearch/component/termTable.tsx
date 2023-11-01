@@ -305,7 +305,7 @@ const TermTable = ({
                 <>
                     <span className="border-b border-dashed border-[#9fa3a8]">{row.searches}</span>
                     <Tooltip placement="top" title="日均">
-                        <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30).toString())}</div>
+                        <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30)?.toString())}</div>
                     </Tooltip>
                 </>
             )

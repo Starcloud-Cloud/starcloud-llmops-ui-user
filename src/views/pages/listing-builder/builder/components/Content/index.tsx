@@ -109,8 +109,7 @@ const Content = () => {
         uid,
         handleSumGrade,
         fiveLen,
-        setListingParam,
-        listingParam
+        setListingParam
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
@@ -519,6 +518,20 @@ const Content = () => {
 
     // 所搜
     const handleSearch = async (value: any) => {
+        if (!value) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请先输入ASIN',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
         const someList = list.some((item) => item.value);
         if (someList) {
             Modal.confirm({
@@ -832,7 +845,7 @@ const Content = () => {
                     <div className="flex items-center justify-end flex-[70%]">
                         <Search
                             onSearch={handleSearch}
-                            className="lg:w-full xl:w-[70%]"
+                            className="w-full md:w-[400px]"
                             placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
                             enterButton="获取Listing"
                         />
@@ -971,7 +984,7 @@ const Content = () => {
                                                 variant="contained"
                                                 onClick={() => handleAIGenerateAll()}
                                             >
-                                                AI生成(消耗x点)
+                                                AI生成完整Listing(消耗{fiveLen + 2}点)
                                             </Button>
                                         </Tooltip>
                                     </Grid>

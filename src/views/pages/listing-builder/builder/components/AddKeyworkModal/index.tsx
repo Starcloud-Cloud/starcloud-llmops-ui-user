@@ -44,7 +44,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate, detail, list, listingParam } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail, list, listingParam, enableAi } = useListing();
     const navigate = useNavigate();
 
     // 添加关键词
@@ -60,7 +60,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             version,
             endpoint: country.key,
             draftConfig: {
-                enableAi: true,
+                enableAi,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
                 aiConfigDTO: listingParam
             },
@@ -110,7 +110,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
         } else {
             const res = await importDict({
                 ...data,
-                version
+                dictUid: checked
             });
             if (res) {
                 if (res) {

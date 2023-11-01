@@ -1,4 +1,16 @@
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Checkbox, Paper } from '@mui/material';
+import {
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TableSortLabel,
+    Checkbox,
+    Paper,
+    Tooltip
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -22,6 +34,7 @@ type TableEnhancedCreateDataType = {
     month: string;
     updatedTime: string;
     use: any[];
+    status: number;
 };
 
 // table filter
@@ -122,7 +135,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list, setEnableAi } =
+        useListing();
 
     // 获取详情
     useEffect(() => {
@@ -151,7 +165,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                             setUpdate({ type: 1 });
                         }
                     } else {
-                        setDetail({ ...res, keywordResume: res.keywordMetaData.map((item: any) => item.keyword) || [] });
+                        setDetail({ ...res, keywordResume: res?.keywordMetaData?.map((item: any) => item?.keyword) || [] });
+                        setEnableAi(res?.draftConfig?.enableAi);
                         setItemScore({
                             ...res.itemScore,
                             score: res.score,
@@ -360,7 +375,17 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                         />
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0">
-                                        <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
+                                        {row.status === 10 ? (
+                                            <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
+                                        ) : (
+                                            <div>
+                                                <Tooltip title={'正在请求数据'}>
+                                                    <span className="line-clamp-1  text-[#bec2cc] inline cursor-pointer">
+                                                        {row.keyword}
+                                                    </span>
+                                                </Tooltip>
+                                            </div>
+                                        )}
                                     </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
                                     <TableCell align="left" className="py-[6px] px-0">

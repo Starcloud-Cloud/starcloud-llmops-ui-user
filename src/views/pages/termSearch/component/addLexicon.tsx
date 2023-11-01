@@ -116,7 +116,7 @@ const AddLexicon = ({
                             variant="contained"
                             color="secondary"
                             onClick={() => {
-                                dictAdd();
+                                // dictAdd();
                                 setOpen(false);
                             }}
                         >

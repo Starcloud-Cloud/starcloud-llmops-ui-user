@@ -649,7 +649,7 @@ const TermTable = ({
                     />
                 </div>
             )}
-            {open && <AddLexicon open={open} queryAsin={queryAsin} setOpen={setOpen} />}
+            {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
         </>
     );
 };

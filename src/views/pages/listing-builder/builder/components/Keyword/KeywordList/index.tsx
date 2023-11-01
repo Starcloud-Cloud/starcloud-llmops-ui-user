@@ -143,7 +143,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                         setDetail((pre: any) => ({
                             ...pre,
                             keywordMetaData: res.keywordMetaData,
-                            keywordResume: res.keywordMetaData.map((item: any) => item.keyword),
+                            keywordResume: res.keywordMetaData.map((item: any) => item.keyword) || [],
                             draftConfig: res.draftConfig
                         }));
                         setItemScore(res.itemScore);
@@ -151,7 +151,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                             setUpdate({ type: 1 });
                         }
                     } else {
-                        setDetail({ ...res, keywordResume: res.keywordMetaData.map((item: any) => item.keyword) });
+                        setDetail({ ...res, keywordResume: res.keywordMetaData.map((item: any) => item.keyword) || [] });
                         setItemScore({
                             ...res.itemScore,
                             score: res.score,

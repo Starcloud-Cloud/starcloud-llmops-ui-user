@@ -956,7 +956,7 @@ const Content = () => {
                                             <Button
                                                 className="!cursor-pointer !pointer-events-auto w-[300px]"
                                                 startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                                disabled={!productFeature || !detail.keywordMetaData.length || loadingList.length > 0}
+                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
                                                 color="secondary"
                                                 size="small"
                                                 variant="contained"

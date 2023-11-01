@@ -1,0 +1,168 @@
+import React from 'react';
+
+// material-ui
+import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal } from '@mui/material';
+import { Input, Radio, RadioChangeEvent } from 'antd';
+
+const { Search } = Input;
+
+// project imports
+import MainCard from 'ui-component/cards/MainCard';
+
+// assets
+import CloseIcon from '@mui/icons-material/Close';
+import { gridSpacing } from 'store/constant';
+
+// generate random
+function rand() {
+    return Math.round(Math.random() * 20) - 10;
+}
+
+// modal position
+function getModalStyle() {
+    const top = 50 + rand();
+    const left = 50 + rand();
+
+    return {
+        top: `${top}%`,
+        left: `${left}%`,
+        transform: `translate(-${top}%, -${left}%)`
+    };
+}
+
+interface BodyProps extends CardProps {
+    modalStyle: React.CSSProperties;
+    handleClose: () => void;
+    url: string;
+    isTimeout?: boolean;
+    onRefresh: () => void;
+    payPrice?: number;
+}
+
+// ==============================|| SIMPLE MODAL ||============================== //
+export function DiscountModal({
+    open,
+    handleClose,
+    url,
+    payPrice
+}: {
+    open: boolean;
+    handleClose: () => void;
+    url: string;
+    isTimeout?: boolean;
+    onRefresh: () => void;
+    payPrice?: number;
+}) {
+    const [timeType, setTimeType] = React.useState(1);
+
+    const handleOnSearch = (value: string) => {};
+
+    const handleRadio = (e: RadioChangeEvent) => {
+        setTimeType(e.target.value);
+    };
+
+    return (
+        <Grid container justifyContent="flex-end">
+            <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+                <MainCard
+                    style={{
+                        position: 'absolute',
+                        width: '600px',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)'
+                    }}
+                    title="订单预览"
+                    content={false}
+                    secondary={
+                        <IconButton onClick={handleClose} size="large" aria-label="close modal">
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    }
+                >
+                    <CardContent>
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} sm={12} md={12}>
+                                <div className="flex justify-center flex-col items-center w-full">
+                                    <div className="flex justify-between items-center w-full mb-3">
+                                        <span className="text-[#868A91]">套餐类型</span>
+                                        <span className="text-base font-semibold text-[#2B2D2F]">标准版</span>
+                                    </div>
+                                    <div className="flex justify-between items-center w-full mb-3">
+                                        <span className="text-[#868A91]">套餐单价</span>
+                                        <div className="flex items-center">
+                                            <span className="text-[#de4437] text-lg font-semibold">￥123.00</span>
+                                            <span className="text-xs">/元</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center w-full mb-3">
+                                        <span className="text-[#868A91]">订阅时长</span>
+                                        <span>
+                                            <Radio.Group onChange={handleRadio} value={timeType}>
+                                                <Radio value={1}>年</Radio>
+                                                <Radio value={2}>月</Radio>
+                                            </Radio.Group>
+                                        </span>
+                                    </div>
+                                    <div className="flex w-full flex-col mb-3">
+                                        <span className="text-[#868A91] mb-2">折扣券</span>
+                                        <div>
+                                            <Search
+                                                placeholder="请输入折扣码"
+                                                enterButton="检测有效性"
+                                                size="large"
+                                                onSearch={handleOnSearch}
+                                            />
+                                        </div>
+                                        <span className="text-[#919DA8] mt-1">
+                                            输入/选择折扣券后系统会自动检测折扣券，如折扣券有效则显示在优惠金额
+                                        </span>
+                                    </div>
+                                    <div className="flex  items-center w-full mb-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-[#868A91] mb-2">优惠金额</span>
+                                            <span className="text-[#de4437] text-lg">￥123.00</span>
+                                        </div>
+                                        <div className="flex flex-col ml-[30%]">
+                                            <span className="text-[#868A91] mb-2">订单总价</span>
+                                            <span className="text-[#de4437] text-lg">￥123.00</span>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        className="w-[300px] mt-4"
+                                        color="secondary"
+                                        startIcon={
+                                            <svg
+                                                viewBox="0 0 1024 1024"
+                                                version="1.1"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                p-id="1575"
+                                                width="32"
+                                                height="32"
+                                            >
+                                                <path
+                                                    d="M492.343 777.511c-67.093 32.018-144.129 51.939-227.552 32.27-83.424-19.678-142.626-73.023-132.453-171.512 10.192-98.496 115.478-132.461 202.07-132.461 86.622 0 250.938 56.122 250.938 56.122s13.807-30.937 27.222-66.307c13.405-35.365 17.21-63.785 17.21-63.785H279.869v-35.067h169.995v-67.087l-211.925 1.526v-44.218h211.925v-100.63h111.304v100.629H788.35v44.218l-227.181 1.524v62.511l187.584 1.526s-3.391 35.067-27.17 98.852c-23.755 63.783-46.061 96.312-46.061 96.312L960 685.279V243.2C960 144.231 879.769 64 780.8 64H243.2C144.231 64 64 144.231 64 243.2v537.6C64 879.769 144.231 960 243.2 960h537.6c82.487 0 151.773-55.806 172.624-131.668L625.21 672.744s-65.782 72.748-132.867 104.767z"
+                                                    p-id="1576"
+                                                    fill="#fff"
+                                                ></path>
+                                                <path
+                                                    d="M297.978 559.871c-104.456 6.649-129.974 52.605-129.974 94.891s25.792 101.073 148.548 101.073c122.727 0 226.909-123.77 226.909-123.77s-141.057-78.842-245.483-72.194z"
+                                                    p-id="1577"
+                                                    fill="#fff"
+                                                ></path>
+                                            </svg>
+                                        }
+                                        variant="contained"
+                                    >
+                                        立即支付
+                                    </Button>
+                                </div>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                    <Divider />
+                </MainCard>
+            </Modal>
+        </Grid>
+    );
+}

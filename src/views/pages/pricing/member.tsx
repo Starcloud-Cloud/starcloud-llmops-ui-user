@@ -56,6 +56,7 @@ import people8 from 'assets/images/pay/people8.png';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { PlayArrow } from '@mui/icons-material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { DiscountModal } from './discountModal';
 
 const recommendList = [
     {
@@ -401,6 +402,8 @@ const Price1 = () => {
     const [isTimeout, setIsTimeout] = useState(false);
 
     const [orderId, setOrderId] = useState('');
+
+    const [discountOpen, setDiscountOpen] = useState(false);
 
     useEffect(() => {
         if (value === '1') {
@@ -768,6 +771,14 @@ const Price1 = () => {
             </SectionWrapper>
             <PayModal
                 open={open}
+                handleClose={() => handleClose()}
+                url={payUrl}
+                isTimeout={isTimeout}
+                onRefresh={onRefresh}
+                payPrice={payPrice}
+            />
+            <DiscountModal
+                open={true}
                 handleClose={() => handleClose()}
                 url={payUrl}
                 isTimeout={isTimeout}

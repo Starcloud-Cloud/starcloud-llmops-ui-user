@@ -696,7 +696,7 @@ function CreateDetail() {
                 <PermissionUpgradeModal
                     open={tokenOpen}
                     handleClose={() => setTokenOpen(false)}
-                    title={'当前使用当前魔法豆不足，升级会员，立享五折优惠！魔法豆不足'}
+                    title={'当前魔法豆不足，升级会员，立享五折优惠！'}
                 />
             )}
         </Card>

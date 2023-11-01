@@ -1774,7 +1774,11 @@ export const Chat = ({
             <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
             <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
-            <PermissionUpgradeModal open={openToken} handleClose={() => setOpenToken(false)} title={'当前使当前魔法豆不足，升级会员，立享五折优惠！的魔法豆不足'} />
+            <PermissionUpgradeModal
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+            />
         </div>
     );
 };

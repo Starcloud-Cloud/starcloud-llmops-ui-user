@@ -7,10 +7,11 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useListing } from 'contexts/ListingContext';
-import { delKey } from 'api/listing/build';
+import { delKey, saveListing } from 'api/listing/build';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { Confirm } from 'ui-component/Confirm';
+import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 const containerStyle: React.CSSProperties = {
     position: 'relative',
@@ -23,7 +24,7 @@ const KeyWord = () => {
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
     const [delOpen, setDelOpen] = React.useState(false);
-    const { detail, setUpdate, uid, version } = useListing();
+    const { detail, setUpdate, uid, version, list, country, listingParam } = useListing();
 
     const containerRef = useRef<any>(null);
 
@@ -32,27 +33,51 @@ const KeyWord = () => {
     };
 
     const handleDel = async () => {
-        const res = await delKey({
+        // 删除前先保存下文本数据
+        const result = list
+            .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+            .reduce((acc: any, obj, index) => {
+                acc[index + 1] = obj.value;
+                return acc;
+            }, {});
+        const data = {
             uid,
             version,
-            removeBindKey: selected
-        });
-        if (res) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '删除成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    close: false
-                })
-            );
-            setDelOpen(false);
-            setSelected([]);
-            // 只更新关键词和打分
-            setUpdate({ type: 1 });
+            endpoint: country.key,
+            draftConfig: {
+                enableAi: true,
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
+                aiConfigDTO: listingParam
+            },
+            title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+            productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+            searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+            fiveDesc: result
+        };
+        const resSave = await saveListing(data);
+        if (resSave) {
+            const res = await delKey({
+                uid,
+                version,
+                removeBindKey: selected
+            });
+            if (res) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '删除成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                setDelOpen(false);
+                setSelected([]);
+                // 只更新关键词和打分
+                setUpdate({});
+            }
         }
     };
 

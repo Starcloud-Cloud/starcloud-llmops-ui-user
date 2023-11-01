@@ -75,18 +75,29 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             if (uid) {
                 // 如果站点一样就就新增
                 if (detail.endpoint === country.key) {
-                    const res = await addKey({ uid, version, addKey: lines });
+                    // const res = await addKey({ uid, version, addKey: lines });
+                    // if (res) {
+                    //     handleClose();
+                    //     setUpdate({ type: 1 });
+                    // }
+                    const res = await saveListing({ ...data, keys: lines });
                     if (res) {
+                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        setVersion(res.version);
+                        setUid(res.uid);
                         handleClose();
-                        setUpdate({ type: 1 });
+                        setUpdate({});
                     }
                 } else {
                     // 修改了站点所属
                     const res = await saveListing({ ...data, keys: lines });
-                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
-                    setVersion(res.version);
-                    setUid(res.uid);
-                    handleClose();
+                    if (res) {
+                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        setVersion(res.version);
+                        setUid(res.uid);
+                        handleClose();
+                        setUpdate({});
+                    }
                 }
             } else {
                 const res = await saveListing({ ...data, keys: lines });
@@ -94,6 +105,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                 setVersion(res.version);
                 setUid(res.uid);
                 handleClose();
+                // 路由变了 会自动请求详情接口，不用手动触发
             }
         } else {
             const res = await importDict({
@@ -107,7 +119,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     handleClose();
                     if (uid) {
                         // 更新
-                        setUpdate({ type: 1 });
+                        setUpdate({});
                     }
                     navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
                 }

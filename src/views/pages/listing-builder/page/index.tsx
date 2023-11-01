@@ -474,14 +474,30 @@ const ListingBuilderPage: React.FC = () => {
                                     {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
-                                            <div className="flex flex-col">
-                                                <div className="text-xs">{row?.scoreProportion?.toFixed(1) || 0.0}</div>
-                                                <div className="text-sm">{row.score || 0}/9 </div>
-                                            </div>
+                                            <Tooltip
+                                                title={'这按亚马逊官方推荐的标准进行打分，共有9个打分项，满分100分'}
+                                                placement="top"
+                                                arrow
+                                            >
+                                                <div className="flex flex-col cursor-pointer">
+                                                    <div className="text-base font-semibold">{row?.scoreProportion || 0}</div>
+                                                    <div className="text-sm">{row.score || 0}/9 </div>
+                                                </div>
+                                            </Tooltip>
                                             <Divider type={'vertical'} />
-                                            <div>
-                                                <Progress type="circle" percent={row?.searchersProportion * 100} size={25} />
-                                            </div>
+                                            <Tooltip title={'List中已埋词的总搜索量占总关键词搜索量的比值'} placement="top" arrow>
+                                                <div className="cursor-pointer">
+                                                    <Progress
+                                                        type="circle"
+                                                        percent={row?.searchersProportion * 100}
+                                                        format={(percent) => (percent === 100 ? '100%' : `${percent}%`)}
+                                                        size={35}
+                                                        success={{
+                                                            percent: 101
+                                                        }}
+                                                    />
+                                                </div>
+                                            </Tooltip>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

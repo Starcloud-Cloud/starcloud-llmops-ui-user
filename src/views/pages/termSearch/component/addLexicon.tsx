@@ -1,10 +1,12 @@
-import { Checkbox, Divider, Button } from 'antd';
-import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { Radio, Divider, Button } from 'antd';
+import type { RadioChangeEvent } from 'antd';
 import { Modal, IconButton, CardContent, TextField, CardActions, Grid, Divider as Dividers, Button as Buttons } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
 import { useState, useEffect } from 'react';
 import { dictPage, dictAdd, dictCreate } from 'api/listing/termSerch';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const AddLexicon = ({
     open,
     queryAsin,
@@ -17,7 +19,7 @@ const AddLexicon = ({
     setOpen: (data: boolean) => void;
 }) => {
     //选中的值
-    const [lexiconList, setLexiconList] = useState<any[]>([]);
+    const [lexiconList, setLexiconList] = useState<any>(null);
     //词库列表
     const [lexiconItem, setLexiconItem] = useState<any[]>([]);
     const addlexicon = async () => {
@@ -42,6 +44,7 @@ const AddLexicon = ({
                     ? 'CA'
                     : 'IN'
         });
+        setValue('');
         getList();
     };
     const [value, setValue] = useState('');
@@ -78,11 +81,13 @@ const AddLexicon = ({
             >
                 <CardContent>
                     <div className="font-600 text-[#000] text-base mb-[14px]">选择关键词词库</div>
-                    <Checkbox.Group
-                        options={lexiconItem}
-                        defaultValue={lexiconList}
-                        onChange={(checkedValues: CheckboxValueType[]) => setLexiconList(checkedValues)}
-                    />
+                    <Radio.Group onChange={(e) => setLexiconList(e.target.value)}>
+                        {lexiconItem.map((item) => (
+                            <Radio key={item.uid} value={item.uid}>
+                                {item.name}
+                            </Radio>
+                        ))}
+                    </Radio.Group>
                     <Divider />
                     <div className="font-600 text-[#000] text-base mb-[14px]">创建新词库</div>
                     <div className="flex items-center">
@@ -113,11 +118,26 @@ const AddLexicon = ({
                 <CardActions>
                     <Grid container justifyContent="flex-end">
                         <Buttons
+                            disabled={!lexiconList}
                             variant="contained"
                             color="secondary"
                             onClick={() => {
-                                // dictAdd();
-                                setOpen(false);
+                                console.log(lexiconList);
+                                console.log(selectedRowKeys);
+                                dictAdd(lexiconList, selectedRowKeys).then((res) => {
+                                    setOpen(false);
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '添加成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            close: false
+                                        })
+                                    );
+                                });
                             }}
                         >
                             已确认，提交吧！

@@ -1,7 +1,7 @@
 import request from 'utils/axios';
 //新增关键词
 export const dictAdd = (uid: string, data: any) => {
-    return request.put({ url: '/listing/dict/add/' + uid, data });
+    return request.put({ url: '/listing/dict/key/add/' + uid, data });
 };
 //新增关键词库
 export const dictCreate = (data: any) => {

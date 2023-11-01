@@ -1,6 +1,7 @@
 import { Button, Select, Divider, Tag, Input, Popover } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Modal, IconButton, CardContent } from '@mui/material';
+import SubCard from 'ui-component/cards/SubCard';
 import { Close } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
 import { useEffect, useState } from 'react';
@@ -41,7 +42,7 @@ const TermSearch = () => {
     //根据ASIN获取拓展词变体
     const [pageQuery, setPageQuery] = useState({
         page: 1,
-        size: 50,
+        size: 20,
         desc: true, //升降序
         orderColumn: 12 //排序的字段
     });
@@ -49,7 +50,7 @@ const TermSearch = () => {
         if (type !== 0) {
             getExtended(type);
         }
-    }, [pageQuery.page]);
+    }, [pageQuery.page, pageQuery.size]);
     //搜索结果过滤的值
     const [searchResult, setSearchResult] = useState<any>(null);
     //变体类型
@@ -102,6 +103,15 @@ const TermSearch = () => {
     }, [searchResult]);
     return (
         <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
+            <SubCard
+                sx={{ mb: 3 }}
+                contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+            >
+                <div>
+                    <span className="text-[#000c] font-[500]">关键词优化</span>&nbsp;
+                    <span className="text-[#673ab7] font-[500]">- 拓展关键词</span>
+                </div>
+            </SubCard>
             <div className="flex justify-center bg-[#fff] py-[50px]">
                 <div className="w-[990px]">
                     <div className="min-h-[44px] border border-solid border-[#673ab7] rounded">
@@ -168,7 +178,7 @@ const TermSearch = () => {
                                 onChange={(e: any) => setValue(e.target.value)}
                                 className="w-[100%] flex-1"
                                 bordered={false}
-                                placeholder="已录入20个ASIN"
+                                placeholder="输入父(子)体ASIN(最多20个)，多个以空格区分，或直接从txt/Excel按列复制粘贴"
                             />
                         </div>
                     </div>
@@ -227,7 +237,8 @@ const TermSearch = () => {
                             left: '50%',
                             transform: 'translate(-50%, 0)',
                             maxHeight: '80%',
-                            overflow: 'auto'
+                            overflow: 'auto',
+                            outline: 0
                         }}
                         title="选择拓词方式"
                         content={false}
@@ -243,22 +254,8 @@ const TermSearch = () => {
                             </div>
                             <div className="flex justify-between items-center px-[80px]">
                                 <div>
-                                    使用<span className="font-[600] text-[#2a2b2c]"> 全部变体 </span>{' '}
-                                    <span className="cursor-pointer text-[#673ab7]">
-                                        <Popover
-                                            content={
-                                                <div className="w-[400px] drop-shadow-sm rounded">
-                                                    <p>全部变体指的是当前查询ASIN所在Listing的所有变体</p>
-                                                    <p>使用全部变体拓词，即查询出全部变体的所有流量词，合并去重后展示</p>
-                                                </div>
-                                            }
-                                            placement="right"
-                                            trigger="hover"
-                                        >
-                                            <QuestionCircleOutlined rev={undefined} />
-                                        </Popover>
-                                    </span>
-                                    &nbsp;拓词，获取流量词数：
+                                    使用<span className="font-[600] text-[#2a2b2c]"> 全部变体 </span>
+                                    拓词，获取流量词数：
                                 </div>
                                 <div
                                     onClick={() => {
@@ -272,24 +269,8 @@ const TermSearch = () => {
                             </div>
                             <div className="flex justify-between items-center px-[80px] my-[10px]">
                                 <div>
-                                    使用<span className="font-[600] text-[#2a2b2c]"> 畅销变体 </span>{' '}
-                                    <span className="cursor-pointer text-[#673ab7]">
-                                        <Popover
-                                            content={
-                                                <div className="w-[400px] drop-shadow-sm rounded">
-                                                    <p>畅销变体指的是当前查询ASIN所在Listing中流量词最多的变体</p>
-                                                    <p>
-                                                        使用畅销变体拓词，系统会自动将当前查询ASIN替换为畅销变体查询流量词，如同时查询多个ASIN，则合并去重后展示
-                                                    </p>
-                                                </div>
-                                            }
-                                            placement="right"
-                                            trigger="hover"
-                                        >
-                                            <QuestionCircleOutlined rev={undefined} />
-                                        </Popover>
-                                    </span>
-                                    &nbsp; 拓词，获取流量词数：
+                                    使用<span className="font-[600] text-[#2a2b2c]"> 畅销变体 </span>
+                                    拓词，获取流量词数：
                                 </div>
                                 <div
                                     onClick={() => {
@@ -303,24 +284,8 @@ const TermSearch = () => {
                             </div>
                             <div className="flex justify-between items-center px-[80px]">
                                 <div>
-                                    使用<span className="font-[600] text-[#2a2b2c]"> 当前变体 </span>{' '}
-                                    <span className="cursor-pointer text-[#673ab7]">
-                                        <Popover
-                                            content={
-                                                <div className="w-[400px] drop-shadow-sm rounded">
-                                                    <p>当前变体指的是当前查询ASIN，即在搜索框内输入的ASIN</p>
-                                                    <p>
-                                                        使用当前变体拓词，即只查询当前变体的所有流量词，如同时查询多个ASIN，则合并去重后展示
-                                                    </p>
-                                                </div>
-                                            }
-                                            placement="right"
-                                            trigger="hover"
-                                        >
-                                            <QuestionCircleOutlined rev={undefined} />
-                                        </Popover>
-                                    </span>
-                                    &nbsp; 拓词，获取流量词数：
+                                    使用<span className="font-[600] text-[#2a2b2c]"> 当前变体 </span>
+                                    拓词，获取流量词数：
                                 </div>
                                 <div
                                     onClick={() => {

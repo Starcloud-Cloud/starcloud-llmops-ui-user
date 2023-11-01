@@ -1,4 +1,4 @@
-import { Row, Col, InputNumber, Input, Popover, Button, Radio, Checkbox } from 'antd';
+import { Row, Col, InputNumber, Input, Popover, Button, Checkbox } from 'antd';
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 const ResultFilter = ({
@@ -162,7 +162,9 @@ const ResultFilter = ({
             
             比如相关ASIN数最小值设置为3，则可以筛选出在查询的ASIN及其变体中，相关ASIN数大于等于3的关键词`,
             addonAfter: ''
-        },
+        }
+    ];
+    const searchArray = [
         {
             title: 'Amazon Choice',
             desc: `AC推荐词：Amazon's Choice，勾选后可以筛选出拥有AC标识的关键词
@@ -214,81 +216,109 @@ const ResultFilter = ({
             {filteOpen && (
                 <div>
                     <Row gutter={20} className="px-[30px]">
-                        {searchList.map((item) =>
-                            !item?.size ? (
-                                <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
-                                    <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
-                                        {item.title}{' '}
-                                        <Popover
-                                            color="#262626"
-                                            trigger="hover"
-                                            zIndex={9999}
-                                            placement="top"
-                                            title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
-                                        >
-                                            <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
-                                        </Popover>
-                                    </div>
-                                    {item?.type !== 'checkbox' ? (
-                                        <div className="flex items-center mb-[30px]">
-                                            <InputNumber
-                                                min={0}
-                                                value={item.after ? searchWord[item.key + 'Min'] : searchWord['min' + item.key]}
-                                                onChange={(data) => {
-                                                    if (item.addonAfter === '%') {
-                                                        setSearchWord({
-                                                            ...searchWord,
-                                                            [item.after ? item.key + 'Min' : 'min' + item.key]: data / 100
-                                                        });
-                                                    } else {
-                                                        setSearchWord({
-                                                            ...searchWord,
-                                                            [item.after ? item.key + 'Min' : 'min' + item.key]: data
-                                                        });
-                                                    }
-                                                }}
-                                                formatter={(value) => {
-                                                    if (value) {
-                                                        return item.addonAfter === '%' ? (value * 100).toString() : value;
-                                                    } else {
-                                                        return '';
-                                                    }
-                                                }}
-                                                className="flex-1"
-                                                placeholder="最小值"
-                                                controls={false}
-                                                addonAfter={item.addonAfter}
-                                            />
-                                            <span>&nbsp;~&nbsp;</span>
-                                            <InputNumber
-                                                value={item.after ? searchWord[item.key + 'Max'] : searchWord['max' + item.key]}
-                                                onChange={(data) => {
-                                                    if (item.addonAfter === '%') {
-                                                        setSearchWord({
-                                                            ...searchWord,
-                                                            [item.after ? item.key + 'Max' : 'max' + item.key]: data / 100
-                                                        });
-                                                    } else {
-                                                        setSearchWord({
-                                                            ...searchWord,
-                                                            [item.after ? item.key + 'Max' : 'max' + item.key]: data
-                                                        });
-                                                    }
-                                                }}
-                                                formatter={(value) => {
-                                                    if (value) {
-                                                        return item.addonAfter === '%' ? (value * 100).toString() : value;
-                                                    } else {
-                                                        return '';
-                                                    }
-                                                }}
-                                                min={0}
-                                                className="flex-1"
-                                                placeholder="最大值"
-                                                controls={false}
-                                                addonAfter={item.addonAfter}
-                                            />
-                                        </div>
+                        {searchList.map((item) => (
+                            <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
+                                <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
+                                    {item.title}{' '}
+                                    <Popover
+                                        color="#262626"
+                                        trigger="hover"
+                                        zIndex={9999}
+                                        placement="top"
+                                        title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
+                                    >
+                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    </Popover>
+                                </div>
+                                <div className="flex items-center mb-[30px]">
+                                    <InputNumber
+                                        min={0}
+                                        value={item.after ? searchWord[item.key + 'Min'] : searchWord['min' + item.key]}
+                                        onChange={(data) => {
+                                            if (item.addonAfter === '%') {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Min' : 'min' + item.key]: data / 100
+                                                });
+                                            } else {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Min' : 'min' + item.key]: data
+                                                });
+                                            }
+                                        }}
+                                        formatter={(value) => {
+                                            if (value) {
+                                                return item.addonAfter === '%' ? (value * 100).toString() : value;
+                                            } else {
+                                                return '';
+                                            }
+                                        }}
+                                        className="flex-1"
+                                        placeholder="最小值"
+                                        controls={false}
+                                        addonAfter={item.addonAfter}
+                                    />
+                                    <span>&nbsp;~&nbsp;</span>
+                                    <InputNumber
+                                        value={item.after ? searchWord[item.key + 'Max'] : searchWord['max' + item.key]}
+                                        onChange={(data) => {
+                                            if (item.addonAfter === '%') {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Max' : 'max' + item.key]: data / 100
+                                                });
+                                            } else {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Max' : 'max' + item.key]: data
+                                                });
+                                            }
+                                        }}
+                                        formatter={(value) => {
+                                            if (value) {
+                                                return item.addonAfter === '%' ? (value * 100).toString() : value;
+                                            } else {
+                                                return '';
+                                            }
+                                        }}
+                                        min={0}
+                                        className="flex-1"
+                                        placeholder="最大值"
+                                        controls={false}
+                                        addonAfter={item.addonAfter}
+                                    />
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+                    <Row gutter={20} className="px-[30px]">
+                        {searchArray.map((item) => (
+                            <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
+                                <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
+                                    {item.title}{' '}
+                                    <Popover
+                                        color="#262626"
+                                        trigger="hover"
+                                        zIndex={9999}
+                                        placement="top"
+                                        title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
+                                    >
+                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    </Popover>
+                                </div>
+                                <div className="flex mb-[30px]">
+                                    {item?.size ? (
+                                        <Input
+                                            value={searchWord[item.key]}
+                                            onChange={(e) => {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.key]: e.target.value
+                                                });
+                                            }}
+                                            placeholder="请输入关键词，多个以逗号区分"
+                                        />
                                     ) : (
                                         <Checkbox
                                             checked={searchWord.ac}
@@ -302,36 +332,9 @@ const ResultFilter = ({
                                             仅AC推荐词
                                         </Checkbox>
                                     )}
-                                </Col>
-                            ) : (
-                                <Col key={item.title} span={8}>
-                                    <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
-                                        {item.title}{' '}
-                                        <Popover
-                                            color="#262626"
-                                            trigger="hover"
-                                            zIndex={9999}
-                                            placement="top"
-                                            title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
-                                        >
-                                            <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
-                                        </Popover>
-                                    </div>
-                                    <div className="flex mb-[30px]">
-                                        <Input
-                                            value={searchWord[item.key]}
-                                            onChange={(e) => {
-                                                setSearchWord({
-                                                    ...searchWord,
-                                                    [item.key]: e.target.value
-                                                });
-                                            }}
-                                            placeholder="请输入关键词，多个以逗号区分"
-                                        />
-                                    </div>
-                                </Col>
-                            )
-                        )}
+                                </div>
+                            </Col>
+                        ))}
                     </Row>
                     <div className="flex items-center justify-center pb-[30px]">
                         <Button

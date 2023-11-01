@@ -59,6 +59,28 @@ const AddLexicon = ({
     useEffect(() => {
         getList();
     }, []);
+    const nation = (type: string) => {
+        switch (type) {
+            case 'US':
+                return '🇺🇸';
+            case 'JP':
+                return '🇯🇵';
+            case 'UK':
+                return '🇬🇧';
+            case 'DE':
+                return '🇩🇪';
+            case 'FR':
+                return '🇫🇷';
+            case 'IT':
+                return '🇮🇹';
+            case 'ES':
+                return '🇪🇸';
+            case 'CA':
+                return '🇨🇦';
+            case 'IN':
+                return '🇮🇳';
+        }
+    };
     return (
         <Modal open={open} onClose={() => setOpen(false)}>
             <MainCard
@@ -84,7 +106,9 @@ const AddLexicon = ({
                     <Radio.Group onChange={(e) => setLexiconList(e.target.value)}>
                         {lexiconItem.map((item) => (
                             <Radio key={item.uid} value={item.uid}>
-                                {item.name}
+                                <div className="flex items-center">
+                                    {nation(item.endpoint)} {item.name}
+                                </div>
                             </Radio>
                         ))}
                     </Radio.Group>

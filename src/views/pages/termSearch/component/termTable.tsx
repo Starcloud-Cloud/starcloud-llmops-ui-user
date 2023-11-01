@@ -1,4 +1,4 @@
-import { Button, Select, Tag, Table, Popover, Tooltip, Image } from 'antd';
+import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
 import { ArrowDownOutlined } from '@ant-design/icons';
@@ -8,6 +8,7 @@ import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import './termTable.scss';
 const TermTable = ({
     loading,
     pageQuery,
@@ -37,7 +38,7 @@ const TermTable = ({
     const columns: ColumnsType<any> = [
         {
             title: '#',
-            width: 40,
+            width: 72,
             render: (_, row, index) => <div>{(index + 1) * pageQuery.page}</div>
         },
         {
@@ -55,7 +56,7 @@ const TermTable = ({
             render: (_, row) => (
                 <>
                     <Popover
-                        placement="right"
+                        placement="rightBottom"
                         content={
                             <div className="w-[630px] h-[280px] rounded flex flex-wrap gap-4">
                                 {row.gkDatas?.map((item: any, index: number) => (
@@ -135,9 +136,6 @@ const TermTable = ({
                     }
                 >
                     <div className="cursor-default relative min-w-[90px]">
-                        <span className="text-[12px] leading-3 p-[2px] text-[#fff] rounded bg-[#673ab7] absolute top-[-13px] left-[13px]">
-                            内测版
-                        </span>
                         <span className="text-[#673ab7] text-sm">
                             流量占比
                             <ArrowDownOutlined className="" rev={undefined} />
@@ -175,12 +173,12 @@ const TermTable = ({
             render: (_, row) => (
                 <div className="w-[150px]">
                     <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
-                    <div className="flex w-[118px] h-[58px] overflow-x-auto items-center">
+                    <div className="flex w-[118px] h-[58px] overflow-x-auto items-center sidebar">
                         <div className="shrink-0 cursor-pointer">
                             {row.relationVariationsItems?.map((item: any) => (
                                 <Popover
                                     content={
-                                        <div className="w-[400px] h-[500px] drop-shadow-sm rounded">
+                                        <div className="w-[400px] h-[460px] drop-shadow-sm rounded">
                                             <Image
                                                 width={400}
                                                 className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
@@ -202,20 +200,6 @@ const TermTable = ({
                                                         {item.reviews}({item.rating})
                                                     </span>
                                                 </div>
-                                            </div>
-                                            <div className="mt-[10px]">
-                                                <Tag className="cursor-pointer" color="warning">
-                                                    广告洞察
-                                                </Tag>
-                                                <Tag className="cursor-pointer" color="warning">
-                                                    查流量来源
-                                                </Tag>
-                                                <Tag className="cursor-pointer" color="warning">
-                                                    关联流量
-                                                </Tag>
-                                                <Tag className="cursor-pointer" color="warning">
-                                                    加入产品库
-                                                </Tag>
                                             </div>
                                         </div>
                                     }
@@ -635,8 +619,8 @@ const TermTable = ({
                 columns={columns}
                 dataSource={tableData}
             />
-            {total > 50 && (
-                <div className="mt-[20px]">
+            {total > pageQuery.size && (
+                <div className="mt-[20px] flex">
                     <Pagination
                         page={pageQuery.pag}
                         count={Math.ceil(total / pageQuery.size)}
@@ -646,6 +630,22 @@ const TermTable = ({
                                 page: value
                             });
                         }}
+                    />
+                    <Select
+                        style={{ width: 100 }}
+                        value={pageQuery.size}
+                        onChange={(value) => {
+                            setPageQuery({
+                                ...pageQuery,
+                                size: value
+                            });
+                        }}
+                        options={[
+                            { value: 10, label: '10 条/页' },
+                            { value: 20, label: '20 条/页' },
+                            { value: 30, label: '30 条/页' },
+                            { value: 50, label: '50 条/页' }
+                        ]}
                     />
                 </div>
             )}

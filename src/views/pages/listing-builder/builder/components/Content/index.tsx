@@ -109,7 +109,8 @@ const Content = () => {
         uid,
         handleSumGrade,
         fiveLen,
-        setListingParam
+        setListingParam,
+        listingParam
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
@@ -399,6 +400,7 @@ const Content = () => {
 
     useEffect(() => {
         if (detail?.draftConfig?.aiConfigDTO) {
+            setProductFeature(detail.draftConfig.aiConfigDTO.productFeature);
             formik.setValues({
                 ...detail.draftConfig.aiConfigDTO
             });
@@ -843,7 +845,7 @@ const Content = () => {
                         <div className="flex justify-between items-center">
                             <span className="text-[#505355] text-base font-semibold">添加ASIN辅助信息帮助AI更贴切的生成您的Listing</span>
                             <div className="flex items-center">
-                                <span>本月剩余次数1000</span>
+                                {/* <span>本月剩余次数1000</span> */}
                                 <div className="flex items-center ml-3 cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
                                     {!assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                     {!assistOpen ? (

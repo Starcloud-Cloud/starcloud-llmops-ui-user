@@ -272,7 +272,7 @@ const ListingBuilder = () => {
                         <Tab label="导入" {...a11yProps(1)} />
                     </Tabs>
                     <TabPanel value={tab} index={0}>
-                        <div className="w-[450px] h-screen">
+                        <div className="w-full h-screen">
                             <KeyWord />
                         </div>
                     </TabPanel>

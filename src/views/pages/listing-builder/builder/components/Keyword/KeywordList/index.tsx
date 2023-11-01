@@ -58,7 +58,7 @@ const headCells = [
     // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     // { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'use', numeric: false, disablePadding: true, label: '使用分布' }
+    { id: 'use', numeric: true, disablePadding: true, label: '使用分布' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -371,7 +371,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                     {/* <TableCell align="left" className="py-[6px] px-0">
                                         {row.keyword}
                                     </TableCell> */}
-                                    <TableCell align="center" className="py-[6px] px-0">
+                                    <TableCell align="right" className="py-[6px] px-0">
                                         <div className="flex items-center justify-center">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>

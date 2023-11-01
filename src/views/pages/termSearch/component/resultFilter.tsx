@@ -1,6 +1,6 @@
 import { Row, Col, InputNumber, Input, Popover, Button, Checkbox } from 'antd';
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 const ResultFilter = ({
     filterTable,
     type,
@@ -362,4 +362,11 @@ const ResultFilter = ({
         </div>
     );
 };
+// const arePropsEqual = (prevProps: any, nextProps: any) => {
+//     return (
+//         JSON.stringify(prevProps?.tableData) === JSON.stringify(nextProps?.tableData) &&
+//         JSON.stringify(prevProps?.loading) === JSON.stringify(nextProps?.loading)
+//     );
+// };
+// export default memo(ResultFilter, arePropsEqual);
 export default ResultFilter;

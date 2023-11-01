@@ -437,12 +437,19 @@ const Content = () => {
         const copyList = _.cloneDeep(list);
         copyList.splice(-2, 0, {
             title: `五点描述${index}`,
-            des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-            2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-            3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-            4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-            5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-            6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+            des: (
+                <span>
+                    1、提炼产品核心卖点，比如：尺寸、质保信息、适用年龄等，按重要程度排序；
+                    <br />
+                    2、字符要求：单行最多500字符，一般建议在200字符以内；
+                    <br />
+                    3、分点描述，每个五点描述的首字母大写，避免全部使用大写字母；
+                    <br />
+                    4、语言本地化、可读性强，让消费者可以通过简洁明了的描述最快速地了解产品的详细情况；
+                    <br />
+                    5、不要包含促销和定价的相关信息，不要包含物流、卖家以及公司的相关信息。
+                </span>
+            ),
             placeholder: `产品卖点描述${index}`,
             type: ListingBuilderEnum.FIVE_DES,
             isOvertop: true,
@@ -956,7 +963,7 @@ const Content = () => {
                                             <Button
                                                 className="!cursor-pointer !pointer-events-auto w-[300px]"
                                                 startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                                disabled={!productFeature || !detail.keywordMetaData.length || loadingList.length > 0}
+                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
                                                 color="secondary"
                                                 size="small"
                                                 variant="contained"

@@ -57,7 +57,8 @@ const ListingBuilder = () => {
         setDetail,
         setItemScore,
         setUpdate,
-        listingParam
+        listingParam,
+        enableAi
     } = useListing();
     const navigate = useNavigate();
 
@@ -143,7 +144,7 @@ const ListingBuilder = () => {
             version,
             endpoint: country.key,
             draftConfig: {
-                enableAi: true,
+                enableAi,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
                 aiConfigDTO: listingParam
             },
@@ -176,87 +177,100 @@ const ListingBuilder = () => {
         <Card>
             <CardHeader
                 sx={{ padding: 2 }}
-                title={list?.[0]?.value || 'Listing草稿'}
-                action={
-                    <div className="flex items-center">
-                        <div className="w-[130px] flex items-center">
-                            <Tooltip title={'删除关键词后可重新选择'} placement="top" arrow>
-                                <HelpOutlineIcon className="text-sm mr-1 cursor-pointer" />
-                            </Tooltip>
-                            <Dropdown
-                                disabled={detail?.keywordResume?.length > 0}
-                                menu={{ items: COUNTRY_LIST, onClick }}
-                                open={dropdownOpen}
-                                onOpenChange={setDropdownOpen}
-                                arrow
-                                placement={'top'}
+                title={
+                    <div className="flex justify-between items-center ">
+                        <Tooltip title={list?.[0]?.value || 'Listing草稿'}>
+                            <div className="sm:w-[400px] line-clamp-1 cursor-pointer xs:flex-wrap xs:w-full">
+                                {list?.[0]?.value || 'Listing草稿'}
+                            </div>
+                        </Tooltip>
+                        <div className="flex items-center">
+                            <div className="w-[130px] flex items-center">
+                                <Tooltip title={'删除关键词后可重新选择'} placement="top" arrow>
+                                    <HelpOutlineIcon className="text-sm mr-1 cursor-pointer" />
+                                </Tooltip>
+                                <Dropdown
+                                    disabled={detail?.keywordResume?.length > 0}
+                                    menu={{ items: COUNTRY_LIST, onClick }}
+                                    open={dropdownOpen}
+                                    onOpenChange={setDropdownOpen}
+                                    arrow
+                                    placement={'top'}
+                                >
+                                    <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
+                                        {country.icon}
+                                        <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
+                                        {!detail?.keywordResume?.length && (dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+                                    </div>
+                                </Dropdown>
+                            </div>
+                            <Button
+                                startIcon={<SaveIcon />}
+                                color="secondary"
+                                size="small"
+                                variant="contained"
+                                onClick={() => handleSave()}
                             >
-                                <div onClick={(e) => e.preventDefault()} className="cursor-pointer flex items-center font-normal">
-                                    {country.icon}
-                                    <span className="ml-1 text-sm color-[#606266]">{country.label}</span>
-                                    {!detail?.keywordResume?.length && (dropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
-                                </div>
-                            </Dropdown>
-                        </div>
-                        <Button startIcon={<SaveIcon />} color="secondary" size="small" variant="contained" onClick={() => handleSave()}>
-                            保存草稿
-                        </Button>
-                        {/* <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">
+                                保存草稿
+                            </Button>
+                            {/* <Button startIcon={<CloudUploadIcon />} color="secondary" size="small" variant="contained" className="ml-2">
                             同步到亚马逊
                         </Button> */}
-                        <IconButton
-                            aria-label="more"
-                            id="long-button"
-                            aria-haspopup="true"
-                            className="ml-1"
-                            onClick={(e) => {
-                                setDelAnchorEl(e.currentTarget);
-                            }}
-                        >
-                            <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                            id="del-menu"
-                            MenuListProps={{
-                                'aria-labelledby': 'del-button'
-                            }}
-                            anchorEl={delAnchorEl}
-                            open={delOpen}
-                            onClose={() => {
-                                setDelAnchorEl(null);
-                            }}
-                        >
-                            <MenuItem
-                                disabled={!uid}
-                                onClick={() => {
-                                    setDelAnchorEl(null);
-                                    setOpen(true);
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-haspopup="true"
+                                className="ml-1"
+                                onClick={(e) => {
+                                    setDelAnchorEl(e.currentTarget);
                                 }}
                             >
-                                <ListItemIcon>
-                                    <DeleteIcon />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    删除
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem
-                                disabled={!uid}
-                                onClick={() => {
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="del-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'del-button'
+                                }}
+                                anchorEl={delAnchorEl}
+                                open={delOpen}
+                                onClose={() => {
                                     setDelAnchorEl(null);
-                                    doExport();
                                 }}
                             >
-                                <ListItemIcon>
-                                    <CloudDownloadIcon />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    导出
-                                </Typography>
-                            </MenuItem>
-                        </Menu>
+                                <MenuItem
+                                    disabled={!uid}
+                                    onClick={() => {
+                                        setDelAnchorEl(null);
+                                        setOpen(true);
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <DeleteIcon />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit" noWrap>
+                                        删除
+                                    </Typography>
+                                </MenuItem>
+                                <MenuItem
+                                    disabled={!uid}
+                                    onClick={() => {
+                                        setDelAnchorEl(null);
+                                        doExport();
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <CloudDownloadIcon />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit" noWrap>
+                                        导出
+                                    </Typography>
+                                </MenuItem>
+                            </Menu>
+                        </div>
                     </div>
                 }
+                // action={}
             />
             <Divider />
             {isMobile ? (

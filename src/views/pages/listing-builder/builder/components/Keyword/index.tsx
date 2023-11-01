@@ -24,7 +24,7 @@ const KeyWord = () => {
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
     const [delOpen, setDelOpen] = React.useState(false);
-    const { detail, setUpdate, uid, version, list, country, listingParam } = useListing();
+    const { detail, setUpdate, uid, version, list, country, listingParam, enableAi } = useListing();
 
     const containerRef = useRef<any>(null);
 
@@ -45,7 +45,7 @@ const KeyWord = () => {
             version,
             endpoint: country.key,
             draftConfig: {
-                enableAi: true,
+                enableAi,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
                 aiConfigDTO: listingParam
             },

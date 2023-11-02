@@ -1,16 +1,19 @@
-import { Button, Select, Divider, Tag, Input, Popover } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Modal, IconButton, CardContent } from '@mui/material';
+import { Select } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
-import { Close } from '@mui/icons-material';
-import MainCard from 'ui-component/cards/MainCard';
 import { useEffect, useState } from 'react';
 import ResultFilter from './component/resultFilter';
 import TermTable from './component/termTable';
-import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage } from 'api/listing/termSerch';
+import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin } from 'api/listing/termSerch';
+import { useLocation } from 'react-router-dom';
+import { keywordPage } from 'api/listing/thesaurus';
+
+const { Option } = Select;
 
 const ThesaurusDetail = () => {
-    const { Option } = Select;
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const uid = searchParams.get('uid');
+
     const handleClose = (removedTag: string) => {
         const newTags = queryAsin.asinList.filter((tag: string) => tag !== removedTag);
         setQueryAsin({
@@ -48,9 +51,7 @@ const ThesaurusDetail = () => {
         orderColumn: 12 //排序的字段
     });
     useEffect(() => {
-        if (type !== 0) {
-            getExtended(type);
-        }
+        getExtended(type);
     }, [pageQuery.page, pageQuery.size]);
     //搜索结果过滤的值
     const [searchResult, setSearchResult] = useState<any>(null);
@@ -60,8 +61,11 @@ const ThesaurusDetail = () => {
         const { month, market } = queryAsin;
         setLoading(true);
         setAsinOpen(false);
-        const result = await KeywordMetadataExtendAsin({
+        const result = await keywordPage({
+            dictUid: uid,
             ...pageQuery,
+            pageNo: pageQuery.page,
+            pageSize: pageQuery.size,
             ...searchResult,
             excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
             includeKeywords: searchResult?.includeKeywords ? searchResult.includeKeywords.split(',') : undefined,

@@ -44,7 +44,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate, detail, list, listingParam, enableAi } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail, list, listingParam, enableAi, listingBuildType } = useListing();
     const navigate = useNavigate();
 
     // 添加关键词
@@ -67,7 +67,8 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-            fiveDesc: result
+            fiveDesc: result,
+            type: listingBuildType
         };
 
         if (tab === 0) {

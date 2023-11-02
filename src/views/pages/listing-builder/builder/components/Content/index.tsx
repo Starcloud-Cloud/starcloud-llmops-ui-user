@@ -39,6 +39,7 @@ import { getListingByAsin, getMetadata, getRecommend } from 'api/listing/build';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { fetchRequestCanCancel } from 'utils/fetch';
+import { useLocation } from 'react-router-dom';
 
 const { Search } = Input;
 
@@ -94,6 +95,8 @@ const Content = () => {
     const [mateList, setMateList] = React.useState<any>();
     const [productFeature, setProductFeature] = React.useState('');
     const [loadingList, setLoadingList] = React.useState<any[]>([]);
+    const [openGrade, setOpenGrade] = React.useState(true);
+    const location = useLocation();
 
     const {
         list,
@@ -109,7 +112,9 @@ const Content = () => {
         uid,
         handleSumGrade,
         fiveLen,
-        setListingParam
+        setListingParam,
+        setAsin,
+        asin
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
@@ -518,6 +523,7 @@ const Content = () => {
 
     // 所搜
     const handleSearch = async (value: any) => {
+        setAsin(value);
         if (!value) {
             dispatch(
                 openSnackbar({
@@ -735,62 +741,37 @@ const Content = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1 gap-4 w-full">
-                    {scoreList?.map((item, index) => (
-                        <div className="flex  items-center w-full flex-col" key={index}>
-                            <div className="mt-2  w-full">
-                                <span className="font-semibold text-base">{item.title}</span>
-                                {item.list.map((v, i) => (
-                                    <>
-                                        <div className="w-full py-1" key={i}>
-                                            <div className="flex justify-between items-center h-[30px]">
-                                                <span className="flex-[80%]">{v.label}</span>
-                                                {item.title.includes('5点描述') ? (
-                                                    <Popover content={fiveDesGrade(i)} title="打分">
-                                                        {!v.value ? (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px] ${
-                                                                    item.title.includes('5点描述') && 'cursor-pointer'
-                                                                }`}
-                                                                viewBox="0 0 1098 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="11931"
-                                                                width="32"
-                                                                height="32"
-                                                            >
-                                                                <path
-                                                                    d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
-                                                                    fill="#FB6547"
-                                                                    p-id="11932"
-                                                                ></path>
-                                                            </svg>
-                                                        ) : (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px] ${
-                                                                    item.title.includes('5点描述') && 'cursor-pointer'
-                                                                }`}
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="21700"
-                                                                width="16"
-                                                                height="16"
-                                                            >
-                                                                <path
-                                                                    d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
-                                                                    fill="#673ab7"
-                                                                    p-id="21701"
-                                                                ></path>
-                                                            </svg>
-                                                        )}
-                                                    </Popover>
-                                                ) : (
-                                                    <>
-                                                        {!v.value ? (
-                                                            <Tooltip title={'不满足'}>
+                <div className="flex justify-between items-center my-2 cursor-pointer" onClick={() => setOpenGrade(!openGrade)}>
+                    <span className="text-[#505355] text-base font-semibold">打分明细</span>
+                    <div className="flex items-center">
+                        <div className="flex items-center ml-3 ">
+                            {openGrade ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            {openGrade ? (
+                                <span className="text-[#505355] text-sm font-semibold">收起打分明细</span>
+                            ) : (
+                                <span className="text-[#505355] text-sm font-semibold">展开打分明细</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                {openGrade && (
+                    <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1 gap-4 w-full">
+                        {scoreList?.map((item, index) => (
+                            <div className="flex  items-center w-full flex-col" key={index}>
+                                <div className="mt-2  w-full">
+                                    <span className="font-semibold text-base">{item.title}</span>
+                                    {item.list.map((v, i) => (
+                                        <>
+                                            <div className="w-full py-1" key={i}>
+                                                <div className="flex justify-between items-center h-[30px]">
+                                                    <span className="flex-[80%]">{v.label}</span>
+                                                    {item.title.includes('5点描述') ? (
+                                                        <Popover content={fiveDesGrade(i)} title="打分">
+                                                            {!v.value ? (
                                                                 <svg
-                                                                    className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                    className={`h-[14px] w-[14px] ${
+                                                                        item.title.includes('5点描述') && 'cursor-pointer'
+                                                                    }`}
                                                                     viewBox="0 0 1098 1024"
                                                                     version="1.1"
                                                                     xmlns="http://www.w3.org/2000/svg"
@@ -804,11 +785,11 @@ const Content = () => {
                                                                         p-id="11932"
                                                                     ></path>
                                                                 </svg>
-                                                            </Tooltip>
-                                                        ) : (
-                                                            <Tooltip title={'满足'}>
+                                                            ) : (
                                                                 <svg
-                                                                    className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                    className={`h-[14px] w-[14px] ${
+                                                                        item.title.includes('5点描述') && 'cursor-pointer'
+                                                                    }`}
                                                                     viewBox="0 0 1024 1024"
                                                                     version="1.1"
                                                                     xmlns="http://www.w3.org/2000/svg"
@@ -822,21 +803,61 @@ const Content = () => {
                                                                         p-id="21701"
                                                                     ></path>
                                                                 </svg>
-                                                            </Tooltip>
-                                                        )}
-                                                    </>
-                                                )}
+                                                            )}
+                                                        </Popover>
+                                                    ) : (
+                                                        <>
+                                                            {!v.value ? (
+                                                                <Tooltip title={'不满足'}>
+                                                                    <svg
+                                                                        className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                        viewBox="0 0 1098 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        p-id="11931"
+                                                                        width="32"
+                                                                        height="32"
+                                                                    >
+                                                                        <path
+                                                                            d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                                                            fill="#FB6547"
+                                                                            p-id="11932"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </Tooltip>
+                                                            ) : (
+                                                                <Tooltip title={'满足'}>
+                                                                    <svg
+                                                                        className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                        viewBox="0 0 1024 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        p-id="21700"
+                                                                        width="16"
+                                                                        height="16"
+                                                                    >
+                                                                        <path
+                                                                            d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                                                            fill="#673ab7"
+                                                                            p-id="21701"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </Tooltip>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <MuiDivider />
-                                    </>
-                                ))}
+                                            <MuiDivider />
+                                        </>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </Card>
-            <Card className="p-5 mt-2">
+            {/* <Card className="p-5 mt-2">
                 <div className="flex justify-between flex-[30%] flex-wrap">
                     <div className="flex items-center">
                         <span>AI模式</span>
@@ -851,17 +872,29 @@ const Content = () => {
                         />
                     </div>
                 </div>
-            </Card>
-            {enableAi && (
+            </Card> */}
+            {true && (
                 <Card className="p-5 mt-2">
+                    {location.pathname === '/listingBuilderOptimize' && (
+                        <div>
+                            <div className="flex items-center  justify-between mb-3">
+                                <span className="text-[#505355] text-base font-semibold">输入ASIN</span>
+                                <Search
+                                    onSearch={handleSearch}
+                                    className="w-full md:w-[400px]"
+                                    placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
+                                    enterButton="获取Listing"
+                                />
+                            </div>
+                        </div>
+                    )}
                     <div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
                             <span className="text-[#505355] text-base font-semibold">添加ASIN辅助信息帮助AI更贴切的生成您的Listing</span>
                             <div className="flex items-center">
-                                {/* <span>本月剩余次数1000</span> */}
-                                <div className="flex items-center ml-3 cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
-                                    {!assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                    {!assistOpen ? (
+                                <div className="flex items-center ml-3 ">
+                                    {assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                    {assistOpen ? (
                                         <span className="text-[#505355] text-sm font-semibold">收起辅助信息</span>
                                     ) : (
                                         <span className="text-[#505355] text-sm font-semibold">展开辅助信息</span>

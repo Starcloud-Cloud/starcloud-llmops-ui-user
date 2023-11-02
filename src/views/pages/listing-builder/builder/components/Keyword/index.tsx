@@ -24,9 +24,7 @@ const KeyWord = () => {
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
     const [delOpen, setDelOpen] = React.useState(false);
-    const { detail, setUpdate, uid, version, list, country, listingParam, enableAi } = useListing();
-
-    const containerRef = useRef<any>(null);
+    const { detail, setUpdate, uid, version, list, country, listingParam, enableAi, listingBuildType } = useListing();
 
     const handleClose = () => {
         setOpen(false);
@@ -52,7 +50,8 @@ const KeyWord = () => {
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-            fiveDesc: result
+            fiveDesc: result,
+            type: listingBuildType
         };
         const resSave = await saveListing(data);
         if (resSave) {

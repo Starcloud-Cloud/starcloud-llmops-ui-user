@@ -25,6 +25,7 @@ const TermTable = ({
     total: number;
     tableData: any[];
     type: number;
+
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
 }) => {

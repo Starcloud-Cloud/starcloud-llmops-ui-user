@@ -3,6 +3,7 @@ import { Row, Col, InputNumber, Input, Popover, Button, Checkbox, Card, Select, 
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
 import { dictPage } from 'api/listing/thesaurus';
 import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
+import value from 'assets/scss/_themes-vars.module.scss';
 
 const { Option } = Select;
 
@@ -163,11 +164,17 @@ const searchList = [
 const ResultFilter = ({
     filterTable,
     type,
-    getExtended
+    getExtended,
+    setAddKeywordOpen,
+    setUid,
+    uid
 }: {
     filterTable: (data: any) => void;
     type: number;
     getExtended: (data: number) => void;
+    setAddKeywordOpen: (open: boolean) => void;
+    setUid: (uid: string) => void;
+    uid: string;
 }) => {
     const [filteOpen, setFilteOpen] = useState(true);
     const [searchWord, setSearchWord] = useState<any>({});
@@ -188,18 +195,27 @@ const ResultFilter = ({
         <Card className="py-[10px]">
             <Row gutter={20} className="mb-[30px] px-[30px]">
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
-                    <Select style={{ width: '100%' }} placeholder="select one country">
-                        {list.map((item: any) => (
-                            <Option value={item.uid} label={item.name}>
-                                <Space>
-                                    <div className="flex items-center">
-                                        <span role="img">{COUNTRY_LIST.find((v: any) => v.key === item.endpoint)?.icon}</span>
-                                        <span>{item.name}</span>
-                                    </div>
-                                </Space>
-                            </Option>
-                        ))}
-                    </Select>
+                    {list?.length > 0 && (
+                        <Select
+                            style={{ width: '100%' }}
+                            placeholder="select one country"
+                            value={uid}
+                            onChange={(value) => {
+                                setUid(value);
+                            }}
+                        >
+                            {list?.map((item: any) => (
+                                <Option value={item.uid} label={item.name}>
+                                    <Space>
+                                        <div className="flex items-center">
+                                            <span role="img">{COUNTRY_LIST.find((v: any) => v.key === item.endpoint)?.icon}</span>
+                                            <span className="ml-1">{item.name}</span>
+                                        </div>
+                                    </Space>
+                                </Option>
+                            ))}
+                        </Select>
+                    )}
                 </Col>
 
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
@@ -226,7 +242,7 @@ const ResultFilter = ({
                     <Button type="primary">查询</Button>
                 </Col>
                 <Col>
-                    <Button>新增关键词</Button>
+                    <Button onClick={() => setAddKeywordOpen(true)}>新增关键词</Button>
                 </Col>
             </Row>
 
@@ -236,7 +252,7 @@ const ResultFilter = ({
                         {searchList.map((item: any) => (
                             <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
                                 <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
-                                    {item.title}{' '}
+                                    {item.title}
                                     <Popover
                                         color="#262626"
                                         trigger="hover"

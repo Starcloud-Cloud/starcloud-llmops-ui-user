@@ -6,13 +6,28 @@ import TermTable from './component/termTable';
 import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin } from 'api/listing/termSerch';
 import { useLocation } from 'react-router-dom';
 import { keywordPage } from 'api/listing/thesaurus';
+import { AddKeywordDrawer } from './component/AddKeywordDrawer';
 
 const { Option } = Select;
 
+const containerStyle: React.CSSProperties = {
+    position: 'relative',
+    overflow: 'hidden',
+    height: 'calc(100vh - 128px)'
+};
+
 const ThesaurusDetail = () => {
+    const [addKeywordOpen, setAddKeywordOpen] = useState(false);
+    const [uid, setUid] = useState('');
+    const [update, forceUpdate] = useState({});
+
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const uid = searchParams.get('uid');
+    const queryUid = searchParams.get('uid');
+
+    useEffect(() => {
+        setUid(queryUid!);
+    }, [queryUid]);
 
     const handleClose = (removedTag: string) => {
         const newTags = queryAsin.asinList.filter((tag: string) => tag !== removedTag);
@@ -51,12 +66,15 @@ const ThesaurusDetail = () => {
         orderColumn: 12 //排序的字段
     });
     useEffect(() => {
-        getExtended(type);
-    }, [pageQuery.page, pageQuery.size]);
+        if (uid) {
+            getExtended(type);
+        }
+    }, [pageQuery.page, pageQuery.size, uid]);
     //搜索结果过滤的值
     const [searchResult, setSearchResult] = useState<any>(null);
     //变体类型
     const [type, setType] = useState(0);
+
     const getExtended = async (num: number) => {
         const { month, market } = queryAsin;
         setLoading(true);
@@ -125,7 +143,7 @@ const ThesaurusDetail = () => {
         }
     }, [searchResult]);
     return (
-        <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
+        <div className="overflow-y-auto overflow-x-hidden" style={containerStyle}>
             <SubCard
                 sx={{ mb: 3 }}
                 contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
@@ -136,7 +154,14 @@ const ThesaurusDetail = () => {
                 </div>
             </SubCard>
 
-            <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} />
+            <ResultFilter
+                filterTable={filterTable}
+                type={type}
+                getExtended={getExtended}
+                setAddKeywordOpen={setAddKeywordOpen}
+                uid={uid}
+                setUid={setUid}
+            />
             <TermTable
                 pageQuery={pageQuery}
                 queryAsin={queryAsin}
@@ -147,6 +172,7 @@ const ThesaurusDetail = () => {
                 type={type}
                 getExtended={getExtended}
             />
+            <AddKeywordDrawer open={addKeywordOpen} handleClose={() => setAddKeywordOpen(false)} uid={uid} forceUpdate={forceUpdate} />
         </div>
     );
 };

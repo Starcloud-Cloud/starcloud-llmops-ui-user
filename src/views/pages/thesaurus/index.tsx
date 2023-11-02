@@ -394,7 +394,7 @@ const Thesaurus = () => {
                                                         aria-label="delete"
                                                         size="small"
                                                         onClick={() => {
-                                                            navigate('/termSearch');
+                                                            navigate(`/thesaurusDetail?uid=${row.uid}`);
                                                         }}
                                                     >
                                                         <SummarizeIcon className="text-base" />

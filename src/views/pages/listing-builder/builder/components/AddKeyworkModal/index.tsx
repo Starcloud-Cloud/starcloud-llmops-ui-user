@@ -210,7 +210,9 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     </div>
                     <div className="flex items-center mt-4">
                         <HelpOutlineIcon className="text-base mr-1 text-[#999]" />
-                        <span className="text-[#999]">不知道关键词如何来？可使用拓展流量词</span>
+                        <span className="text-[#999]">
+                            不知道关键词如何来？可使用<a href="/termSearch">拓展流量词</a>
+                        </span>
                     </div>
                 </TabPanel>
                 <TabPanel value={tab} index={1}>

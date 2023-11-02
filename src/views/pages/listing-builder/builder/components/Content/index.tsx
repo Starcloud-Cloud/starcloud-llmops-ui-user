@@ -95,7 +95,7 @@ const Content = () => {
     const [mateList, setMateList] = React.useState<any>();
     const [productFeature, setProductFeature] = React.useState('');
     const [loadingList, setLoadingList] = React.useState<any[]>([]);
-    const [openGrade, setOpenGrade] = React.useState(true);
+    const [openGrade, setOpenGrade] = React.useState(false);
     const location = useLocation();
 
     const {
@@ -120,6 +120,12 @@ const Content = () => {
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
     const timeoutRef = React.useRef<any>(null);
+
+    React.useEffect(() => {
+        if (detail) {
+            setAsin(detail.asin);
+        }
+    }, [detail]);
 
     // 设置头部分数
     React.useEffect(() => {
@@ -583,10 +589,10 @@ const Content = () => {
                 const { promise, controller } = fetchRequestCanCancel('/llm/listing/execute/asyncExecute', 'post', {
                     listingType:
                         item.type === ListingBuilderEnum.TITLE
-                            ? 'TITLE'
+                            ? 'LISTING_TITLE'
                             : item.type === ListingBuilderEnum.FIVE_DES
-                            ? 'BULLET_POINT'
-                            : 'PRODUCT_DESCRIPTION',
+                            ? 'LISTING_BULLET_POINT'
+                            : 'LISTING_PRODUCT_DESCRIPTION',
                     keywords: item.keyword.map((item: any) => item.text),
                     ...formik.values,
                     draftUid: uid,
@@ -686,7 +692,7 @@ const Content = () => {
     return (
         <div>
             <Card className="rounded-t-none flex justify-center flex-col p-3" title={list?.[0]?.value || 'Listing草稿'}>
-                <div className="text-lg font-bold py-1">Listing评分</div>
+                <div className="text-xl font-bold py-1 mt-2">Listing评分</div>
                 <div className="grid xl:grid-cols-2 xs:grid-cols-1 gap-2 w-full">
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
@@ -742,7 +748,7 @@ const Content = () => {
                     </div>
                 </div>
                 <div className="flex justify-between items-center my-2 cursor-pointer" onClick={() => setOpenGrade(!openGrade)}>
-                    <span className="text-[#505355] text-base font-semibold">打分明细</span>
+                    {/* <span className="text-[#505355] text-base font-semibold">打分明细</span> */}
                     <div className="flex items-center">
                         <div className="flex items-center ml-3 ">
                             {openGrade ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -877,13 +883,15 @@ const Content = () => {
                 <Card className="p-5 mt-2">
                     {location.pathname === '/listingBuilderOptimize' && (
                         <div>
-                            <div className="flex items-center  justify-between mb-3">
-                                <span className="text-[#505355] text-base font-semibold">输入ASIN</span>
+                            <div className="flex mb-3 flex-col">
+                                <span className="text-[#505355] text-base font-semibold mb-2">输入ASIN</span>
                                 <Search
+                                    value={asin}
                                     onSearch={handleSearch}
                                     className="w-full md:w-[400px]"
                                     placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
                                     enterButton="获取Listing"
+                                    onChange={(e: any) => setAsin(e.target.value)}
                                 />
                             </div>
                         </div>
@@ -1028,7 +1036,7 @@ const Content = () => {
                 </Card>
             )}
             <Card className="mt-2 p-5">
-                <div className="text-lg font-bold py-1">Listing优化</div>
+                <div className="text-xl font-bold py-1">Listing优化</div>
                 {list.map((item, index) => (
                     <>
                         {item.type === ListingBuilderEnum.PRODUCT_DES && (

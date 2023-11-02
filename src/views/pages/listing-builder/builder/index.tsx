@@ -58,9 +58,11 @@ const ListingBuilder = () => {
         setItemScore,
         setUpdate,
         listingParam,
+        setListingParam,
         enableAi,
         listingBuildType,
-        asin
+        asin,
+        setAsin
     } = useListing();
     const navigate = useNavigate();
 
@@ -100,6 +102,8 @@ const ListingBuilder = () => {
             setKeywordHighlight([]);
             setDetail(null);
             setItemScore({});
+            setAsin('');
+            setListingParam({});
         };
     }, []);
 
@@ -170,7 +174,11 @@ const ListingBuilder = () => {
                     close: false
                 })
             );
-            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+            if (listingBuildType === 1) {
+                navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+            } else {
+                navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+            }
             setVersion(res.version);
             setUid(res.uid);
             setUpdate({});

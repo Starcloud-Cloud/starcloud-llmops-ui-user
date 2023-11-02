@@ -82,8 +82,8 @@ const KeyWord = () => {
 
     return (
         <div className="h-full p-3 bg-white" style={containerStyle}>
-            <div className="flex justify-between items-center">
-                <div className="text-lg font-bold py-1">关键词</div>
+            <div className="flex justify-between items-center mt-2">
+                <div className="text-xl font-bold py-1 ">关键词</div>
                 <div className="flex justify-between">
                     <Button
                         startIcon={<AddIcon />}

@@ -83,7 +83,11 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     // }
                     const res = await saveListing({ ...data, keys: lines });
                     if (res) {
-                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        if (listingBuildType === 1) {
+                            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        } else {
+                            navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                        }
                         setVersion(res.version);
                         setUid(res.uid);
                         handleClose();
@@ -93,7 +97,11 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     // 修改了站点所属
                     const res = await saveListing({ ...data, keys: lines });
                     if (res) {
-                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        if (listingBuildType === 1) {
+                            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        } else {
+                            navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                        }
                         setVersion(res.version);
                         setUid(res.uid);
                         handleClose();
@@ -102,7 +110,11 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                 }
             } else {
                 const res = await saveListing({ ...data, keys: lines });
-                navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                if (listingBuildType === 1) {
+                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                } else {
+                    navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                }
                 setVersion(res.version);
                 setUid(res.uid);
                 handleClose();
@@ -122,7 +134,11 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                         // 更新
                         setUpdate({});
                     }
-                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                    if (listingBuildType === 1) {
+                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                    } else {
+                        navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                    }
                 }
             }
         }

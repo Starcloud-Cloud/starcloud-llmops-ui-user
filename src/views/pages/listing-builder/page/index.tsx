@@ -1,23 +1,12 @@
-import { Button, Checkbox, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, Typography } from '@mui/material';
+import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
 
-import {
-    Box,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel,
-    CircularProgress
-} from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
 
 import React, { useEffect, useState } from 'react';
-import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
+import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -26,7 +15,6 @@ import { Divider, Progress } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router-dom';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { delListing, draftClone, draftExport, getListingPage } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
@@ -35,8 +23,7 @@ import { COUNTRY_LIST } from '../data';
 import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
-import { CircularProgressWithLabel } from 'ui-component/CircularProgressWithLabel';
-const { result_code, base_url, share_base_url, request_timeout } = config;
+const { base_url } = config;
 
 export interface DraftConfig {}
 
@@ -68,6 +55,7 @@ export interface TableEnhancedCreateDataType {
     matchSearchers: number;
     searchersProportion: number;
     scoreProportion: number;
+    type: number;
 }
 
 const headCells = [
@@ -246,8 +234,12 @@ const ListingBuilderPage: React.FC = () => {
         navigate('/listingBuilder');
     };
 
-    const handleEdit = async (uid: string, version: number) => {
-        navigate('/listingBuilder?uid=' + uid + '&version=' + version);
+    const handleEdit = async (type: number, uid: string, version: number) => {
+        if (type === 1) {
+            navigate('/listingBuilder?uid=' + uid + '&version=' + version);
+        } else {
+            navigate('/listingBuilderOptimize?uid=' + uid + '&version=' + version);
+        }
     };
 
     const handleTransfer = (key: string) => {
@@ -337,7 +329,7 @@ const ListingBuilderPage: React.FC = () => {
                         size="small"
                         className="ml-1"
                     >
-                        新增Listing优化
+                        优化已有Listing
                     </Button>
                     <Divider type={'vertical'} />
                     <Button
@@ -529,7 +521,7 @@ const ListingBuilderPage: React.FC = () => {
                                                 aria-label="delete"
                                                 size="small"
                                                 onClick={() => {
-                                                    handleEdit(row.uid, row.version);
+                                                    handleEdit(row.type, row.uid, row.version);
                                                 }}
                                             >
                                                 <EditIcon className="text-base" />

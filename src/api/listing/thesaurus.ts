@@ -15,6 +15,6 @@ export const dictPage = (data: any) => {
 };
 
 // 删除
-export const delPage = (data: any) => {
-    return request.get({ url: '/listing/dict/delete', data });
+export const delDict = (data: any) => {
+    return request.delete({ url: '/listing/dict/delete', data });
 };

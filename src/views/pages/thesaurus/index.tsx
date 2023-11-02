@@ -1,4 +1,3 @@
-import { Divider } from 'antd';
 import {
     Grid,
     TextField,
@@ -10,28 +9,33 @@ import {
     Table,
     TableContainer,
     TableHead,
-    TableSortLabel,
-    Box,
     TableCell,
     TableBody,
     Checkbox,
     TableRow,
     Tooltip,
-    IconButton
+    IconButton,
+    TableSortLabel,
+    Box
 } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
-import { Search, Add, Delete, Edit, RawOff } from '@mui/icons-material';
+import { Add, Delete } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Icon, TablePagination } from '@mui/material';
+import { Card, TablePagination } from '@mui/material';
 import { COUNTRY_LIST } from '../listing-builder/data/index';
-import { dictPage } from 'api/listing/thesaurus';
+import { delDict, dictPage } from 'api/listing/thesaurus';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import React from 'react';
+import dayjs from 'dayjs';
+import { visuallyHidden } from '@mui/utils';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { AddDictModal } from './component/addDictModal';
 
 const headCells = [
     { id: 'name', numeric: false, disablePadding: false, label: '词库名称' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '所谓站点' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '所属站点' },
     { id: 'count', numeric: false, disablePadding: false, label: '关键词数量' },
     { id: 'createTime', numeric: false, disablePadding: false, label: ' 创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
@@ -65,7 +69,22 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
-                        {headCell.label}
+                        {['updateTime', 'createTime', 'count'].includes(headCell.id) ? (
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id && (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                )}
+                            </TableSortLabel>
+                        ) : (
+                            headCell.label
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
@@ -73,26 +92,26 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     );
 }
 const Thesaurus = () => {
-    const [pageQuery, setPageQuery] = useState({
-        pageNo: 1,
-        pageSize: 10
-    });
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-
     const [total, setTotal] = useState(0);
-    const [count, setCount] = useState(0);
     const [dense] = useState(false);
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
     const [rows, setRows] = useState<any[]>([]);
-    // const rows = [{ id: 1 }, { id: 2 }];
+    const [query, setQuery] = useState({});
+    const [update, forceUpdate] = useState({});
+    const [addDictOpen, setAddDictOpen] = useState(false);
+
     const navigate = useNavigate();
 
     React.useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage, ...query };
+            if (pageVO.endpoint === 'all') {
+                pageVO.endpoint = '';
+            }
             if (orderBy) {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
@@ -109,7 +128,7 @@ const Thesaurus = () => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage, count, order, orderBy]);
+    }, [page, rowsPerPage, update, order, orderBy, query]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -129,7 +148,6 @@ const Thesaurus = () => {
     const countryList = [
         {
             key: 'all',
-            value: 'all',
             label: '所有站点',
             icon: (
                 <svg
@@ -180,6 +198,26 @@ const Thesaurus = () => {
         setSelected(newSelected);
     };
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+    const handleDel = async () => {
+        const res = await delDict(selected);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            forceUpdate({});
+            setSelected([]);
+        }
+    };
+
     return (
         <div className="h-full">
             <Card>
@@ -190,42 +228,93 @@ const Thesaurus = () => {
                                 <InputLabel size="small" id="model">
                                     站点
                                 </InputLabel>
-                                <Select size="small" labelId="model" name="model" label="模型" onChange={() => null}>
+                                <Select
+                                    size="small"
+                                    labelId="endpoint"
+                                    name="endpoint"
+                                    label="站点"
+                                    onChange={(e) =>
+                                        setQuery((pre: any) => ({
+                                            ...pre,
+                                            endpoint: e.target.value
+                                        }))
+                                    }
+                                >
                                     {countryList.map((item) => (
-                                        <MenuItem key={item.key} value={item.value} className="flex items-center">
-                                            {item.icon}
-                                            <span className="ml-1">{item.label}</span>
+                                        <MenuItem key={item.key} value={item.key} className="flex items-center">
+                                            <div className="flex items-center">
+                                                {item.icon}
+                                                <span className="ml-1">{item.label}</span>
+                                            </div>
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
                         </Grid>
                         <Grid item md={2}>
-                            <TextField size="small" fullWidth label="词库名称" color="secondary" />
+                            <TextField
+                                size="small"
+                                fullWidth
+                                label="词库名称"
+                                color="secondary"
+                                onChange={(e) =>
+                                    setQuery((pre: any) => ({
+                                        ...pre,
+                                        name: e.target.value
+                                    }))
+                                }
+                            />
                         </Grid>
                         <Grid item md={3}>
-                            <TextField size="small" fullWidth label="包含关键词" color="secondary" />
+                            <TextField
+                                size="small"
+                                fullWidth
+                                label="包含关键词"
+                                color="secondary"
+                                onChange={(e) =>
+                                    setQuery((pre: any) => ({
+                                        ...pre,
+                                        keyword: e.target.value
+                                    }))
+                                }
+                            />
                         </Grid>
-                        <Grid item md={4}>
+                        {/* <Grid item md={4}>
                             <Button variant="contained" color="secondary" startIcon={<Search />}>
                                 查询
                             </Button>
                             <Button sx={{ ml: 1 }} variant="contained" color="secondary" startIcon={<Add />}>
                                 新建词库
                             </Button>
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </div>
             </Card>
             <Card className="mt-4">
                 <div className="bg-[#fff] py-[16px]">
                     <div className="px-[16px] flex items-center justify-between">
-                        <div>
-                            <Button variant="contained" color="secondary" startIcon={<Delete />}>
+                        <div className="flex justify-between w-full">
+                            <Button
+                                size="small"
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<Add />}
+                                onClick={() => setAddDictOpen(true)}
+                            >
+                                新建词库
+                            </Button>
+                            <Button
+                                onClick={handleDel}
+                                size="small"
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<Delete />}
+                                disabled={!selected.length}
+                            >
                                 批量删除
                             </Button>
                         </div>
-                        <div className="flex items-center">
+                        {/* <div className="flex items-center">
                             <FormControl size="small" color="secondary" sx={{ width: '140px' }}>
                                 <InputLabel>更新时间</InputLabel>
                                 <Select label="更新时间">
@@ -244,7 +333,7 @@ const Thesaurus = () => {
                             <Button variant="contained" color="secondary">
                                 确定
                             </Button>
-                        </div>
+                        </div> */}
                     </div>
                     <TableContainer>
                         <Table sx={{ minWidth: 1100 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
@@ -259,13 +348,13 @@ const Thesaurus = () => {
                             <TableBody>
                                 {rows.map((row, index) => {
                                     console.log(row, 'row');
-                                    const isItemSelected = isSelected(row.id);
+                                    const isItemSelected = isSelected(row.uid);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
                                         <TableRow
                                             hover
-                                            key={row.id}
+                                            key={row.uid}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
@@ -273,7 +362,7 @@ const Thesaurus = () => {
                                         >
                                             <TableCell padding="checkbox">
                                                 <Checkbox
-                                                    onClick={(event) => handleClick(event, row.id)}
+                                                    onClick={(event) => handleClick(event, row.uid)}
                                                     color="primary"
                                                     checked={isItemSelected}
                                                     inputProps={{
@@ -281,11 +370,24 @@ const Thesaurus = () => {
                                                     }}
                                                 />
                                             </TableCell>
-                                            <TableCell align="center">{row.name}</TableCell>
-                                            <TableCell align="center">{row.endpoint}</TableCell>
+                                            <TableCell align="center" className="w-[300px]">
+                                                <div className="w-full line-clamp-1 text-center">{row.name}</div>
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <div className="flex items-center justify-center">
+                                                    {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
+                                                    <span className="ml-1">
+                                                        {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
                                             <TableCell align="center">{row.count}</TableCell>
-                                            <TableCell align="center">{row.createTime}</TableCell>
-                                            <TableCell align="center">{row.updateTime}</TableCell>
+                                            <TableCell align="center">
+                                                {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            </TableCell>
                                             <TableCell align="center">
                                                 <Tooltip placement="top" title={'查看关键词列表'}>
                                                     <IconButton
@@ -295,7 +397,7 @@ const Thesaurus = () => {
                                                             navigate('/termSearch');
                                                         }}
                                                     >
-                                                        <Edit className="text-base" />
+                                                        <SummarizeIcon className="text-base" />
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
@@ -317,6 +419,13 @@ const Thesaurus = () => {
                     />
                 </div>
             </Card>
+            <AddDictModal
+                open={addDictOpen}
+                handleClose={() => {
+                    setAddDictOpen(false);
+                }}
+                forceUpdate={forceUpdate}
+            />
         </div>
     );
 };

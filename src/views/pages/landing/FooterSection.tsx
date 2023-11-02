@@ -164,7 +164,7 @@ const FooterSection = () => {
                     <a target="_blank" className="text-[#2196f3] ml-2" href="https://www.234.cn">
                         234跨境导航
                     </a>
-                    <a target="_blank" className="text-[#2196f3]" href="https://www.h1z1tmc.com/">
+                    <a target="_blank" className="text-[#2196f3] ml-2" href="https://www.h1z1tmc.com/">
                         AI导航猫
                     </a>
                 </div>

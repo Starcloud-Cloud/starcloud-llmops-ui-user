@@ -2,7 +2,7 @@ import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
 import { ArrowDownOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import * as echarts from 'echarts';
 import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
@@ -39,7 +39,7 @@ const TermTable = ({
         {
             title: '#',
             width: 72,
-            render: (_, row, index) => <div>{(index + 1) * pageQuery.page}</div>
+            render: (_, row, index) => <div>{index + 1 + pageQuery.size * (pageQuery.page - 1)}</div>
         },
         {
             title: (
@@ -242,7 +242,7 @@ const TermTable = ({
             width: 200,
             render: (_, row, index) => (
                 <div className="w-[168px] relative">
-                    <div className="absolute top-[-20px] left-0 w-[168px] h-[100px]" id={'chart' + index}></div>
+                    <div className="absolute top-[-20px] left-0 w-[168px] h-[70px]" id={'chart' + index}></div>
                 </div>
             )
         },
@@ -544,7 +544,7 @@ const TermTable = ({
             const rankList: any[] = [];
             const searchList: any[] = [];
             item.searchesTrend?.map((el: any) => {
-                Axis.push(`${el?.month?.slice(0, 4)}年${el?.month?.slice(4, 2)}`);
+                Axis.push(`${el?.month?.substr(0, 4)}年${el?.month?.substr(4, 2)}月`);
                 rankList.push(el?.searchRank);
                 searchList.push(el?.searches);
             });
@@ -556,10 +556,10 @@ const TermTable = ({
         <>
             <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
+                    <Button>导出</Button>
+                    <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
                         加入词库
                     </Button>
-                    <Button className="mx-[10px]">导出</Button>
                     <span className="text-[#7b7e81]">
                         搜索结果数：<span className="text-[#673ab7] font-[600]">{total}</span>
                     </span>
@@ -622,7 +622,7 @@ const TermTable = ({
             {total > pageQuery.size && (
                 <div className="mt-[20px] flex">
                     <Pagination
-                        page={pageQuery.pag}
+                        page={pageQuery.page}
                         count={Math.ceil(total / pageQuery.size)}
                         onChange={(e: any, value: number) => {
                             setPageQuery({
@@ -653,4 +653,11 @@ const TermTable = ({
         </>
     );
 };
-export default TermTable;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return (
+        JSON.stringify(prevProps?.tableData) === JSON.stringify(nextProps?.tableData) &&
+        JSON.stringify(prevProps?.loading) === JSON.stringify(nextProps?.loading) &&
+        JSON.stringify(prevProps?.page) === JSON.stringify(nextProps?.page)
+    );
+};
+export default memo(TermTable, arePropsEqual);

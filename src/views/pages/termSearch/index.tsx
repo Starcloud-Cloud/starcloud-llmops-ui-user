@@ -94,11 +94,29 @@ const TermSearch = () => {
     };
     //结果筛选
     const filterTable = (data: any) => {
-        setSearchResult(data);
+        if (JSON.stringify(data) === JSON.stringify(searchResult)) {
+            if (pageQuery.page === 1) {
+                getExtended(type);
+            } else {
+                setPageQuery({
+                    ...pageQuery,
+                    page: 1
+                });
+            }
+        } else {
+            setSearchResult(data);
+        }
     };
     useEffect(() => {
         if (searchResult) {
-            getExtended(type);
+            if (pageQuery.page === 1) {
+                getExtended(type);
+            } else {
+                setPageQuery({
+                    ...pageQuery,
+                    page: 1
+                });
+            }
         }
     }, [searchResult]);
     return (

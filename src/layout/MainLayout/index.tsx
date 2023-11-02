@@ -322,6 +322,7 @@ const MainLayout = () => {
             '/createChat',
             '/appMarket',
             '/listingBuilder',
+            '/listingBuilderOptimize',
             '/collect',
             '/termSearch'
         ];

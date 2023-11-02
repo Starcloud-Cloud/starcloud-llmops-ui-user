@@ -330,6 +330,17 @@ const ListingBuilderPage: React.FC = () => {
                         新增Listing
                     </Button>
                     <Button
+                        color="secondary"
+                        startIcon={<AddIcon />}
+                        onClick={() => navigate('/listingBuilderOptimize')}
+                        variant="contained"
+                        size="small"
+                        className="ml-1"
+                    >
+                        新增Listing优化
+                    </Button>
+                    <Divider type={'vertical'} />
+                    <Button
                         disabled={selected.length === 0}
                         className="ml-1"
                         size="small"
@@ -419,7 +430,7 @@ const ListingBuilderPage: React.FC = () => {
             }
         >
             <TableContainer>
-                <Table sx={{ minWidth: 1200 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}
@@ -459,7 +470,7 @@ const ListingBuilderPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.title}>
-                                            <span className="line-clamp-1 w-[450px] mx-auto">{row.title}</span>
+                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.title}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">

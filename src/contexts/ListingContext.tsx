@@ -61,6 +61,9 @@ type ListingContextType = {
     keywordHighlightRef: any;
     setListingParam: (listingParam: any) => any;
     listingParam: any;
+    listingBuildType: number;
+    asin: string;
+    setAsin: (asin: string) => void;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
@@ -78,6 +81,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const [update, setUpdate] = useState<any>({});
     const [itemScore, setItemScore] = useState<any>({});
     const [listingParam, setListingParam] = useState<any>({}); //
+    const [asin, setAsin] = useState<string>('');
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -85,6 +89,14 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const queryVersion = searchParams.get('version');
 
     const keywordHighlightRef = useRef<any>(null);
+
+    const listingBuildType = useMemo(() => {
+        if (location.pathname === '/listingBuilder') {
+            return 1;
+        } else {
+            return 2;
+        }
+    }, [location]);
 
     useEffect(() => {
         if (queryVersion && queryUid) {
@@ -339,7 +351,10 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 fiveLen,
                 keywordHighlightRef,
                 setListingParam,
-                listingParam
+                listingParam,
+                listingBuildType,
+                setAsin,
+                asin
             }}
         >
             {children}

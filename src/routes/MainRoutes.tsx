@@ -154,6 +154,10 @@ const MainRoutes = {
             element: <ListingBuilder />
         },
         {
+            path: '/listingBuilderOptimize',
+            element: <ListingBuilder />
+        },
+        {
             path: '/ListingBuilderPage',
             element: <ListingBuilderPage />
         },

@@ -58,7 +58,9 @@ const ListingBuilder = () => {
         setItemScore,
         setUpdate,
         listingParam,
-        enableAi
+        enableAi,
+        listingBuildType,
+        asin
     } = useListing();
     const navigate = useNavigate();
 
@@ -151,7 +153,9 @@ const ListingBuilder = () => {
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-            fiveDesc: result
+            fiveDesc: result,
+            type: listingBuildType,
+            asin
         };
         const res = await saveListing(data);
         if (res) {

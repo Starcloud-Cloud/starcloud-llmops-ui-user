@@ -324,7 +324,8 @@ const MainLayout = () => {
             '/listingBuilder',
             '/listingBuilderOptimize',
             '/collect',
-            '/termSearch'
+            '/termSearch',
+            '/thesaurusDetail'
         ];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);

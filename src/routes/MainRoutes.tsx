@@ -42,6 +42,8 @@ const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 // listing-builder
 const ListingBuilder = Loadable(lazy(() => import('views/pages/listing-builder/builder')));
 const ListingBuilderPage = Loadable(lazy(() => import('views/pages/listing-builder/page')));
+const ThesaurusDetail = Loadable(lazy(() => import('views/pages/thesaurusDetail')));
+
 //小红书图文
 const SmallRedBook = Loadable(lazy(() => import('views/pages/smallRedBook/index')));
 //词库
@@ -164,6 +166,10 @@ const MainRoutes = {
         {
             path: '/thesaurus',
             element: <Thesaurus />
+        },
+        {
+            path: '/thesaurusDetail',
+            element: <ThesaurusDetail />
         },
         {
             path: '/smallRedBook',

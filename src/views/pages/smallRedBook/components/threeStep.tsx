@@ -7,8 +7,10 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { fetchRequestCanCancel } from 'utils/fetch';
 import { createRedBookImg } from '../../../../api/redBook/index';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
-export const ThreeStep = ({ data }: { data: any }) => {
+export const ThreeStep = () => {
     const [text, setText] = React.useState<string>('');
     const [images, setImages] = React.useState<any[]>([]);
     const [swiperRef, setSwiperRef] = React.useState<any>(null);
@@ -92,6 +94,20 @@ export const ThreeStep = ({ data }: { data: any }) => {
             ]
         });
         if (res) {
+            if (res.some((item: any) => !item.success)) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '生成失败',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+                return;
+            }
             setImages(res);
             setImgLoading(false);
         }
@@ -109,8 +125,8 @@ export const ThreeStep = ({ data }: { data: any }) => {
             <Space direction="vertical" size={16} className="w-full">
                 <Card title="小红书生成" extra={<Button onClick={handleCreate}>生成</Button>}>
                     <div className="w-full grid grid-cols-3 h-[60vh]">
-                        <Spin tip="Loading..." spinning={imgLoading}>
-                            <div className="col-span-2 relative">
+                        <div className="col-span-2 relative">
+                            <Spin tip="Loading..." spinning={imgLoading}>
                                 {images.length > 0 && (
                                     <>
                                         <div className="flex justify-between absolute top-[46%] w-full z-10">
@@ -156,10 +172,10 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                         </div>
                                     </>
                                 )}
-                            </div>
-                        </Spin>
-                        <Spin tip="Loading..." spinning={textLoading}>
-                            <div className="col-span-1">
+                            </Spin>
+                        </div>
+                        <div className="col-span-1">
+                            <Spin tip="Loading..." spinning={textLoading}>
                                 {images.length > 0 && (
                                     <div className="w-full h-full p-4">
                                         <div className="flex items-center justify-between">
@@ -178,8 +194,8 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                         <Divider />
                                     </div>
                                 )}
-                            </div>
-                        </Spin>
+                            </Spin>
+                        </div>
                     </div>
                 </Card>
             </Space>

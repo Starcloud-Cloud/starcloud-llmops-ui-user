@@ -183,7 +183,14 @@ const SmallRedBook = () => {
     const [consList, setConsList] = useState<any[]>([{ key: 'one' }, { key: 'two' }]);
     return (
         <div className="h-full bg-[#fff] p-[20px]">
-            <Steps className="px-[100px]" current={current} items={[{ title: '第一步' }, { title: '第二步' }]} />
+            <Steps
+                className="px-[30%]"
+                current={current}
+                items={[
+                    { title: '第一步', description: '配置' },
+                    { title: '第二步', description: '生成' }
+                ]}
+            />
             <div className="min-h-[500px] my-[20px] rounded border border-dashed border-[#d4d4d4] p-[20px]">
                 {current === 0 && (
                     <div>

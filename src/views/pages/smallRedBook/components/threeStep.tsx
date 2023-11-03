@@ -6,24 +6,31 @@ import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { fetchRequestCanCancel } from 'utils/fetch';
-import { createRedBookImg } from '../../../../api/redBook/index';
+import { createRedBookImg, doCreateText } from '../../../../api/redBook/index';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
-export const ThreeStep = () => {
+export const ThreeStep = ({ data }: { data: any }) => {
+    console.log(data, 'data');
     const [text, setText] = React.useState<string>('');
+    const [title, setTitle] = React.useState<string>('');
     const [images, setImages] = React.useState<any[]>([]);
     const [swiperRef, setSwiperRef] = React.useState<any>(null);
     const [imgLoading, setImgLoading] = React.useState<boolean>(false);
     const [textLoading, setTextLoading] = React.useState<boolean>(false);
 
+    // const handleCreateText = async () => {
+    //     const res = await doCreateText({ ...data.appRequest });
+    //     console.log(res, 'res');
+    //     if (res) {
+    //         setText(res.content);
+    //         setTitle(res.title);
+    //         setTextLoading(false);
+    //     }
+    // };
+
     const handleCreateText = async () => {
-        const { promise, controller } = fetchRequestCanCancel('/llm/app/xhs/appExecute', 'post', {
-            uid: '0df9889631344ccabbc05b8541c2a1c7',
-            params: {
-                BRAND_NAME: '美女'
-            }
-        });
+        const { promise, controller } = fetchRequestCanCancel('/llm/app/xhs/appExecute', 'post', { ...data.appRequest });
         let resp: any = await promise;
 
         const reader = resp.getReader();
@@ -58,40 +65,7 @@ export const ThreeStep = () => {
 
     const handleCreateImg = async () => {
         const res = await createRedBookImg({
-            imageRequests: [
-                {
-                    imageTemplate: 'NINE_BOX_GRID',
-                    params: {
-                        IMAGE_1: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00814b133d4607649e93d5ca903149e2.png',
-                        IMAGE_2: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/008b3ba25fe0edd9e13b12a52f2e0112.png',
-                        IMAGE_3: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00c297aa35b651313caadbd9e832f433.png',
-                        IMAGE_4: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00cce449bc2c5e3930b9f1a056715d25.png',
-                        IMAGE_5: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00e3a142e6288392a817c363548ac37c.png',
-                        IMAGE_6: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/010097441176b6fa2a48696f43e429ce.png',
-                        IMAGE_7: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/0113baffc0a41662b589550e712cda7f.png',
-                        IMAGE_8: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/0118ab046580533c85e1b3e978c8af25.png',
-                        IMAGE_9: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/014ff2dae78ff68df28681b96a1462d7.png',
-                        TITLE: '测试生成图片，你猜能成功不！',
-                        SUB_TITLE: '嘻嘻，嘿嘿，哈哈，滴滴滴'
-                    }
-                },
-                {
-                    imageTemplate: 'NINE_BOX_GRID',
-                    params: {
-                        IMAGE_1: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00814b133d4607649e93d5ca903149e2.png',
-                        IMAGE_2: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/008b3ba25fe0edd9e13b12a52f2e0112.png',
-                        IMAGE_3: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00c297aa35b651313caadbd9e832f433.png',
-                        IMAGE_4: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00cce449bc2c5e3930b9f1a056715d25.png',
-                        IMAGE_5: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/00e3a142e6288392a817c363548ac37c.png',
-                        IMAGE_6: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/010097441176b6fa2a48696f43e429ce.png',
-                        IMAGE_7: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/0113baffc0a41662b589550e712cda7f.png',
-                        IMAGE_8: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/0118ab046580533c85e1b3e978c8af25.png',
-                        IMAGE_9: 'https://download.hotsalecloud.com/mofaai/images/ai-generation/014ff2dae78ff68df28681b96a1462d7.png',
-                        TITLE: '测试生成图片！',
-                        SUB_TITLE: '嘻嘻，嘿嘿，哈哈'
-                    }
-                }
-            ]
+            imageRequests: data.imageRequests
         });
         if (res) {
             if (res.some((item: any) => !item.success)) {
@@ -114,6 +88,8 @@ export const ThreeStep = () => {
     };
 
     const handleCreate = async () => {
+        setImages([]);
+        setText('');
         setTextLoading(true);
         setImgLoading(true);
         await handleCreateImg();
@@ -124,7 +100,7 @@ export const ThreeStep = () => {
         <div>
             <Space direction="vertical" size={16} className="w-full">
                 <Card title="小红书生成" extra={<Button onClick={handleCreate}>生成</Button>}>
-                    <div className="w-full grid grid-cols-3 h-[60vh]">
+                    <div className="w-full grid grid-cols-3 min-h-[60vh]">
                         <div className="col-span-2 relative">
                             <Spin tip="Loading..." spinning={imgLoading}>
                                 {images.length > 0 && (
@@ -164,7 +140,7 @@ export const ThreeStep = () => {
                                                 >
                                                     {images.map((item: any, index) => (
                                                         <SwiperSlide key={index}>
-                                                            <img src={item.url} />
+                                                            <img className="w-full" src={item.url} />
                                                         </SwiperSlide>
                                                     ))}
                                                 </Swiper>
@@ -190,8 +166,9 @@ export const ThreeStep = () => {
                                                 关注
                                             </div>
                                         </div>
-                                        <div className="font-semibold text-lg mb-2 mt-8">{text}</div>
+                                        <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap">{text}</div>
                                         <Divider />
+                                        {/* <div className="text-base mb-2 mt-8 whitespace-pre-wrap">{text}</div> */}
                                     </div>
                                 )}
                             </Spin>

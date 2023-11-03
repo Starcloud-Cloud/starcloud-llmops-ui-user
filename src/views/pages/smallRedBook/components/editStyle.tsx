@@ -84,7 +84,7 @@ const EditStyle = ({
                     </div>
                 )}
                 <Divider />
-                <div className="text-[red] font-bold tex-[13px] mt-[20px]">必须添加 9 张图片</div>
+                {/* <div className="text-[red] font-bold tex-[13px] mt-[20px]">必须添加 9 张图片</div> */}
                 <div className="mt-[20px] flex flex-wrap gap-2">
                     {tabImage?.map((item: any, index: number) => (
                         <div key={item} className="rounded-[8px] overflow-hidden relative">
@@ -94,7 +94,7 @@ const EditStyle = ({
                                     onClick={() => {
                                         detailImage(label, index);
                                     }}
-                                    className="cursor-pointer hover:text-[red]"
+                                    className="cursor-pointer hover:text-[red] text-4xl"
                                     rev={undefined}
                                 />
                             </div>

@@ -1,4 +1,3 @@
-import { Select } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
 import { useEffect, useState } from 'react';
 import ResultFilter from './component/resultFilter';
@@ -9,7 +8,6 @@ import { AddKeywordDrawer } from './component/AddKeywordDrawer';
 
 const containerStyle: React.CSSProperties = {
     position: 'relative',
-    overflow: 'hidden',
     height: 'calc(100vh - 128px)'
 };
 
@@ -31,11 +29,12 @@ const ThesaurusDetail = () => {
         page: 1,
         size: 20,
         desc: true, //升降序
-        orderColumn: 12 //排序的字段
+        orderColumn: 6 //排序的字段
     });
+
     useEffect(() => {
         if (uid) {
-            getExtended(type);
+            getExtended();
         }
     }, [pageQuery.page, pageQuery.size, uid]);
     //搜索结果过滤的值
@@ -46,7 +45,7 @@ const ThesaurusDetail = () => {
     const [loading, setLoading] = useState(false);
     const [tableData, setTableData] = useState<any[]>([]);
 
-    const getExtended = async (num: number) => {
+    const getExtended = async () => {
         setLoading(true);
         const result = await keywordPage({
             dictUid: uid,
@@ -56,19 +55,18 @@ const ThesaurusDetail = () => {
             ...searchResult,
             excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
             includeKeywords: searchResult?.includeKeywords ? searchResult.includeKeywords.split(',') : undefined,
-            queryVariations: num === 1 ? true : false,
             filterDeletedKeywords: false
         });
         setLoading(false);
-        setTotal(result.total);
-        setTableData(result.items);
+        setTotal(result.keywordMetadataResp.total);
+        setTableData(result.keywordMetadataResp.list);
     };
 
     //结果筛选
     const filterTable = (data: any) => {
         if (JSON.stringify(data) === JSON.stringify(searchResult)) {
             if (pageQuery.page === 1) {
-                getExtended(type);
+                getExtended();
             } else {
                 setPageQuery({
                     ...pageQuery,
@@ -82,7 +80,7 @@ const ThesaurusDetail = () => {
     useEffect(() => {
         if (searchResult) {
             if (pageQuery.page === 1) {
-                getExtended(type);
+                getExtended();
             } else {
                 setPageQuery({
                     ...pageQuery,
@@ -91,8 +89,9 @@ const ThesaurusDetail = () => {
             }
         }
     }, [searchResult]);
+
     return (
-        <div className="overflow-y-auto overflow-x-hidden" style={containerStyle}>
+        <div className="overflow-y-auto" style={containerStyle}>
             <SubCard
                 sx={{ mb: 3 }}
                 contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
@@ -112,6 +111,7 @@ const ThesaurusDetail = () => {
                 setUid={setUid}
             />
             <TermTable
+                uid={uid}
                 pageQuery={pageQuery}
                 queryAsin={() => null}
                 loading={loading}

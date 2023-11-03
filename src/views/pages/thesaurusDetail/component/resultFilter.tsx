@@ -3,17 +3,10 @@ import { Row, Col, InputNumber, Input, Popover, Button, Checkbox, Card, Select, 
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
 import { dictPage } from 'api/listing/thesaurus';
 import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
-import value from 'assets/scss/_themes-vars.module.scss';
 
 const { Option } = Select;
 
 const searchList = [
-    // {
-    //     title: '流量占比',
-    //     key: 'TrafficPercentage',
-    //     desc: `指的是所有查询ASIN通过不同流量词获得的曝光量占比总和关键词的流量占比数值越大，说明该关键词给ASIN带来的曝光量越大`,
-    //     addonAfter: '%'
-    // },
     {
         title: 'ABA周排名',
         key: 'searchesRank',
@@ -107,20 +100,7 @@ const searchList = [
         则前三ASIN点击总占比=13.9%+12.4%+11.1%=37.4%`,
         addonAfter: '%'
     },
-    // {
-    //     title: '转化总占比',
-    //     key: 'Top3ConversionRate',
-    //     desc: `前三ASIN转化总占比，指的是该关键词下点击排名前三ASIN的转化共享之和
 
-    //     （转化共享，指的是该ASIN在这个关键词下的销量占整个词销量的比例）
-
-    //     数据来源于亚马逊后台ABA报告，一般来说，前三ASIN的转化总占比越高，该词垄断程度越高
-
-    //     假设点击前三ASIN的转化共享分别是18.4%、10.9%、5.6%
-
-    //     则前三ASIN转化总占比=18.4%+10.9%+5.6%=34.9%`,
-    //     addonAfter: '%'
-    // },
     {
         title: 'PPC竞价',
         key: 'bid',
@@ -143,14 +123,14 @@ const searchList = [
         比如iphone11 case单词个数为2，airpods pro case单词个数为3`,
         addonAfter: ''
     },
-    {
-        title: '货流值',
-        key: 'Competitors',
-        desc: `货流值  =  PPC价格/点击排名前3 ASIN的中位数价格*100%
+    // {
+    //     title: '货流值',
+    //     key: 'GoodsValue',
+    //     desc: `货流值  =  PPC价格/点击排名前3 ASIN的中位数价格*100%
 
-        货流值越低，意味着该细分行业引流成本越低，竞争越小，也可能意味着该市场还处于蓝海`,
-        addonAfter: ''
-    },
+    //     货流值越低，意味着该细分行业引流成本越低，竞争越小，也可能意味着该市场还处于蓝海`,
+    //     addonAfter: ''
+    // },
     {
         title: 'Amazon Choice',
         desc: `AC推荐词：Amazon's Choice，勾选后可以筛选出拥有AC标识的关键词
@@ -176,7 +156,7 @@ const ResultFilter = ({
     setUid: (uid: string) => void;
     uid: string;
 }) => {
-    const [filteOpen, setFilteOpen] = useState(true);
+    const [filterOpen, setFilterOpen] = useState(true);
     const [searchWord, setSearchWord] = useState<any>({});
     const [list, setList] = useState<any>([]);
 
@@ -219,20 +199,36 @@ const ResultFilter = ({
                 </Col>
 
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
-                    <Input placeholder="包含关键词" />
+                    <Input
+                        placeholder="包含关键词，多个以逗号区分"
+                        onChange={(e) =>
+                            setSearchWord({
+                                ...searchWord,
+                                includeKeywords: e.target.value.split(',')
+                            })
+                        }
+                    />
                 </Col>
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
-                    <Input placeholder="排除关键词" />
+                    <Input
+                        placeholder="排除关键词，多个以逗号区分"
+                        onChange={(e) =>
+                            setSearchWord({
+                                ...searchWord,
+                                excludeKeywords: e.target.value?.split(',')
+                            })
+                        }
+                    />
                 </Col>
                 <Col>
                     <div className="flex items-center">
                         <span
                             className="text-[#673ab7] rounded border border-solid border-[#673ab7] text-[13px] font-[500] px-[6px] py-[9px] cursor-pointer ml-[30px] leading-3"
-                            onClick={() => setFilteOpen(!filteOpen)}
+                            onClick={() => setFilterOpen(!filterOpen)}
                         >
-                            {filteOpen ? '隐藏过滤条件' : '展示过滤条件'}
+                            {filterOpen ? '隐藏过滤条件' : '展示过滤条件'}
                             <DownOutlined
-                                style={{ transition: 'transform .3s', transform: !filteOpen ? 'rotate(-180deg)' : '' }}
+                                style={{ transition: 'transform .3s', transform: !filterOpen ? 'rotate(-180deg)' : '' }}
                                 rev={undefined}
                             />
                         </span>
@@ -246,7 +242,7 @@ const ResultFilter = ({
                 </Col>
             </Row>
 
-            {filteOpen && (
+            {filterOpen && (
                 <div>
                     <Row gutter={20} className="px-[30px]">
                         {searchList.map((item: any) => (
@@ -326,11 +322,11 @@ const ResultFilter = ({
                                 ) : (
                                     <div className="flex items-center mb-[30px]">
                                         <Checkbox
-                                            checked={searchWord.ac}
+                                            checked={searchWord.amazonChoice}
                                             onChange={(e) => {
                                                 setSearchWord({
                                                     ...searchWord,
-                                                    ac: e.target.checked
+                                                    amazonChoice: e.target.checked
                                                 });
                                             }}
                                         >
@@ -341,50 +337,7 @@ const ResultFilter = ({
                             </Col>
                         ))}
                     </Row>
-                    {/* <Row gutter={20} className="px-[30px]">
-                        {searchArray.map((item) => (
-                            <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
-                                <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
-                                    {item.title}{' '}
-                                    <Popover
-                                        color="#262626"
-                                        trigger="hover"
-                                        zIndex={9999}
-                                        placement="top"
-                                        title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
-                                    >
-                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
-                                    </Popover>
-                                </div>
-                                <div className="flex mb-[30px]">
-                                    {item?.size ? (
-                                        <Input
-                                            value={searchWord[item.key]}
-                                            onChange={(e) => {
-                                                setSearchWord({
-                                                    ...searchWord,
-                                                    [item.key]: e.target.value
-                                                });
-                                            }}
-                                            placeholder="请输入关键词，多个以逗号区分"
-                                        />
-                                    ) : (
-                                        <Checkbox
-                                            checked={searchWord.ac}
-                                            onChange={(e) => {
-                                                setSearchWord({
-                                                    ...searchWord,
-                                                    ac: e.target.checked
-                                                });
-                                            }}
-                                        >
-                                            仅AC推荐词
-                                        </Checkbox>
-                                    )}
-                                </div>
-                            </Col>
-                        ))}
-                    </Row> */}
+
                     <div className="flex items-center justify-center pb-[30px]">
                         <Button
                             onClick={() => {

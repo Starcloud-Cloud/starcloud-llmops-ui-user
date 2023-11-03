@@ -72,7 +72,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                 dispatch(
                     openSnackbar({
                         open: true,
-                        message: '生成失败',
+                        message: '图片生成失败',
                         variant: 'alert',
                         alert: {
                             color: 'error'

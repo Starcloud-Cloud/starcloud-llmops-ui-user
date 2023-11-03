@@ -102,7 +102,7 @@ const searchList = [
     },
 
     {
-        title: 'PPC竞价',
+        title: 'RPC竞价',
         key: 'bid',
         after: true,
         desc: `亚马逊站内广告Bid价格，系统提供【词组匹配】的Bid建议价格以及范围

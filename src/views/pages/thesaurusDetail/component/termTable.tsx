@@ -8,6 +8,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
 import { delKeyword } from 'api/listing/thesaurus';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 
 const TermTable = ({
     loading,
@@ -123,104 +124,7 @@ const TermTable = ({
                 </>
             )
         },
-        // {
-        //     title: (
-        //         <Tooltip
-        //             placement="top"
-        //             title={
-        //                 <>
-        //                     <p>上行：流量占比，指的是所有查询ASIN通过该流量词获得的曝光量占比的总和</p>
-        //                     <p>关键词的流量占比数值越大，说明该关键词给ASIN带来的曝光量越大</p>
-        //                     <p className="mt-[10px]">
-        //                         下行：预估周曝光量，指的是该关键词本周内给产品带来的预估曝光量，非该词在亚马逊的总搜索量
-        //                     </p>
-        //                 </>
-        //             }
-        //         >
-        //             <div className="cursor-default relative min-w-[90px]">
-        //                 <span className="text-[#673ab7] text-sm">
-        //                     流量占比
-        //                     <ArrowDownOutlined className="" rev={undefined} />
-        //                 </span>
-        //             </div>
-        //         </Tooltip>
-        //     ),
-        //     width: 90,
-        //     render: (_, row) => (
-        //         <div className="">
-        //             <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
-        //             <Tooltip placement="top" title="预计周曝光量">
-        //                 <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
-        //             </Tooltip>
-        //         </div>
-        //     )
-        // },
-        // {
-        //     title: (
-        //         <Tooltip
-        //             placement="top"
-        //             title={
-        //                 <>
-        //                     <p> 选中后可切换到筛选相关产品视图</p>
-        //                     <p>您可以通过Top 10产品图片判断关键词与您的产品是否相关比如保温杯，可能出现在户外、家居类目</p>
-        //                 </>
-        //             }
-        //         >
-        //             <div className="cursor-default">相关产品</div>
-        //         </Tooltip>
-        //     ),
-        //     width: 150,
-        //     render: (_, row) => (
-        //         <div className="w-[150px]">
-        //             <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
-        //             <div className="flex w-[118px] h-[58px] overflow-x-auto items-center sidebar">
-        //                 <div className="shrink-0 cursor-pointer">
-        //                     {row.relationVariationsItems?.map((item: any) => (
-        //                         <Popover
-        //                             content={
-        //                                 <div className="w-[400px] h-[460px] drop-shadow-sm rounded">
-        //                                     <Image
-        //                                         width={400}
-        //                                         className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
-        //                                         src={item.imageUrl}
-        //                                         preview={false}
-        //                                     />
-        //                                     <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">{item.title}</div>
-        //                                     <div className="flex justify-between items-center text-[#95999e]">
-        //                                         <div>
-        //                                             流量占比：
-        //                                             <span className="text-[#673ab7]">{(item.trafficPercentage * 100)?.toFixed(2)}%</span>
-        //                                         </div>
-        //                                         <div>
-        //                                             价格：<span className="text-[#673ab7]">${item.price}</span>
-        //                                         </div>
-        //                                         <div>
-        //                                             评论数(评分)：
-        //                                             <span className="text-[#673ab7]">
-        //                                                 {item.reviews}({item.rating})
-        //                                             </span>
-        //                                         </div>
-        //                                     </div>
-        //                                 </div>
-        //                             }
-        //                             placement="right"
-        //                             trigger="hover"
-        //                         >
-        //                             <Image
-        //                                 className="border border-solid border-transparent hover:border-[#673ab7] rounded overflow-hidden"
-        //                                 key={item.asin}
-        //                                 width={46}
-        //                                 height={46}
-        //                                 preview={false}
-        //                                 src={item.imageUrl}
-        //                             />
-        //                         </Popover>
-        //                     ))}
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     )
-        // },
+
         {
             title: (
                 <Tooltip
@@ -254,7 +158,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">月搜索趋势</div>
+                    <div className="cursor-default">
+                        月搜索趋势
+                        {[23].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             width: 200,
@@ -281,7 +188,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">相关度</div>
+                    <div className="cursor-default">
+                        相关度
+                        {[21].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -308,7 +218,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">月搜索量</div>
+                    <div className="cursor-default">
+                        月搜索量
+                        {[5].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -340,7 +253,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">月购买量</div>
+                    <div className="cursor-default">
+                        月购买量
+                        {[7].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -365,7 +281,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">SPR</div>
+                    <div className="cursor-default">
+                        SPR
+                        {[16].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             dataIndex: 'spr'
@@ -384,7 +303,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">标题密度</div>
+                    <div className="cursor-default">
+                        标题密度
+                        {[15].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             dataIndex: 'titleDensity'
@@ -404,7 +326,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">商品数</div>
+                    <div className="cursor-default">
+                        商品数
+                        {[8].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             dataIndex: 'products'
@@ -423,7 +348,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">供需比</div>
+                    <div className="cursor-default">
+                        供需比
+                        {[9].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             dataIndex: 'supplyDemandRatio'
@@ -439,7 +367,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">广告竞品数</div>
+                    <div className="cursor-default">
+                        广告竞品数
+                        {[22].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -465,11 +396,13 @@ const TermTable = ({
                                 下行：前三ASIN转化总占比，指的是该关键词下点击排名前三ASIN的转化共享之和（转化共享，指的是该ASIN在这个关键词下的销量占整个词销量的比例）
                             </p>
                             <p className="mt-[10px]">则前三ASIN转化总占比=18.4%+10.9%+5.6%=34.9%</p>
-                            <p></p>
                         </>
                     }
                 >
-                    <div className="cursor-default">点击集中度</div>
+                    <div className="cursor-default">
+                        点击集中度
+                        {[18].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -496,7 +429,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">PPC竞价</div>
+                    <div className="cursor-default">
+                        RPC竞价
+                        {[11].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (
@@ -522,7 +458,10 @@ const TermTable = ({
                         </>
                     }
                 >
-                    <div className="cursor-default">市场分析</div>
+                    <div className="cursor-default">
+                        市场分析
+                        {[17].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                    </div>
                 </Tooltip>
             ),
             render: (_, row) => (

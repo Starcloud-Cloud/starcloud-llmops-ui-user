@@ -8,6 +8,9 @@ import EditStyle from './components/editStyle';
 import _ from 'lodash-es';
 import Form from './components/form';
 import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
+import { ThreeStep } from './components/threeStep';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const SmallRedBook = () => {
     const { TabPane } = Tabs;
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -176,7 +179,7 @@ const SmallRedBook = () => {
         setItems(newPanes);
         setActiveKey(newActiveKey);
     };
-
+    const [allResult, setAllResult] = useState<any>(null);
     const [consList, setConsList] = useState<any[]>([{ key: 'one' }, { key: 'two' }]);
     return (
         <div className="h-full bg-[#fff] p-[20px]">
@@ -240,42 +243,9 @@ const SmallRedBook = () => {
                         </Tabs>
                     </div>
                 )}
-                {current === 1 && (
-                    <div>
-                        <Row gutter={20}>
-                            <Col md={18} sm={12} xs={24}>
-                                <Carousel autoplay>
-                                    <div>
-                                        <h3 style={contentStyle}>1</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>2</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>3</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>4</h3>
-                                    </div>
-                                </Carousel>
-                            </Col>
-                            <Col className="flex-1">111111shkjshdfksjdhfksjdhfksjhfksd</Col>
-                        </Row>
-                    </div>
-                )}
+                {current === 1 && <ThreeStep data={allResult} />}
             </div>
             <div>
-                {/* {current === 0 && (
-                    <Button
-                        disabled={detaData?.variables?.some((item: any) => !item.value)}
-                        type="primary"
-                        onClick={() => {
-                            setCurrent(current + 1);
-                        }}
-                    >
-                        下一步
-                    </Button>
-                )} */}
                 {current === 0 && (
                     <Button
                         type="primary"
@@ -312,26 +282,37 @@ const SmallRedBook = () => {
                                         }
                                     };
                                 });
-                                console.log(arr);
+                                const app: any = {};
+                                detaData.variables.map((item: any) => {
+                                    app[item.field] = item.value;
+                                });
+                                const obj = {
+                                    appRequest: {
+                                        uid: detaData.uid,
+                                        params: {
+                                            ...app
+                                        }
+                                    },
+                                    imageRequests: arr
+                                };
+                                setAllResult(obj);
+                                setCurrent(current + 1);
                             } else {
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '图片没有选择完整或标题没有输入',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'error'
+                                        },
+                                        close: false
+                                    })
+                                );
                             }
-
-                            const app: any = {};
-                            detaData.variables.map((item: any) => {
-                                app[item.field] = item.value;
-                            });
-                            const obj = {
-                                appRequest: {
-                                    uid: detaData.uid,
-                                    params: {
-                                        ...app
-                                    }
-                                },
-                                imageRequests: arr
-                            };
                         }}
                     >
-                        执行
+                        下一步
                     </Button>
                 )}
             </div>

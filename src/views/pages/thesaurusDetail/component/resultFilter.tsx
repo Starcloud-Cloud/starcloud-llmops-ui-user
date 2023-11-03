@@ -123,14 +123,6 @@ const searchList = [
         比如iphone11 case单词个数为2，airpods pro case单词个数为3`,
         addonAfter: ''
     },
-    // {
-    //     title: '货流值',
-    //     key: 'GoodsValue',
-    //     desc: `货流值  =  PPC价格/点击排名前3 ASIN的中位数价格*100%
-
-    //     货流值越低，意味着该细分行业引流成本越低，竞争越小，也可能意味着该市场还处于蓝海`,
-    //     addonAfter: ''
-    // },
     {
         title: 'Amazon Choice',
         desc: `AC推荐词：Amazon's Choice，勾选后可以筛选出拥有AC标识的关键词
@@ -151,7 +143,7 @@ const ResultFilter = ({
 }: {
     filterTable: (data: any) => void;
     type: number;
-    getExtended: (data: number) => void;
+    getExtended: () => void;
     setAddKeywordOpen: (open: boolean) => void;
     setUid: (uid: string) => void;
     uid: string;
@@ -201,6 +193,7 @@ const ResultFilter = ({
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
                     <Input
                         placeholder="包含关键词，多个以逗号区分"
+                        value={searchWord.includeKeywords}
                         onChange={(e) =>
                             setSearchWord({
                                 ...searchWord,
@@ -212,12 +205,13 @@ const ResultFilter = ({
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
                     <Input
                         placeholder="排除关键词，多个以逗号区分"
-                        onChange={(e) =>
+                        value={searchWord.excludeKeywords}
+                        onChange={(e) => {
                             setSearchWord({
                                 ...searchWord,
                                 excludeKeywords: e.target.value?.split(',')
-                            })
-                        }
+                            });
+                        }}
                     />
                 </Col>
                 <Col>
@@ -235,7 +229,9 @@ const ResultFilter = ({
                     </div>
                 </Col>
                 <Col>
-                    <Button type="primary">查询</Button>
+                    <Button type="primary" onClick={() => filterTable(searchWord)}>
+                        查询
+                    </Button>
                 </Col>
                 <Col>
                     <Button onClick={() => setAddKeywordOpen(true)}>新增关键词</Button>
@@ -338,7 +334,7 @@ const ResultFilter = ({
                         ))}
                     </Row>
 
-                    <div className="flex items-center justify-center pb-[30px]">
+                    <div className="flex items-center justify-center">
                         <Button
                             onClick={() => {
                                 filterTable(searchWord);

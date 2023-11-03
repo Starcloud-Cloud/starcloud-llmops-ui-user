@@ -14,6 +14,11 @@ const containerStyle: React.CSSProperties = {
 const ThesaurusDetail = () => {
     const [addKeywordOpen, setAddKeywordOpen] = useState(false);
     const [uid, setUid] = useState('');
+    const [searchResult, setSearchResult] = useState<any>(null);
+    const [type, setType] = useState(0);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [tableData, setTableData] = useState<any[]>([]);
     const [update, forceUpdate] = useState({});
 
     const location = useLocation();
@@ -37,25 +42,15 @@ const ThesaurusDetail = () => {
             getExtended();
         }
     }, [pageQuery.page, pageQuery.size, uid]);
-    //搜索结果过滤的值
-    const [searchResult, setSearchResult] = useState<any>(null);
-    //变体类型
-    const [type, setType] = useState(0);
-    const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [tableData, setTableData] = useState<any[]>([]);
 
     const getExtended = async () => {
         setLoading(true);
         const result = await keywordPage({
             dictUid: uid,
             ...pageQuery,
-            pageNo: pageQuery.page,
-            pageSize: pageQuery.size,
             ...searchResult,
-            excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
-            includeKeywords: searchResult?.includeKeywords ? searchResult.includeKeywords.split(',') : undefined,
-            filterDeletedKeywords: false
+            pageNo: pageQuery.page,
+            pageSize: pageQuery.size
         });
         setLoading(false);
         setTotal(result.keywordMetadataResp.total);

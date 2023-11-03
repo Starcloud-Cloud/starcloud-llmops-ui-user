@@ -1,15 +1,14 @@
 import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Card, Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
-import { ArrowDownOutlined } from '@ant-design/icons';
 import React, { useState, useEffect, memo } from 'react';
 import * as echarts from 'echarts';
-import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
 import { delKeyword } from 'api/listing/thesaurus';
+
 const TermTable = ({
     loading,
     pageQuery,
@@ -28,11 +27,9 @@ const TermTable = ({
     tableData: any[];
     type: number;
     uid: string;
-
     setPageQuery: (data: any) => void;
-    getExtended: (data: number) => void;
+    getExtended: () => void;
 }) => {
-    const [open, setOpen] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const rowSelection = {
         selectedRowKeys,
@@ -623,6 +620,7 @@ const TermTable = ({
                     close: false
                 })
             );
+            getExtended();
         }
     };
 
@@ -678,7 +676,7 @@ const TermTable = ({
                             { label: '降序', value: true }
                         ]}
                     ></Select>
-                    <Button onClick={() => getExtended(type)}>确定</Button>
+                    <Button onClick={() => getExtended()}>确定</Button>
                 </div>
             </div>
             <Table
@@ -721,15 +719,8 @@ const TermTable = ({
                     />
                 </div>
             )}
-            {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
         </Card>
     );
 };
-const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return (
-        JSON.stringify(prevProps?.tableData) === JSON.stringify(nextProps?.tableData) &&
-        JSON.stringify(prevProps?.loading) === JSON.stringify(nextProps?.loading) &&
-        JSON.stringify(prevProps?.page) === JSON.stringify(nextProps?.page)
-    );
-};
-export default memo(TermTable, arePropsEqual);
+
+export default memo(TermTable);

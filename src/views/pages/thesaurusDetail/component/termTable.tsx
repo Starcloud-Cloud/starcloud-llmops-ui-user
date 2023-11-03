@@ -1,14 +1,14 @@
 import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Card, Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
-import { ArrowDownOutlined } from '@ant-design/icons';
 import React, { useState, useEffect, memo } from 'react';
 import * as echarts from 'echarts';
-import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
+import { delKeyword } from 'api/listing/thesaurus';
+
 const TermTable = ({
     loading,
     pageQuery,
@@ -17,7 +17,8 @@ const TermTable = ({
     tableData,
     type,
     setPageQuery,
-    getExtended
+    getExtended,
+    uid
 }: {
     loading: boolean;
     pageQuery: any;
@@ -25,9 +26,9 @@ const TermTable = ({
     total: number;
     tableData: any[];
     type: number;
-
+    uid: string;
     setPageQuery: (data: any) => void;
-    getExtended: (data: number) => void;
+    getExtended: () => void;
 }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const rowSelection = {
@@ -97,7 +98,7 @@ const TermTable = ({
                             <span
                                 className="border-b border-dashed border-[#d4d8dd] cursor-pointer"
                                 onClick={() => {
-                                    copy(row.keywords);
+                                    copy(row.keyword);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -113,7 +114,7 @@ const TermTable = ({
                                     );
                                 }}
                             >
-                                {row.keywords}
+                                {row.keyword}
                             </span>
                         </Tooltip>
                     </Popover>
@@ -122,105 +123,121 @@ const TermTable = ({
                 </>
             )
         },
+        // {
+        //     title: (
+        //         <Tooltip
+        //             placement="top"
+        //             title={
+        //                 <>
+        //                     <p>上行：流量占比，指的是所有查询ASIN通过该流量词获得的曝光量占比的总和</p>
+        //                     <p>关键词的流量占比数值越大，说明该关键词给ASIN带来的曝光量越大</p>
+        //                     <p className="mt-[10px]">
+        //                         下行：预估周曝光量，指的是该关键词本周内给产品带来的预估曝光量，非该词在亚马逊的总搜索量
+        //                     </p>
+        //                 </>
+        //             }
+        //         >
+        //             <div className="cursor-default relative min-w-[90px]">
+        //                 <span className="text-[#673ab7] text-sm">
+        //                     流量占比
+        //                     <ArrowDownOutlined className="" rev={undefined} />
+        //                 </span>
+        //             </div>
+        //         </Tooltip>
+        //     ),
+        //     width: 90,
+        //     render: (_, row) => (
+        //         <div className="">
+        //             <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
+        //             <Tooltip placement="top" title="预计周曝光量">
+        //                 <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
+        //             </Tooltip>
+        //         </div>
+        //     )
+        // },
+        // {
+        //     title: (
+        //         <Tooltip
+        //             placement="top"
+        //             title={
+        //                 <>
+        //                     <p> 选中后可切换到筛选相关产品视图</p>
+        //                     <p>您可以通过Top 10产品图片判断关键词与您的产品是否相关比如保温杯，可能出现在户外、家居类目</p>
+        //                 </>
+        //             }
+        //         >
+        //             <div className="cursor-default">相关产品</div>
+        //         </Tooltip>
+        //     ),
+        //     width: 150,
+        //     render: (_, row) => (
+        //         <div className="w-[150px]">
+        //             <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
+        //             <div className="flex w-[118px] h-[58px] overflow-x-auto items-center sidebar">
+        //                 <div className="shrink-0 cursor-pointer">
+        //                     {row.relationVariationsItems?.map((item: any) => (
+        //                         <Popover
+        //                             content={
+        //                                 <div className="w-[400px] h-[460px] drop-shadow-sm rounded">
+        //                                     <Image
+        //                                         width={400}
+        //                                         className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
+        //                                         src={item.imageUrl}
+        //                                         preview={false}
+        //                                     />
+        //                                     <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">{item.title}</div>
+        //                                     <div className="flex justify-between items-center text-[#95999e]">
+        //                                         <div>
+        //                                             流量占比：
+        //                                             <span className="text-[#673ab7]">{(item.trafficPercentage * 100)?.toFixed(2)}%</span>
+        //                                         </div>
+        //                                         <div>
+        //                                             价格：<span className="text-[#673ab7]">${item.price}</span>
+        //                                         </div>
+        //                                         <div>
+        //                                             评论数(评分)：
+        //                                             <span className="text-[#673ab7]">
+        //                                                 {item.reviews}({item.rating})
+        //                                             </span>
+        //                                         </div>
+        //                                     </div>
+        //                                 </div>
+        //                             }
+        //                             placement="right"
+        //                             trigger="hover"
+        //                         >
+        //                             <Image
+        //                                 className="border border-solid border-transparent hover:border-[#673ab7] rounded overflow-hidden"
+        //                                 key={item.asin}
+        //                                 width={46}
+        //                                 height={46}
+        //                                 preview={false}
+        //                                 src={item.imageUrl}
+        //                             />
+        //                         </Popover>
+        //                     ))}
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     )
+        // },
         {
             title: (
                 <Tooltip
                     placement="top"
                     title={
                         <>
-                            <p>上行：流量占比，指的是所有查询ASIN通过该流量词获得的曝光量占比的总和</p>
-                            <p>关键词的流量占比数值越大，说明该关键词给ASIN带来的曝光量越大</p>
-                            <p className="mt-[10px]">
-                                下行：预估周曝光量，指的是该关键词本周内给产品带来的预估曝光量，非该词在亚马逊的总搜索量
-                            </p>
+                            <p>该关键词下搜索结果第1页产品的主要所属类目</p>
+                            <p>将搜索结果第1页的产品按所属类目汇总，类目下产品越多的类目排在前面</p>
+                            <p>比如保温杯，可能出现在户外、家居类目</p>
                         </>
                     }
                 >
-                    <div className="cursor-default relative min-w-[90px]">
-                        <span className="text-[#673ab7] text-sm">
-                            流量占比
-                            <ArrowDownOutlined className="" rev={undefined} />
-                        </span>
-                    </div>
+                    <div className="cursor-default">所属类目</div>
                 </Tooltip>
             ),
-            width: 90,
-            render: (_, row) => (
-                <div className="">
-                    <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
-                    <Tooltip placement="top" title="预计周曝光量">
-                        <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
-                    </Tooltip>
-                </div>
-            )
-        },
-        {
-            title: (
-                <Tooltip
-                    placement="top"
-                    title={
-                        <>
-                            <p>通过相关ASIN，可以查看该关键词来源于查询ASIN中的哪些变体</p>
-                            <p>展示的变体根据关键词流量占比从左至右降序排列，您可以滑动查看更多变体</p>
-                            <p className="mt-[10px]">图片支持点击跳转到该变体的亚马逊Listing详情页</p>
-                            <p>鼠标悬浮在图片上可以看到产品大图及流量占比、价格等数据</p>
-                        </>
-                    }
-                >
-                    <div className="cursor-default">相关ASIN</div>
-                </Tooltip>
-            ),
-            width: 150,
-            render: (_, row) => (
-                <div className="w-[150px]">
-                    <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
-                    <div className="flex w-[118px] h-[58px] overflow-x-auto items-center sidebar">
-                        <div className="shrink-0 cursor-pointer">
-                            {row.relationVariationsItems?.map((item: any) => (
-                                <Popover
-                                    content={
-                                        <div className="w-[400px] h-[460px] drop-shadow-sm rounded">
-                                            <Image
-                                                width={400}
-                                                className=" border border-solid border-transparent hover:border-[#673ab7] rounded-lg"
-                                                src={item.imageUrl}
-                                                preview={false}
-                                            />
-                                            <div className="my-[10px] line-clamp-1 text-[#dcddde] text-sm">{item.title}</div>
-                                            <div className="flex justify-between items-center text-[#95999e]">
-                                                <div>
-                                                    流量占比：
-                                                    <span className="text-[#673ab7]">{(item.trafficPercentage * 100)?.toFixed(2)}%</span>
-                                                </div>
-                                                <div>
-                                                    价格：<span className="text-[#673ab7]">${item.price}</span>
-                                                </div>
-                                                <div>
-                                                    评论数(评分)：
-                                                    <span className="text-[#673ab7]">
-                                                        {item.reviews}({item.rating})
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                    placement="right"
-                                    trigger="hover"
-                                >
-                                    <Image
-                                        className="border border-solid border-transparent hover:border-[#673ab7] rounded overflow-hidden"
-                                        key={item.asin}
-                                        width={46}
-                                        height={46}
-                                        preview={false}
-                                        src={item.imageUrl}
-                                    />
-                                </Popover>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )
+            width: 200,
+            render: (_, row, index) => <span>{row?.departments?.[0]?.label}</span>
         },
         {
             title: (
@@ -253,18 +270,26 @@ const TermTable = ({
                     placement="top"
                     title={
                         <>
+                            <p> 上行：相关度的相对值，最高=100，最低=0.5</p>
+                            <p> 数值越大，表示该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN数量越多</p>
                             <p>
-                                数据来源于亚马逊ABA数据的每周关键词搜索频率排名（Search Frequency Rank）数字越小表示排名越靠前，搜索量越高
+                                ps：相关度=100并不代表该关键词与查询关键词所关联的ASIN完全一样，而是指该关键词与查询关键词在亚马逊搜索结果第一页的自然排名产品中同款ASIN数量最多
                             </p>
-                            <p className="mt-[10px]">列表页的ABA周排名展示的是最近一周的数据，每周更新上一周的数据</p>
-                            <p>鼠标悬浮在排名数字上可以看到当前数据对应的时间</p>
+                            <p>
+                                下行：相关度的绝对值，即该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN的具体数量
+                            </p>
                         </>
                     }
                 >
-                    <div className="cursor-default">ABA周排名</div>
+                    <div className="cursor-default">相关度</div>
                 </Tooltip>
             ),
-            render: (_, row) => <span className="border-b border-dashed border-[#9fa3a8]">{row.searchesRank}</span>
+            render: (_, row) => (
+                <>
+                    <span>{row.absoluteRelevancy}</span>
+                    <div className="text-[#95999e] text-[13px]">{row.relevancy && Math.round(row.relevancy)}</div>
+                </>
+            )
         },
         {
             title: (
@@ -343,7 +368,7 @@ const TermTable = ({
                     <div className="cursor-default">SPR</div>
                 </Tooltip>
             ),
-            dataIndex: 'cprExact'
+            dataIndex: 'spr'
         },
         {
             title: (
@@ -362,7 +387,7 @@ const TermTable = ({
                     <div className="cursor-default">标题密度</div>
                 </Tooltip>
             ),
-            dataIndex: 'titleDensityExact'
+            dataIndex: 'titleDensity'
         },
         {
             title: (
@@ -419,7 +444,7 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <Tooltip placement="top" title="近7天广告竞品数">
-                    <div>{row.latest7daysAds}</div>
+                    <div>{row.adProducts}</div>
                 </Tooltip>
             )
         },
@@ -449,8 +474,8 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.top3ClickingRate * 100)?.toFixed(1) + '%'}</span>
-                    <div className="text-[#95999e] text-[13px]">{(row.top3ConversionRate * 100)?.toFixed(1) + '%'}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.monopolyClickRate * 100)?.toFixed(1) + '%'}</span>
+                    <div className="text-[#95999e] text-[13px]">{(row.cvsShareRate * 100)?.toFixed(1) + '%'}</div>
                 </div>
             )
         },
@@ -476,8 +501,34 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">${row.top3ClickingRate?.toFixed(2)}</span>
-                    <div className="text-[#95999e] text-[13px]">{row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">${row.bid?.toFixed(2)}</span>
+                    <div className="text-[#95999e] text-[13px]">${row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
+                </div>
+            )
+        },
+        {
+            title: (
+                <Tooltip
+                    placement="top"
+                    title={
+                        <>
+                            <p> 数据取自: 关键词在亚马逊搜索结果中点击排名前3 ASIN的“中位数”</p>
+                            <p>点击数字，可查看该关键词搜索前3页的价格/评分数/评分值分布情况</p>
+                            <p> 价格分布：判断哪个价格区间可能还有机会(价格差异化)，以及哪个价格区间竞争最为激烈</p>
+                            <p> 评分数分布：说明该市场打造新品的难度，如果中低评分数区间占比较大，说明新品进入壁垒不高</p>
+                            <p>
+                                评分值分布：说明该市场的成熟度，如果4.5以上的商品数很多，说明该市场很成熟，通过商品差异性建立竞争壁垒难度较大；如果3.5分商品很多，可能存在改进空间
+                            </p>
+                        </>
+                    }
+                >
+                    <div className="cursor-default">市场分析</div>
+                </Tooltip>
+            ),
+            render: (_, row) => (
+                <div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">${row.avgPrice}</span>
+                    <div className="text-[#95999e] text-[13px]">${row.avgReviews + '(' + row.avgRating + ')'}</div>
                 </div>
             )
         }
@@ -537,14 +588,13 @@ const TermTable = ({
         };
         myChart.setOption(options);
     };
-    //弹框
-    const [open, setOpen] = useState(false);
+
     useEffect(() => {
         tableData?.map((item: any, index: number) => {
             const Axis: any[] = [];
             const rankList: any[] = [];
             const searchList: any[] = [];
-            item.searchesTrend?.map((el: any) => {
+            item.trends?.map((el: any) => {
                 Axis.push(`${el?.month?.substr(0, 4)}年${el?.month?.substr(4, 2)}月`);
                 rankList.push(el?.searchRank);
                 searchList.push(el?.searches);
@@ -553,13 +603,33 @@ const TermTable = ({
         });
     }, [JSON.stringify(tableData)]);
 
+    const handleDelDict = async () => {
+        const res = await delKeyword({
+            uid,
+            data: selectedRowKeys
+        });
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            getExtended();
+        }
+    };
+
     return (
         <Card className="mt-4">
             <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button>导出</Button>
-                    <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
-                        加入词库
+                    <Button className="mr-2" disabled={!selectedRowKeys.length} onClick={() => handleDelDict()}>
+                        批量删除
                     </Button>
                     <span className="text-[#7b7e81]">
                         搜索结果数：<span className="text-[#673ab7] font-[600]">{total}</span>
@@ -576,20 +646,19 @@ const TermTable = ({
                             })
                         }
                         options={[
-                            { label: '流量占比', value: 12 },
-                            { label: '相关ASIN', value: 20 },
-                            { label: 'ABA周排名', value: 4 },
+                            { label: '相关度', value: 21 },
+                            { label: 'ABA周排名', value: 23 },
                             { label: '月搜索量', value: 5 },
-                            { label: '月购买量', value: 6 },
                             { label: '月购买量', value: 6 },
                             { label: '购买率', value: 7 },
                             { label: 'SPR', value: 16 },
                             { label: '标题密度', value: 15 },
                             { label: '商品数', value: 8 },
                             { label: '供需比', value: 9 },
-                            { label: '广告竞品数', value: 10 },
-                            { label: '点击集中度', value: 19 },
-                            { label: 'PPC竞价', value: 11 }
+                            { label: '广告竞品数', value: 22 },
+                            { label: '点击集中度', value: 18 },
+                            { label: 'RPC竞价', value: 11 },
+                            { label: '均价', value: 17 }
                         ]}
                     ></Select>
                     <Select
@@ -607,7 +676,7 @@ const TermTable = ({
                             { label: '降序', value: true }
                         ]}
                     ></Select>
-                    <Button onClick={() => getExtended(type)}>确定</Button>
+                    <Button onClick={() => getExtended()}>确定</Button>
                 </div>
             </div>
             <Table
@@ -615,7 +684,7 @@ const TermTable = ({
                 sticky={{ offsetHeader: 0 }}
                 scroll={{ x: '1300px' }}
                 pagination={false}
-                rowKey={'keywords'}
+                rowKey={'keyword'}
                 rowSelection={rowSelection}
                 columns={columns}
                 dataSource={tableData}
@@ -650,15 +719,8 @@ const TermTable = ({
                     />
                 </div>
             )}
-            {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
         </Card>
     );
 };
-const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return (
-        JSON.stringify(prevProps?.tableData) === JSON.stringify(nextProps?.tableData) &&
-        JSON.stringify(prevProps?.loading) === JSON.stringify(nextProps?.loading) &&
-        JSON.stringify(prevProps?.page) === JSON.stringify(nextProps?.page)
-    );
-};
-export default memo(TermTable, arePropsEqual);
+
+export default memo(TermTable);

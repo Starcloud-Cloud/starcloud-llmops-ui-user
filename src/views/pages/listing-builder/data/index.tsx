@@ -2430,7 +2430,7 @@ export const SCORE_LIST = [
         title: '标题:',
         list: [
             {
-                label: '标题不包含符合或表情',
+                label: '标题不包含符号或表情',
                 value: 0
             },
             {

@@ -9,6 +9,8 @@ import _ from 'lodash-es';
 import Form from './components/form';
 import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
 import { ThreeStep } from './components/threeStep';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const SmallRedBook = () => {
     const { TabPane } = Tabs;
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -177,14 +179,15 @@ const SmallRedBook = () => {
         setItems(newPanes);
         setActiveKey(newActiveKey);
     };
-
+    const [allResult, setAllResult] = useState<any>(null);
     const [consList, setConsList] = useState<any[]>([{ key: 'one' }, { key: 'two' }]);
     return (
         <div className="h-full bg-[#fff] p-[20px]">
-            <Steps className="px-[100px]" current={current} items={[{ title: '第一步' }, { title: '第二步' }, { title: '第三步' }]} />
+            <Steps className="px-[100px]" current={current} items={[{ title: '第一步' }, { title: '第二步' }]} />
             <div className="min-h-[500px] my-[20px] rounded border border-dashed border-[#d4d4d4] p-[20px]">
                 {current === 0 && (
                     <div>
+                        <div className="text-[18px] font-[600] my-[20px]">1. 选择类型</div>
                         <FormControl color="secondary" fullWidth>
                             <InputLabel id="type">类型</InputLabel>
                             <Select
@@ -211,10 +214,8 @@ const SmallRedBook = () => {
                                 ))}
                             </Row>
                         </div>
-                    </div>
-                )}
-                {current === 1 && (
-                    <div className="min-h-[500px]">
+                        <Divider sx={{ my: '20px' }} />
+                        <div className="text-[18px] font-[600] mb-[20px]">2. 上传图片</div>
                         <Upload {...props}>
                             <div>
                                 <PlusOutlined rev={undefined} />
@@ -222,6 +223,7 @@ const SmallRedBook = () => {
                             </div>
                         </Upload>
                         <Divider sx={{ my: '20px' }} />
+                        <div className="text-[18px] font-[600] mb-[20px]">3. 图片风格选择</div>
                         <Tabs type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}>
                             {items.map((item: any, index: number) => (
                                 <TabPane tab={item.label} key={item.key}>
@@ -241,21 +243,10 @@ const SmallRedBook = () => {
                         </Tabs>
                     </div>
                 )}
-                {current === 2 && <ThreeStep data={data} />}
+                {current === 1 && <ThreeStep data={allResult} />}
             </div>
             <div>
                 {current === 0 && (
-                    <Button
-                        disabled={detaData?.variables?.some((item: any) => !item.value)}
-                        type="primary"
-                        onClick={() => {
-                            setCurrent(current + 1);
-                        }}
-                    >
-                        下一步
-                    </Button>
-                )}
-                {current === 1 && (
                     <Button
                         type="primary"
                         onClick={() => {
@@ -270,8 +261,6 @@ const SmallRedBook = () => {
                                 );
                             });
                             if (result) {
-                                console.log(11111);
-
                                 consList.map((item, index) => {
                                     const aa: any = {};
                                     typeList.map((tpye: any) => {
@@ -293,18 +282,37 @@ const SmallRedBook = () => {
                                         }
                                     };
                                 });
-                                console.log(arr);
+                                const app: any = {};
+                                detaData.variables.map((item: any) => {
+                                    app[item.field] = item.value;
+                                });
+                                const obj = {
+                                    appRequest: {
+                                        uid: detaData.uid,
+                                        params: {
+                                            ...app
+                                        }
+                                    },
+                                    imageRequests: arr
+                                };
+                                setAllResult(obj);
+                                setCurrent(current + 1);
                             } else {
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '图片没有选择完整或标题没有输入',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'error'
+                                        },
+                                        close: false
+                                    })
+                                );
                             }
-                            console.log(arr);
                         }}
                     >
-                        执行
-                    </Button>
-                )}
-                {current > 0 && (
-                    <Button style={{ margin: '0 8px' }} onClick={() => setCurrent(current - 1)}>
-                        上一步
+                        下一步
                     </Button>
                 )}
             </div>

@@ -19,12 +19,6 @@ const EditStyle = ({
     changeDetail: (data: any) => void;
 }) => {
     const [value, setValue] = useState('');
-    useEffect(() => {
-        if (tabImage) {
-            console.log(tabImage);
-            console.log(typeList);
-        }
-    }, [tabImage]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -51,9 +45,10 @@ const EditStyle = ({
                                 .filter((val: any) => val.id === value)[0]
                                 ?.variables?.map((el: any, index: number) =>
                                     el?.style === 'IMAGE' ? (
-                                        <Col className="mt-[10px]" key={index}>
-                                            <div className=" rounded-[8px] overflow-hidden relative">
-                                                <Image
+                                        <div>
+                                            {/* <Col className="mt-[10px]" key={index}>
+                                             <div className=" rounded-[8px] overflow-hidden relative">
+                                                 <Image
                                                     className="rounded"
                                                     width={100}
                                                     height={100}
@@ -71,7 +66,8 @@ const EditStyle = ({
                                                     />
                                                 </div>
                                             </div>
-                                        </Col>
+                                        </Col> */}
+                                        </div>
                                     ) : (
                                         <Col key={index} sm={12} xs={24} md={6}>
                                             <Form
@@ -87,10 +83,12 @@ const EditStyle = ({
                         </Row>
                     </div>
                 )}
+                <Divider />
+                <div className="text-[red] font-bold tex-[13px] mt-[20px]">必须添加 9 张图片</div>
                 <div className="mt-[20px] flex flex-wrap gap-2">
                     {tabImage?.map((item: any, index: number) => (
-                        <div key={item.uid} className="rounded-[8px] overflow-hidden relative">
-                            <Image className="rounded" width={100} height={100} preview={false} src={item?.response?.data?.url} />
+                        <div key={item} className="rounded-[8px] overflow-hidden relative">
+                            <Image className="rounded" width={100} height={100} preview={false} src={item} />
                             <div className="absolute w-full h-full top-0  opacity-50 z-1 flex justify-center text-[transparent] items-center hover:bg-[#000] hover:text-[#fff]">
                                 <DeleteOutlined
                                     onClick={() => {

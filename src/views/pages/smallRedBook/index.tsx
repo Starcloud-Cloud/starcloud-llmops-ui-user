@@ -38,21 +38,18 @@ const SmallRedBook = () => {
             console.log('Dropped files', e.dataTransfer.files);
         },
         onPreview(e) {
-            const newData = _.cloneDeep(consList);
-            newData.findIndex((item: any) => item.key === activeKey);
-
-            //     const newData = _.cloneDeep(tabImage);
-            //     if (!newData[activeKey]) {
-            //         setTabImage({
-            //             ...newData,
-            //             [activeKey]: [{ url: e?.response?.data?.url }]
-            //         });
-            //     } else {
-            //         if (!newData[activeKey].some((item: any) => item.url === e.url)) {
-            //             newData[activeKey].push({ url: e?.response?.data?.url });
-            //             setTabImage(newData);
-            //         }
-            //     }
+            const newData = _.cloneDeep(tabImage);
+            if (!newData[activeKey]) {
+                setTabImage({
+                    ...newData,
+                    [activeKey]: [e?.response?.data?.url]
+                });
+            } else {
+                if (!newData[activeKey].some((item: any) => item === e?.response?.data?.url)) {
+                    newData[activeKey].push(e?.response?.data?.url);
+                    setTabImage(newData);
+                }
+            }
         }
     };
     //类型下拉框
@@ -104,7 +101,6 @@ const SmallRedBook = () => {
         console.log(consList);
         const newData = _.cloneDeep(consList);
         newData[items.findIndex((item: any) => item.key === activeKey)][data.field] = data.value;
-
         setConsList(newData);
         return;
         // const newData = _.cloneDeep(tabImage);
@@ -147,6 +143,9 @@ const SmallRedBook = () => {
             label: '图片 ' + newPanes.length,
             key: newActiveKey
         });
+        const newValue = _.cloneDeep(consList);
+        newValue.push({ key: newActiveKey });
+        setConsList(newValue);
         setItems(newPanes);
         setActiveKey(newActiveKey);
     };
@@ -168,12 +167,18 @@ const SmallRedBook = () => {
         }
         const newData = _.cloneDeep(tabImage);
         newData[newActiveKey] = undefined;
+        const newValue = _.cloneDeep(consList);
+        newValue.splice(
+            items.findIndex((item: any) => item.key === targetKey),
+            1
+        );
+        setConsList(newValue);
         setTabImage(newData);
         setItems(newPanes);
         setActiveKey(newActiveKey);
     };
 
-    const [consList, setConsList] = useState<any[]>([{}, {}]);
+    const [consList, setConsList] = useState<any[]>([{ key: 'one' }, { key: 'two' }]);
     return (
         <div className="h-full bg-[#fff] p-[20px]">
             <Steps className="px-[100px]" current={current} items={[{ title: '第一步' }, { title: '第二步' }, { title: '第三步' }]} />
@@ -254,7 +259,44 @@ const SmallRedBook = () => {
                     <Button
                         type="primary"
                         onClick={() => {
-                            console.log(fileList);
+                            const arr: any = [];
+                            const result = consList.every((item, index) => {
+                                return (
+                                    tabImage[item.key]?.length ===
+                                        typeList
+                                            .filter((el: any) => el.id === item.imageTemplate)[0]
+                                            ?.variables.filter((i: any) => i.style === 'IMAGE')?.length &&
+                                    tabImage[item.key]?.length !== undefined
+                                );
+                            });
+                            if (result) {
+                                console.log(11111);
+
+                                consList.map((item, index) => {
+                                    const aa: any = {};
+                                    typeList.map((tpye: any) => {
+                                        if (tpye.id === item.imageTemplate) {
+                                            tpye.variables
+                                                .filter((don: any) => don.style === 'IMAGE')
+                                                ?.map((n: any, num: number) => {
+                                                    aa[n.field] = tabImage[item.key][num];
+                                                });
+                                        }
+                                    });
+                                    arr[index] = {
+                                        imageTemplate: item?.imageTemplate,
+                                        params: {
+                                            ...item,
+                                            key: undefined,
+                                            imageTemplate: undefined,
+                                            ...aa
+                                        }
+                                    };
+                                });
+                                console.log(arr);
+                            } else {
+                            }
+                            console.log(arr);
                         }}
                     >
                         执行

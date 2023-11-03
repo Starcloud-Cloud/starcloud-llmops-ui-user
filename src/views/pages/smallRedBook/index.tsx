@@ -8,6 +8,7 @@ import EditStyle from './components/editStyle';
 import _ from 'lodash-es';
 import Form from './components/form';
 import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
+import { ThreeStep } from './components/threeStep';
 const SmallRedBook = () => {
     const { TabPane } = Tabs;
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -235,29 +236,7 @@ const SmallRedBook = () => {
                         </Tabs>
                     </div>
                 )}
-                {current === 2 && (
-                    <div>
-                        <Row gutter={20}>
-                            <Col md={18} sm={12} xs={24}>
-                                <Carousel autoplay>
-                                    <div>
-                                        <h3 style={contentStyle}>1</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>2</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>3</h3>
-                                    </div>
-                                    <div>
-                                        <h3 style={contentStyle}>4</h3>
-                                    </div>
-                                </Carousel>
-                            </Col>
-                            <Col className="flex-1">111111shkjshdfksjdhfksjdhfksjhfksd</Col>
-                        </Row>
-                    </div>
-                )}
+                {current === 2 && <ThreeStep />}
             </div>
             <div>
                 {current === 0 && (

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Steps, Upload, UploadProps, Carousel, Row, Col, Tabs, Tooltip } from 'antd';
 import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
 import type { UploadFile } from 'antd/es/upload/interface';
@@ -6,27 +6,13 @@ import { PlusOutlined, SubnodeOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import EditStyle from './components/editStyle';
 import _ from 'lodash-es';
-import './index.scss';
+import Form from './components/form';
+import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
 const SmallRedBook = () => {
     const { TabPane } = Tabs;
-    const [fileList, setFileList] = useState<UploadFile[]>([
-        {
-            uid: '-1',
-            name: 'image.png',
-            status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-        }
-    ]);
-    //存储图片的地址
-    const [tabImage, setTabImage] = useState<any>({});
-    //删除存储的图片
-    const detailImage = (label: string, index: number) => {
-        const newData = _.cloneDeep(tabImage);
-        newData[label].splice(index, 1);
-        setTabImage(newData);
-    };
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const props: UploadProps = {
-        name: 'file',
+        name: 'image',
         multiple: true,
         listType: 'picture-card',
         showUploadList: {
@@ -39,59 +25,72 @@ const SmallRedBook = () => {
             )
         },
         fileList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
-        data: {},
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },
         maxCount: 20,
         onChange(info) {
-            if (info.fileList.every((value) => value.status !== 'uploading')) {
-                const errMsg = info.fileList.map((item: any) => {
-                    setFileList(info.fileList);
-                });
-            }
+            setFileList(info.fileList);
         },
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
         },
         onPreview(e) {
-            const newData = _.cloneDeep(tabImage);
-            if (!newData[activeKey]) {
-                setTabImage({
-                    ...newData,
-                    [activeKey]: [e]
-                });
-            } else {
-                if (!newData[activeKey].some((item: any) => item.uid === e.uid)) {
-                    newData[activeKey].push(e);
-                    setTabImage(newData);
-                }
-            }
+            const newData = _.cloneDeep(consList);
+            newData.findIndex((item: any) => item.key === activeKey);
+
+            //     const newData = _.cloneDeep(tabImage);
+            //     if (!newData[activeKey]) {
+            //         setTabImage({
+            //             ...newData,
+            //             [activeKey]: [{ url: e?.response?.data?.url }]
+            //         });
+            //     } else {
+            //         if (!newData[activeKey].some((item: any) => item.url === e.url)) {
+            //             newData[activeKey].push({ url: e?.response?.data?.url });
+            //             setTabImage(newData);
+            //         }
+            //     }
         }
     };
-    const steps = [
-        {
-            title: 'First',
-            content: 'First-content'
-        },
-        {
-            title: 'Second',
-            content: 'Second-content'
-        },
-        {
-            title: 'Last',
-            content: 'Last-content'
+    //类型下拉框
+    const [styles, setStyles] = useState('');
+    //类型下拉框列表
+    const [styleList, setStyleList] = useState<any[]>([]);
+    //跟觉类型获取详情
+    const [detaData, setDetaData] = useState<any>(null);
+    const changeDetail = (data: any) => {
+        const newData = _.cloneDeep(detaData);
+        newData.variables[data.index].value = data.value;
+        setDetaData(newData);
+    };
+    const getList = async () => {
+        imageTemplates().then((res) => {
+            setTypeList(res);
+        });
+        const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
+        if (result) {
+            setStyles(result[0].value);
+            setStyleList(result);
+            const res = await xhsApp(result[0].value);
+            setDetaData(res);
         }
-    ];
-    const [current, setCurrent] = useState(1);
-    const next = () => {
-        // setCurrent(current + 1);
-        console.log(tabImage);
     };
-    const prev = () => {
-        setCurrent(current - 1);
+    useEffect(() => {
+        getList();
+    }, []);
+
+    //存储图片的地址
+    const [tabImage, setTabImage] = useState<any>({});
+    //删除存储的图片
+    const detailImage = (label: string, index: number) => {
+        const newData = _.cloneDeep(tabImage);
+        newData[label].splice(index, 1);
+        setTabImage(newData);
     };
+    //步骤
+    const [current, setCurrent] = useState(0);
     const contentStyle: React.CSSProperties = {
         height: '160px',
         color: '#fff',
@@ -99,7 +98,32 @@ const SmallRedBook = () => {
         textAlign: 'center',
         background: '#364d79'
     };
+    //改变值
+    const changeImages = (data: any) => {
+        console.log(consList);
+        const newData = _.cloneDeep(consList);
+        newData[items.findIndex((item: any) => item.key === activeKey)][data.field] = data.value;
+
+        setConsList(newData);
+        return;
+        // const newData = _.cloneDeep(tabImage);
+        // if (newData[activeKey]) {
+        //     newData[activeKey][data.file] = data.value;
+        // } else {
+        //     newData[activeKey] = { [data.file]: data.value };
+        // }
+        // console.log(newData);
+
+        // setTabImage(newData);
+    };
+    useEffect(() => {
+        console.log(tabImage);
+    }, [tabImage]);
+    //风格列表 Item
+    const [typeList, setTypeList] = useState<any>(null);
+    //Tabs 选中的值
     const [activeKey, setActiveKey] = useState('one');
+    //Tabs 子项
     const [items, setItems] = useState<any>([
         { label: '头图', closable: false, key: 'one' },
         { label: '图片 1', key: 'two' }
@@ -141,9 +165,14 @@ const SmallRedBook = () => {
                 newActiveKey = newPanes[0].key;
             }
         }
+        const newData = _.cloneDeep(tabImage);
+        newData[newActiveKey] = undefined;
+        setTabImage(newData);
         setItems(newPanes);
         setActiveKey(newActiveKey);
     };
+
+    const [consList, setConsList] = useState<any[]>([{}, {}]);
     return (
         <div className="h-full bg-[#fff] p-[20px]">
             <Steps className="px-[100px]" current={current} items={[{ title: '第一步' }, { title: '第二步' }, { title: '第三步' }]} />
@@ -152,12 +181,30 @@ const SmallRedBook = () => {
                     <div>
                         <FormControl color="secondary" fullWidth>
                             <InputLabel id="type">类型</InputLabel>
-                            <Select labelId="type" label="类型">
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
+                            <Select
+                                value={styles}
+                                onChange={(e) => {
+                                    setStyles(e.target.value);
+                                }}
+                                labelId="type"
+                                label="类型"
+                            >
+                                {styleList.map((item) => (
+                                    <MenuItem key={item.value} value={item.value}>
+                                        {item.label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
+                        <div className="mt-[20px]">
+                            <Row gutter={20}>
+                                {detaData?.variables?.map((item: any, index: number) => (
+                                    <Col key={index} sm={12} xs={24} md={6}>
+                                        <Form changeValue={changeDetail} item={item} index={index} />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </div>
                     </div>
                 )}
                 {current === 1 && (
@@ -170,12 +217,15 @@ const SmallRedBook = () => {
                         </Upload>
                         <Divider sx={{ my: '20px' }} />
                         <Tabs type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}>
-                            {items.map((item: any) => (
+                            {items.map((item: any, index: number) => (
                                 <TabPane tab={item.label} key={item.key}>
                                     <div>
                                         <EditStyle
                                             tabImage={tabImage[item.key]}
+                                            consData={consList[index]}
+                                            changeDetail={changeImages}
                                             label={item.key}
+                                            typeList={typeList}
                                             detailImage={detailImage}
                                             key={JSON.stringify(item)}
                                         />
@@ -210,18 +260,29 @@ const SmallRedBook = () => {
                 )}
             </div>
             <div>
-                {current < steps.length - 1 && (
-                    <Button type="primary" onClick={() => next()}>
+                {current === 0 && (
+                    <Button
+                        disabled={detaData?.variables?.some((item: any) => !item.value)}
+                        type="primary"
+                        onClick={() => {
+                            setCurrent(current + 1);
+                        }}
+                    >
                         下一步
                     </Button>
                 )}
-                {current === steps.length - 1 && (
-                    <Button type="primary" onClick={() => message.success('Processing complete!')}>
+                {current === 1 && (
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            console.log(fileList);
+                        }}
+                    >
                         执行
                     </Button>
                 )}
                 {current > 0 && (
-                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                    <Button style={{ margin: '0 8px' }} onClick={() => setCurrent(current - 1)}>
                         上一步
                     </Button>
                 )}

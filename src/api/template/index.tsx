@@ -179,3 +179,11 @@ export const createLimit = (data: any) => {
 export const modifyLimit = (data: any) => {
     return request.post({ url: `/llm/app/publish/limit/modify`, data });
 };
+// 获取图片模板列表
+export const imageTemplates = () => {
+    return request.get({ url: `/llm/app/xhs/imageTemplates` });
+};
+// 获取应用信息
+export const xhsApp = (uid: any) => {
+    return request.get({ url: `/llm/app/xhs/app/${uid}` });
+};

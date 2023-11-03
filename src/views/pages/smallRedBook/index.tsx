@@ -241,7 +241,7 @@ const SmallRedBook = () => {
                         </Tabs>
                     </div>
                 )}
-                {current === 2 && <ThreeStep />}
+                {current === 2 && <ThreeStep data={data} />}
             </div>
             <div>
                 {current === 0 && (

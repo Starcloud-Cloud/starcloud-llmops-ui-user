@@ -9,23 +9,23 @@ const { Option } = Select;
 const searchList = [
     {
         title: 'ABA周排名',
-        key: 'searchesRank',
-        after: true,
+        key: 'SearchRank',
+        after: false,
         desc: `数据来源于亚马逊ABA数据的每周关键词搜索频率排名（Search Frequency Rank）
         数字越小表示排名越靠前，搜索量越高`,
         addonAfter: ''
     },
     {
         title: '月搜索量',
-        key: 'searches',
-        after: true,
+        key: 'Search',
+        after: false,
         desc: `指的是一个自然月的月搜索量，比如2022年6月，该关键词在亚马逊站内的搜索总次数\n您现在看到的是上个月的月搜索量，每月月初更新上个月的数据`,
         addonAfter: ''
     },
     {
         title: '月购买量',
-        key: 'purchases',
-        after: true,
+        key: 'Purchases',
+        after: false,
         desc: `指一个自然月，比如2023年7月，在亚马逊站内搜索该关键词后产生购买的次数
 
         比如：某用户搜索iphone charger，然后1次购买了1个iphone充电器，2条数据线(关联推荐的商品)，则购买量=1`,
@@ -33,33 +33,35 @@ const searchList = [
     },
     {
         title: '购买率',
-        key: 'purchaseRate',
-        after: true,
+        key: 'PurchasesRate',
+        after: false,
         desc: `购买率，购买率=购买量/搜索量，指的是在买家输入该搜索词并点击此细分市场中的任意商品后，买家的购买次数占买家输入该搜索词总次数的比例，详细了解
             比如关键词wireless charger，一个月内被搜索了120万次，共产生了1.6万次销售(未必全部是无线充电器，也可能是数据线)，则该词的购买率 = 1.6万/120万=1.33%`,
         addonAfter: '%'
     },
     {
         title: 'SPR',
-        key: 'CprExact',
+        key: 'SPR',
         desc: `SellerSprite Product Rank，能够让该关键词排名维持在搜索结果第1页的8天预估单量
          比如SPR=280，则代表产品8天内该关键词下的出单量需要达到280，才能让该关键词排名维持在搜索结果第1页
         SPR数值越大，表示让关键词排名维持在首页的单量要求更高，竞争更激烈
         扩展阅读：如何让关键词排名快速上首页？`,
+        after: false,
         addonAfter: ''
     },
     {
         title: '标题密度',
-        key: 'TitleDensityExact',
+        key: 'TitleDensity',
         desc: `该关键词在亚马逊搜索结果第1页的产品中，标题包含该关键词的产品数量
                 比如标题密度为12，则代表该关键词的搜索结果第1页中，共有12个产品的标题包含了该关键词
                 扩展阅读：如何利用标题密度找出竞品核心关键词？`,
+        after: false,
         addonAfter: ''
     },
     {
         title: '商品数',
-        key: 'products',
-        after: true,
+        key: 'Products',
+        after: false,
         desc: `商品数，指搜索该关键词后出现了多少相关产品(All Departments类目)
 
         比如：1-48 of over 1,000 results for "ipad stand"
@@ -68,8 +70,8 @@ const searchList = [
     },
     {
         title: '供需比',
-        key: 'supplyDemandRatio',
-        after: true,
+        key: 'SupplyDemandRatio',
+        after: false,
         desc: `供需比 = 搜索量(需求) / 商品数(供应)
 
         在同类市场中，供需比值越高，则代表该市场需求越强劲
@@ -83,8 +85,8 @@ const searchList = [
     },
     {
         title: '广告竞品数',
-        key: 'ads7',
-        after: true,
+        key: 'AdProducts',
+        after: false,
         desc: `表示近7天内进入过该关键词搜索结果前3页的广告产品总数
                 包括SP广告、HR广告、品牌广告和视频广告`,
         addonAfter: ''
@@ -103,8 +105,8 @@ const searchList = [
 
     {
         title: 'RPC竞价',
-        key: 'bid',
-        after: true,
+        key: 'Bid',
+        after: false,
         desc: `亚马逊站内广告Bid价格，系统提供【词组匹配】的Bid建议价格以及范围
 
         关键词出价是市场竞争度、市场成熟度的直接反映，也是营销费用的反映
@@ -118,10 +120,11 @@ const searchList = [
     },
     {
         title: '单词个数',
-        key: 'Keywords',
+        key: 'WordCount',
         desc: `关键词词组的单词个数，以空格区分；只能输入整数
         比如iphone11 case单词个数为2，airpods pro case单词个数为3`,
-        addonAfter: ''
+        addonAfter: '',
+        after: false
     },
     {
         title: 'Amazon Choice',
@@ -261,25 +264,25 @@ const ResultFilter = ({
                                             min={0}
                                             value={item.after ? searchWord[item.key + 'Min'] : searchWord['min' + item.key]}
                                             onChange={(data) => {
-                                                if (item.addonAfter === '%') {
-                                                    setSearchWord({
-                                                        ...searchWord,
-                                                        [item.after ? item.key + 'Min' : 'min' + item.key]: data / 100
-                                                    });
-                                                } else {
-                                                    setSearchWord({
-                                                        ...searchWord,
-                                                        [item.after ? item.key + 'Min' : 'min' + item.key]: data
-                                                    });
-                                                }
+                                                // if (item.addonAfter === '%') {
+                                                //     setSearchWord({
+                                                //         ...searchWord,
+                                                //         [item.after ? item.key + 'Min' : 'min' + item.key]: data / 100
+                                                //     });
+                                                // } else {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Min' : 'min' + item.key]: data
+                                                });
+                                                // }
                                             }}
-                                            formatter={(value) => {
-                                                if (value) {
-                                                    return item.addonAfter === '%' ? (value * 100).toString() : value;
-                                                } else {
-                                                    return '';
-                                                }
-                                            }}
+                                            // formatter={(value) => {
+                                            //     if (value) {
+                                            //         return item.addonAfter === '%' ? (value * 100).toString() : value;
+                                            //     } else {
+                                            //         return '';
+                                            //     }
+                                            // }}
                                             className="flex-1"
                                             placeholder="最小值"
                                             controls={false}
@@ -289,25 +292,26 @@ const ResultFilter = ({
                                         <InputNumber
                                             value={item.after ? searchWord[item.key + 'Max'] : searchWord['max' + item.key]}
                                             onChange={(data) => {
-                                                if (item.addonAfter === '%') {
-                                                    setSearchWord({
-                                                        ...searchWord,
-                                                        [item.after ? item.key + 'Max' : 'max' + item.key]: data / 100
-                                                    });
-                                                } else {
-                                                    setSearchWord({
-                                                        ...searchWord,
-                                                        [item.after ? item.key + 'Max' : 'max' + item.key]: data
-                                                    });
-                                                }
+                                                console.log(data, 'data');
+                                                // if (item.addonAfter === '%') {
+                                                //     setSearchWord({
+                                                //         ...searchWord,
+                                                //         [item.after ? item.key + 'Max' : 'max' + item.key]: data / 100
+                                                //     });
+                                                // } else {
+                                                setSearchWord({
+                                                    ...searchWord,
+                                                    [item.after ? item.key + 'Max' : 'max' + item.key]: data
+                                                });
+                                                // }
                                             }}
-                                            formatter={(value) => {
-                                                if (value) {
-                                                    return item.addonAfter === '%' ? (value * 100).toString() : value;
-                                                } else {
-                                                    return '';
-                                                }
-                                            }}
+                                            // formatter={(value) => {
+                                            //     if (value) {
+                                            //         return item.addonAfter === '%' ? (value * 100).toString() : value;
+                                            //     } else {
+                                            //         return '';
+                                            //     }
+                                            // }}
                                             min={0}
                                             className="flex-1"
                                             placeholder="最大值"

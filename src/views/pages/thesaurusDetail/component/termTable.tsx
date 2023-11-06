@@ -8,7 +8,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
 import { delKeyword } from 'api/listing/thesaurus';
-import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import { Arrow } from './Arrow';
 
 const TermTable = ({
     loading,
@@ -160,7 +160,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         月搜索趋势
-                        {[23].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[23].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -190,7 +190,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         相关度
-                        {[21].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[21].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -220,7 +220,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         月搜索量
-                        {[5].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[5].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -255,7 +255,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         月购买量
-                        {[7].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[7].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -283,7 +283,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         SPR
-                        {[16].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[16].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -305,7 +305,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         标题密度
-                        {[15].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[15].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -328,7 +328,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         商品数
-                        {[8].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[8].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -350,7 +350,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         供需比
-                        {[9].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[9].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -369,7 +369,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         广告竞品数
-                        {[22].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[22].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -401,7 +401,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         点击集中度
-                        {[18].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[18].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -431,7 +431,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         RPC竞价
-                        {[11].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[11].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),
@@ -460,7 +460,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         市场分析
-                        {[17].includes(pageQuery.orderColumn) && <ArrowDownOutlined className="text-[#673ab7]" rev={undefined} />}
+                        {[17].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),

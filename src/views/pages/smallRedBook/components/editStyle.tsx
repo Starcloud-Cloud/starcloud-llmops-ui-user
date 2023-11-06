@@ -18,17 +18,15 @@ const EditStyle = ({
     detailImage: (label: string, index: number) => void;
     changeDetail: (data: any) => void;
 }) => {
-    const [value, setValue] = useState('');
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
                 <FormControl sx={{ flex: 1 }} color="secondary" fullWidth>
                     <InputLabel id="type">风格</InputLabel>
                     <Select
-                        value={value}
+                        value={consData.imageTemplate}
                         onChange={(e: any) => {
-                            changeDetail({ value: e.target.value, field: 'imageTemplate' });
-                            setValue(e.target.value);
+                            changeDetail({ value: e.target.value, field: 'imageTemplate', flag: true });
                         }}
                         labelId="type"
                         label="风格"
@@ -38,11 +36,11 @@ const EditStyle = ({
                         ))}
                     </Select>
                 </FormControl>
-                {value && (
+                {consData.imageTemplate && (
                     <div className="mt-[20px]">
                         <Row className="items-center" gutter={20}>
                             {typeList
-                                .filter((val: any) => val.id === value)[0]
+                                .filter((val: any) => val.id === consData.imageTemplate)[0]
                                 ?.variables?.map((el: any, index: number) =>
                                     el?.style === 'IMAGE' ? (
                                         <div>

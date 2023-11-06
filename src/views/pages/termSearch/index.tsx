@@ -7,15 +7,16 @@ import MainCard from 'ui-component/cards/MainCard';
 import { useEffect, useState } from 'react';
 import ResultFilter from './component/resultFilter';
 import TermTable from './component/termTable';
+import _ from 'lodash-es';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage } from 'api/listing/termSerch';
 const TermSearch = () => {
     const { Option } = Select;
-    const handleClose = (removedTag: string) => {
-        const newTags = queryAsin.asinList.filter((tag: string) => tag !== removedTag);
-        setQueryAsin({
-            ...queryAsin,
-            asinList: newTags
-        });
+    const handleClose = (index: number) => {
+        const newList = _.cloneDeep(queryAsin);
+        newList.asinList.splice(index, 1);
+        setQueryAsin(newList);
     };
     const [value, setValue] = useState('');
 
@@ -28,6 +29,20 @@ const TermSearch = () => {
     });
     const [asinData, setAsinData] = useState<any>({});
     const getAsin = async () => {
+        if (queryAsin.asinList.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'ASIN没有输入',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
         const result = await KeywordMetadataExtendPrepare({
             ...queryAsin,
             month: queryAsin.month === '最近30天' ? '' : queryAsin.month
@@ -38,6 +53,17 @@ const TermSearch = () => {
     useEffect(() => {
         getAsin();
     }, []);
+    useEffect(() => {
+        if (value) {
+            const str = /^[a-zA-Z0-9]{10}$/;
+            if (str.test(value)) {
+                const newList = _.cloneDeep(queryAsin);
+                newList.asinList.push(value.toUpperCase());
+                setQueryAsin(newList);
+                setValue('');
+            }
+        }
+    }, [value]);
 
     //根据ASIN获取拓展词变体
     const [pageQuery, setPageQuery] = useState({
@@ -176,15 +202,15 @@ const TermSearch = () => {
                                 ))}
                             </Select>
                             <Divider className="border-[#d8dadf]" type="vertical" />
-                            {queryAsin.asinList.map((item: string) => (
+                            {queryAsin.asinList.map((item: string, index: number) => (
                                 <Tag
-                                    key={item}
+                                    key={index}
                                     color="#3e4757"
                                     className="my-[6px] mr-[10px] rounded-[15px] h-[30px] text-sm leading-[28px]"
                                     closable
                                     onClose={(e) => {
                                         e.preventDefault();
-                                        handleClose(item);
+                                        handleClose(index);
                                     }}
                                 >
                                     <span className="pr-[5px]">{item}</span>

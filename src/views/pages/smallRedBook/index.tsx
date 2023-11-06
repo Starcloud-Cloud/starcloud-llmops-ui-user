@@ -41,15 +41,17 @@ const SmallRedBook = () => {
         },
         onPreview(e) {
             const newData = _.cloneDeep(tabImage);
-            if (!newData[activeKey]) {
-                setTabImage({
-                    ...newData,
-                    [activeKey]: [e?.response?.data?.url]
-                });
-            } else {
-                if (!newData[activeKey].some((item: any) => item === e?.response?.data?.url)) {
-                    newData[activeKey].push(e?.response?.data?.url);
-                    setTabImage(newData);
+            if (e?.response?.data?.url) {
+                if (!newData[activeKey]) {
+                    setTabImage({
+                        ...newData,
+                        [activeKey]: [e?.response?.data?.url]
+                    });
+                } else {
+                    if (!newData[activeKey].some((item: any) => item === e?.response?.data?.url)) {
+                        newData[activeKey].push(e?.response?.data?.url);
+                        setTabImage(newData);
+                    }
                 }
             }
         }
@@ -91,33 +93,16 @@ const SmallRedBook = () => {
     };
     //步骤
     const [current, setCurrent] = useState(0);
-    const contentStyle: React.CSSProperties = {
-        height: '160px',
-        color: '#fff',
-        lineHeight: '160px',
-        textAlign: 'center',
-        background: '#364d79'
-    };
     //改变值
     const changeImages = (data: any) => {
-        console.log(consList);
         const newData = _.cloneDeep(consList);
         newData[items.findIndex((item: any) => item.key === activeKey)][data.field] = data.value;
+        if (data.flag) {
+            newData[items.findIndex((item: any) => item.key === activeKey)].TITLE = undefined;
+            newData[items.findIndex((item: any) => item.key === activeKey)].SUB_TITLE = undefined;
+        }
         setConsList(newData);
-        return;
-        // const newData = _.cloneDeep(tabImage);
-        // if (newData[activeKey]) {
-        //     newData[activeKey][data.file] = data.value;
-        // } else {
-        //     newData[activeKey] = { [data.file]: data.value };
-        // }
-        // console.log(newData);
-
-        // setTabImage(newData);
     };
-    useEffect(() => {
-        console.log(tabImage);
-    }, [tabImage]);
     //风格列表 Item
     const [typeList, setTypeList] = useState<any>(null);
     //Tabs 选中的值
@@ -260,14 +245,18 @@ const SmallRedBook = () => {
                             const arr: any = [];
                             const result = consList.every((item, index) => {
                                 return (
-                                    tabImage[item.key]?.length ===
+                                    tabImage[item.key]?.length >=
                                         typeList
                                             .filter((el: any) => el.id === item.imageTemplate)[0]
                                             ?.variables.filter((i: any) => i.style === 'IMAGE')?.length &&
-                                    tabImage[item.key]?.length !== undefined
+                                    tabImage[item.key]?.length !== undefined &&
+                                    typeList
+                                        .filter((el: any) => el.id === item.imageTemplate)[0]
+                                        ?.variables.filter((i: any) => i.style !== 'IMAGE')
+                                        ?.every((int: any) => item[int.field])
                                 );
                             });
-                            if (result) {
+                            if (result && detaData.variables.every((item: any) => item.value)) {
                                 consList.map((item, index) => {
                                     const aa: any = {};
                                     typeList.map((tpye: any) => {

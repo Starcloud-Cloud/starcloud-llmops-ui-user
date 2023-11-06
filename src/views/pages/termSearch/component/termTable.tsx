@@ -2,7 +2,7 @@ import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
 import { ArrowDownOutlined } from '@ant-design/icons';
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useRef } from 'react';
 import * as echarts from 'echarts';
 import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
@@ -28,6 +28,7 @@ const TermTable = ({
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
 }) => {
+    const tableRef: any = useRef(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const rowSelection = {
         selectedRowKeys,
@@ -38,7 +39,8 @@ const TermTable = ({
     const columns: ColumnsType<any> = [
         {
             title: '#',
-            width: 72,
+            width: 50,
+            align: 'center',
             render: (_, row, index) => <div>{index + 1 + pageQuery.size * (pageQuery.page - 1)}</div>
         },
         {
@@ -53,6 +55,7 @@ const TermTable = ({
                 </span>
             ),
             width: 130,
+            align: 'center',
             render: (_, row) => (
                 <>
                     <Popover
@@ -144,9 +147,10 @@ const TermTable = ({
                 </Tooltip>
             ),
             width: 90,
+            align: 'center',
             render: (_, row) => (
                 <div className="">
-                    <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) + '%'}</div>
+                    <div className="text-[#1e2022]">{(row?.trafficPercentage * 100)?.toFixed(2) || 0 + '%'}</div>
                     <Tooltip placement="top" title="预计周曝光量">
                         <div className="text-[#95999e] cursor-pointer">{parseInt(row?.calculatedWeeklySearches)}</div>
                     </Tooltip>
@@ -170,6 +174,7 @@ const TermTable = ({
                 </Tooltip>
             ),
             width: 150,
+            align: 'center',
             render: (_, row) => (
                 <div className="w-[150px]">
                     <div className="text-sm font-[500] text-[#95999e] text-center">相关产品：{row.relationVariationsItems?.length}</div>
@@ -189,7 +194,9 @@ const TermTable = ({
                                             <div className="flex justify-between items-center text-[#95999e]">
                                                 <div>
                                                     流量占比：
-                                                    <span className="text-[#673ab7]">{(item.trafficPercentage * 100)?.toFixed(2)}%</span>
+                                                    <span className="text-[#673ab7]">
+                                                        {(item.trafficPercentage * 100)?.toFixed(2) || 0}%
+                                                    </span>
                                                 </div>
                                                 <div>
                                                     价格：<span className="text-[#673ab7]">${item.price}</span>
@@ -239,6 +246,7 @@ const TermTable = ({
                     <div className="cursor-default">月搜索趋势</div>
                 </Tooltip>
             ),
+            align: 'center',
             width: 200,
             render: (_, row, index) => (
                 <div className="w-[168px] relative">
@@ -263,6 +271,7 @@ const TermTable = ({
                     <div className="cursor-default">ABA周排名</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => <span className="border-b border-dashed border-[#9fa3a8]">{row.searchesRank}</span>
         },
         {
@@ -285,6 +294,7 @@ const TermTable = ({
                     <div className="cursor-default">月搜索量</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => (
                 <>
                     <span className="border-b border-dashed border-[#9fa3a8]">{row.searches}</span>
@@ -317,10 +327,11 @@ const TermTable = ({
                     <div className="cursor-default">月购买量</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => (
                 <>
                     <span>{row.purchases}</span>
-                    <div className="text-[#95999e] text-[13px]">{parseInt((row.purchaseRate * 100)?.toFixed(2) + '%')}</div>
+                    <div className="text-[#95999e] text-[13px]">{parseInt((row.purchaseRate * 100)?.toFixed(2) || 0 + '%')}</div>
                 </>
             )
         },
@@ -342,6 +353,7 @@ const TermTable = ({
                     <div className="cursor-default">SPR</div>
                 </Tooltip>
             ),
+            align: 'center',
             dataIndex: 'cprExact'
         },
         {
@@ -361,6 +373,7 @@ const TermTable = ({
                     <div className="cursor-default">标题密度</div>
                 </Tooltip>
             ),
+            align: 'center',
             dataIndex: 'titleDensityExact'
         },
         {
@@ -381,6 +394,7 @@ const TermTable = ({
                     <div className="cursor-default">商品数</div>
                 </Tooltip>
             ),
+            align: 'center',
             dataIndex: 'products'
         },
         {
@@ -400,6 +414,7 @@ const TermTable = ({
                     <div className="cursor-default">供需比</div>
                 </Tooltip>
             ),
+            align: 'center',
             dataIndex: 'supplyDemandRatio'
         },
         {
@@ -416,6 +431,7 @@ const TermTable = ({
                     <div className="cursor-default">广告竞品数</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => (
                 <Tooltip placement="top" title="近7天广告竞品数">
                     <div>{row.latest7daysAds}</div>
@@ -446,10 +462,11 @@ const TermTable = ({
                     <div className="cursor-default">点击集中度</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.top3ClickingRate * 100)?.toFixed(1) + '%'}</span>
-                    <div className="text-[#95999e] text-[13px]">{(row.top3ConversionRate * 100)?.toFixed(1) + '%'}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.top3ClickingRate * 100)?.toFixed(1) || 0 + '%'}</span>
+                    <div className="text-[#95999e] text-[13px]">{(row.top3ConversionRate * 100)?.toFixed(1) || 0 + '%'}</div>
                 </div>
             )
         },
@@ -473,10 +490,11 @@ const TermTable = ({
                     <div className="cursor-default">PPC竞价</div>
                 </Tooltip>
             ),
+            align: 'center',
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">${row.top3ClickingRate?.toFixed(2)}</span>
-                    <div className="text-[#95999e] text-[13px]">{row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">${row.top3ClickingRate?.toFixed(2) || 0}</span>
+                    <div className="text-[#95999e] text-[13px]">{row.bidMin?.toFixed(2) || 0 + '-' + row.bidMax?.toFixed(2) || 0}</div>
                 </div>
             )
         }
@@ -550,11 +568,13 @@ const TermTable = ({
             });
             getChartsList(index, Axis, rankList, searchList);
         });
+        if (tableRef.current) {
+            tableRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
     }, [JSON.stringify(tableData)]);
-
     return (
-        <>
-            <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
+        <div ref={tableRef}>
+            <div className="sticky top-0 z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
                     <Button>导出</Button>
                     <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
@@ -611,7 +631,7 @@ const TermTable = ({
             </div>
             <Table
                 loading={loading}
-                sticky={{ offsetHeader: 0 }}
+                sticky={{ offsetHeader: 76 }}
                 scroll={{ x: '1300px' }}
                 pagination={false}
                 rowKey={'keywords'}
@@ -650,7 +670,7 @@ const TermTable = ({
                 </div>
             )}
             {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
-        </>
+        </div>
     );
 };
 const arePropsEqual = (prevProps: any, nextProps: any) => {

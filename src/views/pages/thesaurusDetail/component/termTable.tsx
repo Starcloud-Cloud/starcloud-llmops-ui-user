@@ -29,9 +29,12 @@ const TermTable = ({
     type: number;
     uid: string;
     setPageQuery: (data: any) => void;
-    getExtended: () => void;
+    getExtended: (orderColumn?: number, desc?: boolean) => void;
 }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [desc, setDesc] = useState<boolean>(false);
+    const [orderColumn, setOrderColumn] = useState<number>(0);
+
     const rowSelection = {
         selectedRowKeys,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
@@ -578,11 +581,12 @@ const TermTable = ({
                     <Select
                         className="w-[140px] h-[36px]"
                         value={pageQuery.orderColumn}
-                        onChange={(data) =>
-                            setPageQuery({
-                                ...pageQuery,
-                                orderColumn: data
-                            })
+                        onChange={
+                            (data) => setOrderColumn(data)
+                            // setPageQuery({
+                            //     ...pageQuery,
+                            //     orderColumn: data
+                            // })
                         }
                         options={[
                             { label: '相关度', value: 21 },
@@ -603,11 +607,12 @@ const TermTable = ({
                     <Select
                         className="w-[80px] h-[36px] mx-[10px]"
                         value={pageQuery.desc}
-                        onChange={(data) =>
-                            setPageQuery({
-                                ...pageQuery,
-                                desc: data
-                            })
+                        onChange={
+                            (data) => setDesc(data)
+                            // setPageQuery({
+                            //     ...pageQuery,
+                            //     desc: data
+                            // })
                         }
                         defaultValue="倒序"
                         options={[
@@ -615,7 +620,7 @@ const TermTable = ({
                             { label: '降序', value: true }
                         ]}
                     ></Select>
-                    <Button onClick={() => getExtended()}>确定</Button>
+                    <Button onClick={() => getExtended(orderColumn, desc)}>确定</Button>
                 </div>
             </div>
             <Table

@@ -568,7 +568,7 @@ const TermTable = ({
 
     return (
         <div className="mt-4 rounded-lg bg-[#fff] py-[10px]">
-            <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
+            <div className="z-[3] bg-[#fff] flex items-center justify-between px-[20px] flex-wrap">
                 <div>
                     <Button className="mr-2" disabled={!selectedRowKeys.length} onClick={() => handleDelDict()}>
                         批量删除
@@ -577,7 +577,7 @@ const TermTable = ({
                         搜索结果数：<span className="text-[#673ab7] font-[600]">{total}</span>
                     </span>
                 </div>
-                <div>
+                <div className="my-[10px]">
                     <Select
                         className="w-[140px] h-[36px]"
                         value={pageQuery.orderColumn}

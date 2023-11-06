@@ -166,7 +166,7 @@ const ResultFilter = ({
     return (
         <Card className="py-[10px]">
             <Row gutter={20} className="px-[30px]">
-                <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
+                <Col xxl={4} xl={6} lg={8} md={12} xs={24} className="pb-[30px]">
                     {list?.length > 0 && (
                         <Select
                             style={{ width: '100%' }}
@@ -190,7 +190,7 @@ const ResultFilter = ({
                     )}
                 </Col>
 
-                <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
+                <Col xxl={4} xl={6} lg={8} md={12} xs={24} className="pb-[30px]">
                     <Input
                         placeholder="包含关键词，多个以逗号区分"
                         value={searchWord.includeKeywords}
@@ -202,7 +202,7 @@ const ResultFilter = ({
                         }
                     />
                 </Col>
-                <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
+                <Col xxl={4} xl={6} lg={8} md={12} xs={24} className="pb-[30px]">
                     <Input
                         placeholder="排除关键词，多个以逗号区分"
                         value={searchWord.excludeKeywords}
@@ -214,10 +214,10 @@ const ResultFilter = ({
                         }}
                     />
                 </Col>
-                <Col>
+                <Col className="pb-[30px]">
                     <div className="flex items-center">
                         <span
-                            className="text-[#673ab7] rounded border border-solid border-[#673ab7] text-[13px] font-[500] px-[6px] py-[9px] cursor-pointer ml-[30px] leading-3"
+                            className="text-[#673ab7] rounded border border-solid border-[#673ab7] text-[13px] font-[500] px-[6px] py-[9px] cursor-pointer leading-3"
                             onClick={() => setFilterOpen(!filterOpen)}
                         >
                             {filterOpen ? '隐藏过滤条件' : '展示过滤条件'}
@@ -228,21 +228,21 @@ const ResultFilter = ({
                         </span>
                     </div>
                 </Col>
-                <Col>
+                <Col className="pb-[30px]">
                     <Button type="primary" onClick={() => filterTable(searchWord)}>
                         查询
                     </Button>
                 </Col>
-                <Col>
+                <Col className="pb-[30px]">
                     <Button onClick={() => setAddKeywordOpen(true)}>新增关键词</Button>
                 </Col>
             </Row>
 
             {filterOpen && (
-                <div className="mt-[30px]">
+                <div>
                     <Row gutter={20} className="px-[30px]">
                         {searchList.map((item: any) => (
-                            <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
+                            <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={24}>
                                 <div className="mb-[10px] text-[#86898c] text-[13px] font-[500] flex items-center">
                                     {item.title}
                                     <Popover

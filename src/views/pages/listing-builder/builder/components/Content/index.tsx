@@ -513,6 +513,7 @@ const Content = () => {
                 asin: value,
                 marketName: country.key
             });
+            window.scrollTo(0, 870);
             setLoadingList([]);
             let copyList: any[] = _.cloneDeep(list);
             copyList[0].value = res.title;
@@ -750,7 +751,7 @@ const Content = () => {
                 <div className="flex justify-between items-center my-2 cursor-pointer" onClick={() => setOpenGrade(!openGrade)}>
                     {/* <span className="text-[#505355] text-base font-semibold">打分明细</span> */}
                     <div className="flex items-center">
-                        <div className="flex items-center ml-3 ">
+                        <div className="flex items-center">
                             {openGrade ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                             {openGrade ? (
                                 <span className="text-[#505355] text-sm font-semibold">收起打分明细</span>

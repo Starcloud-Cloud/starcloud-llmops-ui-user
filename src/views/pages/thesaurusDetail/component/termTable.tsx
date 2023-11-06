@@ -199,8 +199,8 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <>
-                    <span>{row.absoluteRelevancy}</span>
-                    <div className="text-[#95999e] text-[13px]">{row.relevancy && Math.round(row.relevancy)}</div>
+                    <div>{row.relevancy && Math.round(row.relevancy)}</div>
+                    <span className="text-[#95999e] text-[13px]">{row.absoluteRelevancy}</span>
                 </>
             )
         },
@@ -410,8 +410,10 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">{(row.monopolyClickRate * 100)?.toFixed(1) + '%'}</span>
-                    <div className="text-[#95999e] text-[13px]">{(row.cvsShareRate * 100)?.toFixed(1) + '%'}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">
+                        {row.monopolyClickRate && (row.monopolyClickRate * 100)?.toFixed(1) + '%'}
+                    </span>
+                    <div className="text-[#95999e] text-[13px]">{row.cvsShareRate && (row.cvsShareRate * 100)?.toFixed(1) + '%'}</div>
                 </div>
             )
         },
@@ -440,8 +442,10 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <div>
-                    <span className="border-b border-dashed border-[#9fa3a8]">${row.bid?.toFixed(2)}</span>
-                    <div className="text-[#95999e] text-[13px]">${row.bidMin?.toFixed(2) + '-' + row.bidMax?.toFixed(2)}</div>
+                    <span className="border-b border-dashed border-[#9fa3a8]">${row.bid && row.bid?.toFixed(2)}</span>
+                    <div className="text-[#95999e] text-[13px]">
+                        ${row.bidMin && row.bidMin?.toFixed(2) + '-' + row.bidMax && row.bidMax?.toFixed(2)}
+                    </div>
                 </div>
             )
         },

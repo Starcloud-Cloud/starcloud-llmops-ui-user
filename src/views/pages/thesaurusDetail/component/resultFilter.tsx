@@ -165,7 +165,7 @@ const ResultFilter = ({
 
     return (
         <Card className="py-[10px]">
-            <Row gutter={20} className="mb-[30px] px-[30px]">
+            <Row gutter={20} className="px-[30px]">
                 <Col xxl={4} xl={6} lg={8} md={12} xs={12}>
                     {list?.length > 0 && (
                         <Select
@@ -239,11 +239,11 @@ const ResultFilter = ({
             </Row>
 
             {filterOpen && (
-                <div>
+                <div className="mt-[30px]">
                     <Row gutter={20} className="px-[30px]">
                         {searchList.map((item: any) => (
                             <Col key={item.title} xxl={4} xl={6} lg={8} md={12} xs={12}>
-                                <div className="mb-[10px] text-[#86898c] text-[13px] font-[500]">
+                                <div className="mb-[10px] text-[#86898c] text-[13px] font-[500] flex items-center">
                                     {item.title}
                                     <Popover
                                         color="#262626"

@@ -567,7 +567,7 @@ const TermTable = ({
     };
 
     return (
-        <Card className="mt-4">
+        <div className="mt-4 rounded-lg bg-[#fff] py-[10px]">
             <div className="z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
                     <Button className="mr-2" disabled={!selectedRowKeys.length} onClick={() => handleDelDict()}>
@@ -634,7 +634,7 @@ const TermTable = ({
                 dataSource={tableData}
             />
             {total > pageQuery.size && (
-                <div className="mt-[20px] flex">
+                <div className="mb-[10px] mt-[20px] mr-[10px] flex justify-end">
                     <Pagination
                         page={pageQuery.page}
                         count={Math.ceil(total / pageQuery.size)}
@@ -663,7 +663,7 @@ const TermTable = ({
                     />
                 </div>
             )}
-        </Card>
+        </div>
     );
 };
 

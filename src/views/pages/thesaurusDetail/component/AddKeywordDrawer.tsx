@@ -58,9 +58,10 @@ export const AddKeywordDrawer = ({ open, handleClose, uid, forceUpdate }: IAddKe
                         rows={11}
                         label={'关键词'}
                         InputLabelProps={{ shrink: true }}
-                        placeholder={`请输入关键词，一行一个词组
-最多2000个关键词
-超过则系统自动截取前2000`}
+                        placeholder={`一行一组关键词，如：
+flashlight
+led flashlight
+mini led flashlight`}
                         className="w-full"
                         onChange={(e) => {
                             setKeyWord(e.target.value);

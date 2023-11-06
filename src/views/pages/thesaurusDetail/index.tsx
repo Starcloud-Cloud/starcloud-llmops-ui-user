@@ -41,7 +41,7 @@ const ThesaurusDetail = () => {
         if (uid) {
             getExtended();
         }
-    }, [pageQuery.page, pageQuery.size, uid]);
+    }, [pageQuery.page, pageQuery.size, uid, update]);
 
     const getExtended = async (orderColumn?: number, desc?: boolean) => {
         setLoading(true);
@@ -66,6 +66,9 @@ const ThesaurusDetail = () => {
         }
 
         const result = await keywordPage(data);
+        if (result.status === 'ANALYSIS') {
+            forceUpdate({});
+        }
         setLoading(false);
         setTotal(result.keywordMetadataResp.total);
         setTableData(result.keywordMetadataResp.list);

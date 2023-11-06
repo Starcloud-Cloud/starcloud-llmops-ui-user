@@ -17,7 +17,7 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 import { isMobile } from 'react-device-detect';
 import { TabPanel } from 'views/template/myChat/createChat';
 import { Confirm } from 'ui-component/Confirm';
-import { dispatch } from 'store';
+import { dispatch, useDispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
@@ -26,6 +26,7 @@ import { config } from 'utils/axios/config';
 import { getAccessToken } from 'utils/auth';
 import { DEFAULT_LIST } from 'views/pages/listing-builder/data';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { openDrawer } from 'store/slices/menu';
 const { base_url } = config;
 
 function a11yProps(index: number) {
@@ -65,6 +66,16 @@ const ListingBuilder = () => {
         setAsin
     } = useListing();
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(openDrawer(false));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => {
+            dispatch(openDrawer(true));
+        };
+    }, []);
 
     const onClick: MenuProps['onClick'] = ({ key }) => {
         const current = COUNTRY_LIST.find((item: any) => item.key === key);

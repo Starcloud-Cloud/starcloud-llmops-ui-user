@@ -41,17 +41,34 @@ const ThesaurusDetail = () => {
         if (uid) {
             getExtended();
         }
-    }, [pageQuery.page, pageQuery.size, uid]);
+    }, [pageQuery.page, pageQuery.size, uid, update]);
 
-    const getExtended = async () => {
+    const getExtended = async (orderColumn?: number, desc?: boolean) => {
         setLoading(true);
-        const result = await keywordPage({
+        const data = {
             dictUid: uid,
             ...pageQuery,
             ...searchResult,
             pageNo: pageQuery.page,
             pageSize: pageQuery.size
-        });
+        };
+
+        if (orderColumn && desc !== undefined) {
+            data.orderColumn = orderColumn;
+            data.desc = desc;
+            setPageQuery((pre: any) => {
+                return {
+                    ...pre,
+                    orderColumn,
+                    desc
+                };
+            });
+        }
+
+        const result = await keywordPage(data);
+        if (result.status === 'ANALYSIS') {
+            forceUpdate({});
+        }
         setLoading(false);
         setTotal(result.keywordMetadataResp.total);
         setTableData(result.keywordMetadataResp.list);

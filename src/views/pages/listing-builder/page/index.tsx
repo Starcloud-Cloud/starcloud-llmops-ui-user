@@ -495,9 +495,6 @@ const ListingBuilderPage: React.FC = () => {
                                                         percent={row?.searchersProportion * 100}
                                                         format={(percent) => (percent === 100 ? '100%' : `${percent}%`)}
                                                         size={35}
-                                                        success={{
-                                                            percent: 101
-                                                        }}
                                                     />
                                                 </div>
                                             </Tooltip>

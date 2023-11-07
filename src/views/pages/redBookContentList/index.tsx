@@ -23,6 +23,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
+import { DetailModal } from './component/detailModal';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -136,6 +137,7 @@ const RedBookContentList: React.FC = () => {
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
+    const [open, setOpen] = useState(true);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -490,6 +492,7 @@ const RedBookContentList: React.FC = () => {
                 labelRowsPerPage="每页行数"
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
+            <DetailModal open={open} handleClose={() => setOpen(false)} />
         </MainCard>
     );
 };

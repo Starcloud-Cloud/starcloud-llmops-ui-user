@@ -2,11 +2,9 @@ import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import StopIcon from '@mui/icons-material/Stop';
-import ReorderIcon from '@mui/icons-material/Reorder';
-
+import ReplayIcon from '@mui/icons-material/Replay';
 import MainCard from 'ui-component/cards/MainCard';
+import ReorderIcon from '@mui/icons-material/Reorder';
 
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
@@ -61,13 +59,17 @@ export interface TableEnhancedCreateDataType {
 }
 
 const headCells = [
-    { id: 'title', numeric: false, disablePadding: false, label: '计划名称' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
-    { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
+    { id: 'title', numeric: false, disablePadding: false, label: 'id' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '文案模版' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片模版' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片数量' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '文字数量' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'status', numeric: false, disablePadding: false, label: ' 创作者' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
+    { id: 'score', numeric: false, disablePadding: false, label: '是否被认领' },
+    { id: 'score', numeric: false, disablePadding: false, label: '重试次数' },
+    { id: 'createTime', numeric: false, disablePadding: false, label: '开始时间' },
+    { id: 'updateTime', numeric: false, disablePadding: false, label: '结束时间' },
+    { id: 'updateTime', numeric: false, disablePadding: false, label: '消耗时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -123,7 +125,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-const RedBookTaskList: React.FC = () => {
+const RedBookContentList: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
@@ -231,8 +233,8 @@ const RedBookTaskList: React.FC = () => {
         }
     };
 
-    const addPlan = async () => {
-        // navigate('/listingBuilder');
+    const addListing = async () => {
+        navigate('/listingBuilder');
     };
 
     const handleEdit = async (type: number, uid: string, version: number) => {
@@ -240,6 +242,23 @@ const RedBookTaskList: React.FC = () => {
             navigate('/listingBuilder?uid=' + uid + '&version=' + version);
         } else {
             navigate('/listingBuilderOptimize?uid=' + uid + '&version=' + version);
+        }
+    };
+
+    const handleTransfer = (key: string) => {
+        switch (key) {
+            case 'ANALYSIS':
+                return '分析中';
+            case 'ANALYSIS_ERROR':
+                return '分析失败';
+            case 'ANALYSIS_END':
+                return '分析结束';
+            case 'EXECUTING':
+                return '执行中';
+            case 'EXECUTE_ERROR':
+                return '执行失败';
+            case 'EXECUTED':
+                return '执行结束';
         }
     };
 
@@ -299,13 +318,9 @@ const RedBookTaskList: React.FC = () => {
     return (
         <MainCard
             content={false}
-            title="创作计划"
+            title="创作内容"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
-                        新建创作计划
-                    </Button>
-                    <Divider type={'vertical'} />
                     <Button
                         disabled={selected.length === 0}
                         className="ml-1"
@@ -384,6 +399,17 @@ const RedBookTaskList: React.FC = () => {
                                                     <div className="text-sm">{row.score || 0}/9 </div>
                                                 </div>
                                             </Tooltip>
+                                            <Divider type={'vertical'} />
+                                            <Tooltip title={'List中已埋词的总搜索量占总关键词搜索量的比值'} placement="top" arrow>
+                                                <div className="cursor-pointer">
+                                                    <Progress
+                                                        type="circle"
+                                                        percent={row?.searchersProportion * 100}
+                                                        format={(percent) => (percent === 100 ? '100%' : `${percent}%`)}
+                                                        size={35}
+                                                    />
+                                                </div>
+                                            </Tooltip>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
@@ -411,27 +437,13 @@ const RedBookTaskList: React.FC = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'查看'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <ReorderIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'开始'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <PlayCircleOutlineIcon className="text-base" />
-                                                {/* <StopIcon className="text-base" /> */}
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'复制'}>
+                                        <Tooltip title={'复制内容'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <ContentCopyIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
                                         <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-
-                                        <Tooltip title={'删除'}>
+                                        <Tooltip title={'查看详情'}>
                                             <IconButton
                                                 aria-label="delete"
                                                 size="small"
@@ -441,7 +453,21 @@ const RedBookTaskList: React.FC = () => {
                                                     setRow(row);
                                                 }}
                                             >
-                                                <DeleteIcon className="text-base" />
+                                                <ReorderIcon className="text-base" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                        <Tooltip title={'重试'}>
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    setDelType(0);
+                                                    setDelVisible(true);
+                                                    setRow(row);
+                                                }}
+                                            >
+                                                <ReplayIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>
@@ -468,4 +494,4 @@ const RedBookTaskList: React.FC = () => {
     );
 };
 
-export default RedBookTaskList;
+export default RedBookContentList;

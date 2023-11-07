@@ -51,6 +51,8 @@ const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedB
 
 const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
 
+const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
+
 //词库
 const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
@@ -187,6 +189,10 @@ const MainRoutes = {
         {
             path: '/redBookTaskList',
             element: <RedBookTaskList />
+        },
+        {
+            path: '/redBookContentList',
+            element: <RedBookContentList />
         }
     ]
 };

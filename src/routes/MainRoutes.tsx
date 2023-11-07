@@ -48,6 +48,11 @@ const ThesaurusDetail = Loadable(lazy(() => import('views/pages/thesaurusDetail'
 const SmallRedBook = Loadable(lazy(() => import('views/pages/smallRedBook/index')));
 //批量小红书图文
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
+
+const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
+
+const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
+
 //词库
 const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
@@ -180,6 +185,14 @@ const MainRoutes = {
         {
             path: '/batchSmallRedBook',
             element: <BatchSmallRedBook />
+        },
+        {
+            path: '/redBookTaskList',
+            element: <RedBookTaskList />
+        },
+        {
+            path: '/redBookContentList',
+            element: <RedBookContentList />
         }
     ]
 };

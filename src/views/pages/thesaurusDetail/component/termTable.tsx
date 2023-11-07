@@ -9,6 +9,7 @@ import { dispatch } from 'store';
 import './termTable.scss';
 import { delKeyword } from 'api/listing/thesaurus';
 import { Arrow } from './Arrow';
+import { splitThousandth } from 'utils/number-format';
 
 const TermTable = ({
     loading,
@@ -174,36 +175,36 @@ const TermTable = ({
                 </div>
             )
         },
-        {
-            title: (
-                <Tooltip
-                    placement="top"
-                    title={
-                        <>
-                            <p> 上行：相关度的相对值，最高=100，最低=0.5</p>
-                            <p> 数值越大，表示该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN数量越多</p>
-                            <p>
-                                ps：相关度=100并不代表该关键词与查询关键词所关联的ASIN完全一样，而是指该关键词与查询关键词在亚马逊搜索结果第一页的自然排名产品中同款ASIN数量最多
-                            </p>
-                            <p>
-                                下行：相关度的绝对值，即该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN的具体数量
-                            </p>
-                        </>
-                    }
-                >
-                    <div className="cursor-default">
-                        相关度
-                        {[21].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
-                    </div>
-                </Tooltip>
-            ),
-            render: (_, row) => (
-                <>
-                    <div>{row.relevancy && Math.round(row.relevancy)}</div>
-                    <span className="text-[#95999e] text-[13px]">{row.absoluteRelevancy}</span>
-                </>
-            )
-        },
+        // {
+        //     title: (
+        //         <Tooltip
+        //             placement="top"
+        //             title={
+        //                 <>
+        //                     <p> 上行：相关度的相对值，最高=100，最低=0.5</p>
+        //                     <p> 数值越大，表示该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN数量越多</p>
+        //                     <p>
+        //                         ps：相关度=100并不代表该关键词与查询关键词所关联的ASIN完全一样，而是指该关键词与查询关键词在亚马逊搜索结果第一页的自然排名产品中同款ASIN数量最多
+        //                     </p>
+        //                     <p>
+        //                         下行：相关度的绝对值，即该关键词与查询关键词在亚马逊搜索结果第一页的自然排名中，所关联的同款竞品ASIN的具体数量
+        //                     </p>
+        //                 </>
+        //             }
+        //         >
+        //             <div className="cursor-default">
+        //                 相关度
+        //                 {[21].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
+        //             </div>
+        //         </Tooltip>
+        //     ),
+        //     render: (_, row) => (
+        //         <>
+        //             <div>{row.relevancy && Math.round(row.relevancy)}</div>
+        //             <span className="text-[#95999e] text-[13px]">{row.absoluteRelevancy}</span>
+        //         </>
+        //     )
+        // },
         {
             title: (
                 <Tooltip
@@ -229,9 +230,9 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <>
-                    <span className="border-b border-dashed border-[#9fa3a8]">{row.searches}</span>
+                    <span className="border-b border-dashed border-[#9fa3a8]">{splitThousandth(row.searches)}</span>
                     <Tooltip placement="top" title="日均">
-                        <div className="text-[#95999e] text-[13px]">{parseInt((row.searches / 30)?.toString())}</div>
+                        <div className="text-[#95999e] text-[13px]">{splitThousandth(parseInt((row.searches / 30)?.toString()))}</div>
                     </Tooltip>
                 </>
             )
@@ -264,8 +265,8 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <>
-                    <span>{row.purchases}</span>
-                    <div className="text-[#95999e] text-[13px]">{parseInt((row.purchaseRate * 100)?.toFixed(2) + '%')}</div>
+                    <span>{splitThousandth(row.purchases)}</span>
+                    <div className="text-[#95999e] text-[13px]">{parseInt((row.purchaseRate * 100)?.toFixed(2))}%</div>
                 </>
             )
         },
@@ -290,7 +291,8 @@ const TermTable = ({
                     </div>
                 </Tooltip>
             ),
-            dataIndex: 'spr'
+            dataIndex: 'spr',
+            render: (value) => splitThousandth(value)
         },
         {
             title: (
@@ -335,7 +337,8 @@ const TermTable = ({
                     </div>
                 </Tooltip>
             ),
-            dataIndex: 'products'
+            dataIndex: 'products',
+            render: (value) => splitThousandth(value)
         },
         {
             title: (
@@ -378,7 +381,7 @@ const TermTable = ({
             ),
             render: (_, row) => (
                 <Tooltip placement="top" title="近7天广告竞品数">
-                    <div>{row.adProducts}</div>
+                    <div>{splitThousandth(row.adProducts)}</div>
                 </Tooltip>
             )
         },
@@ -444,7 +447,7 @@ const TermTable = ({
                 <div>
                     <span className="border-b border-dashed border-[#9fa3a8]">${row.bid && row.bid?.toFixed(2)}</span>
                     <div className="text-[#95999e] text-[13px]">
-                        ${row.bidMin && row.bidMin?.toFixed(2) + '-' + row.bidMax && row.bidMax?.toFixed(2)}
+                        {row.bidMin && row.bidMin?.toFixed(2)} - {row.bidMax && row.bidMax?.toFixed(2)}
                     </div>
                 </div>
             )
@@ -474,7 +477,7 @@ const TermTable = ({
             render: (_, row) => (
                 <div>
                     <span className="border-b border-dashed border-[#9fa3a8]">${row.avgPrice}</span>
-                    <div className="text-[#95999e] text-[13px]">${row.avgReviews + '(' + row.avgRating + ')'}</div>
+                    <div className="text-[#95999e] text-[13px]">${splitThousandth(row.avgReviews) + '(' + row.avgRating + ')'}</div>
                 </div>
             )
         }
@@ -593,7 +596,7 @@ const TermTable = ({
                             // })
                         }
                         options={[
-                            { label: '相关度', value: 21 },
+                            // { label: '相关度', value: 21 },
                             { label: 'ABA周排名', value: 23 },
                             { label: '月搜索量', value: 5 },
                             { label: '月购买量', value: 6 },

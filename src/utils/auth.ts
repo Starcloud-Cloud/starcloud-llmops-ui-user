@@ -12,8 +12,8 @@ const RefreshTokenKey = 'REFRESH_TOKEN';
 export const getAccessToken = () => {
     // 此处与TokenKey相同，此写法解决初始化时Cookies中不存在TokenKey报错
     // TODO
-    // return wsCache.get(AccessTokenKey) ? wsCache.get(AccessTokenKey) : wsCache.get('ACCESS_TOKEN');
-    return '7ee072152e9e413aa1fb135b75a8852d';
+    return wsCache.get(AccessTokenKey) ? wsCache.get(AccessTokenKey) : wsCache.get('ACCESS_TOKEN');
+    // return '7ee072152e9e413aa1fb135b75a8852d';
 };
 
 // 刷新token

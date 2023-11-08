@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal } from '@mui/material';
@@ -43,23 +43,48 @@ interface BodyProps extends CardProps {
 export function DiscountModal({
     open,
     handleClose,
-    url,
-    payPrice
+    currentSelect,
+    handleFetchPay,
+    setCurrentSelect,
+    handleCreateOrder
 }: {
     open: boolean;
     handleClose: () => void;
-    url: string;
-    isTimeout?: boolean;
-    onRefresh: () => void;
-    payPrice?: number;
+    handleFetchPay: (productCode?: string, noNeedProductCode?: string, discountCode?: string) => void;
+    currentSelect: any;
+    setCurrentSelect: (currentSelect: any) => void;
+    handleCreateOrder: (code?: string, discountCode?: string) => void;
 }) {
-    const [timeType, setTimeType] = React.useState(1);
+    const [selectCode, setSelectCode] = React.useState('');
+    const [discountCode, setDiscountCode] = React.useState('');
 
-    const handleOnSearch = (value: string) => {};
-
-    const handleRadio = (e: RadioChangeEvent) => {
-        setTimeType(e.target.value);
+    const handleOnSearch = async (value: string) => {
+        setDiscountCode(value);
+        await handleFetchPay(selectCode, currentSelect.monthCode === selectCode ? currentSelect.yearCode : currentSelect.monthCode, value);
     };
+
+    const handleRadio = async (e: RadioChangeEvent) => {
+        setCurrentSelect((pre: any) => {
+            return {
+                ...pre,
+                select: e.target.value === pre.monthCode ? '1' : '2'
+            };
+        });
+        setSelectCode(e.target.value);
+        await handleFetchPay(e.target.value, currentSelect.monthCode === e.target.value ? currentSelect.yearCode : currentSelect.monthCode);
+    };
+
+    useEffect(() => {
+        setSelectCode(currentSelect?.select === '1' ? currentSelect?.monthCode : currentSelect?.yearCode);
+    }, [currentSelect]);
+
+    const canSubmit = React.useMemo(() => {
+        if (discountCode && !currentSelect.discountCouponStatus) {
+            return false;
+        } else {
+            return true;
+        }
+    }, [discountCode, currentSelect.discountCouponStatus]);
 
     return (
         <Grid container justifyContent="flex-end">
@@ -86,21 +111,23 @@ export function DiscountModal({
                                 <div className="flex justify-center flex-col items-center w-full">
                                     <div className="flex justify-between items-center w-full mb-3">
                                         <span className="text-[#868A91]">套餐类型</span>
-                                        <span className="text-base font-semibold text-[#2B2D2F]">标准版</span>
+                                        <span className="text-base font-semibold text-[#2B2D2F]">{currentSelect?.title}</span>
                                     </div>
                                     <div className="flex justify-between items-center w-full mb-3">
                                         <span className="text-[#868A91]">套餐单价</span>
                                         <div className="flex items-center">
-                                            <span className="text-[#de4437] text-lg font-semibold">￥123.00</span>
+                                            <span className="text-[#de4437] text-lg font-semibold">
+                                                ￥{(currentSelect?.originalAmount / 100).toFixed(2)}
+                                            </span>
                                             <span className="text-xs">/元</span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center w-full mb-3">
                                         <span className="text-[#868A91]">订阅时长</span>
                                         <span>
-                                            <Radio.Group onChange={handleRadio} value={timeType}>
-                                                <Radio value={1}>年</Radio>
-                                                <Radio value={2}>月</Radio>
+                                            <Radio.Group onChange={handleRadio} value={selectCode}>
+                                                <Radio value={currentSelect?.yearCode}>年</Radio>
+                                                <Radio value={currentSelect?.monthCode}>月</Radio>
                                             </Radio.Group>
                                         </span>
                                     </div>
@@ -112,6 +139,13 @@ export function DiscountModal({
                                                 enterButton="检测有效性"
                                                 size="large"
                                                 onSearch={handleOnSearch}
+                                                onChange={(e) => {
+                                                    setCurrentSelect((pre: any) => ({
+                                                        ...pre,
+                                                        discountCouponStatus: false
+                                                    }));
+                                                    setDiscountCode(e.target.value);
+                                                }}
                                             />
                                         </div>
                                         <span className="text-[#919DA8] mt-1">
@@ -121,14 +155,22 @@ export function DiscountModal({
                                     <div className="flex  items-center w-full mb-3">
                                         <div className="flex flex-col">
                                             <span className="text-[#868A91] mb-2">优惠金额</span>
-                                            <span className="text-[#de4437] text-lg">￥123.00</span>
+                                            <span className="text-[#de4437] text-lg">
+                                                ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
+                                            </span>
                                         </div>
                                         <div className="flex flex-col ml-[30%]">
                                             <span className="text-[#868A91] mb-2">订单总价</span>
-                                            <span className="text-[#de4437] text-lg">￥123.00</span>
+                                            <span className="text-[#de4437] text-lg">
+                                                ￥{(currentSelect?.discountedAmount / 100).toFixed(2)}
+                                            </span>
                                         </div>
                                     </div>
                                     <Button
+                                        disabled={!canSubmit}
+                                        onClick={() =>
+                                            handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
+                                        }
                                         className="w-[300px] mt-4"
                                         color="secondary"
                                         startIcon={

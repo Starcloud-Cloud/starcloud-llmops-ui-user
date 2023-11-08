@@ -12,11 +12,9 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider, Progress } from 'antd';
-import AddIcon from '@mui/icons-material/Add';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { Divider } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { delListing, draftClone, draftExport, getListingPage } from 'api/listing/build';
+import { delListing, draftClone } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -24,6 +22,7 @@ import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 import { DetailModal } from './component/detailModal';
+import { delContent, getContentPage } from 'api/redBook';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -35,42 +34,23 @@ export interface ItemScore {
 
 export interface FiveDesc {}
 
-export interface TableEnhancedCreateDataType {
-    id: number;
-    uid: string;
-    title: string;
-    endpoint: string;
-    asin: string;
-    keywordResume?: any;
-    keywordMetaData?: any;
-    draftConfig: DraftConfig;
-    score?: any;
-    itemScore: ItemScore;
-    fiveDesc: FiveDesc;
-    productDesc: string;
-    searchTerm: string;
-    version: number;
-    status: string;
-    createTime: number;
-    updateTime: number;
-    matchSearchers: number;
-    searchersProportion: number;
-    scoreProportion: number;
-    type: number;
-}
-
 const headCells = [
-    { id: 'title', numeric: false, disablePadding: false, label: 'id' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '文案模版' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片模版' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片数量' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '文字数量' },
-    { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'score', numeric: false, disablePadding: false, label: '是否被认领' },
-    { id: 'score', numeric: false, disablePadding: false, label: '重试次数' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '开始时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '结束时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '消耗时间' },
+    { id: 'businessUid', numeric: false, disablePadding: false, label: 'id' },
+    { id: 'copyWritingUid', numeric: false, disablePadding: false, label: '文案模版' },
+    { id: 'copyWritingTitle', numeric: false, disablePadding: false, label: '文字数量' },
+    { id: 'copyWritingStatus', numeric: false, disablePadding: false, label: ' 文案状态' },
+    { id: 'copyWritingRetryCount', numeric: false, disablePadding: false, label: '文案重试次数' },
+    { id: 'copyWritingStartTime', numeric: false, disablePadding: false, label: '文案开始时间' },
+    { id: 'copyWritingEndTime', numeric: false, disablePadding: false, label: '文案结束时间' },
+    { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案消耗时间(毫秒)' },
+    { id: 'pictureTempUid', numeric: false, disablePadding: false, label: '图片模版' },
+    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
+    { id: 'pictureStatus', numeric: false, disablePadding: false, label: ' 图片状态' },
+    { id: 'pictureRetryCount', numeric: false, disablePadding: false, label: '图片重试次数' },
+    { id: 'pictureStartTime', numeric: false, disablePadding: false, label: '图片开始时间' },
+    { id: 'pictureEndTime', numeric: false, disablePadding: false, label: '图片结束时间' },
+    { id: 'pictureExecuteTime', numeric: false, disablePadding: false, label: '图片消耗时间(毫秒)' },
+    { id: 'claim', numeric: false, disablePadding: false, label: '是否被认领' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -99,6 +79,13 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
+                        className={
+                            headCell.label === '是否被认领'
+                                ? 'sticky right-[132px] bg-white'
+                                : headCell.label === '操作'
+                                ? 'sticky right-0 bg-white'
+                                : ''
+                        }
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
@@ -136,8 +123,9 @@ const RedBookContentList: React.FC = () => {
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
-    const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
-    const [open, setOpen] = useState(true);
+    const [row, setRow] = useState<any>({});
+    const [open, setOpen] = useState(false);
+    const [rows, setRows] = useState<any[]>([]);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -147,26 +135,24 @@ const RedBookContentList: React.FC = () => {
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
-        // const fetchPageData = async () => {
-        //     const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
-        //     if (orderBy) {
-        //         pageVO.sortField = orderBy;
-        //         pageVO.asc = order === 'asc';
-        //     }
-        //     getListingPage({ ...pageVO })
-        //         .then((res) => {
-        //             const fetchedRows = res.list;
-        //             setRows([...fetchedRows]);
-        //             setTotal(res?.total);
-        //         })
-        //         .catch((error) => {
-        //             console.error(error);
-        //         });
-        // };
-        // fetchPageData();
+        const fetchPageData = async () => {
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            if (orderBy) {
+                pageVO.sortField = orderBy;
+                pageVO.asc = order === 'asc';
+            }
+            getContentPage({ ...pageVO })
+                .then((res) => {
+                    const fetchedRows = res.list;
+                    setRows([...fetchedRows]);
+                    setTotal(res?.total);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        };
+        fetchPageData();
     }, [page, rowsPerPage, count, order, orderBy]);
-
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -214,9 +200,8 @@ const RedBookContentList: React.FC = () => {
 
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
-    const delDraft = async () => {
-        const data = delType === 0 ? [row?.id] : selected;
-        const res = await delListing(data);
+    const handleDelContent = async () => {
+        const res = await delContent(row.businessUid);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -249,18 +234,14 @@ const RedBookContentList: React.FC = () => {
 
     const handleTransfer = (key: string) => {
         switch (key) {
-            case 'ANALYSIS':
-                return '分析中';
-            case 'ANALYSIS_ERROR':
-                return '分析失败';
-            case 'ANALYSIS_END':
-                return '分析结束';
-            case 'EXECUTING':
+            case 'init':
+                return '初始化';
+            case 'executing':
                 return '执行中';
-            case 'EXECUTE_ERROR':
+            case 'execute_success':
+                return '执行成功';
+            case 'execute_error':
                 return '执行失败';
-            case 'EXECUTED':
-                return '执行结束';
         }
     };
 
@@ -355,7 +336,6 @@ const RedBookContentList: React.FC = () => {
                             if (typeof row === 'number') {
                                 return null; // 忽略数字类型的行
                             }
-                            console.log(row, 'row');
 
                             const isItemSelected = isSelected(row.id);
                             const labelId = `enhanced-table-checkbox-${index}`;
@@ -380,98 +360,125 @@ const RedBookContentList: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title={row.title}>
-                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.title}</span>
-                                        </Tooltip>
+                                        <span className="line-clamp-1 w-[300px] mx-auto">{row.businessUid}</span>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center"></div>
+                                        <div className="flex items-center justify-center">{row.copyWritingUid}</div>
                                     </TableCell>
-                                    {/* <TableCell align="center">{row.asin}</TableCell> */}
-                                    {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">
-                                            <Tooltip
-                                                title={'这按亚马逊官方推荐的标准进行打分，共有9个打分项，满分100分'}
-                                                placement="top"
-                                                arrow
-                                            >
-                                                <div className="flex flex-col cursor-pointer">
-                                                    <div className="text-base font-semibold">{row?.scoreProportion || 0}</div>
-                                                    <div className="text-sm">{row.score || 0}/9 </div>
-                                                </div>
-                                            </Tooltip>
-                                            <Divider type={'vertical'} />
-                                            <Tooltip title={'List中已埋词的总搜索量占总关键词搜索量的比值'} placement="top" arrow>
-                                                <div className="cursor-pointer">
-                                                    <Progress
-                                                        type="circle"
-                                                        percent={row?.searchersProportion * 100}
-                                                        format={(percent) => (percent === 100 ? '100%' : `${percent}%`)}
-                                                        size={35}
-                                                    />
-                                                </div>
-                                            </Tooltip>
+                                        <div className="flex items-center justify-center">{row.copyWritingTitle}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">{handleTransfer(row.copyWritingStatus)}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">{row.copyWritingRetryCount}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.copyWritingStartTime && dayjs(row.copyWritingStartTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.copyWritingStartTime && dayjs(row.copyWritingStartTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
-                                            <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
+                                            <span> {row.copyWritingEndTime && dayjs(row.copyWritingEndTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.copyWritingEndTime && dayjs(row.copyWritingEndTime).format('HH:mm:ss')}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">{row.copyWritingExecuteTime / 1000}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <span className="line-clamp-1 w-[300px] mx-auto">{row.pictureTempUid}</span>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <span className="line-clamp-1 w-[300px] mx-auto">{row.pictureNum}</span>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center justify-center">{handleTransfer(row.pictureStatus)}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">{row.pictureRetryCount}</div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.pictureStartTime && dayjs(row.pictureStartTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.pictureStartTime && dayjs(row.pictureStartTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
+                                            <span> {row.pictureEndTime && dayjs(row.pictureEndTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.pictureEndTime && dayjs(row.pictureEndTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title={'编辑'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    handleEdit(row.type, row.uid, row.version);
-                                                }}
-                                            >
-                                                <EditIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'复制内容'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <ContentCopyIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'查看详情'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    setDelType(0);
-                                                    setDelVisible(true);
-                                                    setRow(row);
-                                                }}
-                                            >
-                                                <ReorderIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'重试'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    setDelType(0);
-                                                    setDelVisible(true);
-                                                    setRow(row);
-                                                }}
-                                            >
-                                                <ReplayIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <div className="flex flex-col items-center">{row.pictureExecuteTime}</div>
+                                    </TableCell>
+                                    <TableCell align="center" className="sticky right-[132px] bg-white">
+                                        <div className="flex flex-col items-center">{row.claim}</div>
+                                    </TableCell>
+                                    <TableCell align="center" className="sticky right-0 bg-white">
+                                        <div className="flex items-center w-[130px]">
+                                            <Tooltip title={'编辑'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        handleEdit(row.type, row.uid, row.version);
+                                                    }}
+                                                >
+                                                    <EditIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'复制内容'}>
+                                                <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
+                                                    <ContentCopyIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip> */}
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'查看详情'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setOpen(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <ReorderIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'重试'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setDelType(0);
+                                                        setDelVisible(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <ReplayIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'删除'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setDelVisible(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <DeleteIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -491,8 +498,8 @@ const RedBookContentList: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
-            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
-            <DetailModal open={open} handleClose={() => setOpen(false)} />
+            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={handleDelContent} />
+            {open && <DetailModal open={open} handleClose={() => setOpen(false)} businessUid={row.businessUid} />}
         </MainCard>
     );
 };

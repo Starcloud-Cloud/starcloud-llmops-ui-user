@@ -546,7 +546,7 @@ const TermTable = ({
             item.trends?.map((el: any) => {
                 Axis.push(`${el?.month?.substr(0, 4)}年${el?.month?.substr(4, 2)}月`);
                 rankList.push(el?.searchRank);
-                searchList.push(el?.searches);
+                searchList.push(el?.search);
             });
             getChartsList(index, Axis, rankList, searchList);
         });

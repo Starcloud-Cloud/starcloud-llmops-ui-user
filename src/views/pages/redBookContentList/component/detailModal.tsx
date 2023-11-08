@@ -15,18 +15,30 @@ import {
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
 import { ThreeStep } from './threeStep';
+import { getContentDetail } from 'api/redBook';
 
 type IAddAiModalProps = {
     open: boolean;
     handleClose: () => void;
+    businessUid: string;
 };
 
-export const DetailModal = ({ open, handleClose }: IAddAiModalProps) => {
+export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps) => {
+    const [detail, setDetail] = useState(null);
+
+    useEffect(() => {
+        getContentDetail(businessUid).then((res) => {
+            if (res) {
+                setDetail(res);
+            }
+        });
+    }, [businessUid]);
+
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -50,16 +62,8 @@ export const DetailModal = ({ open, handleClose }: IAddAiModalProps) => {
                         p: 2
                     }}
                 >
-                    <ThreeStep />
+                    <ThreeStep data={detail} />
                 </CardContent>
-                <Divider />
-                {/* <CardActions>
-                    <Grid container justifyContent="flex-end">
-                        <Button variant="contained" type="button" color="secondary" onClick={() => {}}>
-                            确认
-                        </Button>
-                    </Grid>
-                </CardActions> */}
             </MainCard>
         </Modal>
     );

@@ -32,7 +32,7 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { createOrder, getOrderIsPay } from 'api/vip';
+import { createOrder, getOrderIsPay, getPrice } from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -56,6 +56,9 @@ import people8 from 'assets/images/pay/people8.png';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { PlayArrow } from '@mui/icons-material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { DiscountModal } from './discountModal';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const recommendList = [
     {
@@ -366,16 +369,16 @@ let interval: any;
 const Price1 = () => {
     const [planList, setPlanList] = useState(planListDefault(1));
     const [plans, setPlans] = useState(plansDefault(1));
-
-    const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
-
     const [openDialog, setOpenDialog] = useState(false);
     const [openPayDialog, setOpenPayDialog] = useState(false);
     const [swiperRef, setSwiperRef] = useState<any>(null);
     const [payPrice, setPayPrice] = useState(0);
+    const [currentSelect, setCurrentSelect] = useState<any>(null);
+
     const { width } = useWindowSize();
+    const navigate = useNavigate();
 
     const priceListDisable = {
         opacity: '0.4',
@@ -401,6 +404,8 @@ const Price1 = () => {
     const [isTimeout, setIsTimeout] = useState(false);
 
     const [orderId, setOrderId] = useState('');
+
+    const [discountOpen, setDiscountOpen] = useState(false);
 
     useEffect(() => {
         if (value === '1') {
@@ -461,7 +466,7 @@ const Price1 = () => {
         }, 5 * 60 * 1000);
     };
 
-    const handleCreateOrder = async (code?: string) => {
+    const handleCreateOrder = async (code?: string, discountCode?: string) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -472,32 +477,38 @@ const Price1 = () => {
                 const options = Intl.DateTimeFormat().resolvedOptions();
                 const timeZone = options.timeZone;
                 handleOpen();
-                const res = await createOrder({ productCode: code, timestamp: new Date().getTime(), timeZone });
-                setOrderId(res);
-                const resOrder = await submitOrder({
-                    orderId: res,
-                    channelCode: 'alipay_pc',
-                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-                    displayMode: 'qr_code'
-                });
-                setPayUrl(resOrder.displayContent);
+                const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
+                console.log('🚀 ~ file: member.tsx:481 ~ handleCreateOrder ~ res:', res);
 
-                interval = setInterval(() => {
-                    getOrderIsPay({ orderId: res }).then((isPayRes) => {
-                        if (isPayRes) {
-                            handleClose();
-                            setOpenPayDialog(true);
-                            setTimeout(() => {
-                                navigate('/orderRecord');
-                            }, 3000);
-                        }
+                if (res) {
+                    setOrderId(res);
+                    const resOrder = await submitOrder({
+                        orderId: res,
+                        channelCode: 'alipay_pc',
+                        channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+                        displayMode: 'qr_code'
                     });
-                }, 1000);
+                    setPayUrl(resOrder.displayContent);
 
-                setTimeout(() => {
-                    clearInterval(interval);
-                    setIsTimeout(true);
-                }, 5 * 60 * 1000);
+                    interval = setInterval(() => {
+                        getOrderIsPay({ orderId: res }).then((isPayRes) => {
+                            if (isPayRes) {
+                                handleClose();
+                                setOpenPayDialog(true);
+                                setTimeout(() => {
+                                    navigate('/orderRecord');
+                                }, 3000);
+                            }
+                        });
+                    }, 1000);
+
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        setIsTimeout(true);
+                    }, 5 * 60 * 1000);
+                } else {
+                    PubSub.publish('global.error', { message: '订单支付失败', type: 'error' });
+                }
             } catch (e) {
                 const TEXT_MESSAGE = '登录超时,请重新登录!';
                 if (e === TEXT_MESSAGE) {
@@ -512,17 +523,42 @@ const Price1 = () => {
         }
     };
 
-    const handleClick = (index: number, code?: string, price?: any) => {
-        setPayPrice(price);
+    const handleFetchPay = async (productCode?: string, noNeedProductCode?: string, discountCode?: string) => {
+        const res = await getPrice({ productCode, noNeedProductCode, discountCode });
+        if (res) {
+            setDiscountOpen(true);
+            setCurrentSelect((pre: any) => {
+                return {
+                    ...pre,
+                    ...res
+                };
+            });
+            if (res.discountCouponStatus === false) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '折扣券无效',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: false
+                    })
+                );
+            }
+        }
+    };
+
+    const handleClick = (index: number, productCode?: string, noNeedProductCode?: string) => {
         switch (index) {
             case 0:
                 return navigate('/exchange');
             case 1:
-                return handleCreateOrder(code);
+                return handleFetchPay(productCode, noNeedProductCode);
             case 2:
-                return handleCreateOrder(code);
+                return handleFetchPay(productCode, noNeedProductCode);
             case 3:
-                return handleCreateOrder(code);
+                return handleFetchPay(productCode, noNeedProductCode);
             case 4:
                 return;
         }
@@ -651,13 +687,19 @@ const Price1 = () => {
                                                     <Button
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
-                                                        onClick={() =>
+                                                        onClick={() => {
+                                                            setCurrentSelect({
+                                                                title: plan.title,
+                                                                select: value,
+                                                                monthCode: plan.monthCode,
+                                                                yearCode: plan.yearCode
+                                                            });
                                                             handleClick(
                                                                 index,
                                                                 value === '1' ? plan.monthCode : plan.yearCode,
-                                                                value === '1' ? plan.monthPrice : plan.yearPrice
-                                                            )
-                                                        }
+                                                                value === '1' ? plan.yearCode : plan.monthCode
+                                                            );
+                                                        }}
                                                         color="secondary"
                                                     >
                                                         {plan.btnText}
@@ -774,6 +816,16 @@ const Price1 = () => {
                 onRefresh={onRefresh}
                 payPrice={payPrice}
             />
+            {discountOpen && (
+                <DiscountModal
+                    open={discountOpen}
+                    handleClose={() => setDiscountOpen(false)}
+                    handleFetchPay={handleFetchPay}
+                    setCurrentSelect={setCurrentSelect}
+                    currentSelect={currentSelect}
+                    handleCreateOrder={handleCreateOrder}
+                />
+            )}
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}
             <Dialog
                 open={openDialog}

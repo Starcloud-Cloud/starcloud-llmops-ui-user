@@ -40,3 +40,8 @@ export const getOrderIsPay = (data: any) => {
 export const getVipTimeOut = () => {
     return request.post({ url: '/llm/user-benefits/expiredReminder' });
 };
+
+// 获取折扣价格
+export const getPrice = (data: any) => {
+    return request.post({ url: '/llm/pay/order/product/discount', data });
+};

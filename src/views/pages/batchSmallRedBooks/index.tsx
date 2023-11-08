@@ -148,23 +148,33 @@ const BatcSmallRedBooks = () => {
             setMockData(res);
         });
     }, []);
-    const addStyle = () => {
+    const digui = (data: number) => {
         let newData = _.cloneDeep(detailData);
-        if (!newData.imageStyleList) {
-            newData.imageStyleList = [];
+        if (newData.imageStyleList.every((item: any) => item.name.indexOf(data.toString()) === -1)) {
+            console.log(data, 111);
+
+            if (!newData.imageStyleList) {
+                newData.imageStyleList = [];
+            }
+            newData.imageStyleList.push({
+                id: uuidv4(),
+                name: `风格 ${data}`,
+                templateList: [
+                    {
+                        id: '',
+                        name: '首图',
+                        variables: []
+                    }
+                ]
+            });
+            setDetailData(newData);
+        } else {
+            digui(newTabIndex.current++);
         }
-        newData.imageStyleList.push({
-            key: uuidv4(),
-            name: `风格 ${newTabIndex.current++}`,
-            templateList: [
-                {
-                    id: '',
-                    name: '首图',
-                    variables: []
-                }
-            ]
-        });
-        setDetailData(newData);
+    };
+
+    const addStyle = () => {
+        digui(newTabIndex.current++);
     };
 
     //保存
@@ -328,49 +338,52 @@ const BatcSmallRedBooks = () => {
                     增加风格
                 </Button>
             </div>
-            <Collapse
-                accordion
-                items={detailData?.imageStyleList?.map((item: any, index: number) => {
-                    return {
-                        key: item.key,
-                        label: item.name,
-                        extra: (
-                            <Popover
-                                content={
-                                    <Button
-                                        onClick={(e: any) => {
-                                            const newData = _.cloneDeep(detailData);
-                                            newData.imageStyleList.splice(index, 1);
-                                            setDetailData(newData);
-                                            e.stopPropagation();
-                                        }}
-                                        danger
-                                        icon={<DeleteOutlined rev={undefined} />}
-                                    >
-                                        删除
-                                    </Button>
-                                }
-                                trigger="click"
-                            >
-                                <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
-                                    <MoreVertIcon />
-                                </IconButton>
-                            </Popover>
-                        ),
-                        children: (
-                            <StyleTabs
-                                imageStyleData={item?.templateList}
-                                typeList={typeList}
-                                setDetailData={(data: any) => {
-                                    const newData = _.cloneDeep(detailData);
-                                    newData.imageStyleList[index].templateList = data;
-                                    setDetailData(newData);
-                                }}
-                            />
-                        )
-                    };
-                })}
-            />
+            {detailData?.imageStyleList && (
+                <Collapse
+                    // accordion
+                    defaultActiveKey={detailData?.imageStyleList?.map((item: any) => item.id)}
+                    items={detailData?.imageStyleList?.map((item: any, index: number) => {
+                        return {
+                            key: item.id,
+                            label: item.name,
+                            extra: (
+                                <Popover
+                                    content={
+                                        <Button
+                                            onClick={(e: any) => {
+                                                const newData = _.cloneDeep(detailData);
+                                                newData.imageStyleList.splice(index, 1);
+                                                setDetailData(newData);
+                                                e.stopPropagation();
+                                            }}
+                                            danger
+                                            icon={<DeleteOutlined rev={undefined} />}
+                                        >
+                                            删除
+                                        </Button>
+                                    }
+                                    trigger="click"
+                                >
+                                    <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                </Popover>
+                            ),
+                            children: (
+                                <StyleTabs
+                                    imageStyleData={item?.templateList}
+                                    typeList={typeList}
+                                    setDetailData={(data: any) => {
+                                        const newData = _.cloneDeep(detailData);
+                                        newData.imageStyleList[index].templateList = data;
+                                        setDetailData(newData);
+                                    }}
+                                />
+                            )
+                        };
+                    })}
+                />
+            )}
             <div className="text-[18px] font-[600] my-[20px]">4. 生成随机参数</div>
             <div>
                 <Radio.Group

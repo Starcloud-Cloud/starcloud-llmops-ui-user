@@ -22,7 +22,7 @@ import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 import { DetailModal } from './component/detailModal';
-import { getContentPage } from 'api/redBook';
+import { delContent, getContentPage } from 'api/redBook';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -79,6 +79,13 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
+                        className={
+                            headCell.label === '是否被认领'
+                                ? 'sticky right-[132px] bg-white'
+                                : headCell.label === '操作'
+                                ? 'sticky right-0 bg-white'
+                                : ''
+                        }
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
@@ -193,9 +200,8 @@ const RedBookContentList: React.FC = () => {
 
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
-    const delDraft = async () => {
-        const data = delType === 0 ? [row?.id] : selected;
-        const res = await delListing(data);
+    const handleDelContent = async () => {
+        const res = await delContent(row.businessUid);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -410,11 +416,11 @@ const RedBookContentList: React.FC = () => {
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">{row.pictureExecuteTime}</div>
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="center" className="sticky right-[132px] bg-white">
                                         <div className="flex flex-col items-center">{row.claim}</div>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex items-center w-[160px]">
+                                    <TableCell align="center" className="sticky right-0 bg-white">
+                                        <div className="flex items-center w-[130px]">
                                             <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"
@@ -426,20 +432,19 @@ const RedBookContentList: React.FC = () => {
                                                     <EditIcon className="text-base" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                             <Tooltip title={'复制内容'}>
                                                 <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                     <ContentCopyIcon className="text-base" />
                                                 </IconButton>
-                                            </Tooltip>
+                                            </Tooltip> */}
                                             <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                             <Tooltip title={'查看详情'}>
                                                 <IconButton
                                                     aria-label="delete"
                                                     size="small"
                                                     onClick={() => {
-                                                        setDelType(0);
-                                                        setDelVisible(true);
+                                                        setOpen(true);
                                                         setRow(row);
                                                     }}
                                                 >
@@ -458,6 +463,19 @@ const RedBookContentList: React.FC = () => {
                                                     }}
                                                 >
                                                     <ReplayIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'删除'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setDelVisible(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <DeleteIcon className="text-base" />
                                                 </IconButton>
                                             </Tooltip>
                                         </div>
@@ -480,8 +498,8 @@ const RedBookContentList: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
-            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
-            <DetailModal open={open} handleClose={() => setOpen(false)} />
+            <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={handleDelContent} />
+            {open && <DetailModal open={open} handleClose={() => setOpen(false)} businessUid={row.businessUid} />}
         </MainCard>
     );
 };

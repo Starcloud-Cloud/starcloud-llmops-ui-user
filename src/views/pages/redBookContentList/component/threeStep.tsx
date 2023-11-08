@@ -10,7 +10,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 // import { dispatch } from 'store';
 // import { openSnackbar } from 'store/slices/snackbar';
 
-export const ThreeStep = () => {
+export const ThreeStep = ({ data }: { data: any }) => {
     const [text, setText] = React.useState<string>('文案');
     const [title, setTitle] = React.useState<string>('');
     const [images, setImages] = React.useState<any[]>([

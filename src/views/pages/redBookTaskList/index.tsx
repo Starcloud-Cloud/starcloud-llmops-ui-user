@@ -1,10 +1,12 @@
 import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Tag } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import StopIcon from '@mui/icons-material/Stop';
 import ReorderIcon from '@mui/icons-material/Reorder';
+import SportsVolleyballIcon from '@mui/icons-material/SportsVolleyball';
 
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -26,6 +28,8 @@ import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 const { base_url } = config;
+import AddModal from './modal';
+import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
 
 export interface DraftConfig {}
 
@@ -65,7 +69,7 @@ const headCells = [
     { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
     { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'status', numeric: false, disablePadding: false, label: ' 创作者' },
+    { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -129,11 +133,21 @@ const RedBookTaskList: React.FC = () => {
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
+
+    const [open, setOpen] = useState(false);
+    const [templateList, setTemplateList] = useState<any[]>([]);
+    useEffect(() => {
+        if (open) {
+            listTemplates().then((res) => {
+                setTemplateList(res);
+            });
+        }
+    }, [open]);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -143,26 +157,22 @@ const RedBookTaskList: React.FC = () => {
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
-        // const fetchPageData = async () => {
-        //     const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
-        //     if (orderBy) {
-        //         pageVO.sortField = orderBy;
-        //         pageVO.asc = order === 'asc';
-        //     }
-        //     getListingPage({ ...pageVO })
-        //         .then((res) => {
-        //             const fetchedRows = res.list;
-        //             setRows([...fetchedRows]);
-        //             setTotal(res?.total);
-        //         })
-        //         .catch((error) => {
-        //             console.error(error);
-        //         });
-        // };
-        // fetchPageData();
+        const fetchPageData = async () => {
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            if (orderBy) {
+                pageVO.sortField = orderBy;
+                pageVO.asc = order === 'asc';
+            }
+            planPage({ ...pageVO }).then((res) => {
+                const fetchedRows = res.list;
+                setRows([...fetchedRows]);
+                setTotal(res?.page?.total);
+            });
+        };
+        fetchPageData();
     }, [page, rowsPerPage, count, order, orderBy]);
 
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
+    const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -211,8 +221,8 @@ const RedBookTaskList: React.FC = () => {
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     const delDraft = async () => {
-        const data = delType === 0 ? [row?.id] : selected;
-        const res = await delListing(data);
+        const data = delType === 0 ? [row?.uid] : selected;
+        const res = await planDelete(data);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -231,21 +241,23 @@ const RedBookTaskList: React.FC = () => {
         }
     };
 
-    const addPlan = async () => {
-        // navigate('/listingBuilder');
+    const [executeOpen, setExecuteOpen] = useState(false);
+    const Execute = () => {
+        planExecute({ uid: row?.uid }).then((res) => {
+            setExecuteOpen(false);
+        });
     };
 
-    const handleEdit = async (type: number, uid: string, version: number) => {
-        if (type === 1) {
-            navigate('/listingBuilder?uid=' + uid + '&version=' + version);
-        } else {
-            navigate('/listingBuilderOptimize?uid=' + uid + '&version=' + version);
-        }
+    const addPlan = async () => {
+        setOpen(true);
+    };
+
+    const handleEdit = async (uid: string) => {
+        navigate('/batchSmallRedBook?uid=' + uid);
     };
 
     const doClone = async (row: any) => {
-        const res = await draftClone({
-            version: row.version,
+        const res = await planCopy({
             uid: row.uid
         });
         if (res) {
@@ -305,7 +317,7 @@ const RedBookTaskList: React.FC = () => {
                     <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
                         新建创作计划
                     </Button>
-                    <Divider type={'vertical'} />
+                    {/* <Divider type={'vertical'} />
                     <Button
                         disabled={selected.length === 0}
                         className="ml-1"
@@ -319,7 +331,7 @@ const RedBookTaskList: React.FC = () => {
                         variant="contained"
                     >
                         批量删除
-                    </Button>
+                    </Button> */}
                 </div>
             }
         >
@@ -340,7 +352,7 @@ const RedBookTaskList: React.FC = () => {
                             }
                             console.log(row, 'row');
 
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(row.uid);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
@@ -363,15 +375,13 @@ const RedBookTaskList: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title={row.title}>
-                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.title}</span>
+                                        <Tooltip title={row.name}>
+                                            <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center"></div>
+                                        <div className="flex items-center justify-center">小红书</div>
                                     </TableCell>
-                                    {/* <TableCell align="center">{row.asin}</TableCell> */}
-                                    {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
                                             <Tooltip
@@ -379,13 +389,47 @@ const RedBookTaskList: React.FC = () => {
                                                 placement="top"
                                                 arrow
                                             >
-                                                <div className="flex flex-col cursor-pointer">
-                                                    <div className="text-base font-semibold">{row?.scoreProportion || 0}</div>
-                                                    <div className="text-sm">{row.score || 0}/9 </div>
+                                                <div className="flex">
+                                                    <div>{row?.successCount || 0}</div>/
+                                                    <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
                                                 </div>
                                             </Tooltip>
                                         </div>
                                     </TableCell>
+                                    <TableCell align="center">
+                                        <Tag
+                                            color={
+                                                row.status === 'PENDING'
+                                                    ? 'processing'
+                                                    : row.status === 'RUNNING'
+                                                    ? 'processing'
+                                                    : row.status === 'PAUSE'
+                                                    ? 'default'
+                                                    : row.status === 'CANCELED'
+                                                    ? 'default'
+                                                    : row.status === 'COMPLETE'
+                                                    ? 'success'
+                                                    : row.status === 'FAILURE'
+                                                    ? 'error'
+                                                    : 'processing'
+                                            }
+                                        >
+                                            {row.status === 'PENDING'
+                                                ? '待执行'
+                                                : row.status === 'RUNNING'
+                                                ? '执行中'
+                                                : row.status === 'PAUSE'
+                                                ? '已暂停'
+                                                : row.status === 'CANCELED'
+                                                ? '已取消'
+                                                : row.status === 'COMPLETE'
+                                                ? '已完成'
+                                                : row.status === 'FAILURE'
+                                                ? '已失败'
+                                                : ''}
+                                        </Tag>
+                                    </TableCell>
+                                    <TableCell align="center">{row.creator}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
@@ -404,7 +448,7 @@ const RedBookTaskList: React.FC = () => {
                                                 aria-label="delete"
                                                 size="small"
                                                 onClick={() => {
-                                                    handleEdit(row.type, row.uid, row.version);
+                                                    handleEdit(row.uid);
                                                 }}
                                             >
                                                 <EditIcon className="text-base" />
@@ -412,17 +456,23 @@ const RedBookTaskList: React.FC = () => {
                                         </Tooltip>
                                         <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'查看'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    navigate('/redBookContentList?uid=' + row.uid);
+                                                }}
+                                            >
                                                 <ReorderIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                        {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'开始'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <PlayCircleOutlineIcon className="text-base" />
-                                                {/* <StopIcon className="text-base" /> */}
+                                                <StopIcon className="text-base" />
                                             </IconButton>
-                                        </Tooltip>
+                                        </Tooltip> */}
                                         <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'复制'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
@@ -442,6 +492,19 @@ const RedBookTaskList: React.FC = () => {
                                                 }}
                                             >
                                                 <DeleteIcon className="text-base" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                        <Tooltip title={'执行'}>
+                                            <IconButton
+                                                aria-label="delete"
+                                                size="small"
+                                                onClick={() => {
+                                                    setExecuteOpen(true);
+                                                    setRow(row);
+                                                }}
+                                            >
+                                                <SportsVolleyballIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>
@@ -464,6 +527,8 @@ const RedBookTaskList: React.FC = () => {
                 labelRowsPerPage="每页行数"
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
+            <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
+            <AddModal open={open} setOpen={setOpen} templateList={templateList} />
         </MainCard>
     );
 };

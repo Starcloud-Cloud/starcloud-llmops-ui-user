@@ -1,79 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
-import { Button, Upload, UploadProps, Image, Progress, Transfer, Collapse, Radio, Modal, Row, Col, InputNumber } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { TextField, IconButton } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Button, Upload, UploadProps, Image, Progress, Transfer, Collapse, Radio, Modal, Row, Col, InputNumber, Popover } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
 import type { RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import StyleTabs from './components/styleTabs';
+import { copyWritingTemplates } from 'api/redBook/batchIndex';
 import Forms from 'views/pages/smallRedBook/components/form';
-import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
+import { imageTemplates } from 'api/template';
+import { planCreate, planGet, planModify, listTemplates } from 'api/redBook/batchIndex';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
-const res = {
-    imageUrlList: [],
-    copywritingList: [],
-    variableList: [
-        {
-            label: '',
-            field: 'aaa',
-            type: '',
-            style: 'SELECT',
-            group: '',
-            order: 0,
-            defaultValue: {},
-            value: {},
-            isShow: true,
-            isPoint: true,
-            description: '',
-            options: [
-                {
-                    label: 'aaa',
-                    value: '',
-                    description: ''
-                }
-            ]
-        }
-    ],
-    imageStyleList: [
-        {
-            name: '风格 1234',
-            templateList: [
-                {
-                    id: 'ONE_BOX_GRID',
-                    posterId: '',
-                    name: '',
-                    token: '',
-                    imageNumber: 0,
-                    variables: [
-                        {
-                            label: '',
-                            field: 'aaa',
-                            type: '',
-                            style: 'SELECT',
-                            group: '',
-                            order: 0,
-                            defaultValue: {},
-                            value: {},
-                            isShow: true,
-                            isPoint: true,
-                            description: '',
-                            options: [
-                                {
-                                    label: 'aaa',
-                                    value: '',
-                                    description: ''
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-    total: 0
-};
 const BatcSmallRedBooks = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(location.search);
+    const [value, setValue] = useState('');
+    const [valueOpen, setValueOpen] = useState(false);
     const newTabIndex = useRef(1);
     //1.批量上传图片素材
     const [open, setOpen] = useState(false);
@@ -90,6 +38,8 @@ const BatcSmallRedBooks = () => {
         },
         maxCount: 500,
         onChange(info) {
+            console.log(info);
+
             setImageList(info.fileList);
         },
         onPreview: (file) => {
@@ -101,64 +51,194 @@ const BatcSmallRedBooks = () => {
         }
     };
     //2.文案模板
-    const [mockData, setMockData] = useState<any[]>([
-        { key: '1', title: '文案 1', description: 'string' },
-        { key: '2', title: '文案 2', description: 'string' },
-        { key: '3', title: '文案 3', description: 'string' }
-    ]);
-    const [targetKeys, setTargetKeys] = useState<any[]>(['2']);
-    const [selectedKeys, setSelectedKeys] = useState<any[]>(['1']);
+    const [mockData, setMockData] = useState<any[]>([]);
+    const [targetKeys, setTargetKeys] = useState<any[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<any[]>([]);
 
+    const deduplicateArray = (arr: any[], prop: string) => {
+        const uniqueValues = new Set();
+        const deduplicatedArray: any[] = [];
+        for (const item of arr) {
+            const value = item[prop];
+            if (!uniqueValues.has(value)) {
+                uniqueValues.add(value);
+                deduplicatedArray.push(item);
+            }
+        }
+        return deduplicatedArray;
+    };
+    useEffect(() => {
+        if (targetKeys.length > 0) {
+            const arr: any[] = [];
+            const newList = mockData?.filter((item: any) => targetKeys.some((el) => item.uid === el));
+            newList.map((item) => {
+                item.variables?.map((el: any) => {
+                    arr.push(el);
+                });
+            });
+            const newData = _.cloneDeep(detailData);
+            newData.variableList = deduplicateArray(arr, 'field');
+            setDetailData(newData);
+        } else {
+            if (detailData?.variableList) {
+                const newData = _.cloneDeep(detailData);
+                newData.variableList = [];
+                setDetailData(newData);
+            }
+        }
+    }, [targetKeys]);
     const onChange = (nextTargetKeys: string[], direction: TransferDirection, moveKeys: string[]) => {
-        console.log('targetKeys:', nextTargetKeys);
-        console.log('direction:', direction);
-        console.log('moveKeys:', moveKeys);
         setTargetKeys(nextTargetKeys);
     };
     const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
-        console.log('sourceSelectedKeys:', sourceSelectedKeys);
-        console.log('targetSelectedKeys:', targetSelectedKeys);
         setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
-    };
-    const onScroll = (direction: TransferDirection, e: React.SyntheticEvent<HTMLUListElement>) => {
-        console.log('direction:', direction);
-        console.log('target:', e.target);
     };
     //3.图片模板
     const [typeList, setTypeList] = useState<any[]>([]); //选择格式的列表（四宫格、六宫格、九宫格）
     useEffect(() => {
+        if (searchParams.get('uid')) {
+            planGet(searchParams.get('uid')).then((res) => {
+                if (res) {
+                    setValue(res.name);
+                    setDetailData(res.config);
+                    setTargetKeys(res.config?.copyWritingList);
+                    setImageList(
+                        res.config?.imageUrlList?.map((item: any) => {
+                            return {
+                                uid: uuidv4(),
+                                thumbUrl: item,
+                                response: {
+                                    data: {
+                                        url: item
+                                    }
+                                }
+                            };
+                        })
+                    );
+                }
+            });
+        }
+        if (searchParams.get('template')) {
+            listTemplates().then((result) => {
+                if (result) {
+                    const res = result[searchParams.get('template') as string];
+                    setValue(res.name);
+                    setDetailData(res.config);
+                    setTargetKeys(res.config?.copyWritingList);
+                    setImageList(
+                        res.config?.imageUrlList?.map((item: any) => {
+                            return {
+                                uid: uuidv4(),
+                                thumbUrl: item,
+                                response: {
+                                    data: {
+                                        url: item
+                                    }
+                                }
+                            };
+                        })
+                    );
+                }
+            });
+        }
         imageTemplates().then((res) => {
             setTypeList(res);
         });
+        copyWritingTemplates().then((res: any) => {
+            setMockData(res);
+        });
     }, []);
-    const [imageTem, setImageTem] = useState<any[]>([
-        {
-            key: '1',
-            name: '风格 1',
-            templateList: []
-        }
-    ]);
     const addStyle = () => {
-        const newList = _.cloneDeep(imageTem);
-        newList.push({ key: uuidv4(), label: `风格 ${newTabIndex.current++}` });
-        setImageTem(newList);
+        let newData = _.cloneDeep(detailData);
+        if (!newData.imageStyleList) {
+            newData.imageStyleList = [];
+        }
+        newData.imageStyleList.push({
+            key: uuidv4(),
+            name: `风格 ${newTabIndex.current++}`,
+            templateList: [
+                {
+                    id: '',
+                    name: '首图',
+                    variables: []
+                }
+            ]
+        });
+        setDetailData(newData);
     };
-    //4.生成参数
-    const [radioValue, setRadioValue] = useState('');
-    const [numbe, setNumbe] = useState<number | string>(1);
 
     //保存
-    const [detailData, setDetailData] = useState<any>(res);
+    const [detailData, setDetailData] = useState<any>({
+        randomType: 'RANDOM',
+        total: 1
+    });
     const handleSave = () => {
-        console.log(imageList);
-        console.log(targetKeys);
+        if (!value) {
+            setValueOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '模板名称必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!imageList || imageList.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '没有上传图片',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
+        const newData = _.cloneDeep(detailData);
+        newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
+        newData.copyWritingList = targetKeys;
+        if (searchParams.get('uid')) {
+            planModify({ name: value, config: newData, type: 'XHS', uid: searchParams.get('uid') }).then((res) => {
+                if (res) {
+                    navigate('/redBookTaskList');
+                }
+            });
+        } else {
+            planCreate({ name: value, config: newData, type: 'XHS' }).then((res) => {
+                if (res) {
+                    navigate('/redBookTaskList');
+                }
+            });
+        }
     };
     return (
         <div>
+            <TextField
+                sx={{ width: '300px', mb: 2 }}
+                size="small"
+                color="secondary"
+                InputLabelProps={{ shrink: true }}
+                error={valueOpen && !value}
+                helperText={valueOpen && !value ? '模板名称必填' : ' '}
+                label="模板名称"
+                value={value}
+                onChange={(e: any) => {
+                    setValueOpen(true);
+                    setValue(e.target.value);
+                }}
+            />
             <div className="text-[18px] font-[600] my-[20px]">1. 批量上传素材图片</div>
             <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
                 <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
-                    <Image preview={false} alt="example" width={472} height={472} src={previewImage} />
+                    <Image preview={false} alt="example" src={previewImage} />
                 </Modal>
                 <div>
                     <Upload {...props}>
@@ -204,34 +284,45 @@ const BatcSmallRedBooks = () => {
             </div>
             <div className="text-[18px] font-[600] my-[20px]">2. 文案模板</div>
             <Transfer
-                dataSource={mockData}
+                dataSource={mockData.map((item) => {
+                    return {
+                        key: item.uid,
+                        title: item.name,
+                        description: item.description
+                    };
+                })}
                 listStyle={{
                     width: 400,
-                    height: 600
+                    height: 400
                 }}
                 titles={['精选文案', '已选择的文案']}
                 targetKeys={targetKeys}
                 selectedKeys={selectedKeys}
                 onChange={onChange}
                 onSelectChange={onSelectChange}
-                onScroll={onScroll}
-                render={(item) => item.title}
+                render={(item) => (
+                    <Popover zIndex={9999} content={<div className="w-[500px]">{item.description}</div>} placement="top">
+                        <div>{item.title}</div>
+                    </Popover>
+                )}
             />
-            <div className="text-[18px] font-[600] my-[20px]">3. 文案模板并集</div>
+            <div className="text-[16px] font-[600] my-[20px]">模板字段</div>
             <Row gutter={20}>
-                {detailData.variableList.map((item: any, index: number) => (
+                {detailData?.variableList?.map((item: any, index: number) => (
                     <Col key={index} sm={12} xs={24} md={6}>
                         <Forms
                             item={item}
                             index={index}
                             changeValue={(data: any) => {
-                                console.log(data);
+                                const newData = _.cloneDeep(detailData);
+                                newData.variableList[data.index].value = data.value;
+                                setDetailData(newData);
                             }}
                         />
                     </Col>
                 ))}
             </Row>
-            <div className="text-[18px] font-[600] my-[20px]">4. 图片模板</div>
+            <div className="text-[18px] font-[600] my-[20px]">3. 图片模板</div>
             <div className="mb-[20px]">
                 <Button onClick={addStyle} icon={<PlusOutlined rev={undefined} />}>
                     增加风格
@@ -239,25 +330,75 @@ const BatcSmallRedBooks = () => {
             </div>
             <Collapse
                 accordion
-                items={detailData.imageStyleList.map((item: any, index: number) => {
+                items={detailData?.imageStyleList?.map((item: any, index: number) => {
                     return {
                         key: item.key,
                         label: item.name,
-                        children: <StyleTabs imageStyleData={item?.templateList} typeList={typeList} />
+                        extra: (
+                            <Popover
+                                content={
+                                    <Button
+                                        onClick={(e: any) => {
+                                            const newData = _.cloneDeep(detailData);
+                                            newData.imageStyleList.splice(index, 1);
+                                            setDetailData(newData);
+                                            e.stopPropagation();
+                                        }}
+                                        danger
+                                        icon={<DeleteOutlined rev={undefined} />}
+                                    >
+                                        删除
+                                    </Button>
+                                }
+                                trigger="click"
+                            >
+                                <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
+                                    <MoreVertIcon />
+                                </IconButton>
+                            </Popover>
+                        ),
+                        children: (
+                            <StyleTabs
+                                imageStyleData={item?.templateList}
+                                typeList={typeList}
+                                setDetailData={(data: any) => {
+                                    const newData = _.cloneDeep(detailData);
+                                    newData.imageStyleList[index].templateList = data;
+                                    setDetailData(newData);
+                                }}
+                            />
+                        )
                     };
                 })}
             />
-            <div className="text-[18px] font-[600] my-[20px]">5. 生成随机参数</div>
+            <div className="text-[18px] font-[600] my-[20px]">4. 生成随机参数</div>
             <div>
-                <Radio.Group value={radioValue} onChange={(e: RadioChangeEvent) => setRadioValue(e.target.value)}>
-                    <Radio value="a">全部随机</Radio>
-                    <Radio value="b">按顺序</Radio>
+                <Radio.Group
+                    value={detailData?.randomType}
+                    onChange={(e: RadioChangeEvent) => {
+                        const newData = _.cloneDeep(detailData);
+                        newData.randomType = e.target.value;
+                        setDetailData(newData);
+                    }}
+                >
+                    <Radio value="RANDOM">全部随机</Radio>
+                    <Radio value="SEQUENCE">按顺序</Radio>
                 </Radio.Group>
             </div>
-            <InputNumber min={1} max={9} defaultValue={3} className="mt-[20px] w-[300px]" />
+            <InputNumber
+                value={detailData?.total}
+                onChange={(e: any) => {
+                    const newData = _.cloneDeep(detailData);
+                    newData.total = e;
+                    setDetailData(newData);
+                }}
+                min={1}
+                max={500}
+                className="mt-[20px] w-[300px]"
+            />
             <div className="mt-[40px] flex justify-center items-center">
                 <Button onClick={handleSave} type="primary" className="w-[300px]">
-                    保存
+                    {searchParams.get('uid') ? '更新' : '创建'}
                 </Button>
             </div>
         </div>

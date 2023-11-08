@@ -3,61 +3,57 @@ import { useState, useRef } from 'react';
 import EditStyle from './EditStyle';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
-const StyleTabs = ({ typeList, imageStyleData }: { typeList: any[]; imageStyleData: any[] }) => {
+const StyleTabs = ({
+    typeList,
+    imageStyleData,
+    setDetailData
+}: {
+    typeList: any[];
+    imageStyleData: any[];
+    setDetailData: (data: any) => void;
+}) => {
     const [consList, setConsList] = useState<any[]>([{ key: 'one' }]);
     const changeImages = (data: any) => {
-        const newData = _.cloneDeep(consList);
-        newData[tabsList.findIndex((item: any) => item.key === activeKey)][data.field] = data.value;
-        if (data.flag) {
-            newData[tabsList.findIndex((item: any) => item.key === activeKey)].TITLE = undefined;
-            newData[tabsList.findIndex((item: any) => item.key === activeKey)].SUB_TITLE = undefined;
-        }
-        setConsList(newData);
+        // const newData = _.cloneDeep(consList);
+        // newData[tabsList.findIndex((item: any) => item.key === activeKey)][data.field] = data.value;
+        // if (data.flag) {
+        //     newData[tabsList.findIndex((item: any) => item.key === activeKey)].TITLE = undefined;
+        //     newData[tabsList.findIndex((item: any) => item.key === activeKey)].SUB_TITLE = undefined;
+        // }
+        // setConsList(newData);
     };
 
-    const [activeKey, setActiveKey] = useState('one');
-    const [tabsList, setTabList] = useState<any[]>([
-        {
-            label: '首图',
-            key: 'one'
-        }
-    ]);
-    const newTabIndex = useRef(0);
-
+    const [activeKey, setActiveKey] = useState('0');
+    const newTabIndex = useRef(1);
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);
     };
-
     const add = () => {
-        const newActiveKey = `newTab${newTabIndex.current++}`;
-        const newPanes = [...tabsList];
-        newPanes.push({ label: 'New Tab', key: newActiveKey });
-        setTabList(newPanes);
-        setActiveKey(newActiveKey);
-        //增加consList
-        const newConsList = _.cloneDeep(consList);
-        newConsList.push({ key: newActiveKey });
-        setConsList(newConsList);
+        const newPanes = _.cloneDeep(imageStyleData);
+        newPanes.push({ id: '', name: `图片 ${newTabIndex.current++}`, key: newTabIndex.current, variables: [] });
+        setDetailData(newPanes);
     };
-
     const remove = (targetKey: TargetKey) => {
         let newActiveKey = activeKey;
         let lastIndex = -1;
-        tabsList.forEach((item, i) => {
-            if (item.key === targetKey) {
+        imageStyleData.forEach((item, i) => {
+            if (i.toString() === targetKey) {
                 lastIndex = i - 1;
             }
         });
-        const newPanes = tabsList.filter((item) => item.key !== targetKey);
+        const newPanes = imageStyleData.filter((item, i) => i.toString() !== targetKey);
         if (newPanes.length && newActiveKey === targetKey) {
             if (lastIndex >= 0) {
-                newActiveKey = newPanes[lastIndex].key;
+                newActiveKey = lastIndex.toString();
             } else {
-                newActiveKey = newPanes[0].key;
+                newActiveKey = '0';
             }
         }
-        setTabList(newPanes);
-        setConsList(newPanes);
+        console.log(newActiveKey);
+        console.log(newPanes);
+
+        setDetailData(newPanes);
+        // setConsList(newPanes);
         setActiveKey(newActiveKey);
     };
 
@@ -75,27 +71,25 @@ const StyleTabs = ({ typeList, imageStyleData }: { typeList: any[]; imageStyleDa
                 onChange={onChange}
                 activeKey={activeKey}
                 onEdit={onEdit}
-                items={tabsList.map((item, index) => {
+                items={imageStyleData.map((item: any, i: number) => {
                     return {
-                        label: item.label,
-                        key: item.key,
+                        label: item.name,
+                        key: i.toString(),
+                        closable: i === 0 ? false : true,
                         children: (
                             <EditStyle
-                                imageStyleData={imageStyleData[index]}
-                                // changeDetail={changeDetail}
+                                imageStyleData={item}
+                                setData={(data: any) => {
+                                    const newData = _.cloneDeep(imageStyleData);
+                                    newData[i] = data;
+                                    setDetailData(newData);
+                                }}
                                 typeList={typeList}
                             />
                         )
                     };
                 })}
             />
-            <Button
-                onClick={() => {
-                    console.log(consList);
-                }}
-            >
-                aaa
-            </Button>
         </>
     );
 };

@@ -24,6 +24,7 @@ import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 import { DetailModal } from './component/detailModal';
+import { getContentPage } from 'api/redBook';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -60,17 +61,17 @@ export interface TableEnhancedCreateDataType {
 }
 
 const headCells = [
-    { id: 'title', numeric: false, disablePadding: false, label: 'id' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '文案模版' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片模版' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '图片数量' },
+    { id: 'uid', numeric: false, disablePadding: false, label: 'id' },
+    { id: 'copyWritingUid', numeric: false, disablePadding: false, label: '文案模版' },
+    { id: 'pictureTempUid', numeric: false, disablePadding: false, label: '图片模版' },
+    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '文字数量' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'score', numeric: false, disablePadding: false, label: '是否被认领' },
-    { id: 'score', numeric: false, disablePadding: false, label: '重试次数' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '开始时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '结束时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '消耗时间' },
+    { id: 'claim', numeric: false, disablePadding: false, label: '是否被认领' },
+    { id: 'retryCount', numeric: false, disablePadding: false, label: '重试次数' },
+    { id: 'startTime', numeric: false, disablePadding: false, label: '开始时间' },
+    { id: 'endTime', numeric: false, disablePadding: false, label: '结束时间' },
+    { id: 'executeTime', numeric: false, disablePadding: false, label: '消耗时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -147,23 +148,23 @@ const RedBookContentList: React.FC = () => {
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
-        // const fetchPageData = async () => {
-        //     const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
-        //     if (orderBy) {
-        //         pageVO.sortField = orderBy;
-        //         pageVO.asc = order === 'asc';
-        //     }
-        //     getListingPage({ ...pageVO })
-        //         .then((res) => {
-        //             const fetchedRows = res.list;
-        //             setRows([...fetchedRows]);
-        //             setTotal(res?.total);
-        //         })
-        //         .catch((error) => {
-        //             console.error(error);
-        //         });
-        // };
-        // fetchPageData();
+        const fetchPageData = async () => {
+            const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+            if (orderBy) {
+                pageVO.sortField = orderBy;
+                pageVO.asc = order === 'asc';
+            }
+            getContentPage({ ...pageVO })
+                .then((res) => {
+                    const fetchedRows = res.list;
+                    setRows([...fetchedRows]);
+                    setTotal(res?.total);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        };
+        fetchPageData();
     }, [page, rowsPerPage, count, order, orderBy]);
 
     const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);

@@ -13,7 +13,10 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 export const ThreeStep = () => {
     const [text, setText] = React.useState<string>('文案');
     const [title, setTitle] = React.useState<string>('');
-    const [images, setImages] = React.useState<any[]>(['https://lmg.jj20.com/up/allimg/1113/031920120534/200319120534-7-1200.jpg']);
+    const [images, setImages] = React.useState<any[]>([
+        'https://download.hotsalecloud.com/mofaai%2Fimages%2Fai-generation%2F9992609716f3e877eea3f24a22293a1d.png?OSSAccessKeyId=LTAI5tGEvqJyWM21MAMPEHhG&Expires=4852621873&Signature=uEEXYEXxeLjKIW0rgjyTrJ6WUG0%3D',
+        'https://download.hotsalecloud.com/mofaai%2Fimages%2Fai-generation%2F9992609716f3e877eea3f24a22293a1d.png?OSSAccessKeyId=LTAI5tGEvqJyWM21MAMPEHhG&Expires=4852621873&Signature=uEEXYEXxeLjKIW0rgjyTrJ6WUG0%3D'
+    ]);
     const [swiperRef, setSwiperRef] = React.useState<any>(null);
     const [imgLoading, setImgLoading] = React.useState<boolean>(false);
     const [textLoading, setTextLoading] = React.useState<boolean>(false);
@@ -86,20 +89,31 @@ export const ThreeStep = () => {
     //     }
     // };
 
-    const handleCreate = async () => {
-        setImages([]);
-        setText('');
-        setTextLoading(true);
-        setImgLoading(true);
+    const handleReFetch = async () => {
+        // setImages([]);
+        // setText('');
+        // setTextLoading(true);
+        // setImgLoading(true);
         // await handleCreateImg();
         // await handleCreateText();
     };
 
+    const handleCopy = async () => {};
+
     return (
         <div>
             <Space direction="vertical" size={16} className="w-full">
-                <Card title="小红书生成">
-                    {/* <Card title="小红书生成" extra={<Button onClick={handleCreate}>生成</Button>}> */}
+                {/* <Card title="小红书生成"> */}
+                <Card
+                    title="小红书生成"
+                    extra={
+                        <>
+                            <Button onClick={handleReFetch}>重试</Button>
+                            <Divider type="vertical" />
+                            <Button onClick={handleCopy}>复制</Button>
+                        </>
+                    }
+                >
                     <div className="w-full grid grid-cols-3 min-h-[60vh]">
                         <div className="col-span-2 relative">
                             <Spin tip="Loading..." spinning={imgLoading}>

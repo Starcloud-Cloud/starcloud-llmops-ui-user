@@ -7,3 +7,11 @@ export const createRedBookImg = (data: any) => {
 export const doCreateText = (data: any) => {
     return request.post({ url: '/llm/app/xhs/appExecute', data });
 };
+
+export const getContentPage = (data: any) => {
+    return request.get({ url: '/llm/xhs/content/page', params: data });
+};
+
+export const getContentDetail = (data: any) => {
+    return request.get({ url: '/llm/xhs/content/page', params: data });
+};

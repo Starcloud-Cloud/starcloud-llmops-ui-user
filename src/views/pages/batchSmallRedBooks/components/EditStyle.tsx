@@ -2,8 +2,9 @@ import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/materia
 import { DeleteOutlined } from '@ant-design/icons';
 import { Image, Row, Col } from 'antd';
 import { useEffect, useState } from 'react';
+import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
-const EditStyle = ({ typeList, imageStyleData }: { typeList: any[]; imageStyleData: any }) => {
+const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; imageStyleData: any; setData: (data: any) => void }) => {
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -12,17 +13,20 @@ const EditStyle = ({ typeList, imageStyleData }: { typeList: any[]; imageStyleDa
                     <Select
                         value={imageStyleData?.id}
                         onChange={(e: any) => {
-                            // changeDetail({ value: e.target.value, field: 'imageTemplate', flag: true });
+                            const newData = _.cloneDeep(imageStyleData);
+                            (newData.id = e.target.value),
+                                (newData.variables = typeList?.filter((value: any) => value.id === e.target.value)[0]?.variables);
+                            setData(newData);
                         }}
                         labelId="type"
                         label="风格"
                     >
                         {typeList?.map((item: any) => (
-                            <MenuItem value={item.id}>{item.name}</MenuItem>
+                            <MenuItem value={item?.id}>{item?.name}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-                {imageStyleData.id && (
+                {imageStyleData?.id && (
                     <div className="mt-[20px]">
                         <Row className="items-center" gutter={20}>
                             {imageStyleData?.variables?.map((el: any, index: number) => (
@@ -30,9 +34,9 @@ const EditStyle = ({ typeList, imageStyleData }: { typeList: any[]; imageStyleDa
                                     <Form
                                         index={index}
                                         changeValue={(data: any) => {
-                                            console.log(data);
-
-                                            // changeDetail({ ...data, field: el.field });
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            newData.variables[data.index].value = data.value;
+                                            setData(newData);
                                         }}
                                         item={el}
                                     />

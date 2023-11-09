@@ -50,7 +50,7 @@ export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps
                 }}
                 title={'详情'}
                 content={false}
-                className="sm:w-[1200px] xs:w-[300px]"
+                className="sm:w-[1200px] xs:w-[300px] h-[92vh]"
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">
                         <CloseIcon fontSize="small" />
@@ -58,6 +58,7 @@ export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps
                 }
             >
                 <CardContent
+                    className="h-[calc(100%-86px)]"
                     sx={{
                         p: 2
                     }}

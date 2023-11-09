@@ -1,12 +1,10 @@
-import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
 import { Tag } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import StopIcon from '@mui/icons-material/Stop';
 import ReorderIcon from '@mui/icons-material/Reorder';
-import SportsVolleyballIcon from '@mui/icons-material/SportsVolleyball';
 
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -65,6 +63,7 @@ export interface TableEnhancedCreateDataType {
 }
 
 const headCells = [
+    { id: 'id', numeric: false, disablePadding: false, label: 'ID' },
     { id: 'title', numeric: false, disablePadding: false, label: '计划名称' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
     { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
@@ -83,7 +82,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -93,7 +92,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                             'aria-label': 'select all desserts'
                         }}
                     />
-                </TableCell>
+                </TableCell> */}
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -133,7 +132,7 @@ const RedBookTaskList: React.FC = () => {
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
@@ -364,7 +363,7 @@ const RedBookTaskList: React.FC = () => {
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell padding="checkbox">
+                                    {/* <TableCell padding="checkbox">
                                         <Checkbox
                                             onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
@@ -373,45 +372,44 @@ const RedBookTaskList: React.FC = () => {
                                                 'aria-labelledby': labelId
                                             }}
                                         />
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
+                                            <span className="line-clamp-1 mx-auto">{row.uid}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">小红书</div>
+                                        <Tooltip title={row.name}>
+                                            <span className="line-clamp-1 w-[120px] mx-auto">{row.name}</span>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center justify-center  w-[100px] ">小红书</div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
-                                            <Tooltip
-                                                title={'这按亚马逊官方推荐的标准进行打分，共有9个打分项，满分100分'}
-                                                placement="top"
-                                                arrow
-                                            >
-                                                <div className="flex">
-                                                    <div>{row?.successCount || 0}</div>/
-                                                    <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
-                                                </div>
-                                            </Tooltip>
+                                            <div className="flex">
+                                                <div>{row?.successCount || 0}</div>/
+                                                <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tag
                                             color={
                                                 row.status === 'PENDING'
-                                                    ? 'processing'
+                                                    ? 'green'
                                                     : row.status === 'RUNNING'
-                                                    ? 'processing'
+                                                    ? 'green'
                                                     : row.status === 'PAUSE'
-                                                    ? 'default'
+                                                    ? 'warning'
                                                     : row.status === 'CANCELED'
-                                                    ? 'default'
+                                                    ? 'warning'
                                                     : row.status === 'COMPLETE'
-                                                    ? 'success'
+                                                    ? 'blue'
                                                     : row.status === 'FAILURE'
                                                     ? 'error'
-                                                    : 'processing'
+                                                    : 'default'
                                             }
                                         >
                                             {row.status === 'PENDING'
@@ -443,70 +441,72 @@ const RedBookTaskList: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title={'编辑'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    handleEdit(row.uid);
-                                                }}
-                                            >
-                                                <EditIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'查看'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    navigate('/redBookContentList?uid=' + row.uid);
-                                                }}
-                                            >
-                                                <ReorderIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                        <div className="w-[180px]">
+                                            <Tooltip title={'编辑'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        handleEdit(row.uid);
+                                                    }}
+                                                >
+                                                    <EditIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'查看操作任务'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        navigate(`/redBookContentList?uid=${row.uid}&name=${row.name}`);
+                                                    }}
+                                                >
+                                                    <ReorderIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'开始'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <PlayCircleOutlineIcon className="text-base" />
                                                 <StopIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip> */}
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'复制'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <ContentCopyIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'复制'}>
+                                                <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
+                                                    <ContentCopyIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
 
-                                        <Tooltip title={'删除'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    setDelType(0);
-                                                    setDelVisible(true);
-                                                    setRow(row);
-                                                }}
-                                            >
-                                                <DeleteIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'执行'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    setExecuteOpen(true);
-                                                    setRow(row);
-                                                }}
-                                            >
-                                                <SportsVolleyballIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
+                                            <Tooltip title={'删除'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setDelType(0);
+                                                        setDelVisible(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <DeleteIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'执行'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setExecuteOpen(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <PlayCircleOutlineIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -517,7 +517,7 @@ const RedBookTaskList: React.FC = () => {
 
             {/* table pagination */}
             <TablePagination
-                rowsPerPageOptions={[5, 10]}
+                rowsPerPageOptions={[20, 50, 100]}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}

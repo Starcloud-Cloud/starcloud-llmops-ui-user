@@ -109,8 +109,8 @@ export const ThreeStep = ({ data }: { data: any }) => {
                     extra={
                         <>
                             <Button onClick={handleReFetch}>重试</Button>
-                            <Divider type="vertical" />
-                            <Button onClick={handleCopy}>复制</Button>
+                            {/* <Divider type="vertical" /> */}
+                            {/* <Button onClick={handleCopy}>复制</Button> */}
                         </>
                     }
                 >

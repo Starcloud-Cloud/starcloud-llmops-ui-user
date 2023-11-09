@@ -62,7 +62,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -72,7 +72,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                             'aria-label': 'select all desserts'
                         }}
                     />
-                </TableCell>
+                </TableCell> */}
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -304,7 +304,7 @@ const RedBookContentList: React.FC = () => {
             title="创作内容"
             secondary={
                 <div>
-                    <Button
+                    {/* <Button
                         disabled={selected.length === 0}
                         className="ml-1"
                         size="small"
@@ -317,7 +317,7 @@ const RedBookContentList: React.FC = () => {
                         variant="contained"
                     >
                         批量删除
-                    </Button>
+                    </Button> */}
                 </div>
             }
         >
@@ -349,7 +349,7 @@ const RedBookContentList: React.FC = () => {
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell padding="checkbox">
+                                    {/* <TableCell padding="checkbox">
                                         <Checkbox
                                             onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
@@ -358,7 +358,7 @@ const RedBookContentList: React.FC = () => {
                                                 'aria-labelledby': labelId
                                             }}
                                         />
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell align="center">
                                         <span className="line-clamp-1 w-[300px] mx-auto">{row.businessUid}</span>
                                     </TableCell>
@@ -421,7 +421,7 @@ const RedBookContentList: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center" className="sticky right-0 bg-white">
                                         <div className="flex items-center w-[130px]">
-                                            <Tooltip title={'编辑'}>
+                                            {/* <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"
                                                     size="small"
@@ -431,14 +431,14 @@ const RedBookContentList: React.FC = () => {
                                                 >
                                                     <EditIcon className="text-base" />
                                                 </IconButton>
-                                            </Tooltip>
+                                            </Tooltip> */}
                                             {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                             <Tooltip title={'复制内容'}>
                                                 <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                     <ContentCopyIcon className="text-base" />
                                                 </IconButton>
                                             </Tooltip> */}
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} /> */}
                                             <Tooltip title={'查看详情'}>
                                                 <IconButton
                                                     aria-label="delete"

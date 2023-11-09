@@ -524,6 +524,13 @@ const Price1 = () => {
     };
 
     const handleFetchPay = async (productCode?: string, noNeedProductCode?: string, discountCode?: string) => {
+        if (!isLoggedIn) {
+            setOpenDialog(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
+            return;
+        }
         const res = await getPrice({ productCode, noNeedProductCode, discountCode });
         if (res) {
             setDiscountOpen(true);
@@ -814,7 +821,7 @@ const Price1 = () => {
                 url={payUrl}
                 isTimeout={isTimeout}
                 onRefresh={onRefresh}
-                payPrice={payPrice}
+                payPrice={currentSelect?.discountedAmount / 100 || 0}
             />
             {discountOpen && (
                 <DiscountModal

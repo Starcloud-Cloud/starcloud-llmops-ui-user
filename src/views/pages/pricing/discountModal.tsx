@@ -114,9 +114,9 @@ export function DiscountModal({
                                         <span className="text-base font-semibold text-[#2B2D2F]">{currentSelect?.title}</span>
                                     </div>
                                     <div className="flex justify-between items-center w-full mb-3">
-                                        <span className="text-[#868A91]">套餐单价</span>
+                                        <span className="text-[#868A91]">套餐原价</span>
                                         <div className="flex items-center">
-                                            <span className="text-[#de4437] text-lg font-semibold">
+                                            <span className="text-[#de4437] text-lg ">
                                                 ￥{(currentSelect?.originalAmount / 100).toFixed(2)}
                                             </span>
                                             <span className="text-xs">/元</span>
@@ -126,17 +126,17 @@ export function DiscountModal({
                                         <span className="text-[#868A91]">订阅时长</span>
                                         <span>
                                             <Radio.Group onChange={handleRadio} value={selectCode}>
-                                                <Radio value={currentSelect?.yearCode}>年</Radio>
                                                 <Radio value={currentSelect?.monthCode}>月</Radio>
+                                                <Radio value={currentSelect?.yearCode}>年</Radio>
                                             </Radio.Group>
                                         </span>
                                     </div>
-                                    <div className="flex w-full flex-col mb-3">
+                                    <div className="flex w-full flex-col mb-3 mt-3">
                                         <span className="text-[#868A91] mb-2">折扣券</span>
                                         <div>
                                             <Search
                                                 placeholder="请输入折扣码"
-                                                enterButton="检测有效性"
+                                                enterButton={<span className="text-sm">检测有效性</span>}
                                                 size="large"
                                                 onSearch={handleOnSearch}
                                                 onChange={(e) => {
@@ -152,24 +152,25 @@ export function DiscountModal({
                                             输入/选择折扣券后系统会自动检测折扣券，如折扣券有效则显示在优惠金额
                                         </span>
                                     </div>
-                                    <div className="flex  items-center w-full mb-3">
+                                    <div className="flex  items-center w-full mb-3 mt-3">
                                         <div className="flex flex-col">
                                             <span className="text-[#868A91] mb-2">优惠金额</span>
-                                            <span className="text-[#de4437] text-lg">
+                                            <span className="text-[#de4437] text-2xl ">
                                                 ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
                                             </span>
                                         </div>
                                         <div className="flex flex-col ml-[30%]">
                                             <span className="text-[#868A91] mb-2">订单总价</span>
-                                            <span className="text-[#de4437] text-lg">
+                                            <span className="text-[#de4437] text-2xl font-semibold">
                                                 ￥{(currentSelect?.discountedAmount / 100).toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
                                     <Button
-                                        disabled={!canSubmit}
+                                        // disabled={!canSubmit}
                                         onClick={() =>
-                                            handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
+                                            // handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
+                                            handleCreateOrder(selectCode, discountCode)
                                         }
                                         className="w-[300px] mt-4"
                                         color="secondary"

@@ -150,9 +150,10 @@ const BatcSmallRedBooks = () => {
     }, []);
     const digui = (data: number) => {
         let newData = _.cloneDeep(detailData);
+        if (!newData.imageStyleList) {
+            newData.imageStyleList = [];
+        }
         if (newData.imageStyleList.every((item: any) => item.name.indexOf(data.toString()) === -1)) {
-            console.log(data, 111);
-
             if (!newData.imageStyleList) {
                 newData.imageStyleList = [];
             }

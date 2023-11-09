@@ -1,7 +1,7 @@
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
-const Form = ({ item, index, changeValue }: { item: any; index: number; changeValue: any }) => {
+const Form = ({ item, index, changeValue, flag }: { item: any; index: number; changeValue: any; flag?: boolean }) => {
     const mt = {
         marginTop: 2
     };
@@ -19,8 +19,8 @@ const Form = ({ item, index, changeValue }: { item: any; index: number; changeVa
                     required
                     name={item.field}
                     InputLabelProps={{ shrink: true }}
-                    error={!item.value && open}
-                    helperText={!item.value && open ? `${item.label}是必填项` : ' '}
+                    error={!item.value && open && !flag}
+                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
@@ -41,8 +41,8 @@ const Form = ({ item, index, changeValue }: { item: any; index: number; changeVa
                     minRows={3}
                     maxRows={3}
                     InputLabelProps={{ shrink: true }}
-                    error={!item.value && open}
-                    helperText={!item.value && open ? `${item.label}是必填项` : ' '}
+                    error={!item.value && open && !flag}
+                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
@@ -61,8 +61,8 @@ const Form = ({ item, index, changeValue }: { item: any; index: number; changeVa
                     id={item.field}
                     name={item.field}
                     label={item.label}
-                    error={!item.value && open}
-                    helperText={!item.value && open ? `${item.label}是必填项` : ' '}
+                    error={!item.value && open && !flag}
+                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });

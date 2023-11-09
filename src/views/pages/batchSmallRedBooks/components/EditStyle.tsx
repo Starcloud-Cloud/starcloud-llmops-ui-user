@@ -32,6 +32,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             {imageStyleData?.variables?.map((el: any, index: number) => (
                                 <Col key={index} sm={12} xs={24} md={6}>
                                     <Form
+                                        flag={true}
                                         index={index}
                                         changeValue={(data: any) => {
                                             const newData = _.cloneDeep(imageStyleData);

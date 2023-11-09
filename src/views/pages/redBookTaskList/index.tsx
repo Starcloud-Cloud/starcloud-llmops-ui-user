@@ -29,6 +29,7 @@ import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 const { base_url } = config;
 import AddModal from './modal';
+import DetailModal from './components/addModal';
 import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
 
 export interface DraftConfig {}
@@ -139,6 +140,7 @@ const RedBookTaskList: React.FC = () => {
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
 
+    //模板选择
     const [open, setOpen] = useState(false);
     const [templateList, setTemplateList] = useState<any[]>([]);
     useEffect(() => {
@@ -148,6 +150,9 @@ const RedBookTaskList: React.FC = () => {
             });
         }
     }, [open]);
+
+    //创建的内容
+    const [detailOpen, setDetailOpen] = useState(true);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -529,6 +534,7 @@ const RedBookTaskList: React.FC = () => {
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
             <AddModal open={open} setOpen={setOpen} templateList={templateList} />
+            {detailOpen && <DetailModal detailOpen={detailOpen} setDetailOpen={setDetailOpen} />}
         </MainCard>
     );
 };

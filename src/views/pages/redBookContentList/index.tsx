@@ -12,8 +12,8 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Divider, Tag } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { delListing, draftClone } from 'api/listing/build';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
@@ -79,13 +79,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        className={
-                            headCell.label === '是否被认领'
-                                ? 'sticky right-[132px] bg-white'
-                                : headCell.label === '操作'
-                                ? 'sticky right-0 bg-white'
-                                : ''
-                        }
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
@@ -133,6 +127,10 @@ const RedBookContentList: React.FC = () => {
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
     const forceUpdate = () => setCount((pre) => pre + 1);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+
+    const uid = searchParams.get('uid');
 
     useEffect(() => {
         const fetchPageData = async () => {
@@ -141,7 +139,7 @@ const RedBookContentList: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            getContentPage({ ...pageVO })
+            getContentPage({ ...pageVO, planUid: uid })
                 .then((res) => {
                     const fetchedRows = res.list;
                     setRows([...fetchedRows]);
@@ -152,7 +150,7 @@ const RedBookContentList: React.FC = () => {
                 });
         };
         fetchPageData();
-    }, [page, rowsPerPage, count, order, orderBy]);
+    }, [page, rowsPerPage, count, order, orderBy, uid]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -235,13 +233,13 @@ const RedBookContentList: React.FC = () => {
     const handleTransfer = (key: string) => {
         switch (key) {
             case 'init':
-                return '初始化';
+                return <Tag color="green">初始化</Tag>;
             case 'executing':
-                return '执行中';
+                return <Tag color="gold">执行中</Tag>;
             case 'execute_success':
-                return '执行成功';
+                return <Tag color="blue">执行成功</Tag>;
             case 'execute_error':
-                return '执行失败';
+                return <Tag color="red">执行失败</Tag>;
         }
     };
 
@@ -416,7 +414,7 @@ const RedBookContentList: React.FC = () => {
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">{row.pictureExecuteTime}</div>
                                     </TableCell>
-                                    <TableCell align="center" className="sticky right-[132px] bg-white">
+                                    <TableCell align="center">
                                         <div className="flex flex-col items-center">{row.claim}</div>
                                     </TableCell>
                                     <TableCell align="center" className="sticky right-0 bg-white">

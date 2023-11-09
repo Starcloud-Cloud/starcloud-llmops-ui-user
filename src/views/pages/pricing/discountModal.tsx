@@ -154,7 +154,9 @@ export function DiscountModal({
                                     </div>
                                     <div className="flex  items-center w-full mb-3 mt-3">
                                         <div className="flex flex-col">
-                                            <span className="text-[#868A91] mb-2">优惠金额</span>
+                                            <span className="text-[#868A91] mb-2">
+                                                优惠金额{currentSelect.discountCouponName ? `（${currentSelect?.discountCouponName}）` : ''}
+                                            </span>
                                             <span className="text-[#de4437] text-2xl ">
                                                 ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
                                             </span>

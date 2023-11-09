@@ -106,7 +106,15 @@ export function PayModal({
 
     return (
         <Grid container justifyContent="flex-end">
-            <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+            <Modal
+                open={open}
+                onClose={(e, reason) => {
+                    if (reason === 'backdropClick') return;
+                    handleClose();
+                }}
+                aria-labelledby="modal-title"
+                aria-describedby="modal-description"
+            >
                 <Body
                     modalStyle={modalStyle}
                     handleClose={handleClose}

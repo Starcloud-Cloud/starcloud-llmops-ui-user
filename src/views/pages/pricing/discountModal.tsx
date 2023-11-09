@@ -167,10 +167,9 @@ export function DiscountModal({
                                         </div>
                                     </div>
                                     <Button
-                                        // disabled={!canSubmit}
+                                        disabled={!canSubmit}
                                         onClick={() =>
-                                            // handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
-                                            handleCreateOrder(selectCode, discountCode)
+                                            handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
                                         }
                                         className="w-[300px] mt-4"
                                         color="secondary"

@@ -473,52 +473,38 @@ const Price1 = () => {
                 navigate('/login');
             }, 3000);
         } else {
-            try {
-                const options = Intl.DateTimeFormat().resolvedOptions();
-                const timeZone = options.timeZone;
+            const options = Intl.DateTimeFormat().resolvedOptions();
+            const timeZone = options.timeZone;
+            const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
+            if (res) {
                 handleOpen();
-                const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
-                console.log('🚀 ~ file: member.tsx:481 ~ handleCreateOrder ~ res:', res);
+                setOrderId(res);
+                const resOrder = await submitOrder({
+                    orderId: res,
+                    channelCode: 'alipay_pc',
+                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+                    displayMode: 'qr_code'
+                });
+                setPayUrl(resOrder.displayContent);
 
-                if (res) {
-                    setOrderId(res);
-                    const resOrder = await submitOrder({
-                        orderId: res,
-                        channelCode: 'alipay_pc',
-                        channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-                        displayMode: 'qr_code'
+                interval = setInterval(() => {
+                    getOrderIsPay({ orderId: res }).then((isPayRes) => {
+                        if (isPayRes) {
+                            handleClose();
+                            setOpenPayDialog(true);
+                            setTimeout(() => {
+                                navigate('/orderRecord');
+                            }, 3000);
+                        }
                     });
-                    setPayUrl(resOrder.displayContent);
+                }, 1000);
 
-                    interval = setInterval(() => {
-                        getOrderIsPay({ orderId: res }).then((isPayRes) => {
-                            if (isPayRes) {
-                                handleClose();
-                                setOpenPayDialog(true);
-                                setTimeout(() => {
-                                    navigate('/orderRecord');
-                                }, 3000);
-                            }
-                        });
-                    }, 1000);
-
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        setIsTimeout(true);
-                    }, 5 * 60 * 1000);
-                } else {
-                    PubSub.publish('global.error', { message: '订单支付失败', type: 'error' });
-                }
-            } catch (e) {
-                const TEXT_MESSAGE = '登录超时,请重新登录!';
-                if (e === TEXT_MESSAGE) {
-                    setOpenDialog(true);
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 3000);
-                } else {
-                    PubSub.publish('global.error', { message: e as string, type: 'error' });
-                }
+                setTimeout(() => {
+                    clearInterval(interval);
+                    setIsTimeout(true);
+                }, 5 * 60 * 1000);
+            } else {
+                PubSub.publish('global.error', { message: '订单支付失败', type: 'error' });
             }
         }
     };

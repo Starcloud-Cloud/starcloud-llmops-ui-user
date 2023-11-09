@@ -259,7 +259,7 @@ const TermTable = ({
                 >
                     <div className="cursor-default">
                         月购买量
-                        {[7].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
+                        {[6, 7].includes(pageQuery.orderColumn) && <Arrow isDesc={pageQuery.desc} />}
                     </div>
                 </Tooltip>
             ),

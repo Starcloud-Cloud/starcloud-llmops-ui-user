@@ -174,9 +174,12 @@ const ResultFilter = ({
                         <Select
                             style={{ width: '100%' }}
                             placeholder="select one country"
-                            value={uid}
+                            value={searchWord.uid || uid}
                             onChange={(value) => {
-                                setUid(value);
+                                setSearchWord({
+                                    ...searchWord,
+                                    uid: value
+                                });
                             }}
                         >
                             {list?.map((item: any) => (

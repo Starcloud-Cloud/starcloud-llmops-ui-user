@@ -34,7 +34,7 @@ const ThesaurusDetail = () => {
         page: 1,
         size: 20,
         desc: true, //升降序
-        orderColumn: 6 //排序的字段
+        orderColumn: 5 //排序的字段
     });
 
     useEffect(() => {
@@ -46,7 +46,7 @@ const ThesaurusDetail = () => {
     const getExtended = async (orderColumn?: number, desc?: boolean) => {
         setLoading(true);
         const data = {
-            dictUid: uid,
+            dictUid: searchResult?.uid || uid,
             ...pageQuery,
             ...searchResult,
             pageNo: pageQuery.page,
@@ -133,7 +133,9 @@ const ThesaurusDetail = () => {
                 type={type}
                 getExtended={getExtended}
             />
-            <AddKeywordDrawer open={addKeywordOpen} handleClose={() => setAddKeywordOpen(false)} uid={uid} forceUpdate={forceUpdate} />
+            {addKeywordOpen && (
+                <AddKeywordDrawer open={addKeywordOpen} handleClose={() => setAddKeywordOpen(false)} uid={uid} forceUpdate={forceUpdate} />
+            )}
         </div>
     );
 };

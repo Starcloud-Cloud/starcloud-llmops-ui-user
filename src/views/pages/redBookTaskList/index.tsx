@@ -101,9 +101,9 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
-                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white !px-2' : '!px-2'}
                     >
-                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                        {[''].includes(headCell.id) ? (
                             <TableSortLabel
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
@@ -365,6 +365,12 @@ const RedBookTaskList: React.FC = () => {
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
                                     selected={isItemSelected}
+                                    sx={{
+                                        '.MuiTableCell-root': {
+                                            paddingLeft: '8px',
+                                            paddingRight: '8px'
+                                        }
+                                    }}
                                 >
                                     {/* <TableCell padding="checkbox">
                                         <Checkbox
@@ -377,7 +383,7 @@ const RedBookTaskList: React.FC = () => {
                                         />
                                     </TableCell> */}
                                     <TableCell align="center">
-                                        <div className="flex">
+                                        <div className="flex items-center justify-center">
                                             <Popover
                                                 content={
                                                     <div>
@@ -417,11 +423,11 @@ const RedBookTaskList: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 w-[120px] mx-auto">{row.name}</span>
+                                            <span className="line-clamp-1 w-[250px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center  w-[100px] ">小红书</div>
+                                        <div className="flex items-center justify-center">小红书</div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
@@ -477,7 +483,7 @@ const RedBookTaskList: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center" className="sticky right-0 bg-white">
-                                        <div className="w-[180px]">
+                                        <div className="min-w-[180px]">
                                             <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"

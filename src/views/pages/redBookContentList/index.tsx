@@ -80,7 +80,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         align={headCell.numeric ? 'right' : 'center'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white !px-2' : '!px-2'}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
@@ -388,6 +388,12 @@ const RedBookContentList: React.FC = () => {
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
                                         selected={isItemSelected}
+                                        sx={{
+                                            '.MuiTableCell-root': {
+                                                paddingLeft: '8px',
+                                                paddingRight: '8px'
+                                            }
+                                        }}
                                     >
                                         {/* <TableCell padding="checkbox">
                                         <Checkbox
@@ -573,7 +579,7 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center" className="sticky right-0 bg-white">
-                                            <div className="flex items-center w-[95px]">
+                                            <div className="flex items-center min-w-[96px]">
                                                 {/* <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"

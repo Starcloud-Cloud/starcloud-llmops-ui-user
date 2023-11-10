@@ -47,6 +47,7 @@ const headCells = [
     { id: 'copyWritingTitle', numeric: false, disablePadding: false, label: '文案内容' },
     { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(毫秒)' },
     { id: 'pictureStatus', numeric: false, disablePadding: false, label: ' 图片生成状态' },
+    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
     { id: 'pictureContent', numeric: false, disablePadding: false, label: '图片内容' },
     { id: 'pictureExecuteTime', numeric: false, disablePadding: false, label: '图片耗时(毫秒)' },
     { id: 'claim', numeric: false, disablePadding: false, label: '是否被认领' },
@@ -300,7 +301,14 @@ const RedBookContentList: React.FC = () => {
         <div className="redBookContentList">
             <MainCard
                 content={false}
-                title={`创作内容-${name}`}
+                title={
+                    <div>
+                        <a className="cursor-pointer text-[blue]" onClick={() => navigate('/redBookTaskList')}>
+                            返回
+                        </a>{' '}
+                        / <span>创作内容 / {name}</span>
+                    </div>
+                }
                 secondary={
                     <div>
                         {/* <Button
@@ -473,6 +481,9 @@ const RedBookContentList: React.FC = () => {
 
                                         <TableCell align="center">
                                             <div className="flex items-center justify-center">{handleTransfer(row.pictureStatus)}</div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">{row.pictureNum}</div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="w-[300px] overflow-auto">

@@ -336,30 +336,55 @@ const RedBookContentList: React.FC = () => {
                 content={false}
                 title={
                     <div>
-                        <a className="cursor-pointer text-[blue]" onClick={() => navigate('/redBookTaskList')}>
-                            返回
-                        </a>{' '}
-                        / <span>创作内容 / {name}</span>
+                        <div>
+                            <a className="cursor-pointer text-[blue]" onClick={() => navigate('/redBookTaskList')}>
+                                返回
+                            </a>{' '}
+                            / <span>创作任务 / {name}</span>
+                        </div>
+                        <div className="flex justify-end">
+                            <Button
+                                className="ml-1"
+                                size="small"
+                                color="secondary"
+                                startIcon={<ReplayIcon />}
+                                onClick={() => {
+                                    const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+                                    if (orderBy) {
+                                        pageVO.sortField = orderBy;
+                                        pageVO.asc = order === 'asc';
+                                    }
+                                    getContentPage({ ...pageVO, planUid: uid })
+                                        .then((res) => {
+                                            const fetchedRows = res.list;
+                                            setRows([...fetchedRows]);
+                                            setTotal(res?.total);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '操作成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false,
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                    transition: 'SlideLeft'
+                                                })
+                                            );
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                        });
+                                }}
+                                variant="contained"
+                            >
+                                更新列表
+                            </Button>
+                        </div>
                     </div>
                 }
-                secondary={
-                    <div>
-                        {/* <Button
-                        disabled={selected.length === 0}
-                        className="ml-1"
-                        size="small"
-                        color="secondary"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => {
-                            setDelVisible(true);
-                            setDelType(2);
-                        }}
-                        variant="contained"
-                    >
-                        批量删除
-                    </Button> */}
-                    </div>
-                }
+                // secondary={}
             >
                 <TableContainer>
                     <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
@@ -611,7 +636,7 @@ const RedBookContentList: React.FC = () => {
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                                <Tooltip title={'重试'}>
+                                                <Tooltip title={'重新生成'}>
                                                     <IconButton
                                                         aria-label="delete"
                                                         size="small"

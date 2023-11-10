@@ -29,6 +29,7 @@ const { base_url } = config;
 import AddModal from './modal';
 import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
 import copy from 'clipboard-copy';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 export interface DraftConfig {}
 
@@ -67,7 +68,7 @@ const headCells = [
     { id: 'id', numeric: false, disablePadding: false, label: 'ID' },
     { id: 'title', numeric: false, disablePadding: false, label: '计划名称' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
-    { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
+    { id: 'score', numeric: false, disablePadding: false, label: '成功数/失败数/总数' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
     { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -313,29 +314,78 @@ const RedBookTaskList: React.FC = () => {
     return (
         <MainCard
             content={false}
-            title="创作计划"
-            secondary={
+            title={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
-                        新建创作计划
-                    </Button>
-                    {/* <Divider type={'vertical'} />
-                    <Button
-                        disabled={selected.length === 0}
-                        className="ml-1"
-                        size="small"
-                        color="secondary"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => {
-                            setDelVisible(true);
-                            setDelType(2);
-                        }}
-                        variant="contained"
-                    >
-                        批量删除
-                    </Button> */}
+                    <div className="flex justify-between items-center">
+                        <div>创作计划</div>
+                        <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+                            新建创作计划
+                        </Button>
+                    </div>
+                    <div className="flex justify-end mt-1">
+                        <Button
+                            className="ml-1"
+                            size="small"
+                            color="secondary"
+                            startIcon={<ReplayIcon />}
+                            onClick={() => {
+                                const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+                                if (orderBy) {
+                                    pageVO.sortField = orderBy;
+                                    pageVO.asc = order === 'asc';
+                                }
+                                planPage({ ...pageVO })
+                                    .then((res) => {
+                                        const fetchedRows = res.list;
+                                        setRows([...fetchedRows]);
+                                        setTotal(res?.page?.total);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '操作成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                close: false,
+                                                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                transition: 'SlideLeft'
+                                            })
+                                        );
+                                    })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    });
+                            }}
+                            variant="contained"
+                        >
+                            更新列表
+                        </Button>
+                    </div>
                 </div>
             }
+            // secondary={
+            //     <div>
+            //         <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+            //             新建创作计划
+            //         </Button>
+            //         {/* <Divider type={'vertical'} />
+            //         <Button
+            //             disabled={selected.length === 0}
+            //             className="ml-1"
+            //             size="small"
+            //             color="secondary"
+            //             startIcon={<DeleteIcon />}
+            //             onClick={() => {
+            //                 setDelVisible(true);
+            //                 setDelType(2);
+            //             }}
+            //             variant="contained"
+            //         >
+            //             批量删除
+            //         </Button> */}
+            //     </div>
+            // }
         >
             <TableContainer>
                 <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
@@ -432,7 +482,8 @@ const RedBookTaskList: React.FC = () => {
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
                                             <div className="flex">
-                                                <div>{row?.successCount || 0}</div>/<div>{row.total || 0}</div>
+                                                <div>{row?.successCount || 0}</div>/<div>{row.failureCount || 0}</div>/
+                                                <div>{row.total || 0}</div>
                                             </div>
                                         </div>
                                     </TableCell>

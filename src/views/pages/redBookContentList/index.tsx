@@ -46,11 +46,11 @@ const headCells = [
     { id: 'createTemplate', numeric: false, disablePadding: false, label: '生成参数' },
     { id: 'copyWritingStatus', numeric: false, disablePadding: false, label: ' 文案生成状态' },
     { id: 'copyWritingTitle', numeric: false, disablePadding: false, label: '文案内容' },
-    { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(秒)' },
     { id: 'pictureStatus', numeric: false, disablePadding: false, label: ' 图片生成状态' },
-    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
     { id: 'pictureContent', numeric: false, disablePadding: false, label: '图片内容' },
-    { id: 'pictureExecuteTime', numeric: false, disablePadding: false, label: '图片耗时(毫秒)' },
+    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
+    { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(秒)' },
+    { id: 'pictureExecuteTime', numeric: false, disablePadding: false, label: '图片耗时(秒)' },
     { id: 'claim', numeric: false, disablePadding: false, label: '是否被认领' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
@@ -232,16 +232,41 @@ const RedBookContentList: React.FC = () => {
         }
     };
 
-    const handleTransfer = (key: string) => {
+    const handleTransfer = (key: string, errMessage: string) => {
         switch (key) {
             case 'init':
-                return <Tag color="blue">初始化</Tag>;
+                return (
+                    <Tag className="!mr-0" color="blue">
+                        初始化
+                    </Tag>
+                );
             case 'executing':
-                return <Tag color="gold">执行中</Tag>;
+                return (
+                    <Tag className="!mr-0" color="gold">
+                        执行中
+                    </Tag>
+                );
             case 'execute_success':
-                return <Tag color="green">执行成功</Tag>;
+                return (
+                    <Tag className="!mr-0" color="green">
+                        执行成功
+                    </Tag>
+                );
             case 'execute_error':
-                return <Tag color="red">执行失败</Tag>;
+                return (
+                    <Popover
+                        content={
+                            <div>
+                                <div>{errMessage}</div>
+                            </div>
+                        }
+                        title="失败原因"
+                    >
+                        <Tag className="!mr-0 cursor-pointer" color="red">
+                            执行失败
+                        </Tag>
+                    </Popover>
+                );
         }
     };
 
@@ -436,7 +461,9 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <div className="flex items-center justify-center">{handleTransfer(row.copyWritingStatus)}</div>
+                                            <div className="flex items-center justify-center">
+                                                {handleTransfer(row.copyWritingStatus, row.copyWritingErrorMsg)}
+                                            </div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <Popover
@@ -457,6 +484,24 @@ const RedBookContentList: React.FC = () => {
                                             >
                                                 <div className="line-clamp-1 w-[250px]">{row.copyWritingTitle}</div>
                                             </Popover>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">
+                                                {handleTransfer(row.pictureStatus, row.pictureErrorMsg)}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="w-[300px] overflow-auto">
+                                                <Image.PreviewGroup preview={{ rootClassName: 'previewRoot' }}>
+                                                    {row.pictureContent?.map((item: any, index: any) => (
+                                                        <Image className="object-contain" height={80} width={80} src={item.url} />
+                                                    ))}
+                                                </Image.PreviewGroup>
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">{row.pictureNum}</div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <Popover
@@ -482,25 +527,9 @@ const RedBookContentList: React.FC = () => {
                                                 title="详情"
                                             >
                                                 <div className="flex flex-col items-center cursor-pointer">
-                                                    {row.copyWritingExecuteTime / 1000}
+                                                    {row.copyWritingExecuteTime && row.copyWritingExecuteTime / 1000}
                                                 </div>
                                             </Popover>
-                                        </TableCell>
-
-                                        <TableCell align="center">
-                                            <div className="flex items-center justify-center">{handleTransfer(row.pictureStatus)}</div>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <div className="flex items-center justify-center">{row.pictureNum}</div>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <div className="w-[300px] overflow-auto">
-                                                <Image.PreviewGroup preview={{ rootClassName: 'previewRoot' }}>
-                                                    {row.pictureContent?.map((item: any, index: any) => (
-                                                        <Image className="object-contain" height={80} width={80} src={item.url} />
-                                                    ))}
-                                                </Image.PreviewGroup>
-                                            </div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <Popover
@@ -526,13 +555,21 @@ const RedBookContentList: React.FC = () => {
                                                 title="详情"
                                             >
                                                 <div className="flex flex-col items-center cursor-pointer">
-                                                    {row.pictureExecuteTime / 1000}
+                                                    {row.pictureExecuteTime && row.pictureExecuteTime / 1000}
                                                 </div>
                                             </Popover>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="flex flex-col items-center">
-                                                {!row.claim ? <Tag color="blue">未认领</Tag> : <Tag color="green">已认领</Tag>}
+                                                {!row.claim ? (
+                                                    <Tag className="!mr-0" color="blue">
+                                                        未认领
+                                                    </Tag>
+                                                ) : (
+                                                    <Tag className="!mr-0" color="green">
+                                                        已认领
+                                                    </Tag>
+                                                )}
                                             </div>
                                         </TableCell>
                                         <TableCell align="center" className="sticky right-0 bg-white">

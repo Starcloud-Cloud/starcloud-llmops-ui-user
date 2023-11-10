@@ -22,7 +22,7 @@ const config: {
     /**
      * 接口请求超时时间
      */
-    request_timeout: 30000,
+    request_timeout: 30000 * 1000,
 
     /**
      * 默认接口请求类型

@@ -98,7 +98,7 @@ function ChatLink({ navigate }: { navigate: (link: string) => void }) {
     const [open, setOpen] = React.useState(true);
     return open ? (
         <div
-            className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer"
+            className="fixed flex rounded-xl bg-white w-[154px] h-[64px] shadow-lg items-center p-[12px] right-[30px] bottom-[20px] cursor-pointer z-[99999]"
             onClick={() => {
                 navigate('/chatMarket');
             }}
@@ -322,8 +322,10 @@ const MainLayout = () => {
             '/createChat',
             '/appMarket',
             '/listingBuilder',
+            '/listingBuilderOptimize',
             '/collect',
-            '/termSearch'
+            '/termSearch',
+            '/thesaurusDetail'
         ];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);

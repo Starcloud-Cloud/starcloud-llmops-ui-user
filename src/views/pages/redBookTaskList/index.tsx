@@ -1,7 +1,10 @@
-import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
+import { Tag } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import ReorderIcon from '@mui/icons-material/Reorder';
 
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -19,11 +22,12 @@ import { delListing, draftClone, draftExport, getListingPage } from 'api/listing
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { COUNTRY_LIST } from '../data';
 import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 const { base_url } = config;
+import AddModal from './modal';
+import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
 
 export interface DraftConfig {}
 
@@ -59,11 +63,12 @@ export interface TableEnhancedCreateDataType {
 }
 
 const headCells = [
-    { id: 'title', numeric: false, disablePadding: false, label: '商品标题' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '站点' },
-    // { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
-    // { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
-    { id: 'score', numeric: false, disablePadding: false, label: '分值/搜索量' },
+    { id: 'id', numeric: false, disablePadding: false, label: 'ID' },
+    { id: 'title', numeric: false, disablePadding: false, label: '计划名称' },
+    { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
+    { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
+    { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
+    { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -77,7 +82,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -87,7 +92,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                             'aria-label': 'select all desserts'
                         }}
                     />
-                </TableCell>
+                </TableCell> */}
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -95,6 +100,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
                             <TableSortLabel
@@ -121,17 +127,27 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-const ListingBuilderPage: React.FC = () => {
+const RedBookTaskList: React.FC = () => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
+
+    const [open, setOpen] = useState(false);
+    const [templateList, setTemplateList] = useState<any[]>([]);
+    useEffect(() => {
+        if (open) {
+            listTemplates().then((res) => {
+                setTemplateList(res);
+            });
+        }
+    }, [open]);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
@@ -147,21 +163,16 @@ const ListingBuilderPage: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            getListingPage({ ...pageVO })
-                .then((res) => {
-                    const fetchedRows = res.list;
-                    setRows([...fetchedRows]);
-                    setTotal(res?.total);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+            planPage({ ...pageVO }).then((res) => {
+                const fetchedRows = res.list;
+                setRows([...fetchedRows]);
+                setTotal(res?.page?.total);
+            });
         };
-
         fetchPageData();
     }, [page, rowsPerPage, count, order, orderBy]);
 
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
+    const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -210,8 +221,8 @@ const ListingBuilderPage: React.FC = () => {
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     const delDraft = async () => {
-        const data = delType === 0 ? [row?.id] : selected;
-        const res = await delListing(data);
+        const data = delType === 0 ? [row?.uid] : selected;
+        const res = await planDelete(data);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -230,38 +241,23 @@ const ListingBuilderPage: React.FC = () => {
         }
     };
 
-    const addListing = async () => {
-        navigate('/listingBuilder');
+    const [executeOpen, setExecuteOpen] = useState(false);
+    const Execute = () => {
+        planExecute({ uid: row?.uid }).then((res) => {
+            setExecuteOpen(false);
+        });
     };
 
-    const handleEdit = async (type: number, uid: string, version: number) => {
-        if (type === 1) {
-            navigate('/listingBuilder?uid=' + uid + '&version=' + version);
-        } else {
-            navigate('/listingBuilderOptimize?uid=' + uid + '&version=' + version);
-        }
+    const addPlan = async () => {
+        setOpen(true);
     };
 
-    const handleTransfer = (key: string) => {
-        switch (key) {
-            case 'ANALYSIS':
-                return '分析中';
-            case 'ANALYSIS_ERROR':
-                return '分析失败';
-            case 'ANALYSIS_END':
-                return '分析结束';
-            case 'EXECUTING':
-                return '执行中';
-            case 'EXECUTE_ERROR':
-                return '执行失败';
-            case 'EXECUTED':
-                return '执行结束';
-        }
+    const handleEdit = async (uid: string) => {
+        navigate('/batchSmallRedBook?uid=' + uid);
     };
 
     const doClone = async (row: any) => {
-        const res = await draftClone({
-            version: row.version,
+        const res = await planCopy({
             uid: row.uid
         });
         if (res) {
@@ -315,23 +311,13 @@ const ListingBuilderPage: React.FC = () => {
     return (
         <MainCard
             content={false}
-            title="Listing草稿箱"
+            title="创作计划"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()} variant="contained" size="small">
-                        新增Listing
+                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+                        新建创作计划
                     </Button>
-                    <Button
-                        color="secondary"
-                        startIcon={<AddIcon />}
-                        onClick={() => navigate('/listingBuilderOptimize')}
-                        variant="contained"
-                        size="small"
-                        className="ml-1"
-                    >
-                        优化已有Listing
-                    </Button>
-                    <Divider type={'vertical'} />
+                    {/* <Divider type={'vertical'} />
                     <Button
                         disabled={selected.length === 0}
                         className="ml-1"
@@ -345,79 +331,7 @@ const ListingBuilderPage: React.FC = () => {
                         variant="contained"
                     >
                         批量删除
-                    </Button>
-                    <Button
-                        disabled={selected.length === 0}
-                        className="ml-1"
-                        color="secondary"
-                        startIcon={<CloudDownloadIcon />}
-                        onClick={() => doExport()}
-                        variant="contained"
-                        size="small"
-                    >
-                        批量导出
-                    </Button>
-                    {/* <IconButton
-                        aria-label="more"
-                        id="long-button"
-                        aria-haspopup="true"
-                        className="ml-1"
-                        onClick={(e) => {
-                            setDelAnchorEl(e.currentTarget);
-                        }}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                        id="del-menu"
-                        MenuListProps={{
-                            'aria-labelledby': 'del-button'
-                        }}
-                        anchorEl={delAnchorEl}
-                        open={delOpen}
-                        onClose={() => {
-                            setDelAnchorEl(null);
-                        }}
-                    >
-                        <MenuItem
-                            onClick={() => {
-                                setDelAnchorEl(null);
-                            }}
-                        >
-                            <ListItemIcon>
-                                <AddIcon />
-                            </ListItemIcon>
-                            <Typography variant="inherit" noWrap>
-                                批量AI生成Listing
-                            </Typography>
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                setDelAnchorEl(null);
-                                setDelVisible(true);
-                                setDelType(2);
-                            }}
-                        >
-                            <ListItemIcon>
-                                <DeleteIcon />
-                            </ListItemIcon>
-                            <Typography variant="inherit" noWrap>
-                                批量删除
-                            </Typography>
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                setDelAnchorEl(null);
-                            }}
-                        >
-                            <ListItemIcon>
-                                <CloudDownloadIcon />
-                            </ListItemIcon>
-                            <Typography variant="inherit" noWrap>
-                                批量导出
-                            </Typography>
-                        </MenuItem>
-                    </Menu> */}
+                    </Button> */}
                 </div>
             }
         >
@@ -438,7 +352,7 @@ const ListingBuilderPage: React.FC = () => {
                             }
                             console.log(row, 'row');
 
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(row.uid);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
@@ -450,7 +364,7 @@ const ListingBuilderPage: React.FC = () => {
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell padding="checkbox">
+                                    {/* <TableCell padding="checkbox">
                                         <Checkbox
                                             onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
@@ -459,47 +373,62 @@ const ListingBuilderPage: React.FC = () => {
                                                 'aria-labelledby': labelId
                                             }}
                                         />
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell align="center">
-                                        <Tooltip title={row.title}>
-                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.title}</span>
+                                        <Tooltip title={row.name}>
+                                            <span className="line-clamp-1 mx-auto">{row.uid}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">
-                                            {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.icon}
-                                            <span className="ml-1">
-                                                {COUNTRY_LIST.find((item: any) => item.key === row.endpoint)?.label}
-                                            </span>
-                                        </div>
+                                        <Tooltip title={row.name}>
+                                            <span className="line-clamp-1 w-[120px] mx-auto">{row.name}</span>
+                                        </Tooltip>
                                     </TableCell>
-                                    {/* <TableCell align="center">{row.asin}</TableCell> */}
-                                    {/* <TableCell align="center">{handleTransfer(row.status)}</TableCell> */}
+                                    <TableCell align="center">
+                                        <div className="flex items-center justify-center  w-[100px] ">小红书</div>
+                                    </TableCell>
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
-                                            <Tooltip
-                                                title={'这按亚马逊官方推荐的标准进行打分，共有9个打分项，满分100分'}
-                                                placement="top"
-                                                arrow
-                                            >
-                                                <div className="flex flex-col cursor-pointer">
-                                                    <div className="text-base font-semibold">{row?.scoreProportion || 0}</div>
-                                                    <div className="text-sm">{row.score || 0}/9 </div>
-                                                </div>
-                                            </Tooltip>
-                                            <Divider type={'vertical'} />
-                                            <Tooltip title={'List中已埋词的总搜索量占总关键词搜索量的比值'} placement="top" arrow>
-                                                <div className="cursor-pointer">
-                                                    <Progress
-                                                        type="circle"
-                                                        percent={row?.searchersProportion * 100}
-                                                        format={(percent) => (percent === 100 ? '100%' : `${percent}%`)}
-                                                        size={35}
-                                                    />
-                                                </div>
-                                            </Tooltip>
+                                            <div className="flex">
+                                                <div>{row?.successCount || 0}</div>/
+                                                <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
+                                            </div>
                                         </div>
                                     </TableCell>
+                                    <TableCell align="center">
+                                        <Tag
+                                            color={
+                                                row.status === 'PENDING'
+                                                    ? 'green'
+                                                    : row.status === 'RUNNING'
+                                                    ? 'green'
+                                                    : row.status === 'PAUSE'
+                                                    ? 'warning'
+                                                    : row.status === 'CANCELED'
+                                                    ? 'warning'
+                                                    : row.status === 'COMPLETE'
+                                                    ? 'blue'
+                                                    : row.status === 'FAILURE'
+                                                    ? 'error'
+                                                    : 'default'
+                                            }
+                                        >
+                                            {row.status === 'PENDING'
+                                                ? '待执行'
+                                                : row.status === 'RUNNING'
+                                                ? '执行中'
+                                                : row.status === 'PAUSE'
+                                                ? '已暂停'
+                                                : row.status === 'CANCELED'
+                                                ? '已取消'
+                                                : row.status === 'COMPLETE'
+                                                ? '已完成'
+                                                : row.status === 'FAILURE'
+                                                ? '已失败'
+                                                : ''}
+                                        </Tag>
+                                    </TableCell>
+                                    <TableCell align="center">{row.creator}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
@@ -512,38 +441,73 @@ const ListingBuilderPage: React.FC = () => {
                                             <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <Tooltip title={'编辑'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    handleEdit(row.type, row.uid, row.version);
-                                                }}
-                                            >
-                                                <EditIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'复制'}>
+                                    <TableCell align="center" className="sticky right-0 bg-white">
+                                        <div className="w-[180px]">
+                                            <Tooltip title={'编辑'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        handleEdit(row.uid);
+                                                    }}
+                                                >
+                                                    <EditIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'查看操作任务'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        navigate(`/redBookContentList?uid=${row.uid}&name=${row.name}`);
+                                                    }}
+                                                >
+                                                    <ReorderIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                        <Tooltip title={'开始'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <ContentCopyIcon className="text-base" />
+                                                <PlayCircleOutlineIcon className="text-base" />
+                                                <StopIcon className="text-base" />
                                             </IconButton>
-                                        </Tooltip>
-                                        <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'删除'}>
-                                            <IconButton
-                                                aria-label="delete"
-                                                size="small"
-                                                onClick={() => {
-                                                    setDelType(0);
-                                                    setDelVisible(true);
-                                                    setRow(row);
-                                                }}
-                                            >
-                                                <DeleteIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        </Tooltip> */}
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'复制'}>
+                                                <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
+                                                    <ContentCopyIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+
+                                            <Tooltip title={'删除'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setDelType(0);
+                                                        setDelVisible(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <DeleteIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                            <Tooltip title={'执行'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setExecuteOpen(true);
+                                                        setRow(row);
+                                                    }}
+                                                >
+                                                    <PlayCircleOutlineIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -554,7 +518,7 @@ const ListingBuilderPage: React.FC = () => {
 
             {/* table pagination */}
             <TablePagination
-                rowsPerPageOptions={[5, 10]}
+                rowsPerPageOptions={[20, 50, 100]}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}
@@ -564,8 +528,10 @@ const ListingBuilderPage: React.FC = () => {
                 labelRowsPerPage="每页行数"
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
+            <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
+            <AddModal open={open} setOpen={setOpen} templateList={templateList} />
         </MainCard>
     );
 };
 
-export default ListingBuilderPage;
+export default RedBookTaskList;

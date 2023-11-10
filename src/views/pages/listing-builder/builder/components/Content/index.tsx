@@ -35,9 +35,11 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FiledTextArea from './FiledTextArea';
 import { useListing } from 'contexts/ListingContext';
-import { getRecommend } from 'api/listing/build';
+import { getListingByAsin, getMetadata, getRecommend } from 'api/listing/build';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import imgLoading from 'assets/images/picture/loading.gif';
+import { fetchRequestCanCancel } from 'utils/fetch';
+import { useLocation } from 'react-router-dom';
 
 const { Search } = Input;
 
@@ -89,8 +91,12 @@ const Content = () => {
     const [currentInputIndex, setCurrentInputIndex] = React.useState(0);
     const [editIndex, setEditIndex] = React.useState(0);
     const [currentWord, setCurrentWord] = React.useState('');
-    const [allLoading, setAllLoading] = React.useState(false);
     const [activeIndex, setActiveIndex] = React.useState<number | undefined>(undefined);
+    const [mateList, setMateList] = React.useState<any>();
+    const [productFeature, setProductFeature] = React.useState('');
+    const [loadingList, setLoadingList] = React.useState<any[]>([]);
+    const [openGrade, setOpenGrade] = React.useState(false);
+    const location = useLocation();
 
     const {
         list,
@@ -105,12 +111,21 @@ const Content = () => {
         version,
         uid,
         handleSumGrade,
-        fiveLen
+        fiveLen,
+        setListingParam,
+        setAsin,
+        asin
     } = useListing();
 
     const ulRef = React.useRef<any>(null);
     const hoverKeyRef = React.useRef<any>(null);
     const timeoutRef = React.useRef<any>(null);
+
+    React.useEffect(() => {
+        if (detail) {
+            setAsin(detail.asin);
+        }
+    }, [detail]);
 
     // 设置头部分数
     React.useEffect(() => {
@@ -139,19 +154,19 @@ const Content = () => {
             Object.keys(copyItemScore?.fiveDescScore).forEach((i) => {
                 if (index === 0) {
                     list.push({
-                        label: `五点描述${i} 包含150到200个字符`,
+                        label: `五点描述${i}： 包含150到200个字符`,
                         value: copyItemScore?.fiveDescScore[i].fiveDescLength
                     });
                 }
                 if (index === 1) {
                     list.push({
-                        label: `五点描述${i} 第一个字母大写`,
+                        label: `五点描述${i}： 第一个字母大写`,
                         value: copyItemScore?.fiveDescScore[i].starUppercase
                     });
                 }
                 if (index === 2) {
                     list.push({
-                        label: `五点描述${i} 不全是大写`,
+                        label: `五点描述${i}： 不全是大写`,
                         value: copyItemScore?.fiveDescScore[i].hasLowercase
                     });
                 }
@@ -162,42 +177,53 @@ const Content = () => {
         }
     };
 
+    useEffect(() => {
+        (async () => {
+            const res = await getMetadata();
+            setMateList(res);
+        })();
+    }, []);
+
     const getItemGradeComp = (v: any) => {
         return (
             <div className="flex justify-between items-center h-[30px]">
                 <span className="flex-[80%]">{v.label}</span>
                 {!v.value ? (
-                    <svg
-                        className="h-[14px] w-[14px]"
-                        viewBox="0 0 1098 1024"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        p-id="11931"
-                        width="32"
-                        height="32"
-                    >
-                        <path
-                            d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
-                            fill="#FB6547"
-                            p-id="11932"
-                        ></path>
-                    </svg>
+                    <Tooltip title={'不满足'}>
+                        <svg
+                            className="h-[14px] w-[14px] cursor-pointer"
+                            viewBox="0 0 1098 1024"
+                            version="1.1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            p-id="11931"
+                            width="32"
+                            height="32"
+                        >
+                            <path
+                                d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                fill="#FB6547"
+                                p-id="11932"
+                            ></path>
+                        </svg>
+                    </Tooltip>
                 ) : (
-                    <svg
-                        className="h-[14px] w-[14px]"
-                        viewBox="0 0 1024 1024"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        p-id="21700"
-                        width="16"
-                        height="16"
-                    >
-                        <path
-                            d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
-                            fill="#673ab7"
-                            p-id="21701"
-                        ></path>
-                    </svg>
+                    <Tooltip title={'满足'}>
+                        <svg
+                            className="h-[14px] w-[14px] cursor-pointer"
+                            viewBox="0 0 1024 1024"
+                            version="1.1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            p-id="21700"
+                            width="16"
+                            height="16"
+                        >
+                            <path
+                                d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                fill="#673ab7"
+                                p-id="21701"
+                            ></path>
+                        </svg>
+                    </Tooltip>
                 )}
             </div>
         );
@@ -243,7 +269,7 @@ const Content = () => {
     );
 
     useEffect(() => {
-        const filerList = detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord));
+        const filerList = detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()));
         if (!filerList?.length || !currentWord) {
             setOpenKeyWordSelect(false);
             setHoverKey(0);
@@ -269,7 +295,9 @@ const Content = () => {
                     e.preventDefault(); // 防止滚动页面
                     if (hoverKeyRef.current !== undefined) {
                         handleReplaceValue(
-                            detail?.keywordResume?.filter((item: string) => item?.startsWith(currentWord))[hoverKeyRef.current || 0]
+                            detail?.keywordResume?.filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))[
+                                hoverKeyRef.current || 0
+                            ]
                         );
                     }
                 }
@@ -315,7 +343,7 @@ const Content = () => {
         setCurrentWord(word);
         if (startIndex === 1 || value[startIndex - 2] === ' ') {
             // const filterKeyWord = keyword.filter((item, index) => {
-            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.startsWith(word)) || [];
+            const filterKeyWord = detail?.keywordResume?.filter((item: string) => item?.toLowerCase().startsWith(word.toLowerCase())) || [];
             if (filterKeyWord?.length > 0) {
                 const { x, y } = getCaretPosition(e.target);
                 setX(x);
@@ -367,18 +395,27 @@ const Content = () => {
 
     const formik = useFormik({
         initialValues: {
-            productFeatures: '',
-            clientFeatures: '',
-            voidWord: '',
-            showNamePosition: '',
-            name: '',
-            style: ''
+            productFeature: '',
+            customerFeature: '',
+            brandName: '',
+            targetLanguage: '',
+            writingStyle: ''
         },
-        validationSchema: yup.object({
-            productFeatures: yup.string().required('标题是必填的')
-        }),
         onSubmit: async (values) => {}
     });
+
+    useEffect(() => {
+        setListingParam({ ...formik.values });
+    }, [formik.values]);
+
+    useEffect(() => {
+        if (detail?.draftConfig?.aiConfigDTO) {
+            setProductFeature(detail.draftConfig.aiConfigDTO.productFeature);
+            formik.setValues({
+                ...detail.draftConfig.aiConfigDTO
+            });
+        }
+    }, [detail]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEnableAi(event.target.checked);
@@ -412,12 +449,19 @@ const Content = () => {
         const copyList = _.cloneDeep(list);
         copyList.splice(-2, 0, {
             title: `五点描述${index}`,
-            des: `1、标题是亚马逊站内外搜索权重最高的项目，需确保它易于阅读、描述性强并包含产品的主要关键字；
-            2、200字符以内。但因为移动端仅展示标题的前60个字符，所以建议将最重要的信息放在前60个字符以内；
-            3、避免使用装饰性字符、表情符号和 ASCII 字符（例如： ~ ! * $ ? _ { } # < > | * ; ^ ¬ ¦ Æ © ®）；
-            4、每个单词的首字母大写，但介词、 (in, on, over, with) 连词 (and, or, for) 或冠词 (the, a, an) 除外，避免全部使用大写字母；
-            5、避免使用主观性评价用语，例如“热销商品”或“畅销商品”或促销短语，例如“免费送货”、“100% 质量保证；
-            6、尺寸和颜色变体应包含在子 ASIN 的商品名称中，而非包含在主要商品名称中。`,
+            des: (
+                <span>
+                    1、提炼产品核心卖点，比如：尺寸、质保信息、适用年龄等，按重要程度排序；
+                    <br />
+                    2、字符要求：单行最多500字符，一般建议在200字符以内；
+                    <br />
+                    3、分点描述，每个五点描述的首字母大写，避免全部使用大写字母；
+                    <br />
+                    4、语言本地化、可读性强，让消费者可以通过简洁明了的描述最快速地了解产品的详细情况；
+                    <br />
+                    5、不要包含促销和定价的相关信息，不要包含物流、卖家以及公司的相关信息。
+                </span>
+            ),
             placeholder: `产品卖点描述${index}`,
             type: ListingBuilderEnum.FIVE_DES,
             isOvertop: true,
@@ -461,57 +505,54 @@ const Content = () => {
     };
 
     const typeSearchList = async (value: string) => {
-        setAllLoading(true);
-        // const res = await getListingByAsin({
-        //     asin: value,
-        //     marketName: country.key
-        // });
-        const res = {
-            market: 'GLOBAL',
-            asin: 'B08RYQR1CJ',
-            imgUrls: [
-                'https://images-na.ssl-images-amazon.com/images/I/41Jj+ixqgFL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41HoSBUctCL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/51CATaXh+ZL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41RIFOzGg0L.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/318E3Iwxe+L.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41TlyeP9kmL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/51tqGaEVYzL.jpg',
-                'https://images-na.ssl-images-amazon.com/images/I/41HNbEScSSL.jpg'
-            ],
-            title: 'Makeup Bag Portable Travel Cosmetic Bag for Women, Beauty Zipper Makeup Organizer PU Leather Washable Waterproof (Pink)',
-            features: [
-                '✅【WATERPROOF MATERIAL】 Cosmetic case made of high-quality PU leather material, the surface is waterproof and washable, easy to clean; no worries for leakage when traveling',
-                '✅【LIGHT WEIGHT & ROOMY】 9 x 6 x 4.5 inch; this makeup bag is light-weighted and perfect for holding all kinds of beauty essentials, enough to hold everything securely you need for your travel',
-                '✅【UNIQUE DESIGN】 Makeup bag with wide durable handle and sturdy zipper, portable and easy to carry; can be used as a make up organizer, toiletry wash bag, pencil case and daily handbag. Suitable for outdoor, business trip, camping, travel, gym room, indoor, house-held storage',
-                '✅【VERSATILE MAKEUP BAG】Ideal for travel, business trip, vacation, gym, camping, toiletry organization and outdoor activity; its a functional makeup bag, cosmetic bag, travel organizer bag',
-                '✅【SERVICE GUARANTEE】Please feel free to contact us whenever you meet any problem; we provide lifetime warranty and customer service'
-            ],
-            description: null
-        };
-        let copyList: any[] = _.cloneDeep(list);
-        copyList[0].value = res.title;
-        const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
-        copyList[productIndex].value = res.description;
-        res.features?.forEach((item, index) => {
-            copyList[index + 1].value = item;
-        });
-        setList(copyList);
-        setTimeout(() => {
-            setAllLoading(false);
-        }, 3000);
+        try {
+            const indexList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD).map((item, index) => index);
+            setLoadingList(indexList);
+
+            const res = await getListingByAsin({
+                asin: value,
+                marketName: country.key
+            });
+            window.scrollTo(0, 870);
+            setLoadingList([]);
+            let copyList: any[] = _.cloneDeep(list);
+            copyList[0].value = res.title;
+            const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
+            copyList[productIndex].value = res.description;
+            res.features?.forEach((item: any, index: number) => {
+                copyList[index + 1].value = item;
+            });
+            setList(copyList);
+        } catch (e) {
+            setLoadingList([]);
+        }
     };
 
     // 所搜
     const handleSearch = async (value: any) => {
+        setAsin(value);
+        if (!value) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请先输入ASIN',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return;
+        }
         const someList = list.some((item) => item.value);
         if (someList) {
             Modal.confirm({
                 title: '温馨提示',
                 icon: <ExclamationCircleFilled rev={undefined} />,
-                content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库,是否继续',
-                onOk: async () => {
-                    await typeSearchList(value);
+                content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    typeSearchList(value);
                 },
                 onCancel() {
                     console.log('Cancel');
@@ -522,44 +563,154 @@ const Content = () => {
         }
     };
 
-    const handleClick = async (item: any, index: number) => {
-        // 智能推荐
-        if (index === list.length - 1) {
-            const res = await getRecommend({ version, uid });
-            if (res) {
-                setList((pre: any[]) => {
-                    const copyPre = [...pre];
-                    copyPre[index] = {
-                        ...copyPre[index],
-                        value: res
-                    };
-                    return copyPre;
+    const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
+        try {
+            setLoadingList([index]);
+            // 清空当前value
+            setList((preList: any) => {
+                const copyPreList = _.cloneDeep(preList);
+                copyPreList[index].value = '';
+                return copyPreList;
+            });
+            // 智能推荐
+            if (item.type === ListingBuilderEnum.SEARCH_WORD) {
+                setLoadingList([]);
+                const res = await getRecommend({ version, uid });
+                if (res) {
+                    setList((pre: any[]) => {
+                        const copyPre = [...pre];
+                        copyPre[index] = {
+                            ...copyPre[index],
+                            value: res
+                        };
+                        return copyPre;
+                    });
+                }
+            } else {
+                const { promise, controller } = fetchRequestCanCancel('/llm/listing/execute/asyncExecute', 'post', {
+                    listingType:
+                        item.type === ListingBuilderEnum.TITLE
+                            ? 'LISTING_TITLE'
+                            : item.type === ListingBuilderEnum.FIVE_DES
+                            ? 'LISTING_BULLET_POINT'
+                            : 'LISTING_PRODUCT_DESCRIPTION',
+                    keywords: item.keyword.map((item: any) => item.text),
+                    ...formik.values,
+                    draftUid: uid,
+                    title: list[0].value,
+                    bulletPoints: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES).map((item) => item.value)
                 });
+                let resp: any = await promise;
+                // controllerRef.current = controller;
+
+                const reader = resp.getReader();
+                const textDecoder = new TextDecoder();
+                let outerJoins = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        console.log(isAll, 'isAll');
+                        if (isAll) {
+                            const filterList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD);
+                            const length = filterList.length;
+                            console.log(length, 'length');
+                            if (index < length - 1) {
+                                doAiWrite(filterList[index + 1], index + 1, true);
+                            }
+                        }
+                        break;
+                    }
+                    const str = textDecoder.decode(value);
+                    outerJoins += str;
+
+                    // 查找事件结束标志，例如"}\n"
+                    let eventEndIndex = outerJoins.indexOf('}\n');
+
+                    while (eventEndIndex !== -1) {
+                        const eventData = outerJoins.slice(0, eventEndIndex + 1);
+                        const subString = eventData.substring(5);
+                        const bufferObj = JSON.parse(subString);
+                        if (bufferObj.type === 'm') {
+                            setLoadingList([]);
+                            setList((preList: any) => {
+                                const copyPreList = _.cloneDeep(preList);
+                                copyPreList[index].value = copyPreList[index].value + bufferObj.content;
+                                return copyPreList;
+                            });
+                        }
+                        outerJoins = outerJoins.slice(eventEndIndex + 3);
+                        eventEndIndex = outerJoins.indexOf('}\n');
+                    }
+                }
             }
+        } catch (e) {
+            setLoadingList([]);
+        }
+    };
+
+    const handleClick = async (item: any, index: number) => {
+        if (list[index].value) {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: <ExclamationCircleFilled rev={undefined} />,
+                content:
+                    item.type === ListingBuilderEnum.SEARCH_WORD
+                        ? '智能推荐后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续'
+                        : 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    doAiWrite(item, index);
+                },
+                onCancel() {
+                    console.log('Cancel');
+                }
+            });
+        } else {
+            await doAiWrite(item, index);
+        }
+    };
+
+    // 循环遍历
+    const handleAIGenerateAll = () => {
+        const hasValue = list.some((item) => item.value);
+        if (hasValue) {
+            Modal.confirm({
+                title: '温馨提示',
+                icon: <ExclamationCircleFilled rev={undefined} />,
+                content: 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
+                onOk: () => {
+                    doAiWrite(list[0], 0, true);
+                },
+                onCancel() {
+                    console.log('Cancel');
+                }
+            });
+        } else {
+            doAiWrite(list[0], 0, true);
         }
     };
 
     return (
         <div>
             <Card className="rounded-t-none flex justify-center flex-col p-3" title={list?.[0]?.value || 'Listing草稿'}>
-                <div className="text-lg font-bold py-1">Listing优化</div>
+                <div className="text-xl font-bold py-1 mt-2">Listing评分</div>
                 <div className="grid xl:grid-cols-2 xs:grid-cols-1 gap-2 w-full">
                     <div className="bg-[#f4f6f8] p-4 rounded-md">
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
                                 <span className="text-lg font-semibold">List质量分</span>
-                                <Tooltip title={'这是一条广告'} placement="top" arrow>
+                                <Tooltip title={'这按亚马逊官方推荐的标准进行打分，共有9个打分项，满分100分'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <div className="flex justify-between items-end w-full mt-10">
-                                <span className="text-2xl font-semibold">{itemScore?.score}</span>
+                                <span className="text-2xl font-semibold">{itemScore?.score || 0}</span>
                                 <span className="text-base">/9</span>
                             </div>
 
                             <LinearProgress
                                 variant="determinate"
-                                value={(itemScore?.score / 9) * 100}
+                                value={((itemScore?.score || 0) / 9) * 100}
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -572,7 +723,7 @@ const Content = () => {
                         <div className="flex flex-col items-center w-full">
                             <div className="flex justify-between items-center w-full">
                                 <span className="text-lg font-semibold">搜索量预估</span>
-                                <Tooltip title={'这是一条广告'} placement="top" arrow>
+                                <Tooltip title={'List中已埋词的总搜索量占总关键词搜索量的比值'} placement="top" arrow>
                                     <HelpOutlineIcon className="text-lg font-semibold ml-1 cursor-pointer" />
                                 </Tooltip>
                             </div>
@@ -583,7 +734,11 @@ const Content = () => {
 
                             <LinearProgress
                                 variant="determinate"
-                                value={((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100}
+                                value={
+                                    !itemScore?.totalSearches
+                                        ? 0
+                                        : ((itemScore?.matchSearchers || 0) / (itemScore?.totalSearches || 0)) * 100
+                                }
                                 className="w-full"
                                 sx={{
                                     height: '8px',
@@ -593,104 +748,123 @@ const Content = () => {
                         </div>
                     </div>
                 </div>
-                <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1 gap-4 w-full">
-                    {scoreList?.map((item, index) => (
-                        <div className="flex  items-center w-full flex-col" key={index}>
-                            <div className="mt-2  w-full">
-                                <span className="font-semibold text-base">{item.title}</span>
-                                {item.list.map((v, i) => (
-                                    <>
-                                        <div className="w-full py-1" key={i}>
-                                            <div className="flex justify-between items-center h-[30px]">
-                                                <span className="flex-[80%]">{v.label}</span>
-                                                {item.title.includes('5点描述') ? (
-                                                    <Popover content={fiveDesGrade(i)} title="打分">
-                                                        {!v.value ? (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px] ${
-                                                                    item.title.includes('5点描述') && 'cursor-pointer'
-                                                                }`}
-                                                                viewBox="0 0 1098 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="11931"
-                                                                width="32"
-                                                                height="32"
-                                                            >
-                                                                <path
-                                                                    d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
-                                                                    fill="#FB6547"
-                                                                    p-id="11932"
-                                                                ></path>
-                                                            </svg>
-                                                        ) : (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px] ${
-                                                                    item.title.includes('5点描述') && 'cursor-pointer'
-                                                                }`}
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="21700"
-                                                                width="16"
-                                                                height="16"
-                                                            >
-                                                                <path
-                                                                    d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
-                                                                    fill="#673ab7"
-                                                                    p-id="21701"
-                                                                ></path>
-                                                            </svg>
-                                                        )}
-                                                    </Popover>
-                                                ) : (
-                                                    <>
-                                                        {!v.value ? (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px]`}
-                                                                viewBox="0 0 1098 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="11931"
-                                                                width="32"
-                                                                height="32"
-                                                            >
-                                                                <path
-                                                                    d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
-                                                                    fill="#FB6547"
-                                                                    p-id="11932"
-                                                                ></path>
-                                                            </svg>
-                                                        ) : (
-                                                            <svg
-                                                                className={`h-[14px] w-[14px]`}
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="21700"
-                                                                width="16"
-                                                                height="16"
-                                                            >
-                                                                <path
-                                                                    d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
-                                                                    fill="#673ab7"
-                                                                    p-id="21701"
-                                                                ></path>
-                                                            </svg>
-                                                        )}
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <MuiDivider />
-                                    </>
-                                ))}
-                            </div>
+                <div className="flex justify-between items-center my-2 cursor-pointer" onClick={() => setOpenGrade(!openGrade)}>
+                    {/* <span className="text-[#505355] text-base font-semibold">打分明细</span> */}
+                    <div className="flex items-center">
+                        <div className="flex items-center">
+                            {openGrade ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            {openGrade ? (
+                                <span className="text-[#505355] text-sm font-semibold">收起打分明细</span>
+                            ) : (
+                                <span className="text-[#505355] text-sm font-semibold">展开打分明细</span>
+                            )}
                         </div>
-                    ))}
+                    </div>
                 </div>
+                {openGrade && (
+                    <div className="grid 2xl:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1 gap-4 w-full">
+                        {scoreList?.map((item, index) => (
+                            <div className="flex  items-center w-full flex-col" key={index}>
+                                <div className="mt-2  w-full">
+                                    <span className="font-semibold text-base">{item.title}</span>
+                                    {item.list.map((v, i) => (
+                                        <>
+                                            <div className="w-full py-1" key={i}>
+                                                <div className="flex justify-between items-center h-[30px]">
+                                                    <span className="flex-[80%]">{v.label}</span>
+                                                    {item.title.includes('5点描述') ? (
+                                                        <Popover content={fiveDesGrade(i)} title="打分">
+                                                            {!v.value ? (
+                                                                <svg
+                                                                    className={`h-[14px] w-[14px] ${
+                                                                        item.title.includes('5点描述') && 'cursor-pointer'
+                                                                    }`}
+                                                                    viewBox="0 0 1098 1024"
+                                                                    version="1.1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    p-id="11931"
+                                                                    width="32"
+                                                                    height="32"
+                                                                >
+                                                                    <path
+                                                                        d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                                                        fill="#FB6547"
+                                                                        p-id="11932"
+                                                                    ></path>
+                                                                </svg>
+                                                            ) : (
+                                                                <svg
+                                                                    className={`h-[14px] w-[14px] ${
+                                                                        item.title.includes('5点描述') && 'cursor-pointer'
+                                                                    }`}
+                                                                    viewBox="0 0 1024 1024"
+                                                                    version="1.1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    p-id="21700"
+                                                                    width="16"
+                                                                    height="16"
+                                                                >
+                                                                    <path
+                                                                        d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                                                        fill="#673ab7"
+                                                                        p-id="21701"
+                                                                    ></path>
+                                                                </svg>
+                                                            )}
+                                                        </Popover>
+                                                    ) : (
+                                                        <>
+                                                            {!v.value ? (
+                                                                <Tooltip title={'不满足'}>
+                                                                    <svg
+                                                                        className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                        viewBox="0 0 1098 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        p-id="11931"
+                                                                        width="32"
+                                                                        height="32"
+                                                                    >
+                                                                        <path
+                                                                            d="M610.892409 345.817428C611.128433 343.63044 611.249529 341.409006 611.249529 339.159289 611.249529 305.277109 583.782594 277.810176 549.900416 277.810176 516.018238 277.810176 488.551303 305.277109 488.551303 339.159289 488.551303 339.229063 488.55142 339.298811 488.551654 339.368531L488.36115 339.368531 502.186723 631.80002C502.185201 631.957072 502.184441 632.114304 502.184441 632.271715 502.184441 658.624519 523.547611 679.98769 549.900416 679.98769 576.253221 679.98769 597.616391 658.624519 597.616391 632.271715 597.616391 631.837323 597.610587 631.404284 597.599053 630.972676L610.892409 345.817428ZM399.853166 140.941497C481.4487 1.632048 613.916208 1.930844 695.336733 140.941497L1060.013239 763.559921C1141.608773 902.869372 1076.938039 1015.801995 915.142835 1015.801995L180.047065 1015.801995C18.441814 1015.801995-46.243866 902.570576 35.176659 763.559921L399.853166 140.941497ZM549.900416 877.668165C583.782594 877.668165 611.249529 850.201231 611.249529 816.319053 611.249529 782.436871 583.782594 754.96994 549.900416 754.96994 516.018238 754.96994 488.551303 782.436871 488.551303 816.319053 488.551303 850.201231 516.018238 877.668165 549.900416 877.668165Z"
+                                                                            fill="#FB6547"
+                                                                            p-id="11932"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </Tooltip>
+                                                            ) : (
+                                                                <Tooltip title={'满足'}>
+                                                                    <svg
+                                                                        className={`h-[14px] w-[14px] cursor-pointer`}
+                                                                        viewBox="0 0 1024 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        p-id="21700"
+                                                                        width="16"
+                                                                        height="16"
+                                                                    >
+                                                                        <path
+                                                                            d="M511.999994 0C229.205543 0 0.020822 229.226376 0.020822 512.020827c0 282.752797 229.184721 511.979173 511.979173 511.979173s511.979173-229.226376 511.979173-511.979173C1023.979167 229.226376 794.794446 0 511.999994 0zM815.371918 318.95082l-346.651263 461.201969c-10.830249 14.370907-27.32555 23.409999-45.27877 24.742952-1.582882 0.124964-3.12411 0.166619-4.665338 0.166619-16.328682 0-32.074198-6.373185-43.779197-17.911565l-192.903389-189.44604c-24.617988-24.20144-24.992881-63.731847-0.791441-88.349835 24.20144-24.659643 63.731847-24.951226 88.349835-0.833096l142.042875 139.501932 303.788472-404.2182c20.744091-27.575479 59.899605-33.115568 87.516739-12.413131C830.534266 252.219827 836.116009 291.375341 815.371918 318.95082z"
+                                                                            fill="#673ab7"
+                                                                            p-id="21701"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </Tooltip>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <MuiDivider />
+                                        </>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </Card>
-            <Card className="p-5 mt-2">
+            {/* <Card className="p-5 mt-2">
                 <div className="flex justify-between flex-[30%] flex-wrap">
                     <div className="flex items-center">
                         <span>AI模式</span>
@@ -699,23 +873,37 @@ const Content = () => {
                     <div className="flex items-center justify-end flex-[70%]">
                         <Search
                             onSearch={handleSearch}
-                            className="lg:w-full xl:w-[70%]"
+                            className="w-full md:w-[400px]"
                             placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
                             enterButton="获取Listing"
                         />
                     </div>
                 </div>
-            </Card>
-            {enableAi && (
+            </Card> */}
+            {true && (
                 <Card className="p-5 mt-2">
+                    {location.pathname === '/listingBuilderOptimize' && (
+                        <div>
+                            <div className="flex mb-3 flex-col">
+                                <span className="text-[#505355] text-base font-semibold mb-2">输入ASIN</span>
+                                <Search
+                                    value={asin}
+                                    onSearch={handleSearch}
+                                    className="w-full md:w-[400px]"
+                                    placeholder="输入ASIN, 获取亚马逊List的内容作为草稿"
+                                    enterButton="获取Listing"
+                                    onChange={(e: any) => setAsin(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    )}
                     <div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
                             <span className="text-[#505355] text-base font-semibold">添加ASIN辅助信息帮助AI更贴切的生成您的Listing</span>
                             <div className="flex items-center">
-                                <span>本月剩余次数1000</span>
-                                <div className="flex items-center ml-3 cursor-pointer" onClick={() => setAssistOpen(!assistOpen)}>
-                                    {!assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                    {!assistOpen ? (
+                                <div className="flex items-center ml-3 ">
+                                    {assistOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                    {assistOpen ? (
                                         <span className="text-[#505355] text-sm font-semibold">收起辅助信息</span>
                                     ) : (
                                         <span className="text-[#505355] text-sm font-semibold">展开辅助信息</span>
@@ -736,14 +924,17 @@ const Content = () => {
                                             size="small"
                                             fullWidth
                                             label={'*产品特征'}
-                                            id="productFeatures"
-                                            name="productFeatures"
+                                            id="productFeature"
+                                            name="productFeature"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.productFeatures}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.productFeatures && Boolean(formik.errors.productFeatures)}
-                                            helperText={formik.touched.productFeatures && formik.errors.productFeatures}
+                                            value={formik.values.productFeature}
+                                            onChange={(e) => {
+                                                setProductFeature(e.target.value);
+                                                formik.handleChange(e);
+                                            }}
+                                            error={formik.touched.productFeature && Boolean(formik.errors.productFeature)}
+                                            helperText={formik.touched.productFeature && formik.errors.productFeature}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="w-full">
@@ -751,14 +942,14 @@ const Content = () => {
                                             size="small"
                                             label={'客户特征'}
                                             fullWidth
-                                            id="clientFeatures"
-                                            name="clientFeatures"
+                                            id="customerFeature"
+                                            name="customerFeature"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.clientFeatures}
+                                            value={formik.values.customerFeature}
                                             onChange={formik.handleChange}
-                                            error={formik.touched.clientFeatures && Boolean(formik.errors.clientFeatures)}
-                                            helperText={formik.touched.clientFeatures && formik.errors.clientFeatures}
+                                            error={formik.touched.customerFeature && Boolean(formik.errors.customerFeature)}
+                                            helperText={formik.touched.customerFeature && formik.errors.customerFeature}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="w-full">
@@ -766,14 +957,14 @@ const Content = () => {
                                             size="small"
                                             label={'品牌名称'}
                                             fullWidth
-                                            id="voidWord"
-                                            name="voidWord"
+                                            id="brandName"
+                                            name="brandName"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            value={formik.values.voidWord}
+                                            value={formik.values.brandName}
                                             onChange={formik.handleChange}
-                                            error={formik.touched.voidWord && Boolean(formik.errors.voidWord)}
-                                            helperText={formik.touched.voidWord && formik.errors.voidWord}
+                                            error={formik.touched.brandName && Boolean(formik.errors.brandName)}
+                                            helperText={formik.touched.brandName && formik.errors.brandName}
                                         />
                                     </Grid>
                                     <Grid sx={{ mt: 2 }} item className="grid gap-2 grid-cols-2 w-full">
@@ -785,16 +976,18 @@ const Content = () => {
                                                 <Select
                                                     size="small"
                                                     labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
+                                                    label="targetLanguage"
+                                                    id="targetLanguage"
+                                                    name="targetLanguage"
+                                                    value={formik.values.targetLanguage}
+                                                    onChange={formik.handleChange}
+                                                    error={formik.touched.targetLanguage && Boolean(formik.errors.targetLanguage)}
                                                 >
-                                                    <MenuItem value={1}>正式</MenuItem>
-                                                    <MenuItem value={2}>感性</MenuItem>
-                                                    <MenuItem value={3}>鼓吹</MenuItem>
-                                                    <MenuItem value={4}>有激情</MenuItem>
-                                                    <MenuItem value={5}>又爆发力</MenuItem>
+                                                    {mateList?.targetLanguage.map((item: any, index: number) => (
+                                                        <MenuItem value={item.value} key={index}>
+                                                            {item.label}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </div>
@@ -806,31 +999,36 @@ const Content = () => {
                                                 <Select
                                                     size="small"
                                                     labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    // value={age}
-                                                    label="Age"
-                                                    // onChange={handleChange}
+                                                    label="writingStyle"
+                                                    id="writingStyle"
+                                                    name="writingStyle"
+                                                    value={formik.values.writingStyle}
+                                                    onChange={formik.handleChange}
+                                                    error={formik.touched.writingStyle && Boolean(formik.errors.writingStyle)}
                                                 >
-                                                    <MenuItem value={1}>正式</MenuItem>
-                                                    <MenuItem value={2}>感性</MenuItem>
-                                                    <MenuItem value={3}>鼓吹</MenuItem>
-                                                    <MenuItem value={4}>有激情</MenuItem>
-                                                    <MenuItem value={5}>又爆发力</MenuItem>
+                                                    {mateList?.writingStyle.map((item: any, index: number) => (
+                                                        <MenuItem value={item.value} key={index}>
+                                                            {item.label}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </div>
                                     </Grid>
                                     <Grid sx={{ mt: 2, textAlign: 'center' }} item md={12}>
-                                        <Button
-                                            startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                            color="secondary"
-                                            size="small"
-                                            variant="contained"
-                                            onClick={() => setAssistOpen(true)}
-                                            className="w-[300px]"
-                                        >
-                                            AI生成(消耗x点)
-                                        </Button>
+                                        <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto w-[300px]"
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                                onClick={() => handleAIGenerateAll()}
+                                            >
+                                                AI生成完整Listing(消耗{fiveLen + 2}点)
+                                            </Button>
+                                        </Tooltip>
                                     </Grid>
                                 </Grid>
                             </form>
@@ -838,8 +1036,8 @@ const Content = () => {
                     )}
                 </Card>
             )}
-            {/* <Spin tip="Loading..." size={'large'} spinning={allLoading} indicator={<img width={60} src={imgLoading} />}> */}
             <Card className="mt-2 p-5">
+                <div className="text-xl font-bold py-1">Listing优化</div>
                 {list.map((item, index) => (
                     <>
                         {item.type === ListingBuilderEnum.PRODUCT_DES && (
@@ -864,7 +1062,13 @@ const Content = () => {
                                     <span className="text-[#505355] text-base font-semibold">{item.title}</span>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Popover content={handleGradeItem(index, item.type)} title="打分">
-                                        <Rate allowHalf value={handleSumGrade(index, item.type)} count={1} disabled />
+                                        <Rate
+                                            className="!cursor-pointer"
+                                            allowHalf
+                                            value={handleSumGrade(index, item.type)}
+                                            count={1}
+                                            disabled
+                                        />
                                     </Popover>
                                     <Divider type="vertical" style={{ marginInline: '4px' }} />
                                     <Button color="secondary" size="small" variant="text" onClick={() => handleExpand(index)}>
@@ -872,16 +1076,36 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <Button
-                                        disabled={item.type === ListingBuilderEnum.SEARCH_WORD && !uid}
-                                        onClick={() => handleClick(item, index)}
-                                        startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                        color="secondary"
-                                        size="small"
-                                        variant="contained"
-                                    >
-                                        {item.btnText}
-                                    </Button>
+                                    {enableAi && item.type !== ListingBuilderEnum.SEARCH_WORD && (
+                                        <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto"
+                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
+                                                onClick={() => handleClick(item, index)}
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                {item.btnText}
+                                            </Button>
+                                        </Tooltip>
+                                    )}
+                                    {item.type === ListingBuilderEnum.SEARCH_WORD && (
+                                        <Tooltip title="请输入关键词" placement={'top'} arrow>
+                                            <Button
+                                                className="!cursor-pointer !pointer-events-auto"
+                                                disabled={!detail?.keywordMetaData?.length}
+                                                onClick={() => handleClick(item, index)}
+                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                color="secondary"
+                                                size="small"
+                                                variant="contained"
+                                            >
+                                                {item.btnText}
+                                            </Button>
+                                        </Tooltip>
+                                    )}
                                     {/* {item.type === ListingBuilderEnum.SEARCH_WORD ? (
                                         <Button
                                             onClick={handleSearchWord}
@@ -985,28 +1209,35 @@ const Content = () => {
                                         )}
                                     </div>
                                 </div>
-                                <FiledTextArea
-                                    rows={item.row}
-                                    placeholder={item.placeholder}
-                                    value={item.value}
-                                    handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
-                                    handleClick={() => {
-                                        if (index === activeIndex) {
-                                            setActiveIndex(index);
-                                        } else {
-                                            setOpenKeyWordSelect(false);
-                                            setActiveIndex(index);
-                                        }
-                                    }}
-                                    highlightWordList={item.keyword}
-                                    highlightAllWordList={detail?.keywordMetaData || []}
-                                    index={index}
-                                    type={item.type}
-                                />
+                                <Spin
+                                    tip="思考中..."
+                                    size={'large'}
+                                    spinning={loadingList.includes(index)}
+                                    indicator={<img width={60} src={imgLoading} />}
+                                >
+                                    <FiledTextArea
+                                        rows={item.row}
+                                        placeholder={item.placeholder}
+                                        value={item.value}
+                                        handleInputChange={(e: any) => handleInputChange(e, index, detail?.keywordMetaData || [])}
+                                        handleClick={() => {
+                                            if (index === activeIndex) {
+                                                setActiveIndex(index);
+                                            } else {
+                                                setOpenKeyWordSelect(false);
+                                                setActiveIndex(index);
+                                            }
+                                        }}
+                                        highlightWordList={item.keyword}
+                                        highlightAllWordList={detail?.keywordMetaData || []}
+                                        index={index}
+                                        type={item.type}
+                                    />
+                                </Spin>
                                 {item.type !== ListingBuilderEnum.SEARCH_WORD && (
                                     <div className="flex px-4 py-3 items-center">
                                         <div className="flex-1 flex items-center">
-                                            <span className="mr-2 flex items-center">
+                                            <span className="mr-2 flex items-center text-[#999]">
                                                 建议关键词:
                                                 <div className="ml-2 flex items-center">
                                                     {item?.keyword?.map((itemKeyword, keywordIndex) => (
@@ -1015,7 +1246,10 @@ const Content = () => {
                                                             className={`${
                                                                 keywordHighlight[index]
                                                                     ?.filter((item) => item !== undefined)
-                                                                    .find((itemKeyH) => itemKeyH.text === itemKeyword.text)?.num
+                                                                    .find(
+                                                                        (itemKeyH) =>
+                                                                            itemKeyH.text.toLowerCase() === itemKeyword.text.toLowerCase()
+                                                                    )?.num
                                                                     ? 'bg-[#ffaca6] ml-1 line-through px-1'
                                                                     : 'ml-1 px-1'
                                                             }`}
@@ -1052,7 +1286,7 @@ const Content = () => {
                         className="rounded border min-w-[200px] cursor-pointer border-[#f4f6f8] border-solid p-1 bg-white z-50"
                     >
                         {detail?.keywordResume
-                            .filter((item: string) => item?.startsWith(currentWord))
+                            .filter((item: string) => item.toLowerCase()?.startsWith(currentWord.toLowerCase()))
                             ?.map((item: string, keyWordItemKey: number) => (
                                 <li
                                     key={keyWordItemKey}
@@ -1070,7 +1304,6 @@ const Content = () => {
                     </ul>
                 )}
             </Card>
-            {/* </Spin> */}
             <AiCustomModal
                 open={aiCustomOpen}
                 handleClose={() => {

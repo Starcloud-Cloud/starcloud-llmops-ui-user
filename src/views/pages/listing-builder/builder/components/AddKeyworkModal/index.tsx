@@ -44,7 +44,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
     const [checked, setChecked] = useState<any[]>([]);
-    const { uid, setVersion, setUid, country, version, setUpdate, detail, list } = useListing();
+    const { uid, setVersion, setUid, country, version, setUpdate, detail, list, listingParam, enableAi, listingBuildType } = useListing();
     const navigate = useNavigate();
 
     // 添加关键词
@@ -60,13 +60,15 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             version,
             endpoint: country.key,
             draftConfig: {
-                enableAi: true,
-                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+                enableAi,
+                fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
+                aiConfigDTO: listingParam
             },
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
             productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
             searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
-            fiveDesc: result
+            fiveDesc: result,
+            type: listingBuildType
         };
 
         if (tab === 0) {
@@ -74,30 +76,54 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
             if (uid) {
                 // 如果站点一样就就新增
                 if (detail.endpoint === country.key) {
-                    const res = await addKey({ uid, version, addKey: lines });
+                    // const res = await addKey({ uid, version, addKey: lines });
+                    // if (res) {
+                    //     handleClose();
+                    //     setUpdate({ type: 1 });
+                    // }
+                    const res = await saveListing({ ...data, keys: lines });
                     if (res) {
+                        if (listingBuildType === 1) {
+                            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        } else {
+                            navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                        }
+                        setVersion(res.version);
+                        setUid(res.uid);
                         handleClose();
-                        setUpdate({ type: 1 });
+                        setUpdate({});
                     }
                 } else {
                     // 修改了站点所属
                     const res = await saveListing({ ...data, keys: lines });
-                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
-                    setVersion(res.version);
-                    setUid(res.uid);
-                    handleClose();
+                    if (res) {
+                        if (listingBuildType === 1) {
+                            navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                        } else {
+                            navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                        }
+                        setVersion(res.version);
+                        setUid(res.uid);
+                        handleClose();
+                        setUpdate({});
+                    }
                 }
             } else {
                 const res = await saveListing({ ...data, keys: lines });
-                navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                if (listingBuildType === 1) {
+                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                } else {
+                    navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                }
                 setVersion(res.version);
                 setUid(res.uid);
                 handleClose();
+                // 路由变了 会自动请求详情接口，不用手动触发
             }
         } else {
             const res = await importDict({
                 ...data,
-                version
+                dictUid: checked
             });
             if (res) {
                 if (res) {
@@ -106,9 +132,13 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                     handleClose();
                     if (uid) {
                         // 更新
-                        setUpdate({ type: 1 });
+                        setUpdate({});
                     }
-                    navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                    if (listingBuildType === 1) {
+                        navigate(`/listingBuilder?uid=${res.uid}&version=${res.version}`);
+                    } else {
+                        navigate(`/listingBuilderOptimize?uid=${res.uid}&version=${res.version}`);
+                    }
                 }
             }
         }
@@ -179,8 +209,10 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                         />
                     </div>
                     <div className="flex items-center mt-4">
-                        <HelpOutlineIcon className="text-base mr-1" />
-                        <span className="text-[#999]">不知道关键词如何来？可使用拓展流量词</span>
+                        <HelpOutlineIcon className="text-base mr-1 text-[#999]" />
+                        <span className="text-[#999]">
+                            不知道关键词如何来？可使用<a href="/termSearch">拓展流量词</a>
+                        </span>
                     </div>
                 </TabPanel>
                 <TabPanel value={tab} index={1}>

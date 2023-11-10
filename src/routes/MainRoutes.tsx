@@ -42,8 +42,19 @@ const ChatMarket = Loadable(lazy(() => import('views/chat/market')));
 // listing-builder
 const ListingBuilder = Loadable(lazy(() => import('views/pages/listing-builder/builder')));
 const ListingBuilderPage = Loadable(lazy(() => import('views/pages/listing-builder/page')));
-//拓展词搜索
-const TermSearch = Loadable(lazy(() => import('views/pages/termSearch')));
+const ThesaurusDetail = Loadable(lazy(() => import('views/pages/thesaurusDetail')));
+
+//小红书图文
+const SmallRedBook = Loadable(lazy(() => import('views/pages/smallRedBook/index')));
+//批量小红书图文
+const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
+
+const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
+
+const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
+
+//词库
+const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 
@@ -152,12 +163,36 @@ const MainRoutes = {
             element: <ListingBuilder />
         },
         {
+            path: '/listingBuilderOptimize',
+            element: <ListingBuilder />
+        },
+        {
             path: '/ListingBuilderPage',
             element: <ListingBuilderPage />
         },
         {
-            path: '/termSearch',
-            element: <TermSearch />
+            path: '/thesaurus',
+            element: <Thesaurus />
+        },
+        {
+            path: '/thesaurusDetail',
+            element: <ThesaurusDetail />
+        },
+        {
+            path: '/smallRedBook',
+            element: <SmallRedBook />
+        },
+        {
+            path: '/batchSmallRedBook',
+            element: <BatchSmallRedBook />
+        },
+        {
+            path: '/redBookTaskList',
+            element: <RedBookTaskList />
+        },
+        {
+            path: '/redBookContentList',
+            element: <RedBookContentList />
         }
     ]
 };

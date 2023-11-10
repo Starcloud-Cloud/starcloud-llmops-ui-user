@@ -1,4 +1,16 @@
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Checkbox, Paper } from '@mui/material';
+import {
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TableSortLabel,
+    Checkbox,
+    Paper,
+    Tooltip
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -22,6 +34,7 @@ type TableEnhancedCreateDataType = {
     month: string;
     updatedTime: string;
     use: any[];
+    status: number;
 };
 
 // table filter
@@ -58,7 +71,7 @@ const headCells = [
     // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     // { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'use', numeric: false, disablePadding: true, label: '使用分布' }
+    { id: 'use', numeric: true, disablePadding: true, label: '使用分布' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -122,7 +135,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
 
     const [rows, setRows] = useState<any[]>([]);
 
-    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list } = useListing();
+    const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list, setEnableAi } =
+        useListing();
 
     // 获取详情
     useEffect(() => {
@@ -143,7 +157,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                         setDetail((pre: any) => ({
                             ...pre,
                             keywordMetaData: res.keywordMetaData,
-                            keywordResume: res.keywordResume,
+                            keywordResume: res.keywordMetaData.map((item: any) => item.keyword) || [],
                             draftConfig: res.draftConfig
                         }));
                         setItemScore(res.itemScore);
@@ -151,7 +165,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                             setUpdate({ type: 1 });
                         }
                     } else {
-                        setDetail(res);
+                        setDetail({ ...res, keywordResume: res?.keywordMetaData?.map((item: any) => item?.keyword) || [] });
+                        setEnableAi(res?.draftConfig?.enableAi);
                         setItemScore({
                             ...res.itemScore,
                             score: res.score,
@@ -253,22 +268,22 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
         return (
             <div>
                 <div>
-                    <span>标题：</span>
-                    <span>{filterTitle?.[0]?.num}</span>
+                    <span>标&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;题：</span>
+                    <span>{filterTitle?.[0]?.num || 0}次</span>
                 </div>
                 {sortedFive.map((item) => (
                     <div>
-                        <span>{`五点描述${item.index}`}:</span>
-                        <span>{item?.num}</span>
+                        <span>{`五点描述${item.index}`}：</span>
+                        <span>{item?.num || 0}次</span>
                     </div>
                 ))}
                 <div>
-                    <span>产品描述:</span>
-                    <span>{filterProduct?.[0]?.num}</span>
+                    <span>产品描述：</span>
+                    <span>{filterProduct?.[0]?.num || 0}次</span>
                 </div>
                 <div>
-                    <span>搜索词:</span>
-                    <span>{filterSearch?.[0]?.num}</span>
+                    <span>搜&nbsp;&nbsp;索&nbsp;&nbsp;词：</span>
+                    <span>{filterSearch?.[0]?.num || 0}次</span>
                 </div>
             </div>
         );
@@ -287,25 +302,25 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                 case 1:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <RadioButtonUncheckedIcon />
+                            <RadioButtonUncheckedIcon className="cursor-pointer text-base" />
                         </Popover>
                     );
                 case 2:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <CheckCircleIcon />
+                            <CheckCircleIcon className="cursor-pointer text-base" />
                         </Popover>
                     );
                 case 3:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate allowHalf count={1} />
+                            <Rate className="!cursor-pointer text-base" allowHalf value={0.5} disabled count={1} />
                         </Popover>
                     );
                 case 4:
                     return (
                         <Popover content={() => keywordUseModal(keyword)} title="使用分布">
-                            <Rate count={1} />
+                            <Rate className="!cursor-pointer text-base" disabled value={1} count={1} />
                         </Popover>
                     );
                 default:
@@ -360,7 +375,17 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                         />
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0">
-                                        {row.keyword}
+                                        {row.status === 10 ? (
+                                            <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
+                                        ) : (
+                                            <div>
+                                                <Tooltip title={'正在请求数据'}>
+                                                    <span className="line-clamp-1  text-[#bec2cc] inline cursor-pointer">
+                                                        {row.keyword}
+                                                    </span>
+                                                </Tooltip>
+                                            </div>
+                                        )}
                                     </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
                                     <TableCell align="left" className="py-[6px] px-0">
@@ -371,8 +396,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                     {/* <TableCell align="left" className="py-[6px] px-0">
                                         {row.keyword}
                                     </TableCell> */}
-                                    <TableCell align="left" className="py-[6px] px-0">
-                                        {handleUse(row.keyword)}
+                                    <TableCell align="right" className="py-[6px] px-0">
+                                        <div className="flex items-center justify-center">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>
                             );

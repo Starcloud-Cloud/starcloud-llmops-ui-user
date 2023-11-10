@@ -59,11 +59,16 @@ type ListingContextType = {
     itemScore: any;
     fiveLen: number;
     keywordHighlightRef: any;
+    setListingParam: (listingParam: any) => any;
+    listingParam: any;
+    listingBuildType: number;
+    asin: string;
+    setAsin: (asin: string) => void;
 };
 
 export const ListingProvider = ({ children }: { children: React.ReactElement }) => {
     const [uid, setUid] = useState('');
-    const [version, setVersion] = useState<number | undefined>();
+    const [version, setVersion] = useState<number | undefined>(1);
     const [country, setCountry] = useState({
         key: COUNTRY_LIST?.['0']?.key,
         icon: COUNTRY_LIST?.['0']?.icon,
@@ -75,6 +80,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const [detail, setDetail] = useState<any>(null);
     const [update, setUpdate] = useState<any>({});
     const [itemScore, setItemScore] = useState<any>({});
+    const [listingParam, setListingParam] = useState<any>({}); //
+    const [asin, setAsin] = useState<string>('');
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -82,6 +89,14 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     const queryVersion = searchParams.get('version');
 
     const keywordHighlightRef = useRef<any>(null);
+
+    const listingBuildType = useMemo(() => {
+        if (location.pathname === '/listingBuilder') {
+            return 1;
+        } else {
+            return 2;
+        }
+    }, [location]);
 
     useEffect(() => {
         if (queryVersion && queryUid) {
@@ -118,7 +133,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                         word: 0,
                         value: '',
                         row: 4,
-                        btnText: 'AI生成五点描述',
+                        btnText: 'AI生成描述(消耗1点)',
                         enable: true,
                         keyword: [],
                         grade: 0
@@ -131,6 +146,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             copyList[0].enable = newDetail.titleConfig?.ignoreUse;
             copyList[0].keyword = newDetail.titleConfig?.recommendKeys?.map((item: any) => ({ text: item.keyword })) || [];
             copyList[0].value = detail.title;
+            copyList[0].character = detail.title?.length || 0;
+            copyList[0].word = detail.title?.trim() === '' ? 0 : detail?.title?.trim()?.split(' ')?.length;
 
             //描述
             const descIndex = newDetail.fiveDescNum + 1;
@@ -141,6 +158,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     recommend: 1
                 })) || [];
             copyList[descIndex].value = detail.productDesc;
+            copyList[descIndex].character = detail.productDesc?.length || 0;
+            copyList[descIndex].word = detail.productDesc?.trim() === '' ? 0 : detail?.productDesc?.trim()?.split(' ')?.length;
 
             // 搜索
             const searchIndex = newDetail.fiveDescNum + 2;
@@ -151,6 +170,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                     recommend: 1
                 })) || [];
             copyList[searchIndex].value = detail.searchTerm;
+            copyList[searchIndex].character = detail.searchTerm?.length || 0;
+            copyList[searchIndex].word = detail.searchTerm?.trim() === '' ? 0 : detail?.searchTerm?.trim()?.split(' ')?.length;
 
             // // 5点描述
             newDetail.fiveDescConfig &&
@@ -166,6 +187,9 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 Object.keys(detail.fiveDesc)?.forEach((key) => {
                     const index = Number(key);
                     copyList[index].value = detail?.fiveDesc?.[index];
+                    copyList[index].character = detail?.fiveDesc?.[index]?.length || 0;
+                    copyList[index].word =
+                        detail?.fiveDesc?.[index]?.trim() === '' ? 0 : detail?.fiveDesc?.[index]?.trim()?.split(' ')?.length;
                 });
 
             setList(copyList);
@@ -288,7 +312,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
             version,
             endpoint: country.key,
             draftConfig: {
-                enableAi: true,
+                enableAi,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
             },
             title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
@@ -325,7 +349,12 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                 setItemScore,
                 itemScore,
                 fiveLen,
-                keywordHighlightRef
+                keywordHighlightRef,
+                setListingParam,
+                listingParam,
+                listingBuildType,
+                setAsin,
+                asin
             }}
         >
             {children}

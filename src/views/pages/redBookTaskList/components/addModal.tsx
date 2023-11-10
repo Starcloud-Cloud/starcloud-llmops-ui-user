@@ -122,7 +122,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
     const [data, setData] = useState<any[]>([]);
     const [editOpen, setEditOpen] = useState(-1);
     const getList = async () => {
-        if (!editOpen) {
+        if (editOpen === -1) {
             const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
             setStyle(result[0]?.value);
             setStyleList(result);
@@ -131,8 +131,6 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         }
     };
     useEffect(() => {
-        console.log(style);
-
         if (style) {
             xhsApp(style).then((res) => {
                 setVariable(res);

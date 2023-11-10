@@ -100,6 +100,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
                     >
                         {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
                             <TableSortLabel
@@ -440,7 +441,7 @@ const RedBookTaskList: React.FC = () => {
                                             <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="center" className="sticky right-0 bg-white">
                                         <div className="w-[180px]">
                                             <Tooltip title={'编辑'}>
                                                 <IconButton

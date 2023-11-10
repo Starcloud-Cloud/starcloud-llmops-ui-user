@@ -93,10 +93,11 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                     <Button
                         type="text"
                         onClick={() => {
+                            setEditOpen(index);
+                            setAddOpen(true);
                             setStyle(row.id);
                             setVariable(row.variable);
                             setImageStyleData(row.config);
-                            setAddOpen(true);
                         }}
                     >
                         编辑
@@ -119,14 +120,19 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         }
     ];
     const [data, setData] = useState<any[]>([]);
+    const [editOpen, setEditOpen] = useState(-1);
     const getList = async () => {
-        const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
-        setStyle(result[0]?.value);
-        setStyleList(result);
-        const res = await imageTemplates();
-        setTypeList(res);
+        if (!editOpen) {
+            const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
+            setStyle(result[0]?.value);
+            setStyleList(result);
+            const res = await imageTemplates();
+            setTypeList(res);
+        }
     };
     useEffect(() => {
+        console.log(style);
+
         if (style) {
             xhsApp(style).then((res) => {
                 setVariable(res);
@@ -137,6 +143,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         if (addOpen) {
             getList();
         } else {
+            setStyle('');
             setActiveKey('0');
             setVariable(null);
             setImageStyleData([
@@ -377,16 +384,29 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                 return false;
                                             }
                                             const newList = _.cloneDeep(data);
-                                            newList.push({
-                                                id: style,
-                                                name: variable.name,
-                                                desc: variable.description,
-                                                variable: variable,
-                                                variables: variable.variables,
-                                                config: imageStyleData
-                                            });
-                                            setData(newList);
-                                            setAddOpen(false);
+                                            if (editOpen === -1) {
+                                                newList.push({
+                                                    id: style,
+                                                    name: variable.name,
+                                                    desc: variable.description,
+                                                    variable: variable,
+                                                    variables: variable.variables,
+                                                    config: imageStyleData
+                                                });
+                                                setData(newList);
+                                                setAddOpen(false);
+                                            } else {
+                                                newList[editOpen] = {
+                                                    id: style,
+                                                    name: variable.name,
+                                                    desc: variable.description,
+                                                    variable: variable,
+                                                    variables: variable.variables,
+                                                    config: imageStyleData
+                                                };
+                                                setData(newList);
+                                                setAddOpen(false);
+                                            }
                                         }}
                                     >
                                         保存
@@ -395,7 +415,15 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                             </CardActions>
                         </MainCard>
                     </Modals>
-                    <Button onClick={() => setAddOpen(true)} className="mb-[20px]" type="primary" icon={<PlusOutlined rev={undefined} />}>
+                    <Button
+                        onClick={() => {
+                            setEditOpen(-1);
+                            setAddOpen(true);
+                        }}
+                        className="mb-[20px]"
+                        type="primary"
+                        icon={<PlusOutlined rev={undefined} />}
+                    >
                         新增
                     </Button>
                     <Table size="small" columns={columns} dataSource={data} />

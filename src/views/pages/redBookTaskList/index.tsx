@@ -1,5 +1,5 @@
 import { Button, IconButton, Tooltip } from '@mui/material';
-import { Tag } from 'antd';
+import { Popover, Spin, Tag } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -28,6 +28,9 @@ import { getAccessToken } from 'utils/auth';
 const { base_url } = config;
 import AddModal from './modal';
 import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
+import copy from 'clipboard-copy';
+import ReplayIcon from '@mui/icons-material/Replay';
+import imgLoading from 'assets/images/picture/loading.gif';
 
 export interface DraftConfig {}
 
@@ -66,7 +69,7 @@ const headCells = [
     { id: 'id', numeric: false, disablePadding: false, label: 'ID' },
     { id: 'title', numeric: false, disablePadding: false, label: '计划名称' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '渠道' },
-    { id: 'score', numeric: false, disablePadding: false, label: '成功数/总数' },
+    { id: 'score', numeric: false, disablePadding: false, label: '成功数/失败数/总数' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
     { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -100,9 +103,9 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{ pl: 3, whiteSpace: 'nowrap' }}
-                        className={headCell.label === '操作' ? 'sticky right-0 bg-white' : ''}
+                        className={headCell.label === '操作' ? 'sticky right-0 bg-white !px-2' : '!px-2'}
                     >
-                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                        {[''].includes(headCell.id) ? (
                             <TableSortLabel
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
@@ -138,6 +141,7 @@ const RedBookTaskList: React.FC = () => {
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
+    const [loading, setLoading] = useState(false);
 
     const [open, setOpen] = useState(false);
     const [templateList, setTemplateList] = useState<any[]>([]);
@@ -312,60 +316,106 @@ const RedBookTaskList: React.FC = () => {
     return (
         <MainCard
             content={false}
-            title="创作计划"
-            secondary={
+            title={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
-                        新建创作计划
-                    </Button>
-                    {/* <Divider type={'vertical'} />
-                    <Button
-                        disabled={selected.length === 0}
-                        className="ml-1"
-                        size="small"
-                        color="secondary"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => {
-                            setDelVisible(true);
-                            setDelType(2);
-                        }}
-                        variant="contained"
-                    >
-                        批量删除
-                    </Button> */}
+                    <div className="flex justify-between items-center">
+                        <div>创作计划</div>
+                        <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+                            新建创作计划
+                        </Button>
+                    </div>
+                    <div className="flex justify-end mt-1">
+                        <Button
+                            className="ml-1"
+                            size="small"
+                            color="secondary"
+                            startIcon={<ReplayIcon />}
+                            onClick={() => {
+                                setLoading(true);
+                                const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
+                                if (orderBy) {
+                                    pageVO.sortField = orderBy;
+                                    pageVO.asc = order === 'asc';
+                                }
+                                planPage({ ...pageVO })
+                                    .then((res) => {
+                                        setLoading(false);
+                                        const fetchedRows = res.list;
+                                        setRows([...fetchedRows]);
+                                        setTotal(res?.page?.total);
+                                    })
+                                    .catch((error) => {
+                                        setLoading(false);
+                                        console.error(error);
+                                    });
+                            }}
+                            variant="contained"
+                        >
+                            更新列表
+                        </Button>
+                    </div>
                 </div>
             }
+            // secondary={
+            //     <div>
+            //         <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+            //             新建创作计划
+            //         </Button>
+            //         {/* <Divider type={'vertical'} />
+            //         <Button
+            //             disabled={selected.length === 0}
+            //             className="ml-1"
+            //             size="small"
+            //             color="secondary"
+            //             startIcon={<DeleteIcon />}
+            //             onClick={() => {
+            //                 setDelVisible(true);
+            //                 setDelType(2);
+            //             }}
+            //             variant="contained"
+            //         >
+            //             批量删除
+            //         </Button> */}
+            //     </div>
+            // }
         >
             <TableContainer>
-                <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-                    <EnhancedTableHead
-                        numSelected={selected.length}
-                        order={order}
-                        orderBy={orderBy}
-                        onSelectAllClick={handleSelectAllClick}
-                        onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
-                    />
-                    <TableBody>
-                        {rows.map((row, index) => {
-                            if (typeof row === 'number') {
-                                return null; // 忽略数字类型的行
-                            }
-                            console.log(row, 'row');
+                <Spin tip="请求中..." size={'large'} spinning={loading} indicator={<img width={60} src={imgLoading} />}>
+                    <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                        <EnhancedTableHead
+                            numSelected={selected.length}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                            rowCount={rows.length}
+                        />
+                        <TableBody>
+                            {rows.map((row, index) => {
+                                if (typeof row === 'number') {
+                                    return null; // 忽略数字类型的行
+                                }
+                                console.log(row, 'row');
 
-                            const isItemSelected = isSelected(row.uid);
-                            const labelId = `enhanced-table-checkbox-${index}`;
+                                const isItemSelected = isSelected(row.uid);
+                                const labelId = `enhanced-table-checkbox-${index}`;
 
-                            return (
-                                <TableRow
-                                    hover
-                                    key={row.id}
-                                    role="checkbox"
-                                    aria-checked={isItemSelected}
-                                    tabIndex={-1}
-                                    selected={isItemSelected}
-                                >
-                                    {/* <TableCell padding="checkbox">
+                                return (
+                                    <TableRow
+                                        hover
+                                        key={row.id}
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        selected={isItemSelected}
+                                        sx={{
+                                            '.MuiTableCell-root': {
+                                                paddingLeft: '8px',
+                                                paddingRight: '8px'
+                                            }
+                                        }}
+                                    >
+                                        {/* <TableCell padding="checkbox">
                                         <Checkbox
                                             onClick={(event) => handleClick(event, row.id)}
                                             color="primary"
@@ -375,146 +425,181 @@ const RedBookTaskList: React.FC = () => {
                                             }}
                                         />
                                     </TableCell> */}
-                                    <TableCell align="center">
-                                        <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 mx-auto">{row.uid}</span>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 w-[120px] mx-auto">{row.name}</span>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex items-center justify-center  w-[100px] ">小红书</div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex items-center justify-center">
-                                            <div className="flex">
-                                                <div>{row?.successCount || 0}</div>/
-                                                <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">
+                                                <Popover
+                                                    content={
+                                                        <div>
+                                                            <div>{row.uid}</div>
+                                                        </div>
+                                                    }
+                                                    title="内容ID"
+                                                >
+                                                    <div className="line-clamp-1 w-[100px] break-words cursor-pointer">{row.uid}</div>
+                                                </Popover>
+
+                                                <Tooltip title={'复制'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(row.uid);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        <ContentCopyIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Tag
-                                            color={
-                                                row.status === 'PENDING'
-                                                    ? 'green'
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title={row.name}>
+                                                <span className="line-clamp-1 w-[250px] mx-auto">{row.name}</span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">小红书</div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">
+                                                <div className="flex">
+                                                    <div>{row?.successCount || 0}</div>/<div>{row.failureCount || 0}</div>/
+                                                    <div>{row.total || 0}</div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Tag
+                                                color={
+                                                    row.status === 'PENDING'
+                                                        ? 'green'
+                                                        : row.status === 'RUNNING'
+                                                        ? 'green'
+                                                        : row.status === 'PAUSE'
+                                                        ? 'warning'
+                                                        : row.status === 'CANCELED'
+                                                        ? 'warning'
+                                                        : row.status === 'COMPLETE'
+                                                        ? 'blue'
+                                                        : row.status === 'FAILURE'
+                                                        ? 'error'
+                                                        : 'default'
+                                                }
+                                            >
+                                                {row.status === 'PENDING'
+                                                    ? '待执行'
                                                     : row.status === 'RUNNING'
-                                                    ? 'green'
+                                                    ? '执行中'
                                                     : row.status === 'PAUSE'
-                                                    ? 'warning'
+                                                    ? '已暂停'
                                                     : row.status === 'CANCELED'
-                                                    ? 'warning'
+                                                    ? '已取消'
                                                     : row.status === 'COMPLETE'
-                                                    ? 'blue'
+                                                    ? '已完成'
                                                     : row.status === 'FAILURE'
-                                                    ? 'error'
-                                                    : 'default'
-                                            }
-                                        >
-                                            {row.status === 'PENDING'
-                                                ? '待执行'
-                                                : row.status === 'RUNNING'
-                                                ? '执行中'
-                                                : row.status === 'PAUSE'
-                                                ? '已暂停'
-                                                : row.status === 'CANCELED'
-                                                ? '已取消'
-                                                : row.status === 'COMPLETE'
-                                                ? '已完成'
-                                                : row.status === 'FAILURE'
-                                                ? '已失败'
-                                                : ''}
-                                        </Tag>
-                                    </TableCell>
-                                    <TableCell align="center">{row.creator}</TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex flex-col items-center">
-                                            <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex flex-col items-center">
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center" className="sticky right-0 bg-white">
-                                        <div className="w-[180px]">
-                                            <Tooltip title={'编辑'}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        handleEdit(row.uid);
-                                                    }}
-                                                >
-                                                    <EditIcon className="text-base" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                            <Tooltip title={'查看操作任务'}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        navigate(`/redBookContentList?uid=${row.uid}&name=${row.name}`);
-                                                    }}
-                                                >
-                                                    <ReorderIcon className="text-base" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                    ? '已失败'
+                                                    : ''}
+                                            </Tag>
+                                        </TableCell>
+                                        <TableCell align="center">{row.creator}</TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex flex-col items-center">
+                                                <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
+                                                <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex flex-col items-center">
+                                                <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
+                                                <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell align="center" className="sticky right-0 bg-white">
+                                            <div className="min-w-[180px]">
+                                                <Tooltip title={'编辑'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            handleEdit(row.uid);
+                                                        }}
+                                                    >
+                                                        <EditIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                <Tooltip title={'查看操作任务'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            navigate(`/redBookContentList?uid=${row.uid}&name=${row.name}`);
+                                                        }}
+                                                    >
+                                                        <ReorderIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'开始'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                 <PlayCircleOutlineIcon className="text-base" />
                                                 <StopIcon className="text-base" />
                                             </IconButton>
                                         </Tooltip> */}
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                            <Tooltip title={'复制'}>
-                                                <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                    <ContentCopyIcon className="text-base" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                <Tooltip title={'复制'}>
+                                                    <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
+                                                        <ContentCopyIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
 
-                                            <Tooltip title={'删除'}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        setDelType(0);
-                                                        setDelVisible(true);
-                                                        setRow(row);
-                                                    }}
-                                                >
-                                                    <DeleteIcon className="text-base" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                            <Tooltip title={'执行'}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        setExecuteOpen(true);
-                                                        setRow(row);
-                                                    }}
-                                                >
-                                                    <PlayCircleOutlineIcon className="text-base" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
+                                                <Tooltip title={'删除'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            setDelType(0);
+                                                            setDelVisible(true);
+                                                            setRow(row);
+                                                        }}
+                                                    >
+                                                        <DeleteIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                <Tooltip title={'执行'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            setExecuteOpen(true);
+                                                            setRow(row);
+                                                        }}
+                                                    >
+                                                        <PlayCircleOutlineIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </Spin>
             </TableContainer>
 
             {/* table pagination */}

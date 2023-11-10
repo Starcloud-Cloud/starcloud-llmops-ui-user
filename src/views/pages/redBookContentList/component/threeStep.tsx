@@ -6,7 +6,8 @@ import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 // import { fetchRequestCanCancel } from 'utils/fetch';
-// import { createRedBookImg, doCreateText } from '../../../../api/redBook/index';
+import { createRedBookImg, doCreateText, retryContent } from '../../../../api/redBook/index';
+import { set } from 'date-fns';
 // import { dispatch } from 'store';
 // import { openSnackbar } from 'store/slices/snackbar';
 
@@ -103,6 +104,15 @@ export const ThreeStep = ({ data }: { data: any }) => {
         // await handleCreateText();
     };
 
+    const doRetry = async () => {
+        const res = await retryContent(data.businessUid);
+        if (res) {
+            setText(res.copyWritingContent);
+            setTitle(res.copyWritingTitle);
+            setImages(res.pictureContent || []);
+        }
+    };
+
     const handleCopy = async () => {};
 
     return (
@@ -117,7 +127,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                 }}
                 extra={
                     <>
-                        <Button onClick={handleReFetch}>重试</Button>
+                        <Button onClick={doRetry}>重新生成</Button>
                         {/* <Divider type="vertical" /> */}
                         {/* <Button onClick={handleCopy}>复制</Button> */}
                     </>

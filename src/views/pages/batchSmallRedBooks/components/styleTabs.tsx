@@ -1,6 +1,7 @@
 import { Tabs, Button } from 'antd';
 import { useState, useRef } from 'react';
 import EditStyle from './EditStyle';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const StyleTabs = ({
@@ -79,7 +80,14 @@ const StyleTabs = ({
                 onEdit={onEdit}
                 items={imageStyleData.map((item: any, i: number) => {
                     return {
-                        label: item.name,
+                        label: (
+                            <div className="flex items-center">
+                                <span style={{ display: !item.id ? 'block' : 'none' }} className=" text-[#ff4d4f] text-[16px]">
+                                    <CloseCircleOutlined rev={undefined} />
+                                </span>
+                                {item.name}
+                            </div>
+                        ),
                         key: i.toString(),
                         closable: i === 0 ? false : true,
                         children: (

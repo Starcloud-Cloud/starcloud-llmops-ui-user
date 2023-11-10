@@ -356,7 +356,7 @@ const RedBookContentList: React.FC = () => {
                                         />
                                     </TableCell> */}
                                         <TableCell align="center">
-                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.businessUid}</span>
+                                            <div className="line-clamp-1 w-[100px] break-words">{row.businessUid}</div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="flex flex-col">
@@ -430,7 +430,7 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center" className="sticky right-0 bg-white">
-                                            <div className="flex items-center w-[130px]">
+                                            <div className="flex items-center w-[95px]">
                                                 {/* <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"

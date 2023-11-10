@@ -19,3 +19,7 @@ export const getContentDetail = (businessUid: string) => {
 export const delContent = (businessUid: string) => {
     return request.delete({ url: `/llm/xhs/content/delete/${businessUid}` });
 };
+
+export const retryContent = (businessUid: string) => {
+    return request.get({ url: `/llm/xhs/content/retry/${businessUid}` });
+};

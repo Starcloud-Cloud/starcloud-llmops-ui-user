@@ -28,6 +28,7 @@ import { DetailModal } from './component/detailModal';
 import { delContent, getContentPage } from 'api/redBook';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import SearchIcon from '@mui/icons-material/Search';
+import { retryContent } from '../../../api/redBook/index';
 
 const { base_url } = config;
 
@@ -45,7 +46,7 @@ const headCells = [
     { id: 'createTemplate', numeric: false, disablePadding: false, label: '生成参数' },
     { id: 'copyWritingStatus', numeric: false, disablePadding: false, label: ' 文案生成状态' },
     { id: 'copyWritingTitle', numeric: false, disablePadding: false, label: '文案内容' },
-    { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(毫秒)' },
+    { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(秒)' },
     { id: 'pictureStatus', numeric: false, disablePadding: false, label: ' 图片生成状态' },
     { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
     { id: 'pictureContent', numeric: false, disablePadding: false, label: '图片内容' },
@@ -297,6 +298,13 @@ const RedBookContentList: React.FC = () => {
             });
     };
 
+    const doRetry = async (businessUid: string) => {
+        const res = await retryContent(businessUid);
+        if (res) {
+            forceUpdate();
+        }
+    };
+
     return (
         <div className="redBookContentList">
             <MainCard
@@ -474,7 +482,7 @@ const RedBookContentList: React.FC = () => {
                                                 title="详情"
                                             >
                                                 <div className="flex flex-col items-center cursor-pointer">
-                                                    {row.copyWritingExecuteTime}
+                                                    {row.copyWritingExecuteTime / 1000}
                                                 </div>
                                             </Popover>
                                         </TableCell>
@@ -517,7 +525,9 @@ const RedBookContentList: React.FC = () => {
                                                 }
                                                 title="详情"
                                             >
-                                                <div className="flex flex-col items-center cursor-pointer">{row.pictureExecuteTime}</div>
+                                                <div className="flex flex-col items-center cursor-pointer">
+                                                    {row.pictureExecuteTime / 1000}
+                                                </div>
                                             </Popover>
                                         </TableCell>
                                         <TableCell align="center">
@@ -563,9 +573,7 @@ const RedBookContentList: React.FC = () => {
                                                         aria-label="delete"
                                                         size="small"
                                                         onClick={() => {
-                                                            setDelType(0);
-                                                            setDelVisible(true);
-                                                            setRow(row);
+                                                            doRetry(row.businessUid);
                                                         }}
                                                     >
                                                         <ReplayIcon className="text-base" />

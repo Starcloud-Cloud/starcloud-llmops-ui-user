@@ -426,8 +426,7 @@ const RedBookTaskList: React.FC = () => {
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
                                             <div className="flex">
-                                                <div>{row?.successCount || 0}</div>/
-                                                <div>{row.successCount + row.failureCount + row.pendingCount || 0}</div>
+                                                <div>{row?.successCount || 0}</div>/<div>{row.total || 0}</div>
                                             </div>
                                         </div>
                                     </TableCell>

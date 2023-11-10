@@ -1077,7 +1077,7 @@ export const PictureCreateMenu = ({
             <PermissionUpgradeModal
                 open={openToken}
                 handleClose={() => setOpenToken(false)}
-                title={'当前当前魔法豆不足，升级会员，立享五折优惠！使用的魔法豆不足'}
+                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
             />
         </>
     );

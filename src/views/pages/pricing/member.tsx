@@ -526,7 +526,7 @@ const Price1 = () => {
                     ...res
                 };
             });
-            if (res.discountCouponStatus === false) {
+            if (res.discountCouponStatus === false && discountCode) {
                 dispatch(
                     openSnackbar({
                         open: true,

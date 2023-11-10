@@ -97,8 +97,18 @@ const BatcSmallRedBooks = () => {
     const [typeList, setTypeList] = useState<any[]>([]); //选择格式的列表（四宫格、六宫格、九宫格）
     useEffect(() => {
         if (searchParams.get('uid')) {
-            planGet(searchParams.get('uid')).then((res) => {
-                if (res) {
+            planGet(searchParams.get('uid')).then((result) => {
+                if (result) {
+                    const res = _.cloneDeep(result);
+                    res.config.imageStyleList.forEach((item: any) => {
+                        item.templateList.forEach((el: any, index: number) => {
+                            if (index === 0) {
+                                el.name = '首图';
+                            } else {
+                                el.name = `图片 ${index}`;
+                            }
+                        });
+                    });
                     setValue(res.name);
                     setDetailData(res.config);
                     setTargetKeys(res.config?.copyWritingList);
@@ -148,18 +158,17 @@ const BatcSmallRedBooks = () => {
             setMockData(res);
         });
     }, []);
-    const digui = (data: number) => {
+
+    const addStyle = () => {
         let newData = _.cloneDeep(detailData);
         if (!newData.imageStyleList) {
             newData.imageStyleList = [];
         }
-        if (newData.imageStyleList.every((item: any) => item.name.indexOf(data.toString()) === -1)) {
-            if (!newData.imageStyleList) {
-                newData.imageStyleList = [];
-            }
+        const newList = newData?.imageStyleList?.map((item: any) => item.name.split(' ')[1]);
+        if (newList.every((item: any) => !item)) {
             newData.imageStyleList.push({
                 id: uuidv4(),
-                name: `风格 ${data}`,
+                name: `风格 1`,
                 templateList: [
                     {
                         id: '',
@@ -168,14 +177,21 @@ const BatcSmallRedBooks = () => {
                     }
                 ]
             });
-            setDetailData(newData);
         } else {
-            digui(newTabIndex.current++);
+            newData.imageStyleList.push({
+                id: uuidv4(),
+                name: `风格 ${newList?.sort((a: any, b: any) => b - a)[0] * 1 + 1}`,
+                templateList: [
+                    {
+                        id: '',
+                        name: '首图',
+                        variables: []
+                    }
+                ]
+            });
         }
-    };
 
-    const addStyle = () => {
-        digui(newTabIndex.current++);
+        setDetailData(newData);
     };
 
     //保存

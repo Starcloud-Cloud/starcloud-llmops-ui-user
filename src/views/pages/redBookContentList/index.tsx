@@ -522,10 +522,12 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <div className="w-[300px] overflow-auto">
+                                            <div className="w-[300px] overflow-x-auto flex justify-center">
                                                 <Image.PreviewGroup preview={{ rootClassName: 'previewRoot' }}>
                                                     {row.pictureContent?.map((item: any, index: any) => (
-                                                        <Image className="object-contain" height={80} width={80} src={item.url} />
+                                                        <div className="w-[80px] h-[80px]" key={index}>
+                                                            <Image width={80} height={80} className="object-contain" src={item.url} />
+                                                        </div>
                                                     ))}
                                                 </Image.PreviewGroup>
                                             </div>

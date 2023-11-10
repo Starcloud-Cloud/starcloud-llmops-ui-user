@@ -1,5 +1,5 @@
 import { Button, IconButton, Tooltip } from '@mui/material';
-import { Tag } from 'antd';
+import { Popover, Tag } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -28,6 +28,7 @@ import { getAccessToken } from 'utils/auth';
 const { base_url } = config;
 import AddModal from './modal';
 import { listTemplates, planPage, planDelete, planCopy, planExecute } from 'api/redBook/batchIndex';
+import copy from 'clipboard-copy';
 
 export interface DraftConfig {}
 
@@ -376,9 +377,43 @@ const RedBookTaskList: React.FC = () => {
                                         />
                                     </TableCell> */}
                                     <TableCell align="center">
-                                        <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 mx-auto">{row.uid}</span>
-                                        </Tooltip>
+                                        <div className="flex">
+                                            <Popover
+                                                content={
+                                                    <div>
+                                                        <div>{row.uid}</div>
+                                                    </div>
+                                                }
+                                                title="内容ID"
+                                            >
+                                                <div className="line-clamp-1 w-[100px] break-words cursor-pointer">{row.uid}</div>
+                                            </Popover>
+
+                                            <Tooltip title={'复制'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        copy(row.uid);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '复制成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                transition: 'SlideLeft'
+                                                            })
+                                                        );
+                                                    }}
+                                                >
+                                                    <ContentCopyIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>

@@ -1,4 +1,5 @@
 import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import copy from 'clipboard-copy';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -25,6 +26,8 @@ import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 import { DetailModal } from './component/detailModal';
 import { delContent, getContentPage } from 'api/redBook';
+import CopyToClipboard from 'react-copy-to-clipboard';
+import SearchIcon from '@mui/icons-material/Search';
 
 const { base_url } = config;
 
@@ -44,6 +47,7 @@ const headCells = [
     { id: 'copyWritingTitle', numeric: false, disablePadding: false, label: '文案内容' },
     { id: 'copyWritingExecuteTime', numeric: false, disablePadding: false, label: '文案耗时(毫秒)' },
     { id: 'pictureStatus', numeric: false, disablePadding: false, label: ' 图片生成状态' },
+    { id: 'pictureNum', numeric: false, disablePadding: false, label: '图片数量' },
     { id: 'pictureContent', numeric: false, disablePadding: false, label: '图片内容' },
     { id: 'pictureExecuteTime', numeric: false, disablePadding: false, label: '图片耗时(毫秒)' },
     { id: 'claim', numeric: false, disablePadding: false, label: '是否被认领' },
@@ -297,7 +301,14 @@ const RedBookContentList: React.FC = () => {
         <div className="redBookContentList">
             <MainCard
                 content={false}
-                title={`创作内容-${name}`}
+                title={
+                    <div>
+                        <a className="cursor-pointer text-[blue]" onClick={() => navigate('/redBookTaskList')}>
+                            返回
+                        </a>{' '}
+                        / <span>创作内容 / {name}</span>
+                    </div>
+                }
                 secondary={
                     <div>
                         {/* <Button
@@ -356,29 +367,63 @@ const RedBookContentList: React.FC = () => {
                                         />
                                     </TableCell> */}
                                         <TableCell align="center">
-                                            <span className="line-clamp-1 w-[300px] mx-auto">{row.businessUid}</span>
+                                            <div className="flex">
+                                                <Popover
+                                                    content={
+                                                        <div>
+                                                            <div>{row.businessUid}</div>
+                                                        </div>
+                                                    }
+                                                    title="内容ID"
+                                                >
+                                                    <div className="line-clamp-1 w-[100px] break-words cursor-pointer">
+                                                        {row.businessUid}
+                                                    </div>
+                                                </Popover>
+
+                                                <Tooltip title={'复制'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(row.businessUid);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        <ContentCopyIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="flex flex-col">
                                                 <Popover
                                                     content={
                                                         <div>
+                                                            <div>文案模版</div>
                                                             <div>{row.copyWritingUid}</div>
-                                                        </div>
-                                                    }
-                                                    title="文案模版"
-                                                >
-                                                    <div className="cursor-pointer">文案模版</div>
-                                                </Popover>
-                                                <Popover
-                                                    content={
-                                                        <div>
+                                                            <Divider className="!my-2" />
+                                                            <div>图片模版</div>
                                                             <div>{row.pictureTempUid}</div>
                                                         </div>
                                                     }
-                                                    title="文案模版"
+                                                    title="模版"
                                                 >
-                                                    <div className="cursor-pointer">图片模版</div>
+                                                    <div className="cursor-pointer">
+                                                        <SearchIcon className="text-base" />
+                                                    </div>
                                                 </Popover>
                                             </div>
                                         </TableCell>
@@ -388,7 +433,7 @@ const RedBookContentList: React.FC = () => {
                                         <TableCell align="center">
                                             <Popover
                                                 content={
-                                                    <div>
+                                                    <div className="max-w-[500px]">
                                                         <div>
                                                             <div>标题:</div>
                                                             <div>{row.copyWritingTitle}</div>
@@ -406,11 +451,39 @@ const RedBookContentList: React.FC = () => {
                                             </Popover>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <div className="flex flex-col items-center">{row.copyWritingExecuteTime}</div>
+                                            <Popover
+                                                content={
+                                                    <div className="max-w-[500px]">
+                                                        <div>
+                                                            <div>开始时间:</div>
+                                                            <div>
+                                                                {row.copyWritingStartTime &&
+                                                                    dayjs(row.copyWritingStartTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </div>
+                                                        </div>
+                                                        <Divider className="!my-2" />
+                                                        <div>
+                                                            <div>结束时间:</div>
+                                                            <div>
+                                                                {row.copyWritingEndTime &&
+                                                                    dayjs(row.copyWritingEndTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                title="详情"
+                                            >
+                                                <div className="flex flex-col items-center cursor-pointer">
+                                                    {row.copyWritingExecuteTime}
+                                                </div>
+                                            </Popover>
                                         </TableCell>
 
                                         <TableCell align="center">
                                             <div className="flex items-center justify-center">{handleTransfer(row.pictureStatus)}</div>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">{row.pictureNum}</div>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="w-[300px] overflow-auto">
@@ -422,7 +495,30 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <div className="flex flex-col items-center">{row.pictureExecuteTime}</div>
+                                            <Popover
+                                                content={
+                                                    <div className="max-w-[500px]">
+                                                        <div>
+                                                            <div>开始时间:</div>
+                                                            <div>
+                                                                {row.pictureStartTime &&
+                                                                    dayjs(row.pictureStartTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </div>
+                                                        </div>
+                                                        <Divider className="!my-2" />
+                                                        <div>
+                                                            <div>结束时间:</div>
+                                                            <div>
+                                                                {row.pictureEndTime &&
+                                                                    dayjs(row.pictureEndTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                title="详情"
+                                            >
+                                                <div className="flex flex-col items-center cursor-pointer">{row.pictureExecuteTime}</div>
+                                            </Popover>
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="flex flex-col items-center">
@@ -430,7 +526,7 @@ const RedBookContentList: React.FC = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell align="center" className="sticky right-0 bg-white">
-                                            <div className="flex items-center w-[130px]">
+                                            <div className="flex items-center w-[95px]">
                                                 {/* <Tooltip title={'编辑'}>
                                                 <IconButton
                                                     aria-label="delete"

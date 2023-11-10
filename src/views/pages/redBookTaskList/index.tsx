@@ -245,6 +245,7 @@ const RedBookTaskList: React.FC = () => {
     const Execute = () => {
         planExecute({ uid: row?.uid }).then((res) => {
             setExecuteOpen(false);
+            forceUpdate();
         });
     };
 

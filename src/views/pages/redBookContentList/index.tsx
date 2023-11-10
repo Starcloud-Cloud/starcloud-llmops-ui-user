@@ -234,11 +234,11 @@ const RedBookContentList: React.FC = () => {
     const handleTransfer = (key: string) => {
         switch (key) {
             case 'init':
-                return <Tag color="green">初始化</Tag>;
+                return <Tag color="blue">初始化</Tag>;
             case 'executing':
                 return <Tag color="gold">执行中</Tag>;
             case 'execute_success':
-                return <Tag color="blue">执行成功</Tag>;
+                return <Tag color="green">执行成功</Tag>;
             case 'execute_error':
                 return <Tag color="red">执行失败</Tag>;
         }
@@ -522,7 +522,7 @@ const RedBookContentList: React.FC = () => {
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className="flex flex-col items-center">
-                                                {!row.claim ? <Tag color="error">未认领</Tag> : <Tag color="blue">已认领</Tag>}
+                                                {!row.claim ? <Tag color="blue">未认领</Tag> : <Tag color="green">已认领</Tag>}
                                             </div>
                                         </TableCell>
                                         <TableCell align="center" className="sticky right-0 bg-white">

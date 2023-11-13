@@ -26,8 +26,13 @@ import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
 import { useNavigate } from 'react-router-dom';
 import { DownLoadBtn, PayBtn } from './DownloadBtn';
+import './index.css';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
+
+const isMac = () => {
+    return navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
+};
 
 const Header = () => {
     const theme = useTheme();
@@ -61,9 +66,21 @@ const Header = () => {
                     }
                 }}
             >
-                <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
-                    <LogoSection />
-                </Box>
+                <Popover
+                    rootClassName="logo_popover"
+                    placement="bottomRight"
+                    title={'小提示:'}
+                    content={
+                        <div>
+                            {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}
+                        </div>
+                    }
+                    zIndex={9999}
+                >
+                    <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
+                        <LogoSection />
+                    </Box>
+                </Popover>
                 {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || (layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && matchDownMd)) && (
                     <Avatar
                         variant="rounded"

@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, Select, MenuItem, Divider } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Image, Row, Col } from 'antd';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
-                <FormControl sx={{ flex: 1 }} color="secondary" fullWidth>
+                <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
                     <InputLabel id="type">风格</InputLabel>
                     <Select
                         value={imageStyleData?.id}
@@ -25,6 +25,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             <MenuItem value={item?.id}>{item?.name}</MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText>{!imageStyleData?.id ? '风格是必选项' : ' '}</FormHelperText>
                 </FormControl>
                 {imageStyleData?.id && (
                     <div className="mt-[20px]">

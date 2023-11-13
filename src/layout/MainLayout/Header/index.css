@@ -1,0 +1,14 @@
+.logo_popover .ant-popover-arrow::before {
+    background: #673ab7;
+}
+.logo_popover .ant-popover-inner {
+    background: #673ab7;
+}
+
+.logo_popover .ant-popover-inner .ant-popover-title {
+    color: #fff;
+}
+
+.logo_popover .ant-popover-inner .ant-popover-inner-content {
+    color: #fff;
+}

@@ -5,7 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, Upload, UploadProps, Image, Progress, Transfer, Collapse, Radio, Modal, Row, Col, InputNumber, Popover } from 'antd';
 import type { TransferDirection } from 'antd/es/transfer';
 import type { RadioChangeEvent } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import StyleTabs from './components/styleTabs';
 import { copyWritingTemplates } from 'api/redBook/batchIndex';
@@ -197,7 +197,7 @@ const BatcSmallRedBooks = () => {
     //保存
     const [detailData, setDetailData] = useState<any>({
         randomType: 'RANDOM',
-        total: 1
+        total: 5
     });
     const handleSave = () => {
         if (!value) {
@@ -358,11 +358,22 @@ const BatcSmallRedBooks = () => {
             {detailData?.imageStyleList && (
                 <Collapse
                     // accordion
+
                     defaultActiveKey={detailData?.imageStyleList?.map((item: any) => item.id)}
                     items={detailData?.imageStyleList?.map((item: any, index: number) => {
                         return {
                             key: item.id,
-                            label: item.name,
+                            label: (
+                                <div className="flex items-center">
+                                    <span
+                                        style={{ display: item?.templateList?.some((item: any) => !item.id) ? 'block' : 'none' }}
+                                        className="mr-[10px] text-[#ff4d4f] text-[16px]"
+                                    >
+                                        <CloseCircleOutlined rev={undefined} />
+                                    </span>
+                                    {item.name}
+                                </div>
+                            ),
                             extra: (
                                 <Popover
                                     content={

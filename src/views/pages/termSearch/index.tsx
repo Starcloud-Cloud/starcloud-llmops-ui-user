@@ -50,9 +50,9 @@ const TermSearch = () => {
         setAsinData(result);
         setAsinOpen(true);
     };
-    useEffect(() => {
-        getAsin();
-    }, []);
+    // useEffect(() => {
+    //     getAsin();
+    // }, []);
     useEffect(() => {
         if (value) {
             const str = /^[a-zA-Z0-9]{10}$/;

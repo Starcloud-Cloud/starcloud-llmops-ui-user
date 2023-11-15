@@ -32,6 +32,7 @@ import './index.css';
 import React from 'react';
 import useRouteStore from 'store/router';
 import { isMobile } from 'react-device-detect';
+import CloseIcon from '@mui/icons-material/Close';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -60,6 +61,7 @@ const Header = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const setRoutesIndex = useRouteStore((state) => state.setRoutesIndex);
+    const [logoPopoverOpen, setLogoPopoverOpen] = useState(true);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -89,11 +91,15 @@ const Header = () => {
                 }}
             >
                 <Popover
+                    open={logoPopoverOpen}
                     rootClassName="logo_popover"
                     placement="bottomRight"
                     title={'小提示:'}
                     content={
-                        <div>
+                        <div className="relative">
+                            <span onClick={() => setLogoPopoverOpen(false)}>
+                                <CloseIcon className="absolute right-[-3px] top-[-35px] text-base cursor-pointer" />
+                            </span>
                             {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}
                         </div>
                     }

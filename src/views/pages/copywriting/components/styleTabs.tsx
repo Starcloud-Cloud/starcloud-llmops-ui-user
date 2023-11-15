@@ -12,7 +12,7 @@ const StyleTabs = ({
     imageStyleData: any[];
     setDetailData: (data: any) => void;
 }) => {
-    const [activeKey, setActiveKey] = useState('1');
+    const [activeKey, setActiveKey] = useState('0');
     const newTabIndex = useRef(1);
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);
@@ -63,7 +63,7 @@ const StyleTabs = ({
                 items={imageStyleData.map((item: any, i: number) => {
                     return {
                         label: item.name,
-                        key: item.key.toString(),
+                        key: i.toString(),
                         closable: i === 0 ? false : true,
                         children: (
                             <EditStyle

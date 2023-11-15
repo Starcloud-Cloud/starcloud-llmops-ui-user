@@ -7,49 +7,53 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    FormHelperText,
     CardActions,
     Grid,
-    Switch
+    Switch,
+    Autocomplete,
+    Chip
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
-import { UploadProps, Image, Upload, Table, Button, Divider, Row, Col, Tabs, Popover } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
-import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
-import Form from '../../smallRedBook/components/form';
+import { imageTemplates } from 'api/template';
+import { schemeCreate, schemeGet, schemeModify } from 'api/redBook/copywriting';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
-const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetailOpen: (data: boolean) => void }) => {
+const AddModal = ({
+    detailOpen,
+    title,
+    uid,
+    setDetailOpen
+}: {
+    detailOpen: boolean;
+    title: string;
+    uid: string;
+    setDetailOpen: (data: boolean) => void;
+}) => {
     // 1.模板名称
     const [params, setParams] = useState<any>({});
+    const [titleOpen, setTitleOpen] = useState(false);
+    const [tagOpen, setTagOpen] = useState(false);
+    const [categoryOpen, setCategoryOpen] = useState(false);
     const changeParams = (data: any) => {
         setParams({
             ...params,
             [data.name]: data.value
         });
     };
-
-    const [addOpen, setAddOpen] = useState(false);
-    //文案
-    const [style, setStyle] = useState('');
     //文案列表
     const [styleList, setStyleList] = useState<any[]>([]);
-    //文案变量
-    const [variable, setVariable] = useState<any>(null);
-    //修改文案变量
-    const changeDetail = (data: any) => {
-        const newData = _.cloneDeep(variable);
-        newData.variables[data.index].value = data.value;
-        setVariable(newData);
-    };
     //风格类型
     const [typeList, setTypeList] = useState<any[]>([]);
     const columns: ColumnsType<any> = [
@@ -59,28 +63,34 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         },
         {
             title: '参考标题',
-            dataIndex: 'name',
-            key: 'name'
+            dataIndex: 'title',
+            key: 'title'
         },
         {
             title: '参考内容',
-            dataIndex: 'desc',
-            key: 'desc'
+            dataIndex: 'content',
+            key: 'content'
         },
         {
             title: '参考图片',
-            dataIndex: 'desc',
-            key: 'desc'
+            key: 'images',
+            render: (_, row) => (
+                <div className="flex wrap gap-2">
+                    {row.images?.map((item: string, index: number) => (
+                        <Image className="mr-[5px]" key={index} width={50} height={50} preview={false} src={item} />
+                    ))}
+                </div>
+            )
         },
         {
             title: '账号',
-            dataIndex: 'desc',
-            key: 'desc'
+            dataIndex: 'account',
+            key: 'account'
         },
         {
             title: '账号链接',
-            dataIndex: 'desc',
-            key: 'desc'
+            dataIndex: 'link',
+            key: 'link'
         },
         {
             title: 'Action',
@@ -91,11 +101,23 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                     <Button
                         type="text"
                         onClick={() => {
-                            setEditOpen(index);
+                            setRowIndex(index);
+                            setAccoutQuery({
+                                ...row,
+                                fileList: row?.images?.map((item: any) => {
+                                    return {
+                                        uid: uuidv4(),
+                                        thumbUrl: item,
+                                        response: {
+                                            data: {
+                                                url: item
+                                            }
+                                        }
+                                    };
+                                })
+                            });
+                            setAddTitle('编辑参考账号');
                             setAddOpen(true);
-                            setStyle(row.id);
-                            setVariable(row.variable);
-                            setImageStyleData(row.config);
                         }}
                     >
                         编辑
@@ -103,10 +125,9 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                     <Divider type="vertical" />
                     <Button
                         onClick={() => {
-                            const newList = JSON.parse(JSON.stringify(data));
-
-                            newList.splice(index, 1);
-                            setData(newList);
+                            const newList = JSON.parse(JSON.stringify(tableData));
+                            newList.splice(rowIndex, 1);
+                            setTableData(newList);
                         }}
                         danger
                         type="text"
@@ -117,48 +138,17 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
             )
         }
     ];
-    const [data, setData] = useState<any[]>([]);
-    const [editOpen, setEditOpen] = useState(-1);
-    const getList = async () => {
-        if (editOpen === -1) {
-            const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
-            setStyle(result[0]?.value);
-            setStyleList(result);
-            const res = await imageTemplates();
-            setTypeList(res);
-        }
-    };
-    useEffect(() => {
-        if (style) {
-            xhsApp(style).then((res) => {
-                setVariable(res);
-            });
-        }
-    }, [style]);
-    // useEffect(() => {
-    //     if (addOpen) {
-    //         getList();
-    //     } else {
-    //         setStyle('');
-    //         setActiveKey('0');
-    //         setVariable(null);
-    //         setImageStyleData([
-    //             {
-    //                 id: '',
-    //                 name: '首图',
-    //                 variables: []
-    //             }
-    //         ]);
-    //     }
-    // }, [addOpen]);
-
+    const [addOpen, setAddOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(-1);
+    const [tableData, setTableData] = useState<any[]>([]);
     //新增文案与风格
     const [activeKey, setActiveKey] = useState('1');
-
+    const [focuActive, setFocuActive] = useState<any[]>([]);
     const [imageStyleData, setImageStyleData] = useState<any[]>([
         {
             name: '风格 1',
             key: '1',
+            id: '1',
             templateList: [
                 {
                     key: '1',
@@ -178,40 +168,73 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         }
         return newData?.sort((a, b) => b - a)[0] * 1 + 1;
     };
-    const add = () => {
-        let newPanes = _.cloneDeep(imageStyleData);
-        if (!newPanes) {
-            newPanes = [];
+
+    //文案生成模板
+    const [copyWritingTemplate, setCopyWritingTemplate] = useState<any>({});
+    //modal
+    const [addTitle, setAddTitle] = useState('');
+    const [accoutQuery, setAccoutQuery] = useState<any>({});
+    const [valueOpen, setValueOpen] = useState(false);
+    const [contentOpen, setContentOpen] = useState(false);
+    const props: UploadProps = {
+        name: 'image',
+        listType: 'picture-card',
+        multiple: true,
+        fileList: accoutQuery.fileList,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 20,
+        onChange(info) {
+            setAccoutQuery({
+                ...accoutQuery,
+                fileList: info.fileList
+            });
+        },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
         }
-        newPanes.push({ name: `图片 ${digui()}`, key: digui(), variables: [] });
-        setImageStyleData(newPanes);
     };
-    const remove = (targetKey: TargetKey) => {
-        let newActiveKey = activeKey;
-        let lastIndex = -1;
-        imageStyleData.forEach((item, i) => {
-            if (i.toString() === targetKey) {
-                lastIndex = i - 1;
-            }
+    useEffect(() => {
+        imageTemplates().then((res) => {
+            setTypeList(res);
         });
-        const newPanes = imageStyleData.filter((item, i) => i.toString() !== targetKey);
-        if (newPanes.length && newActiveKey === targetKey) {
-            if (lastIndex >= 0) {
-                newActiveKey = lastIndex.toString();
-            } else {
-                newActiveKey = '0';
-            }
+    }, []);
+    useEffect(() => {
+        if (!addOpen) {
+            setValueOpen(false);
+            setContentOpen(false);
+            setAccoutQuery({});
         }
-        setImageStyleData(newPanes);
-        setActiveKey(newActiveKey);
+    }, [addOpen]);
+    //改变值
+    const changeAccoutQuery = (data: { name: string; value: number | string }) => {
+        setAccoutQuery({
+            ...accoutQuery,
+            [data.name]: data.value
+        });
     };
-    const onEdit = (targetKey: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove') => {
-        if (action === 'add') {
-            add();
-        } else {
-            remove(targetKey);
+    useEffect(() => {
+        if (uid) {
+            schemeGet(uid).then((res) => {
+                if (res) {
+                    console.log(res);
+
+                    setParams({
+                        name: res.name,
+                        category: res.category,
+                        tags: res.tags,
+                        type: res.type === 'USER' ? true : false,
+                        description: res.description
+                    });
+                    setTableData(res.refers);
+                    setCopyWritingTemplate(res.configuration.copyWritingTemplate);
+                    setImageStyleData(res.configuration.imageTemplate.styleList);
+                }
+            });
         }
-    };
+    }, [uid]);
     return (
         <Modals open={detailOpen} onClose={() => setDetailOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -223,7 +246,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                     maxHeight: '90%',
                     overflow: 'auto'
                 }}
-                title={'创建'}
+                title={title}
                 content={false}
                 className="w-[80%] max-w-[1000px]"
                 secondary={
@@ -234,7 +257,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
             >
                 <CardContent>
                     <Grid sx={{ ml: 0 }} container spacing={2}>
-                        <Grid md={4} sm={12}>
+                        <Grid md={12} sm={12}>
                             <TextField
                                 sx={{ width: '300px', mt: 2 }}
                                 size="small"
@@ -242,57 +265,104 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                 InputLabelProps={{ shrink: true }}
                                 label="方案名称"
                                 name="name"
-                                value={params.value}
+                                value={params.name}
+                                error={!params.name && titleOpen}
+                                helperText={!params.name && titleOpen ? '方案名称必填' : ''}
                                 onChange={(e: any) => {
+                                    setTitleOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
                         </Grid>
-                        <Grid md={4} sm={12}>
-                            <FormControl sx={{ mt: 2, width: '300px' }} color="secondary" size="small" fullWidth>
-                                <InputLabel id="category">类目</InputLabel>
+                        <Grid md={12} sm={12}>
+                            <FormControl
+                                key={params.category}
+                                error={!params.category && categoryOpen}
+                                sx={{ mt: 2 }}
+                                color="secondary"
+                                size="small"
+                                fullWidth
+                            >
+                                <InputLabel id="categorys">类目</InputLabel>
                                 <Select
                                     name="category"
                                     value={params.category}
-                                    onChange={(e: any) => changeParams(e.target)}
-                                    labelId="category"
+                                    onChange={(e: any) => {
+                                        setCategoryOpen(true);
+                                        changeParams(e.target);
+                                    }}
+                                    labelId="categorys"
                                     label="类目"
                                 >
-                                    {styleList?.map((item) => (
+                                    <MenuItem value={'类目 1'}>类目 1</MenuItem>
+                                    <MenuItem value={'类目 2'}>类目 2</MenuItem>
+                                    {/* {styleList?.map((item) => (
                                         <MenuItem key={item.value} value={item.value}>
                                             {item.label}
                                         </MenuItem>
-                                    ))}
+                                    ))} */}
                                 </Select>
+                                <FormHelperText>{!params.category && categoryOpen ? '类目必选' : ''}</FormHelperText>
                             </FormControl>
                         </Grid>
-                        <Grid md={4} sm={12}>
-                            <TextField
-                                sx={{ width: '300px', mt: 2 }}
-                                size="small"
+                        <Grid md={12} sm={12}>
+                            <FormControl
+                                key={params.tags}
+                                error={(!params.tags || params.tags.length === 0) && categoryOpen}
+                                sx={{ mt: 2 }}
                                 color="secondary"
-                                InputLabelProps={{ shrink: true }}
-                                label="标签"
-                                name="tag"
-                                value={params.tag}
-                                onChange={(e: any) => {
-                                    changeParams(e.target);
-                                }}
-                            />
+                                size="small"
+                                fullWidth
+                            >
+                                <Autocomplete
+                                    sx={{ mt: 2 }}
+                                    multiple
+                                    size="small"
+                                    id="tags-filled"
+                                    color="secondary"
+                                    options={[]}
+                                    defaultValue={params.tags}
+                                    freeSolo
+                                    renderTags={(value: readonly string[], getTagProps) =>
+                                        value.map((option: string, index: number) => (
+                                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                        ))
+                                    }
+                                    onChange={(e: any, newValue) => {
+                                        changeParams({
+                                            name: 'tags',
+                                            value: newValue
+                                        });
+                                    }}
+                                    renderInput={(param) => (
+                                        <TextField
+                                            error={(!params.tags || params.tags.length === 0) && categoryOpen}
+                                            color="secondary"
+                                            {...param}
+                                            label="标签"
+                                            placeholder="请输入标签然后回车"
+                                        />
+                                    )}
+                                />
+                                <FormHelperText>
+                                    {(!params.tags || params.tags.length === 0) && tagOpen ? '标签最少输入一个' : ''}
+                                </FormHelperText>
+                            </FormControl>
                         </Grid>
-                        <Grid md={4} sm={12}>
+                        <Grid md={12} sm={12}>
                             <div className="flex items-center mt-[16px]">
                                 <Switch
                                     color={'secondary'}
-                                    checked={params.all}
-                                    onClick={() => setParams({ ...params, all: !params.all })}
+                                    checked={params.type}
+                                    onClick={() => setParams({ ...params, type: !params.type })}
                                 />{' '}
                                 公开
                             </div>
                         </Grid>
                     </Grid>
                     <TextField
-                        sx={{ width: '300px', mt: 2 }}
+                        sx={{ mt: 2 }}
+                        fullWidth
                         multiline
                         minRows={4}
                         maxRows={6}
@@ -300,17 +370,17 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                         color="secondary"
                         InputLabelProps={{ shrink: true }}
                         label="备注"
-                        name="desc"
-                        value={params.desc}
+                        name="description"
+                        value={params.description}
                         onChange={(e: any) => {
                             changeParams(e.target);
                         }}
                     />
-                    <div className="flex justify-between items-center">
-                        <div className="text-[18px] font-[600] my-[20px]">参考账号</div>
+                    <div className="flex justify-between items-center mt-[20px]">
+                        <div className="text-[18px] font-[600]">参考账号</div>
                         <Button
                             onClick={() => {
-                                setEditOpen(-1);
+                                setAddTitle('新增参考账号');
                                 setAddOpen(true);
                             }}
                             className="mb-[20px]"
@@ -320,10 +390,10 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                             新增
                         </Button>
                     </div>
-                    <Table size="small" columns={columns} dataSource={data} />
+                    <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
                     <div className="text-[18px] font-[600] my-[20px]">生成配置</div>
                     <Tabs
-                        defaultActiveKey="1"
+                        activeKey={activeKey}
                         items={[
                             {
                                 key: '1',
@@ -334,8 +404,13 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                         <div className="flex items-center">
                                             <Switch
                                                 color={'secondary'}
-                                                checked={params.all}
-                                                onClick={() => setParams({ ...params, all: !params.all })}
+                                                checked={copyWritingTemplate.isPromoteMp}
+                                                onClick={() =>
+                                                    setCopyWritingTemplate({
+                                                        ...copyWritingTemplate,
+                                                        isPromoteMp: !copyWritingTemplate.isPromoteMp
+                                                    })
+                                                }
                                             />
                                             <TextField
                                                 sx={{ width: '300px' }}
@@ -343,21 +418,19 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                 color="secondary"
                                                 InputLabelProps={{ shrink: true }}
                                                 placeholder="请输入"
-                                                name="desc"
-                                                value={params.desc}
+                                                name="mpCode"
+                                                value={copyWritingTemplate.mpCode}
                                                 onChange={(e: any) => {
-                                                    changeParams(e.target);
+                                                    setCopyWritingTemplate({
+                                                        ...copyWritingTemplate,
+                                                        mpCode: e.target.value
+                                                    });
                                                 }}
                                             />
                                         </div>
-                                        <div className="flex justify-between items-center">
-                                            <div className="text-[14px] font-[600] my-[20px]">文案生成要求</div>
-                                            <Button
-                                                onClick={() => {}}
-                                                className="mb-[20px]"
-                                                type="primary"
-                                                icon={<PlusOutlined rev={undefined} />}
-                                            >
+                                        <div className="flex justify-between items-center my-[20px]">
+                                            <div className="text-[14px] font-[600]">文案生成要求</div>
+                                            <Button onClick={() => {}} type="primary">
                                                 自动分析，生成要求
                                             </Button>
                                         </div>
@@ -369,10 +442,13 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                             size="small"
                                             color="secondary"
                                             InputLabelProps={{ shrink: true }}
-                                            name="desc"
-                                            value={params.desc}
+                                            name="demand"
+                                            value={copyWritingTemplate.demand}
                                             onChange={(e: any) => {
-                                                changeParams(e.target);
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    demand: e.target.value
+                                                });
                                             }}
                                         />
                                         <div className="text-[14px] font-[600] my-[20px]">文案生成参数</div>
@@ -425,7 +501,8 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                 const newData = _.cloneDeep(imageStyleData);
                                                 newData.push({
                                                     name: `风格 ${digui()}`,
-                                                    key: digui(),
+                                                    key: digui().toString(),
+                                                    id: digui().toString(),
                                                     templateList: [
                                                         {
                                                             key: '1',
@@ -446,11 +523,38 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                             items={imageStyleData.map((item, i) => {
                                                 return {
                                                     label: item.name,
-                                                    key: item.key,
+                                                    key: item.id,
                                                     children: (
                                                         <div>
                                                             <div className="bg-[#edf0f2]/80 rounded py-[12px] px-[16px] flex justify-between items-center">
-                                                                <div className="cursor-pointer">{item.name}</div>
+                                                                {!focuActive[i] ? (
+                                                                    <div
+                                                                        className="cursor-pointer"
+                                                                        onClick={() => {
+                                                                            const newData = _.cloneDeep(focuActive);
+                                                                            newData[i] = true;
+                                                                            setFocuActive(newData);
+                                                                        }}
+                                                                    >
+                                                                        {item.name}
+                                                                    </div>
+                                                                ) : (
+                                                                    <TextField
+                                                                        onBlur={(e) => {
+                                                                            const newList = _.cloneDeep(focuActive);
+                                                                            newList[i] = false;
+                                                                            setFocuActive(newList);
+                                                                            if (e.target.value) {
+                                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                                newData[i].name = e.target.value;
+                                                                                setImageStyleData(newData);
+                                                                            }
+                                                                        }}
+                                                                        color="secondary"
+                                                                        variant="standard"
+                                                                    />
+                                                                )}
+
                                                                 <div>
                                                                     <Popover
                                                                         zIndex={9999}
@@ -511,9 +615,9 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                 maxHeight: '80%',
                                 overflow: 'auto'
                             }}
-                            title={'创建'}
+                            title={addTitle}
                             content={false}
-                            className="w-[80%] max-w-[800px]"
+                            className="w-[80%] max-w-[700px]"
                             secondary={
                                 <IconButton onClick={() => setAddOpen(false)} size="large" aria-label="close modal">
                                     <CloseIcon fontSize="small" />
@@ -521,51 +625,76 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                             }
                         >
                             <CardContent>
-                                <div className="text-[18px] font-[600] my-[20px]">1. 选择文案类型</div>
-                                <FormControl color="secondary" size="small" fullWidth>
-                                    <InputLabel id="wenan">选择文案</InputLabel>
-                                    <Select value={style} labelId="wenan" label="选择文案">
-                                        {styleList?.map((item) => (
-                                            <MenuItem key={item.value} value={item.value}>
-                                                {item.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <div className="mt-[20px]">
-                                    <Row gutter={20}>
-                                        {variable?.variables?.map((item: any, index: number) => (
-                                            <Col key={index} sm={12} xs={24} md={6}>
-                                                <Form changeValue={changeDetail} item={item} index={index} />
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                </div>
-                                <div className="text-[18px] font-[600] my-[20px]">2. 图片风格选择</div>
-                                <Tabs
-                                    type="editable-card"
-                                    onChange={onChange}
-                                    activeKey={activeKey}
-                                    onEdit={onEdit}
-                                    items={imageStyleData.map((item: any, i: number) => {
-                                        return {
-                                            label: item.name,
-                                            key: i.toString(),
-                                            closable: i === 0 ? false : true,
-                                            children: (
-                                                <EditStyle
-                                                    imageStyleData={item}
-                                                    setData={(data: any) => {
-                                                        const newData = _.cloneDeep(imageStyleData);
-                                                        newData[i] = data;
-                                                        setImageStyleData(newData);
-                                                    }}
-                                                    typeList={typeList}
-                                                />
-                                            )
-                                        };
-                                    })}
-                                />
+                                <Grid container spacing={2}>
+                                    <Grid item md={12}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            color="secondary"
+                                            InputLabelProps={{ shrink: true }}
+                                            label="参考标题"
+                                            name="title"
+                                            error={!accoutQuery.title && valueOpen}
+                                            helperText={!accoutQuery.title && valueOpen ? '参考标题必填' : ''}
+                                            value={accoutQuery.title}
+                                            onChange={(e: any) => {
+                                                setValueOpen(true);
+                                                changeAccoutQuery(e.target);
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            color="secondary"
+                                            InputLabelProps={{ shrink: true }}
+                                            label="参考内容"
+                                            name="content"
+                                            error={!accoutQuery.content && contentOpen}
+                                            helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
+                                            value={accoutQuery.content}
+                                            onChange={(e: any) => {
+                                                setContentOpen(true);
+                                                changeAccoutQuery(e.target);
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            color="secondary"
+                                            InputLabelProps={{ shrink: true }}
+                                            label="小红书账号"
+                                            name="account"
+                                            value={accoutQuery.account}
+                                            onChange={(e: any) => {
+                                                changeAccoutQuery(e.target);
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            color="secondary"
+                                            InputLabelProps={{ shrink: true }}
+                                            label="小红书账号链接"
+                                            name="link"
+                                            value={accoutQuery.link}
+                                            onChange={(e: any) => {
+                                                changeAccoutQuery(e.target);
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Upload className="mt-[20px]" {...props}>
+                                    <div>
+                                        <PlusOutlined rev={undefined} />
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
                             </CardContent>
                             <Divider />
                             <CardActions>
@@ -573,57 +702,29 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                     <Button
                                         type="primary"
                                         onClick={() => {
-                                            if (variable?.variables.length > 0 && variable?.variables?.some((item: any) => !item.value)) {
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '文案变量必填',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'error'
-                                                        },
-                                                        close: false
-                                                    })
-                                                );
-                                                return false;
-                                            }
-                                            if (imageStyleData.some((item: any) => !item.id)) {
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '有风格未选择',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'error'
-                                                        },
-                                                        close: false
-                                                    })
-                                                );
-                                                return false;
-                                            }
-                                            const newList = _.cloneDeep(data);
-                                            if (editOpen === -1) {
-                                                newList.push({
-                                                    id: style,
-                                                    name: variable.name,
-                                                    desc: variable.description,
-                                                    variable: variable,
-                                                    variables: variable.variables,
-                                                    config: imageStyleData
-                                                });
-                                                setData(newList);
-                                                setAddOpen(false);
+                                            if (!accoutQuery.title || !accoutQuery.content) {
+                                                setValueOpen(true);
+                                                setContentOpen(true);
                                             } else {
-                                                newList[editOpen] = {
-                                                    id: style,
-                                                    name: variable.name,
-                                                    desc: variable.description,
-                                                    variable: variable,
-                                                    variables: variable.variables,
-                                                    config: imageStyleData
+                                                console.log(accoutQuery.fileList);
+
+                                                const newList = _.cloneDeep(tableData);
+                                                const obj = {
+                                                    ...accoutQuery,
+                                                    images:
+                                                        accoutQuery.fileList
+                                                            ?.map((item: any) => item?.response?.data?.url)
+                                                            ?.filter((el: any) => el !== undefined) || []
                                                 };
-                                                setData(newList);
-                                                setAddOpen(false);
+                                                if (addTitle === '新增参考账号') {
+                                                    newList.push(obj);
+                                                    setTableData(newList);
+                                                    setAddOpen(false);
+                                                } else {
+                                                    newList.splice(rowIndex, 1, obj);
+                                                    setTableData(newList);
+                                                    setAddOpen(false);
+                                                }
                                             }
                                         }}
                                     >
@@ -633,6 +734,125 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                             </CardActions>
                         </MainCard>
                     </Modals>
+                    <Divider />
+                    <CardActions>
+                        <Grid container justifyContent="flex-end">
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    if (!params.name) {
+                                        setTitleOpen(true);
+                                        setCategoryOpen(true);
+                                        setTagOpen(true);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '方案名称必填',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return false;
+                                    }
+                                    if (!params.category) {
+                                        setTitleOpen(true);
+                                        setCategoryOpen(true);
+                                        setTagOpen(true);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '类目必选',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return false;
+                                    }
+                                    if (!params.tags || params.tags?.length === 0) {
+                                        setTitleOpen(true);
+                                        setCategoryOpen(true);
+                                        setTagOpen(true);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '标签最少输入一个',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                        return false;
+                                    }
+                                    if (uid) {
+                                        schemeModify({
+                                            uid,
+                                            ...params,
+                                            type: params ? 'USER' : 'SYSTEM',
+                                            refers: tableData,
+                                            configuration: {
+                                                copyWritingTemplate,
+                                                imageTemplate: {
+                                                    styleList: imageStyleData
+                                                }
+                                            }
+                                        }).then((res) => {
+                                            if (res) {
+                                                setDetailOpen(false);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: ' 编辑成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                            }
+                                        });
+                                        return false;
+                                    }
+                                    schemeCreate({
+                                        ...params,
+                                        type: params ? 'USER' : 'SYSTEM',
+                                        refers: tableData,
+                                        configuration: {
+                                            copyWritingTemplate,
+                                            imageTemplate: {
+                                                styleList: imageStyleData
+                                            }
+                                        }
+                                    }).then((res) => {
+                                        if (res) {
+                                            setDetailOpen(false);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: ' 创建成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false
+                                                })
+                                            );
+                                        }
+                                    });
+                                }}
+                            >
+                                保存
+                            </Button>
+                        </Grid>
+                    </CardActions>
                 </CardContent>
             </MainCard>
         </Modals>

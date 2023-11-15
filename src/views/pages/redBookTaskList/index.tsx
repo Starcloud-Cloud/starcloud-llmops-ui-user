@@ -152,7 +152,7 @@ const RedBookTaskList: React.FC = () => {
     }, [open]);
 
     //创建的内容
-    const [detailOpen, setDetailOpen] = useState(true);
+    const [detailOpen, setDetailOpen] = useState(false);
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();

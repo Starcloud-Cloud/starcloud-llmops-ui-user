@@ -1,5 +1,5 @@
 // material-ui
-import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia } from '@mui/material';
+import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia, Tabs, Tab } from '@mui/material';
 import { Popover } from 'antd';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
@@ -26,7 +26,12 @@ import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
 import { useNavigate } from 'react-router-dom';
 import { DownLoadBtn, PayBtn } from './DownloadBtn';
+import { CACHE_KEY, useCache } from 'hooks/web/useCache';
+const { wsCache } = useCache();
 import './index.css';
+import React from 'react';
+import useRouteStore from 'store/router';
+import { isMobile } from 'react-device-detect';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -34,9 +39,17 @@ const isMac = () => {
     return navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
 };
 
+function a11yProps(index: number) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`
+    };
+}
+
 const Header = () => {
     const theme = useTheme();
     const { navType, onChangeMenuType } = useConfig();
+    const [value, setValue] = React.useState(0);
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
     const navigate = useNavigate();
@@ -46,12 +59,21 @@ const Header = () => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const setRoutesIndex = useRouteStore((state) => state.setRoutesIndex);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const firstMenu = wsCache.get(CACHE_KEY.ROLE_ROUTERS).find((item: any) => item.name === 'mofaai')?.children;
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        const currentData = firstMenu[newValue];
+        navigate(currentData.path);
+        setValue(newValue);
+        setRoutesIndex(newValue);
+    };
+
     // @ts-ignore
     return (
         <>
@@ -103,6 +125,31 @@ const Header = () => {
                     </Avatar>
                 )}
             </Box>
+            {!isMobile && (
+                <>
+                    <Tabs
+                        indicatorColor={'secondary'}
+                        className="ml-3"
+                        textColor={'secondary'}
+                        value={value}
+                        onChange={handleChange}
+                        sx={{
+                            '.MuiTabs-flexContainer': {
+                                borderBottom: 0
+                            },
+                            '.MuiTab-textColorSecondary': {
+                                padding: '32px 0'
+                            }
+                        }}
+                    >
+                        {firstMenu.map((item: any, index: number) => (
+                            <Tab key={index} label={item.name} {...a11yProps(index)} />
+                        ))}
+                    </Tabs>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
             <Popover
                 zIndex={9999}
                 placement="bottom"
@@ -154,12 +201,18 @@ const Header = () => {
                     <KeyboardArrowDownIcon />
                 </Box>
             </Popover>
-            <PayBtn />
+            <div className="mr-2">
+                <PayBtn />
+            </div>
             {/* header search */}
             <SearchSection />
-            <Box sx={{ flexGrow: 1 }} />
-            <Box sx={{ flexGrow: 1 }} />
 
+            {isMobile && (
+                <>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
             {/* mega-menu */}
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />

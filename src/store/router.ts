@@ -16,6 +16,8 @@ const useRouteStore = create<RouteStore>((set) => ({
     menuTabRouters: [],
     hasCheckedAuth: false,
     accessToken: null,
+    routesIndex: 0,
+    setRoutesIndex: (index: number) => set({ routesIndex: index }),
     setAccessToken: (token: string | null) => set({ accessToken: token }),
     setHasCheckedAuth: (value: boolean) => set({ hasCheckedAuth: value }),
     setRoutes: (newRoutes: AppCustomRouteRecordRaw[]) => set({ routes: newRoutes }),

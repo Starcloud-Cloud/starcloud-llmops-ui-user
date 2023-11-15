@@ -73,7 +73,7 @@ const Sidebar = () => {
             </>
         ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [matchUpMd, drawerOpen, drawerType]
+        [matchUpMd, drawerOpen, drawerType, window.location.pathname]
     );
 
     return (

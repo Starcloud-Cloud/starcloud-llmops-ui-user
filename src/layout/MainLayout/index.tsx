@@ -407,11 +407,16 @@ const MainLayout = () => {
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 
     const header = useMemo(
-        () => (
-            <Toolbar sx={{ p: condition ? '10px' : '16px' }}>
-                <Header />
-            </Toolbar>
-        ),
+        () =>
+            isMobile ? (
+                <Toolbar sx={{ p: condition ? '10px' : '16px' }}>
+                    <Header />
+                </Toolbar>
+            ) : (
+                <Toolbar sx={{ p: 0 }}>
+                    <Header />
+                </Toolbar>
+            ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [layout, matchDownMd]
     );

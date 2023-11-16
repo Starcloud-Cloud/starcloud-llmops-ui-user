@@ -25,7 +25,7 @@ const TermSearch = () => {
     const [queryAsin, setQueryAsin] = useState<any>({
         month: '最近30天',
         market: 1,
-        asinList: ['B098T9ZFB5', 'B09JW5FNVX', 'B0B71DH45N', 'B07MHHM31K', 'B08RYQR1CJ']
+        asinList: []
     });
     const [asinData, setAsinData] = useState<any>({});
     const getAsin = async () => {

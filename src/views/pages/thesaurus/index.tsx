@@ -16,7 +16,8 @@ import {
     Tooltip,
     IconButton,
     TableSortLabel,
-    Box
+    Box,
+    Divider
 } from '@mui/material';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import { Add, Delete } from '@mui/icons-material';
@@ -32,11 +33,13 @@ import { visuallyHidden } from '@mui/utils';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { AddDictModal } from './component/addDictModal';
+import { Confirm } from 'ui-component/Confirm';
 
 const headCells = [
     { id: 'name', numeric: false, disablePadding: false, label: '词库名称' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '所属站点' },
     { id: 'count', numeric: false, disablePadding: false, label: '关键词数量' },
+    { id: 'creator', numeric: false, disablePadding: false, label: ' 创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: ' 创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -217,7 +220,27 @@ const Thesaurus = () => {
             setSelected([]);
         }
     };
-
+    const [delOpen, setDelOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(-1);
+    const delOk = async () => {
+        const res = await delDict([rowIndex]);
+        if (res) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '操作成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+            forceUpdate({});
+            setSelected([]);
+        }
+        setDelOpen(false);
+    };
     return (
         <div className="h-full">
             <Card>
@@ -382,6 +405,7 @@ const Thesaurus = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell align="center">{row.count}</TableCell>
+                                            <TableCell align="center">{row.creator}</TableCell>
                                             <TableCell align="center">
                                                 {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </TableCell>
@@ -398,6 +422,19 @@ const Thesaurus = () => {
                                                         }}
                                                     >
                                                         <SummarizeIcon className="text-base" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Divider orientation="vertical" flexItem />
+                                                <Tooltip placement="top" title={'删除'}>
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            setDelOpen(true);
+                                                            setRowIndex(row.uid);
+                                                        }}
+                                                    >
+                                                        <Delete className="text-base" />
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
@@ -426,6 +463,7 @@ const Thesaurus = () => {
                 }}
                 forceUpdate={forceUpdate}
             />
+            <Confirm open={delOpen} handleClose={() => setDelOpen(false)} handleOk={delOk} />
         </div>
     );
 };

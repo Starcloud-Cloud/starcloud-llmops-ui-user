@@ -144,14 +144,18 @@ const Header = () => {
                                 borderBottom: 0
                             },
                             '.MuiTab-textColorSecondary': {
-                                padding: '32px 0'
+                                padding: '32px 18px',
+                                minWidth: 0
                             }
                         }}
                     >
                         {firstMenu.map((item: any, index: number) => (
-                            <Tab key={index} label={item.name} {...a11yProps(index)} />
+                            <Tab key={index} label={<span className="text-lg font-semibold"> {item.name} </span>} {...a11yProps(index)} />
                         ))}
                     </Tabs>
+                    <div className="mr-2">
+                        <PayBtn />
+                    </div>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ flexGrow: 1 }} />
                 </>
@@ -207,9 +211,7 @@ const Header = () => {
                     <KeyboardArrowDownIcon />
                 </Box>
             </Popover>
-            <div className="mr-2">
-                <PayBtn />
-            </div>
+
             {/* header search */}
             <SearchSection />
 

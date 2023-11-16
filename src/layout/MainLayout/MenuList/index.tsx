@@ -54,7 +54,7 @@ const MenuList = () => {
         }
     });
 
-    return <>{navItems}</>;
+    return <div className="min-h-[40vh]">{navItems}</div>;
 };
 
 export default MenuList;

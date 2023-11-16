@@ -8,7 +8,7 @@ import type { RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import StyleTabs from './components/styleTabs';
-import { copyWritingTemplates } from 'api/redBook/batchIndex';
+import { schemeList } from 'api/redBook/batchIndex';
 import Forms from 'views/pages/smallRedBook/components/form';
 import { imageTemplates } from 'api/template';
 import { planCreate, planGet, planModify, listTemplates } from 'api/redBook/batchIndex';
@@ -154,7 +154,7 @@ const BatcSmallRedBooks = () => {
         imageTemplates().then((res) => {
             setTypeList(res);
         });
-        copyWritingTemplates().then((res: any) => {
+        schemeList().then((res: any) => {
             setMockData(res);
         });
     }, []);
@@ -333,7 +333,7 @@ const BatcSmallRedBooks = () => {
                     </Popover>
                 )}
             />
-            <div className="text-[16px] font-[600] my-[20px]">模板字段</div>
+            {/* <div className="text-[16px] font-[600] my-[20px]">模板字段</div>
             <Row gutter={20}>
                 {detailData?.variableList?.map((item: any, index: number) => (
                     <Col key={index} sm={12} xs={24} md={6}>
@@ -348,7 +348,7 @@ const BatcSmallRedBooks = () => {
                         />
                     </Col>
                 ))}
-            </Row>
+            </Row> */}
             <div className="text-[18px] font-[600] my-[20px]">3. 图片模板</div>
             <div className="mb-[20px]">
                 <Button onClick={addStyle} icon={<PlusOutlined rev={undefined} />}>

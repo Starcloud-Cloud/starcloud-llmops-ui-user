@@ -57,4 +57,4 @@ const MenuList = () => {
     return <>{navItems}</>;
 };
 
-export default memo(MenuList);
+export default MenuList;

@@ -5,6 +5,7 @@ import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 import { generateRoute } from 'utils/routerHelper';
 // import remainingroutes from 'router/routes';
 import { AppCustomRouteRecordRaw, RouteStore } from 'types/router';
+import localStorage from 'redux-persist/es/storage';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const { wsCache } = useCache();
@@ -16,6 +17,11 @@ const useRouteStore = create<RouteStore>((set) => ({
     menuTabRouters: [],
     hasCheckedAuth: false,
     accessToken: null,
+    routesIndex: 0,
+    setRoutesIndex: (index: number) => {
+        localStorage.setItem('routesIndex', index.toString());
+        set({ routesIndex: index });
+    },
     setAccessToken: (token: string | null) => set({ accessToken: token }),
     setHasCheckedAuth: (value: boolean) => set({ hasCheckedAuth: value }),
     setRoutes: (newRoutes: AppCustomRouteRecordRaw[]) => set({ routes: newRoutes }),

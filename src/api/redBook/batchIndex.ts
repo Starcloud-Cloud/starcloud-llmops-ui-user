@@ -13,6 +13,10 @@ export const copyWritingTemplates = () => {
 export const listTemplates = () => {
     return request.get({ url: '/llm/creative/plan/listTemplates' });
 };
+//获取创作方案列表
+export const schemeList = () => {
+    return request.get({ url: '/llm/creative/scheme/list' });
+};
 //创建
 export const planCreate = (data: any) => {
     return request.post({ url: '/llm/creative/plan/create', data });

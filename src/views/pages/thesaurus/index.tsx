@@ -37,6 +37,7 @@ const headCells = [
     { id: 'name', numeric: false, disablePadding: false, label: '词库名称' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '所属站点' },
     { id: 'count', numeric: false, disablePadding: false, label: '关键词数量' },
+    { id: 'createUser', numeric: false, disablePadding: false, label: ' 创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: ' 创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -382,6 +383,7 @@ const Thesaurus = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell align="center">{row.count}</TableCell>
+                                            <TableCell align="center">{row.createUser}</TableCell>
                                             <TableCell align="center">
                                                 {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </TableCell>

@@ -74,4 +74,6 @@ interface RouteStore {
     setRoutes: (newRoutes: AppCustomRouteRecordRaw[]) => void;
     generateRoutes: () => Promise<void>;
     setMenuTabRouters: (routers: AppCustomRouteRecordRaw[]) => void;
+    routesIndex: number;
+    setRoutesIndex: (index: number) => void;
 }

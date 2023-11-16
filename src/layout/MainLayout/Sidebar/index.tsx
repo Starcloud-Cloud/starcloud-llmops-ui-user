@@ -19,6 +19,7 @@ import { drawerWidth } from 'store/constant';
 
 import { useDispatch, useSelector } from 'store';
 import { openDrawer } from 'store/slices/menu';
+import useRouteStore from 'store/router';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
@@ -29,6 +30,7 @@ const Sidebar = () => {
 
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
+    const routesIndex = useRouteStore((store) => store.routesIndex);
 
     const { layout, drawerType } = useConfig();
 
@@ -73,7 +75,7 @@ const Sidebar = () => {
             </>
         ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [matchUpMd, drawerOpen, drawerType]
+        [matchUpMd, drawerOpen, drawerType, routesIndex]
     );
 
     return (

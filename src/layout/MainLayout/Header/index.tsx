@@ -1,8 +1,8 @@
 // material-ui
-import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia } from '@mui/material';
+import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia, Tabs, Tab } from '@mui/material';
 import { Popover } from 'antd';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // project imports
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
@@ -26,13 +26,26 @@ import { IconMenu2 } from '@tabler/icons';
 import { t } from 'hooks/web/useI18n';
 import { useNavigate } from 'react-router-dom';
 import { DownLoadBtn, PayBtn } from './DownloadBtn';
+import { CACHE_KEY, useCache } from 'hooks/web/useCache';
+const { wsCache } = useCache();
 import './index.css';
+import React from 'react';
+import useRouteStore from 'store/router';
+import { isMobile } from 'react-device-detect';
+import CloseIcon from '@mui/icons-material/Close';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
 const isMac = () => {
     return navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
 };
+
+function a11yProps(index: number) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`
+    };
+}
 
 const Header = () => {
     const theme = useTheme();
@@ -46,12 +59,27 @@ const Header = () => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const { setRoutesIndex, routesIndex } = useRouteStore((state) => state);
+    const [logoPopoverOpen, setLogoPopoverOpen] = useState(true);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const firstMenu = wsCache.get(CACHE_KEY.ROLE_ROUTERS)?.find((item: any) => item.name === 'mofaai')?.children;
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        const currentData = firstMenu[newValue];
+        navigate(currentData.path);
+        setRoutesIndex(newValue);
+    };
+
+    useEffect(() => {
+        const tabIndex = Number(localStorage.getItem('routesIndex') || '0');
+        setRoutesIndex(tabIndex);
+    }, []);
+
     // @ts-ignore
     return (
         <>
@@ -67,11 +95,15 @@ const Header = () => {
                 }}
             >
                 <Popover
+                    open={logoPopoverOpen}
                     rootClassName="logo_popover"
                     placement="bottomRight"
                     title={'小提示:'}
                     content={
-                        <div>
+                        <div className="relative">
+                            <span onClick={() => setLogoPopoverOpen(false)}>
+                                <CloseIcon className="absolute right-[-3px] top-[-35px] text-base cursor-pointer" />
+                            </span>
                             {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}
                         </div>
                     }
@@ -103,6 +135,35 @@ const Header = () => {
                     </Avatar>
                 )}
             </Box>
+            {!isMobile && (
+                <>
+                    <Tabs
+                        indicatorColor={'secondary'}
+                        className="ml-3"
+                        textColor={'secondary'}
+                        value={routesIndex}
+                        onChange={handleChange}
+                        sx={{
+                            '.MuiTabs-flexContainer': {
+                                borderBottom: 0
+                            },
+                            '.MuiTab-textColorSecondary': {
+                                padding: '32px 18px',
+                                minWidth: 0
+                            }
+                        }}
+                    >
+                        {firstMenu?.map((item: any, index: number) => (
+                            <Tab key={index} label={<span className="text-lg font-semibold"> {item.name} </span>} {...a11yProps(index)} />
+                        ))}
+                    </Tabs>
+                    <div className="mr-2">
+                        <PayBtn />
+                    </div>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
             <Popover
                 zIndex={9999}
                 placement="bottom"
@@ -154,12 +215,16 @@ const Header = () => {
                     <KeyboardArrowDownIcon />
                 </Box>
             </Popover>
-            <PayBtn />
+
             {/* header search */}
             <SearchSection />
-            <Box sx={{ flexGrow: 1 }} />
-            <Box sx={{ flexGrow: 1 }} />
 
+            {isMobile && (
+                <>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ flexGrow: 1 }} />
+                </>
+            )}
             {/* mega-menu */}
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <MegaMenuSection />

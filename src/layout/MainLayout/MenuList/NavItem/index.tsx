@@ -48,7 +48,9 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
     const { layout, borderRadius } = useConfig();
 
     const { selectedItem, drawerOpen } = useSelector((state) => state.menu);
-    const isSelected = selectedItem.findIndex((id) => id === item.id) > -1;
+    // const isSelected = selectedItem.findIndex((id) => id === item.id) > -1;
+    const isSelected = `/${item.url}` === window.location.pathname;
+
     const obj: { [key: string]: React.ElementType } = {
         StorefrontIcon,
         StarsIcon,

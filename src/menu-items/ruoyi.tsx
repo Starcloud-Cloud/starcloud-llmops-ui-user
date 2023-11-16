@@ -41,7 +41,7 @@ export const RuoyiMenu = () => {
             }
             return targetRoute && targetRoute?.children && convertRouteList(targetRoute?.children);
         }
-    }, [routes, window.location.pathname]); // 仅当 routes 变化时重新计算 getMenu 的值
+    }, [routes, routesIndex]); // 仅当 routes 变化时重新计算 getMenu 的值
 
     return ruoyiMenu;
 };

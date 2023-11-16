@@ -2,7 +2,7 @@
 import { Avatar, Box, Button, FormControlLabel, Switch, Typography, useMediaQuery, CardMedia, Tabs, Tab } from '@mui/material';
 import { Popover } from 'antd';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // project imports
 import LAYOUT_CONST from 'constant';
 import useConfig from 'hooks/useConfig';
@@ -50,7 +50,6 @@ function a11yProps(index: number) {
 const Header = () => {
     const theme = useTheme();
     const { navType, onChangeMenuType } = useConfig();
-    const [value, setValue] = React.useState(0);
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
     const navigate = useNavigate();
@@ -60,7 +59,7 @@ const Header = () => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const setRoutesIndex = useRouteStore((state) => state.setRoutesIndex);
+    const { setRoutesIndex, routesIndex } = useRouteStore((state) => state);
     const [logoPopoverOpen, setLogoPopoverOpen] = useState(true);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -68,13 +67,19 @@ const Header = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const firstMenu = wsCache.get(CACHE_KEY.ROLE_ROUTERS).find((item: any) => item.name === 'mofaai')?.children;
+    const firstMenu = wsCache.get(CACHE_KEY.ROLE_ROUTERS)?.find((item: any) => item.name === 'mofaai')?.children;
+
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         const currentData = firstMenu[newValue];
         navigate(currentData.path);
-        setValue(newValue);
         setRoutesIndex(newValue);
     };
+
+    useEffect(() => {
+        const tabIndex = Number(localStorage.getItem('routesIndex') || '0');
+        setRoutesIndex(tabIndex);
+    }, []);
+    console.log(routesIndex);
 
     // @ts-ignore
     return (
@@ -137,7 +142,7 @@ const Header = () => {
                         indicatorColor={'secondary'}
                         className="ml-3"
                         textColor={'secondary'}
-                        value={value}
+                        value={routesIndex}
                         onChange={handleChange}
                         sx={{
                             '.MuiTabs-flexContainer': {
@@ -149,7 +154,7 @@ const Header = () => {
                             }
                         }}
                     >
-                        {firstMenu.map((item: any, index: number) => (
+                        {firstMenu?.map((item: any, index: number) => (
                             <Tab key={index} label={<span className="text-lg font-semibold"> {item.name} </span>} {...a11yProps(index)} />
                         ))}
                     </Tabs>

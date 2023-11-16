@@ -50,6 +50,8 @@ const SmallRedBook = Loadable(lazy(() => import('views/pages/smallRedBook/index'
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
 //创作文案
 const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
+//新增创作文案
+const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
 //任务中心
 const TaskCenter = Loadable(lazy(() => import('views/pages/taskCenter')));
 
@@ -201,6 +203,10 @@ const MainRoutes = {
         {
             path: '/copywriting',
             element: <Copywriting />
+        },
+        {
+            path: '/copywritingModal',
+            element: <CopywritingModal />
         },
         {
             path: '/taskCenter',

@@ -1,5 +1,6 @@
-import { Tabs, Button } from 'antd';
+import { Tabs } from 'antd';
 import { useState, useRef } from 'react';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
@@ -26,11 +27,11 @@ const StyleTabs = ({
         let newActiveKey = activeKey;
         let lastIndex = -1;
         imageStyleData.forEach((item, i) => {
-            if (item.key === targetKey) {
+            if (i.toString() === targetKey) {
                 lastIndex = i - 1;
             }
         });
-        const newPanes = imageStyleData.filter((item, i) => item.key !== targetKey);
+        const newPanes = imageStyleData.filter((item, i) => i.toString() !== targetKey);
         if (newPanes.length && newActiveKey === targetKey) {
             if (lastIndex >= 0) {
                 newActiveKey = lastIndex.toString();
@@ -38,9 +39,6 @@ const StyleTabs = ({
                 newActiveKey = '0';
             }
         }
-        console.log(newActiveKey);
-        console.log(newPanes);
-
         setDetailData(newPanes);
         setActiveKey(newActiveKey);
     };
@@ -62,7 +60,12 @@ const StyleTabs = ({
                 onEdit={onEdit}
                 items={imageStyleData.map((item: any, i: number) => {
                     return {
-                        label: item.name,
+                        label: (
+                            <div>
+                                {item.name}
+                                {!item.id && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
+                            </div>
+                        ),
                         key: i.toString(),
                         closable: i === 0 ? false : true,
                         children: (

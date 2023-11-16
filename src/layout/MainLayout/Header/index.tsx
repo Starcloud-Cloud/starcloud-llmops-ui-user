@@ -79,7 +79,6 @@ const Header = () => {
         const tabIndex = Number(localStorage.getItem('routesIndex') || '0');
         setRoutesIndex(tabIndex);
     }, []);
-    console.log(routesIndex);
 
     // @ts-ignore
     return (

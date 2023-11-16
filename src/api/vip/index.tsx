@@ -45,3 +45,15 @@ export const getVipTimeOut = () => {
 export const getPrice = (data: any) => {
     return request.post({ url: '/llm/pay/order/product/discount', data });
 };
+
+export const createSign = (data: any) => {
+    return request.post({ url: '/llm/pay/sign/createSign', data });
+};
+
+export const submitSign = (data: any) => {
+    return request.post({ url: '/llm/pay/sign/submitSign', data });
+};
+
+export const getIsSign = (data: any) => {
+    return request.post({ url: '/llm/pay/sign/IsSuccess', data });
+};

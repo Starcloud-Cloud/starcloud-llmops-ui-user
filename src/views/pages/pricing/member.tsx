@@ -32,7 +32,7 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { createOrder, getOrderIsPay, getPrice } from 'api/vip';
+import { createOrder, getOrderIsPay, getPrice, createSign, submitSign, getIsSign } from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -59,6 +59,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { DiscountModal } from './discountModal';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { SignModal } from './SignModal';
 
 const recommendList = [
     {
@@ -376,6 +377,7 @@ const Price1 = () => {
     const [swiperRef, setSwiperRef] = useState<any>(null);
     const [payPrice, setPayPrice] = useState(0);
     const [currentSelect, setCurrentSelect] = useState<any>(null);
+    const [openSignDialog, setOpenSignDialog] = useState(false);
 
     const { width } = useWindowSize();
     const navigate = useNavigate();
@@ -398,6 +400,7 @@ const Price1 = () => {
     const [value, setValue] = useState('1');
 
     const [open, setOpen] = React.useState(false);
+    const [openSign, setOpenSign] = React.useState(false);
 
     const [payUrl, setPayUrl] = useState('');
 
@@ -426,6 +429,12 @@ const Price1 = () => {
     const handleClose = () => {
         setPayUrl('');
         setOpen(false);
+        clearInterval(interval);
+    };
+
+    const handleSignClose = () => {
+        setPayUrl('');
+        setOpenSign(false);
         clearInterval(interval);
     };
 
@@ -466,32 +475,58 @@ const Price1 = () => {
         }, 5 * 60 * 1000);
     };
 
-    const handleCreateOrder = async (code?: string, discountCode?: string) => {
+    const handleCreateOrder = async (code?: string, discountCode?: string, type = 1) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
                 navigate('/login');
             }, 3000);
         } else {
-            const options = Intl.DateTimeFormat().resolvedOptions();
-            const timeZone = options.timeZone;
-            const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
-            if (res) {
-                handleOpen();
-                setOrderId(res);
-                const resOrder = await submitOrder({
-                    orderId: res,
-                    channelCode: 'alipay_pc',
-                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-                    displayMode: 'qr_code'
+            if (type === 1) {
+                const options = Intl.DateTimeFormat().resolvedOptions();
+                const timeZone = options.timeZone;
+                const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
+                if (res) {
+                    handleOpen();
+                    setOrderId(res);
+                    const resOrder = await submitOrder({
+                        orderId: res,
+                        channelCode: 'alipay_pc',
+                        channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+                        displayMode: 'qr_code'
+                    });
+                    setPayUrl(resOrder.displayContent);
+
+                    interval = setInterval(() => {
+                        getOrderIsPay({ orderId: res }).then((isPayRes) => {
+                            if (isPayRes) {
+                                handleClose();
+                                setOpenPayDialog(true);
+                                setTimeout(() => {
+                                    navigate('/orderRecord');
+                                }, 3000);
+                            }
+                        });
+                    }, 1000);
+
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        setIsTimeout(true);
+                    }, 5 * 60 * 1000);
+                }
+            } else {
+                const resSign = await createSign({
+                    productCode: code
                 });
-                setPayUrl(resOrder.displayContent);
+                const res = await submitSign({ merchantSignId: resSign });
+                setOpenSign(true);
+                setPayUrl(res);
 
                 interval = setInterval(() => {
-                    getOrderIsPay({ orderId: res }).then((isPayRes) => {
-                        if (isPayRes) {
-                            handleClose();
-                            setOpenPayDialog(true);
+                    getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
+                        if (isSignRes) {
+                            handleSignClose();
+                            setOpenSignDialog(true);
                             setTimeout(() => {
                                 navigate('/orderRecord');
                             }, 3000);
@@ -503,8 +538,6 @@ const Price1 = () => {
                     clearInterval(interval);
                     setIsTimeout(true);
                 }, 5 * 60 * 1000);
-            } else {
-                PubSub.publish('global.error', { message: '订单支付失败', type: 'error' });
             }
         }
     };
@@ -809,6 +842,7 @@ const Price1 = () => {
                 onRefresh={onRefresh}
                 payPrice={currentSelect?.discountedAmount / 100 || 0}
             />
+            <SignModal open={openSign} handleClose={() => setOpenSign(false)} url={payUrl} isTimeout={isTimeout} onRefresh={() => null} />
             {discountOpen && (
                 <DiscountModal
                     open={discountOpen}
@@ -854,6 +888,26 @@ const Price1 = () => {
                             <DialogContentText id="alert-dialog-description">
                                 <Typography variant="h5" component="span">
                                     支付成功，3S后跳转至订单记录页...
+                                </Typography>
+                            </DialogContentText>
+                        </DialogContent>
+                    </>
+                )}
+            </Dialog>
+            <Dialog
+                open={openSignDialog}
+                onClose={() => setOpenSignDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{ p: 2 }}
+            >
+                {openSignDialog && (
+                    <>
+                        <DialogTitle id="alert-dialog-title">提示</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Typography variant="h5" component="span">
+                                    签约成功，3S后跳转至订单记录页...
                                 </Typography>
                             </DialogContentText>
                         </DialogContent>

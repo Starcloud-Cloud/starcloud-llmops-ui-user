@@ -34,6 +34,7 @@ import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Confirm } from 'ui-component/Confirm';
+import { VideoModel } from '../components/VideoModel';
 
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -286,6 +287,8 @@ function CreateDetail() {
     //tabs
     const [value, setValue] = useState(1);
     const [saveState, setSaveState] = useState(0);
+    const [videoOpen, setVideoOpen] = useState(false);
+
     const handleChange = (event: any, newValue: number) => {
         setValue(newValue);
     };
@@ -311,7 +314,10 @@ function CreateDetail() {
                     }
                     title={chatBotInfo?.name}
                     action={
-                        <>
+                        <div className="flex items-center">
+                            <span className="cursor-pointer text-[#6839b7] ml-1" onClick={() => setVideoOpen(true)}>
+                                查看视频教程
+                            </span>
                             <IconButton
                                 aria-label="more"
                                 id="long-button"
@@ -346,7 +352,7 @@ function CreateDetail() {
                                     </Typography>
                                 </MenuItem>
                             </Menu>
-                        </>
+                        </div>
                     }
                     // action={
                     //     (value === 0 || value === 1 || value === 6) && (
@@ -442,6 +448,7 @@ function CreateDetail() {
                 title="提醒"
                 content="确认删除该机器人？"
             />
+            {videoOpen && <VideoModel open={videoOpen} handleClose={() => setVideoOpen(false)} />}
         </div>
     );
 }

@@ -18,6 +18,7 @@ import myChat from 'store/myChat';
 import { Item } from 'types/template';
 import { createChat, getChatPage, getChatTemplate } from '../../../api/chat';
 import FormDialog from './components/FormDialog';
+import { VideoModel } from './components/VideoModel';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -66,6 +67,7 @@ function MyTemplate() {
     const [robotName, setRobotName] = useState('');
     const [currentRow, setCurrentRow] = useState<any>(null);
     const [update, setUpdate] = useState(0);
+    const [videoOpen, setVideoOpen] = useState(false);
 
     const [queryParams, setQueryParams] = useState<{ name: string }>({
         name: ''
@@ -169,9 +171,14 @@ function MyTemplate() {
             </Box> */}
             {/* {totals > 0 && ( */}
             <Box>
-                <Typography variant="h3" my={2}>
-                    {t('chat.myRobot')}
-                </Typography>
+                <div className="flex items-center">
+                    <Typography variant="h3" my={2}>
+                        {t('chat.myRobot')}
+                    </Typography>
+                    <span className="cursor-pointer text-[#6839b7] ml-1" onClick={() => setVideoOpen(true)}>
+                        查看视频教程
+                    </span>
+                </div>
                 <MyselfTemplate appList={newAppList} setUpdate={setUpdate} />
                 {totals > 0 && (
                     <Box my={2}>
@@ -180,6 +187,7 @@ function MyTemplate() {
                 )}
             </Box>
             <FormDialog open={open} setOpen={() => setOpen(false)} handleOk={handleCreate} setValue={setRobotName} value={robotName} />
+            {videoOpen && <VideoModel open={videoOpen} handleClose={() => setVideoOpen(false)} />}
         </Box>
     );
 }

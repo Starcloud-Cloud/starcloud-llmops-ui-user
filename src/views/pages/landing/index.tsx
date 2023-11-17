@@ -14,6 +14,8 @@ import FooterSection from './FooterSection';
 import PreBuildDashBoard from './PreBuildDashBoard';
 import StartupProjectSection from './StartupProjectSection';
 import { useLocation } from 'react-router-dom';
+import CustomizeSection from './CustomizeSection';
+import VideoSection from './VideoSection';
 // import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
@@ -55,15 +57,16 @@ const Landing = () => {
                 <HeaderSection />
             </HeaderWrapper>
 
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+                <VideoSection />
+            </SectionWrapper>
+
             {/* 2. card section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <CardSection />
             </SectionWrapper>
 
             {/* 4. Developer Experience section */}
-            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
-                <CustomizeSection />
-            </SectionWrapper> */}
 
             {/* 3. about section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>

@@ -33,7 +33,7 @@ export const VideoModel = ({ handleClose, open }: { handleClose: () => void; ope
                             objectFit: 'fill'
                         }}
                         src={
-                            'https://outin-8f077b286e5d11ee8a1600163e32a995.oss-cn-shanghai.aliyuncs.com/22993e306e6371ee80796632b68f0102/d7d0dbf3cc5e1afb7f933cdb733900ec-ld.mp4?Expires=1700213465&OSSAccessKeyId=LTAIxSaOfEzCnBOj&Signature=In7hY2z5sZW9wvL6e9oK%2FpNXKuA%3D'
+                            'https://mofaai-others.oss-cn-hangzhou.aliyuncs.com/mofaai_web/%E9%AD%94%E6%B3%95AI%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8.mp4'
                         }
                     />
                 </CardContent>

@@ -45,7 +45,7 @@ const VideoSection = () => {
                                 </svg> */}
                                 <video
                                     controls
-                                    autoPlay
+                                    // autoPlay
                                     className="cursor-pointer"
                                     style={{
                                         borderRadius: '12px',
@@ -54,7 +54,7 @@ const VideoSection = () => {
                                         objectFit: 'fill'
                                     }}
                                     src={
-                                        'https://outin-8f077b286e5d11ee8a1600163e32a995.oss-cn-shanghai.aliyuncs.com/720ef0a0850071ee9bf55017f0e90102/90ec370018a39698ec84cec14d716954-ld.mp4?Expires=1700213024&OSSAccessKeyId=LTAIxSaOfEzCnBOj&Signature=Yx9bPhy2wcU9dQyfJ%2FHDyUAs40s%3D'
+                                        'https://mofaai-others.oss-cn-hangzhou.aliyuncs.com/mofaai_web/%E9%AD%94%E6%B3%95ai%E5%AE%A3%E4%BC%A0%E7%89%87.mp4'
                                     }
                                 />
                             </div>

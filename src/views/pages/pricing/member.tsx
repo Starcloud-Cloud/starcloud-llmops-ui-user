@@ -59,6 +59,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { DiscountModal } from './discountModal';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { SignModal } from './SignModal';
 
 const recommendList = [
     {
@@ -399,6 +400,7 @@ const Price1 = () => {
     const [value, setValue] = useState('1');
 
     const [open, setOpen] = React.useState(false);
+    const [openSign, setOpenSign] = React.useState(false);
 
     const [payUrl, setPayUrl] = useState('');
 
@@ -427,6 +429,12 @@ const Price1 = () => {
     const handleClose = () => {
         setPayUrl('');
         setOpen(false);
+        clearInterval(interval);
+    };
+
+    const handleSignClose = () => {
+        setPayUrl('');
+        setOpenSign(false);
         clearInterval(interval);
     };
 
@@ -493,7 +501,7 @@ const Price1 = () => {
                         getOrderIsPay({ orderId: res }).then((isPayRes) => {
                             if (isPayRes) {
                                 handleClose();
-                                setOpenSignDialog(true);
+                                setOpenPayDialog(true);
                                 setTimeout(() => {
                                     navigate('/orderRecord');
                                 }, 3000);
@@ -511,14 +519,14 @@ const Price1 = () => {
                     productCode: code
                 });
                 const res = await submitSign({ merchantSignId: resSign });
-                handleOpen();
+                setOpenSign(true);
                 setPayUrl(res);
 
                 interval = setInterval(() => {
                     getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
                         if (isSignRes) {
-                            handleClose();
-                            setOpenPayDialog(true);
+                            handleSignClose();
+                            setOpenSignDialog(true);
                             setTimeout(() => {
                                 navigate('/orderRecord');
                             }, 3000);
@@ -834,6 +842,7 @@ const Price1 = () => {
                 onRefresh={onRefresh}
                 payPrice={currentSelect?.discountedAmount / 100 || 0}
             />
+            <SignModal open={openSign} handleClose={() => setOpenSign(false)} url={payUrl} isTimeout={isTimeout} onRefresh={() => null} />
             {discountOpen && (
                 <DiscountModal
                     open={discountOpen}

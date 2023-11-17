@@ -139,7 +139,7 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    <Tab label="订阅" {...a11yProps(1)} />
+                                    <Tab disabled={!currentSelect.monthCode.includes('basic')} label="订阅" {...a11yProps(1)} />
                                 </Tabs>
                                 <div className="flex justify-center flex-col items-center w-full p-3">
                                     <div className="flex justify-between items-center w-full mb-3">
@@ -200,20 +200,35 @@ export function DiscountModal({
                                         </div>
                                     )}
                                     <div className="flex  items-center w-full mb-3 mt-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-[#868A91] mb-2">
-                                                优惠金额{currentSelect.discountCouponName ? `（${currentSelect?.discountCouponName}）` : ''}
-                                            </span>
-                                            <span className="text-[#de4437] text-2xl ">
-                                                ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-col ml-[30%]">
-                                            <span className="text-[#868A91] mb-2">订单总价</span>
-                                            <span className="text-[#de4437] text-2xl font-semibold">
-                                                ￥{(currentSelect?.discountedAmount / 100).toFixed(2)}
-                                            </span>
-                                        </div>
+                                        {!value ? (
+                                            <div className="flex flex-col">
+                                                <span className="text-[#868A91] mb-2">
+                                                    优惠金额
+                                                    {currentSelect.discountCouponName ? `（${currentSelect?.discountCouponName}）` : ''}
+                                                </span>
+                                                <span className="text-[#de4437] text-2xl ">
+                                                    ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col">
+                                                <span className="text-[#868A91] mb-2">优惠金额</span>
+                                                <span className="text-[#de4437] text-2xl ">￥{(1000 / 100).toFixed(2)}</span>
+                                            </div>
+                                        )}
+                                        {!value ? (
+                                            <div className="flex flex-col ml-[30%]">
+                                                <span className="text-[#868A91] mb-2">订单总价</span>
+                                                <span className="text-[#de4437] text-2xl font-semibold">
+                                                    ￥{(currentSelect?.discountedAmount / 100).toFixed(2)}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col ml-[30%]">
+                                                <span className="text-[#868A91] mb-2">订单总价</span>
+                                                <span className="text-[#de4437] text-2xl font-semibold">￥{(4900 / 100).toFixed(2)}</span>
+                                            </div>
+                                        )}
                                     </div>
                                     {!!value && (
                                         <div className="flex items-center">

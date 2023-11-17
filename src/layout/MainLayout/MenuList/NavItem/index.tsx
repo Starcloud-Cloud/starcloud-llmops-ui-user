@@ -18,6 +18,9 @@ import ChatIcon from '@mui/icons-material/Chat';
 import HdOutlinedIcon from '@mui/icons-material/HdOutlined';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import FormatShapesIcon from '@mui/icons-material/FormatShapes';
+import GradingIcon from '@mui/icons-material/Grading';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import AbcIcon from '@mui/icons-material/Abc';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -67,7 +70,10 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         AltRouteIcon,
         BrushIcon,
         FourKIcon,
-        ManageAccountsIcon
+        ManageAccountsIcon,
+        AutoGraphIcon,
+        GradingIcon,
+        AbcIcon
     };
     const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 

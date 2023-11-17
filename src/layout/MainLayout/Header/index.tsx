@@ -33,6 +33,7 @@ import React from 'react';
 import useRouteStore from 'store/router';
 import { isMobile } from 'react-device-detect';
 import CloseIcon from '@mui/icons-material/Close';
+import dayjs from 'dayjs';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -60,7 +61,7 @@ const Header = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const { setRoutesIndex, routesIndex } = useRouteStore((state) => state);
-    const [logoPopoverOpen, setLogoPopoverOpen] = useState(true);
+    const [logoPopoverOpen, setLogoPopoverOpen] = useState(false);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -74,6 +75,19 @@ const Header = () => {
         navigate(currentData.path);
         setRoutesIndex(newValue);
     };
+
+    useEffect(() => {
+        const dateTime = localStorage.getItem('tipsEndTime');
+        if (dateTime) {
+            if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                setLogoPopoverOpen(true);
+            } else {
+                setLogoPopoverOpen(false);
+            }
+        } else {
+            setLogoPopoverOpen(true);
+        }
+    }, []);
 
     useEffect(() => {
         const tabIndex = Number(localStorage.getItem('routesIndex') || '0');
@@ -101,7 +115,13 @@ const Header = () => {
                     title={'小提示:'}
                     content={
                         <div className="relative">
-                            <span onClick={() => setLogoPopoverOpen(false)}>
+                            <span
+                                onClick={() => {
+                                    const tipsEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
+                                    localStorage.setItem('tipsEndTime', tipsEndTime);
+                                    setLogoPopoverOpen(false);
+                                }}
+                            >
                                 <CloseIcon className="absolute right-[-3px] top-[-35px] text-base cursor-pointer" />
                             </span>
                             {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}

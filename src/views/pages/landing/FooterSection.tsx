@@ -170,6 +170,9 @@ const FooterSection = () => {
                     <a target="_blank" className="text-[#2196f3] ml-2" href="https://www.surfcg.com/index?by=2">
                         SurfCG
                     </a>
+                    <a target="_blank" className="text-[#2196f3] ml-2" href="https://luban.bluemediagroup.cn/about/index?utm_source=mofaai">
+                        鲁班跨境通
+                    </a>
                 </div>
             </div>
             <Box sx={{ bgcolor: 'dark.dark', py: { xs: 3, sm: 1.5 } }}>

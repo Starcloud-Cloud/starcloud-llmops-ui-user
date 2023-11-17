@@ -334,11 +334,18 @@ const Copywriting: React.FC = () => {
                                             ))}
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">{row.copyWritingExample}</TableCell>
+                                    <TableCell align="center">
+                                        <div>
+                                            {row?.copyWritingExample}
+                                            {/* {row?.copyWritingExample?.map((item: string) => (
+                                                <div key={item}>{item}</div>
+                                            ))} */}
+                                        </div>
+                                    </TableCell>
                                     <TableCell align="center">
                                         <div className="flex gap-2">
-                                            {row?.imageExample.map((item: string) => (
-                                                <Image key={item} width={50} height={50} src={item} preview={false} />
+                                            {row?.imageExample?.map((item: any) => (
+                                                <Image key={item.url} width={50} height={50} src={item.url} preview={false} />
                                             ))}
                                         </div>
                                     </TableCell>

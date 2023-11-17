@@ -68,9 +68,9 @@ const BatcSmallRedBooks = () => {
         return deduplicatedArray;
     };
     useEffect(() => {
-        if (targetKeys.length > 0) {
+        if (targetKeys?.length > 0) {
             const arr: any[] = [];
-            const newList = mockData?.filter((item: any) => targetKeys.some((el) => item.uid === el));
+            const newList = mockData?.filter((item: any) => targetKeys?.some((el) => item.uid === el));
             newList.map((item) => {
                 item.variables?.map((el: any) => {
                     arr.push(el);
@@ -100,18 +100,22 @@ const BatcSmallRedBooks = () => {
             planGet(searchParams.get('uid')).then((result) => {
                 if (result) {
                     const res = _.cloneDeep(result);
-                    res.config.imageStyleList.forEach((item: any) => {
-                        item.templateList.forEach((el: any, index: number) => {
-                            if (index === 0) {
-                                el.name = '首图';
-                            } else {
-                                el.name = `图片 ${index}`;
-                            }
-                        });
-                    });
+                    // res.config.imageStyleList.forEach((item: any) => {
+                    //     item.templateList.forEach((el: any, index: number) => {
+                    //         if (index === 0) {
+                    //             el.name = '首图';
+                    //         } else {
+                    //             el.name = `图片 ${index}`;
+                    //         }
+                    //     });
+                    // });
                     setValue(res.name);
-                    setDetailData(res.config);
-                    setTargetKeys(res.config?.copyWritingList);
+                    setDetailData({
+                        ...res.config,
+                        total: res.total,
+                        randomType: res.randomType
+                    });
+                    setTargetKeys(res.config?.schemeUidList);
                     setImageList(
                         res.config?.imageUrlList?.map((item: any) => {
                             return {
@@ -133,8 +137,12 @@ const BatcSmallRedBooks = () => {
                 if (result) {
                     const res = result[searchParams.get('template') as string];
                     setValue(res.name);
-                    setDetailData(res.config);
-                    setTargetKeys(res.config?.copyWritingList);
+                    setDetailData({
+                        ...res.config,
+                        total: res.total,
+                        randomType: res.randomType
+                    });
+                    setTargetKeys(res.config?.schemeUidList);
                     setImageList(
                         res.config?.imageUrlList?.map((item: any) => {
                             return {
@@ -231,15 +239,28 @@ const BatcSmallRedBooks = () => {
         }
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
-        newData.copyWritingList = targetKeys;
+        newData.schemeUidList = targetKeys;
         if (searchParams.get('uid')) {
-            planModify({ name: value, config: newData, type: 'XHS', uid: searchParams.get('uid') }).then((res) => {
+            planModify({
+                name: value,
+                randomType: newData.randomType,
+                total: newData.total,
+                config: { ...newData, total: undefined, randomType: undefined, imageStyleList: undefined, variableList: undefined },
+                type: 'XHS',
+                uid: searchParams.get('uid')
+            }).then((res) => {
                 if (res) {
                     navigate('/redBookTaskList');
                 }
             });
         } else {
-            planCreate({ name: value, config: newData, type: 'XHS' }).then((res) => {
+            planCreate({
+                name: value,
+                randomType: newData.randomType,
+                total: newData.total,
+                config: { ...newData, total: undefined, randomType: undefined, imageStyleList: undefined, variableList: undefined },
+                type: 'XHS'
+            }).then((res) => {
                 if (res) {
                     navigate('/redBookTaskList');
                 }
@@ -349,8 +370,8 @@ const BatcSmallRedBooks = () => {
                     </Col>
                 ))}
             </Row> */}
-            <div className="text-[18px] font-[600] my-[20px]">3. 图片模板</div>
-            <div className="mb-[20px]">
+            {/* <div className="text-[18px] font-[600] my-[20px]">3. 图片模板</div> */}
+            {/* <div className="mb-[20px]">
                 <Button onClick={addStyle} icon={<PlusOutlined rev={undefined} />}>
                     增加风格
                 </Button>
@@ -411,7 +432,7 @@ const BatcSmallRedBooks = () => {
                         };
                     })}
                 />
-            )}
+            )} */}
             <div className="text-[18px] font-[600] my-[20px]">4. 生成随机参数</div>
             <div>
                 <Radio.Group

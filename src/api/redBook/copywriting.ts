@@ -1,5 +1,9 @@
 import request from 'utils/axios';
 
+//获取类目
+export const schemeMetadata = () => {
+    return request.get({ url: '/llm/creative/scheme/metadata' });
+};
 //列表
 export const schemePage = (data: any) => {
     return request.get({ url: '/llm/creative/scheme/page', data });

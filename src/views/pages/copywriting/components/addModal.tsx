@@ -19,18 +19,20 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
-import { schemeCreate, schemeGet, schemeModify } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata } from 'api/redBook/copywriting';
+import imgLoading from 'assets/images/picture/loading.gif';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import copywriting from 'store/copywriting';
+import '../index.scss';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const { tableList, setTableList } = copywriting();
@@ -48,45 +50,34 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
-    //文案列表
-    const [styleList, setStyleList] = useState<any[]>([]);
     //风格类型
     const [typeList, setTypeList] = useState<any[]>([]);
+    //类目列表
+    const [categoryList, setCategoryList] = useState<any[]>([]);
+    //参考来源列表
+    const [sourceList, setSourceList] = useState<any[]>([]);
     const columns: ColumnsType<any> = [
         {
-            title: '参考标题、内容',
-            dataIndex: 'title',
-            render: (_, row) => (
-                <div>
-                    <div>
-                        <span className="font-[600]">参考标题：</span>
-                        {row.title}
-                    </div>
-                    <div>
-                        <span className="font-[600]">参考内容：</span>
-                        {row.content}
-                    </div>
-                </div>
-            )
+            title: '参考标题',
+            dataIndex: 'title'
+        },
+        {
+            title: '参考内容',
+            dataIndex: 'content'
         },
         {
             title: '参考图片',
             key: 'images',
             render: (_, row) => (
                 <div className="flex wrap gap-2">
-                    {row.images?.map((item: string, index: number) => (
-                        <Image className="mr-[5px]" key={index} width={50} height={50} preview={false} src={item} />
+                    {row.images?.map((item: any, index: number) => (
+                        <Image className="mr-[5px]" key={index} width={50} height={50} preview={false} src={item.url} />
                     ))}
                 </div>
             )
         },
         {
-            title: '账号',
-            dataIndex: 'account',
-            key: 'account'
-        },
-        {
-            title: '账号链接',
+            title: '参考链接地址',
             dataIndex: 'link',
             key: 'link'
         },
@@ -105,15 +96,21 @@ const AddModal = () => {
                                 fileList: row?.images?.map((item: any) => {
                                     return {
                                         uid: uuidv4(),
-                                        thumbUrl: item,
+                                        percent: 100,
+                                        thumbUrl: item?.url,
                                         response: {
                                             data: {
-                                                url: item
+                                                url: item?.url
                                             }
                                         }
                                     };
                                 })
                             });
+                            setImageContent(
+                                row?.images?.map((item: any) => {
+                                    return item.content;
+                                })
+                            );
                             setAddTitle('编辑参考账号');
                             setAddOpen(true);
                         }}
@@ -178,6 +175,7 @@ const AddModal = () => {
         name: 'image',
         listType: 'picture-card',
         multiple: true,
+        showUploadList: false,
         fileList: accoutQuery.fileList,
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
         headers: {
@@ -185,6 +183,8 @@ const AddModal = () => {
         },
         maxCount: 20,
         onChange(info) {
+            console.log(info);
+
             setAccoutQuery({
                 ...accoutQuery,
                 fileList: info.fileList
@@ -194,9 +194,14 @@ const AddModal = () => {
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
+    const [imageConent, setImageContent] = useState<any[]>([]);
     useEffect(() => {
         imageTemplates().then((res) => {
             setTypeList(res);
+        });
+        schemeMetadata().then((res) => {
+            setCategoryList(res.category);
+            // setSourceList(res.)
         });
     }, []);
     useEffect(() => {
@@ -204,6 +209,7 @@ const AddModal = () => {
             setValueOpen(false);
             setContentOpen(false);
             setAccoutQuery({});
+            setImageContent([]);
         }
     }, [addOpen]);
     //改变值
@@ -274,41 +280,42 @@ const AddModal = () => {
                         />
                     </Grid>
                     <Grid md={12} sm={12}>
-                        <FormControl
-                            key={params.category}
-                            error={!params.category && categoryOpen}
-                            sx={{ mt: 2 }}
-                            color="secondary"
-                            size="small"
-                            fullWidth
-                        >
-                            <InputLabel id="categorys">类目</InputLabel>
-                            <Select
-                                name="category"
+                        <div className="relative mt-[16px]">
+                            <TreeSelect
+                                className="bg-[#f8fafc]  h-[40px] border border-solid rounded-[6px] antdSel"
+                                showSearch
+                                style={{ width: '100%', borderColor: !params.category && categoryOpen ? '#f44336' : '#697586ad' }}
                                 value={params.category}
-                                onChange={(e: any) => {
+                                dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
+                                allowClear
+                                treeCheckable={false}
+                                treeDefaultExpandAll
+                                onChange={(e) => {
                                     setCategoryOpen(true);
-                                    changeParams(e.target);
+                                    changeParams({ name: 'category', value: e });
                                 }}
-                                labelId="categorys"
-                                label="类目"
+                                onClear={() => {
+                                    setCategoryOpen(true);
+                                    changeParams({ name: 'category', value: '' });
+                                }}
+                                fieldNames={{
+                                    label: 'name',
+                                    value: 'code'
+                                }}
+                                treeData={categoryList}
+                            />
+                            <span
+                                className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px]"
+                                style={{ color: !params.category && categoryOpen ? '#f44336' : '#697586' }}
                             >
-                                <MenuItem value={'类目 1'}>类目 1</MenuItem>
-                                <MenuItem value={'类目 2'}>类目 2</MenuItem>
-                                {/* {styleList?.map((item) => (
-                                        <MenuItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </MenuItem>
-                                    ))} */}
-                            </Select>
-                            <FormHelperText>{!params.category && categoryOpen ? '类目必选' : ''}</FormHelperText>
-                        </FormControl>
+                                类目
+                            </span>
+                        </div>
                     </Grid>
                     <Grid md={12} sm={12}>
                         <FormControl
                             key={params.tags}
-                            error={(!params.tags || params.tags.length === 0) && categoryOpen}
-                            sx={{ mt: 2 }}
+                            error={(!params.tags || params.tags.length === 0) && tagOpen}
                             color="secondary"
                             size="small"
                             fullWidth
@@ -335,7 +342,7 @@ const AddModal = () => {
                                 }}
                                 renderInput={(param) => (
                                     <TextField
-                                        error={(!params.tags || params.tags.length === 0) && categoryOpen}
+                                        error={(!params.tags || params.tags.length === 0) && tagOpen}
                                         color="secondary"
                                         {...param}
                                         label="标签"
@@ -376,7 +383,7 @@ const AddModal = () => {
                     }}
                 />
                 <div className="flex justify-between items-center mt-[20px]">
-                    <div className="text-[18px] font-[600]">参考账号</div>
+                    <div className="text-[18px] font-[600]">参考内容</div>
                     <Button
                         onClick={() => {
                             setAddTitle('新增参考账号');
@@ -631,6 +638,26 @@ const AddModal = () => {
                         <CardContent>
                             <Grid container spacing={2}>
                                 <Grid item md={12}>
+                                    <FormControl color="secondary" fullWidth>
+                                        <InputLabel id="source">参考来源</InputLabel>
+                                        <Select
+                                            labelId="source"
+                                            value={accoutQuery.source}
+                                            label="参考来源"
+                                            onChange={(e) => {
+                                                // setSourceOpen(true);
+                                                changeAccoutQuery(e.target);
+                                            }}
+                                        >
+                                            {sourceList.map((item) => (
+                                                <MenuItem key={item.value} value={item.value}>
+                                                    {item.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item md={12}>
                                     <TextField
                                         size="small"
                                         fullWidth
@@ -670,21 +697,7 @@ const AddModal = () => {
                                         fullWidth
                                         color="secondary"
                                         InputLabelProps={{ shrink: true }}
-                                        label="小红书账号"
-                                        name="account"
-                                        value={accoutQuery.account}
-                                        onChange={(e: any) => {
-                                            changeAccoutQuery(e.target);
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item md={12}>
-                                    <TextField
-                                        size="small"
-                                        fullWidth
-                                        color="secondary"
-                                        InputLabelProps={{ shrink: true }}
-                                        label="小红书账号链接"
+                                        label="参考链接地址"
                                         name="link"
                                         value={accoutQuery.link}
                                         onChange={(e: any) => {
@@ -693,12 +706,59 @@ const AddModal = () => {
                                     />
                                 </Grid>
                             </Grid>
-                            <Upload className="mt-[20px]" {...props}>
-                                <div>
-                                    <PlusOutlined rev={undefined} />
-                                    <div style={{ marginTop: 8 }}>Upload</div>
-                                </div>
-                            </Upload>
+                            <div className="flex flex-wrap gap-2 my-[20px]">
+                                {accoutQuery.fileList?.map((item: any, index: number) => (
+                                    <div key={index}>
+                                        <div className=" w-[100px] rounded-[8px] border border-solid border-[#d9d9d9] p-[8px]">
+                                            <div className="relative w-[84px] h-[84px]">
+                                                <Image
+                                                    width={84}
+                                                    height={84}
+                                                    src={item?.response?.data?.url}
+                                                    preview={false}
+                                                    fallback="data:image/png;base64,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"
+                                                />
+                                                {item?.percent !== 100 && (
+                                                    <div className="absolute bg-[#f3f3f3] top-0 w-full h-full flex justify-center items-center">
+                                                        <Image className="!w-[20px] !h-[20px]" src={imgLoading} preview={false} />
+                                                    </div>
+                                                )}
+                                                {item?.percent === 100 && item?.response?.data?.url && (
+                                                    <div className="absolute top-0 w-full h-full flex justify-center items-center hover:bg-[#000]/20 text-transparent hover:text-[#ff4d4f]">
+                                                        <DeleteOutlined
+                                                            onClick={() => {
+                                                                const newData = _.cloneDeep(accoutQuery);
+                                                                newData.fileList?.splice(index, 1);
+                                                                setAccoutQuery(newData);
+                                                            }}
+                                                            rev={undefined}
+                                                            className="cursor-pointer"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {item?.percent === 100 && item?.response?.data?.url && (
+                                            <Input
+                                                value={imageConent[index]}
+                                                onChange={(e) => {
+                                                    const newList = _.cloneDeep(imageConent);
+                                                    newList[index] = e.target.value;
+                                                    setImageContent(newList);
+                                                }}
+                                                placeholder="图片内容"
+                                                className="mt-[8px] w-[100px]"
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                                <Upload className="inline-block !w-auto" {...props}>
+                                    <div>
+                                        <PlusOutlined rev={undefined} />
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </div>
                         </CardContent>
                         <Divider />
                         <CardActions>
@@ -713,9 +773,19 @@ const AddModal = () => {
                                             const newList = _.cloneDeep(tableData);
                                             const obj = {
                                                 ...accoutQuery,
+                                                fileList: undefined,
                                                 images:
                                                     accoutQuery.fileList
-                                                        ?.map((item: any) => item?.response?.data?.url)
+                                                        ?.map((item: any, i: number) => {
+                                                            if (item?.response?.data?.url) {
+                                                                return {
+                                                                    url: item?.response?.data?.url,
+                                                                    content: imageConent[i]
+                                                                };
+                                                            } else {
+                                                                return undefined;
+                                                            }
+                                                        })
                                                         ?.filter((el: any) => el !== undefined) || []
                                             };
                                             if (addTitle === '新增参考账号') {

@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 
 // material-ui
@@ -33,6 +33,7 @@ import BgDark from 'assets/images/landing/bg-hero-block-dark.png';
 import BgLight from 'assets/images/landing/bg-hero-block-light.png';
 import { t } from 'hooks/web/useI18n';
 import Slider from 'react-slick';
+import useRouteStore from 'store/router';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -58,6 +59,8 @@ const HeaderAnimationImage = styled('img')({
 const HeaderSection = () => {
     const theme = useTheme();
     const { rtlLayout } = useConfig();
+    const navigate = useNavigate();
+    const { setRoutesIndex } = useRouteStore((state) => state);
     const settings = {
         className: 'center',
         dots: false,
@@ -194,8 +197,12 @@ const HeaderSection = () => {
                                     <Grid item>
                                         <AnimateButton>
                                             <Button
-                                                component={RouterLink}
-                                                to="/appMarket"
+                                                // component={RouterLink}
+                                                // to="/appMarket"
+                                                onClick={() => {
+                                                    navigate('/appMarket');
+                                                    setRoutesIndex(0);
+                                                }}
                                                 // target="_blank"
                                                 size="large"
                                                 variant="contained"

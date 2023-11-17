@@ -1,5 +1,5 @@
 import { cloneElement, useState, ReactElement } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // material-ui
 import {
@@ -26,6 +26,7 @@ import Logo from 'ui-component/Logo';
 // assets
 import { IconDashboard, IconHome2 } from '@tabler/icons';
 import MenuIcon from '@mui/icons-material/Menu';
+import useRouteStore from 'store/router';
 
 // elevation scroll
 interface ElevationScrollProps {
@@ -54,6 +55,8 @@ function ElevationScroll({ children, window }: ElevationScrollProps) {
 
 const AppBar = ({ ...others }) => {
     const [drawerToggle, setDrawerToggle] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const { setRoutesIndex } = useRouteStore((state) => state);
 
     const drawerToggler = (open: boolean) => (event: any) => {
         if (event.type! === 'keydown' && (event.key! === 'Tab' || event.key! === 'Shift')) {
@@ -70,9 +73,14 @@ const AppBar = ({ ...others }) => {
                         <Logo />
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button
-                                component={RouterLink}
-                                to="/appMarket"
+                                // component={RouterLink}
+                                // to="/appMarket"
                                 // target="_blank"
+
+                                onClick={() => {
+                                    navigate('/appMarket');
+                                    setRoutesIndex(0);
+                                }}
                                 disableElevation
                                 variant="contained"
                                 color="secondary"

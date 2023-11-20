@@ -405,13 +405,14 @@ const Thesaurus = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell align="center">{row.count}</TableCell>
+                                            <TableCell align="center">{row.createUser}</TableCell>
                                             <TableCell align="center">
                                                 {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </TableCell>
                                             <TableCell align="center">
                                                 {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                             </TableCell>
-                                            <TableCell align="center">
+                                            <TableCell align="center" className="w-[80px] flex justify-end">
                                                 <Tooltip placement="top" title={'查看关键词列表'}>
                                                     <IconButton
                                                         aria-label="delete"

@@ -12,14 +12,29 @@ import {
     Grid,
     Switch,
     Autocomplete,
-    Chip
+    Chip,
+    Box,
+    Typography,
+    Tooltip,
+    FormControlLabel,
+    TableContainer,
+    TableHead,
+    Table as Tables,
+    TableRow,
+    TableCell,
+    TableBody,
+    Button as Buttons
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorIcon from '@mui/icons-material/Error';
+import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MainCard from 'ui-component/cards/MainCard';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -33,6 +48,8 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import copywriting from 'store/copywriting';
 import '../index.scss';
+import { t } from 'hooks/web/useI18n';
+import VariableModal from './variableModal';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const { tableList, setTableList } = copywriting();
@@ -241,6 +258,23 @@ const AddModal = () => {
             setTableData(tableList);
         }
     }, []);
+    const iptRef: any = useRef(null);
+    const [rows, setRows] = useState<any[]>([]);
+    const [title, setTitle] = useState('');
+    const [variableOpen, setVariableOpen] = useState(false);
+    const [varIndex, setVarIndex] = useState(-1);
+    const [itemData, setItemData] = useState<any>({});
+    const saveContent = (data: any) => {
+        if (title === '增加变量') {
+            setRows([...rows, data]);
+            setVariableOpen(false);
+        } else {
+            const newList = _.cloneDeep(rows);
+            newList[varIndex] = data;
+            setRows(newList);
+            setVariableOpen(false);
+        }
+    };
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard
@@ -262,7 +296,7 @@ const AddModal = () => {
         >
             <CardContent>
                 <Grid sx={{ ml: 0 }} container spacing={2}>
-                    <Grid md={12} sm={12}>
+                    <Grid item md={12} sm={12}>
                         <TextField
                             sx={{ width: '300px', mt: 2 }}
                             size="small"
@@ -279,7 +313,7 @@ const AddModal = () => {
                             }}
                         />
                     </Grid>
-                    <Grid md={12} sm={12}>
+                    <Grid item md={12} sm={12}>
                         <div className="relative mt-[16px]">
                             <TreeSelect
                                 className="bg-[#f8fafc]  h-[40px] border border-solid rounded-[6px] antdSel"
@@ -312,7 +346,7 @@ const AddModal = () => {
                             </span>
                         </div>
                     </Grid>
-                    <Grid md={12} sm={12}>
+                    <Grid item md={12} sm={12}>
                         <FormControl
                             key={params.tags}
                             error={(!params.tags || params.tags.length === 0) && tagOpen}
@@ -355,7 +389,7 @@ const AddModal = () => {
                             </FormHelperText>
                         </FormControl>
                     </Grid>
-                    <Grid md={12} sm={12}>
+                    <Grid item md={12} sm={12}>
                         <div className="flex items-center mt-[16px]">
                             <Switch
                                 color={'secondary'}
@@ -441,22 +475,137 @@ const AddModal = () => {
                                         </Button>
                                     </div>
                                     <TextField
-                                        fullWidth
+                                        color="secondary"
+                                        inputRef={iptRef}
+                                        placeholder={''}
+                                        value={copyWritingTemplate.demand}
+                                        required
+                                        name="demand"
                                         multiline
                                         minRows={4}
-                                        maxRows={6}
-                                        size="small"
-                                        color="secondary"
+                                        maxRows={4}
                                         InputLabelProps={{ shrink: true }}
-                                        name="demand"
-                                        value={copyWritingTemplate.demand}
-                                        onChange={(e: any) => {
+                                        onChange={(e) => {
                                             setCopyWritingTemplate({
                                                 ...copyWritingTemplate,
                                                 demand: e.target.value
                                             });
                                         }}
+                                        fullWidth
                                     />
+                                    <Box mb={1}>
+                                        {rows?.map((item, index: number) => (
+                                            <Tooltip key={index} placement="top" title={t('market.fields')}>
+                                                <Chip
+                                                    sx={{ mr: 1, mt: 1 }}
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => {
+                                                        const newVal = _.cloneDeep(copyWritingTemplate.demand);
+                                                        const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
+                                                        const part2 = newVal?.slice(iptRef.current?.selectionStart);
+                                                        setCopyWritingTemplate({
+                                                            ...copyWritingTemplate,
+                                                            demand: `${part1}{STEP.${'我是变量'}.${index}}${part2}`
+                                                        });
+                                                    }}
+                                                    label={item.field}
+                                                ></Chip>
+                                            </Tooltip>
+                                        ))}
+                                    </Box>
+                                    <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Box mr={1}>{t('myApp.table')}</Box>
+                                                <Tooltip placement="top" title={t('market.varableDesc')}>
+                                                    <ErrorIcon fontSize="small" />
+                                                </Tooltip>
+                                            </Typography>
+                                            <Buttons
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() => {
+                                                    setTitle('增加变量');
+                                                    setVariableOpen(true);
+                                                }}
+                                                variant="outlined"
+                                                startIcon={<AddIcon />}
+                                            >
+                                                {t('myApp.add')}
+                                            </Buttons>
+                                        </Box>
+                                        <Divider style={{ margin: '10px 0' }} />
+                                        <TableContainer>
+                                            <Tables size="small">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>{t('myApp.field')}</TableCell>
+                                                        <TableCell>{t('myApp.name')}</TableCell>
+                                                        <TableCell>{t('myApp.type')}</TableCell>
+                                                        <TableCell> {t('myApp.isShow')}</TableCell>
+                                                        <TableCell>{t('myApp.operation')}</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {rows?.map((row: any, i: number) => (
+                                                        <TableRow hover key={row.field}>
+                                                            <TableCell>{row.field}</TableCell>
+                                                            <TableCell>{row.label}</TableCell>
+                                                            <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
+                                                            <TableCell>
+                                                                <Switch
+                                                                    name={row.field}
+                                                                    onChange={() => {
+                                                                        console.log('显示开关');
+                                                                    }}
+                                                                    checked={row?.isShow}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <IconButton
+                                                                    onClick={() => {
+                                                                        setVarIndex(i);
+                                                                        setItemData(row);
+                                                                        setTitle('编辑变量');
+                                                                        setVariableOpen(true);
+                                                                    }}
+                                                                    color="primary"
+                                                                >
+                                                                    <SettingsIcon />
+                                                                </IconButton>
+                                                                <Popconfirm
+                                                                    title={t('myApp.del')}
+                                                                    description={t('myApp.delDesc')}
+                                                                    onConfirm={() => {
+                                                                        const newList = _.cloneDeep(rows);
+                                                                        newList?.splice(i, 1);
+                                                                        setRows(newList);
+                                                                    }}
+                                                                    onCancel={() => {}}
+                                                                    okText={t('myApp.confirm')}
+                                                                    cancelText={t('myApp.cancel')}
+                                                                >
+                                                                    <IconButton color="error">
+                                                                        <DeleteIcon />
+                                                                    </IconButton>
+                                                                </Popconfirm>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Tables>
+                                        </TableContainer>
+                                    </MainCard>
+                                    {variableOpen && (
+                                        <VariableModal
+                                            title={title}
+                                            open={variableOpen}
+                                            setOpen={setVariableOpen}
+                                            itemData={itemData}
+                                            saveContent={saveContent}
+                                        />
+                                    )}
                                     {/* <div className="text-[14px] font-[600] my-[20px]">文案生成参数</div>
                                     <Grid container spacing={2}>
                                         <Grid item md={4}>

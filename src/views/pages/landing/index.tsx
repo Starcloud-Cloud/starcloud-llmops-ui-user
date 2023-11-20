@@ -57,7 +57,7 @@ const Landing = () => {
                 <HeaderSection />
             </HeaderWrapper>
 
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default', py: '80px' }}>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default', pt: '45px' }}>
                 <VideoSection />
             </SectionWrapper>
 

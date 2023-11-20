@@ -104,7 +104,7 @@ const HeaderSection = () => {
     );
 
     return (
-        <Container sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+        <Container sx={{ height: '88vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <Grid
                 container
                 justifyContent="space-between"
@@ -284,7 +284,6 @@ const HeaderSection = () => {
                     {HeaderAnimationImagememo}
                 </Grid>
             </Grid>
-            <img onClick={() => handleScroll()} src={downArrow} className="absolute bottom-0 cursor-pointer" />
         </Container>
     );
 };

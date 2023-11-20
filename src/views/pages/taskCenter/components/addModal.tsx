@@ -8,14 +8,15 @@ import {
     Select,
     MenuItem,
     CardActions,
-    Grid
+    Grid,
+    FormHelperText
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Divider, Image, DatePicker, Row, Col, Radio } from 'antd';
+import { Table, Button, Divider, DatePicker, Row, Col, Radio } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
@@ -34,6 +35,19 @@ const AddModal = ({
 }) => {
     // 1.模板名称
     const [params, setParams] = useState<any>({});
+    const [time, setTime] = useState<any>({});
+    const [nameOpen, setNameOpen] = useState(false);
+    const [platformOpen, setPlatformOpen] = useState(false);
+    const [fieldOpen, setFieldOpen] = useState(false);
+    const [typeOpen, setTypeOpen] = useState(false);
+    const [postingUnitPriceOpen, setPostingUnitPriceOpen] = useState(false);
+    const [replyUnitPriceOpen, setReplyUnitPriceOpen] = useState(false);
+    const [likeUnitPriceOpen, setLikeUnitPriceOpen] = useState(false);
+    const [startTimeOpen, setStartTimeOpen] = useState(false);
+    const [endTimeOpen, setEndTimeOpen] = useState(false);
+    const [singleBudgetOpen, setSingleBudgetOpen] = useState(false);
+    const [notificationBudgetOpen, setNotificationBudgetOpen] = useState(false);
+
     const changeParams = (data: any) => {
         setParams({
             ...params,
@@ -123,7 +137,48 @@ const AddModal = ({
     ];
     const [rowIndex, setRowIndex] = useState(-1);
     const [tableData, setTableData] = useState<any[]>([]);
-
+    const handleSave = () => {
+        console.log(params);
+        const {
+            name,
+            platform,
+            field,
+            startTime,
+            endTime,
+            type,
+            postingUnitPrice,
+            replyUnitPrice,
+            likeUnitPrice,
+            singleBudget,
+            notificationBudget
+        } = params;
+        if (
+            !name ||
+            !platform ||
+            !field ||
+            !startTime ||
+            !endTime ||
+            !type ||
+            !postingUnitPrice ||
+            !replyUnitPrice ||
+            !likeUnitPrice ||
+            !singleBudget ||
+            !notificationBudget
+        ) {
+            setNameOpen(true);
+            setPlatformOpen(true);
+            setFieldOpen(true);
+            setTypeOpen(true);
+            setPostingUnitPriceOpen(true);
+            setReplyUnitPriceOpen(true);
+            setLikeUnitPriceOpen(true);
+            setStartTimeOpen(true);
+            setEndTimeOpen(true);
+            setSingleBudgetOpen(true);
+            setNotificationBudgetOpen(true);
+            return false;
+        }
+    };
     useEffect(() => {
         if (uid) {
             console.log(1);
@@ -160,43 +215,54 @@ const AddModal = ({
                                 label="任务名称"
                                 name="name"
                                 value={params.name}
+                                error={!params.name && nameOpen}
+                                helperText={!params.name && nameOpen ? '任务名称必填' : ''}
                                 onChange={(e: any) => {
+                                    setNameOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
                         </Col>
                         <Col md={8} sm={24}>
-                            <FormControl key={params.category} color="secondary" size="small" fullWidth>
+                            <FormControl
+                                error={!params.platform && platformOpen}
+                                key={params.platform}
+                                color="secondary"
+                                size="small"
+                                fullWidth
+                            >
                                 <InputLabel id="categorys">平台</InputLabel>
                                 <Select
-                                    name="category"
-                                    value={params.category}
+                                    name="platform"
+                                    value={params.platform}
                                     onChange={(e: any) => {
+                                        setPlatformOpen(true);
                                         changeParams(e.target);
                                     }}
                                     labelId="categorys"
                                     label="平台"
                                 >
-                                    <MenuItem value={'类目 1'}>平台 1</MenuItem>
-                                    <MenuItem value={'类目 2'}>平台 2</MenuItem>
+                                    <MenuItem value={'xhs'}>小红书</MenuItem>
                                 </Select>
+                                <FormHelperText>{!params.platform && platformOpen ? '平台必选' : ''}</FormHelperText>
                             </FormControl>
                         </Col>
                         <Col md={8} sm={24}>
-                            <FormControl key={params.category} color="secondary" size="small" fullWidth>
+                            <FormControl error={!params.field && fieldOpen} key={params.category} color="secondary" size="small" fullWidth>
                                 <InputLabel id="fields">领域</InputLabel>
                                 <Select
                                     name="field"
                                     value={params.field}
                                     onChange={(e: any) => {
+                                        setFieldOpen(true);
                                         changeParams(e.target);
                                     }}
                                     labelId="fields"
                                     label="领域"
                                 >
-                                    <MenuItem value={'类目 1'}>领域 1</MenuItem>
-                                    <MenuItem value={'类目 2'}>领域 2</MenuItem>
+                                    <MenuItem value={'Xhss'}>领域</MenuItem>
                                 </Select>
+                                <FormHelperText>{!params.field && fieldOpen ? '领域必选' : ''}</FormHelperText>
                             </FormControl>
                         </Col>
                     </Row>
@@ -204,21 +270,39 @@ const AddModal = ({
                     <Row gutter={20}>
                         <Col md={8} sm={24}>
                             <DatePicker
-                                className="!w-full"
-                                value={params.startTime}
+                                size="large"
+                                status={!params.startTime && startTimeOpen ? 'error' : ''}
+                                className="!w-full mb-[5px]"
+                                value={time.startTime}
                                 onChange={(date, dateString) => {
+                                    setStartTimeOpen(true);
+                                    setTime({
+                                        ...time,
+                                        startTime: date
+                                    });
                                     changeParams({ name: 'startTime', value: dateString });
                                 }}
                             />
+                            {!params.startTime && startTimeOpen && (
+                                <span className="ml-[10px] text-[#ff4d4f] text-[12px]">开始时间必选</span>
+                            )}
                         </Col>
                         <Col md={8} sm={24}>
                             <DatePicker
-                                className="!w-full"
-                                value={params.endTime}
+                                size="large"
+                                status={!params.endTime && endTimeOpen ? 'error' : ''}
+                                className="!w-full mb-[5px]"
+                                value={time.endTime}
                                 onChange={(date, dateString) => {
+                                    setEndTimeOpen(true);
+                                    setTime({
+                                        ...time,
+                                        endTime: date
+                                    });
                                     changeParams({ name: 'endTime', value: dateString });
                                 }}
                             />
+                            {!params.endTime && endTimeOpen && <span className="ml-[10px] text-[#ff4d4f] text-[12px]">结束时间必选</span>}
                         </Col>
                     </Row>
                     <Divider />
@@ -232,7 +316,10 @@ const AddModal = ({
                                 label="任务类型"
                                 name="type"
                                 value={params.type}
+                                error={!params.type && typeOpen}
+                                helperText={!params.type && typeOpen ? '任务类型必填' : ''}
                                 onChange={(e: any) => {
+                                    setTypeOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
@@ -245,9 +332,12 @@ const AddModal = ({
                                 InputLabelProps={{ shrink: true }}
                                 label="发帖单价"
                                 type="number"
-                                name="price"
-                                value={params.price}
+                                name="postingUnitPrice"
+                                value={params.postingUnitPrice}
+                                error={!params.postingUnitPrice && postingUnitPriceOpen}
+                                helperText={!params.postingUnitPrice && postingUnitPriceOpen ? '发帖单价必填' : ''}
                                 onChange={(e: any) => {
+                                    setPostingUnitPriceOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
@@ -259,9 +349,12 @@ const AddModal = ({
                                 InputLabelProps={{ shrink: true }}
                                 label="回复单价"
                                 type="number"
-                                name="callprice"
-                                value={params.callprice}
+                                name="replyUnitPrice"
+                                value={params.replyUnitPrice}
+                                error={!params.replyUnitPrice && replyUnitPriceOpen}
+                                helperText={!params.replyUnitPrice && replyUnitPriceOpen ? '回复单价必填' : ''}
                                 onChange={(e: any) => {
+                                    setReplyUnitPriceOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
@@ -273,14 +366,17 @@ const AddModal = ({
                                 InputLabelProps={{ shrink: true }}
                                 label="点赞单价"
                                 type="number"
-                                name="likePrice"
-                                value={params.likePrice}
+                                name="likeUnitPrice"
+                                value={params.likeUnitPrice}
+                                error={!params.likeUnitPrice && likeUnitPriceOpen}
+                                helperText={!params.likeUnitPrice && likeUnitPriceOpen ? '点赞单价必填' : ''}
                                 onChange={(e: any) => {
+                                    setLikeUnitPriceOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
                         </Col>
-                        <Col span={8}>
+                        {/* <Col span={8}>
                             <Radio.Group
                                 value={params.options}
                                 onChange={(e) => {
@@ -292,7 +388,7 @@ const AddModal = ({
                                 <Radio value="b">选项 2</Radio>
                                 <Radio value="c">选项 3</Radio>
                             </Radio.Group>
-                        </Col>
+                        </Col> */}
                     </Row>
                     <Divider />
                     <Row gutter={20}>
@@ -304,9 +400,12 @@ const AddModal = ({
                                 InputLabelProps={{ shrink: true }}
                                 label="单任务预算上限"
                                 type="number"
-                                name="limit"
-                                value={params.limit}
+                                name="singleBudget"
+                                value={params.singleBudget}
+                                error={!params.singleBudget && singleBudgetOpen}
+                                helperText={!params.singleBudget && singleBudgetOpen ? '单任务预算上限必填' : ''}
                                 onChange={(e: any) => {
+                                    setSingleBudgetOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
@@ -317,11 +416,14 @@ const AddModal = ({
                                 color="secondary"
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
-                                label="任务总预算"
+                                label="通告总预算"
                                 type="number"
-                                name="totalLimit"
-                                value={params.totalLimit}
+                                name="notificationBudget"
+                                value={params.notificationBudget}
+                                error={!params.notificationBudget && notificationBudgetOpen}
+                                helperText={!params.notificationBudget && notificationBudgetOpen ? '通告总预算必填' : ''}
                                 onChange={(e: any) => {
+                                    setNotificationBudgetOpen(true);
                                     changeParams(e.target);
                                 }}
                             />
@@ -338,8 +440,8 @@ const AddModal = ({
                                 minRows={4}
                                 maxRows={6}
                                 type="number"
-                                name="desc"
-                                value={params.desc}
+                                name="description"
+                                value={params.description}
                                 onChange={(e: any) => {
                                     changeParams(e.target);
                                 }}
@@ -371,7 +473,7 @@ const AddModal = ({
                         </Button>
                     </div>
                     <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
-                    <TextField
+                    {/* <TextField
                         sx={{ width: '300px', mt: 2 }}
                         size="small"
                         color="secondary"
@@ -440,11 +542,11 @@ const AddModal = ({
                                 </Select>
                             </FormControl>
                         </Col>
-                    </Row>
+                    </Row> */}
                     <Divider />
                     <CardActions>
                         <Grid container justifyContent="flex-end">
-                            <Button type="primary" onClick={() => {}}>
+                            <Button type="primary" onClick={handleSave}>
                                 保存
                             </Button>
                         </Grid>

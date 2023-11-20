@@ -1,25 +1,18 @@
-import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, Checkbox, Tooltip } from '@mui/material';
 import { Tag } from 'antd';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-
 import MainCard from 'ui-component/cards/MainCard';
-
 import React, { useEffect, useState } from 'react';
-import { Image } from 'antd';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { schemePage, schemeDelete, schemeCopy } from 'api/redBook/copywriting';
-import { listTemplates } from 'api/redBook/batchIndex';
+import { notificationPage } from 'api/redBook/task';
 import AddModal from './components/addModal';
 
 export interface DraftConfig {}
@@ -129,23 +122,8 @@ const TaskCenter: React.FC = () => {
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
-
-    //模板选择
-    const [open, setOpen] = useState(false);
-    const [templateList, setTemplateList] = useState<any[]>([]);
-    useEffect(() => {
-        if (open) {
-            listTemplates().then((res) => {
-                setTemplateList(res);
-            });
-        }
-    }, [open]);
-
     //创建的内容
     const [detailOpen, setDetailOpen] = useState(false);
-
-    const delOpen = Boolean(delAnchorEl);
-    const navigate = useNavigate();
 
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
@@ -158,7 +136,7 @@ const TaskCenter: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            schemePage({ ...pageVO }).then((res) => {
+            notificationPage({ ...pageVO }).then((res) => {
                 const fetchedRows = res?.list;
                 setRows([...fetchedRows]);
                 setTotal(res?.total);

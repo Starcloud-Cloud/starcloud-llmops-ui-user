@@ -139,7 +139,7 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    <Tab disabled={!currentSelect.monthCode.includes('basic')} label="订阅" {...a11yProps(1)} />
+                                    <Tab disabled={!currentSelect.monthCode.includes('basic')} label="订阅(立减10元)" {...a11yProps(1)} />
                                 </Tabs>
                                 <div className="flex justify-center flex-col items-center w-full p-3">
                                     <div className="flex justify-between items-center w-full mb-3">

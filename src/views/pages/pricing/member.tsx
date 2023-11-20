@@ -174,7 +174,14 @@ const plansDefault = (value: number) => [
         preMonthPrice: 49.91,
         des: '适用于普通用户',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        btnText: '立即购买',
+        btnText: (
+            <div>
+                立即购买
+                <Tag className="ml-1" color="#f50">
+                    订阅立减10元
+                </Tag>
+            </div>
+        ),
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },

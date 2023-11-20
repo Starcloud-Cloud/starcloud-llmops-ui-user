@@ -21,8 +21,18 @@ const VideoSection = () => {
                 <Grid item xs={12} md={12}>
                     <Grid container spacing={2.5}>
                         <Grid item xs={12}>
-                            <Typography className="text-center" variant="h3" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, mb: 2 }}>
-                                1分钟了解魔法AI
+                            <Typography
+                                className="text-center cursor-pointer"
+                                variant="h3"
+                                sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, mb: 2 }}
+                            >
+                                <span
+                                    onClick={() => {
+                                        window.scrollTo(0, window.innerHeight - 250);
+                                    }}
+                                >
+                                    1分钟了解魔法AI
+                                </span>
                             </Typography>
                         </Grid>
 

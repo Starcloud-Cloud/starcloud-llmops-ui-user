@@ -104,7 +104,7 @@ const HeaderSection = () => {
     );
 
     return (
-        <Container sx={{ height: '88vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+        <Container sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <Grid
                 container
                 justifyContent="space-between"

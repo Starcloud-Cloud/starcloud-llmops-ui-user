@@ -259,7 +259,8 @@ const RedBookTaskList: React.FC = () => {
     };
 
     const addPlan = async () => {
-        setOpen(true);
+        navigate('/batchSmallRedBook');
+        // setOpen(true);
     };
 
     const handleEdit = async (uid: string) => {

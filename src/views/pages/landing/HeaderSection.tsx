@@ -24,6 +24,7 @@ import img6 from 'assets/images/landing/6.png';
 import img7 from 'assets/images/landing/7.png';
 import img8 from 'assets/images/landing/8.png';
 import img9 from 'assets/images/landing/9.png';
+import downArrow from 'assets/images/landing/down-arrow.gif';
 // import TechLight from 'assets/images/landing/tech-light.svg';
 // import TechDark from 'assets/images/landing/tech-dark.svg';
 import dashboard from 'assets/images/landing/hero-dashboard.png';
@@ -76,6 +77,10 @@ const HeaderSection = () => {
         autoplaySpeed: 2000
     };
 
+    const handleScroll = () => {
+        window.scrollTo(0, window.innerHeight - 80);
+    };
+
     const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3rem', lg: '3rem' } };
 
     const HeaderAnimationImagememo = useMemo(
@@ -99,7 +104,7 @@ const HeaderSection = () => {
     );
 
     return (
-        <Container sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Container sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <Grid
                 container
                 justifyContent="space-between"
@@ -279,6 +284,7 @@ const HeaderSection = () => {
                     {HeaderAnimationImagememo}
                 </Grid>
             </Grid>
+            <img onClick={() => handleScroll()} src={downArrow} className="absolute bottom-0 cursor-pointer" />
         </Container>
     );
 };

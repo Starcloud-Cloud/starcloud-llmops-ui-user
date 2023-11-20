@@ -22,7 +22,7 @@ const VideoSection = () => {
                     <Grid container spacing={2.5}>
                         <Grid item xs={12}>
                             <Typography className="text-center" variant="h3" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, mb: 2 }}>
-                                3分钟了解魔法AI
+                                1分钟了解魔法AI
                             </Typography>
                         </Grid>
 

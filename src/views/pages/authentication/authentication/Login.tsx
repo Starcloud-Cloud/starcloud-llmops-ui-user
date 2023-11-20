@@ -17,8 +17,8 @@ import { useEffect, useState } from 'react';
 import infoStore from 'store/entitlementAction';
 
 // assets
-// import imgMain from 'assets/images/auth/img-a2-login.svg';
-import imgMain from 'assets/images/auth/des.png';
+import imgMain from 'assets/images/auth/img-a2-login.svg';
+// import imgMain from 'assets/images/auth/des.png';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -99,8 +99,9 @@ const Login = () => {
                                 </Grid>
                             </Grid>
                             <Grid item xs={12} sx={{ position: 'relative' }}>
-                                <div className="relative" onClick={() => setOpen(true)}>
-                                    <svg
+                                {/* <div className="relative" onClick={() => setOpen(true)}> */}
+                                <div>
+                                    {/* <svg
                                         className="absolute left-[50%] top-[50%] ml-[-24px] mt-[-24px] z-10 cursor-pointer"
                                         viewBox="0 0 1024 1024"
                                         version="1.1"
@@ -114,7 +115,7 @@ const Login = () => {
                                             p-id="1566"
                                             fill="#8a8a8a"
                                         ></path>
-                                    </svg>
+                                    </svg> */}
 
                                     <img
                                         alt="Auth method"
@@ -123,10 +124,10 @@ const Login = () => {
                                             maxWidth: '100%',
                                             margin: '0 auto',
                                             display: 'block',
-                                            width: 500,
+                                            width: 300,
                                             position: 'relative',
-                                            zIndex: 5,
-                                            cursor: 'pointer'
+                                            zIndex: 5
+                                            // cursor: 'pointer'
                                         }}
                                     />
                                 </div>

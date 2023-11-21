@@ -11,9 +11,9 @@ import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { schemePage, schemeDelete, schemeCopy } from 'api/redBook/copywriting';
-import { notificationPage } from 'api/redBook/task';
+import { notificationPage, notificationDelete, notificationPublish } from 'api/redBook/task';
 import AddModal from './components/addModal';
+import Announce from './components/announce';
 
 export interface DraftConfig {}
 
@@ -50,12 +50,16 @@ export interface TableEnhancedCreateDataType {
 
 const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '任务名称' },
-    { id: 'endpoint', numeric: false, disablePadding: false, label: '任务模式' },
-    { id: 'score', numeric: false, disablePadding: false, label: '任务周期' },
-    { id: 'status', numeric: false, disablePadding: false, label: ' 任务投入总价' },
-    { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
-    { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
-    { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
+    { id: 'type', numeric: false, disablePadding: false, label: '任务类型' },
+    { id: 'platform', numeric: false, disablePadding: false, label: '平台' },
+    { id: 'field', numeric: false, disablePadding: false, label: '领域' },
+    { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '发帖单价' },
+    { id: 'replyUnitPrice', numeric: false, disablePadding: false, label: '回复单价' },
+    { id: 'likeUnitPrice', numeric: false, disablePadding: false, label: '点赞单价' },
+    { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
+    { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
+    { id: 'startTime', numeric: false, disablePadding: false, label: '任务开始时间' },
+    { id: 'endTime', numeric: false, disablePadding: false, label: '任务结束时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -147,7 +151,7 @@ const TaskCenter: React.FC = () => {
         }
     }, [page, rowsPerPage, count, order, orderBy, detailOpen]);
     const [title, setTitle] = useState('');
-    const [rows, setRows] = useState<any[]>([{}]);
+    const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -196,7 +200,7 @@ const TaskCenter: React.FC = () => {
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
     const delDraft = async () => {
-        const res = await schemeDelete(row?.uid);
+        const res = await notificationDelete(row?.uid);
         if (res) {
             dispatch(
                 openSnackbar({
@@ -216,14 +220,15 @@ const TaskCenter: React.FC = () => {
     };
 
     const [executeOpen, setExecuteOpen] = useState(false);
+    const [publish, setPublish] = useState(true);
     const Execute = () => {
-        schemeCopy({ uid: row?.uid }).then((res) => {
+        notificationPublish(row?.uid, publish).then((res) => {
             if (res) {
                 forceUpdate();
                 setExecuteOpen(false);
                 openSnackbar({
                     open: true,
-                    message: '复制成功',
+                    message: '操作成功',
                     variant: 'alert',
                     alert: {
                         color: 'success'
@@ -232,22 +237,21 @@ const TaskCenter: React.FC = () => {
                 });
             }
         });
-        // planExecute({ uid: row?.uid }).then((res) => {
-        setExecuteOpen(false);
-        // });
     };
 
     const addPlan = async () => {
         setTitle('新建创作方案');
         setDetailOpen(true);
     };
-    const [editUid, setEditUid] = useState('');
-    const handleEdit = async (uid: string) => {
-        setEditUid(uid);
+    const [editData, setEditData] = useState<any>({});
+    const handleEdit = async (row: any) => {
+        setEditData(row);
         setTitle('编辑创作方案');
         setDetailOpen(true);
     };
 
+    //通告任务
+    const [announceOpen, setAnnounceOpen] = useState(false);
     return (
         <MainCard
             content={false}
@@ -303,23 +307,25 @@ const TaskCenter: React.FC = () => {
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">{row.model}</div>
+                                        <div className="flex items-center justify-center">{row.type}</div>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <div>{row.category}</div>
-                                    </TableCell>
-                                    <TableCell align="center">{row.example}</TableCell>
-                                    <TableCell align="center">{row.creator}</TableCell>
+                                    <TableCell align="center">{row.platform}</TableCell>
+                                    <TableCell align="center">{row.field}</TableCell>
+                                    <TableCell align="center">{row.unitPrice?.postingUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.unitPrice?.replyUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.singleBudget}</TableCell>
+                                    <TableCell align="center">{row.notificationBudget}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
-                                            <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
+                                            <span> {row.startTime && dayjs(row.startTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.startTime && dayjs(row.startTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
+                                            <span> {row.endTime && dayjs(row.endTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.endTime && dayjs(row.endTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
@@ -330,7 +336,7 @@ const TaskCenter: React.FC = () => {
                                                 aria-label="delete"
                                                 size="small"
                                                 onClick={() => {
-                                                    handleEdit(row.uid);
+                                                    handleEdit(row);
                                                 }}
                                             >
                                                 编辑
@@ -342,17 +348,17 @@ const TaskCenter: React.FC = () => {
                                                 onClick={() => {
                                                     setRow(row);
                                                     setExecuteOpen(true);
+                                                    setPublish(row.status ? false : true);
                                                 }}
                                             >
-                                                发布任务、取消任务
+                                                {row.status ? '发布任务' : '取消任务'}
                                             </Button>
                                             <Button
                                                 aria-label="delete"
                                                 size="small"
                                                 color="secondary"
                                                 onClick={() => {
-                                                    setRow(row);
-                                                    setExecuteOpen(true);
+                                                    setAnnounceOpen(true);
                                                 }}
                                             >
                                                 查看通告任务
@@ -392,7 +398,8 @@ const TaskCenter: React.FC = () => {
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
-            {detailOpen && <AddModal title={title} uid={editUid} detailOpen={detailOpen} setDetailOpen={setDetailOpen} />}
+            {detailOpen && <AddModal title={title} editData={editData} detailOpen={detailOpen} setDetailOpen={setDetailOpen} />}
+            {announceOpen && <Announce open={announceOpen} setOpen={setAnnounceOpen} />}
         </MainCard>
     );
 };

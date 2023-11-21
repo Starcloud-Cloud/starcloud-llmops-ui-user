@@ -12,25 +12,26 @@ import {
     FormHelperText
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import dayjs from 'dayjs';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Divider, DatePicker, Row, Col, Radio } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { Button, Divider, DatePicker, Row, Col, Radio } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import './addModal.scss';
+import { notificationCreate, notificationModify } from 'api/redBook/task';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = ({
     detailOpen,
     title,
-    uid,
+    editData,
     setDetailOpen
 }: {
     detailOpen: boolean;
     title: string;
-    uid: string;
+    editData: any;
     setDetailOpen: (data: boolean) => void;
 }) => {
     // 1.模板名称
@@ -54,90 +55,7 @@ const AddModal = ({
             [data.name]: data.value
         });
     };
-    const columns: ColumnsType<any> = [
-        {
-            title: '任务编码',
-            dataIndex: 'encoding'
-        },
-        {
-            title: '任务文案',
-            dataIndex: 'copywriting'
-        },
-        {
-            title: '任务图片',
-            dataIndex: 'copyImage'
-        },
-        {
-            title: '创作计划',
-            dataIndex: 'plan'
-        },
-        {
-            title: '状态',
-            dataIndex: 'status'
-        },
-        {
-            title: '认领人',
-            dataIndex: 'peoper'
-        },
-        {
-            title: '认领时间',
-            dataIndex: 'claimTime'
-        },
-        {
-            title: '提交时间',
-            dataIndex: 'submitTime'
-        },
-        {
-            title: '发布链接',
-            dataIndex: 'link'
-        },
-        {
-            title: '预结算时间',
-            dataIndex: 'lementTime'
-        },
-        {
-            title: '预结花费',
-            dataIndex: 'lementPrice'
-        },
-        {
-            title: '结算时间',
-            dataIndex: 'lementsTime'
-        },
-        {
-            title: '支付订单号',
-            dataIndex: 'payOrder'
-        },
-        {
-            title: '操作',
-            render: (_, row, index) => (
-                <div className="whitespace-nowrap">
-                    <Button
-                        type="text"
-                        onClick={() => {
-                            setRowIndex(index);
-                        }}
-                    >
-                        编辑
-                    </Button>
-                    <Divider type="vertical" />
-                    <Button
-                        onClick={() => {
-                            const newList = JSON.parse(JSON.stringify(tableData));
-                            newList.splice(rowIndex, 1);
-                            setTableData(newList);
-                        }}
-                        danger
-                        type="text"
-                    >
-                        删除
-                    </Button>
-                </div>
-            )
-        }
-    ];
-    const [rowIndex, setRowIndex] = useState(-1);
-    const [tableData, setTableData] = useState<any[]>([]);
-    const handleSave = () => {
+    const handleSave = async () => {
         console.log(params);
         const {
             name,
@@ -178,12 +96,73 @@ const AddModal = ({
             setNotificationBudgetOpen(true);
             return false;
         }
+        if (title === '新建创作方案') {
+            const result = await notificationCreate({
+                ...params,
+                postingUnitPrice: undefined,
+                replyUnitPrice: undefined,
+                likeUnitPrice: undefined,
+                unitPrice: {
+                    postingUnitPrice: params.postingUnitPrice,
+                    replyUnitPrice: params.replyUnitPrice,
+                    likeUnitPrice: params.likeUnitPrice
+                }
+            });
+            if (result) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '创建成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                setDetailOpen(false);
+            }
+        } else {
+            const result = await notificationModify({
+                ...params,
+                postingUnitPrice: undefined,
+                replyUnitPrice: undefined,
+                likeUnitPrice: undefined,
+                unitPrice: {
+                    postingUnitPrice: params.postingUnitPrice,
+                    replyUnitPrice: params.replyUnitPrice,
+                    likeUnitPrice: params.likeUnitPrice
+                }
+            });
+            if (result) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '编辑成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                setDetailOpen(false);
+            }
+        }
     };
     useEffect(() => {
-        if (uid) {
-            console.log(1);
+        if (title === '编辑创作方案') {
+            setTime({
+                startTime: dayjs(editData.startTime),
+                endTime: dayjs(editData.endTime)
+            });
+            setParams({
+                ...editData,
+                ...editData?.unitPrice,
+                unitPrice: undefined
+            });
         }
-    }, [uid]);
+    }, []);
     return (
         <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -275,6 +254,8 @@ const AddModal = ({
                                 className="!w-full mb-[5px]"
                                 value={time.startTime}
                                 onChange={(date, dateString) => {
+                                    console.log(date);
+
                                     setStartTimeOpen(true);
                                     setTime({
                                         ...time,
@@ -308,21 +289,22 @@ const AddModal = ({
                     <Divider />
                     <Row gutter={20}>
                         <Col span={8}>
-                            <TextField
-                                size="small"
-                                color="secondary"
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                label="任务类型"
-                                name="type"
-                                value={params.type}
-                                error={!params.type && typeOpen}
-                                helperText={!params.type && typeOpen ? '任务类型必填' : ''}
-                                onChange={(e: any) => {
-                                    setTypeOpen(true);
-                                    changeParams(e.target);
-                                }}
-                            />
+                            <FormControl error={!params.type && typeOpen} key={params.type} color="secondary" size="small" fullWidth>
+                                <InputLabel id="categorys">平台</InputLabel>
+                                <Select
+                                    name="type"
+                                    value={params.type}
+                                    onChange={(e: any) => {
+                                        setTypeOpen(true);
+                                        changeParams(e.target);
+                                    }}
+                                    labelId="categorys"
+                                    label="平台"
+                                >
+                                    <MenuItem value={'posting'}>小红书</MenuItem>
+                                </Select>
+                                <FormHelperText>{!params.platform && typeOpen ? '任务类型必填' : ''}</FormHelperText>
+                            </FormControl>
                         </Col>
                         <Col span={8}>
                             <TextField
@@ -472,7 +454,6 @@ const AddModal = ({
                             新增
                         </Button>
                     </div>
-                    <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
                     {/* <TextField
                         sx={{ width: '300px', mt: 2 }}
                         size="small"

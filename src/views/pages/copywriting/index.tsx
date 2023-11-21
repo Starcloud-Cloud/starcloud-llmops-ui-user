@@ -5,7 +5,7 @@ import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 
 import React, { useEffect, useState } from 'react';
-import { Image, Tag } from 'antd';
+import { Image, Tag, Popover } from 'antd';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -344,8 +344,26 @@ const Copywriting: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex gap-2">
-                                            {row?.imageExample?.map((item: any) => (
-                                                <Image key={item.url} width={50} height={50} src={item.url} preview={false} />
+                                            {row?.imageExample?.map((item: any, index: number) => (
+                                                <Popover
+                                                    key={index}
+                                                    placement="top"
+                                                    content={
+                                                        <div className="flex gap-2">
+                                                            {item?.templateList?.map((el: any) => (
+                                                                <Image
+                                                                    key={el?.example}
+                                                                    width={50}
+                                                                    height={50}
+                                                                    src={el?.example}
+                                                                    preview={false}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    }
+                                                >
+                                                    <Image width={50} height={50} src={item?.templateList[0]?.example} preview={false} />
+                                                </Popover>
                                             ))}
                                         </div>
                                     </TableCell>

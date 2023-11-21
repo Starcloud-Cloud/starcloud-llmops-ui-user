@@ -186,6 +186,7 @@ const AddModal = () => {
     //modal
     const [addTitle, setAddTitle] = useState('');
     const [accoutQuery, setAccoutQuery] = useState<any>({});
+    const [sourceOpen, setSourceOpen] = useState(false);
     const [valueOpen, setValueOpen] = useState(false);
     const [contentOpen, setContentOpen] = useState(false);
     const props: UploadProps = {
@@ -218,7 +219,7 @@ const AddModal = () => {
         });
         schemeMetadata().then((res) => {
             setCategoryList(res.category);
-            // setSourceList(res.)
+            setSourceList(res.refersSource);
         });
     }, []);
     useEffect(() => {
@@ -241,7 +242,7 @@ const AddModal = () => {
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
                     console.log(res);
-
+                    setRows(res.configuration?.copyWritingTemplate?.variables);
                     setParams({
                         name: res.name,
                         category: res.category,
@@ -295,7 +296,7 @@ const AddModal = () => {
             content={false}
         >
             <CardContent>
-                <Grid sx={{ ml: 0 }} container spacing={2}>
+                <Grid sx={{ ml: 0 }} container>
                     <Grid item md={12} sm={12}>
                         <TextField
                             sx={{ width: '300px', mt: 2 }}
@@ -390,7 +391,7 @@ const AddModal = () => {
                         </FormControl>
                     </Grid>
                     <Grid item md={12} sm={12}>
-                        <div className="flex items-center mt-[16px]">
+                        <div className="flex items-center">
                             <Switch
                                 color={'secondary'}
                                 checked={params.type}
@@ -787,14 +788,15 @@ const AddModal = () => {
                         <CardContent>
                             <Grid container spacing={2}>
                                 <Grid item md={12}>
-                                    <FormControl color="secondary" fullWidth>
-                                        <InputLabel id="source">参考来源</InputLabel>
+                                    <FormControl error={sourceOpen && !accoutQuery.source} size="small" color="secondary" fullWidth>
+                                        <InputLabel id="sources">参考来源</InputLabel>
                                         <Select
-                                            labelId="source"
+                                            labelId="sources"
                                             value={accoutQuery.source}
                                             label="参考来源"
+                                            name="source"
                                             onChange={(e) => {
-                                                // setSourceOpen(true);
+                                                setSourceOpen(true);
                                                 changeAccoutQuery(e.target);
                                             }}
                                         >
@@ -804,6 +806,7 @@ const AddModal = () => {
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        <FormHelperText>{sourceOpen && !accoutQuery.source ? '参考来源必选' : ''}</FormHelperText>
                                     </FormControl>
                                 </Grid>
                                 <Grid item md={12}>
@@ -915,7 +918,8 @@ const AddModal = () => {
                                 <Button
                                     type="primary"
                                     onClick={() => {
-                                        if (!accoutQuery.title || !accoutQuery.content) {
+                                        if (!accoutQuery.title || !accoutQuery.content || !accoutQuery.source) {
+                                            setSourceOpen(true);
                                             setValueOpen(true);
                                             setContentOpen(true);
                                         } else {
@@ -1033,7 +1037,11 @@ const AddModal = () => {
                                         type: params ? 'USER' : 'SYSTEM',
                                         refers: tableData,
                                         configuration: {
-                                            copyWritingTemplate,
+                                            copyWritingTemplate: {
+                                                ...copyWritingTemplate,
+                                                isPromoteMp: copyWritingTemplate.isPromoteMp ? true : false,
+                                                variables: rows
+                                            },
                                             imageTemplate: {
                                                 styleList: imageStyleData
                                             }
@@ -1061,7 +1069,11 @@ const AddModal = () => {
                                     type: params ? 'USER' : 'SYSTEM',
                                     refers: tableData,
                                     configuration: {
-                                        copyWritingTemplate,
+                                        copyWritingTemplate: {
+                                            ...copyWritingTemplate,
+                                            isPromoteMp: copyWritingTemplate.isPromoteMp ? true : false,
+                                            variables: rows
+                                        },
                                         imageTemplate: {
                                             styleList: imageStyleData
                                         }

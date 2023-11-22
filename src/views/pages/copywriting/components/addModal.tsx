@@ -50,8 +50,10 @@ import copywriting from 'store/copywriting';
 import '../index.scss';
 import { t } from 'hooks/web/useI18n';
 import VariableModal from './variableModal';
+import useUserStore from 'store/user';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
+    const permissions = useUserStore((state) => state.permissions);
     const { tableList, setTableList } = copywriting();
     const location = useLocation();
     const navigate = useNavigate();
@@ -406,16 +408,18 @@ const AddModal = () => {
                             </FormHelperText>
                         </FormControl>
                     </Grid>
-                    <Grid item md={12} sm={12}>
-                        <div className="flex items-center">
-                            <Switch
-                                color={'secondary'}
-                                checked={params.type}
-                                onClick={() => setParams({ ...params, type: !params.type })}
-                            />{' '}
-                            公开
-                        </div>
-                    </Grid>
+                    {permissions.includes('creative:scheme:publish') && (
+                        <Grid item md={12} sm={12}>
+                            <div className="flex items-center">
+                                <Switch
+                                    color={'secondary'}
+                                    checked={params.type}
+                                    onClick={() => setParams({ ...params, type: !params.type })}
+                                />{' '}
+                                公开
+                            </div>
+                        </Grid>
+                    )}
                 </Grid>
                 <TextField
                     sx={{ mt: 2 }}

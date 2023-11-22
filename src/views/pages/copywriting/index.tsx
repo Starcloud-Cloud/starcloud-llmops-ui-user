@@ -19,6 +19,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { schemePage, schemeDelete, schemeCopy, schemeMetadata } from 'api/redBook/copywriting';
 import { listTemplates } from 'api/redBook/batchIndex';
+import useUserStore from 'store/user';
 
 export interface DraftConfig {}
 
@@ -70,6 +71,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     const createSortHandler = (property: string) => (event: React.SyntheticEvent) => {
         onRequestSort(event, property);
     };
+    const permissions = useUserStore((state) => state.permissions);
     return (
         <TableHead>
             <TableRow>
@@ -84,32 +86,34 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         }}
                     />
                 </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'center'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                        sx={{ pl: 3, whiteSpace: 'nowrap' }}
-                    >
-                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
-                            <TableSortLabel
-                                active={orderBy === headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={createSortHandler(headCell.id)}
-                            >
-                                {headCell.label}
-                                {orderBy === headCell.id && (
-                                    <Box component="span" sx={visuallyHidden}>
-                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                    </Box>
-                                )}
-                            </TableSortLabel>
-                        ) : (
-                            headCell.label
-                        )}
-                    </TableCell>
-                ))}
+                {headCells.map((headCell) =>
+                    !permissions.includes('creative:scheme:publish') && headCell.label === '是否公开' ? undefined : (
+                        <TableCell
+                            key={headCell.id}
+                            align={headCell.numeric ? 'right' : 'center'}
+                            padding={headCell.disablePadding ? 'none' : 'normal'}
+                            sortDirection={orderBy === headCell.id ? order : false}
+                            sx={{ pl: 3, whiteSpace: 'nowrap' }}
+                        >
+                            {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                                <TableSortLabel
+                                    active={orderBy === headCell.id}
+                                    direction={orderBy === headCell.id ? order : 'asc'}
+                                    onClick={createSortHandler(headCell.id)}
+                                >
+                                    {headCell.label}
+                                    {orderBy === headCell.id && (
+                                        <Box component="span" sx={visuallyHidden}>
+                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                        </Box>
+                                    )}
+                                </TableSortLabel>
+                            ) : (
+                                headCell.label
+                            )}
+                        </TableCell>
+                    )
+                )}
             </TableRow>
         </TableHead>
     );
@@ -269,6 +273,7 @@ const Copywriting: React.FC = () => {
             setCategoryList(res.category);
         });
     }, []);
+    const permissions = useUserStore((state) => state.permissions);
     return (
         <MainCard
             content={false}
@@ -323,9 +328,13 @@ const Copywriting: React.FC = () => {
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex items-center justify-center">{row.type !== 'USER' ? '公开' : '不公开'}</div>
-                                    </TableCell>
+                                    {permissions.includes('creative:scheme:publish') && (
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">
+                                                {row.type !== 'USER' ? '公开' : '不公开'}
+                                            </div>
+                                        </TableCell>
+                                    )}
                                     <TableCell align="center">
                                         <div>{categoryList?.filter((item: any) => item.code === row.category)[0]?.name}</div>
                                     </TableCell>

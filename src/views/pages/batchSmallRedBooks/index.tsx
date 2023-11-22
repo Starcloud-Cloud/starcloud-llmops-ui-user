@@ -118,7 +118,11 @@ const BatcSmallRedBooks = () => {
                     if (result.status !== 'PENDING') {
                         getList();
                         timer.current[0] = setInterval(() => {
-                            if (plabListRef.current.slice(0, 20)?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))) {
+                            if (
+                                plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                    return item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing';
+                                })
+                            ) {
                                 clearInterval(timer.current[0]);
                             }
                             getLists(1);
@@ -303,7 +307,7 @@ const BatcSmallRedBooks = () => {
                 if (
                     plabListRef.current
                         .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                        ?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))
+                        ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing')
                 ) {
                     clearInterval(timer.current[queryPage.pageNo - 1]);
                 }
@@ -327,6 +331,29 @@ const BatcSmallRedBooks = () => {
     }, [targetKeys]);
     //执行按钮
     const [executeOpen, setExecuteOpen] = useState(false);
+    const handleTransfer = (key: string, errMessage: string) => {
+        switch (key) {
+            case 'init':
+                return <span className="!mr-0">初始化</span>;
+            case 'executing':
+                return <span className="!mr-0">生成中</span>;
+            case 'execute_error':
+                return (
+                    <Popover
+                        content={
+                            <div>
+                                <div>{errMessage}</div>
+                            </div>
+                        }
+                        title="失败原因"
+                    >
+                        <span className="!mr-0 cursor-pointer" color="red">
+                            执行失败
+                        </span>
+                    </Popover>
+                );
+        }
+    };
     return (
         <div className="h-full">
             <SubCard
@@ -471,9 +498,11 @@ const BatcSmallRedBooks = () => {
                                             getList();
                                             timer.current[0] = setInterval(() => {
                                                 if (
-                                                    plabListRef.current
-                                                        .slice(0, 20)
-                                                        ?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))
+                                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                        return (
+                                                            item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing'
+                                                        );
+                                                    })
                                                 ) {
                                                     clearInterval(timer.current[0]);
                                                 }
@@ -522,20 +551,28 @@ const BatcSmallRedBooks = () => {
                                     <Col span={6}>
                                         <div
                                             key={index}
-                                            className="mb-[20px] aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
+                                            className="mb-[20px] flex-1 aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
                                         >
                                             {!item.pictureContent ? (
-                                                <div className="w-full aspect-[4/6] flex justify-center items-center">
-                                                    <Image width={40} src={imgLoading} preview={false} />
+                                                <div className="w-full aspect-[3/4] flex justify-center items-center">
+                                                    <div className="text-center">
+                                                        <Image width={40} src={imgLoading} preview={false} />
+                                                        <div>
+                                                            {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                            {item.pictureStatus === 'execute_error' && (
+                                                                <span>({item.pictureRetryCount})</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <Carousel className="aspect-[4/5]" autoplay effect="fade">
+                                                <Carousel className="aspect-[3/4]" autoplay effect="fade">
                                                     {item.pictureContent?.map((el: any) => (
                                                         <div>
                                                             <img
                                                                 src={el.url}
                                                                 alt="el.index"
-                                                                className="aspect-[4/5]"
+                                                                className="aspect-[3/4]"
                                                                 style={{ width: '100%', borderRadius: '10px' }}
                                                             />
                                                         </div>
@@ -543,15 +580,21 @@ const BatcSmallRedBooks = () => {
                                                 </Carousel>
                                             )}
                                             {!item.copyWritingTitle ? (
-                                                <>
+                                                <div className="relative">
                                                     <Skeleton paragraph={false} className="mt-[20px]" active />
                                                     <Skeleton paragraph={false} className="mt-[20px]" active />
                                                     <Skeleton paragraph={false} className="mt-[10px]" active />
-                                                </>
+                                                    <div className="absolute right-1 top-0">
+                                                        {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
+                                                        {item.copyWritingRetryCount === 'execute_error' && (
+                                                            <span>({item.pictureRetryCount})</span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             ) : (
                                                 <div className="mt-[20px]">
                                                     <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
-                                                    <div className="line-clamp-3 mt-[10px] text-[13px] text-[#15273799]">
+                                                    <div className="line-clamp-5 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
                                                         {item.copyWritingContent}
                                                     </div>
                                                 </div>

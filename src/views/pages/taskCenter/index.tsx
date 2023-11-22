@@ -220,6 +220,7 @@ const TaskCenter: React.FC = () => {
     };
 
     const [executeOpen, setExecuteOpen] = useState(false);
+    const [notificationUid, setnotificationUid] = useState('');
     const [publish, setPublish] = useState(true);
     const Execute = () => {
         notificationPublish(row?.uid, publish).then((res) => {
@@ -399,7 +400,7 @@ const TaskCenter: React.FC = () => {
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
             {detailOpen && <AddModal title={title} editData={editData} detailOpen={detailOpen} setDetailOpen={setDetailOpen} />}
-            {announceOpen && <Announce open={announceOpen} setOpen={setAnnounceOpen} />}
+            {announceOpen && <Announce open={announceOpen} notificationUid={notificationUid} setOpen={setAnnounceOpen} />}
         </MainCard>
     );
 };

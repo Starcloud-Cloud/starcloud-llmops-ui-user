@@ -21,3 +21,20 @@ export const notificationDelete = (data: any) => {
 export const notificationPublish = (data: any, publish: Boolean) => {
     return request.put({ url: '/llm/notification/publish/' + data + '?publish=' + publish });
 };
+
+//分页查询单条任务
+export const singlePage = (params: any) => {
+    return request.get({ url: '/llm/single/page', params });
+};
+//增加单条任务
+export const singleAdd = (data: any) => {
+    return request.put({ url: `/llm/single/add/${data}` });
+};
+//修改单条任务
+export const singleModify = (data: any) => {
+    return request.put({ url: `/llm/single/modify`, data });
+};
+//删除单条任务
+export const singleDelete = (data: any) => {
+    return request.delete({ url: `/llm/single/delete/${data}` });
+};

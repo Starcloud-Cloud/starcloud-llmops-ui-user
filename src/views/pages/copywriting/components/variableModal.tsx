@@ -104,7 +104,6 @@ const VariableModal = ({
         }
         saveContent({
             ...content,
-            isShow: content.isShow || true,
             style: content.style || 'INPUT',
             options: content.style === 'SELECT' ? options : []
         });
@@ -184,26 +183,6 @@ const VariableModal = ({
                         ))}
                     </Select>
                 </FormControl>
-                <FormControlLabel
-                    sx={{ mt: 2 }}
-                    color="secondary"
-                    control={
-                        <Switch
-                            name="isShow"
-                            color="secondary"
-                            defaultChecked
-                            onChange={() => {
-                                setContent({
-                                    ...content,
-                                    isShow: !content.isShow
-                                });
-                            }}
-                            value={content.isShow}
-                        />
-                    }
-                    label={t('myApp.isShow')}
-                    labelPlacement="start"
-                />
                 {content.style === 'SELECT' && (
                     <Box>
                         {options.map((item, vIndex: number) => (

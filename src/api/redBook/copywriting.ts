@@ -1,4 +1,5 @@
 import request from 'utils/axios';
+import fetch from 'utils/fetch';
 
 //获取类目
 export const schemeMetadata = () => {
@@ -27,4 +28,12 @@ export const schemeCopy = (data: any) => {
 //删除
 export const schemeDelete = (data: any) => {
     return request.delete({ url: `/llm/creative/scheme/delete/${data}` });
+};
+//小红书需求生成
+export const schemeDemand = (data: any) => {
+    return fetch(`/llm/creative/scheme/demand`, 'post', data);
+};
+//小红书文案测试生成
+export const schemeExample = (data: any) => {
+    return request.post({ url: `/llm/creative/scheme/example`, data });
 };

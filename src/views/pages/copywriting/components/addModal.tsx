@@ -39,7 +39,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample } from 'api/redBook/copywriting';
 import imgLoading from 'assets/images/picture/loading.gif';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
@@ -80,7 +80,9 @@ const AddModal = () => {
         },
         {
             title: '参考内容',
-            dataIndex: 'content'
+            width: '40%',
+            dataIndex: 'content',
+            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
         {
             title: '参考图片',
@@ -88,10 +90,14 @@ const AddModal = () => {
             render: (_, row) => (
                 <div className="flex wrap gap-2">
                     {row.images?.map((item: any, index: number) => (
-                        <Image className="mr-[5px]" key={index} width={50} height={50} preview={false} src={item.url} />
+                        <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
                     ))}
                 </div>
             )
+        },
+        {
+            title: '参考来源',
+            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
         {
             title: '参考链接地址',
@@ -100,12 +106,13 @@ const AddModal = () => {
         },
         {
             title: '操作',
-
+            width: 140,
             key: 'action',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
-                    <Button
-                        type="text"
+                    <Buttons
+                        color="secondary"
+                        size="small"
                         onClick={() => {
                             setRowIndex(index);
                             setAccoutQuery({
@@ -125,7 +132,12 @@ const AddModal = () => {
                             });
                             setImageContent(
                                 row?.images?.map((item: any) => {
-                                    return item.content;
+                                    return item.title;
+                                })
+                            );
+                            setImageSubContent(
+                                row?.images?.map((item: any) => {
+                                    return item.subTitle;
                                 })
                             );
                             setAddTitle('编辑参考账号');
@@ -133,19 +145,18 @@ const AddModal = () => {
                         }}
                     >
                         编辑
-                    </Button>
-                    <Divider type="vertical" />
-                    <Button
+                    </Buttons>
+                    <Buttons
                         onClick={() => {
                             const newList = JSON.parse(JSON.stringify(tableData));
                             newList.splice(rowIndex, 1);
                             setTableData(newList);
                         }}
-                        danger
-                        type="text"
+                        color="error"
+                        size="small"
                     >
                         删除
-                    </Button>
+                    </Buttons>
                 </div>
             )
         }
@@ -213,6 +224,7 @@ const AddModal = () => {
         }
     };
     const [imageConent, setImageContent] = useState<any[]>([]);
+    const [imageSubConent, setImageSubContent] = useState<any[]>([]);
     useEffect(() => {
         imageTemplates().then((res) => {
             setTypeList(res);
@@ -230,6 +242,7 @@ const AddModal = () => {
                 source: 'SMALL_RED_BOOK'
             });
             setImageContent([]);
+            setImageSubContent([]);
         }
     }, [addOpen]);
     //改变值
@@ -249,7 +262,7 @@ const AddModal = () => {
                         name: res.name,
                         category: res.category,
                         tags: res.tags,
-                        type: res.type === 'USER' ? true : false,
+                        type: res.type === 'USER' ? false : true,
                         description: res.description
                     });
                     setTableData(res.refers);
@@ -278,6 +291,7 @@ const AddModal = () => {
             setVariableOpen(false);
         }
     };
+    const valueRef: any = useRef(null);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard
@@ -317,7 +331,7 @@ const AddModal = () => {
                         />
                     </Grid>
                     <Grid item md={12} sm={12}>
-                        <div className="relative mt-[16px]">
+                        <div className="relative mt-[16px] max-w-[300px]">
                             <TreeSelect
                                 className="bg-[#f8fafc]  h-[40px] border border-solid rounded-[6px] antdSel"
                                 showSearch
@@ -433,7 +447,7 @@ const AddModal = () => {
                         新增
                     </Button>
                 </div>
-                <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
+                <Table scroll={{ y: 500 }} size="small" columns={columns} dataSource={tableData} />
                 <div className="text-[18px] font-[600] my-[20px]">生成配置</div>
                 <Tabs
                     activeKey={activeKey}
@@ -443,37 +457,160 @@ const AddModal = () => {
                             label: '文案生成模板',
                             children: (
                                 <div>
-                                    <div className="text-[14px] font-[600] mb-[20px]">是否推广微信公众号</div>
-                                    <div className="flex items-center">
-                                        <Switch
-                                            color={'secondary'}
-                                            checked={copyWritingTemplate.isPromoteMp}
-                                            onClick={() =>
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
-                                                    isPromoteMp: !copyWritingTemplate.isPromoteMp
-                                                })
-                                            }
-                                        />
-                                        <TextField
-                                            sx={{ width: '300px' }}
-                                            size="small"
-                                            color="secondary"
-                                            InputLabelProps={{ shrink: true }}
-                                            placeholder="请输入"
-                                            name="mpCode"
-                                            value={copyWritingTemplate.mpCode}
-                                            onChange={(e: any) => {
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
-                                                    mpCode: e.target.value
-                                                });
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between items-center my-[20px]">
+                                    <div className="flex justify-between items-center mb-[20px]">
                                         <div className="text-[14px] font-[600]">文案生成要求</div>
-                                        <Button onClick={() => {}} type="primary">
+                                        <Button
+                                            onClick={async () => {
+                                                if (!params.name) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '方案名称必填',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (!params.category) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '类目必选',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (!params.tags || params.tags?.length === 0) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '标签最少输入一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (
+                                                    imageStyleData
+                                                        ?.map((i) => i?.templateList?.some((item: any) => !item.id))
+                                                        ?.some((el) => el)
+                                                ) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '图片生成模板风格必选',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                const result: any = await schemeDemand({
+                                                    ...params,
+                                                    type: params.type ? 'SYSTEM' : 'USER',
+                                                    refers: tableData,
+                                                    configuration: {
+                                                        copyWritingTemplate: {
+                                                            ...copyWritingTemplate,
+                                                            variables: rows
+                                                        },
+                                                        imageTemplate: {
+                                                            styleList: imageStyleData
+                                                        }
+                                                    }
+                                                });
+                                                const reader = result.getReader();
+                                                const textDecoder = new TextDecoder();
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    demand: ''
+                                                });
+                                                let outerJoins: any;
+                                                while (1) {
+                                                    let joins = outerJoins;
+                                                    const { done, value } = await reader.read();
+                                                    if (done) {
+                                                        break;
+                                                    }
+                                                    let str = textDecoder.decode(value);
+                                                    const lines = str.split('\n');
+                                                    lines.forEach((message, i: number) => {
+                                                        if (i === 0 && joins) {
+                                                            message = joins + message;
+                                                            joins = undefined;
+                                                        }
+                                                        if (i === lines.length - 1) {
+                                                            if (message && message.indexOf('}') === -1) {
+                                                                joins = message;
+                                                                return;
+                                                            }
+                                                        }
+                                                        let bufferObj;
+                                                        if (message?.startsWith('data:')) {
+                                                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                                                        }
+                                                        if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                                                            valueRef.current = valueRef.current + bufferObj.content;
+                                                            setCopyWritingTemplate({
+                                                                ...copyWritingTemplate,
+                                                                demand: valueRef.current
+                                                            });
+                                                        } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: bufferObj.content,
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: t('market.warning'),
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    });
+                                                    outerJoins = joins;
+                                                }
+                                            }}
+                                            type="primary"
+                                        >
                                             自动分析，生成要求
                                         </Button>
                                     </div>
@@ -553,7 +690,6 @@ const AddModal = () => {
                                                         <TableCell>{t('myApp.field')}</TableCell>
                                                         <TableCell>{t('myApp.name')}</TableCell>
                                                         <TableCell>{t('myApp.type')}</TableCell>
-                                                        <TableCell> {t('myApp.isShow')}</TableCell>
                                                         <TableCell>{t('myApp.operation')}</TableCell>
                                                     </TableRow>
                                                 </TableHead>
@@ -563,16 +699,7 @@ const AddModal = () => {
                                                             <TableCell>{row.field}</TableCell>
                                                             <TableCell>{row.label}</TableCell>
                                                             <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
-                                                            <TableCell>
-                                                                <Switch
-                                                                    name={row.field}
-                                                                    onChange={() => {
-                                                                        console.log('显示开关');
-                                                                    }}
-                                                                    checked={row?.isShow}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell>
+                                                            <TableCell sx={{ width: 120 }}>
                                                                 <IconButton
                                                                     onClick={() => {
                                                                         setVarIndex(i);
@@ -644,7 +771,96 @@ const AddModal = () => {
                                             />
                                         </Grid>
                                     </Grid> */}
-                                    <Button onClick={() => {}} className="mt-[20px]" type="primary" icon={<PlusOutlined rev={undefined} />}>
+                                    <Button
+                                        onClick={() => {
+                                            if (!params.name) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '方案名称必填',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (!params.category) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '类目必选',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (!params.tags || params.tags?.length === 0) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '标签最少输入一个',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (
+                                                imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)
+                                            ) {
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '图片生成模板风格必选',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            schemeExample({
+                                                ...params,
+                                                type: params.type ? 'SYSTEM' : 'USER',
+                                                refers: tableData,
+                                                configuration: {
+                                                    copyWritingTemplate: {
+                                                        ...copyWritingTemplate,
+                                                        variables: rows
+                                                    },
+                                                    imageTemplate: {
+                                                        styleList: imageStyleData
+                                                    }
+                                                }
+                                            }).then((res) => {
+                                                console.log(res);
+                                            });
+                                        }}
+                                        className="mt-[20px]"
+                                        type="primary"
+                                        icon={<PlusOutlined rev={undefined} />}
+                                    >
                                         测试生成
                                     </Button>
                                 </div>
@@ -873,11 +1089,11 @@ const AddModal = () => {
                             <div className="flex flex-wrap gap-2 my-[20px]">
                                 {accoutQuery.fileList?.map((item: any, index: number) => (
                                     <div key={index}>
-                                        <div className=" w-[100px] rounded-[8px] border border-solid border-[#d9d9d9] p-[8px]">
-                                            <div className="relative w-[84px] h-[84px]">
+                                        <div className="rounded-[8px] border border-solid border-[#d9d9d9] p-[8px]">
+                                            <div className="relative w-[160px] h-[160px]">
                                                 <Image
-                                                    width={84}
-                                                    height={84}
+                                                    width={160}
+                                                    height={160}
                                                     src={item?.response?.data?.url}
                                                     preview={false}
                                                     fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2Ibzx0tc44fYX/16lV6NDFLXH+YL32jwiACRBiEbf5KcXoTIsQSpzXx4N28Ja4BQoK7rgXiydbHjx/P25TaQAJEGAguWy0+2Q8PD6/Ki4R8EVl+bzBOnZY95fq9rj9zAkTI2SxdidBHqG9+skdw43borCXO/ZcJdraPWdv22uIEiLA4q7nvvCug8WTqzQveOH26fodo7g6uFe/a17W3+nFBAkRYENRdb1vkkz1CH9cPsVy/jrhr27PqMYvENYNlHAIesRiBYwRy0V+8iXP8+/fvX11Mr7L7ECueb/r48eMqm7FuI2BGWDEG8cm+7G3NEOfmdcTQw4h9/55lhm7DekRYKQPZF2ArbXTAyu4kDYB2YxUzwg0gi/41ztHnfQG26HbGel/crVrm7tNY+/1btkOEAZ2M05r4FB7r9GbAIdxaZYrHdOsgJ/wCEQY0J74TmOKnbxxT9n3FgGGWWsVdowHtjt9Nnvf7yQM2aZU/TIAIAxrw6dOnAWtZZcoEnBpNuTuObWMEiLAx1HY0ZQJEmHJ3HNvGCBBhY6jtaMoEiJB0Z29vL6ls58vxPcO8/zfrdo5qvKO+d3Fx8Wu8zf1dW4p/cPzLly/dtv9Ts/EbcvGAHhHyfBIhZ6NSiIBTo0LNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiEC/wGgKKC4YMA4TAAAAABJRU5ErkJggg=="
@@ -903,20 +1119,32 @@ const AddModal = () => {
                                             </div>
                                         </div>
                                         {item?.percent === 100 && item?.response?.data?.url && (
-                                            <Input
-                                                value={imageConent[index]}
-                                                onChange={(e) => {
-                                                    const newList = _.cloneDeep(imageConent);
-                                                    newList[index] = e.target.value;
-                                                    setImageContent(newList);
-                                                }}
-                                                placeholder="图片内容"
-                                                className="mt-[8px] w-[100px]"
-                                            />
+                                            <>
+                                                <Input
+                                                    value={imageConent[index]}
+                                                    onChange={(e) => {
+                                                        const newList = _.cloneDeep(imageConent);
+                                                        newList[index] = e.target.value;
+                                                        setImageContent(newList);
+                                                    }}
+                                                    placeholder="图片标题"
+                                                    className="mt-[8px] w-[178px] block"
+                                                />
+                                                <Input
+                                                    value={imageSubConent[index]}
+                                                    onChange={(e) => {
+                                                        const newList = _.cloneDeep(imageSubConent);
+                                                        newList[index] = e.target.value;
+                                                        setImageSubContent(newList);
+                                                    }}
+                                                    placeholder="图片副标题"
+                                                    className="mt-[8px] w-[178px]"
+                                                />
+                                            </>
                                         )}
                                     </div>
                                 ))}
-                                <Upload className="inline-block !w-auto" {...props}>
+                                <Upload className="inline-block uploads" {...props}>
                                     <div>
                                         <PlusOutlined rev={undefined} />
                                         <div style={{ marginTop: 8 }}>Upload</div>
@@ -945,7 +1173,8 @@ const AddModal = () => {
                                                             if (item?.response?.data?.url) {
                                                                 return {
                                                                     url: item?.response?.data?.url,
-                                                                    content: imageConent[i]
+                                                                    title: imageConent[i],
+                                                                    subTitle: imageSubConent[i]
                                                                 };
                                                             } else {
                                                                 return undefined;
@@ -1046,12 +1275,11 @@ const AddModal = () => {
                                     schemeModify({
                                         uid: searchParams.get('uid'),
                                         ...params,
-                                        type: params ? 'USER' : 'SYSTEM',
+                                        type: params.type ? 'SYSTEM' : 'USER',
                                         refers: tableData,
                                         configuration: {
                                             copyWritingTemplate: {
                                                 ...copyWritingTemplate,
-                                                isPromoteMp: copyWritingTemplate.isPromoteMp ? true : false,
                                                 variables: rows
                                             },
                                             imageTemplate: {
@@ -1078,12 +1306,11 @@ const AddModal = () => {
                                 }
                                 schemeCreate({
                                     ...params,
-                                    type: params ? 'USER' : 'SYSTEM',
+                                    type: params.type ? 'SYSTEM' : 'USER',
                                     refers: tableData,
                                     configuration: {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
-                                            isPromoteMp: copyWritingTemplate.isPromoteMp ? true : false,
                                             variables: rows
                                         },
                                         imageTemplate: {

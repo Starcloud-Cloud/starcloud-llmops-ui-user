@@ -4,8 +4,9 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
-const Announce = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) => void }) => {
+import { useEffect, useState } from 'react';
+import { singlePage } from 'api/redBook/task';
+const Announce = ({ open, setOpen, notificationUid }: { open: boolean; setOpen: (data: boolean) => void; notificationUid: string }) => {
     const columns: ColumnsType<any> = [
         {
             title: '任务编码',
@@ -74,7 +75,18 @@ const Announce = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) =
         }
     ];
     const [tableData, setTableData] = useState<any[]>([]);
+    const [query, setQuery] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const [total, setTotal] = useState(0);
     const handleSave = () => {};
+    const getList = async () => {
+        const result = await singlePage(query);
+    };
+    useEffect(() => {
+        getList();
+    }, []);
     return (
         <Modal open={open} aria-labelledby="modal-title" aria-describedby="modal-description">
             <MainCard
@@ -102,7 +114,13 @@ const Announce = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) =
                             新增
                         </Button>
                     </div>
-                    <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
+                    <Table
+                        scroll={{ y: 200 }}
+                        size="small"
+                        columns={columns}
+                        dataSource={tableData}
+                        pagination={{ total: total, current: query.pageNo, pageSize: query.pageSize }}
+                    />
                     <Divider />
                     <CardActions>
                         <Grid container justifyContent="flex-end">

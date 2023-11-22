@@ -15,6 +15,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
+import imgLoading from 'assets/images/picture/loading.gif';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -114,7 +115,7 @@ const BatcSmallRedBooks = () => {
             planGet(searchParams.get('uid')).then((result) => {
                 if (result) {
                     setDetail(result);
-                    if (result.status === 'RUNNING') {
+                    if (result.status !== 'PENDING') {
                         getList();
                         timer.current[0] = setInterval(() => {
                             if (plabListRef.current.slice(0, 20)?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))) {
@@ -264,7 +265,7 @@ const BatcSmallRedBooks = () => {
     const handleScroll = () => {
         const { current } = scrollRef;
         if (current) {
-            if (current.scrollHeight - current.scrollTop === current.clientHeight && (queryPage.pageNo + 1) * queryPage.pageSize < total) {
+            if (current.scrollHeight - current.scrollTop === current.clientHeight && queryPage.pageNo * queryPage.pageSize < total) {
                 setQueryPage({
                     ...queryPage,
                     pageNo: queryPage.pageNo + 1
@@ -339,28 +340,18 @@ const BatcSmallRedBooks = () => {
                     <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
                     <span className="text-[#673ab7] font-[500]">- {'新建创作计划'}</span>
                 </div>
-                <div>
-                    <Button
-                        disabled={detailData.status === 'RUNNING' ? true : false}
-                        icon={<SaveOutlined rev={undefined} />}
-                        onClick={handleSave}
-                        type="primary"
-                    >
-                        保存
-                    </Button>
-                </div>
+                <div></div>
             </SubCard>
             <Row gutter={40} className="!ml-0">
                 <Col span={6} className="relative bg-[#fff] !px-[0]">
-                    <div className="!m-[20px]">
+                    <div className="!mx-[20px] py-[20px] h-full overflow-auto">
                         <TextField
                             fullWidth
-                            sx={{ mb: 2 }}
                             size="small"
                             color="secondary"
                             InputLabelProps={{ shrink: true }}
                             error={valueOpen && !value}
-                            helperText={valueOpen && !value ? '模板名称必填' : ' '}
+                            helperText={valueOpen && !value ? '模板名称必填' : ''}
                             label="模板名称"
                             value={value}
                             onChange={(e: any) => {
@@ -449,10 +440,12 @@ const BatcSmallRedBooks = () => {
                                 }}
                             >
                                 <Radio value="RANDOM">全部随机</Radio>
-                                <Radio value="SEQUENCE">按顺序</Radio>
+                                {/* <Radio value="SEQUENCE">按顺序</Radio> */}
                             </Radio.Group>
                         </div>
+                        <div className="mt-[20px]">生成数量：</div>
                         <InputNumber
+                            size="large"
                             value={detailData?.total}
                             onChange={(e: any) => {
                                 const newData = _.cloneDeep(detailData);
@@ -461,15 +454,16 @@ const BatcSmallRedBooks = () => {
                             }}
                             min={1}
                             max={500}
-                            className="mt-[20px] w-full"
+                            className="w-full"
                         />
-                        <div className="absolute bottom-[20px]" style={{ width: 'calc(100% - 60px)' }}>
+
+                        <div className="absolute bottom-[20px] flex gap-2" style={{ width: 'calc(100% - 40px)' }}>
                             <Button
                                 disabled={
                                     !searchParams.get('uid') ? true : false || detailData.status === 'RUNNING' ? true : false || executeOpen
                                 }
-                                type="primary"
                                 className="w-full"
+                                type="primary"
                                 onClick={() => {
                                     planExecute({ uid: searchParams.get('uid') }).then((res) => {
                                         if (res) {
@@ -491,6 +485,15 @@ const BatcSmallRedBooks = () => {
                             >
                                 智能生成设置
                             </Button>
+                            <Button
+                                className="w-full"
+                                disabled={detailData.status === 'RUNNING' ? true : false}
+                                icon={<SaveOutlined rev={undefined} />}
+                                onClick={handleSave}
+                                type="primary"
+                            >
+                                保存
+                            </Button>
                         </div>
                     </div>
                 </Col>
@@ -509,47 +512,54 @@ const BatcSmallRedBooks = () => {
                         </div>
                     ) : (
                         <div
-                            className="overflow-auto flex flex-wrap gap-2"
+                            className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2"
                             ref={scrollRef}
                             onScroll={handleScroll}
                             style={{ height: 'calc(100vh - 210px)' }}
                         >
-                            {planList.map((item, index: number) => (
-                                <div
-                                    key={index}
-                                    className="w-[200px] h-[330px] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
-                                >
-                                    {!item.pictureContent ? (
-                                        <Skeleton.Image className="!w-full !h-[200px]" active={true} />
-                                    ) : (
-                                        <Carousel className="h-[200px]" autoplay effect="fade">
-                                            {item.pictureContent?.map((el: any) => (
-                                                <div>
-                                                    <img
-                                                        src={el.url}
-                                                        alt="el.index"
-                                                        style={{ height: '200px', width: '100%', borderRadius: '10px' }}
-                                                    />
+                            <Row gutter={20}>
+                                {planList.map((item, index: number) => (
+                                    <Col span={6}>
+                                        <div
+                                            key={index}
+                                            className="mb-[20px] aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
+                                        >
+                                            {!item.pictureContent ? (
+                                                <div className="w-full aspect-[4/6] flex justify-center items-center">
+                                                    <Image width={40} src={imgLoading} preview={false} />
                                                 </div>
-                                            ))}
-                                        </Carousel>
-                                    )}
-                                    {!item.copyWritingTitle ? (
-                                        <>
-                                            <Skeleton paragraph={false} className="mt-[20px]" active />
-                                            <Skeleton paragraph={false} className="mt-[20px]" active />
-                                            <Skeleton paragraph={false} className="mt-[10px]" active />
-                                        </>
-                                    ) : (
-                                        <div className="mt-[20px]">
-                                            <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
-                                            <div className="line-clamp-3 mt-[10px] text-[13px] text-[#15273799]">
-                                                {item.copyWritingContent}
-                                            </div>
+                                            ) : (
+                                                <Carousel className="aspect-[4/5]" autoplay effect="fade">
+                                                    {item.pictureContent?.map((el: any) => (
+                                                        <div>
+                                                            <img
+                                                                src={el.url}
+                                                                alt="el.index"
+                                                                className="aspect-[4/5]"
+                                                                style={{ width: '100%', borderRadius: '10px' }}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </Carousel>
+                                            )}
+                                            {!item.copyWritingTitle ? (
+                                                <>
+                                                    <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                    <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                    <Skeleton paragraph={false} className="mt-[10px]" active />
+                                                </>
+                                            ) : (
+                                                <div className="mt-[20px]">
+                                                    <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
+                                                    <div className="line-clamp-3 mt-[10px] text-[13px] text-[#15273799]">
+                                                        {item.copyWritingContent}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    </Col>
+                                ))}
+                            </Row>
                         </div>
                     )}
                 </Col>

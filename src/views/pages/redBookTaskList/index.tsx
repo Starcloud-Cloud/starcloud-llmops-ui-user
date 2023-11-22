@@ -490,7 +490,7 @@ const RedBookTaskList: React.FC = () => {
                                             <Tag
                                                 color={
                                                     row.status === 'PENDING'
-                                                        ? 'green'
+                                                        ? 'default'
                                                         : row.status === 'RUNNING'
                                                         ? 'green'
                                                         : row.status === 'PAUSE'
@@ -545,7 +545,7 @@ const RedBookTaskList: React.FC = () => {
                                                         <EditIcon className="text-base" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                                 <Tooltip title={'查看操作任务'}>
                                                     <IconButton
                                                         aria-label="delete"
@@ -556,7 +556,7 @@ const RedBookTaskList: React.FC = () => {
                                                     >
                                                         <ReorderIcon className="text-base" />
                                                     </IconButton>
-                                                </Tooltip>
+                                                </Tooltip> */}
                                                 {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
                                         <Tooltip title={'开始'}>
                                             <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>

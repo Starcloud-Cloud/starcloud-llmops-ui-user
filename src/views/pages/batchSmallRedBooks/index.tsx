@@ -248,6 +248,7 @@ const BatcSmallRedBooks = () => {
     const scrollRef: any = useRef(null);
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
+    const plabListRef: any = useRef(null);
     const [queryPage, setQueryPage] = useState({
         pageNo: 1,
         pageSize: 20
@@ -269,7 +270,8 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid')
         }).then((res) => {
             setTotal(res.total);
-            setPlanList([...planList, ...res.list]);
+            plabListRef.current = [...planList, ...res.list];
+            setPlanList(plabListRef.current);
         });
     };
     const getLists = (pageNo: number) => {
@@ -279,13 +281,14 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid')
         }).then((res) => {
             setTotal(res.total);
-            const newList = _.cloneDeep(planList);
+            const newList = _.cloneDeep(plabListRef.current);
             console.log(newList);
 
             newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
+            plabListRef.current = newList;
             console.log(newList);
 
-            setPlanList(newList);
+            setPlanList(plabListRef.current);
         });
     };
     useEffect(() => {
@@ -487,11 +490,16 @@ const BatcSmallRedBooks = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="overflow-auto" ref={scrollRef} onScroll={handleScroll} style={{ height: 'calc(100vh - 210px)' }}>
+                        <div
+                            className="overflow-auto flex flex-wrap gap-2"
+                            ref={scrollRef}
+                            onScroll={handleScroll}
+                            style={{ height: 'calc(100vh - 210px)' }}
+                        >
                             {planList.map((item, index: number) => (
                                 <div
                                     key={index}
-                                    className="w-[200px] h-[330px] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] inline-block mb-[20px] mr-[20px]"
+                                    className="w-[200px] h-[330px] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
                                 >
                                     {!item.pictureContent ? (
                                         <Skeleton.Image className="!w-full !h-[200px]" active={true} />

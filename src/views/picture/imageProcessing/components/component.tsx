@@ -1,5 +1,6 @@
 import { Card, Modal, IconButton, Button, Divider, CardContent } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import HistoryIcon from '@mui/icons-material/History';
@@ -297,6 +298,9 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                 <div className="border-[#673ab7] text-[#673ab7] rounded-lg flex flex-col justify-center items-center cursor-pointer">
                                     <PlusOutlined className="text-[20px] mb-[8px]" rev={undefined} />
                                     <p>继续上传</p>
+                                    <div className="text-sm leading-4 flex items-center !text-[12px] text-[#697586]">
+                                        上传图片大小不能超过1024x1024
+                                    </div>
                                 </div>
                             </Dragger>
                             {imageList.map((item, index) => (
@@ -422,7 +426,11 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         <div className="flex justify-between px-[16px] items-center py-[16px]">
                             <div>
                                 <div className="font-bold text-sm leading-5">已上传{imageList.length}/20张</div>
-                                <div className="text-sm leading-4">支持多张图片同时上传，仅支持 JPG/PNG/WEBP 格式图片</div>
+                                <div className="text-sm leading-4 my-[5px]">支持多张图片同时上传，仅支持 JPG/PNG/WEBP 格式图片</div>
+                                <div className="text-sm leading-4 flex items-center !text-[12px] text-[#697586]">
+                                    <InfoIcon sx={{ fontSize: '14px' }} color="error" />
+                                    上传图片大小不能超过1024x1024(1048576 像素)
+                                </div>
                             </div>
                             <div>
                                 <Button

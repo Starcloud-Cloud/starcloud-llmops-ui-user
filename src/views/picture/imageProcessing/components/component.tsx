@@ -378,8 +378,8 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                                 </Radio.Button>
                                             </Tooltip>
                                         </Radio.Group>
+                                        <span className="mx-[10px]">或</span>
                                         <Radio.Group
-                                            className="ml-[16px]"
                                             key={diskey + 1}
                                             onChange={(e) => {
                                                 setMagnPx(e.target.value);

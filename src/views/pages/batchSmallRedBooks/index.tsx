@@ -38,8 +38,6 @@ const BatcSmallRedBooks = () => {
         },
         maxCount: 500,
         onChange(info) {
-            console.log(info);
-
             setImageList(info.fileList);
         },
         onPreview: (file) => {
@@ -119,6 +117,9 @@ const BatcSmallRedBooks = () => {
                     if (result.status === 'RUNNING') {
                         getList();
                         timer.current[0] = setInterval(() => {
+                            if (plabListRef.current.slice(0, 20)?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))) {
+                                clearInterval(timer.current[0]);
+                            }
                             getLists(1);
                         }, 3000);
                     }
@@ -128,6 +129,13 @@ const BatcSmallRedBooks = () => {
         schemeList().then((res: any) => {
             setMockData(res);
         });
+    }, []);
+    useEffect(() => {
+        return () => {
+            timer.current?.map((item: any) => {
+                clearInterval(item);
+            });
+        };
     }, []);
     //保存
     const [detailData, setDetailData] = useState<any>({
@@ -282,12 +290,8 @@ const BatcSmallRedBooks = () => {
         }).then((res) => {
             setTotal(res.total);
             const newList = _.cloneDeep(plabListRef.current);
-            console.log(newList);
-
             newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
             plabListRef.current = newList;
-            console.log(newList);
-
             setPlanList(plabListRef.current);
         });
     };
@@ -295,6 +299,13 @@ const BatcSmallRedBooks = () => {
         if (queryPage.pageNo > 1) {
             getList();
             timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                if (
+                    plabListRef.current
+                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        ?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))
+                ) {
+                    clearInterval(timer.current[queryPage.pageNo - 1]);
+                }
                 getLists(queryPage.pageNo);
             }, 3000);
         }
@@ -465,6 +476,13 @@ const BatcSmallRedBooks = () => {
                                             setExecuteOpen(true);
                                             getList();
                                             timer.current[0] = setInterval(() => {
+                                                if (
+                                                    plabListRef.current
+                                                        .slice(0, 20)
+                                                        ?.every((item: any) => item?.pictureContent?.every((el: any) => el.url))
+                                                ) {
+                                                    clearInterval(timer.current[0]);
+                                                }
                                                 getLists(1);
                                             }, 3000);
                                         }

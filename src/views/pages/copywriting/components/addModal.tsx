@@ -226,7 +226,9 @@ const AddModal = () => {
         if (!addOpen) {
             setValueOpen(false);
             setContentOpen(false);
-            setAccoutQuery({});
+            setAccoutQuery({
+                source: 'SMALL_RED_BOOK'
+            });
             setImageContent([]);
         }
     }, [addOpen]);
@@ -503,12 +505,19 @@ const AddModal = () => {
                                                     color="primary"
                                                     onClick={() => {
                                                         const newVal = _.cloneDeep(copyWritingTemplate.demand);
-                                                        const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
-                                                        const part2 = newVal?.slice(iptRef.current?.selectionStart);
-                                                        setCopyWritingTemplate({
-                                                            ...copyWritingTemplate,
-                                                            demand: `${part1}{STEP.${'我是变量'}.${index}}${part2}`
-                                                        });
+                                                        if (newVal) {
+                                                            const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
+                                                            const part2 = newVal?.slice(iptRef.current?.selectionStart);
+                                                            setCopyWritingTemplate({
+                                                                ...copyWritingTemplate,
+                                                                demand: `${part1}{${item.field}}${part2}`
+                                                            });
+                                                        } else {
+                                                            setCopyWritingTemplate({
+                                                                ...copyWritingTemplate,
+                                                                demand: `{${item.field}}`
+                                                            });
+                                                        }
                                                     }}
                                                     label={item.field}
                                                 ></Chip>
@@ -834,6 +843,9 @@ const AddModal = () => {
                                         InputLabelProps={{ shrink: true }}
                                         label="参考内容"
                                         name="content"
+                                        multiline
+                                        minRows={4}
+                                        maxRows={6}
                                         error={!accoutQuery.content && contentOpen}
                                         helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
                                         value={accoutQuery.content}

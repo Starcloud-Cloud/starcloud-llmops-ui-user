@@ -22,6 +22,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { DetailModal } from '../redBookContentList/component/detailModal';
+
+import formatDate from 'hooks/useDate';
 import copy from 'clipboard-copy';
 import './index.scss';
 const BatcSmallRedBooks = () => {
@@ -583,7 +585,7 @@ const BatcSmallRedBooks = () => {
                     <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
                         <Button
                             className="w-full"
-                            disabled={detailData.status === 'RUNNING' ? true : false}
+                            disabled={detailData.status !== 'PENDING' ? true : false}
                             icon={<SaveOutlined rev={undefined} />}
                             onClick={() => handleSave(false)}
                             type="primary"
@@ -591,9 +593,7 @@ const BatcSmallRedBooks = () => {
                             保存配置
                         </Button>
                         <Button
-                            disabled={
-                                !searchParams.get('uid') ? true : false || detailData.status === 'RUNNING' ? true : false || executeOpen
-                            }
+                            disabled={detailData.status !== 'PENDING' ? true : false}
                             className="w-full"
                             type="primary"
                             onClick={() => handleSave(true)}
@@ -617,7 +617,41 @@ const BatcSmallRedBooks = () => {
                         </div>
                     ) : (
                         <>
-                            <SubCard contentSX={{ p: '10px !important' }}>生成成功数：，生成失败数：，生成总数：{total}</SubCard>
+                            <SubCard contentSX={{ p: '10px !important' }}>
+                                <Tag
+                                    className="mr-[10px]"
+                                    color={
+                                        detailData.status === 'PENDING'
+                                            ? 'default'
+                                            : detailData.status === 'RUNNING'
+                                            ? 'green'
+                                            : detailData.status === 'PAUSE'
+                                            ? 'warning'
+                                            : detailData.status === 'CANCELED'
+                                            ? 'warning'
+                                            : detailData.status === 'COMPLETE'
+                                            ? 'blue'
+                                            : detailData.status === 'FAILURE'
+                                            ? 'error'
+                                            : 'default'
+                                    }
+                                >
+                                    {detailData.status === 'PENDING'
+                                        ? '待执行'
+                                        : detailData.status === 'RUNNING'
+                                        ? '执行中'
+                                        : detailData.status === 'PAUSE'
+                                        ? '已暂停'
+                                        : detailData.status === 'CANCELED'
+                                        ? '已取消'
+                                        : detailData.status === 'COMPLETE'
+                                        ? '已完成'
+                                        : detailData.status === 'FAILURE'
+                                        ? '已失败'
+                                        : ''}
+                                </Tag>
+                                生成总数：{total}
+                            </SubCard>
                             <div
                                 className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
                                 ref={scrollRef}
@@ -629,22 +663,24 @@ const BatcSmallRedBooks = () => {
                                         <Col span={6} className="inline-block">
                                             <div
                                                 key={index}
-                                                className="mb-[20px] flex-1 aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
+                                                className="mb-[20px] flex-1 aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
                                             >
                                                 {!item.pictureContent ? (
-                                                    <div className="w-full aspect-[3/4] flex justify-center items-center">
-                                                        <div className="text-center">
-                                                            <Image width={40} src={imgLoading} preview={false} />
-                                                            <div>
-                                                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                                                                {item.pictureStatus === 'execute_error' && (
-                                                                    <span>({item.pictureRetryCount})</span>
-                                                                )}
+                                                    <div className="w-full flex justify-center items-center">
+                                                        <div className="w-[70%] aspect-[250/335] flex justify-center items-center">
+                                                            <div className="text-center">
+                                                                <Image width={40} src={imgLoading} preview={false} />
+                                                                <div>
+                                                                    {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                                    {item.pictureStatus === 'execute_error' && (
+                                                                        <span>({item.pictureRetryCount})</span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="aspect-[3/4] relative swiperImages">
+                                                    <div className="w-[70%] flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
                                                         <Swiper
                                                             onSwiper={(swiper) => {
                                                                 const newList = swipers.current;
@@ -670,8 +706,8 @@ const BatcSmallRedBooks = () => {
                                                                 </SwiperSlide>
                                                             ))}
                                                         </Swiper>
-                                                        <div className="w-full swiperImage">
-                                                            <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                                        <div className="w-full swiperImage absolute top-[46%] z-10">
+                                                            <div className="flex justify-between w-full">
                                                                 <Button
                                                                     icon={<KeyboardBackspaceIcon />}
                                                                     shape="circle"
@@ -726,7 +762,7 @@ const BatcSmallRedBooks = () => {
                                                                 </div>
                                                             }
                                                         >
-                                                            <div className="line-clamp-2 text-[16px] font-bold">
+                                                            <div className="line-clamp-2 h-[37px] text-[14px] font-bold">
                                                                 {item.copyWritingTitle}
                                                             </div>
                                                         </Popover>
@@ -744,105 +780,34 @@ const BatcSmallRedBooks = () => {
                                                                 </div>
                                                             }
                                                         >
-                                                            <div className="line-clamp-4 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
+                                                            <div className="line-clamp-4 mt-[10px] text-[12px] h-[75px] text-[#15273799]">
                                                                 {item.copyWritingContent}
                                                             </div>
                                                         </Popover>
-                                                        <div className="mt-[5px]">
-                                                            <Popover
-                                                                content={
-                                                                    <div className="text-[12px]">
-                                                                        <div className="flex items-center">
-                                                                            <span className="font-500">内容编号：{item.businessUid}</span>
-                                                                            <span
-                                                                                onClick={(e) => {
-                                                                                    copy(item.businessUid);
-                                                                                    dispatch(
-                                                                                        openSnackbar({
-                                                                                            open: true,
-                                                                                            message: '复制成功',
-                                                                                            variant: 'alert',
-                                                                                            alert: {
-                                                                                                color: 'success'
-                                                                                            },
-                                                                                            close: false
-                                                                                        })
-                                                                                    );
-                                                                                    e.stopPropagation();
-                                                                                }}
-                                                                            >
-                                                                                <ContentCopyIcon
-                                                                                    sx={{ fontSize: '14px', cursor: 'pointer' }}
-                                                                                />
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                生成耗时：{item.pictureExecuteTime}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                开始时间：{item.copyWritingStartTime}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                结束时间：{item.copyWritingEndTime}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                }
-                                                            >
-                                                                <Tag color="warning">文案生成</Tag>
-                                                            </Popover>
-                                                            <Popover
-                                                                content={
-                                                                    <div className="text-[12px]">
-                                                                        <div className="flex items-center">
-                                                                            <span className="font-500">内容编号：{item.businessUid}</span>
-                                                                            <span
-                                                                                onClick={(e) => {
-                                                                                    copy(item.businessUid);
-                                                                                    dispatch(
-                                                                                        openSnackbar({
-                                                                                            open: true,
-                                                                                            message: '复制成功',
-                                                                                            variant: 'alert',
-                                                                                            alert: {
-                                                                                                color: 'success'
-                                                                                            },
-                                                                                            close: false
-                                                                                        })
-                                                                                    );
-                                                                                    e.stopPropagation();
-                                                                                }}
-                                                                            >
-                                                                                <ContentCopyIcon
-                                                                                    sx={{ fontSize: '14px', cursor: 'pointer' }}
-                                                                                />
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                生成耗时：{item.copyWritingExecuteTime}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                开始时间：{item.copyWritingStartTime}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <span className="font-500">
-                                                                                结束时间：{item.copyWritingEndTime}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                }
-                                                            >
-                                                                <Tag color="warning">图片生成</Tag>
-                                                            </Popover>
+                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                            <div>文案生成</div>
+                                                            <div>
+                                                                <div>
+                                                                    生成耗时：{item.copyWritingExecuteTime + 'S'}&nbsp;生成字数：
+                                                                    {item.copyWritingCount}
+                                                                </div>
+                                                                <div>
+                                                                    开始时间：{formatDate(item.copyWritingStartTime)}&nbsp;结束时间：
+                                                                    {formatDate(item.copyWritingEndTime)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                            <div>图片生成</div>
+                                                            <div>
+                                                                <div>
+                                                                    生成耗时：{item.pictureExecuteTime + 'S'}&nbsp;图片数：{item.pictureNum}
+                                                                </div>
+                                                                <div>
+                                                                    开始时间：{formatDate(item.pictureStartTime)}&nbsp;结束时间：
+                                                                    {formatDate(item.pictureEndTime)}
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}

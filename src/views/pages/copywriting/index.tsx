@@ -360,7 +360,9 @@ const Copywriting: React.FC = () => {
                                                         </div>
                                                     }
                                                 >
-                                                    <div key={item.title}>{item.title}</div>
+                                                    <div key={item.title} className="mb-[10px]">
+                                                        {item.title}
+                                                    </div>
                                                 </Popover>
                                             ))}
                                         </div>

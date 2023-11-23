@@ -30,20 +30,23 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 {imageStyleData?.id && (
                     <div>
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variables?.map((el: any, index: number) => (
-                                <Col key={index} sm={12} xs={24} md={6}>
-                                    <Form
-                                        flag={true}
-                                        index={index}
-                                        changeValue={(data: any) => {
-                                            const newData = _.cloneDeep(imageStyleData);
-                                            newData.variables[data.index].value = data.value;
-                                            setData(newData);
-                                        }}
-                                        item={el}
-                                    />
-                                </Col>
-                            ))}
+                            {imageStyleData?.variables?.map(
+                                (el: any, index: number) =>
+                                    el.style === 'INPUT' && (
+                                        <Col key={index} sm={12} xs={24} md={6}>
+                                            <Form
+                                                flag={true}
+                                                index={index}
+                                                changeValue={(data: any) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData.variables[data.index].value = data.value;
+                                                    setData(newData);
+                                                }}
+                                                item={el}
+                                            />
+                                        </Col>
+                                    )
+                            )}
                         </Row>
                         <div className="float-right">
                             <div className="text-[12px]">风格示例图</div>

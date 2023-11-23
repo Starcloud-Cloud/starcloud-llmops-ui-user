@@ -267,6 +267,7 @@ const AddModal = () => {
                         description: res.description
                     });
                     setTableData(res.refers);
+                    setTestTableList(res.configuration.copyWritingTemplate.example);
                     setCopyWritingTemplate(res.configuration.copyWritingTemplate);
                     setImageStyleData(res.configuration.imageTemplate.styleList);
                 }
@@ -576,6 +577,7 @@ const AddModal = () => {
                                                     configuration: {
                                                         copyWritingTemplate: {
                                                             ...copyWritingTemplate,
+                                                            example: testTableList,
                                                             variables: rows
                                                         },
                                                         imageTemplate: {
@@ -691,6 +693,19 @@ const AddModal = () => {
                                         <span className="text-[12px] text-[#15273799]">
                                             （对生成的文案内容就行自定义要求，直接告诉AI你想怎么改文案）
                                         </span>
+                                        <Popover
+                                            placement="top"
+                                            title="可以这样提要求"
+                                            content={
+                                                <div>
+                                                    <div>把品牌替换为 "xxxxxx"</div>
+                                                    <div>把价格替换为 "20-50元"</div>
+                                                    <div>使用更夸张的表达方式</div>
+                                                </div>
+                                            }
+                                        >
+                                            <ErrorIcon sx={{ cursor: 'pointer', fontSize: '16px' }} fontSize="small" />
+                                        </Popover>
                                     </div>
                                     <TextField
                                         color="secondary"
@@ -768,6 +783,7 @@ const AddModal = () => {
                                                     <TableRow>
                                                         <TableCell>{t('myApp.field')}</TableCell>
                                                         <TableCell>{t('myApp.name')}</TableCell>
+                                                        <TableCell>变量默认值</TableCell>
                                                         <TableCell>{t('myApp.type')}</TableCell>
                                                         <TableCell>{t('myApp.operation')}</TableCell>
                                                     </TableRow>
@@ -778,6 +794,7 @@ const AddModal = () => {
                                                             <TableRow hover key={row.field}>
                                                                 <TableCell>{row.field}</TableCell>
                                                                 <TableCell>{row.label}</TableCell>
+                                                                <TableCell>{row.defaultValue}</TableCell>
                                                                 <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
                                                                 <TableCell sx={{ width: 120 }}>
                                                                     <IconButton
@@ -935,6 +952,7 @@ const AddModal = () => {
                                                 configuration: {
                                                     copyWritingTemplate: {
                                                         ...copyWritingTemplate,
+                                                        example: testTableList,
                                                         variables: rows
                                                     },
                                                     imageTemplate: {
@@ -1386,6 +1404,7 @@ const AddModal = () => {
                                         configuration: {
                                             copyWritingTemplate: {
                                                 ...copyWritingTemplate,
+                                                example: testTableList,
                                                 variables: rows
                                             },
                                             imageTemplate: {
@@ -1417,6 +1436,7 @@ const AddModal = () => {
                                     configuration: {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
+                                            example: testTableList,
                                             variables: rows
                                         },
                                         imageTemplate: {

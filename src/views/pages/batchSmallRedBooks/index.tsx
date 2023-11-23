@@ -184,7 +184,7 @@ const BatcSmallRedBooks = () => {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '模板名称必填',
+                    message: '计划名称必填',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -473,8 +473,8 @@ const BatcSmallRedBooks = () => {
                             color="secondary"
                             InputLabelProps={{ shrink: true }}
                             error={valueOpen && !value}
-                            helperText={valueOpen && !value ? '模板名称必填' : ''}
-                            label="模板名称"
+                            helperText={valueOpen && !value ? '计划名称必填' : ''}
+                            label="计划名称"
                             value={value}
                             onChange={(e: any) => {
                                 setValueOpen(true);
@@ -497,7 +497,7 @@ const BatcSmallRedBooks = () => {
                                 </Upload>
                             </div>
                         </div>
-                        <div className="text-[18px] font-[600] my-[20px]">2. 选择生成方案</div>
+                        <div className="text-[18px] font-[600] my-[20px]">2. 选择创作方案</div>
                         <FormControl
                             error={targetKeysOpen && (!targetKeys || targetKeys.length === 0)}
                             color="secondary"
@@ -585,7 +585,7 @@ const BatcSmallRedBooks = () => {
                     <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
                         <Button
                             className="w-full"
-                            disabled={detailData.status !== 'PENDING' ? true : false}
+                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
                             icon={<SaveOutlined rev={undefined} />}
                             onClick={() => handleSave(false)}
                             type="primary"
@@ -593,7 +593,7 @@ const BatcSmallRedBooks = () => {
                             保存配置
                         </Button>
                         <Button
-                            disabled={detailData.status !== 'PENDING' ? true : false}
+                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
                             className="w-full"
                             type="primary"
                             onClick={() => handleSave(true)}
@@ -827,7 +827,7 @@ const BatcSmallRedBooks = () => {
                 color="secondary"
                 InputLabelProps={{ shrink: true }}
                 error={valueOpen && !value}
-                helperText={valueOpen && !value ? '模板名称必填' : ' '}
+                helperText={valueOpen && !value ? '计划名称必填' : ' '}
                 label="模板名称"
                 value={value}
                 onChange={(e: any) => {

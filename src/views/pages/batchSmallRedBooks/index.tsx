@@ -2,8 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Button, Upload, UploadProps, Image, Carousel, Transfer, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton } from 'antd';
-import type { TransferDirection } from 'antd/es/transfer';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton } from 'antd';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import type { RadioChangeEvent } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -16,6 +20,7 @@ import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
 import imgLoading from 'assets/images/picture/loading.gif';
+import { DetailModal } from '../redBookContentList/component/detailModal';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -120,7 +125,12 @@ const BatcSmallRedBooks = () => {
                         timer.current[0] = setInterval(() => {
                             if (
                                 plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                    return item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing';
+                                    return (
+                                        item?.pictureStatus !== 'executing' &&
+                                        item?.pictureStatus !== 'init' &&
+                                        item?.copyWritingStatus !== 'executing' &&
+                                        item?.copyWritingStatus !== 'init'
+                                    );
                                 })
                             ) {
                                 clearInterval(timer.current[0]);
@@ -262,6 +272,8 @@ const BatcSmallRedBooks = () => {
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
+    const [swiperRef, setSwiperRef] = useState<any[]>([]);
+    const swipers: any = useRef([]);
     const [queryPage, setQueryPage] = useState({
         pageNo: 1,
         pageSize: 20
@@ -307,7 +319,13 @@ const BatcSmallRedBooks = () => {
                 if (
                     plabListRef.current
                         .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                        ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing')
+                        ?.every(
+                            (item: any) =>
+                                item?.pictureStatus !== 'executing' &&
+                                item?.pictureStatus !== 'init' &&
+                                item?.copyWritingStatus !== 'executing' &&
+                                item?.copyWritingStatus !== 'init'
+                        )
                 ) {
                     clearInterval(timer.current[queryPage.pageNo - 1]);
                 }
@@ -315,7 +333,6 @@ const BatcSmallRedBooks = () => {
             }, 3000);
         }
     }, [queryPage.pageNo]);
-
     //变量
     const [variables, setVariables] = useState<any>({});
     useEffect(() => {
@@ -354,6 +371,8 @@ const BatcSmallRedBooks = () => {
                 );
         }
     };
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [businessUid, setBusinessUid] = useState('');
     return (
         <div className="h-full">
             <SubCard
@@ -370,8 +389,8 @@ const BatcSmallRedBooks = () => {
                 <div></div>
             </SubCard>
             <Row gutter={40} className="!ml-0">
-                <Col span={6} className="relative bg-[#fff] !px-[0]">
-                    <div className="!mx-[20px] py-[20px] h-full overflow-auto">
+                <Col span={6} className="relative h-full bg-[#fff] !px-[0]">
+                    <div className="!mx-[20px] py-[20px]  overflow-y-auto pb-[72px]" style={{ height: 'calc(100vh - 210px)' }}>
                         <TextField
                             fullWidth
                             size="small"
@@ -483,47 +502,49 @@ const BatcSmallRedBooks = () => {
                             max={500}
                             className="w-full"
                         />
-
-                        <div className="absolute bottom-[20px] flex gap-2" style={{ width: 'calc(100% - 40px)' }}>
-                            <Button
-                                disabled={
-                                    !searchParams.get('uid') ? true : false || detailData.status === 'RUNNING' ? true : false || executeOpen
-                                }
-                                className="w-full"
-                                type="primary"
-                                onClick={() => {
-                                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
-                                        if (res) {
-                                            setExecuteOpen(true);
-                                            getList();
-                                            timer.current[0] = setInterval(() => {
-                                                if (
-                                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                                        return (
-                                                            item?.pictureStatus !== 'executing' && item?.copyWritingStatus !== 'executing'
-                                                        );
-                                                    })
-                                                ) {
-                                                    clearInterval(timer.current[0]);
-                                                }
-                                                getLists(1);
-                                            }, 3000);
-                                        }
-                                    });
-                                }}
-                            >
-                                智能生成设置
-                            </Button>
-                            <Button
-                                className="w-full"
-                                disabled={detailData.status === 'RUNNING' ? true : false}
-                                icon={<SaveOutlined rev={undefined} />}
-                                onClick={handleSave}
-                                type="primary"
-                            >
-                                保存
-                            </Button>
-                        </div>
+                    </div>
+                    <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
+                        <Button
+                            disabled={
+                                !searchParams.get('uid') ? true : false || detailData.status === 'RUNNING' ? true : false || executeOpen
+                            }
+                            className="w-full"
+                            type="primary"
+                            onClick={() => {
+                                planExecute({ uid: searchParams.get('uid') }).then((res) => {
+                                    if (res) {
+                                        setExecuteOpen(true);
+                                        getList();
+                                        timer.current[0] = setInterval(() => {
+                                            if (
+                                                plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                    return (
+                                                        item?.pictureStatus !== 'executing' &&
+                                                        item?.pictureStatus !== 'init' &&
+                                                        item?.copyWritingStatus !== 'executing' &&
+                                                        item?.copyWritingStatus !== 'init'
+                                                    );
+                                                })
+                                            ) {
+                                                clearInterval(timer.current[0]);
+                                            }
+                                            getLists(1);
+                                        }, 3000);
+                                    }
+                                });
+                            }}
+                        >
+                            智能生成设置
+                        </Button>
+                        <Button
+                            className="w-full"
+                            disabled={detailData.status === 'RUNNING' ? true : false}
+                            icon={<SaveOutlined rev={undefined} />}
+                            onClick={handleSave}
+                            type="primary"
+                        >
+                            保存
+                        </Button>
                     </div>
                 </Col>
                 <Col span={18} className="overflow-hidden">
@@ -546,9 +567,9 @@ const BatcSmallRedBooks = () => {
                             onScroll={handleScroll}
                             style={{ height: 'calc(100vh - 210px)' }}
                         >
-                            <Row gutter={20}>
+                            <Row gutter={20} className="h-[fit-content]">
                                 {planList.map((item, index: number) => (
-                                    <Col span={6}>
+                                    <Col span={6} className="inline-block">
                                         <div
                                             key={index}
                                             className="mb-[20px] flex-1 aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
@@ -566,18 +587,50 @@ const BatcSmallRedBooks = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <Carousel className="aspect-[3/4]" autoplay effect="fade">
-                                                    {item.pictureContent?.map((el: any) => (
-                                                        <div>
-                                                            <img
-                                                                src={el.url}
-                                                                alt="el.index"
-                                                                className="aspect-[3/4]"
-                                                                style={{ width: '100%', borderRadius: '10px' }}
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                </Carousel>
+                                                <div className="aspect-[3/4] relative">
+                                                    <Swiper
+                                                        onSwiper={(swiper) => {
+                                                            const newList = swipers.current;
+                                                            newList.push(swiper);
+                                                            swipers.current = _.cloneDeep(newList);
+                                                            newList.push(swipers.current);
+                                                            setSwiperRef(newList);
+                                                        }}
+                                                        slidesPerView={1}
+                                                        spaceBetween={30}
+                                                        centeredSlides={false}
+                                                        loop
+                                                        modules={[]}
+                                                        className="mySwiper h-full"
+                                                        autoplay={{
+                                                            delay: 2500,
+                                                            disableOnInteraction: false
+                                                        }}
+                                                    >
+                                                        {item.pictureContent?.map((el: any, index: number) => (
+                                                            <SwiperSlide key={el.url}>
+                                                                <img className="w-full h-full object-contain" src={el.url} />
+                                                            </SwiperSlide>
+                                                        ))}
+                                                    </Swiper>
+                                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                                        <Button
+                                                            icon={<KeyboardBackspaceIcon />}
+                                                            shape="circle"
+                                                            onClick={() => {
+                                                                swiperRef[index]?.slidePrev();
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            style={{ marginLeft: '10px' }}
+                                                            icon={<ArrowForwardIcon />}
+                                                            shape="circle"
+                                                            onClick={() => {
+                                                                swiperRef[index]?.slideNext();
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
                                             )}
                                             {!item.copyWritingTitle ? (
                                                 <div className="relative">
@@ -592,11 +645,21 @@ const BatcSmallRedBooks = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="mt-[20px]">
-                                                    <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
-                                                    <div className="line-clamp-5 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
-                                                        {item.copyWritingContent}
-                                                    </div>
+                                                <div
+                                                    className="mt-[20px] cursor-pointer"
+                                                    onClick={() => {
+                                                        setBusinessUid(item.businessUid);
+                                                        setDetailOpen(true);
+                                                    }}
+                                                >
+                                                    <Popover content={item.copyWritingTitle}>
+                                                        <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
+                                                    </Popover>
+                                                    <Popover content={<div className="w-[500px]">{item.copyWritingContent}</div>}>
+                                                        <div className="line-clamp-5 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
+                                                            {item.copyWritingContent}
+                                                        </div>
+                                                    </Popover>
                                                 </div>
                                             )}
                                         </div>
@@ -607,6 +670,7 @@ const BatcSmallRedBooks = () => {
                     )}
                 </Col>
             </Row>
+            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
             {/* <TextField
                 sx={{ width: '300px', mb: 2 }}
                 size="small"

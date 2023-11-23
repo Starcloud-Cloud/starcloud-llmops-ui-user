@@ -34,9 +34,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm, Spin } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
 import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample } from 'api/redBook/copywriting';
@@ -293,7 +293,8 @@ const AddModal = () => {
             setVariableOpen(false);
         }
     };
-    const valueRef: any = useRef(null);
+    const valueRef: any = useRef('');
+    const [valueLoading, setValueLoading] = useState(false);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard
@@ -534,6 +535,7 @@ const AddModal = () => {
                                                     );
                                                     return false;
                                                 }
+                                                setValueLoading(true);
                                                 const result: any = await schemeDemand({
                                                     ...params,
                                                     type: params.type ? 'SYSTEM' : 'USER',
@@ -558,6 +560,7 @@ const AddModal = () => {
                                                 while (1) {
                                                     let joins = outerJoins;
                                                     const { done, value } = await reader.read();
+                                                    setValueLoading(false);
                                                     if (done) {
                                                         break;
                                                     }
@@ -618,25 +621,36 @@ const AddModal = () => {
                                             自动分析，生成要求
                                         </Button>
                                     </div>
-                                    <TextField
-                                        color="secondary"
-                                        inputRef={iptRef}
-                                        placeholder={''}
-                                        value={copyWritingTemplate.demand}
-                                        required
-                                        name="demand"
-                                        multiline
-                                        minRows={4}
-                                        maxRows={4}
-                                        InputLabelProps={{ shrink: true }}
-                                        onChange={(e) => {
-                                            setCopyWritingTemplate({
-                                                ...copyWritingTemplate,
-                                                demand: e.target.value
-                                            });
-                                        }}
-                                        fullWidth
-                                    />
+                                    <div className="relative">
+                                        <TextField
+                                            color="secondary"
+                                            inputRef={iptRef}
+                                            placeholder={''}
+                                            value={copyWritingTemplate.demand}
+                                            required
+                                            name="demand"
+                                            multiline
+                                            minRows={4}
+                                            maxRows={4}
+                                            InputLabelProps={{ shrink: true }}
+                                            onChange={(e) => {
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    demand: e.target.value
+                                                });
+                                            }}
+                                            fullWidth
+                                        />
+                                        {valueLoading && (
+                                            <div className="w-full h-full absolute flex justify-center items-center top-0 bg-[#000]/40">
+                                                <Spin
+                                                    spinning={valueLoading}
+                                                    indicator={<LoadingOutlined rev={undefined} style={{ fontSize: 30 }} spin />}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <Box mb={1}>
                                         {rows?.map((item, index: number) => (
                                             <Tooltip key={index} placement="top" title={t('market.fields')}>

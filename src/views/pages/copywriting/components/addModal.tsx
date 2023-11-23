@@ -258,7 +258,6 @@ const AddModal = () => {
         if (searchParams.get('uid')) {
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
-                    console.log(res);
                     setRows(res.configuration?.copyWritingTemplate?.variables);
                     setParams({
                         name: res.name,
@@ -277,9 +276,12 @@ const AddModal = () => {
         }
     }, []);
     const iptRef: any = useRef(null);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
     const [rows, setRows] = useState<any[]>([]);
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
+    const [summaryOpen, setSummaryOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
     const [itemData, setItemData] = useState<any>({});
     const saveContent = (data: any) => {
@@ -295,6 +297,19 @@ const AddModal = () => {
     };
     const valueRef: any = useRef('');
     const [valueLoading, setValueLoading] = useState(false);
+    const testColumn: ColumnsType<any> = [
+        {
+            title: '标题',
+            dataIndex: 'title'
+        },
+        {
+            title: '内容',
+            width: '60%',
+            dataIndex: 'content'
+        }
+    ];
+    const [testOpen, setTestOpen] = useState(false);
+    const [testTableList, setTestTableList] = useState<any[]>([]);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard
@@ -452,7 +467,25 @@ const AddModal = () => {
                         新增
                     </Button>
                 </div>
-                <Table scroll={{ y: 500 }} size="small" columns={columns} dataSource={tableData} />
+                <Table
+                    pagination={{
+                        current,
+                        pageSize,
+                        total: tableData.length,
+                        showSizeChanger: true,
+                        pageSizeOptions: [20, 50, 100],
+                        onChange: (data) => {
+                            setCurrent(data);
+                        },
+                        onShowSizeChange: (data, size) => {
+                            setPageSize(size);
+                        }
+                    }}
+                    scroll={{ y: 500 }}
+                    size="small"
+                    columns={columns}
+                    dataSource={tableData}
+                />
                 <div className="text-[18px] font-[600] my-[20px]">生成配置</div>
                 <Tabs
                     activeKey={activeKey}
@@ -462,8 +495,8 @@ const AddModal = () => {
                             label: '文案生成模板',
                             children: (
                                 <div>
-                                    <div className="flex justify-between items-center mb-[20px]">
-                                        <div className="text-[14px] font-[600]">文案生成要求</div>
+                                    <div className="flex justify-between items-end mb-[10px]">
+                                        <div className="text-[16px] font-[600]">参考文案分析</div>
                                         <Button
                                             onClick={async () => {
                                                 if (!params.name) {
@@ -554,7 +587,7 @@ const AddModal = () => {
                                                 const textDecoder = new TextDecoder();
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
-                                                    demand: ''
+                                                    summary: ''
                                                 });
                                                 let outerJoins: any;
                                                 while (1) {
@@ -585,7 +618,7 @@ const AddModal = () => {
                                                             valueRef.current = valueRef.current + bufferObj.content;
                                                             setCopyWritingTemplate({
                                                                 ...copyWritingTemplate,
-                                                                demand: valueRef.current
+                                                                summary: valueRef.current
                                                             });
                                                         } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
                                                             dispatch(
@@ -618,7 +651,7 @@ const AddModal = () => {
                                             }}
                                             type="primary"
                                         >
-                                            自动分析，生成要求
+                                            AI分析参考文案
                                         </Button>
                                     </div>
                                     <div className="relative">
@@ -626,17 +659,20 @@ const AddModal = () => {
                                             color="secondary"
                                             inputRef={iptRef}
                                             placeholder={''}
-                                            value={copyWritingTemplate.demand}
+                                            value={copyWritingTemplate.summary}
                                             required
-                                            name="demand"
+                                            name="summary"
                                             multiline
-                                            minRows={4}
-                                            maxRows={4}
+                                            minRows={6}
+                                            maxRows={8}
                                             InputLabelProps={{ shrink: true }}
+                                            error={summaryOpen && !copyWritingTemplate.summary}
+                                            helperText={summaryOpen && !copyWritingTemplate.summary ? '参考文案分析必填' : ''}
                                             onChange={(e) => {
+                                                setSummaryOpen(true);
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
-                                                    demand: e.target.value
+                                                    summary: e.target.value
                                                 });
                                             }}
                                             fullWidth
@@ -650,41 +686,66 @@ const AddModal = () => {
                                             </div>
                                         )}
                                     </div>
-
+                                    <div className="mt-[20px] mb-[10px] text-[16px] font-[600] flex items-end">
+                                        文案生成要求
+                                        <span className="text-[12px] text-[#15273799]">
+                                            （对生成的文案内容就行自定义要求，直接告诉AI你想怎么改文案）
+                                        </span>
+                                    </div>
+                                    <TextField
+                                        color="secondary"
+                                        inputRef={iptRef}
+                                        placeholder={''}
+                                        value={copyWritingTemplate.demand}
+                                        required
+                                        name="demand"
+                                        multiline
+                                        minRows={4}
+                                        maxRows={4}
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(e) => {
+                                            setCopyWritingTemplate({
+                                                ...copyWritingTemplate,
+                                                demand: e.target.value
+                                            });
+                                        }}
+                                        fullWidth
+                                    />
                                     <Box mb={1}>
-                                        {rows?.map((item, index: number) => (
-                                            <Tooltip key={index} placement="top" title={t('market.fields')}>
-                                                <Chip
-                                                    sx={{ mr: 1, mt: 1 }}
-                                                    size="small"
-                                                    color="primary"
-                                                    onClick={() => {
-                                                        const newVal = _.cloneDeep(copyWritingTemplate.demand);
-                                                        if (newVal) {
-                                                            const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
-                                                            const part2 = newVal?.slice(iptRef.current?.selectionStart);
-                                                            setCopyWritingTemplate({
-                                                                ...copyWritingTemplate,
-                                                                demand: `${part1}{${item.field}}${part2}`
-                                                            });
-                                                        } else {
-                                                            setCopyWritingTemplate({
-                                                                ...copyWritingTemplate,
-                                                                demand: `{${item.field}}`
-                                                            });
-                                                        }
-                                                    }}
-                                                    label={item.field}
-                                                ></Chip>
-                                            </Tooltip>
-                                        ))}
+                                        {rows.length > 0 &&
+                                            rows?.map((item, index: number) => (
+                                                <Tooltip key={index} placement="top" title={t('market.fields')}>
+                                                    <Chip
+                                                        sx={{ mr: 1, mt: 1 }}
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => {
+                                                            const newVal = _.cloneDeep(copyWritingTemplate.demand);
+                                                            if (newVal) {
+                                                                const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
+                                                                const part2 = newVal?.slice(iptRef.current?.selectionStart);
+                                                                setCopyWritingTemplate({
+                                                                    ...copyWritingTemplate,
+                                                                    demand: `${part1}{${item.field}}${part2}`
+                                                                });
+                                                            } else {
+                                                                setCopyWritingTemplate({
+                                                                    ...copyWritingTemplate,
+                                                                    demand: `{${item.field}}`
+                                                                });
+                                                            }
+                                                        }}
+                                                        label={item.field}
+                                                    ></Chip>
+                                                </Tooltip>
+                                            ))}
                                     </Box>
                                     <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
                                         <Box display="flex" justifyContent="space-between" alignItems="center">
                                             <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Box mr={1}>{t('myApp.table')}</Box>
                                                 <Tooltip placement="top" title={t('market.varableDesc')}>
-                                                    <ErrorIcon fontSize="small" />
+                                                    <ErrorIcon sx={{ cursor: 'pointer' }} fontSize="small" />
                                                 </Tooltip>
                                             </Typography>
                                             <Buttons
@@ -712,42 +773,43 @@ const AddModal = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {rows?.map((row: any, i: number) => (
-                                                        <TableRow hover key={row.field}>
-                                                            <TableCell>{row.field}</TableCell>
-                                                            <TableCell>{row.label}</TableCell>
-                                                            <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
-                                                            <TableCell sx={{ width: 120 }}>
-                                                                <IconButton
-                                                                    onClick={() => {
-                                                                        setVarIndex(i);
-                                                                        setItemData(row);
-                                                                        setTitle('编辑变量');
-                                                                        setVariableOpen(true);
-                                                                    }}
-                                                                    color="primary"
-                                                                >
-                                                                    <SettingsIcon />
-                                                                </IconButton>
-                                                                <Popconfirm
-                                                                    title={t('myApp.del')}
-                                                                    description={t('myApp.delDesc')}
-                                                                    onConfirm={() => {
-                                                                        const newList = _.cloneDeep(rows);
-                                                                        newList?.splice(i, 1);
-                                                                        setRows(newList);
-                                                                    }}
-                                                                    onCancel={() => {}}
-                                                                    okText={t('myApp.confirm')}
-                                                                    cancelText={t('myApp.cancel')}
-                                                                >
-                                                                    <IconButton color="error">
-                                                                        <DeleteIcon />
+                                                    {rows.length > 0 &&
+                                                        rows?.map((row: any, i: number) => (
+                                                            <TableRow hover key={row.field}>
+                                                                <TableCell>{row.field}</TableCell>
+                                                                <TableCell>{row.label}</TableCell>
+                                                                <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
+                                                                <TableCell sx={{ width: 120 }}>
+                                                                    <IconButton
+                                                                        onClick={() => {
+                                                                            setVarIndex(i);
+                                                                            setItemData(row);
+                                                                            setTitle('编辑变量');
+                                                                            setVariableOpen(true);
+                                                                        }}
+                                                                        color="primary"
+                                                                    >
+                                                                        <SettingsIcon />
                                                                     </IconButton>
-                                                                </Popconfirm>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
+                                                                    <Popconfirm
+                                                                        title={t('myApp.del')}
+                                                                        description={t('myApp.delDesc')}
+                                                                        onConfirm={() => {
+                                                                            const newList = _.cloneDeep(rows);
+                                                                            newList?.splice(i, 1);
+                                                                            setRows(newList);
+                                                                        }}
+                                                                        onCancel={() => {}}
+                                                                        okText={t('myApp.confirm')}
+                                                                        cancelText={t('myApp.cancel')}
+                                                                    >
+                                                                        <IconButton color="error">
+                                                                            <DeleteIcon />
+                                                                        </IconButton>
+                                                                    </Popconfirm>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
                                                 </TableBody>
                                             </Tables>
                                         </TableContainer>
@@ -795,6 +857,7 @@ const AddModal = () => {
                                                 setTitleOpen(true);
                                                 setCategoryOpen(true);
                                                 setTagOpen(true);
+                                                setSummaryOpen(true);
                                                 dispatch(
                                                     openSnackbar({
                                                         open: true,
@@ -812,6 +875,7 @@ const AddModal = () => {
                                                 setTitleOpen(true);
                                                 setCategoryOpen(true);
                                                 setTagOpen(true);
+                                                setSummaryOpen(true);
                                                 dispatch(
                                                     openSnackbar({
                                                         open: true,
@@ -829,6 +893,7 @@ const AddModal = () => {
                                                 setTitleOpen(true);
                                                 setCategoryOpen(true);
                                                 setTagOpen(true);
+                                                setSummaryOpen(true);
                                                 dispatch(
                                                     openSnackbar({
                                                         open: true,
@@ -840,6 +905,10 @@ const AddModal = () => {
                                                         close: false
                                                     })
                                                 );
+                                                return false;
+                                            }
+                                            if (!copyWritingTemplate.summary) {
+                                                setSummaryOpen(true);
                                                 return false;
                                             }
                                             if (
@@ -858,6 +927,7 @@ const AddModal = () => {
                                                 );
                                                 return false;
                                             }
+                                            setTestOpen(true);
                                             schemeExample({
                                                 ...params,
                                                 type: params.type ? 'SYSTEM' : 'USER',
@@ -872,15 +942,26 @@ const AddModal = () => {
                                                     }
                                                 }
                                             }).then((res) => {
-                                                console.log(res);
+                                                setTestOpen(false);
+                                                setTestTableList(res);
                                             });
                                         }}
+                                        loading={testOpen}
                                         className="mt-[20px]"
                                         type="primary"
                                         icon={<PlusOutlined rev={undefined} />}
                                     >
                                         测试生成
                                     </Button>
+                                    {testTableList?.length > 0 && (
+                                        <Table
+                                            className="mt-[20px]"
+                                            scroll={{ y: 500 }}
+                                            size="small"
+                                            columns={testColumn}
+                                            dataSource={testTableList}
+                                        />
+                                    )}
                                 </div>
                             )
                         },
@@ -1228,6 +1309,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -1245,6 +1327,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -1262,6 +1345,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -1273,6 +1357,10 @@ const AddModal = () => {
                                             close: false
                                         })
                                     );
+                                    return false;
+                                }
+                                if (!copyWritingTemplate.summary) {
+                                    setSummaryOpen(true);
                                     return false;
                                 }
                                 if (imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) {

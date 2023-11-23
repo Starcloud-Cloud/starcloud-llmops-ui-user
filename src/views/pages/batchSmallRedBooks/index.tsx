@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton } from 'antd';
+import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -21,6 +22,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { DetailModal } from '../redBookContentList/component/detailModal';
+import copy from 'clipboard-copy';
+import './index.scss';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -90,8 +93,25 @@ const BatcSmallRedBooks = () => {
     //         }
     //     }
     // }, [targetKeys]);
+    const [preform, setPerform] = useState(1);
+    useEffect(() => {
+        if (targetKeys && targetKeys.length > 0) {
+            if (preform > 1) {
+                const obj: any = {};
+                targetKeys.map((item: string) => {
+                    obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
+                });
+                setVariables(obj);
+            } else {
+                setPerform(preform + 1);
+            }
+        } else if (targetKeys && targetKeys.length === 0) {
+            setVariables({});
+        }
+    }, [targetKeys]);
     const setDetail = (result: any) => {
         const res = _.cloneDeep(result);
+        setTargetKeys(res.config?.schemeUidList);
         setValue(res.name);
         setDetailData({
             ...res.config,
@@ -100,7 +120,6 @@ const BatcSmallRedBooks = () => {
             status: res.status
         });
         setVariables(res.config?.paramMap);
-        setTargetKeys(res.config?.schemeUidList);
         setImageList(
             res.config?.imageUrlList?.map((item: any) => {
                 return {
@@ -157,7 +176,7 @@ const BatcSmallRedBooks = () => {
         randomType: 'RANDOM',
         total: 5
     });
-    const handleSave = () => {
+    const handleSave = async (flag?: boolean) => {
         if (!value) {
             setValueOpen(true);
             dispatch(
@@ -202,11 +221,33 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
+        if (
+            Object.values(variables)
+                .flat()
+                ?.some((item: any) => !item.value)
+        ) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '方案参数全部必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUidList = targetKeys;
+        if (flag) {
+            setPlanList([]);
+            plabListRef.current = [];
+        }
         if (searchParams.get('uid')) {
-            planModify({
+            const res = await planModify({
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
@@ -220,23 +261,45 @@ const BatcSmallRedBooks = () => {
                 },
                 type: 'XHS',
                 uid: searchParams.get('uid')
-            }).then((res) => {
-                if (res) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: '编辑成功',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            close: false
-                        })
-                    );
-                }
             });
+            if (res) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '编辑成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                if (flag) {
+                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
+                        if (res) {
+                            setExecuteOpen(true);
+                            getList();
+                            timer.current[0] = setInterval(() => {
+                                if (
+                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                        return (
+                                            item?.pictureStatus !== 'executing' &&
+                                            item?.pictureStatus !== 'init' &&
+                                            item?.copyWritingStatus !== 'executing' &&
+                                            item?.copyWritingStatus !== 'init'
+                                        );
+                                    })
+                                ) {
+                                    clearInterval(timer.current[0]);
+                                }
+                                getLists(1);
+                            }, 3000);
+                        }
+                    });
+                }
+            }
         } else {
-            planCreate({
+            const res = await planCreate({
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
@@ -249,22 +312,44 @@ const BatcSmallRedBooks = () => {
                     paramMap: { ...variables }
                 },
                 type: 'XHS'
-            }).then((res) => {
-                if (res) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: '创建成功',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            close: false
-                        })
-                    );
-                    navigate('/batchSmallRedBook?uid=' + res);
-                }
             });
+            if (res) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '创建成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                navigate('/batchSmallRedBook?uid=' + res);
+                if (flag) {
+                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
+                        if (res) {
+                            setExecuteOpen(true);
+                            getList();
+                            timer.current[0] = setInterval(() => {
+                                if (
+                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                        return (
+                                            item?.pictureStatus !== 'executing' &&
+                                            item?.pictureStatus !== 'init' &&
+                                            item?.copyWritingStatus !== 'executing' &&
+                                            item?.copyWritingStatus !== 'init'
+                                        );
+                                    })
+                                ) {
+                                    clearInterval(timer.current[0]);
+                                }
+                                getLists(1);
+                            }, 3000);
+                        }
+                    });
+                }
+            }
         }
     };
     //页面滚动
@@ -335,17 +420,6 @@ const BatcSmallRedBooks = () => {
     }, [queryPage.pageNo]);
     //变量
     const [variables, setVariables] = useState<any>({});
-    useEffect(() => {
-        if (targetKeys && targetKeys.length > 0) {
-            const obj: any = {};
-            targetKeys.map((item: string) => {
-                obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
-            });
-            setVariables(obj);
-        } else if (targetKeys && targetKeys.length === 0) {
-            setVariables([]);
-        }
-    }, [targetKeys]);
     //执行按钮
     const [executeOpen, setExecuteOpen] = useState(false);
     const handleTransfer = (key: string, errMessage: string) => {
@@ -405,11 +479,13 @@ const BatcSmallRedBooks = () => {
                                 setValue(e.target.value);
                             }}
                         />
-                        <div className="text-[18px] font-[600] my-[20px]">1. 批量上传素材图片</div>
+                        <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">1. 批量上传素材图片</div>
+                        <div className="text-[12px] font-[500]">图片总量：{imageList.length}</div>
                         <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
                             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
                             </Modal>
+
                             <div>
                                 <Upload {...props}>
                                     <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
@@ -458,21 +534,22 @@ const BatcSmallRedBooks = () => {
                         {targetKeys && targetKeys.length > 0 && (
                             <div>
                                 <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
-                                {Object.keys(variables)?.map((item) =>
-                                    variables[item]?.map((el: any, i: number) => (
-                                        <Form
-                                            key={JSON.stringify(item)}
-                                            item={el}
-                                            index={i}
-                                            changeValue={(data: any) => {
-                                                const newData = _.cloneDeep(variables);
-                                                newData[item][data.index].value = data.value;
-                                                setVariables(newData);
-                                            }}
-                                            flag={false}
-                                        />
-                                    ))
-                                )}
+                                {variables &&
+                                    Object.keys(variables)?.map((item) =>
+                                        variables[item]?.map((el: any, i: number) => (
+                                            <Form
+                                                key={JSON.stringify(item)}
+                                                item={el}
+                                                index={i}
+                                                changeValue={(data: any) => {
+                                                    const newData = _.cloneDeep(variables);
+                                                    newData[item][data.index].value = data.value;
+                                                    setVariables(newData);
+                                                }}
+                                                flag={false}
+                                            />
+                                        ))
+                                    )}
                             </div>
                         )}
                         <div className="text-[18px] font-[600] my-[20px]">4. 批量生成参数</div>
@@ -499,51 +576,29 @@ const BatcSmallRedBooks = () => {
                                 setDetailData(newData);
                             }}
                             min={1}
-                            max={500}
+                            max={100}
                             className="w-full"
                         />
                     </div>
                     <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
+                        <Button
+                            className="w-full"
+                            disabled={detailData.status === 'RUNNING' ? true : false}
+                            icon={<SaveOutlined rev={undefined} />}
+                            onClick={() => handleSave(false)}
+                            type="primary"
+                        >
+                            保存配置
+                        </Button>
                         <Button
                             disabled={
                                 !searchParams.get('uid') ? true : false || detailData.status === 'RUNNING' ? true : false || executeOpen
                             }
                             className="w-full"
                             type="primary"
-                            onClick={() => {
-                                planExecute({ uid: searchParams.get('uid') }).then((res) => {
-                                    if (res) {
-                                        setExecuteOpen(true);
-                                        getList();
-                                        timer.current[0] = setInterval(() => {
-                                            if (
-                                                plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                                    return (
-                                                        item?.pictureStatus !== 'executing' &&
-                                                        item?.pictureStatus !== 'init' &&
-                                                        item?.copyWritingStatus !== 'executing' &&
-                                                        item?.copyWritingStatus !== 'init'
-                                                    );
-                                                })
-                                            ) {
-                                                clearInterval(timer.current[0]);
-                                            }
-                                            getLists(1);
-                                        }, 3000);
-                                    }
-                                });
-                            }}
+                            onClick={() => handleSave(true)}
                         >
-                            智能生成设置
-                        </Button>
-                        <Button
-                            className="w-full"
-                            disabled={detailData.status === 'RUNNING' ? true : false}
-                            icon={<SaveOutlined rev={undefined} />}
-                            onClick={handleSave}
-                            type="primary"
-                        >
-                            保存
+                            保存并开始生成
                         </Button>
                     </div>
                 </Col>
@@ -561,112 +616,242 @@ const BatcSmallRedBooks = () => {
                             </div>
                         </div>
                     ) : (
-                        <div
-                            className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2"
-                            ref={scrollRef}
-                            onScroll={handleScroll}
-                            style={{ height: 'calc(100vh - 210px)' }}
-                        >
-                            <Row gutter={20} className="h-[fit-content]">
-                                {planList.map((item, index: number) => (
-                                    <Col span={6} className="inline-block">
-                                        <div
-                                            key={index}
-                                            className="mb-[20px] flex-1 aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5]"
-                                        >
-                                            {!item.pictureContent ? (
-                                                <div className="w-full aspect-[3/4] flex justify-center items-center">
-                                                    <div className="text-center">
-                                                        <Image width={40} src={imgLoading} preview={false} />
-                                                        <div>
-                                                            {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                                                            {item.pictureStatus === 'execute_error' && (
+                        <>
+                            <SubCard contentSX={{ p: '10px !important' }}>生成成功数：，生成失败数：，生成总数：{total}</SubCard>
+                            <div
+                                className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                ref={scrollRef}
+                                onScroll={handleScroll}
+                                style={{ height: 'calc(100vh - 270px)' }}
+                            >
+                                <Row gutter={20} className="h-[fit-content]">
+                                    {planList.map((item, index: number) => (
+                                        <Col span={6} className="inline-block">
+                                            <div
+                                                key={index}
+                                                className="mb-[20px] flex-1 aspect-[3/5] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
+                                            >
+                                                {!item.pictureContent ? (
+                                                    <div className="w-full aspect-[3/4] flex justify-center items-center">
+                                                        <div className="text-center">
+                                                            <Image width={40} src={imgLoading} preview={false} />
+                                                            <div>
+                                                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                                {item.pictureStatus === 'execute_error' && (
+                                                                    <span>({item.pictureRetryCount})</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="aspect-[3/4] relative swiperImages">
+                                                        <Swiper
+                                                            onSwiper={(swiper) => {
+                                                                const newList = swipers.current;
+                                                                newList.push(swiper);
+                                                                swipers.current = _.cloneDeep(newList);
+                                                                newList.push(swipers.current);
+                                                                setSwiperRef(newList);
+                                                            }}
+                                                            slidesPerView={1}
+                                                            spaceBetween={30}
+                                                            centeredSlides={false}
+                                                            loop
+                                                            modules={[]}
+                                                            className="mySwiper h-full"
+                                                            autoplay={{
+                                                                delay: 2500,
+                                                                disableOnInteraction: false
+                                                            }}
+                                                        >
+                                                            {item.pictureContent?.map((el: any, index: number) => (
+                                                                <SwiperSlide key={el.url}>
+                                                                    <img className="w-full h-full object-contain" src={el.url} />
+                                                                </SwiperSlide>
+                                                            ))}
+                                                        </Swiper>
+                                                        <div className="w-full swiperImage">
+                                                            <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                                                <Button
+                                                                    icon={<KeyboardBackspaceIcon />}
+                                                                    shape="circle"
+                                                                    onClick={() => {
+                                                                        swiperRef[index]?.slidePrev();
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    className="float-right"
+                                                                    style={{ marginLeft: '10px' }}
+                                                                    icon={<ArrowForwardIcon />}
+                                                                    shape="circle"
+                                                                    onClick={() => {
+                                                                        swiperRef[index]?.slideNext();
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {!item.copyWritingTitle ? (
+                                                    <div className="relative">
+                                                        <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                        <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                        <Skeleton paragraph={false} className="mt-[10px]" active />
+                                                        <div className="absolute right-1 top-0">
+                                                            {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
+                                                            {item.copyWritingRetryCount === 'execute_error' && (
                                                                 <span>({item.pictureRetryCount})</span>
                                                             )}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <div className="aspect-[3/4] relative">
-                                                    <Swiper
-                                                        onSwiper={(swiper) => {
-                                                            const newList = swipers.current;
-                                                            newList.push(swiper);
-                                                            swipers.current = _.cloneDeep(newList);
-                                                            newList.push(swipers.current);
-                                                            setSwiperRef(newList);
-                                                        }}
-                                                        slidesPerView={1}
-                                                        spaceBetween={30}
-                                                        centeredSlides={false}
-                                                        loop
-                                                        modules={[]}
-                                                        className="mySwiper h-full"
-                                                        autoplay={{
-                                                            delay: 2500,
-                                                            disableOnInteraction: false
+                                                ) : (
+                                                    <div
+                                                        className="mt-[10px] cursor-pointer"
+                                                        onClick={() => {
+                                                            setBusinessUid(item.businessUid);
+                                                            setDetailOpen(true);
                                                         }}
                                                     >
-                                                        {item.pictureContent?.map((el: any, index: number) => (
-                                                            <SwiperSlide key={el.url}>
-                                                                <img className="w-full h-full object-contain" src={el.url} />
-                                                            </SwiperSlide>
-                                                        ))}
-                                                    </Swiper>
-                                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
-                                                        <Button
-                                                            icon={<KeyboardBackspaceIcon />}
-                                                            shape="circle"
-                                                            onClick={() => {
-                                                                swiperRef[index]?.slidePrev();
-                                                            }}
-                                                        />
-                                                        <Button
-                                                            style={{ marginLeft: '10px' }}
-                                                            icon={<ArrowForwardIcon />}
-                                                            shape="circle"
-                                                            onClick={() => {
-                                                                swiperRef[index]?.slideNext();
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {!item.copyWritingTitle ? (
-                                                <div className="relative">
-                                                    <Skeleton paragraph={false} className="mt-[20px]" active />
-                                                    <Skeleton paragraph={false} className="mt-[20px]" active />
-                                                    <Skeleton paragraph={false} className="mt-[10px]" active />
-                                                    <div className="absolute right-1 top-0">
-                                                        {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
-                                                        {item.copyWritingRetryCount === 'execute_error' && (
-                                                            <span>({item.pictureRetryCount})</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    className="mt-[20px] cursor-pointer"
-                                                    onClick={() => {
-                                                        setBusinessUid(item.businessUid);
-                                                        setDetailOpen(true);
-                                                    }}
-                                                >
-                                                    <Popover content={item.copyWritingTitle}>
-                                                        <div className="line-clamp-1 text-[20px] font-bold">{item.copyWritingTitle}</div>
-                                                    </Popover>
-                                                    <Popover content={<div className="w-[500px]">{item.copyWritingContent}</div>}>
-                                                        <div className="line-clamp-5 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
-                                                            {item.copyWritingContent}
+                                                        <Popover
+                                                            content={
+                                                                <div className="w-[500px] text-[12px]">
+                                                                    <div>
+                                                                        <span className="font-[600] h-[38px]">标题：</span>
+                                                                        {item.copyWritingTitle}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="font-[600]">描述：</span>
+                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div className="line-clamp-2 text-[16px] font-bold">
+                                                                {item.copyWritingTitle}
+                                                            </div>
+                                                        </Popover>
+                                                        <Popover
+                                                            content={
+                                                                <div className="w-[500px] text-[12px]">
+                                                                    <div>
+                                                                        <span className="font-[600]">标题：</span>
+                                                                        {item.copyWritingTitle}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="font-[600]">描述：</span>
+                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div className="line-clamp-4 mt-[10px] text-[13px] h-[94px] text-[#15273799]">
+                                                                {item.copyWritingContent}
+                                                            </div>
+                                                        </Popover>
+                                                        <div className="mt-[5px]">
+                                                            <Popover
+                                                                content={
+                                                                    <div className="text-[12px]">
+                                                                        <div className="flex items-center">
+                                                                            <span className="font-500">内容编号：{item.businessUid}</span>
+                                                                            <span
+                                                                                onClick={(e) => {
+                                                                                    copy(item.businessUid);
+                                                                                    dispatch(
+                                                                                        openSnackbar({
+                                                                                            open: true,
+                                                                                            message: '复制成功',
+                                                                                            variant: 'alert',
+                                                                                            alert: {
+                                                                                                color: 'success'
+                                                                                            },
+                                                                                            close: false
+                                                                                        })
+                                                                                    );
+                                                                                    e.stopPropagation();
+                                                                                }}
+                                                                            >
+                                                                                <ContentCopyIcon
+                                                                                    sx={{ fontSize: '14px', cursor: 'pointer' }}
+                                                                                />
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                生成耗时：{item.pictureExecuteTime}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                开始时间：{item.copyWritingStartTime}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                结束时间：{item.copyWritingEndTime}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            >
+                                                                <Tag color="warning">文案生成</Tag>
+                                                            </Popover>
+                                                            <Popover
+                                                                content={
+                                                                    <div className="text-[12px]">
+                                                                        <div className="flex items-center">
+                                                                            <span className="font-500">内容编号：{item.businessUid}</span>
+                                                                            <span
+                                                                                onClick={(e) => {
+                                                                                    copy(item.businessUid);
+                                                                                    dispatch(
+                                                                                        openSnackbar({
+                                                                                            open: true,
+                                                                                            message: '复制成功',
+                                                                                            variant: 'alert',
+                                                                                            alert: {
+                                                                                                color: 'success'
+                                                                                            },
+                                                                                            close: false
+                                                                                        })
+                                                                                    );
+                                                                                    e.stopPropagation();
+                                                                                }}
+                                                                            >
+                                                                                <ContentCopyIcon
+                                                                                    sx={{ fontSize: '14px', cursor: 'pointer' }}
+                                                                                />
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                生成耗时：{item.copyWritingExecuteTime}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                开始时间：{item.copyWritingStartTime}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="font-500">
+                                                                                结束时间：{item.copyWritingEndTime}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            >
+                                                                <Tag color="warning">图片生成</Tag>
+                                                            </Popover>
                                                         </div>
-                                                    </Popover>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </Col>
-                                ))}
-                            </Row>
-                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </div>
+                        </>
                     )}
                 </Col>
             </Row>

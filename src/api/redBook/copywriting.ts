@@ -31,7 +31,7 @@ export const schemeDelete = (data: any) => {
 };
 //小红书需求生成
 export const schemeDemand = (data: any) => {
-    return fetch(`/llm/creative/scheme/demand`, 'post', data);
+    return fetch(`/llm/creative/scheme/summary`, 'post', data);
 };
 //小红书文案测试生成
 export const schemeExample = (data: any) => {

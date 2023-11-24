@@ -204,7 +204,13 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
 超过则系统自动截取前2000`}
                             className="w-full"
                             onChange={(e) => {
-                                setKeyWord(e.target.value);
+                                const value = e.target.value;
+                                const trimmedText = value.replace(/^[^\S\r\n]+|[^\S\r\n]+$/gm, '');
+
+                                const formattedText = trimmedText.replace(/\s+/g, ' ');
+                                console.log('🚀 ~ file: index.tsx:212 ~ AddKeywordModal ~ formattedText:', formattedText);
+
+                                setKeyWord(formattedText);
                             }}
                         />
                     </div>

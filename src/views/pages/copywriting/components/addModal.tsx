@@ -726,7 +726,8 @@ const AddModal = () => {
                                         }}
                                         fullWidth
                                     />
-                                    <Box mb={1}>
+                                    <Box>
+                                        <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                                         {rows.length > 0 &&
                                             rows?.map((item, index: number) => (
                                                 <Tooltip key={index} placement="top" title={t('market.fields')}>
@@ -945,24 +946,32 @@ const AddModal = () => {
                                                 return false;
                                             }
                                             setTestOpen(true);
-                                            schemeExample({
-                                                ...params,
-                                                type: params.type ? 'SYSTEM' : 'USER',
-                                                refers: tableData,
-                                                configuration: {
-                                                    copyWritingTemplate: {
-                                                        ...copyWritingTemplate,
-                                                        example: testTableList,
-                                                        variables: rows
-                                                    },
-                                                    imageTemplate: {
-                                                        styleList: imageStyleData
+                                            try {
+                                                schemeExample({
+                                                    ...params,
+                                                    type: params.type ? 'SYSTEM' : 'USER',
+                                                    refers: tableData,
+                                                    configuration: {
+                                                        copyWritingTemplate: {
+                                                            ...copyWritingTemplate,
+                                                            example: testTableList,
+                                                            variables: rows
+                                                        },
+                                                        imageTemplate: {
+                                                            styleList: imageStyleData
+                                                        }
                                                     }
-                                                }
-                                            }).then((res) => {
+                                                })
+                                                    .then((res) => {
+                                                        setTestOpen(false);
+                                                        setTestTableList(res);
+                                                    })
+                                                    .catch((err) => {
+                                                        setTestOpen(false);
+                                                    });
+                                            } catch (err) {
                                                 setTestOpen(false);
-                                                setTestTableList(res);
-                                            });
+                                            }
                                         }}
                                         loading={testOpen}
                                         className="mt-[20px]"

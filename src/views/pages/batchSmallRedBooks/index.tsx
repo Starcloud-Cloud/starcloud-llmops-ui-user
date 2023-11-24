@@ -2,13 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import type { RadioChangeEvent } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -22,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { DetailModal } from '../redBookContentList/component/detailModal';
-
+import Swipers from './components/swiper';
 import formatDate from 'hooks/useDate';
 import copy from 'clipboard-copy';
 import './index.scss';
@@ -62,39 +56,7 @@ const BatcSmallRedBooks = () => {
     //2.文案模板
     const [mockData, setMockData] = useState<any[]>([]);
     const [targetKeys, setTargetKeys] = useState<any[]>([]);
-
-    // const deduplicateArray = (arr: any[], prop: string) => {
-    //     const uniqueValues = new Set();
-    //     const deduplicatedArray: any[] = [];
-    //     for (const item of arr) {
-    //         const value = item[prop];
-    //         if (!uniqueValues.has(value)) {
-    //             uniqueValues.add(value);
-    //             deduplicatedArray.push(item);
-    //         }
-    //     }
-    //     return deduplicatedArray;
-    // };
-    // useEffect(() => {
-    //     if (targetKeys?.length > 0) {
-    //         const arr: any[] = [];
-    //         const newList = mockData?.filter((item: any) => targetKeys?.some((el) => item.uid === el));
-    //         newList.map((item) => {
-    //             item.variables?.map((el: any) => {
-    //                 arr.push(el);
-    //             });
-    //         });
-    //         const newData = _.cloneDeep(detailData);
-    //         newData.variableList = deduplicateArray(arr, 'field');
-    //         setDetailData(newData);
-    //     } else {
-    //         if (detailData?.variableList) {
-    //             const newData = _.cloneDeep(detailData);
-    //             newData.variableList = [];
-    //             setDetailData(newData);
-    //         }
-    //     }
-    // }, [targetKeys]);
+    const uidRef = useRef('');
     const [preform, setPerform] = useState(1);
     useEffect(() => {
         if (targetKeys && targetKeys.length > 0) {
@@ -103,7 +65,8 @@ const BatcSmallRedBooks = () => {
                 targetKeys.map((item: string) => {
                     obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
                 });
-                setVariables(obj);
+                variableRef.current = obj;
+                setVariables(variableRef.current);
             } else {
                 setPerform(preform + 1);
             }
@@ -121,7 +84,8 @@ const BatcSmallRedBooks = () => {
             randomType: res.randomType,
             status: res.status
         });
-        setVariables(res.config?.paramMap);
+        variableRef.current = res.config?.paramMap;
+        setVariables(variableRef.current);
         setImageList(
             res.config?.imageUrlList?.map((item: any) => {
                 return {
@@ -245,8 +209,8 @@ const BatcSmallRedBooks = () => {
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUidList = targetKeys;
         if (flag) {
-            setPlanList([]);
             plabListRef.current = [];
+            setPlanList(plabListRef.current);
         }
         if (searchParams.get('uid')) {
             const res = await planModify({
@@ -265,6 +229,7 @@ const BatcSmallRedBooks = () => {
                 uid: searchParams.get('uid')
             });
             if (res) {
+                uidRef.current = res;
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -279,7 +244,6 @@ const BatcSmallRedBooks = () => {
                 if (flag) {
                     planExecute({ uid: searchParams.get('uid') }).then((res) => {
                         if (res) {
-                            setExecuteOpen(true);
                             getList();
                             timer.current[0] = setInterval(() => {
                                 if (
@@ -316,6 +280,7 @@ const BatcSmallRedBooks = () => {
                 type: 'XHS'
             });
             if (res) {
+                uidRef.current = res;
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -330,9 +295,8 @@ const BatcSmallRedBooks = () => {
 
                 navigate('/batchSmallRedBook?uid=' + res);
                 if (flag) {
-                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
-                        if (res) {
-                            setExecuteOpen(true);
+                    planExecute({ uid: res }).then((result) => {
+                        if (result) {
                             getList();
                             timer.current[0] = setInterval(() => {
                                 if (
@@ -362,8 +326,6 @@ const BatcSmallRedBooks = () => {
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
-    const [swiperRef, setSwiperRef] = useState<any[]>([]);
-    const swipers: any = useRef([]);
     const [queryPage, setQueryPage] = useState({
         pageNo: 1,
         pageSize: 20
@@ -382,7 +344,7 @@ const BatcSmallRedBooks = () => {
     const getList = () => {
         getContentPage({
             ...queryPage,
-            planUid: searchParams.get('uid')
+            planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
             setSuccessCount(res.successCount);
@@ -395,7 +357,7 @@ const BatcSmallRedBooks = () => {
         getContentPage({
             ...queryPage,
             pageNo,
-            planUid: searchParams.get('uid')
+            planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
             setSuccessCount(res.successCount);
@@ -429,14 +391,16 @@ const BatcSmallRedBooks = () => {
     }, [queryPage.pageNo]);
     //变量
     const [variables, setVariables] = useState<any>({});
+    const variableRef: any = useRef(null);
     //执行按钮
-    const [executeOpen, setExecuteOpen] = useState(false);
     const handleTransfer = (key: string, errMessage: string) => {
         switch (key) {
             case 'init':
                 return <span className="!mr-0">初始化</span>;
             case 'executing':
                 return <span className="!mr-0">生成中</span>;
+            case 'execute_success':
+                return <span>执行成功</span>;
             case 'execute_error':
                 return (
                     <Popover
@@ -489,7 +453,7 @@ const BatcSmallRedBooks = () => {
                             }}
                         />
                         <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">1. 批量上传素材图片</div>
-                        <div className="text-[12px] font-[500]">图片总量：{imageList.length}</div>
+                        <div className="text-[12px] font-[500]">图片总量：{imageList?.length}</div>
                         <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
                             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
@@ -518,6 +482,7 @@ const BatcSmallRedBooks = () => {
                                 label="选择文案模版"
                                 multiple
                                 onChange={(e: any) => {
+                                    setPerform(preform + 1);
                                     settargetKeysOpen(true);
                                     setTargetKeys(e.target.value);
                                 }}
@@ -551,6 +516,8 @@ const BatcSmallRedBooks = () => {
                                                 item={el}
                                                 index={i}
                                                 changeValue={(data: any) => {
+                                                    console.log(variables);
+
                                                     const newData = _.cloneDeep(variables);
                                                     newData[item][data.index].value = data.value;
                                                     setVariables(newData);
@@ -625,7 +592,7 @@ const BatcSmallRedBooks = () => {
                     ) : (
                         <>
                             <SubCard contentSX={{ p: '10px !important' }}>
-                                <Tag
+                                {/* <Tag
                                     className="mr-[10px]"
                                     color={
                                         detailData.status === 'PENDING'
@@ -656,7 +623,7 @@ const BatcSmallRedBooks = () => {
                                         : detailData.status === 'FAILURE'
                                         ? '已失败'
                                         : ''}
-                                </Tag>
+                                </Tag> */}
                                 <span className="font-[600]">生成成功数：</span>
                                 {successCount}&nbsp;&nbsp;
                                 <span className="font-[600]">生成失败数：</span>
@@ -670,16 +637,16 @@ const BatcSmallRedBooks = () => {
                                 onScroll={handleScroll}
                                 style={{ height: 'calc(100vh - 270px)' }}
                             >
-                                <Row gutter={20} className="h-[fit-content]">
+                                <Row gutter={20} className="h-[fit-content] w-full">
                                     {planList.map((item, index: number) => (
-                                        <Col span={6} className="inline-block">
+                                        <Col span={6} className="inline-block flex-1">
                                             <div
                                                 key={index}
-                                                className="mb-[20px] flex-1 aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
+                                                className="mb-[20px] aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
                                             >
                                                 {!item.pictureContent ? (
                                                     <div className="w-full flex justify-center items-center">
-                                                        <div className="w-[70%] aspect-[250/335] flex justify-center items-center">
+                                                        <div className="w-full aspect-[250/335] flex justify-center items-center">
                                                             <div className="text-center">
                                                                 <Image width={40} src={imgLoading} preview={false} />
                                                                 <div>
@@ -692,53 +659,7 @@ const BatcSmallRedBooks = () => {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="w-[70%] flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
-                                                        <Swiper
-                                                            onSwiper={(swiper) => {
-                                                                const newList = swipers.current;
-                                                                newList.push(swiper);
-                                                                swipers.current = _.cloneDeep(newList);
-                                                                newList.push(swipers.current);
-                                                                setSwiperRef(newList);
-                                                            }}
-                                                            slidesPerView={1}
-                                                            spaceBetween={30}
-                                                            centeredSlides={false}
-                                                            loop
-                                                            modules={[]}
-                                                            className="mySwiper h-full"
-                                                            autoplay={{
-                                                                delay: 2500,
-                                                                disableOnInteraction: false
-                                                            }}
-                                                        >
-                                                            {item.pictureContent?.map((el: any, index: number) => (
-                                                                <SwiperSlide key={el.url}>
-                                                                    <img className="w-full h-full object-contain" src={el.url} />
-                                                                </SwiperSlide>
-                                                            ))}
-                                                        </Swiper>
-                                                        <div className="w-full swiperImage absolute top-[46%] z-10">
-                                                            <div className="flex justify-between w-full">
-                                                                <Button
-                                                                    icon={<KeyboardBackspaceIcon />}
-                                                                    shape="circle"
-                                                                    onClick={() => {
-                                                                        swiperRef[index]?.slidePrev();
-                                                                    }}
-                                                                />
-                                                                <Button
-                                                                    className="float-right"
-                                                                    style={{ marginLeft: '10px' }}
-                                                                    icon={<ArrowForwardIcon />}
-                                                                    shape="circle"
-                                                                    onClick={() => {
-                                                                        swiperRef[index]?.slideNext();
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <Swipers item={item} />
                                                 )}
                                                 {!item.copyWritingTitle ? (
                                                     <div className="relative">
@@ -797,29 +718,28 @@ const BatcSmallRedBooks = () => {
                                                             </div>
                                                         </Popover>
                                                         <div className="text-[12px] mt-[5px] flex items-center">
-                                                            <div>文案生成</div>
-                                                            <div>
-                                                                <div>
-                                                                    生成耗时：{item.copyWritingExecuteTime + 'S'}&nbsp;生成字数：
-                                                                    {item.copyWritingCount}
-                                                                </div>
-                                                                <div>
-                                                                    开始时间：{formatDate(item.copyWritingStartTime)}&nbsp;结束时间：
-                                                                    {formatDate(item.copyWritingEndTime)}
-                                                                </div>
-                                                            </div>
+                                                            <span className="font-[600]">文案：</span>
+                                                            {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
+                                                            <span className="font-[600]">耗时：</span>
+                                                            {(item.copyWritingExecuteTime / 1000)?.toFixed(2)}S
+                                                            <span className="font-[600]">字数：</span>
+                                                            {item.copyWritingCount}
+                                                        </div>
+                                                        <div className="text-[12px]">
+                                                            <span className="font-[600]">时间：</span>
+                                                            {formatDate(item.copyWritingStartTime)}-{formatDate(item.copyWritingEndTime)}
                                                         </div>
                                                         <div className="text-[12px] mt-[5px] flex items-center">
-                                                            <div>图片生成</div>
-                                                            <div>
-                                                                <div>
-                                                                    生成耗时：{item.pictureExecuteTime + 'S'}&nbsp;图片数：{item.pictureNum}
-                                                                </div>
-                                                                <div>
-                                                                    开始时间：{formatDate(item.pictureStartTime)}&nbsp;结束时间：
-                                                                    {formatDate(item.pictureEndTime)}
-                                                                </div>
-                                                            </div>
+                                                            <span className="font-[600]">图片：</span>
+                                                            {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                            <span className="font-[600]">耗时：</span>
+                                                            {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
+                                                            <span className="font-[600]">张数：</span>
+                                                            {item.pictureNum}
+                                                        </div>
+                                                        <div className="text-[12px]">
+                                                            <span className="font-[600]">时间：</span>
+                                                            {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
                                                         </div>
                                                     </div>
                                                 )}
@@ -833,75 +753,6 @@ const BatcSmallRedBooks = () => {
                 </Col>
             </Row>
             {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
-            {/* <TextField
-                sx={{ width: '300px', mb: 2 }}
-                size="small"
-                color="secondary"
-                InputLabelProps={{ shrink: true }}
-                error={valueOpen && !value}
-                helperText={valueOpen && !value ? '计划名称必填' : ' '}
-                label="模板名称"
-                value={value}
-                onChange={(e: any) => {
-                    setValueOpen(true);
-                    setValue(e.target.value);
-                }}
-            />
-
-            <div className="text-[18px] font-[600] my-[20px]">2. 文案模板</div>
-            <Transfer
-                dataSource={mockData.map((item) => {
-                    return {
-                        key: item.uid,
-                        title: item.name,
-                        description: item.description
-                    };
-                })}
-                listStyle={{
-                    width: 400,
-                    height: 400
-                }}
-                titles={['精选文案', '已选择的文案']}
-                targetKeys={targetKeys}
-                selectedKeys={selectedKeys}
-                onChange={onChange}
-                onSelectChange={onSelectChange}
-                render={(item) => (
-                    <Popover zIndex={9999} content={<div className="w-[500px]">{item.description}</div>} placement="top">
-                        <div>{item.title}</div>
-                    </Popover>
-                )}
-            />
-            <div className="text-[18px] font-[600] my-[20px]">4. 生成随机参数</div>
-            <div>
-                <Radio.Group
-                    value={detailData?.randomType}
-                    onChange={(e: RadioChangeEvent) => {
-                        const newData = _.cloneDeep(detailData);
-                        newData.randomType = e.target.value;
-                        setDetailData(newData);
-                    }}
-                >
-                    <Radio value="RANDOM">全部随机</Radio>
-                    <Radio value="SEQUENCE">按顺序</Radio>
-                </Radio.Group>
-            </div>
-            <InputNumber
-                value={detailData?.total}
-                onChange={(e: any) => {
-                    const newData = _.cloneDeep(detailData);
-                    newData.total = e;
-                    setDetailData(newData);
-                }}
-                min={1}
-                max={500}
-                className="mt-[20px] w-[300px]"
-            />
-            <div className="mt-[40px] flex justify-center items-center">
-                <Button onClick={handleSave} type="primary" className="w-[300px]">
-                    {searchParams.get('uid') ? '更新' : '创建'}
-                </Button>
-            </div> */}
         </div>
     );
 };

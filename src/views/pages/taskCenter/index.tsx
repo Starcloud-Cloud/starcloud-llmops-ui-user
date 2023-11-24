@@ -359,6 +359,7 @@ const TaskCenter: React.FC = () => {
                                                 size="small"
                                                 color="secondary"
                                                 onClick={() => {
+                                                    setnotificationUid(row.uid);
                                                     setAnnounceOpen(true);
                                                 }}
                                             >

@@ -393,7 +393,7 @@ const BatcSmallRedBooks = () => {
     const [variables, setVariables] = useState<any>({});
     const variableRef: any = useRef(null);
     //执行按钮
-    const handleTransfer = (key: string, errMessage: string) => {
+    const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
             case 'init':
                 return <span className="!mr-0">初始化</span>;
@@ -412,7 +412,7 @@ const BatcSmallRedBooks = () => {
                         title="失败原因"
                     >
                         <span className="!mr-0 cursor-pointer" color="red">
-                            执行失败
+                            执行失败({count})
                         </span>
                     </Popover>
                 );
@@ -639,10 +639,10 @@ const BatcSmallRedBooks = () => {
                             >
                                 <Row gutter={20} className="h-[fit-content] w-full">
                                     {planList.map((item, index: number) => (
-                                        <Col span={6} className="inline-block flex-1">
+                                        <Col span={6} className="inline-block">
                                             <div
                                                 key={index}
-                                                className="mb-[20px] aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
+                                                className="mb-[20px] w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
                                             >
                                                 {!item.pictureContent ? (
                                                     <div className="w-full flex justify-center items-center">
@@ -666,11 +666,62 @@ const BatcSmallRedBooks = () => {
                                                         <Skeleton paragraph={false} className="mt-[20px]" active />
                                                         <Skeleton paragraph={false} className="mt-[20px]" active />
                                                         <Skeleton paragraph={false} className="mt-[10px]" active />
+                                                        <Skeleton paragraph={false} className="mt-[10px] mb-[15px]" active />
                                                         <div className="absolute right-1 top-0">
                                                             {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
-                                                            {item.copyWritingRetryCount === 'execute_error' && (
-                                                                <span>({item.pictureRetryCount})</span>
+                                                            {item.copyWritingStatus === 'execute_error' && (
+                                                                <span>({item.copyWritingRetryCount})</span>
                                                             )}
+                                                        </div>
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                                            <div>
+                                                                <span className="font-[600]">文案：</span>
+                                                                {handleTransfer(
+                                                                    item.copyWritingStatus,
+                                                                    item.copyWritingErrorMsg,
+                                                                    item.copyWritingRetryCount
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">耗时：</span>
+                                                                {(item.copyWritingExecuteTime / 1000)?.toFixed(2) || 0}S
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">字数：</span>
+                                                                {item.copyWritingCount}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[#15273799] text-[12px]">
+                                                            <span className="font-[600]">时间：</span>
+                                                            {item.copyWritingStartTime && item.copyWritingEndTime
+                                                                ? formatDate(item.copyWritingStartTime) +
+                                                                  '-' +
+                                                                  formatDate(item.copyWritingEndTime)
+                                                                : ''}
+                                                        </div>
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                                            <div>
+                                                                <span className="font-[600]">图片：</span>
+                                                                {handleTransfer(
+                                                                    item.pictureStatus,
+                                                                    item.pictureErrorMsg,
+                                                                    item.copyWritingRetryCount
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">耗时：</span>
+                                                                {(item.pictureExecuteTime / 1000)?.toFixed(2) || 0}S
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">张数：</span>
+                                                                {item.pictureNum}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[#15273799] text-[12px]">
+                                                            <span className="font-[600]">时间：</span>
+                                                            {item.pictureStartTime && item.pictureEndTime
+                                                                ? formatDate(item.pictureStartTime) + '-' + formatDate(item.pictureEndTime)
+                                                                : ''}
                                                         </div>
                                                     </div>
                                                 ) : (
@@ -717,25 +768,37 @@ const BatcSmallRedBooks = () => {
                                                                 {item.copyWritingContent}
                                                             </div>
                                                         </Popover>
-                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex items-center">
-                                                            <span className="font-[600]">文案：</span>
-                                                            {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
-                                                            <span className="font-[600]">耗时：</span>
-                                                            {(item.copyWritingExecuteTime / 1000)?.toFixed(2)}S
-                                                            <span className="font-[600]">字数：</span>
-                                                            {item.copyWritingCount}
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                                            <div>
+                                                                <span className="font-[600]">文案：</span>
+                                                                {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">耗时：</span>
+                                                                {(item.copyWritingExecuteTime / 1000)?.toFixed(2)}S
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">字数：</span>
+                                                                {item.copyWritingCount}
+                                                            </div>
                                                         </div>
                                                         <div className="text-[#15273799] text-[12px]">
                                                             <span className="font-[600]">时间：</span>
                                                             {formatDate(item.copyWritingStartTime)}-{formatDate(item.copyWritingEndTime)}
                                                         </div>
-                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex items-center">
-                                                            <span className="font-[600]">图片：</span>
-                                                            {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                                                            <span className="font-[600]">耗时：</span>
-                                                            {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
-                                                            <span className="font-[600]">张数：</span>
-                                                            {item.pictureNum}
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                                            <div>
+                                                                <span className="font-[600]">图片：</span>
+                                                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">耗时：</span>
+                                                                {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-[600]">张数：</span>
+                                                                {item.pictureNum}
+                                                            </div>
                                                         </div>
                                                         <div className="text-[#15273799] text-[12px]">
                                                             <span className="font-[600]">时间：</span>

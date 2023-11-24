@@ -82,7 +82,7 @@ const Announce = ({ open, setOpen, notificationUid }: { open: boolean; setOpen: 
     const [total, setTotal] = useState(0);
     const handleSave = () => {};
     const getList = async () => {
-        const result = await singlePage(query);
+        const result = await singlePage({ ...query, notificationUid });
     };
     useEffect(() => {
         getList();

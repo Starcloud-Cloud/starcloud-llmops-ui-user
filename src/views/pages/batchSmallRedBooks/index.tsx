@@ -327,6 +327,7 @@ const BatcSmallRedBooks = () => {
                         close: false
                     })
                 );
+
                 navigate('/batchSmallRedBook?uid=' + res);
                 if (flag) {
                     planExecute({ uid: searchParams.get('uid') }).then((res) => {

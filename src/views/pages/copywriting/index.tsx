@@ -5,7 +5,7 @@ import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 
 import React, { useEffect, useState } from 'react';
-import { Image, Tag } from 'antd';
+import { Image, Tag, Popover } from 'antd';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,8 +17,9 @@ import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { schemePage, schemeDelete, schemeCopy } from 'api/redBook/copywriting';
+import { schemePage, schemeDelete, schemeCopy, schemeMetadata } from 'api/redBook/copywriting';
 import { listTemplates } from 'api/redBook/batchIndex';
+import useUserStore from 'store/user';
 
 export interface DraftConfig {}
 
@@ -70,7 +71,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     const createSortHandler = (property: string) => (event: React.SyntheticEvent) => {
         onRequestSort(event, property);
     };
-
+    const permissions = useUserStore((state) => state.permissions);
     return (
         <TableHead>
             <TableRow>
@@ -85,32 +86,34 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                         }}
                     />
                 </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'center'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                        sx={{ pl: 3, whiteSpace: 'nowrap' }}
-                    >
-                        {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
-                            <TableSortLabel
-                                active={orderBy === headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={createSortHandler(headCell.id)}
-                            >
-                                {headCell.label}
-                                {orderBy === headCell.id && (
-                                    <Box component="span" sx={visuallyHidden}>
-                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                    </Box>
-                                )}
-                            </TableSortLabel>
-                        ) : (
-                            headCell.label
-                        )}
-                    </TableCell>
-                ))}
+                {headCells.map((headCell) =>
+                    !permissions.includes('creative:scheme:publish') && headCell.label === '是否公开' ? undefined : (
+                        <TableCell
+                            key={headCell.id}
+                            align={headCell.numeric ? 'right' : 'center'}
+                            padding={headCell.disablePadding ? 'none' : 'normal'}
+                            sortDirection={orderBy === headCell.id ? order : false}
+                            sx={{ pl: 3, whiteSpace: 'nowrap' }}
+                        >
+                            {['updateTime', 'createTime', 'score'].includes(headCell.id) ? (
+                                <TableSortLabel
+                                    active={orderBy === headCell.id}
+                                    direction={orderBy === headCell.id ? order : 'asc'}
+                                    onClick={createSortHandler(headCell.id)}
+                                >
+                                    {headCell.label}
+                                    {orderBy === headCell.id && (
+                                        <Box component="span" sx={visuallyHidden}>
+                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                        </Box>
+                                    )}
+                                </TableSortLabel>
+                            ) : (
+                                headCell.label
+                            )}
+                        </TableCell>
+                    )
+                )}
             </TableRow>
         </TableHead>
     );
@@ -264,7 +267,13 @@ const Copywriting: React.FC = () => {
     const handleEdit = async (uid: string) => {
         navigate('/copywritingModal?uid=' + uid);
     };
-
+    const [categoryList, setCategoryList] = useState<any[]>([]);
+    useEffect(() => {
+        schemeMetadata().then((res) => {
+            setCategoryList(res.category);
+        });
+    }, []);
+    const permissions = useUserStore((state) => state.permissions);
     return (
         <MainCard
             content={false}
@@ -319,11 +328,15 @@ const Copywriting: React.FC = () => {
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
+                                    {permissions.includes('creative:scheme:publish') && (
+                                        <TableCell align="center">
+                                            <div className="flex items-center justify-center">
+                                                {row.type !== 'USER' ? '公开' : '不公开'}
+                                            </div>
+                                        </TableCell>
+                                    )}
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">{row.isPublic ? '公开' : '不公开'}</div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div>{row.category}</div>
+                                        <div>{categoryList?.filter((item: any) => item.code === row.category)[0]?.name}</div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex items-center justify-center">
@@ -335,17 +348,47 @@ const Copywriting: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div>
-                                            {row?.copyWritingExample}
-                                            {/* {row?.copyWritingExample?.map((item: string) => (
-                                                <div key={item}>{item}</div>
-                                            ))} */}
+                                        <div className="flex gap-2 flex-wrap">
+                                            {row?.copyWritingExample?.map((item: any) => (
+                                                <Popover
+                                                    key={index}
+                                                    placement="top"
+                                                    content={
+                                                        <div className="w-[500px]">
+                                                            <div className="text-[16px] font-[600]">{item.title}</div>
+                                                            <div className="mt-[10px]">{item.content}</div>
+                                                        </div>
+                                                    }
+                                                >
+                                                    <div key={item.title} className="mb-[10px]">
+                                                        {item.title}
+                                                    </div>
+                                                </Popover>
+                                            ))}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex gap-2">
-                                            {row?.imageExample?.map((item: any) => (
-                                                <Image key={item.url} width={50} height={50} src={item.url} preview={false} />
+                                            {row?.imageExample?.map((item: any, index: number) => (
+                                                <Popover
+                                                    key={index}
+                                                    placement="top"
+                                                    content={
+                                                        <div className="flex gap-2">
+                                                            {item?.templateList?.map((el: any) => (
+                                                                <Image
+                                                                    key={el?.example}
+                                                                    width={50}
+                                                                    height={50}
+                                                                    src={el?.example}
+                                                                    preview={false}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    }
+                                                >
+                                                    <Image width={50} height={50} src={item?.templateList[0]?.example} preview={false} />
+                                                </Popover>
                                             ))}
                                         </div>
                                     </TableCell>

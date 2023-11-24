@@ -15,7 +15,7 @@ export const listTemplates = () => {
 };
 //获取创作方案列表
 export const schemeList = () => {
-    return request.get({ url: '/llm/creative/scheme/list' });
+    return request.get({ url: '/llm/creative/scheme/listOption' });
 };
 //创建
 export const planCreate = (data: any) => {

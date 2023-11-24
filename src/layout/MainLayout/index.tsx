@@ -328,7 +328,8 @@ const MainLayout = () => {
             '/thesaurusDetail',
             '/redBookContentList',
             '/redBookTaskList',
-            '/copywriting'
+            '/copywriting',
+            '/batchSmallRedBook'
         ];
         const path = location.pathname;
         return IS_LARGE_PATH.includes(path);

@@ -9,7 +9,7 @@ export const doCreateText = (data: any) => {
 };
 
 export const getContentPage = (data: any) => {
-    return request.get({ url: '/llm/xhs/content/page', params: data });
+    return request.get({ url: '/llm/xhs/content/newPage', params: data });
 };
 
 export const getContentDetail = (businessUid: string) => {

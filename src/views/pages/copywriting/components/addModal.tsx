@@ -12,19 +12,34 @@ import {
     Grid,
     Switch,
     Autocomplete,
-    Chip
+    Chip,
+    Box,
+    Typography,
+    Tooltip,
+    FormControlLabel,
+    TableContainer,
+    TableHead,
+    Table as Tables,
+    TableRow,
+    TableCell,
+    TableBody,
+    Button as Buttons
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorIcon from '@mui/icons-material/Error';
+import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MainCard from 'ui-component/cards/MainCard';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm, Spin } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample } from 'api/redBook/copywriting';
 import imgLoading from 'assets/images/picture/loading.gif';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
@@ -33,8 +48,12 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import copywriting from 'store/copywriting';
 import '../index.scss';
+import { t } from 'hooks/web/useI18n';
+import VariableModal from './variableModal';
+import useUserStore from 'store/user';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
+    const permissions = useUserStore((state) => state.permissions);
     const { tableList, setTableList } = copywriting();
     const location = useLocation();
     const navigate = useNavigate();
@@ -63,7 +82,9 @@ const AddModal = () => {
         },
         {
             title: '参考内容',
-            dataIndex: 'content'
+            width: '40%',
+            dataIndex: 'content',
+            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
         {
             title: '参考图片',
@@ -71,10 +92,14 @@ const AddModal = () => {
             render: (_, row) => (
                 <div className="flex wrap gap-2">
                     {row.images?.map((item: any, index: number) => (
-                        <Image className="mr-[5px]" key={index} width={50} height={50} preview={false} src={item.url} />
+                        <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
                     ))}
                 </div>
             )
+        },
+        {
+            title: '参考来源',
+            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
         {
             title: '参考链接地址',
@@ -83,12 +108,13 @@ const AddModal = () => {
         },
         {
             title: '操作',
-
+            width: 140,
             key: 'action',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
-                    <Button
-                        type="text"
+                    <Buttons
+                        color="secondary"
+                        size="small"
                         onClick={() => {
                             setRowIndex(index);
                             setAccoutQuery({
@@ -108,7 +134,12 @@ const AddModal = () => {
                             });
                             setImageContent(
                                 row?.images?.map((item: any) => {
-                                    return item.content;
+                                    return item.title;
+                                })
+                            );
+                            setImageSubContent(
+                                row?.images?.map((item: any) => {
+                                    return item.subTitle;
                                 })
                             );
                             setAddTitle('编辑参考账号');
@@ -116,19 +147,18 @@ const AddModal = () => {
                         }}
                     >
                         编辑
-                    </Button>
-                    <Divider type="vertical" />
-                    <Button
+                    </Buttons>
+                    <Buttons
                         onClick={() => {
                             const newList = JSON.parse(JSON.stringify(tableData));
                             newList.splice(rowIndex, 1);
                             setTableData(newList);
                         }}
-                        danger
-                        type="text"
+                        color="error"
+                        size="small"
                     >
                         删除
-                    </Button>
+                    </Buttons>
                 </div>
             )
         }
@@ -169,6 +199,7 @@ const AddModal = () => {
     //modal
     const [addTitle, setAddTitle] = useState('');
     const [accoutQuery, setAccoutQuery] = useState<any>({});
+    const [sourceOpen, setSourceOpen] = useState(false);
     const [valueOpen, setValueOpen] = useState(false);
     const [contentOpen, setContentOpen] = useState(false);
     const props: UploadProps = {
@@ -195,21 +226,25 @@ const AddModal = () => {
         }
     };
     const [imageConent, setImageContent] = useState<any[]>([]);
+    const [imageSubConent, setImageSubContent] = useState<any[]>([]);
     useEffect(() => {
         imageTemplates().then((res) => {
             setTypeList(res);
         });
         schemeMetadata().then((res) => {
             setCategoryList(res.category);
-            // setSourceList(res.)
+            setSourceList(res.refersSource);
         });
     }, []);
     useEffect(() => {
         if (!addOpen) {
             setValueOpen(false);
             setContentOpen(false);
-            setAccoutQuery({});
+            setAccoutQuery({
+                source: 'SMALL_RED_BOOK'
+            });
             setImageContent([]);
+            setImageSubContent([]);
         }
     }, [addOpen]);
     //改变值
@@ -223,16 +258,16 @@ const AddModal = () => {
         if (searchParams.get('uid')) {
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
-                    console.log(res);
-
+                    setRows(res.configuration?.copyWritingTemplate?.variables);
                     setParams({
                         name: res.name,
                         category: res.category,
                         tags: res.tags,
-                        type: res.type === 'USER' ? true : false,
+                        type: res.type === 'USER' ? false : true,
                         description: res.description
                     });
                     setTableData(res.refers);
+                    setTestTableList(res.configuration.copyWritingTemplate.example);
                     setCopyWritingTemplate(res.configuration.copyWritingTemplate);
                     setImageStyleData(res.configuration.imageTemplate.styleList);
                 }
@@ -241,6 +276,41 @@ const AddModal = () => {
             setTableData(tableList);
         }
     }, []);
+    const iptRef: any = useRef(null);
+    const [current, setCurrent] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+    const [rows, setRows] = useState<any[]>([]);
+    const [title, setTitle] = useState('');
+    const [variableOpen, setVariableOpen] = useState(false);
+    const [summaryOpen, setSummaryOpen] = useState(false);
+    const [varIndex, setVarIndex] = useState(-1);
+    const [itemData, setItemData] = useState<any>({});
+    const saveContent = (data: any) => {
+        if (title === '增加变量') {
+            setRows([...rows, data]);
+            setVariableOpen(false);
+        } else {
+            const newList = _.cloneDeep(rows);
+            newList[varIndex] = data;
+            setRows(newList);
+            setVariableOpen(false);
+        }
+    };
+    const valueRef: any = useRef('');
+    const [valueLoading, setValueLoading] = useState(false);
+    const testColumn: ColumnsType<any> = [
+        {
+            title: '标题',
+            dataIndex: 'title'
+        },
+        {
+            title: '内容',
+            width: '60%',
+            dataIndex: 'content'
+        }
+    ];
+    const [testOpen, setTestOpen] = useState(false);
+    const [testTableList, setTestTableList] = useState<any[]>([]);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard
@@ -261,8 +331,8 @@ const AddModal = () => {
             content={false}
         >
             <CardContent>
-                <Grid sx={{ ml: 0 }} container spacing={2}>
-                    <Grid md={12} sm={12}>
+                <Grid sx={{ ml: 0 }} container>
+                    <Grid item md={12} sm={12}>
                         <TextField
                             sx={{ width: '300px', mt: 2 }}
                             size="small"
@@ -279,8 +349,8 @@ const AddModal = () => {
                             }}
                         />
                     </Grid>
-                    <Grid md={12} sm={12}>
-                        <div className="relative mt-[16px]">
+                    <Grid item md={12} sm={12}>
+                        <div className="relative mt-[16px] max-w-[300px]">
                             <TreeSelect
                                 className="bg-[#f8fafc]  h-[40px] border border-solid rounded-[6px] antdSel"
                                 showSearch
@@ -312,7 +382,7 @@ const AddModal = () => {
                             </span>
                         </div>
                     </Grid>
-                    <Grid md={12} sm={12}>
+                    <Grid item md={12} sm={12}>
                         <FormControl
                             key={params.tags}
                             error={(!params.tags || params.tags.length === 0) && tagOpen}
@@ -355,16 +425,18 @@ const AddModal = () => {
                             </FormHelperText>
                         </FormControl>
                     </Grid>
-                    <Grid md={12} sm={12}>
-                        <div className="flex items-center mt-[16px]">
-                            <Switch
-                                color={'secondary'}
-                                checked={params.type}
-                                onClick={() => setParams({ ...params, type: !params.type })}
-                            />{' '}
-                            公开
-                        </div>
-                    </Grid>
+                    {permissions.includes('creative:scheme:publish') && (
+                        <Grid item md={12} sm={12}>
+                            <div className="flex items-center">
+                                <Switch
+                                    color={'secondary'}
+                                    checked={params.type}
+                                    onClick={() => setParams({ ...params, type: !params.type })}
+                                />{' '}
+                                公开
+                            </div>
+                        </Grid>
+                    )}
                 </Grid>
                 <TextField
                     sx={{ mt: 2 }}
@@ -396,7 +468,25 @@ const AddModal = () => {
                         新增
                     </Button>
                 </div>
-                <Table scroll={{ y: 200 }} size="small" columns={columns} dataSource={tableData} />
+                <Table
+                    pagination={{
+                        current,
+                        pageSize,
+                        total: tableData.length,
+                        showSizeChanger: true,
+                        pageSizeOptions: [20, 50, 100],
+                        onChange: (data) => {
+                            setCurrent(data);
+                        },
+                        onShowSizeChange: (data, size) => {
+                            setPageSize(size);
+                        }
+                    }}
+                    scroll={{ y: 500 }}
+                    size="small"
+                    columns={columns}
+                    dataSource={tableData}
+                />
                 <div className="text-[18px] font-[600] my-[20px]">生成配置</div>
                 <Tabs
                     activeKey={activeKey}
@@ -406,57 +496,350 @@ const AddModal = () => {
                             label: '文案生成模板',
                             children: (
                                 <div>
-                                    <div className="text-[14px] font-[600] mb-[20px]">是否推广微信公众号</div>
-                                    <div className="flex items-center">
-                                        <Switch
-                                            color={'secondary'}
-                                            checked={copyWritingTemplate.isPromoteMp}
-                                            onClick={() =>
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
-                                                    isPromoteMp: !copyWritingTemplate.isPromoteMp
-                                                })
-                                            }
-                                        />
-                                        <TextField
-                                            sx={{ width: '300px' }}
-                                            size="small"
-                                            color="secondary"
-                                            InputLabelProps={{ shrink: true }}
-                                            placeholder="请输入"
-                                            name="mpCode"
-                                            value={copyWritingTemplate.mpCode}
-                                            onChange={(e: any) => {
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
-                                                    mpCode: e.target.value
+                                    <div className="flex justify-between items-end mb-[10px]">
+                                        <div className="text-[16px] font-[600]">参考文案分析</div>
+                                        <Button
+                                            onClick={async () => {
+                                                if (!params.name) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '方案名称必填',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (!params.category) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '类目必选',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (!params.tags || params.tags?.length === 0) {
+                                                    setTitleOpen(true);
+                                                    setCategoryOpen(true);
+                                                    setTagOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '标签最少输入一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (
+                                                    imageStyleData
+                                                        ?.map((i) => i?.templateList?.some((item: any) => !item.id))
+                                                        ?.some((el) => el)
+                                                ) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '图片生成模板风格必选',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                setValueLoading(true);
+                                                const result: any = await schemeDemand({
+                                                    ...params,
+                                                    type: params.type ? 'SYSTEM' : 'USER',
+                                                    refers: tableData,
+                                                    configuration: {
+                                                        copyWritingTemplate: {
+                                                            ...copyWritingTemplate,
+                                                            example: testTableList,
+                                                            variables: rows
+                                                        },
+                                                        imageTemplate: {
+                                                            styleList: imageStyleData
+                                                        }
+                                                    }
                                                 });
+                                                const reader = result.getReader();
+                                                const textDecoder = new TextDecoder();
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    summary: ''
+                                                });
+                                                let outerJoins: any;
+                                                while (1) {
+                                                    let joins = outerJoins;
+                                                    const { done, value } = await reader.read();
+                                                    setValueLoading(false);
+                                                    if (done) {
+                                                        break;
+                                                    }
+                                                    let str = textDecoder.decode(value);
+                                                    const lines = str.split('\n');
+                                                    lines.forEach((message, i: number) => {
+                                                        if (i === 0 && joins) {
+                                                            message = joins + message;
+                                                            joins = undefined;
+                                                        }
+                                                        if (i === lines.length - 1) {
+                                                            if (message && message.indexOf('}') === -1) {
+                                                                joins = message;
+                                                                return;
+                                                            }
+                                                        }
+                                                        let bufferObj;
+                                                        if (message?.startsWith('data:')) {
+                                                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                                                        }
+                                                        if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                                                            valueRef.current = valueRef.current + bufferObj.content;
+                                                            setCopyWritingTemplate({
+                                                                ...copyWritingTemplate,
+                                                                summary: valueRef.current
+                                                            });
+                                                        } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: bufferObj.content,
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: t('market.warning'),
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    });
+                                                    outerJoins = joins;
+                                                }
                                             }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between items-center my-[20px]">
-                                        <div className="text-[14px] font-[600]">文案生成要求</div>
-                                        <Button onClick={() => {}} type="primary">
-                                            自动分析，生成要求
+                                            type="primary"
+                                        >
+                                            AI分析参考文案
                                         </Button>
                                     </div>
+                                    <div className="relative">
+                                        <TextField
+                                            color="secondary"
+                                            inputRef={iptRef}
+                                            placeholder={''}
+                                            value={copyWritingTemplate.summary}
+                                            required
+                                            name="summary"
+                                            multiline
+                                            minRows={6}
+                                            maxRows={8}
+                                            InputLabelProps={{ shrink: true }}
+                                            error={summaryOpen && !copyWritingTemplate.summary}
+                                            helperText={summaryOpen && !copyWritingTemplate.summary ? '参考文案分析必填' : ''}
+                                            onChange={(e) => {
+                                                setSummaryOpen(true);
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    summary: e.target.value
+                                                });
+                                            }}
+                                            fullWidth
+                                        />
+                                        {valueLoading && (
+                                            <div className="w-full h-full absolute flex justify-center items-center top-0 bg-[#000]/40">
+                                                <Spin
+                                                    spinning={valueLoading}
+                                                    indicator={<LoadingOutlined rev={undefined} style={{ fontSize: 30 }} spin />}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mt-[20px] mb-[10px] text-[16px] font-[600] flex items-end">
+                                        文案生成要求
+                                        <span className="text-[12px] text-[#15273799]">
+                                            （对生成的文案内容就行自定义要求，直接告诉AI你想怎么改文案）
+                                        </span>
+                                        <Popover
+                                            placement="top"
+                                            title="可以这样提要求"
+                                            content={
+                                                <div>
+                                                    <div>把品牌替换为 "xxxxxx"</div>
+                                                    <div>把价格替换为 "20-50元"</div>
+                                                    <div>使用更夸张的表达方式</div>
+                                                </div>
+                                            }
+                                        >
+                                            <ErrorIcon sx={{ cursor: 'pointer', fontSize: '16px' }} fontSize="small" />
+                                        </Popover>
+                                    </div>
                                     <TextField
-                                        fullWidth
+                                        color="secondary"
+                                        inputRef={iptRef}
+                                        placeholder={''}
+                                        value={copyWritingTemplate.demand}
+                                        required
+                                        name="demand"
                                         multiline
                                         minRows={4}
-                                        maxRows={6}
-                                        size="small"
-                                        color="secondary"
+                                        maxRows={4}
                                         InputLabelProps={{ shrink: true }}
-                                        name="demand"
-                                        value={copyWritingTemplate.demand}
-                                        onChange={(e: any) => {
+                                        onChange={(e) => {
                                             setCopyWritingTemplate({
                                                 ...copyWritingTemplate,
                                                 demand: e.target.value
                                             });
                                         }}
+                                        fullWidth
                                     />
+                                    <Box mb={1}>
+                                        {rows.length > 0 &&
+                                            rows?.map((item, index: number) => (
+                                                <Tooltip key={index} placement="top" title={t('market.fields')}>
+                                                    <Chip
+                                                        sx={{ mr: 1, mt: 1 }}
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => {
+                                                            const newVal = _.cloneDeep(copyWritingTemplate.demand);
+                                                            if (newVal) {
+                                                                const part1 = newVal?.slice(0, iptRef.current?.selectionStart);
+                                                                const part2 = newVal?.slice(iptRef.current?.selectionStart);
+                                                                setCopyWritingTemplate({
+                                                                    ...copyWritingTemplate,
+                                                                    demand: `${part1}{${item.field}}${part2}`
+                                                                });
+                                                            } else {
+                                                                setCopyWritingTemplate({
+                                                                    ...copyWritingTemplate,
+                                                                    demand: `{${item.field}}`
+                                                                });
+                                                            }
+                                                        }}
+                                                        label={item.field}
+                                                    ></Chip>
+                                                </Tooltip>
+                                            ))}
+                                    </Box>
+                                    <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
+                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Box mr={1}>{t('myApp.table')}</Box>
+                                                <Tooltip placement="top" title={t('market.varableDesc')}>
+                                                    <ErrorIcon sx={{ cursor: 'pointer' }} fontSize="small" />
+                                                </Tooltip>
+                                            </Typography>
+                                            <Buttons
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() => {
+                                                    setTitle('增加变量');
+                                                    setVariableOpen(true);
+                                                }}
+                                                variant="outlined"
+                                                startIcon={<AddIcon />}
+                                            >
+                                                {t('myApp.add')}
+                                            </Buttons>
+                                        </Box>
+                                        <Divider style={{ margin: '10px 0' }} />
+                                        <TableContainer>
+                                            <Tables size="small">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>{t('myApp.field')}</TableCell>
+                                                        <TableCell>{t('myApp.name')}</TableCell>
+                                                        <TableCell>变量默认值</TableCell>
+                                                        <TableCell>{t('myApp.type')}</TableCell>
+                                                        <TableCell>{t('myApp.operation')}</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {rows.length > 0 &&
+                                                        rows?.map((row: any, i: number) => (
+                                                            <TableRow hover key={row.field}>
+                                                                <TableCell>{row.field}</TableCell>
+                                                                <TableCell>{row.label}</TableCell>
+                                                                <TableCell>{row.defaultValue}</TableCell>
+                                                                <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
+                                                                <TableCell sx={{ width: 120 }}>
+                                                                    <IconButton
+                                                                        onClick={() => {
+                                                                            setVarIndex(i);
+                                                                            setItemData(row);
+                                                                            setTitle('编辑变量');
+                                                                            setVariableOpen(true);
+                                                                        }}
+                                                                        color="primary"
+                                                                    >
+                                                                        <SettingsIcon />
+                                                                    </IconButton>
+                                                                    <Popconfirm
+                                                                        title={t('myApp.del')}
+                                                                        description={t('myApp.delDesc')}
+                                                                        onConfirm={() => {
+                                                                            const newList = _.cloneDeep(rows);
+                                                                            newList?.splice(i, 1);
+                                                                            setRows(newList);
+                                                                        }}
+                                                                        onCancel={() => {}}
+                                                                        okText={t('myApp.confirm')}
+                                                                        cancelText={t('myApp.cancel')}
+                                                                    >
+                                                                        <IconButton color="error">
+                                                                            <DeleteIcon />
+                                                                        </IconButton>
+                                                                    </Popconfirm>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                </TableBody>
+                                            </Tables>
+                                        </TableContainer>
+                                    </MainCard>
+                                    {variableOpen && (
+                                        <VariableModal
+                                            title={title}
+                                            open={variableOpen}
+                                            setOpen={setVariableOpen}
+                                            itemData={itemData}
+                                            saveContent={saveContent}
+                                        />
+                                    )}
                                     {/* <div className="text-[14px] font-[600] my-[20px]">文案生成参数</div>
                                     <Grid container spacing={2}>
                                         <Grid item md={4}>
@@ -485,9 +868,118 @@ const AddModal = () => {
                                             />
                                         </Grid>
                                     </Grid> */}
-                                    <Button onClick={() => {}} className="mt-[20px]" type="primary" icon={<PlusOutlined rev={undefined} />}>
+                                    <Button
+                                        onClick={() => {
+                                            if (!params.name) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                setSummaryOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '方案名称必填',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (!params.category) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                setSummaryOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '类目必选',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (!params.tags || params.tags?.length === 0) {
+                                                setTitleOpen(true);
+                                                setCategoryOpen(true);
+                                                setTagOpen(true);
+                                                setSummaryOpen(true);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '标签最少输入一个',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            if (!copyWritingTemplate.summary) {
+                                                setSummaryOpen(true);
+                                                return false;
+                                            }
+                                            if (
+                                                imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)
+                                            ) {
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '图片生成模板风格必选',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        close: false
+                                                    })
+                                                );
+                                                return false;
+                                            }
+                                            setTestOpen(true);
+                                            schemeExample({
+                                                ...params,
+                                                type: params.type ? 'SYSTEM' : 'USER',
+                                                refers: tableData,
+                                                configuration: {
+                                                    copyWritingTemplate: {
+                                                        ...copyWritingTemplate,
+                                                        example: testTableList,
+                                                        variables: rows
+                                                    },
+                                                    imageTemplate: {
+                                                        styleList: imageStyleData
+                                                    }
+                                                }
+                                            }).then((res) => {
+                                                setTestOpen(false);
+                                                setTestTableList(res);
+                                            });
+                                        }}
+                                        loading={testOpen}
+                                        className="mt-[20px]"
+                                        type="primary"
+                                        icon={<PlusOutlined rev={undefined} />}
+                                    >
                                         测试生成
                                     </Button>
+                                    {testTableList?.length > 0 && (
+                                        <Table
+                                            className="mt-[20px]"
+                                            scroll={{ y: 500 }}
+                                            size="small"
+                                            columns={testColumn}
+                                            dataSource={testTableList}
+                                        />
+                                    )}
                                 </div>
                             )
                         },
@@ -638,14 +1130,15 @@ const AddModal = () => {
                         <CardContent>
                             <Grid container spacing={2}>
                                 <Grid item md={12}>
-                                    <FormControl color="secondary" fullWidth>
-                                        <InputLabel id="source">参考来源</InputLabel>
+                                    <FormControl error={sourceOpen && !accoutQuery.source} size="small" color="secondary" fullWidth>
+                                        <InputLabel id="sources">参考来源</InputLabel>
                                         <Select
-                                            labelId="source"
+                                            labelId="sources"
                                             value={accoutQuery.source}
                                             label="参考来源"
+                                            name="source"
                                             onChange={(e) => {
-                                                // setSourceOpen(true);
+                                                setSourceOpen(true);
                                                 changeAccoutQuery(e.target);
                                             }}
                                         >
@@ -655,6 +1148,7 @@ const AddModal = () => {
                                                 </MenuItem>
                                             ))}
                                         </Select>
+                                        <FormHelperText>{sourceOpen && !accoutQuery.source ? '参考来源必选' : ''}</FormHelperText>
                                     </FormControl>
                                 </Grid>
                                 <Grid item md={12}>
@@ -682,6 +1176,9 @@ const AddModal = () => {
                                         InputLabelProps={{ shrink: true }}
                                         label="参考内容"
                                         name="content"
+                                        multiline
+                                        minRows={4}
+                                        maxRows={6}
                                         error={!accoutQuery.content && contentOpen}
                                         helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
                                         value={accoutQuery.content}
@@ -709,11 +1206,11 @@ const AddModal = () => {
                             <div className="flex flex-wrap gap-2 my-[20px]">
                                 {accoutQuery.fileList?.map((item: any, index: number) => (
                                     <div key={index}>
-                                        <div className=" w-[100px] rounded-[8px] border border-solid border-[#d9d9d9] p-[8px]">
-                                            <div className="relative w-[84px] h-[84px]">
+                                        <div className="rounded-[8px] border border-solid border-[#d9d9d9] p-[8px]">
+                                            <div className="relative w-[160px] h-[160px]">
                                                 <Image
-                                                    width={84}
-                                                    height={84}
+                                                    width={160}
+                                                    height={160}
                                                     src={item?.response?.data?.url}
                                                     preview={false}
                                                     fallback="data:image/png;base64,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"
@@ -739,20 +1236,32 @@ const AddModal = () => {
                                             </div>
                                         </div>
                                         {item?.percent === 100 && item?.response?.data?.url && (
-                                            <Input
-                                                value={imageConent[index]}
-                                                onChange={(e) => {
-                                                    const newList = _.cloneDeep(imageConent);
-                                                    newList[index] = e.target.value;
-                                                    setImageContent(newList);
-                                                }}
-                                                placeholder="图片内容"
-                                                className="mt-[8px] w-[100px]"
-                                            />
+                                            <>
+                                                <Input
+                                                    value={imageConent[index]}
+                                                    onChange={(e) => {
+                                                        const newList = _.cloneDeep(imageConent);
+                                                        newList[index] = e.target.value;
+                                                        setImageContent(newList);
+                                                    }}
+                                                    placeholder="图片标题"
+                                                    className="mt-[8px] w-[178px] block"
+                                                />
+                                                <Input
+                                                    value={imageSubConent[index]}
+                                                    onChange={(e) => {
+                                                        const newList = _.cloneDeep(imageSubConent);
+                                                        newList[index] = e.target.value;
+                                                        setImageSubContent(newList);
+                                                    }}
+                                                    placeholder="图片副标题"
+                                                    className="mt-[8px] w-[178px]"
+                                                />
+                                            </>
                                         )}
                                     </div>
                                 ))}
-                                <Upload className="inline-block !w-auto" {...props}>
+                                <Upload className="inline-block uploads" {...props}>
                                     <div>
                                         <PlusOutlined rev={undefined} />
                                         <div style={{ marginTop: 8 }}>Upload</div>
@@ -766,7 +1275,8 @@ const AddModal = () => {
                                 <Button
                                     type="primary"
                                     onClick={() => {
-                                        if (!accoutQuery.title || !accoutQuery.content) {
+                                        if (!accoutQuery.title || !accoutQuery.content || !accoutQuery.source) {
+                                            setSourceOpen(true);
                                             setValueOpen(true);
                                             setContentOpen(true);
                                         } else {
@@ -780,7 +1290,8 @@ const AddModal = () => {
                                                             if (item?.response?.data?.url) {
                                                                 return {
                                                                     url: item?.response?.data?.url,
-                                                                    content: imageConent[i]
+                                                                    title: imageConent[i],
+                                                                    subTitle: imageSubConent[i]
                                                                 };
                                                             } else {
                                                                 return undefined;
@@ -816,6 +1327,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -833,6 +1345,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -850,6 +1363,7 @@ const AddModal = () => {
                                     setTitleOpen(true);
                                     setCategoryOpen(true);
                                     setTagOpen(true);
+                                    setSummaryOpen(true);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -861,6 +1375,10 @@ const AddModal = () => {
                                             close: false
                                         })
                                     );
+                                    return false;
+                                }
+                                if (!copyWritingTemplate.summary) {
+                                    setSummaryOpen(true);
                                     return false;
                                 }
                                 if (imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) {
@@ -881,10 +1399,14 @@ const AddModal = () => {
                                     schemeModify({
                                         uid: searchParams.get('uid'),
                                         ...params,
-                                        type: params ? 'USER' : 'SYSTEM',
+                                        type: params.type ? 'SYSTEM' : 'USER',
                                         refers: tableData,
                                         configuration: {
-                                            copyWritingTemplate,
+                                            copyWritingTemplate: {
+                                                ...copyWritingTemplate,
+                                                example: testTableList,
+                                                variables: rows
+                                            },
                                             imageTemplate: {
                                                 styleList: imageStyleData
                                             }
@@ -909,10 +1431,14 @@ const AddModal = () => {
                                 }
                                 schemeCreate({
                                     ...params,
-                                    type: params ? 'USER' : 'SYSTEM',
+                                    type: params.type ? 'SYSTEM' : 'USER',
                                     refers: tableData,
                                     configuration: {
-                                        copyWritingTemplate,
+                                        copyWritingTemplate: {
+                                            ...copyWritingTemplate,
+                                            example: testTableList,
+                                            variables: rows
+                                        },
                                         imageTemplate: {
                                             styleList: imageStyleData
                                         }

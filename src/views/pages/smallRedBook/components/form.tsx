@@ -9,24 +9,26 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
     return (
         <div>
             {item.style === 'INPUT' ? (
-                <TextField
-                    color="secondary"
-                    size="small"
-                    sx={mt}
-                    label={item.label}
-                    value={item.value}
-                    id={item.field}
-                    required
-                    name={item.field}
-                    InputLabelProps={{ shrink: true }}
-                    error={!item.value && open && !flag}
-                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
-                    onChange={(e) => {
-                        setOpen(true);
-                        changeValue({ index, value: e.target.value });
-                    }}
-                    fullWidth
-                />
+                <>
+                    <TextField
+                        color="secondary"
+                        size="small"
+                        sx={mt}
+                        label={item.label}
+                        value={item.value}
+                        id={item.field}
+                        required
+                        name={item.field}
+                        InputLabelProps={{ shrink: true }}
+                        error={!item.value && open && !flag}
+                        helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
+                        onChange={(e) => {
+                            setOpen(true);
+                            changeValue({ index, value: e.target.value });
+                        }}
+                        fullWidth
+                    />
+                </>
             ) : item.style === 'TEXTAREA' ? (
                 <TextField
                     color="secondary"

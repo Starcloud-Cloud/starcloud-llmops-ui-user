@@ -1,28 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TextField, IconButton } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, Upload, UploadProps, Image, Progress, Transfer, Collapse, Radio, Modal, Row, Col, InputNumber, Popover } from 'antd';
-import type { TransferDirection } from 'antd/es/transfer';
+import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
+import { KeyboardBackspace } from '@mui/icons-material';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import type { RadioChangeEvent } from 'antd';
-import { PlusOutlined, DeleteOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import StyleTabs from './components/styleTabs';
-import { schemeList } from 'api/redBook/batchIndex';
-import Forms from 'views/pages/smallRedBook/components/form';
-import { imageTemplates } from 'api/template';
-import { planCreate, planGet, planModify, listTemplates } from 'api/redBook/batchIndex';
+import { getContentPage } from 'api/redBook';
+import { planCreate, planGet, planModify, schemeList, planExecute } from 'api/redBook/batchIndex';
+import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
+import Form from '../smallRedBook/components/form';
+import imgLoading from 'assets/images/picture/loading.gif';
+import { DetailModal } from '../redBookContentList/component/detailModal';
+
+import formatDate from 'hooks/useDate';
+import copy from 'clipboard-copy';
+import './index.scss';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
+    const timer: any = useRef([]);
     const [value, setValue] = useState('');
     const [valueOpen, setValueOpen] = useState(false);
-    const newTabIndex = useRef(1);
+    const [targetKeysOpen, settargetKeysOpen] = useState(false);
     //1.批量上传图片素材
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -38,8 +49,6 @@ const BatcSmallRedBooks = () => {
         },
         maxCount: 500,
         onChange(info) {
-            console.log(info);
-
             setImageList(info.fileList);
         },
         onPreview: (file) => {
@@ -53,167 +62,129 @@ const BatcSmallRedBooks = () => {
     //2.文案模板
     const [mockData, setMockData] = useState<any[]>([]);
     const [targetKeys, setTargetKeys] = useState<any[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<any[]>([]);
 
-    const deduplicateArray = (arr: any[], prop: string) => {
-        const uniqueValues = new Set();
-        const deduplicatedArray: any[] = [];
-        for (const item of arr) {
-            const value = item[prop];
-            if (!uniqueValues.has(value)) {
-                uniqueValues.add(value);
-                deduplicatedArray.push(item);
-            }
-        }
-        return deduplicatedArray;
-    };
+    // const deduplicateArray = (arr: any[], prop: string) => {
+    //     const uniqueValues = new Set();
+    //     const deduplicatedArray: any[] = [];
+    //     for (const item of arr) {
+    //         const value = item[prop];
+    //         if (!uniqueValues.has(value)) {
+    //             uniqueValues.add(value);
+    //             deduplicatedArray.push(item);
+    //         }
+    //     }
+    //     return deduplicatedArray;
+    // };
+    // useEffect(() => {
+    //     if (targetKeys?.length > 0) {
+    //         const arr: any[] = [];
+    //         const newList = mockData?.filter((item: any) => targetKeys?.some((el) => item.uid === el));
+    //         newList.map((item) => {
+    //             item.variables?.map((el: any) => {
+    //                 arr.push(el);
+    //             });
+    //         });
+    //         const newData = _.cloneDeep(detailData);
+    //         newData.variableList = deduplicateArray(arr, 'field');
+    //         setDetailData(newData);
+    //     } else {
+    //         if (detailData?.variableList) {
+    //             const newData = _.cloneDeep(detailData);
+    //             newData.variableList = [];
+    //             setDetailData(newData);
+    //         }
+    //     }
+    // }, [targetKeys]);
+    const [preform, setPerform] = useState(1);
     useEffect(() => {
-        if (targetKeys?.length > 0) {
-            const arr: any[] = [];
-            const newList = mockData?.filter((item: any) => targetKeys?.some((el) => item.uid === el));
-            newList.map((item) => {
-                item.variables?.map((el: any) => {
-                    arr.push(el);
+        if (targetKeys && targetKeys.length > 0) {
+            if (preform > 1) {
+                const obj: any = {};
+                targetKeys.map((item: string) => {
+                    obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
                 });
-            });
-            const newData = _.cloneDeep(detailData);
-            newData.variableList = deduplicateArray(arr, 'field');
-            setDetailData(newData);
-        } else {
-            if (detailData?.variableList) {
-                const newData = _.cloneDeep(detailData);
-                newData.variableList = [];
-                setDetailData(newData);
+                setVariables(obj);
+            } else {
+                setPerform(preform + 1);
             }
+        } else if (targetKeys && targetKeys.length === 0) {
+            setVariables({});
         }
     }, [targetKeys]);
-    const onChange = (nextTargetKeys: string[], direction: TransferDirection, moveKeys: string[]) => {
-        setTargetKeys(nextTargetKeys);
+    const setDetail = (result: any) => {
+        const res = _.cloneDeep(result);
+        setTargetKeys(res.config?.schemeUidList);
+        setValue(res.name);
+        setDetailData({
+            ...res.config,
+            total: res.total,
+            randomType: res.randomType,
+            status: res.status
+        });
+        setVariables(res.config?.paramMap);
+        setImageList(
+            res.config?.imageUrlList?.map((item: any) => {
+                return {
+                    uid: uuidv4(),
+                    thumbUrl: item,
+                    response: {
+                        data: {
+                            url: item
+                        }
+                    }
+                };
+            })
+        );
     };
-    const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
-        setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
-    };
-    //3.图片模板
-    const [typeList, setTypeList] = useState<any[]>([]); //选择格式的列表（四宫格、六宫格、九宫格）
     useEffect(() => {
         if (searchParams.get('uid')) {
             planGet(searchParams.get('uid')).then((result) => {
                 if (result) {
-                    const res = _.cloneDeep(result);
-                    // res.config.imageStyleList.forEach((item: any) => {
-                    //     item.templateList.forEach((el: any, index: number) => {
-                    //         if (index === 0) {
-                    //             el.name = '首图';
-                    //         } else {
-                    //             el.name = `图片 ${index}`;
-                    //         }
-                    //     });
-                    // });
-                    setValue(res.name);
-                    setDetailData({
-                        ...res.config,
-                        total: res.total,
-                        randomType: res.randomType
-                    });
-                    setTargetKeys(res.config?.schemeUidList);
-                    setImageList(
-                        res.config?.imageUrlList?.map((item: any) => {
-                            return {
-                                uid: uuidv4(),
-                                thumbUrl: item,
-                                response: {
-                                    data: {
-                                        url: item
-                                    }
-                                }
-                            };
-                        })
-                    );
+                    setDetail(result);
+                    if (result.status !== 'PENDING') {
+                        getList();
+                        timer.current[0] = setInterval(() => {
+                            if (
+                                plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                    return (
+                                        item?.pictureStatus !== 'executing' &&
+                                        item?.pictureStatus !== 'init' &&
+                                        item?.copyWritingStatus !== 'executing' &&
+                                        item?.copyWritingStatus !== 'init'
+                                    );
+                                })
+                            ) {
+                                clearInterval(timer.current[0]);
+                            }
+                            getLists(1);
+                        }, 3000);
+                    }
                 }
             });
         }
-        if (searchParams.get('template')) {
-            listTemplates().then((result) => {
-                if (result) {
-                    const res = result[searchParams.get('template') as string];
-                    setValue(res.name);
-                    setDetailData({
-                        ...res.config,
-                        total: res.total,
-                        randomType: res.randomType
-                    });
-                    setTargetKeys(res.config?.schemeUidList);
-                    setImageList(
-                        res.config?.imageUrlList?.map((item: any) => {
-                            return {
-                                uid: uuidv4(),
-                                thumbUrl: item,
-                                response: {
-                                    data: {
-                                        url: item
-                                    }
-                                }
-                            };
-                        })
-                    );
-                }
-            });
-        }
-        imageTemplates().then((res) => {
-            setTypeList(res);
-        });
         schemeList().then((res: any) => {
             setMockData(res);
         });
     }, []);
-
-    const addStyle = () => {
-        let newData = _.cloneDeep(detailData);
-        if (!newData.imageStyleList) {
-            newData.imageStyleList = [];
-        }
-        const newList = newData?.imageStyleList?.map((item: any) => item.name.split(' ')[1]);
-        if (newList.every((item: any) => !item)) {
-            newData.imageStyleList.push({
-                id: uuidv4(),
-                name: `风格 1`,
-                templateList: [
-                    {
-                        id: '',
-                        name: '首图',
-                        variables: []
-                    }
-                ]
+    useEffect(() => {
+        return () => {
+            timer.current?.map((item: any) => {
+                clearInterval(item);
             });
-        } else {
-            newData.imageStyleList.push({
-                id: uuidv4(),
-                name: `风格 ${newList?.sort((a: any, b: any) => b - a)[0] * 1 + 1}`,
-                templateList: [
-                    {
-                        id: '',
-                        name: '首图',
-                        variables: []
-                    }
-                ]
-            });
-        }
-
-        setDetailData(newData);
-    };
-
+        };
+    }, []);
     //保存
     const [detailData, setDetailData] = useState<any>({
         randomType: 'RANDOM',
         total: 5
     });
-    const handleSave = () => {
+    const handleSave = async (flag?: boolean) => {
         if (!value) {
             setValueOpen(true);
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '模板名称必填',
+                    message: '计划名称必填',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -237,45 +208,638 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
+        if (!targetKeys || targetKeys.length === 0) {
+            settargetKeysOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '没有选择生成方案',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (
+            Object.values(variables)
+                .flat()
+                ?.some((item: any) => !item.value)
+        ) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '方案参数全部必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    close: false
+                })
+            );
+            return false;
+        }
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUidList = targetKeys;
+        if (flag) {
+            setPlanList([]);
+            plabListRef.current = [];
+        }
         if (searchParams.get('uid')) {
-            planModify({
+            const res = await planModify({
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
-                config: { ...newData, total: undefined, randomType: undefined, imageStyleList: undefined, variableList: undefined },
+                config: {
+                    ...newData,
+                    total: undefined,
+                    randomType: undefined,
+                    imageStyleList: undefined,
+                    variableList: undefined,
+                    paramMap: { ...variables }
+                },
                 type: 'XHS',
                 uid: searchParams.get('uid')
-            }).then((res) => {
-                if (res) {
-                    navigate('/redBookTaskList');
-                }
             });
+            if (res) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '编辑成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+                if (flag) {
+                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
+                        if (res) {
+                            setExecuteOpen(true);
+                            getList();
+                            timer.current[0] = setInterval(() => {
+                                if (
+                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                        return (
+                                            item?.pictureStatus !== 'executing' &&
+                                            item?.pictureStatus !== 'init' &&
+                                            item?.copyWritingStatus !== 'executing' &&
+                                            item?.copyWritingStatus !== 'init'
+                                        );
+                                    })
+                                ) {
+                                    clearInterval(timer.current[0]);
+                                }
+                                getLists(1);
+                            }, 3000);
+                        }
+                    });
+                }
+            }
         } else {
-            planCreate({
+            const res = await planCreate({
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
-                config: { ...newData, total: undefined, randomType: undefined, imageStyleList: undefined, variableList: undefined },
+                config: {
+                    ...newData,
+                    total: undefined,
+                    randomType: undefined,
+                    imageStyleList: undefined,
+                    variableList: undefined,
+                    paramMap: { ...variables }
+                },
                 type: 'XHS'
-            }).then((res) => {
-                if (res) {
-                    navigate('/redBookTaskList');
-                }
             });
+            if (res) {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '创建成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: false
+                    })
+                );
+
+                navigate('/batchSmallRedBook?uid=' + res);
+                if (flag) {
+                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
+                        if (res) {
+                            setExecuteOpen(true);
+                            getList();
+                            timer.current[0] = setInterval(() => {
+                                if (
+                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                        return (
+                                            item?.pictureStatus !== 'executing' &&
+                                            item?.pictureStatus !== 'init' &&
+                                            item?.copyWritingStatus !== 'executing' &&
+                                            item?.copyWritingStatus !== 'init'
+                                        );
+                                    })
+                                ) {
+                                    clearInterval(timer.current[0]);
+                                }
+                                getLists(1);
+                            }, 3000);
+                        }
+                    });
+                }
+            }
         }
     };
+    //页面滚动
+    const scrollRef: any = useRef(null);
+    const [successCount, setSuccessCount] = useState(0);
+    const [errorCount, setErrorCount] = useState(0);
+    const [total, setTotal] = useState(0);
+    const [planList, setPlanList] = useState<any[]>([]);
+    const plabListRef: any = useRef(null);
+    const [swiperRef, setSwiperRef] = useState<any[]>([]);
+    const swipers: any = useRef([]);
+    const [queryPage, setQueryPage] = useState({
+        pageNo: 1,
+        pageSize: 20
+    });
+    const handleScroll = () => {
+        const { current } = scrollRef;
+        if (current) {
+            if (current.scrollHeight - current.scrollTop === current.clientHeight && queryPage.pageNo * queryPage.pageSize < total) {
+                setQueryPage({
+                    ...queryPage,
+                    pageNo: queryPage.pageNo + 1
+                });
+            }
+        }
+    };
+    const getList = () => {
+        getContentPage({
+            ...queryPage,
+            planUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            setSuccessCount(res.successCount);
+            setErrorCount(res.errorCount);
+            plabListRef.current = [...planList, ...res.list];
+            setPlanList(plabListRef.current);
+        });
+    };
+    const getLists = (pageNo: number) => {
+        getContentPage({
+            ...queryPage,
+            pageNo,
+            planUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            setSuccessCount(res.successCount);
+            setErrorCount(res.errorCount);
+            const newList = _.cloneDeep(plabListRef.current);
+            newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
+            plabListRef.current = newList;
+            setPlanList(plabListRef.current);
+        });
+    };
+    useEffect(() => {
+        if (queryPage.pageNo > 1) {
+            getList();
+            timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                if (
+                    plabListRef.current
+                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        ?.every(
+                            (item: any) =>
+                                item?.pictureStatus !== 'executing' &&
+                                item?.pictureStatus !== 'init' &&
+                                item?.copyWritingStatus !== 'executing' &&
+                                item?.copyWritingStatus !== 'init'
+                        )
+                ) {
+                    clearInterval(timer.current[queryPage.pageNo - 1]);
+                }
+                getLists(queryPage.pageNo);
+            }, 3000);
+        }
+    }, [queryPage.pageNo]);
+    //变量
+    const [variables, setVariables] = useState<any>({});
+    //执行按钮
+    const [executeOpen, setExecuteOpen] = useState(false);
+    const handleTransfer = (key: string, errMessage: string) => {
+        switch (key) {
+            case 'init':
+                return <span className="!mr-0">初始化</span>;
+            case 'executing':
+                return <span className="!mr-0">生成中</span>;
+            case 'execute_error':
+                return (
+                    <Popover
+                        content={
+                            <div>
+                                <div>{errMessage}</div>
+                            </div>
+                        }
+                        title="失败原因"
+                    >
+                        <span className="!mr-0 cursor-pointer" color="red">
+                            执行失败
+                        </span>
+                    </Popover>
+                );
+        }
+    };
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [businessUid, setBusinessUid] = useState('');
     return (
-        <div>
-            <TextField
+        <div className="h-full">
+            <SubCard
+                sx={{ mb: 3 }}
+                contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+            >
+                <div>
+                    <IconButton onClick={() => navigate('/redBookTaskList')} color="secondary">
+                        <KeyboardBackspace fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
+                    <span className="text-[#673ab7] font-[500]">- {'新建创作计划'}</span>
+                </div>
+                <div></div>
+            </SubCard>
+            <Row gutter={40} className="!ml-0">
+                <Col span={6} className="relative h-full bg-[#fff] !px-[0]">
+                    <div className="!mx-[20px] py-[20px]  overflow-y-auto pb-[72px]" style={{ height: 'calc(100vh - 210px)' }}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            color="secondary"
+                            InputLabelProps={{ shrink: true }}
+                            error={valueOpen && !value}
+                            helperText={valueOpen && !value ? '计划名称必填' : ''}
+                            label="计划名称"
+                            value={value}
+                            onChange={(e: any) => {
+                                setValueOpen(true);
+                                setValue(e.target.value);
+                            }}
+                        />
+                        <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">1. 批量上传素材图片</div>
+                        <div className="text-[12px] font-[500]">图片总量：{imageList.length}</div>
+                        <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
+                                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                            </Modal>
+
+                            <div>
+                                <Upload {...props}>
+                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                        <PlusOutlined rev={undefined} />
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </div>
+                        </div>
+                        <div className="text-[18px] font-[600] my-[20px]">2. 选择创作方案</div>
+                        <FormControl
+                            error={targetKeysOpen && (!targetKeys || targetKeys.length === 0)}
+                            color="secondary"
+                            size="small"
+                            fullWidth
+                        >
+                            <InputLabel id="example">选择文案模版</InputLabel>
+                            <Select
+                                labelId="example"
+                                value={targetKeys}
+                                label="选择文案模版"
+                                multiple
+                                onChange={(e: any) => {
+                                    settargetKeysOpen(true);
+                                    setTargetKeys(e.target.value);
+                                }}
+                                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {selected.map((value, i) => (
+                                            <Chip size="small" key={value} label={mockData.filter((item) => item.uid === value)[0]?.name} />
+                                        ))}
+                                    </Box>
+                                )}
+                            >
+                                {mockData?.map((item) => (
+                                    <MenuItem key={item.uid} value={item.uid}>
+                                        {item.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            <FormHelperText>
+                                {targetKeysOpen && (!targetKeys || targetKeys.length === 0) ? '请选择文案模板' : ''}
+                            </FormHelperText>
+                        </FormControl>
+                        {targetKeys && targetKeys.length > 0 && (
+                            <div>
+                                <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
+                                {variables &&
+                                    Object.keys(variables)?.map((item) =>
+                                        variables[item]?.map((el: any, i: number) => (
+                                            <Form
+                                                key={JSON.stringify(item)}
+                                                item={el}
+                                                index={i}
+                                                changeValue={(data: any) => {
+                                                    const newData = _.cloneDeep(variables);
+                                                    newData[item][data.index].value = data.value;
+                                                    setVariables(newData);
+                                                }}
+                                                flag={false}
+                                            />
+                                        ))
+                                    )}
+                            </div>
+                        )}
+                        <div className="text-[18px] font-[600] my-[20px]">4. 批量生成参数</div>
+                        <div>
+                            <Radio.Group
+                                value={detailData?.randomType}
+                                onChange={(e: RadioChangeEvent) => {
+                                    const newData = _.cloneDeep(detailData);
+                                    newData.randomType = e.target.value;
+                                    setDetailData(newData);
+                                }}
+                            >
+                                <Radio value="RANDOM">全部随机</Radio>
+                                {/* <Radio value="SEQUENCE">按顺序</Radio> */}
+                            </Radio.Group>
+                        </div>
+                        <div className="mt-[20px]">生成数量：</div>
+                        <InputNumber
+                            size="large"
+                            value={detailData?.total}
+                            onChange={(e: any) => {
+                                const newData = _.cloneDeep(detailData);
+                                newData.total = e;
+                                setDetailData(newData);
+                            }}
+                            min={1}
+                            max={100}
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
+                        <Button
+                            className="w-full"
+                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
+                            icon={<SaveOutlined rev={undefined} />}
+                            onClick={() => handleSave(false)}
+                            type="primary"
+                        >
+                            保存配置
+                        </Button>
+                        <Button
+                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
+                            className="w-full"
+                            type="primary"
+                            onClick={() => handleSave(true)}
+                        >
+                            保存并开始生成
+                        </Button>
+                    </div>
+                </Col>
+                <Col span={18} className="overflow-hidden">
+                    {planList?.length === 0 ? (
+                        <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
+                            <div className="text-center">
+                                <img
+                                    className="w-[300px]"
+                                    src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
+                                    alt=""
+                                />
+                                <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法AI创作计划</div>
+                                <div>在左侧输入你的创意吧</div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <SubCard contentSX={{ p: '10px !important' }}>
+                                <Tag
+                                    className="mr-[10px]"
+                                    color={
+                                        detailData.status === 'PENDING'
+                                            ? 'default'
+                                            : detailData.status === 'RUNNING'
+                                            ? 'green'
+                                            : detailData.status === 'PAUSE'
+                                            ? 'warning'
+                                            : detailData.status === 'CANCELED'
+                                            ? 'warning'
+                                            : detailData.status === 'COMPLETE'
+                                            ? 'blue'
+                                            : detailData.status === 'FAILURE'
+                                            ? 'error'
+                                            : 'default'
+                                    }
+                                >
+                                    {detailData.status === 'PENDING'
+                                        ? '待执行'
+                                        : detailData.status === 'RUNNING'
+                                        ? '执行中'
+                                        : detailData.status === 'PAUSE'
+                                        ? '已暂停'
+                                        : detailData.status === 'CANCELED'
+                                        ? '已取消'
+                                        : detailData.status === 'COMPLETE'
+                                        ? '已完成'
+                                        : detailData.status === 'FAILURE'
+                                        ? '已失败'
+                                        : ''}
+                                </Tag>
+                                <span className="font-[600]">生成成功数：</span>
+                                {successCount}&nbsp;&nbsp;
+                                <span className="font-[600]">生成失败数：</span>
+                                {errorCount}&nbsp;&nbsp;
+                                <span className="font-[600]">生成总数：</span>
+                                {total * 2}
+                            </SubCard>
+                            <div
+                                className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                ref={scrollRef}
+                                onScroll={handleScroll}
+                                style={{ height: 'calc(100vh - 270px)' }}
+                            >
+                                <Row gutter={20} className="h-[fit-content]">
+                                    {planList.map((item, index: number) => (
+                                        <Col span={6} className="inline-block">
+                                            <div
+                                                key={index}
+                                                className="mb-[20px] flex-1 aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
+                                            >
+                                                {!item.pictureContent ? (
+                                                    <div className="w-full flex justify-center items-center">
+                                                        <div className="w-[70%] aspect-[250/335] flex justify-center items-center">
+                                                            <div className="text-center">
+                                                                <Image width={40} src={imgLoading} preview={false} />
+                                                                <div>
+                                                                    {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                                                    {item.pictureStatus === 'execute_error' && (
+                                                                        <span>({item.pictureRetryCount})</span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-[70%] flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
+                                                        <Swiper
+                                                            onSwiper={(swiper) => {
+                                                                const newList = swipers.current;
+                                                                newList.push(swiper);
+                                                                swipers.current = _.cloneDeep(newList);
+                                                                newList.push(swipers.current);
+                                                                setSwiperRef(newList);
+                                                            }}
+                                                            slidesPerView={1}
+                                                            spaceBetween={30}
+                                                            centeredSlides={false}
+                                                            loop
+                                                            modules={[]}
+                                                            className="mySwiper h-full"
+                                                            autoplay={{
+                                                                delay: 2500,
+                                                                disableOnInteraction: false
+                                                            }}
+                                                        >
+                                                            {item.pictureContent?.map((el: any, index: number) => (
+                                                                <SwiperSlide key={el.url}>
+                                                                    <img className="w-full h-full object-contain" src={el.url} />
+                                                                </SwiperSlide>
+                                                            ))}
+                                                        </Swiper>
+                                                        <div className="w-full swiperImage absolute top-[46%] z-10">
+                                                            <div className="flex justify-between w-full">
+                                                                <Button
+                                                                    icon={<KeyboardBackspaceIcon />}
+                                                                    shape="circle"
+                                                                    onClick={() => {
+                                                                        swiperRef[index]?.slidePrev();
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    className="float-right"
+                                                                    style={{ marginLeft: '10px' }}
+                                                                    icon={<ArrowForwardIcon />}
+                                                                    shape="circle"
+                                                                    onClick={() => {
+                                                                        swiperRef[index]?.slideNext();
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {!item.copyWritingTitle ? (
+                                                    <div className="relative">
+                                                        <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                        <Skeleton paragraph={false} className="mt-[20px]" active />
+                                                        <Skeleton paragraph={false} className="mt-[10px]" active />
+                                                        <div className="absolute right-1 top-0">
+                                                            {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
+                                                            {item.copyWritingRetryCount === 'execute_error' && (
+                                                                <span>({item.pictureRetryCount})</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="mt-[10px] cursor-pointer"
+                                                        onClick={() => {
+                                                            setBusinessUid(item.businessUid);
+                                                            setDetailOpen(true);
+                                                        }}
+                                                    >
+                                                        <Popover
+                                                            content={
+                                                                <div className="w-[500px] text-[12px]">
+                                                                    <div>
+                                                                        <span className="font-[600] h-[38px]">标题：</span>
+                                                                        {item.copyWritingTitle}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="font-[600]">描述：</span>
+                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div className="line-clamp-2 h-[37px] text-[14px] font-bold">
+                                                                {item.copyWritingTitle}
+                                                            </div>
+                                                        </Popover>
+                                                        <Popover
+                                                            content={
+                                                                <div className="w-[500px] text-[12px]">
+                                                                    <div>
+                                                                        <span className="font-[600]">标题：</span>
+                                                                        {item.copyWritingTitle}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="font-[600]">描述：</span>
+                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        >
+                                                            <div className="line-clamp-4 mt-[10px] text-[12px] h-[75px] text-[#15273799]">
+                                                                {item.copyWritingContent}
+                                                            </div>
+                                                        </Popover>
+                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                            <div>文案生成</div>
+                                                            <div>
+                                                                <div>
+                                                                    生成耗时：{item.copyWritingExecuteTime + 'S'}&nbsp;生成字数：
+                                                                    {item.copyWritingCount}
+                                                                </div>
+                                                                <div>
+                                                                    开始时间：{formatDate(item.copyWritingStartTime)}&nbsp;结束时间：
+                                                                    {formatDate(item.copyWritingEndTime)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                            <div>图片生成</div>
+                                                            <div>
+                                                                <div>
+                                                                    生成耗时：{item.pictureExecuteTime + 'S'}&nbsp;图片数：{item.pictureNum}
+                                                                </div>
+                                                                <div>
+                                                                    开始时间：{formatDate(item.pictureStartTime)}&nbsp;结束时间：
+                                                                    {formatDate(item.pictureEndTime)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </div>
+                        </>
+                    )}
+                </Col>
+            </Row>
+            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
+            {/* <TextField
                 sx={{ width: '300px', mb: 2 }}
                 size="small"
                 color="secondary"
                 InputLabelProps={{ shrink: true }}
                 error={valueOpen && !value}
-                helperText={valueOpen && !value ? '模板名称必填' : ' '}
+                helperText={valueOpen && !value ? '计划名称必填' : ' '}
                 label="模板名称"
                 value={value}
                 onChange={(e: any) => {
@@ -283,53 +847,7 @@ const BatcSmallRedBooks = () => {
                     setValue(e.target.value);
                 }}
             />
-            <div className="text-[18px] font-[600] my-[20px]">1. 批量上传素材图片</div>
-            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
-                    <Image preview={false} alt="example" src={previewImage} />
-                </Modal>
-                <div>
-                    <Upload {...props}>
-                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                            <PlusOutlined rev={undefined} />
-                            <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                    </Upload>
-                </div>
-                {/* {imageList.map((item: any, index: number) => (
-                    <div key={index} className="relative w-[100px] h-[100px] rounded-[5px] overflow-hidden">
-                        <Image
-                            className="w-[100px] h-[100px]"
-                            preview={{
-                                visible: false,
-                                mask: (
-                                    <div className="w-full h-full flex flex-col justify-center items-center cursor-default relative">
-                                        <span
-                                            onClick={(info) => {
-                                                console.log(info);
 
-                                                const newValue = _.cloneDeep(imageList);
-                                                newValue.splice(index, 1);
-                                                setImageList(newValue);
-                                            }}
-                                            className="block cursor-pointer hover:text-[red]"
-                                        >
-                                            <DeleteOutlined className="text-[20px]" rev={undefined} />
-                                        </span>
-                                    </div>
-                                )
-                            }}
-                            src={item.response?.data?.url}
-                            fallback="data:image/png;base64,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"
-                        />
-                        {item?.percent !== 100 && (
-                            <div className="absolute w-[100px] h-[100px] top-0 flex justify-center items-center bg-[#000]/[0.1]">
-                                <Progress size="small" type="circle" percent={75} />
-                            </div>
-                        )}
-                    </div>
-                ))} */}
-            </div>
             <div className="text-[18px] font-[600] my-[20px]">2. 文案模板</div>
             <Transfer
                 dataSource={mockData.map((item) => {
@@ -354,85 +872,6 @@ const BatcSmallRedBooks = () => {
                     </Popover>
                 )}
             />
-            {/* <div className="text-[16px] font-[600] my-[20px]">模板字段</div>
-            <Row gutter={20}>
-                {detailData?.variableList?.map((item: any, index: number) => (
-                    <Col key={index} sm={12} xs={24} md={6}>
-                        <Forms
-                            item={item}
-                            index={index}
-                            changeValue={(data: any) => {
-                                const newData = _.cloneDeep(detailData);
-                                newData.variableList[data.index].value = data.value;
-                                setDetailData(newData);
-                            }}
-                        />
-                    </Col>
-                ))}
-            </Row> */}
-            {/* <div className="text-[18px] font-[600] my-[20px]">3. 图片模板</div> */}
-            {/* <div className="mb-[20px]">
-                <Button onClick={addStyle} icon={<PlusOutlined rev={undefined} />}>
-                    增加风格
-                </Button>
-            </div>
-            {detailData?.imageStyleList && (
-                <Collapse
-                    // accordion
-
-                    defaultActiveKey={detailData?.imageStyleList?.map((item: any) => item.id)}
-                    items={detailData?.imageStyleList?.map((item: any, index: number) => {
-                        return {
-                            key: item.id,
-                            label: (
-                                <div className="flex items-center">
-                                    <span
-                                        style={{ display: item?.templateList?.some((item: any) => !item.id) ? 'block' : 'none' }}
-                                        className="mr-[10px] text-[#ff4d4f] text-[16px]"
-                                    >
-                                        <CloseCircleOutlined rev={undefined} />
-                                    </span>
-                                    {item.name}
-                                </div>
-                            ),
-                            extra: (
-                                <Popover
-                                    content={
-                                        <Button
-                                            onClick={(e: any) => {
-                                                const newData = _.cloneDeep(detailData);
-                                                newData.imageStyleList.splice(index, 1);
-                                                setDetailData(newData);
-                                                e.stopPropagation();
-                                            }}
-                                            danger
-                                            icon={<DeleteOutlined rev={undefined} />}
-                                        >
-                                            删除
-                                        </Button>
-                                    }
-                                    trigger="click"
-                                >
-                                    <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
-                                        <MoreVertIcon />
-                                    </IconButton>
-                                </Popover>
-                            ),
-                            children: (
-                                <StyleTabs
-                                    imageStyleData={item?.templateList}
-                                    typeList={typeList}
-                                    setDetailData={(data: any) => {
-                                        const newData = _.cloneDeep(detailData);
-                                        newData.imageStyleList[index].templateList = data;
-                                        setDetailData(newData);
-                                    }}
-                                />
-                            )
-                        };
-                    })}
-                />
-            )} */}
             <div className="text-[18px] font-[600] my-[20px]">4. 生成随机参数</div>
             <div>
                 <Radio.Group
@@ -462,7 +901,7 @@ const BatcSmallRedBooks = () => {
                 <Button onClick={handleSave} type="primary" className="w-[300px]">
                     {searchParams.get('uid') ? '更新' : '创建'}
                 </Button>
-            </div>
+            </div> */}
         </div>
     );
 };

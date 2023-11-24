@@ -708,16 +708,16 @@ const BatcSmallRedBooks = () => {
                                                                     </div>
                                                                     <div>
                                                                         <span className="font-[600]">描述：</span>
-                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
+                                                                        <span className="text-[#15273799] ">{item.copyWritingContent}</span>
                                                                     </div>
                                                                 </div>
                                                             }
                                                         >
-                                                            <div className="line-clamp-4 mt-[10px] text-[12px] h-[75px] text-[#15273799]">
+                                                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[75px]">
                                                                 {item.copyWritingContent}
                                                             </div>
                                                         </Popover>
-                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex items-center">
                                                             <span className="font-[600]">文案：</span>
                                                             {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
                                                             <span className="font-[600]">耗时：</span>
@@ -725,11 +725,11 @@ const BatcSmallRedBooks = () => {
                                                             <span className="font-[600]">字数：</span>
                                                             {item.copyWritingCount}
                                                         </div>
-                                                        <div className="text-[12px]">
+                                                        <div className="text-[#15273799] text-[12px]">
                                                             <span className="font-[600]">时间：</span>
                                                             {formatDate(item.copyWritingStartTime)}-{formatDate(item.copyWritingEndTime)}
                                                         </div>
-                                                        <div className="text-[12px] mt-[5px] flex items-center">
+                                                        <div className="text-[#15273799] text-[12px] mt-[5px] flex items-center">
                                                             <span className="font-[600]">图片：</span>
                                                             {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
                                                             <span className="font-[600]">耗时：</span>
@@ -737,7 +737,7 @@ const BatcSmallRedBooks = () => {
                                                             <span className="font-[600]">张数：</span>
                                                             {item.pictureNum}
                                                         </div>
-                                                        <div className="text-[12px]">
+                                                        <div className="text-[#15273799] text-[12px]">
                                                             <span className="font-[600]">时间：</span>
                                                             {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
                                                         </div>

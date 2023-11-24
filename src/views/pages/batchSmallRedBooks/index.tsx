@@ -357,6 +357,8 @@ const BatcSmallRedBooks = () => {
     };
     //页面滚动
     const scrollRef: any = useRef(null);
+    const [successCount, setSuccessCount] = useState(0);
+    const [errorCount, setErrorCount] = useState(0);
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
@@ -383,6 +385,8 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid')
         }).then((res) => {
             setTotal(res.total);
+            setSuccessCount(res.successCount);
+            setErrorCount(res.errorCount);
             plabListRef.current = [...planList, ...res.list];
             setPlanList(plabListRef.current);
         });
@@ -394,6 +398,8 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid')
         }).then((res) => {
             setTotal(res.total);
+            setSuccessCount(res.successCount);
+            setErrorCount(res.errorCount);
             const newList = _.cloneDeep(plabListRef.current);
             newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
             plabListRef.current = newList;
@@ -651,7 +657,12 @@ const BatcSmallRedBooks = () => {
                                         ? '已失败'
                                         : ''}
                                 </Tag>
-                                生成总数：{total}
+                                <span className="font-[600]">生成成功数：</span>
+                                {successCount}&nbsp;&nbsp;
+                                <span className="font-[600]">生成失败数：</span>
+                                {errorCount}&nbsp;&nbsp;
+                                <span className="font-[600]">生成总数：</span>
+                                {total * 2}
                             </SubCard>
                             <div
                                 className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"

@@ -95,18 +95,19 @@ const VariableModal = ({
         }
     }, []);
     const handleSave = () => {
-        console.log(content);
-
         if (!content.field || !content.label) {
             setFidldOpen(true);
             setLabelOpen(true);
             return false;
         }
-        saveContent({
-            ...content,
-            style: content.style || 'INPUT',
-            options: content.style === 'SELECT' ? options : []
-        });
+
+        if (/^[A-Z0-9_\-]+$/.test(content.field)) {
+            saveContent({
+                ...content,
+                style: content.style || 'INPUT',
+                options: content.style === 'SELECT' ? options : []
+            });
+        }
     };
     return (
         <Dialog onClose={() => setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
@@ -129,8 +130,12 @@ const VariableModal = ({
                         handleChange(e), setFidldOpen(true);
                     }}
                     InputLabelProps={{ shrink: true }}
-                    error={fieldOpen && !content.field}
-                    helperText={fieldOpen && !content.field ? `${t('myApp.field')}必填` : ''}
+                    error={(fieldOpen && !content.field) || (fieldOpen && !/^[A-Z0-9_\-]+$/.test(content.field))}
+                    helperText={
+                        (fieldOpen && !content.field) || (fieldOpen && !/^[A-Z0-9_\-]+$/.test(content.field))
+                            ? `${t('myApp.field')}必填并只能填写大写字母 数字 _ -`
+                            : ''
+                    }
                 />
                 <TextField
                     fullWidth

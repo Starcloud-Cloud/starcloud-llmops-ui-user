@@ -13,6 +13,10 @@ export const notificationCreate = (data: any) => {
 export const notificationModify = (data: any) => {
     return request.delete({ url: '/llm/notification/modify', data });
 };
+//任务详情
+export const notificationDetail = (data: any) => {
+    return request.get({ url: `/llm/notification/detail/${data}` });
+};
 //删除任务
 export const notificationDelete = (data: any) => {
     return request.delete({ url: '/llm/notification/delete/' + data });
@@ -26,9 +30,13 @@ export const notificationPublish = (data: any, publish: Boolean) => {
 export const singlePage = (params: any) => {
     return request.get({ url: '/llm/single/page', params });
 };
+//分页查询创作内容
+export const contentPage = (params: any) => {
+    return request.get({ url: '/llm/xhs/content/page', params });
+};
 //增加单条任务
-export const singleAdd = (data: any) => {
-    return request.put({ url: `/llm/single/add/${data}` });
+export const singleAdd = (data: any, uids: any[]) => {
+    return request.put({ url: `/llm/single/add/${data}`, data: uids });
 };
 //修改单条任务
 export const singleModify = (data: any) => {

@@ -12,8 +12,6 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { notificationPage, notificationDelete, notificationPublish } from 'api/redBook/task';
-import AddModal from './components/addModal';
-import Announce from './components/announce';
 
 export interface DraftConfig {}
 
@@ -58,6 +56,7 @@ const headCells = [
     { id: 'likeUnitPrice', numeric: false, disablePadding: false, label: '点赞单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
+    { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '任务开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '任务结束时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -116,6 +115,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 // ==============================|| TABLE - ENHANCED ||============================== //
 
 const TaskCenter: React.FC = () => {
+    const navigate = useNavigate();
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('');
     const [selected, setSelected] = useState<any[]>([]);
@@ -127,8 +127,6 @@ const TaskCenter: React.FC = () => {
     const [delType, setDelType] = useState(0); //0.单个 1.多个
     const [row, setRow] = useState<TableEnhancedCreateDataType | null>();
     //创建的内容
-    const [detailOpen, setDetailOpen] = useState(false);
-
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
     const forceUpdate = () => setCount((pre) => pre + 1);
@@ -146,11 +144,30 @@ const TaskCenter: React.FC = () => {
                 setTotal(res?.total);
             });
         };
-        if (!detailOpen) {
-            fetchPageData();
+        fetchPageData();
+    }, [page, rowsPerPage, count, order, orderBy]);
+    const handleTransfer = (key: string) => {
+        switch (key) {
+            case 'init':
+                return (
+                    <Tag className="!mr-0" color="blue">
+                        初始化
+                    </Tag>
+                );
+            case 'published':
+                return (
+                    <Tag className="!mr-0" color="gold">
+                        发布
+                    </Tag>
+                );
+            case 'cancel_published':
+                return (
+                    <Tag className="!mr-0" color="green">
+                        取消发布
+                    </Tag>
+                );
         }
-    }, [page, rowsPerPage, count, order, orderBy, detailOpen]);
-    const [title, setTitle] = useState('');
+    };
     const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
@@ -218,9 +235,7 @@ const TaskCenter: React.FC = () => {
             setSelected([]);
         }
     };
-
     const [executeOpen, setExecuteOpen] = useState(false);
-    const [notificationUid, setnotificationUid] = useState('');
     const [publish, setPublish] = useState(true);
     const Execute = () => {
         notificationPublish(row?.uid, publish).then((res) => {
@@ -239,27 +254,19 @@ const TaskCenter: React.FC = () => {
             }
         });
     };
-
-    const addPlan = async () => {
-        setTitle('新建创作方案');
-        setDetailOpen(true);
-    };
-    const [editData, setEditData] = useState<any>({});
-    const handleEdit = async (row: any) => {
-        setEditData(row);
-        setTitle('编辑创作方案');
-        setDetailOpen(true);
-    };
-
-    //通告任务
-    const [announceOpen, setAnnounceOpen] = useState(false);
     return (
         <MainCard
             content={false}
             title="通告中心"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addPlan()} variant="contained" size="small">
+                    <Button
+                        color="secondary"
+                        startIcon={<AddIcon />}
+                        onClick={() => navigate('/taskModal')}
+                        variant="contained"
+                        size="small"
+                    >
                         创作任务
                     </Button>
                 </div>
@@ -317,16 +324,15 @@ const TaskCenter: React.FC = () => {
                                     <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
                                     <TableCell align="center">{row.singleBudget}</TableCell>
                                     <TableCell align="center">{row.notificationBudget}</TableCell>
+                                    <TableCell align="center">{handleTransfer(row.status)}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.startTime && dayjs(row.startTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.startTime && dayjs(row.startTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.endTime && dayjs(row.endTime).format('YYYY-MM-DD')}</span>
-                                            <span> {row.endTime && dayjs(row.endTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
@@ -336,9 +342,7 @@ const TaskCenter: React.FC = () => {
                                                 color="secondary"
                                                 aria-label="delete"
                                                 size="small"
-                                                onClick={() => {
-                                                    handleEdit(row);
-                                                }}
+                                                onClick={() => navigate('/taskModal?notificationUid=' + row.uid)}
                                             >
                                                 编辑
                                             </Button>
@@ -359,8 +363,7 @@ const TaskCenter: React.FC = () => {
                                                 size="small"
                                                 color="secondary"
                                                 onClick={() => {
-                                                    setnotificationUid(row.uid);
-                                                    setAnnounceOpen(true);
+                                                    navigate('/announce?notificationUid=' + row.uid);
                                                 }}
                                             >
                                                 查看通告任务
@@ -400,8 +403,6 @@ const TaskCenter: React.FC = () => {
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
-            {detailOpen && <AddModal title={title} editData={editData} detailOpen={detailOpen} setDetailOpen={setDetailOpen} />}
-            {announceOpen && <Announce open={announceOpen} notificationUid={notificationUid} setOpen={setAnnounceOpen} />}
         </MainCard>
     );
 };

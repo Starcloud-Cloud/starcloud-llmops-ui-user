@@ -31,7 +31,9 @@ import AddIcon from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import MainCard from 'ui-component/cards/MainCard';
+import SubCard from 'ui-component/cards/SubCard';
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm, Spin } from 'antd';
@@ -313,24 +315,29 @@ const AddModal = () => {
     const [testTableList, setTestTableList] = useState<any[]>([]);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
-        <MainCard
-            title={
-                <Button
-                    onClick={() => {
-                        if (tableData.length > 0 && !searchParams.get('uid')) {
-                            setTableList(tableData);
-                        }
-                        navigate('/copywriting');
-                    }}
-                    icon={<LeftOutlined rev={undefined} />}
-                    type="primary"
-                >
-                    返回
-                </Button>
-            }
-            content={false}
-        >
+        <MainCard content={false}>
             <CardContent>
+                <SubCard
+                    sx={{ mb: 3 }}
+                    contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+                >
+                    <div>
+                        <IconButton
+                            onClick={() => {
+                                if (tableData.length > 0 && !searchParams.get('uid')) {
+                                    setTableList(tableData);
+                                }
+                                navigate('/copywriting');
+                            }}
+                            color="secondary"
+                        >
+                            <KeyboardBackspace fontSize="small" />
+                        </IconButton>
+                        <span className="text-[#000c] font-[500]">创作方案</span>&nbsp;
+                        <span className="text-[#673ab7] font-[500]">- {'新建创作方案'}</span>
+                    </div>
+                    <div></div>
+                </SubCard>
                 <Grid sx={{ ml: 0 }} container>
                     <Grid item md={12} sm={12}>
                         <TextField
@@ -482,6 +489,7 @@ const AddModal = () => {
                             setPageSize(size);
                         }
                     }}
+                    rowKey={'title'}
                     scroll={{ y: 500 }}
                     size="small"
                     columns={columns}
@@ -984,6 +992,7 @@ const AddModal = () => {
                                         <Table
                                             className="mt-[20px]"
                                             scroll={{ y: 500 }}
+                                            rowKey={'title'}
                                             size="small"
                                             columns={testColumn}
                                             dataSource={testTableList}

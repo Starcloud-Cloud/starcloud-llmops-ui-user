@@ -57,3 +57,7 @@ export const submitSign = (data: any) => {
 export const getIsSign = (data: any) => {
     return request.post({ url: '/llm/pay/sign/IsSuccess', data });
 };
+
+export const discountNewUser = () => {
+    return request.post({ url: '/llm/pay/order/discount/newuser' });
+};

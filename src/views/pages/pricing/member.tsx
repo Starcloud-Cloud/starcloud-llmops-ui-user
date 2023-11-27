@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // material-ui
 import {
@@ -32,7 +32,7 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { createOrder, getOrderIsPay, getPrice, createSign, submitSign, getIsSign } from 'api/vip';
+import { createOrder, getOrderIsPay, getPrice, createSign, submitSign, getIsSign, discountNewUser } from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -152,7 +152,7 @@ const recommendList = [
     }
 ];
 
-const plansDefault = (value: number) => [
+const plansDefault = (value: number, name?: string) => [
     {
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
@@ -178,7 +178,7 @@ const plansDefault = (value: number) => [
             <div>
                 立即购买
                 <Tag className="ml-1" color="#f50">
-                    订阅立减10元
+                    {name || '订阅立减10元'}
                 </Tag>
             </div>
         ),
@@ -395,6 +395,14 @@ const Price1 = () => {
             fill: theme.palette.secondary.light
         }
     };
+
+    useEffect(() => {
+        discountNewUser().then((res: any) => {
+            if (res.name) {
+                setPlans([...plansDefault(1, res.name)]);
+            }
+        });
+    }, []);
 
     // 从服务端请求vip数据
     // useEffect(() => {

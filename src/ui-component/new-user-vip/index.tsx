@@ -19,14 +19,15 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
     }, []);
 
     return (
-        <div
-            className={'fixed inset-0 flex items-center justify-center z-[9999] bg-[#00000073] cursor-pointer'}
-            onClick={() => {
-                navigate('/subscribe');
-            }}
-        >
+        <div className={'fixed inset-0 flex items-center justify-center z-[9999] bg-[#00000073] cursor-pointer'}>
             <div className="relative">
-                <img className="w-[365px]" src={vipModal} />
+                <img
+                    className="w-[365px]"
+                    src={vipModal}
+                    onClick={() => {
+                        navigate('/subscribe');
+                    }}
+                />
                 <div className="flex items-baseline text-[#f0d6a4] absolute top-[112px] left-[82px]">
                     <span>距离结束还剩</span>
                     <Countdown

@@ -23,3 +23,7 @@ export const delContent = (businessUid: string) => {
 export const retryContent = (businessUid: string) => {
     return request.get({ url: `/llm/xhs/content/retry/${businessUid}` });
 };
+
+export const modify = (data: any) => {
+    return request.put({ url: `/llm/xhs/content/modify`, data });
+};

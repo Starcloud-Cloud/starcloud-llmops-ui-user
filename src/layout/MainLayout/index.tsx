@@ -22,7 +22,7 @@ import { openDrawer } from 'store/slices/menu';
 
 // assets
 import { IconChevronRight } from '@tabler/icons';
-import { getVipTimeOut } from 'api/vip';
+import { discountNewUser, getVipTimeOut } from 'api/vip';
 import CloseIcon from '@mui/icons-material/Close';
 import { Button } from 'antd';
 import dayjs from 'dayjs';
@@ -33,6 +33,8 @@ import { getUserInfo } from 'api/login';
 import { isMobile } from 'react-device-detect';
 import React from 'react';
 import { ListingProvider } from 'contexts/ListingContext';
+import { NewUserVip } from 'ui-component/new-user-vip';
+import userInfoStore from 'store/entitlementAction';
 
 interface MainStyleProps {
     theme: Theme;
@@ -298,6 +300,7 @@ function ChatLink({ navigate }: { navigate: (link: string) => void }) {
     ) : null;
 }
 
+let userVip: any;
 const MainLayout = () => {
     const navigation = getMenuItems();
     const theme = useTheme();
@@ -308,6 +311,8 @@ const MainLayout = () => {
     const dispatch = useDispatch();
     const { drawerOpen } = useSelector((state) => state.menu);
     const { drawerType, container, layout } = useConfig();
+    const [newUserVipOpen, setNewUserVipOpen] = useState(false);
+
     const [timeOutObj, setTimeOutObj] = useState<{
         type: number;
         time?: number;
@@ -357,6 +362,33 @@ const MainLayout = () => {
     //     }
     //     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, [matchDownMd]);
+
+    const handleShowNewUserVip = () => {
+        const dateTime = localStorage.getItem('newUserVipEndTime');
+        if (dateTime) {
+            if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                setNewUserVipOpen(true);
+            } else {
+                setNewUserVipOpen(false);
+            }
+        } else {
+            setNewUserVipOpen(true);
+        }
+    };
+
+    useEffect(() => {
+        // userVip = setInterval(() => {
+        //     handleShowNewUserVip();
+        // }, 3 * 1000);
+        // () => {
+        //     clearInterval(userVip);
+        //};
+        discountNewUser().then((res) => {
+            if (res.code) {
+                handleShowNewUserVip();
+            }
+        });
+    }, [location.pathname]);
 
     useEffect(() => {
         (async () => {
@@ -527,8 +559,16 @@ const MainLayout = () => {
                                     }}
                                 />
                             )}
+                            {newUserVipOpen && (
+                                <NewUserVip
+                                    onClose={() => {
+                                        const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                                        localStorage.setItem('newUserVipEndTime', newUserVipEndTime);
+                                        setNewUserVipOpen(false);
+                                    }}
+                                />
+                            )}
                         </Main>
-                        {/*<Customization />*/}
                     </Box>
                 </div>
             </div>

@@ -26,6 +26,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
             copyWritingTitle: title,
             copyWritingContent: text
         });
+        setEditType(false);
         dispatch(
             openSnackbar({
                 anchorOrigin: {

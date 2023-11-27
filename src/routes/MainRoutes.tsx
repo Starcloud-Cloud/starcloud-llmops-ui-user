@@ -54,6 +54,10 @@ const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
 const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
 //任务中心
 const TaskCenter = Loadable(lazy(() => import('views/pages/taskCenter')));
+//新增任务中心
+const TaskModal = Loadable(lazy(() => import('views/pages/taskCenter/components/addModal')));
+//查看通告任务
+const Announce = Loadable(lazy(() => import('views/pages/taskCenter/components/announce')));
 
 const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
 
@@ -211,6 +215,14 @@ const MainRoutes = {
         {
             path: '/taskCenter',
             element: <TaskCenter />
+        },
+        {
+            path: '/taskModal',
+            element: <TaskModal />
+        },
+        {
+            path: '/announce',
+            element: <Announce />
         }
     ]
 };

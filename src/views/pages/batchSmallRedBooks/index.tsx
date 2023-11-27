@@ -629,7 +629,7 @@ const BatcSmallRedBooks = () => {
                                 <span className="font-[600]">生成失败数：</span>
                                 {errorCount}&nbsp;&nbsp;
                                 <span className="font-[600]">生成总数：</span>
-                                {total * 2}
+                                {total}
                             </SubCard>
                             <div
                                 className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"

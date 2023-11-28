@@ -523,23 +523,26 @@ const BatcSmallRedBooks = () => {
                             <div>
                                 <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
                                 {variables &&
-                                    Object.keys(variables)?.map((item) =>
-                                        variables[item]?.map((el: any, i: number) => (
-                                            <Form
-                                                key={JSON.stringify(item)}
-                                                item={el}
-                                                index={i}
-                                                changeValue={(data: any) => {
-                                                    console.log(variables);
-
-                                                    const newData = _.cloneDeep(variables);
-                                                    newData[item][data.index].value = data.value;
-                                                    setVariables(newData);
-                                                }}
-                                                flag={false}
-                                            />
-                                        ))
-                                    )}
+                                    Object.keys(variables)?.map((item) => (
+                                        <div key={item}>
+                                            <div className="text-[14px] font-[600] mt-[10px]">
+                                                {mockData?.filter((val) => val?.uid === item)[0]?.name}
+                                            </div>
+                                            {variables[item]?.map((el: any, i: number) => (
+                                                <Form
+                                                    key={JSON.stringify(item)}
+                                                    item={el}
+                                                    index={i}
+                                                    changeValue={(data: any) => {
+                                                        const newData = _.cloneDeep(variables);
+                                                        newData[item][data.index].value = data.value;
+                                                        setVariables(newData);
+                                                    }}
+                                                    flag={false}
+                                                />
+                                            ))}
+                                        </div>
+                                    ))}
                             </div>
                         )}
                         <div className="text-[18px] font-[600] my-[20px]">4. 批量生成参数</div>

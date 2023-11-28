@@ -1206,12 +1206,15 @@ const AddModal = () => {
                                 </Grid>
                                 <Grid item md={12}>
                                     <TextField
-                                        sx={{ width: '100%' }}
                                         fullWidth
                                         multiline
+                                        sx={{
+                                            '& textarea': {
+                                                borderRadius: '0 !important'
+                                            }
+                                        }}
                                         minRows={4}
                                         maxRows={6}
-                                        size="small"
                                         color="secondary"
                                         InputLabelProps={{ shrink: true }}
                                         label="参考内容"

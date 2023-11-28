@@ -453,7 +453,21 @@ const BatcSmallRedBooks = () => {
                             }}
                         />
                         <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">1. 批量上传素材图片</div>
-                        <div className="text-[12px] font-[500]">图片总量：{imageList?.length}</div>
+                        <div className="text-[12px] font-[500] flex items-center justify-between">
+                            <div>图片总量：{imageList?.length}</div>
+                            {imageList?.length > 0 && (
+                                <Button
+                                    danger
+                                    onClick={() => {
+                                        setImageList([]);
+                                    }}
+                                    size="small"
+                                    type="text"
+                                >
+                                    全部清除
+                                </Button>
+                            )}
+                        </div>
                         <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
                             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />

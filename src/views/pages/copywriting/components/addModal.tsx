@@ -300,6 +300,7 @@ const AddModal = () => {
     };
     const valueRef: any = useRef('');
     const [valueLoading, setValueLoading] = useState(false);
+    const [buttonLoading, setButtonLoading] = useState(false);
     const testColumn: ColumnsType<any> = [
         {
             title: '标题',
@@ -507,6 +508,7 @@ const AddModal = () => {
                                     <div className="flex justify-between items-end mb-[10px]">
                                         <div className="text-[16px] font-[600]">参考文案分析</div>
                                         <Button
+                                            disabled={buttonLoading}
                                             onClick={async () => {
                                                 if (!params.name) {
                                                     setTitleOpen(true);
@@ -577,6 +579,7 @@ const AddModal = () => {
                                                     );
                                                     return false;
                                                 }
+                                                setButtonLoading(true);
                                                 setValueLoading(true);
                                                 const result: any = await schemeDemand({
                                                     ...params,
@@ -595,6 +598,7 @@ const AddModal = () => {
                                                 });
                                                 const reader = result.getReader();
                                                 const textDecoder = new TextDecoder();
+                                                valueRef.current = '';
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
                                                     summary: ''
@@ -605,6 +609,7 @@ const AddModal = () => {
                                                     const { done, value } = await reader.read();
                                                     setValueLoading(false);
                                                     if (done) {
+                                                        setButtonLoading(false);
                                                         break;
                                                     }
                                                     let str = textDecoder.decode(value);
@@ -619,6 +624,20 @@ const AddModal = () => {
                                                                 joins = message;
                                                                 return;
                                                             }
+                                                        }
+                                                        if (message.indexOf('"code":400') !== -1) {
+                                                            setButtonLoading(false);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: JSON.parse(message)?.msg,
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
                                                         }
                                                         let bufferObj;
                                                         if (message?.startsWith('data:')) {
@@ -1188,15 +1207,16 @@ const AddModal = () => {
                                 </Grid>
                                 <Grid item md={12}>
                                     <TextField
-                                        size="small"
+                                        sx={{ width: '100%' }}
                                         fullWidth
+                                        multiline
+                                        minRows={4}
+                                        maxRows={6}
+                                        size="small"
                                         color="secondary"
                                         InputLabelProps={{ shrink: true }}
                                         label="参考内容"
                                         name="content"
-                                        multiline
-                                        minRows={4}
-                                        maxRows={6}
                                         error={!accoutQuery.content && contentOpen}
                                         helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
                                         value={accoutQuery.content}

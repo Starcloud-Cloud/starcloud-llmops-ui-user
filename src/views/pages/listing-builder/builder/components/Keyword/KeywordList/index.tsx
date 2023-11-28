@@ -377,6 +377,10 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                                     <TableCell align="left" className="py-[6px] px-0">
                                         {row.status === 10 ? (
                                             <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
+                                        ) : row.status === 6 ? (
+                                            <div>
+                                                <span className="line-clamp-1 line-through text-[#bec2cc] inline">{row.keyword}</span>
+                                            </div>
                                         ) : (
                                             <div>
                                                 <Tooltip title={'正在请求数据'}>

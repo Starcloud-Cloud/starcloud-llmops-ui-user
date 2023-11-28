@@ -41,7 +41,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample, noteDetail } from 'api/redBook/copywriting';
 import imgLoading from 'assets/images/picture/loading.gif';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
@@ -314,6 +314,7 @@ const AddModal = () => {
     ];
     const [testOpen, setTestOpen] = useState(false);
     const [testTableList, setTestTableList] = useState<any[]>([]);
+    const [linkLoading, setLinkLoading] = useState(false);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -1187,6 +1188,42 @@ const AddModal = () => {
                                         <FormHelperText>{sourceOpen && !accoutQuery.source ? '参考来源必选' : ''}</FormHelperText>
                                     </FormControl>
                                 </Grid>
+                                <Grid item md={12} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <TextField
+                                        size="small"
+                                        fullWidth
+                                        color="secondary"
+                                        InputLabelProps={{ shrink: true }}
+                                        label="参考链接地址"
+                                        name="link"
+                                        value={accoutQuery.link}
+                                        onChange={(e: any) => {
+                                            changeAccoutQuery(e.target);
+                                        }}
+                                    />
+                                    {accoutQuery.source === 'SMALL_RED_BOOK' && (
+                                        <Button
+                                            loading={linkLoading}
+                                            onClick={() => {
+                                                setLinkLoading(true);
+                                                noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
+                                                    setLinkLoading(false);
+                                                    if (res) {
+                                                        setAccoutQuery({
+                                                            ...accoutQuery,
+                                                            content: res.desc
+                                                        });
+                                                        res.desc;
+                                                    }
+                                                });
+                                            }}
+                                            className="ml-[10px]"
+                                            type="primary"
+                                        >
+                                            分析链接
+                                        </Button>
+                                    )}
+                                </Grid>
                                 <Grid item md={12}>
                                     <TextField
                                         size="small"
@@ -1224,20 +1261,6 @@ const AddModal = () => {
                                         value={accoutQuery.content}
                                         onChange={(e: any) => {
                                             setContentOpen(true);
-                                            changeAccoutQuery(e.target);
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item md={12}>
-                                    <TextField
-                                        size="small"
-                                        fullWidth
-                                        color="secondary"
-                                        InputLabelProps={{ shrink: true }}
-                                        label="参考链接地址"
-                                        name="link"
-                                        value={accoutQuery.link}
-                                        onChange={(e: any) => {
                                             changeAccoutQuery(e.target);
                                         }}
                                     />

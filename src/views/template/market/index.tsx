@@ -399,7 +399,11 @@ function TemplateMarket() {
                         sx={active === index ? focuos : focus}
                         key={index}
                     >
-                        <img style={{ width: '25px' }} src={require('../../../assets/images/category/' + item.icon + '.svg')} alt="Icon" />
+                        <img
+                            style={{ width: '25px', height: '25px' }}
+                            src={require('../../../assets/images/category/' + item.icon + '.svg')}
+                            alt="Icon"
+                        />
                         <Box sx={{ whiteSpace: 'nowrap', fontSize: '14px' }}>{item.name}</Box>
                     </Box>
                 ))}

@@ -37,3 +37,7 @@ export const schemeDemand = (data: any) => {
 export const schemeExample = (data: any) => {
     return request.post({ url: `/llm/creative/scheme/example`, data });
 };
+//小红书笔记内容
+export const noteDetail = (data: any) => {
+    return request.post({ url: `/llm/xhs/note/detail`, data });
+};

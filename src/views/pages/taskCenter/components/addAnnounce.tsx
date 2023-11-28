@@ -1,10 +1,11 @@
-import { Modal, IconButton, CardContent } from '@mui/material';
+import { Modal, IconButton, CardContent, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Table, Tag, Popover, Button, Image } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { planPage } from 'api/redBook/batchIndex';
 import { contentPage, singleAdd } from 'api/redBook/task';
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
@@ -15,9 +16,14 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             dataIndex: 'copyWritingTitle'
         },
         {
-            title: '文案生成状态',
-            dataIndex: 'copyWritingStatus',
-            render: (_, row) => handleTransfer(row.copyWritingStatus, row.copyWritingErrMessage)
+            title: '文案内容',
+            width: '35%',
+            render: (_, row) => <div className="line-clamp-3">{row.copyWritingContent}</div>
+        },
+        {
+            title: '图片数量',
+            width: 50,
+            dataIndex: 'pictureNum'
         },
         {
             title: '图片内容',
@@ -31,15 +37,6 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                     ))}
                 </div>
             )
-        },
-        {
-            title: '图片数量',
-            dataIndex: 'pictureNum'
-        },
-        {
-            title: '图片生成状态',
-            dataIndex: 'pictureStatus',
-            render: (_, row) => handleTransfer(row.pictureStatus, row.pictureErrMessage)
         }
     ];
     const [addTable, setAddTable] = useState<any[]>([]);
@@ -50,12 +47,20 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             setBusinessUid(selectedRowKeys);
         }
     };
+    const [valueList, setValueList] = useState<any[]>([]);
+    const [values, setValue] = useState<string | null[]>([]);
     const [addCurrent, setAddCurrent] = useState(1);
     const [addPageSize, setAddPageSize] = useState(10);
     const [addTotal, setAddTotal] = useState(0);
     const getAddList = async () => {
         setLoading(true);
-        const result = await contentPage({ pageNo: addCurrent, pageSize: addPageSize, status: 'execute_success', claim: false });
+        const result = await contentPage({
+            pageNo: addCurrent,
+            pageSize: addPageSize,
+            status: 'execute_success',
+            claim: false,
+            planUid: values
+        });
         setLoading(false);
         setAddTable(result.list);
         setAddTotal(result.total);
@@ -64,44 +69,12 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         if (addOpen) {
             getAddList();
         }
-    }, [addOpen, addCurrent, addPageSize]);
-    const handleTransfer = (key: string, errMessage: string) => {
-        switch (key) {
-            case 'init':
-                return (
-                    <Tag className="!mr-0" color="blue">
-                        初始化
-                    </Tag>
-                );
-            case 'executing':
-                return (
-                    <Tag className="!mr-0" color="gold">
-                        执行中
-                    </Tag>
-                );
-            case 'execute_success':
-                return (
-                    <Tag className="!mr-0" color="green">
-                        执行成功
-                    </Tag>
-                );
-            case 'execute_error':
-                return (
-                    <Popover
-                        content={
-                            <div>
-                                <div>{errMessage}</div>
-                            </div>
-                        }
-                        title="失败原因"
-                    >
-                        <Tag className="!mr-0 cursor-pointer" color="red">
-                            执行失败
-                        </Tag>
-                    </Popover>
-                );
-        }
-    };
+    }, [addOpen, addCurrent, addPageSize, values]);
+    useEffect(() => {
+        planPage({ pageNo: 1, pageSize: 10000 }).then((res) => {
+            setValueList(res?.list);
+        });
+    }, []);
     const handleSave = async () => {
         const result = await singleAdd(searchParams.get('notificationUid'), businessUid);
         if (result) {
@@ -129,6 +102,17 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                 }
             >
                 <CardContent>
+                    <FormControl sx={{ mb: 2, width: '300px' }} color="secondary" size="small">
+                        <InputLabel id="plans">创作计划</InputLabel>
+                        <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
+                            {valueList?.map((item: any) => (
+                                <MenuItem key={item.uid} value={item.uid}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <br />
                     <Button onClick={handleSave} className="mb-[20px]" disabled={businessUid?.length === 0} type="primary">
                         确认选择
                     </Button>

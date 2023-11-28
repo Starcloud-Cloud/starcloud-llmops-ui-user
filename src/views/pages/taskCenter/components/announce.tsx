@@ -1,9 +1,24 @@
-import { Button as Buttons, Modal, IconButton, CardContent } from '@mui/material';
+import {
+    Button as Buttons,
+    Modal,
+    IconButton,
+    CardContent,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    TextField,
+    CardActions,
+    Grid,
+    Divider
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Image, Tag } from 'antd';
+import { Table, Button, Image, Tag, Row, Col, DatePicker } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import dayjs from 'dayjs';
+import { formatYear } from 'hooks/useDate';
 import { useEffect, useState } from 'react';
 import { singlePage, singleModify } from 'api/redBook/task';
 import { useLocation } from 'react-router-dom';
@@ -12,7 +27,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { singleDelete } from 'api/redBook/task';
-const Announce = () => {
+const Announce = ({ status }: { status?: string }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleTransfer = (key: string) => {
@@ -98,20 +113,8 @@ const Announce = () => {
             dataIndex: 'claimUsername'
         },
         {
-            title: '发布时间',
-            dataIndex: 'publishTime'
-        },
-        {
-            title: '预结算时间',
-            dataIndex: 'preSettlementTime'
-        },
-        {
             title: '预估花费',
             dataIndex: 'estimatedAmount'
-        },
-        {
-            title: '结算时间',
-            dataIndex: 'settlementTime'
         },
         {
             title: '结算金额',
@@ -122,12 +125,37 @@ const Announce = () => {
             dataIndex: 'paymentOrder'
         },
         {
+            title: '发布时间',
+            render: (_, row) => <div>{formatYear(row.publishTime)}</div>
+        },
+        {
+            title: '预结算时间',
+            render: (_, row) => <div>{formatYear(row.preSettlementTime)}</div>
+        },
+        {
+            title: '结算时间',
+            render: (_, row) => <div>{formatYear(row.settlementTime)}</div>
+        },
+        {
             title: '操作',
             width: 140,
             align: 'center',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
-                    <Buttons size="small" color="secondary" onClick={() => setEditOpen(true)}>
+                    <Buttons
+                        disabled={status !== 'published'}
+                        size="small"
+                        color="secondary"
+                        onClick={() => {
+                            setTime({
+                                publishTime: dayjs(row.publishTime),
+                                preSettlementTime: dayjs(row.preSettlementTime),
+                                settlementTime: dayjs(row.settlementTime)
+                            });
+                            setEditData(row);
+                            setEditOpen(true);
+                        }}
+                    >
                         编辑
                     </Buttons>
                     <Buttons
@@ -145,13 +173,30 @@ const Announce = () => {
         }
     ];
     const [tableData, setTableData] = useState<any[]>([]);
+    const [query, setQuery] = useState<any>({});
     const [pageNo, setPageNo] = useState(1);
     const [pageSize, setPageSize] = useState(20);
     const [total, setTotal] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
+    const statusList = [
+        { label: '代发布', value: 'init' },
+        { label: '待认领', value: 'stay_claim' },
+        { label: '已认领', value: 'claimed' },
+        { label: '用户已发布', value: 'published' },
+        { label: '预结算', value: 'pre_settlement' },
+        { label: '结算', value: 'settlement' },
+        { label: '关闭', value: 'close' },
+        { label: '结算异常', value: 'settlement_error' }
+    ];
+    const handleChange = (e: any) => {
+        setQuery({
+            ...query,
+            [e.target.name]: e.target.value
+        });
+    };
     const getList = async () => {
-        const result = await singlePage({ pageNo, pageSize, notificationUid: searchParams.get('notificationUid') });
+        const result = await singlePage({ pageNo, pageSize, notificationUid: searchParams.get('notificationUid'), ...query });
         setTableData(result.list);
         setTotal(result.total);
     };
@@ -159,8 +204,7 @@ const Announce = () => {
         if (!addOpen) {
             getList();
         }
-    }, [addOpen, pageNo, pageSize]);
-
+    }, [addOpen, pageNo, pageSize, query]);
     //删除
     const [uid, setUid] = useState('');
     const [executeOpen, setExecuteOpen] = useState(false);
@@ -182,11 +226,67 @@ const Announce = () => {
             );
         }
     };
+    //编辑
+    const [time, setTime] = useState<any>({});
+    const [editData, setEditData] = useState<any>({});
+    const handleEdit = (e: any) => {
+        setEditData({
+            ...editData,
+            [e.target.name]: e.target.value
+        });
+    };
+    const handleSave = async () => {
+        const result = await singleModify(editData);
+        if (result) {
+            setEditData({});
+            setTime({});
+            setEditOpen(false);
+            getList();
+        }
+    };
     return (
         <div>
-            <div className="flex justify-right items-center mb-[20px]">
+            <Row gutter={20}>
+                <Col span={6}>
+                    <FormControl color="secondary" size="small" fullWidth>
+                        <InputLabel id="status">任务状态</InputLabel>
+                        <Select labelId="status" name="status" value={query.status} label="任务状态" onChange={handleChange}>
+                            {statusList.map((item: any) => (
+                                <MenuItem key={item.value} value={item.value}>
+                                    {item.label}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Col>
+                <Col span={6}>
+                    <TextField
+                        size="small"
+                        color="secondary"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label="认领人 ID"
+                        name="claimUserId"
+                        value={query.claimUserId}
+                        onChange={handleChange}
+                    />
+                </Col>
+                <Col span={6}>
+                    <TextField
+                        size="small"
+                        color="secondary"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label="认领人"
+                        name="claimUser"
+                        value={query.claimUser}
+                        onChange={handleChange}
+                    />
+                </Col>
+            </Row>
+            <div className="flex justify-right items-center my-[20px]">
                 <Button
-                    disabled={!searchParams.get('notificationUid')}
+                    disabled={!searchParams.get('notificationUid') || status === 'published'}
                     onClick={() => {
                         setAddOpen(true);
                     }}
@@ -229,7 +329,127 @@ const Announce = () => {
                         </IconButton>
                     }
                 >
-                    <CardContent></CardContent>
+                    <CardContent>
+                        <Row gutter={20}>
+                            <Col span={12}>
+                                <FormControl color="secondary" size="small" fullWidth>
+                                    <InputLabel id="status">状态</InputLabel>
+                                    <Select labelId="status" value={query.status} label="状态" onChange={handleChange}>
+                                        {statusList.map((item: any) => (
+                                            <MenuItem key={item.value} value={item.value}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Col>
+                            <Col span={12}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="发布链接"
+                                    name="publishUrl"
+                                    value={editData.publishUrl}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="预计花费"
+                                    name="estimatedAmount"
+                                    value={editData.estimatedAmount}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="结算金额"
+                                    name="settlementAmount"
+                                    value={editData.settlementAmount}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="支付单号"
+                                    name="paymentOrder"
+                                    value={editData.paymentOrder}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <DatePicker
+                                    size="large"
+                                    className="!w-full mb-[20px]"
+                                    placeholder="请选择发布时间"
+                                    value={time.publishTime}
+                                    onChange={(date, dateString) => {
+                                        setTime({
+                                            ...time,
+                                            publishTime: date
+                                        });
+                                        handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
+                                    }}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <DatePicker
+                                    size="large"
+                                    className="!w-full mb-[20px]"
+                                    placeholder="请选择预结算时间"
+                                    value={time.preSettlementTime}
+                                    onChange={(date, dateString) => {
+                                        setTime({
+                                            ...time,
+                                            preSettlementTime: date
+                                        });
+                                        handleEdit({ target: { name: 'preSettlementTime', value: date?.valueOf() } });
+                                    }}
+                                />
+                            </Col>
+                            <Col span={12}>
+                                <DatePicker
+                                    size="large"
+                                    className="!w-full mb-[20px]"
+                                    placeholder="请选择结算时间"
+                                    value={time.settlementTime}
+                                    onChange={(date, dateString) => {
+                                        setTime({
+                                            ...time,
+                                            settlementTime: date
+                                        });
+                                        handleEdit({ target: { name: 'settlementTime', value: date?.valueOf() } });
+                                    }}
+                                />
+                            </Col>
+                        </Row>
+                        <Divider />
+                        <CardActions>
+                            <Grid container justifyContent="flex-end">
+                                <Button type="primary" onClick={handleSave}>
+                                    保存
+                                </Button>
+                            </Grid>
+                        </CardActions>
+                    </CardContent>
                 </MainCard>
             </Modal>
             {addOpen && <AddAnnounce addOpen={addOpen} setAddOpen={setAddOpen} />}

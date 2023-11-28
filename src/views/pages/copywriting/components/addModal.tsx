@@ -1205,13 +1205,30 @@ const AddModal = () => {
                                         <Button
                                             loading={linkLoading}
                                             onClick={() => {
+                                                const str = /^https:\/\/www\.xiaohongshu\.com\/explore\/[a-zA-Z0-9]{24}$/;
+                                                if (!str.test(accoutQuery.link)) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message:
+                                                                '参考链接地址格式错误，请填写https://www.xiaohongshu.com/explore/24位数字或字母',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 setLinkLoading(true);
                                                 noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
                                                     setLinkLoading(false);
                                                     if (res) {
                                                         setAccoutQuery({
                                                             ...accoutQuery,
-                                                            content: res.desc
+                                                            content: res.desc,
+                                                            title: res.title
                                                         });
                                                         res.desc;
                                                     }

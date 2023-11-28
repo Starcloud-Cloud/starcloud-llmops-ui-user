@@ -22,6 +22,7 @@ const StyleTabs = ({
         const newPanes = _.cloneDeep(imageStyleData);
         newPanes.push({ id: '', name: `图片 ${newTabIndex.current++}`, key: newTabIndex.current.toString(), variables: [] });
         setDetailData(newPanes);
+        setActiveKey((newPanes.length - 1).toString());
     };
     const remove = (targetKey: TargetKey) => {
         let newActiveKey = activeKey;

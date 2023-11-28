@@ -198,19 +198,26 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
                             multiline
                             rows={11}
                             label={'关键词'}
+                            value={keyWord}
                             InputLabelProps={{ shrink: true }}
                             placeholder={`请输入关键词，一行一个词组
 最多2000个关键词
 超过则系统自动截取前2000`}
                             className="w-full"
                             onChange={(e) => {
-                                const value = e.target.value;
-                                const trimmedText = value.replace(/^[^\S\r\n]+|[^\S\r\n]+$/gm, '');
+                                const text = e.target.value;
+                                // 匹配开头和结尾的标点符号
+                                const regex = /^[^\w\s]+|[^\w\s]+$/g;
 
-                                const formattedText = trimmedText.replace(/\s+/g, ' ');
-                                console.log('🚀 ~ file: index.tsx:212 ~ AddKeywordModal ~ formattedText:', formattedText);
+                                // 将文本分成多行
+                                const lines = text.split('\n');
 
-                                setKeyWord(formattedText);
+                                // 去掉每行开头和结尾的标点符号，并确保单词之间只有一个空格
+                                const cleanedLines = lines.map((line) => line.replace(regex, '').replace(/\s+/g, ' '));
+
+                                const cleanedText = cleanedLines.join('\n');
+
+                                setKeyWord(cleanedText);
                             }}
                         />
                     </div>

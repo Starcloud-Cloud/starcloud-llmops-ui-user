@@ -692,13 +692,12 @@ const AddModal = () => {
                                             required
                                             name="summary"
                                             multiline
-                                            minRows={6}
-                                            maxRows={8}
+                                            minRows={4}
+                                            maxRows={4}
                                             InputLabelProps={{ shrink: true }}
                                             error={summaryOpen && !copyWritingTemplate.summary}
                                             helperText={summaryOpen && !copyWritingTemplate.summary ? '参考文案分析必填' : ''}
                                             onChange={(e) => {
-                                                setSummaryOpen(true);
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
                                                     summary: e.target.value

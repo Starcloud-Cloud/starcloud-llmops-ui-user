@@ -1193,6 +1193,21 @@ const AddModal = () => {
                                         fullWidth
                                         color="secondary"
                                         InputLabelProps={{ shrink: true }}
+                                        label="参考链接地址"
+                                        name="link"
+                                        value={accoutQuery.link}
+                                        onChange={(e: any) => {
+                                            changeAccoutQuery(e.target);
+                                        }}
+                                    />
+                                    <Button>分析链接</Button>
+                                </Grid>
+                                <Grid item md={12}>
+                                    <TextField
+                                        size="small"
+                                        fullWidth
+                                        color="secondary"
+                                        InputLabelProps={{ shrink: true }}
                                         label="参考标题"
                                         name="title"
                                         error={!accoutQuery.title && valueOpen}
@@ -1224,20 +1239,6 @@ const AddModal = () => {
                                         value={accoutQuery.content}
                                         onChange={(e: any) => {
                                             setContentOpen(true);
-                                            changeAccoutQuery(e.target);
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item md={12}>
-                                    <TextField
-                                        size="small"
-                                        fullWidth
-                                        color="secondary"
-                                        InputLabelProps={{ shrink: true }}
-                                        label="参考链接地址"
-                                        name="link"
-                                        value={accoutQuery.link}
-                                        onChange={(e: any) => {
                                             changeAccoutQuery(e.target);
                                         }}
                                     />

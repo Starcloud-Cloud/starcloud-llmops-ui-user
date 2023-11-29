@@ -126,15 +126,15 @@ const Announce = ({ status }: { status?: string }) => {
         },
         {
             title: '发布时间',
-            render: (_, row) => <div>{formatYear(row.publishTime)}</div>
+            render: (_, row) => <div>{row.publishTime && formatYear(row.publishTime)}</div>
         },
         {
             title: '预结算时间',
-            render: (_, row) => <div>{formatYear(row.preSettlementTime)}</div>
+            render: (_, row) => <div>{row.preSettlementTime && formatYear(row.preSettlementTime)}</div>
         },
         {
             title: '结算时间',
-            render: (_, row) => <div>{formatYear(row.settlementTime)}</div>
+            render: (_, row) => <div>{row.settlementTime && formatYear(row.settlementTime)}</div>
         },
         {
             title: '操作',
@@ -147,10 +147,12 @@ const Announce = ({ status }: { status?: string }) => {
                         size="small"
                         color="secondary"
                         onClick={() => {
+                            console.log(row);
+
                             setTime({
-                                publishTime: dayjs(row.publishTime),
-                                preSettlementTime: dayjs(row.preSettlementTime),
-                                settlementTime: dayjs(row.settlementTime)
+                                publishTime: row.publishTime && dayjs(row.publishTime),
+                                preSettlementTime: row.preSettlementTime && dayjs(row.preSettlementTime),
+                                settlementTime: row.settlementTime && dayjs(row.settlementTime)
                             });
                             setEditData(row);
                             setEditOpen(true);
@@ -322,7 +324,7 @@ const Announce = ({ status }: { status?: string }) => {
                     }}
                     title={'编辑单条任务'}
                     content={false}
-                    className="w-[80%] max-w-[1000px]"
+                    className="w-[80%] max-w-[800px]"
                     secondary={
                         <IconButton onClick={() => setEditOpen(false)} size="large" aria-label="close modal">
                             <CloseIcon fontSize="small" />
@@ -331,10 +333,10 @@ const Announce = ({ status }: { status?: string }) => {
                 >
                     <CardContent>
                         <Row gutter={20}>
-                            <Col span={12}>
-                                <FormControl color="secondary" size="small" fullWidth>
+                            <Col span={24}>
+                                <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
                                     <InputLabel id="status">状态</InputLabel>
-                                    <Select labelId="status" value={query.status} label="状态" onChange={handleChange}>
+                                    <Select labelId="status" value={editData.status} label="状态" onChange={handleChange}>
                                         {statusList.map((item: any) => (
                                             <MenuItem key={item.value} value={item.value}>
                                                 {item.label}
@@ -343,7 +345,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     </Select>
                                 </FormControl>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -356,7 +358,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -369,7 +371,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -382,7 +384,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -395,7 +397,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <DatePicker
                                     size="large"
                                     className="!w-full mb-[20px]"
@@ -410,7 +412,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     }}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <DatePicker
                                     size="large"
                                     className="!w-full mb-[20px]"
@@ -425,7 +427,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     }}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <DatePicker
                                     size="large"
                                     className="!w-full mb-[20px]"

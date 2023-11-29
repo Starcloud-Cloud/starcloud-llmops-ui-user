@@ -152,8 +152,8 @@ const AddModal = () => {
             notificationDetail(searchParams.get('notificationUid')).then((res) => {
                 if (res) {
                     setTime({
-                        startTime: dayjs(res.startTime),
-                        endTime: dayjs(res.endTime)
+                        startTime: res.startTime && dayjs(res.startTime),
+                        endTime: res.endTime && dayjs(res.endTime)
                     });
                     setParams({
                         ...res,

@@ -224,7 +224,7 @@ const Header = () => {
                 <Box
                     display="flex"
                     alignItems="center"
-                    sx={{ cursor: 'pointer' }}
+                    sx={{ cursor: 'pointer', marginRight: '12px' }}
                     onClick={handleClick}
                     className="sm:ml-[47px] xs:ml-[20px]"
                 >
@@ -251,7 +251,7 @@ const Header = () => {
             </Box> */}
             {/* <DownLoadBtn /> */}
 
-            <Button
+            {/* <Button
                 className="mr-10"
                 color={'secondary'}
                 size={'small'}
@@ -262,7 +262,7 @@ const Header = () => {
                 }}
             >
                 {t('EntitlementCard.ppFreegrades')}
-            </Button>
+            </Button> */}
             {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <FormControlLabel
                     value={navType === 'light'}

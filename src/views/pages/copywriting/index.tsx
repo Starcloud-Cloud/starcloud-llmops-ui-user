@@ -3,7 +3,6 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagin
 import { visuallyHidden } from '@mui/utils';
 
 import MainCard from 'ui-component/cards/MainCard';
-import SubCard from 'ui-component/cards/SubCard';
 
 import React, { useEffect, useState } from 'react';
 import { Image, Tag, Popover } from 'antd';
@@ -12,7 +11,6 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +59,7 @@ const headCells = [
     { id: 'endpoint', numeric: false, disablePadding: false, label: '是否公开' },
     { id: 'score', numeric: false, disablePadding: false, label: '类目' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 方案标签' },
-    { id: 'example', numeric: false, disablePadding: false, label: ' 文案示例' },
+    { id: 'example', numeric: false, disablePadding: false, label: ' 文案示例', width: 200 },
     { id: 'imageExample', numeric: false, disablePadding: false, label: ' 图片示例' },
     { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -350,7 +348,7 @@ const Copywriting: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex gap-2 flex-wrap">
+                                        <div className=" min-w-[200px]">
                                             {row?.copyWritingExample?.map((item: any) => (
                                                 <Popover
                                                     key={index}

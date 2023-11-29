@@ -7,6 +7,8 @@ import { getAccessToken, getRefreshToken, getTenantId, setToken } from 'utils/au
 import errorCode from './errorCode';
 import { t } from 'hooks/web/useI18n';
 import PubSub from 'pubsub-js';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
@@ -181,8 +183,11 @@ service.interceptors.response.use(
         }
     },
     (error: AxiosError) => {
-        console.log('err' + error); // for debug
+        console.log(error); // for debug
         let { message } = error;
+        if (message === 'Request failed with status code 404') {
+            message = '接口异常，请联系管理员';
+        }
         if (message === 'Network Error') {
             message = t('sys.api.errorMessage');
         } else if (message.includes('timeout')) {
@@ -190,6 +195,17 @@ service.interceptors.response.use(
         } else if (message.includes('Request failed with status code')) {
             message = t('sys.api.apiRequestFailed') + message.substr(message.length - 3);
         }
+        dispatch(
+            openSnackbar({
+                open: true,
+                message,
+                variant: 'alert',
+                alert: {
+                    color: 'error'
+                },
+                close: false
+            })
+        );
         setNotification(message, 'error');
         return Promise.reject(error);
     }

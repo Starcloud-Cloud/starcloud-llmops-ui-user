@@ -41,7 +41,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { imageTemplates } from 'api/template';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample, noteDetail } from 'api/redBook/copywriting';
 import imgLoading from 'assets/images/picture/loading.gif';
 import StyleTabs from './styleTabs';
 import { dispatch } from 'store';
@@ -300,6 +300,7 @@ const AddModal = () => {
     };
     const valueRef: any = useRef('');
     const [valueLoading, setValueLoading] = useState(false);
+    const [buttonLoading, setButtonLoading] = useState(false);
     const testColumn: ColumnsType<any> = [
         {
             title: '标题',
@@ -313,6 +314,7 @@ const AddModal = () => {
     ];
     const [testOpen, setTestOpen] = useState(false);
     const [testTableList, setTestTableList] = useState<any[]>([]);
+    const [linkLoading, setLinkLoading] = useState(false);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -507,6 +509,7 @@ const AddModal = () => {
                                     <div className="flex justify-between items-end mb-[10px]">
                                         <div className="text-[16px] font-[600]">参考文案分析</div>
                                         <Button
+                                            disabled={buttonLoading}
                                             onClick={async () => {
                                                 if (!params.name) {
                                                     setTitleOpen(true);
@@ -577,6 +580,7 @@ const AddModal = () => {
                                                     );
                                                     return false;
                                                 }
+                                                setButtonLoading(true);
                                                 setValueLoading(true);
                                                 const result: any = await schemeDemand({
                                                     ...params,
@@ -595,6 +599,7 @@ const AddModal = () => {
                                                 });
                                                 const reader = result.getReader();
                                                 const textDecoder = new TextDecoder();
+                                                valueRef.current = '';
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
                                                     summary: ''
@@ -605,6 +610,7 @@ const AddModal = () => {
                                                     const { done, value } = await reader.read();
                                                     setValueLoading(false);
                                                     if (done) {
+                                                        setButtonLoading(false);
                                                         break;
                                                     }
                                                     let str = textDecoder.decode(value);
@@ -619,6 +625,20 @@ const AddModal = () => {
                                                                 joins = message;
                                                                 return;
                                                             }
+                                                        }
+                                                        if (message.indexOf('"code":400') !== -1) {
+                                                            setButtonLoading(false);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: JSON.parse(message)?.msg,
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    close: false
+                                                                })
+                                                            );
                                                         }
                                                         let bufferObj;
                                                         if (message?.startsWith('data:')) {
@@ -673,13 +693,12 @@ const AddModal = () => {
                                             required
                                             name="summary"
                                             multiline
-                                            minRows={6}
-                                            maxRows={8}
+                                            minRows={4}
+                                            maxRows={4}
                                             InputLabelProps={{ shrink: true }}
                                             error={summaryOpen && !copyWritingTemplate.summary}
                                             helperText={summaryOpen && !copyWritingTemplate.summary ? '参考文案分析必填' : ''}
                                             onChange={(e) => {
-                                                setSummaryOpen(true);
                                                 setCopyWritingTemplate({
                                                     ...copyWritingTemplate,
                                                     summary: e.target.value
@@ -1169,6 +1188,59 @@ const AddModal = () => {
                                         <FormHelperText>{sourceOpen && !accoutQuery.source ? '参考来源必选' : ''}</FormHelperText>
                                     </FormControl>
                                 </Grid>
+                                <Grid item md={12} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <TextField
+                                        size="small"
+                                        fullWidth
+                                        color="secondary"
+                                        InputLabelProps={{ shrink: true }}
+                                        label="参考链接地址"
+                                        name="link"
+                                        value={accoutQuery.link}
+                                        onChange={(e: any) => {
+                                            changeAccoutQuery(e.target);
+                                        }}
+                                    />
+                                    {accoutQuery.source === 'SMALL_RED_BOOK' && (
+                                        <Button
+                                            loading={linkLoading}
+                                            onClick={() => {
+                                                const str = /^https:\/\/www\.xiaohongshu\.com\/explore\/[a-zA-Z0-9]{24}$/;
+                                                if (!str.test(accoutQuery.link)) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message:
+                                                                '参考链接地址格式错误，请填写https://www.xiaohongshu.com/explore/24位数字或字母',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                setLinkLoading(true);
+                                                noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
+                                                    setLinkLoading(false);
+                                                    if (res) {
+                                                        setAccoutQuery({
+                                                            ...accoutQuery,
+                                                            content: res.desc,
+                                                            title: res.title
+                                                        });
+                                                        res.desc;
+                                                    }
+                                                });
+                                            }}
+                                            className="ml-[10px]"
+                                            type="primary"
+                                        >
+                                            分析链接
+                                        </Button>
+                                    )}
+                                </Grid>
                                 <Grid item md={12}>
                                     <TextField
                                         size="small"
@@ -1188,34 +1260,24 @@ const AddModal = () => {
                                 </Grid>
                                 <Grid item md={12}>
                                     <TextField
-                                        size="small"
                                         fullWidth
+                                        multiline
+                                        sx={{
+                                            '& textarea': {
+                                                borderRadius: '0 !important'
+                                            }
+                                        }}
+                                        minRows={4}
+                                        maxRows={6}
                                         color="secondary"
                                         InputLabelProps={{ shrink: true }}
                                         label="参考内容"
                                         name="content"
-                                        multiline
-                                        minRows={4}
-                                        maxRows={6}
                                         error={!accoutQuery.content && contentOpen}
                                         helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
                                         value={accoutQuery.content}
                                         onChange={(e: any) => {
                                             setContentOpen(true);
-                                            changeAccoutQuery(e.target);
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item md={12}>
-                                    <TextField
-                                        size="small"
-                                        fullWidth
-                                        color="secondary"
-                                        InputLabelProps={{ shrink: true }}
-                                        label="参考链接地址"
-                                        name="link"
-                                        value={accoutQuery.link}
-                                        onChange={(e: any) => {
                                             changeAccoutQuery(e.target);
                                         }}
                                     />

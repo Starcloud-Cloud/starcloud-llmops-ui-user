@@ -8,7 +8,8 @@ import {
     MenuItem,
     CardActions,
     Grid,
-    FormHelperText
+    FormHelperText,
+    InputAdornment
 } from '@mui/material';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import { useNavigate } from 'react-router-dom';
@@ -144,6 +145,9 @@ const AddModal = () => {
         }
     };
     useEffect(() => {
+        if (searchParams.get('view')) {
+            setActive('2');
+        }
         if (searchParams.get('notificationUid')) {
             notificationDetail(searchParams.get('notificationUid')).then((res) => {
                 if (res) {
@@ -273,14 +277,12 @@ const AddModal = () => {
                                                 className="!w-full mb-[5px]"
                                                 value={time.startTime}
                                                 onChange={(date, dateString) => {
-                                                    console.log(date);
-
                                                     setStartTimeOpen(true);
                                                     setTime({
                                                         ...time,
                                                         startTime: date
                                                     });
-                                                    changeParams({ name: 'startTime', value: dateString });
+                                                    changeParams({ name: 'startTime', value: date?.valueOf() });
                                                 }}
                                             />
                                             {!params.startTime && startTimeOpen && (
@@ -299,7 +301,7 @@ const AddModal = () => {
                                                         ...time,
                                                         endTime: date
                                                     });
-                                                    changeParams({ name: 'endTime', value: dateString });
+                                                    changeParams({ name: 'endTime', value: date?.valueOf() });
                                                 }}
                                             />
                                             {!params.endTime && endTimeOpen && (
@@ -338,7 +340,12 @@ const AddModal = () => {
                                                 size="small"
                                                 color="secondary"
                                                 fullWidth
-                                                InputLabelProps={{ shrink: true }}
+                                                InputLabelProps={{
+                                                    shrink: true
+                                                }}
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                                }}
                                                 label="发帖单价"
                                                 type="number"
                                                 name="postingUnitPrice"
@@ -355,6 +362,9 @@ const AddModal = () => {
                                                 sx={{ mt: 2 }}
                                                 color="secondary"
                                                 fullWidth
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                                }}
                                                 InputLabelProps={{ shrink: true }}
                                                 label="回复单价"
                                                 type="number"
@@ -372,6 +382,9 @@ const AddModal = () => {
                                                 sx={{ mt: 2 }}
                                                 color="secondary"
                                                 fullWidth
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                                }}
                                                 InputLabelProps={{ shrink: true }}
                                                 label="点赞单价"
                                                 type="number"
@@ -393,6 +406,9 @@ const AddModal = () => {
                                                 size="small"
                                                 color="secondary"
                                                 fullWidth
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                                }}
                                                 InputLabelProps={{ shrink: true }}
                                                 label="单任务预算上限"
                                                 type="number"
@@ -411,6 +427,9 @@ const AddModal = () => {
                                                 size="small"
                                                 color="secondary"
                                                 fullWidth
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                                }}
                                                 InputLabelProps={{ shrink: true }}
                                                 label="通告总预算"
                                                 type="number"
@@ -465,7 +484,7 @@ const AddModal = () => {
                                     <Divider />
                                     <CardActions>
                                         <Grid container justifyContent="flex-end">
-                                            <Button type="primary" onClick={handleSave}>
+                                            <Button disabled={params.status === 'published'} type="primary" onClick={handleSave}>
                                                 保存
                                             </Button>
                                         </Grid>
@@ -476,7 +495,7 @@ const AddModal = () => {
                         {
                             label: '绑定通告任务',
                             key: '2',
-                            children: <Announce />
+                            children: <Announce status={params.status} />
                         }
                     ]}
                     onChange={changeActive}

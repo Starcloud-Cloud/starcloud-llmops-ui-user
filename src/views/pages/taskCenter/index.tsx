@@ -156,13 +156,13 @@ const TaskCenter: React.FC = () => {
                 );
             case 'published':
                 return (
-                    <Tag className="!mr-0" color="gold">
+                    <Tag className="!mr-0" color="success">
                         发布
                     </Tag>
                 );
             case 'cancel_published':
                 return (
-                    <Tag className="!mr-0" color="green">
+                    <Tag className="!mr-0" color="blue">
                         取消发布
                     </Tag>
                 );
@@ -353,17 +353,17 @@ const TaskCenter: React.FC = () => {
                                                 onClick={() => {
                                                     setRow(row);
                                                     setExecuteOpen(true);
-                                                    setPublish(row.status ? false : true);
+                                                    setPublish(row.status === 'init' || row.status === 'cancel_published' ? true : false);
                                                 }}
                                             >
-                                                {row.status ? '发布任务' : '取消任务'}
+                                                {row.status === 'init' || row.status === 'cancel_published' ? '发布任务' : '取消任务'}
                                             </Button>
                                             <Button
                                                 aria-label="delete"
                                                 size="small"
                                                 color="secondary"
                                                 onClick={() => {
-                                                    navigate('/announce?notificationUid=' + row.uid);
+                                                    navigate('/taskModal?notificationUid=' + row.uid + '&view=1');
                                                 }}
                                             >
                                                 查看通告任务

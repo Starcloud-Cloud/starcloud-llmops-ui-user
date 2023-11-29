@@ -21,7 +21,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                         name={item.field}
                         InputLabelProps={{ shrink: true }}
                         error={!item.value && open && !flag}
-                        helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
+                        helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
                         onChange={(e) => {
                             setOpen(true);
                             changeValue({ index, value: e.target.value });
@@ -44,7 +44,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     maxRows={3}
                     InputLabelProps={{ shrink: true }}
                     error={!item.value && open && !flag}
-                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
+                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
@@ -64,7 +64,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     name={item.field}
                     label={item.label}
                     error={!item.value && open && !flag}
-                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ' '}
+                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });

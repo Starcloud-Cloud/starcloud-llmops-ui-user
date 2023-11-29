@@ -421,6 +421,19 @@ const AddModal = () => {
                                 }}
                                 renderInput={(param) => (
                                     <TextField
+                                        onBlur={(e: any) => {
+                                            if (e.target.value) {
+                                                let newValue = params.tags;
+                                                if (!newValue) {
+                                                    newValue = [];
+                                                }
+                                                newValue.push(e.target.value);
+                                                changeParams({
+                                                    name: 'tags',
+                                                    value: newValue
+                                                });
+                                            }
+                                        }}
                                         error={(!params.tags || params.tags.length === 0) && tagOpen}
                                         color="secondary"
                                         {...param}
@@ -1222,17 +1235,21 @@ const AddModal = () => {
                                                     return false;
                                                 }
                                                 setLinkLoading(true);
-                                                noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
+                                                try {
+                                                    noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
+                                                        setLinkLoading(false);
+                                                        if (res) {
+                                                            setAccoutQuery({
+                                                                ...accoutQuery,
+                                                                content: res.desc,
+                                                                title: res.title
+                                                            });
+                                                            res.desc;
+                                                        }
+                                                    });
+                                                } catch (err) {
                                                     setLinkLoading(false);
-                                                    if (res) {
-                                                        setAccoutQuery({
-                                                            ...accoutQuery,
-                                                            content: res.desc,
-                                                            title: res.title
-                                                        });
-                                                        res.desc;
-                                                    }
-                                                });
+                                                }
                                             }}
                                             className="ml-[10px]"
                                             type="primary"

@@ -35,7 +35,7 @@ const Announce = ({ status }: { status?: string }) => {
             case 'init':
                 return (
                     <Tag className="!mr-0" color="processing">
-                        代发布
+                        待发布
                     </Tag>
                 );
             case 'stay_claim':
@@ -180,7 +180,7 @@ const Announce = ({ status }: { status?: string }) => {
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const statusList = [
-        { label: '代发布', value: 'init' },
+        { label: '待发布', value: 'init' },
         { label: '待认领', value: 'stay_claim' },
         { label: '已认领', value: 'claimed' },
         { label: '用户已发布', value: 'published' },

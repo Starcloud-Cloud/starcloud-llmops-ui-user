@@ -412,7 +412,7 @@ const BatcSmallRedBooks = () => {
                         title="失败原因"
                     >
                         <span className="!mr-0 cursor-pointer" color="red">
-                            执行失败({count})
+                            执行失败{count && `(${count})`}
                         </span>
                     </Popover>
                 );

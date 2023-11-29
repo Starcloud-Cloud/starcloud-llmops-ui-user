@@ -339,7 +339,7 @@ const Copywriting: React.FC = () => {
                                         <div>{categoryList?.filter((item: any) => item.code === row.category)[0]?.name}</div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">
+                                        <div className="flex items-center justify-center flex-wrap">
                                             {row.tags?.map((item: string) => (
                                                 <Tag color="processing" key={item}>
                                                     {item}

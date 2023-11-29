@@ -1,4 +1,4 @@
-import { Button, Checkbox, Tooltip } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import { Tag } from 'antd';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -47,18 +47,19 @@ export interface TableEnhancedCreateDataType {
 }
 
 const headCells = [
-    { id: 'title', numeric: false, disablePadding: false, label: '任务名称' },
-    { id: 'type', numeric: false, disablePadding: false, label: '任务类型' },
-    { id: 'platform', numeric: false, disablePadding: false, label: '平台' },
-    { id: 'field', numeric: false, disablePadding: false, label: '领域' },
+    { id: 'uid', numeric: false, disablePadding: false, label: 'ID' },
+    { id: 'title', numeric: false, disablePadding: false, label: '通告名称' },
+    { id: 'type', numeric: false, disablePadding: false, label: '通告类型' },
+    { id: 'platform', numeric: false, disablePadding: false, label: '发布平台' },
+    { id: 'field', numeric: false, disablePadding: false, label: '发布类目' },
+    { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
+    { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
+    { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '发帖单价' },
     { id: 'replyUnitPrice', numeric: false, disablePadding: false, label: '回复单价' },
     { id: 'likeUnitPrice', numeric: false, disablePadding: false, label: '点赞单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
-    { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
-    { id: 'startTime', numeric: false, disablePadding: false, label: '任务开始时间' },
-    { id: 'endTime', numeric: false, disablePadding: false, label: '任务结束时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -70,17 +71,6 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts'
-                        }}
-                    />
-                </TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -151,7 +141,7 @@ const TaskCenter: React.FC = () => {
             case 'init':
                 return (
                     <Tag className="!mr-0" color="blue">
-                        初始化
+                        待发布
                     </Tag>
                 );
             case 'published':
@@ -299,42 +289,44 @@ const TaskCenter: React.FC = () => {
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell padding="checkbox">
-                                        <Checkbox
-                                            onClick={(event) => handleClick(event, row.id)}
-                                            color="primary"
-                                            checked={isItemSelected}
-                                            inputProps={{
-                                                'aria-labelledby': labelId
-                                            }}
-                                        />
-                                    </TableCell>
+                                    <TableCell align="center">{row.uid}</TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">{row.type}</div>
+                                        <div className="flex items-center justify-center">{row.type === 'posting' ? '发帖' : row.type}</div>
                                     </TableCell>
-                                    <TableCell align="center">{row.platform}</TableCell>
+                                    <TableCell align="center" className="w-[100px]">
+                                        {row.platform === 'xhs'
+                                            ? '小红书'
+                                            : row.platform === 'tiktok'
+                                            ? '抖音'
+                                            : row.platform === 'other'
+                                            ? '其他'
+                                            : ''}
+                                    </TableCell>
                                     <TableCell align="center">{row.field}</TableCell>
-                                    <TableCell align="center">{row.unitPrice?.postingUnitPrice}</TableCell>
-                                    <TableCell align="center">{row.unitPrice?.replyUnitPrice}</TableCell>
-                                    <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
-                                    <TableCell align="center">{row.singleBudget}</TableCell>
-                                    <TableCell align="center">{row.notificationBudget}</TableCell>
                                     <TableCell align="center">{handleTransfer(row.status)}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.startTime && dayjs(row.startTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.startTime && dayjs(row.startTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.endTime && dayjs(row.endTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.endTime && dayjs(row.endTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
+                                    <TableCell align="center">{row.unitPrice?.postingUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.unitPrice?.replyUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
+                                    <TableCell align="center">{row.singleBudget}</TableCell>
+                                    <TableCell align="center">{row.notificationBudget}</TableCell>
+
                                     <TableCell align="center">
                                         <div className="whitespace-nowrap">
                                             <Button

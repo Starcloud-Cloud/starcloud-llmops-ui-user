@@ -18,7 +18,7 @@ import { Table, Button, Image, Tag, Row, Col, DatePicker } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { formatYear } from 'hooks/useDate';
+import formatDate from 'hooks/useDate';
 import { useEffect, useState } from 'react';
 import { singlePage, singleModify } from 'api/redBook/task';
 import { useLocation } from 'react-router-dom';
@@ -126,15 +126,15 @@ const Announce = ({ status }: { status?: string }) => {
         },
         {
             title: '发布时间',
-            render: (_, row) => <div>{row.publishTime && formatYear(row.publishTime)}</div>
+            render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
             title: '预结算时间',
-            render: (_, row) => <div>{row.preSettlementTime && formatYear(row.preSettlementTime)}</div>
+            render: (_, row) => <div>{row.preSettlementTime && formatDate(row.preSettlementTime)}</div>
         },
         {
             title: '结算时间',
-            render: (_, row) => <div>{row.settlementTime && formatYear(row.settlementTime)}</div>
+            render: (_, row) => <div>{row.settlementTime && formatDate(row.settlementTime)}</div>
         },
         {
             title: '操作',
@@ -368,7 +368,14 @@ const Announce = ({ status }: { status?: string }) => {
                                     label="预计花费"
                                     name="estimatedAmount"
                                     value={editData.estimatedAmount}
-                                    onChange={handleEdit}
+                                    onChange={(e) => {
+                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                            setEditData({
+                                                ...editData,
+                                                [e.target.name]: e.target.value
+                                            });
+                                        }
+                                    }}
                                 />
                             </Col>
                             <Col span={24}>
@@ -381,7 +388,14 @@ const Announce = ({ status }: { status?: string }) => {
                                     label="结算金额"
                                     name="settlementAmount"
                                     value={editData.settlementAmount}
-                                    onChange={handleEdit}
+                                    onChange={(e) => {
+                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                            setEditData({
+                                                ...editData,
+                                                [e.target.name]: e.target.value
+                                            });
+                                        }
+                                    }}
                                 />
                             </Col>
                             <Col span={24}>
@@ -399,6 +413,7 @@ const Announce = ({ status }: { status?: string }) => {
                             </Col>
                             <Col span={24}>
                                 <DatePicker
+                                    showTime
                                     size="large"
                                     className="!w-full mb-[20px]"
                                     placeholder="请选择发布时间"
@@ -414,6 +429,7 @@ const Announce = ({ status }: { status?: string }) => {
                             </Col>
                             <Col span={24}>
                                 <DatePicker
+                                    showTime
                                     size="large"
                                     className="!w-full mb-[20px]"
                                     placeholder="请选择预结算时间"
@@ -429,6 +445,7 @@ const Announce = ({ status }: { status?: string }) => {
                             </Col>
                             <Col span={24}>
                                 <DatePicker
+                                    showTime
                                     size="large"
                                     className="!w-full mb-[20px]"
                                     placeholder="请选择结算时间"

@@ -167,7 +167,8 @@ const Cards = ({ flag = false }) => {
                     <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>
                         <ListItemText sx={{ mt: 0 }}>
                             <Box display="inline-block" padding="4px 10px" border="1px solid #bdbdbd" borderRadius="5px">
-                                {userInfo?.userLevel ? t('user.' + userInfo?.userLevel) : t('user.free')}
+                                {/* {userInfo?.userLevel ? t('user.' + userInfo?.userLevel) : t('user.free')} */}
+                                {userInfo?.userLevelName}
                             </Box>
                         </ListItemText>
                         <ListItemText sx={{ mt: 0 }}>
@@ -186,6 +187,8 @@ const Cards = ({ flag = false }) => {
                                             ? 'secondary'
                                             : userInfo?.userLevel === 'plus'
                                             ? 'warning'
+                                            : userInfo?.userLevel === 'media'
+                                            ? 'success'
                                             : userInfo?.userLevel === 'pro'
                                             ? 'warning'
                                             : 'primary'

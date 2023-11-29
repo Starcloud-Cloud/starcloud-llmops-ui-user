@@ -50,6 +50,7 @@ export interface TableEnhancedCreateDataType {
     searchTerm: string;
     version: number;
     status: string;
+    userName: string;
     createTime: number;
     updateTime: number;
     matchSearchers: number;
@@ -64,6 +65,7 @@ const headCells = [
     // { id: 'asin', numeric: false, disablePadding: false, label: 'ASIN' },
     // { id: 'status', numeric: false, disablePadding: false, label: ' 状态' },
     { id: 'score', numeric: false, disablePadding: false, label: '分值/搜索量' },
+    { id: 'userName', numeric: false, disablePadding: false, label: '创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -127,7 +129,7 @@ const ListingBuilderPage: React.FC = () => {
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
@@ -502,6 +504,11 @@ const ListingBuilderPage: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
+                                            <span> {row?.userName}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">
                                             <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
                                             <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
                                         </div>
@@ -554,7 +561,7 @@ const ListingBuilderPage: React.FC = () => {
 
             {/* table pagination */}
             <TablePagination
-                rowsPerPageOptions={[5, 10]}
+                rowsPerPageOptions={[20, 50, 100]}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}

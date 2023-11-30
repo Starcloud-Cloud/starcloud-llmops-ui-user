@@ -527,6 +527,16 @@ const BatcSmallRedBooks = () => {
                                         <div key={item}>
                                             <div className="text-[14px] font-[600] mt-[10px]">
                                                 {mockData?.filter((val) => val?.uid === item)[0]?.name}
+                                                <span
+                                                    onClick={() => {
+                                                        navigate(
+                                                            `/copywritingModal?uid=${mockData?.filter((val) => val?.uid === item)[0]?.uid}`
+                                                        );
+                                                    }}
+                                                    className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
+                                                >
+                                                    查看方案
+                                                </span>
                                             </div>
                                             {variables[item]?.map((el: any, i: number) => (
                                                 <Form

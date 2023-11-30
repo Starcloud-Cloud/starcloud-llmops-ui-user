@@ -6,8 +6,8 @@ export const schemeMetadata = () => {
     return request.get({ url: '/llm/creative/scheme/metadata' });
 };
 //列表
-export const schemePage = (data: any) => {
-    return request.get({ url: '/llm/creative/scheme/page', data });
+export const schemePage = (params: any) => {
+    return request.get({ url: '/llm/creative/scheme/page', params });
 };
 //创建
 export const schemeCreate = (data: any) => {

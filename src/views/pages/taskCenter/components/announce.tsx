@@ -10,19 +10,22 @@ import {
     TextField,
     CardActions,
     Grid,
-    Divider
+    Divider,
+    InputAdornment
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
 import { Table, Button, Image, Tag, Row, Col, DatePicker } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { formatYear } from 'hooks/useDate';
+import formatDate from 'hooks/useDate';
 import { useEffect, useState } from 'react';
 import { singlePage, singleModify } from 'api/redBook/task';
 import { useLocation } from 'react-router-dom';
 import AddAnnounce from './addAnnounce';
+import { DetailModal } from '../../redBookContentList/component/detailModal';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -86,7 +89,17 @@ const Announce = ({ status }: { status?: string }) => {
         {
             title: '发帖标题',
             dataIndex: 'copywriting',
-            render: (_, row) => <div>{row?.content?.title}</div>
+            render: (_, row) => (
+                <div
+                    className="cursor-pointer hover:text-[#673ab7]"
+                    onClick={() => {
+                        setBusinessUid(row.creativeUid);
+                        setDetailOpen(true);
+                    }}
+                >
+                    {row?.content?.title}
+                </div>
+            )
         },
         {
             title: '任务图片',
@@ -100,10 +113,6 @@ const Announce = ({ status }: { status?: string }) => {
             )
         },
         {
-            title: '创作计划',
-            dataIndex: 'plan'
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             render: (_, row) => <div>{handleTransfer(row.status)}</div>
@@ -113,12 +122,24 @@ const Announce = ({ status }: { status?: string }) => {
             dataIndex: 'claimUsername'
         },
         {
+            title: '认领时间',
+            render: (_, row) => <div>{row.claimTime && formatDate(row.claimTime)}</div>
+        },
+        {
             title: '预估花费',
             dataIndex: 'estimatedAmount'
         },
         {
+            title: '预结算时间',
+            render: (_, row) => <div>{row.preSettlementTime && formatDate(row.preSettlementTime)}</div>
+        },
+        {
             title: '结算金额',
             dataIndex: 'settlementAmount'
+        },
+        {
+            title: '结算时间',
+            render: (_, row) => <div>{row.settlementTime && formatDate(row.settlementTime)}</div>
         },
         {
             title: '支付订单号',
@@ -126,15 +147,7 @@ const Announce = ({ status }: { status?: string }) => {
         },
         {
             title: '发布时间',
-            render: (_, row) => <div>{formatYear(row.publishTime)}</div>
-        },
-        {
-            title: '预结算时间',
-            render: (_, row) => <div>{formatYear(row.preSettlementTime)}</div>
-        },
-        {
-            title: '结算时间',
-            render: (_, row) => <div>{formatYear(row.settlementTime)}</div>
+            render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
             title: '操作',
@@ -147,10 +160,11 @@ const Announce = ({ status }: { status?: string }) => {
                         size="small"
                         color="secondary"
                         onClick={() => {
+                            console.log(row);
                             setTime({
-                                publishTime: dayjs(row.publishTime),
-                                preSettlementTime: dayjs(row.preSettlementTime),
-                                settlementTime: dayjs(row.settlementTime)
+                                publishTime: row.publishTime && dayjs(row.publishTime),
+                                preSettlementTime: row.preSettlementTime && dayjs(row.preSettlementTime),
+                                settlementTime: row.settlementTime && dayjs(row.settlementTime)
                             });
                             setEditData(row);
                             setEditOpen(true);
@@ -204,7 +218,7 @@ const Announce = ({ status }: { status?: string }) => {
         if (!addOpen) {
             getList();
         }
-    }, [addOpen, pageNo, pageSize, query]);
+    }, [addOpen, pageNo, pageSize]);
     //删除
     const [uid, setUid] = useState('');
     const [executeOpen, setExecuteOpen] = useState(false);
@@ -244,13 +258,36 @@ const Announce = ({ status }: { status?: string }) => {
             getList();
         }
     };
+    //详情
+    const [detailOpen, setDetailOpen] = useState<any>(false);
+    const [businessUid, setBusinessUid] = useState<string>('');
     return (
         <div>
-            <Row gutter={20}>
+            <Row gutter={20} align-items="center">
                 <Col span={6}>
-                    <FormControl color="secondary" size="small" fullWidth>
+                    <FormControl key={query.status} color="secondary" size="small" fullWidth>
                         <InputLabel id="status">任务状态</InputLabel>
-                        <Select labelId="status" name="status" value={query.status} label="任务状态" onChange={handleChange}>
+                        <Select
+                            labelId="status"
+                            name="status"
+                            endAdornment={
+                                query.status && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                handleChange({ target: { name: 'status', value: '' } });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            value={query.status}
+                            label="任务状态"
+                            onChange={handleChange}
+                        >
                             {statusList.map((item: any) => (
                                 <MenuItem key={item.value} value={item.value}>
                                     {item.label}
@@ -283,15 +320,26 @@ const Announce = ({ status }: { status?: string }) => {
                         onChange={handleChange}
                     />
                 </Col>
+                <Col>
+                    <Button
+                        type="primary"
+                        disabled={!searchParams.get('notificationUid')}
+                        icon={<SearchOutlined rev={undefined} />}
+                        onClick={() => {
+                            getList();
+                        }}
+                    >
+                        搜索
+                    </Button>
+                </Col>
             </Row>
-            <div className="flex justify-right items-center my-[20px]">
+            <div className="flex justify-right my-[20px]">
                 <Button
                     disabled={!searchParams.get('notificationUid') || status === 'published'}
                     onClick={() => {
                         setAddOpen(true);
                     }}
                     type="primary"
-                    icon={<PlusOutlined rev={undefined} />}
                 >
                     绑定创作计划
                 </Button>
@@ -322,7 +370,7 @@ const Announce = ({ status }: { status?: string }) => {
                     }}
                     title={'编辑单条任务'}
                     content={false}
-                    className="w-[80%] max-w-[1000px]"
+                    className="w-[80%] max-w-[800px]"
                     secondary={
                         <IconButton onClick={() => setEditOpen(false)} size="large" aria-label="close modal">
                             <CloseIcon fontSize="small" />
@@ -331,19 +379,64 @@ const Announce = ({ status }: { status?: string }) => {
                 >
                     <CardContent>
                         <Row gutter={20}>
-                            <Col span={12}>
-                                <FormControl color="secondary" size="small" fullWidth>
-                                    <InputLabel id="status">状态</InputLabel>
-                                    <Select labelId="status" value={query.status} label="状态" onChange={handleChange}>
-                                        {statusList.map((item: any) => (
-                                            <MenuItem key={item.value} value={item.value}>
-                                                {item.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Col>
-                            <Col span={12}>
+                            {
+                                // (editData.status==='claimed'||editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement')&&
+                                <Col span={24}>
+                                    <TextField
+                                        // disabled={editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement'}
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="认领 ID"
+                                        name="claimId"
+                                        value={editData.claimId}
+                                        onChange={handleEdit}
+                                    />
+                                </Col>
+                            }
+                            {
+                                // (editData.status==='claimed'||editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement')&&
+                                <Col span={24}>
+                                    <TextField
+                                        // disabled={editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement'}
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="认领人"
+                                        name="claimName"
+                                        value={editData.claimName}
+                                        onChange={handleEdit}
+                                    />
+                                </Col>
+                            }
+                            {
+                                // editData.status==='claimed'&&
+                                <Col span={24}>
+                                    <div className="relative mb-[20px]">
+                                        <DatePicker
+                                            showTime
+                                            size="large"
+                                            className="!w-full"
+                                            value={time.claimTime}
+                                            onChange={(date, dateString) => {
+                                                setTime({
+                                                    ...time,
+                                                    claimTime: date
+                                                });
+                                                handleEdit({ target: { name: 'claimTime', value: date?.valueOf() } });
+                                            }}
+                                        />
+                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                            认领时间
+                                        </span>
+                                    </div>
+                                </Col>
+                            }
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -356,7 +449,76 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
+                                <div className="relative">
+                                    <DatePicker
+                                        showTime
+                                        size="large"
+                                        className="!w-full mb-[20px]"
+                                        placeholder="请选择发布时间"
+                                        value={time.publishTime}
+                                        onChange={(date, dateString) => {
+                                            setTime({
+                                                ...time,
+                                                publishTime: date
+                                            });
+                                            handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
+                                        }}
+                                    />
+                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                        预结算时间
+                                    </span>
+                                </div>
+                            </Col>
+                            <Col span={24}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    type="number"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="点赞数"
+                                    name="likedCount"
+                                    value={editData.likedCount}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={24}>
+                                <TextField
+                                    sx={{ mb: 2 }}
+                                    size="small"
+                                    type="number"
+                                    color="secondary"
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    label="评论数"
+                                    name="commentCount"
+                                    value={editData.commentCount}
+                                    onChange={handleEdit}
+                                />
+                            </Col>
+                            <Col span={24}>
+                                <div className="relative">
+                                    <DatePicker
+                                        showTime
+                                        size="large"
+                                        className="!w-full mb-[20px]"
+                                        value={time.preSettlementTime}
+                                        onChange={(date, dateString) => {
+                                            setTime({
+                                                ...time,
+                                                preSettlementTime: date
+                                            });
+                                            handleEdit({ target: { name: 'preSettlementTime', value: date?.valueOf() } });
+                                        }}
+                                    />
+                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                        预结算时间
+                                    </span>
+                                </div>
+                            </Col>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -366,10 +528,38 @@ const Announce = ({ status }: { status?: string }) => {
                                     label="预计花费"
                                     name="estimatedAmount"
                                     value={editData.estimatedAmount}
-                                    onChange={handleEdit}
+                                    onChange={(e) => {
+                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                            setEditData({
+                                                ...editData,
+                                                [e.target.name]: e.target.value
+                                            });
+                                        }
+                                    }}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
+                                <div className="relative">
+                                    <DatePicker
+                                        showTime
+                                        size="large"
+                                        className="!w-full mb-[20px]"
+                                        placeholder="请选择结算时间"
+                                        value={time.settlementTime}
+                                        onChange={(date, dateString) => {
+                                            setTime({
+                                                ...time,
+                                                settlementTime: date
+                                            });
+                                            handleEdit({ target: { name: 'settlementTime', value: date?.valueOf() } });
+                                        }}
+                                    />
+                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                        结算时间
+                                    </span>
+                                </div>
+                            </Col>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -379,10 +569,17 @@ const Announce = ({ status }: { status?: string }) => {
                                     label="结算金额"
                                     name="settlementAmount"
                                     value={editData.settlementAmount}
-                                    onChange={handleEdit}
+                                    onChange={(e) => {
+                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                            setEditData({
+                                                ...editData,
+                                                [e.target.name]: e.target.value
+                                            });
+                                        }
+                                    }}
                                 />
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -395,50 +592,17 @@ const Announce = ({ status }: { status?: string }) => {
                                     onChange={handleEdit}
                                 />
                             </Col>
-                            <Col span={12}>
-                                <DatePicker
-                                    size="large"
-                                    className="!w-full mb-[20px]"
-                                    placeholder="请选择发布时间"
-                                    value={time.publishTime}
-                                    onChange={(date, dateString) => {
-                                        setTime({
-                                            ...time,
-                                            publishTime: date
-                                        });
-                                        handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
-                                    }}
-                                />
-                            </Col>
-                            <Col span={12}>
-                                <DatePicker
-                                    size="large"
-                                    className="!w-full mb-[20px]"
-                                    placeholder="请选择预结算时间"
-                                    value={time.preSettlementTime}
-                                    onChange={(date, dateString) => {
-                                        setTime({
-                                            ...time,
-                                            preSettlementTime: date
-                                        });
-                                        handleEdit({ target: { name: 'preSettlementTime', value: date?.valueOf() } });
-                                    }}
-                                />
-                            </Col>
-                            <Col span={12}>
-                                <DatePicker
-                                    size="large"
-                                    className="!w-full mb-[20px]"
-                                    placeholder="请选择结算时间"
-                                    value={time.settlementTime}
-                                    onChange={(date, dateString) => {
-                                        setTime({
-                                            ...time,
-                                            settlementTime: date
-                                        });
-                                        handleEdit({ target: { name: 'settlementTime', value: date?.valueOf() } });
-                                    }}
-                                />
+                            <Col span={24}>
+                                <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
+                                    <InputLabel id="status">状态</InputLabel>
+                                    <Select labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
+                                        {statusList.map((item: any) => (
+                                            <MenuItem disabled={item.value === 'init'} key={item.value} value={item.value}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Col>
                         </Row>
                         <Divider />
@@ -452,6 +616,7 @@ const Announce = ({ status }: { status?: string }) => {
                     </CardContent>
                 </MainCard>
             </Modal>
+            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
             {addOpen && <AddAnnounce addOpen={addOpen} setAddOpen={setAddOpen} />}
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
         </div>

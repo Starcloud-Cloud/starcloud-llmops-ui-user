@@ -1,4 +1,4 @@
-import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, Checkbox, IconButton, Tooltip, Grid, TextField } from '@mui/material';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider } from 'antd';
+import { Divider, Select } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
@@ -20,6 +20,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { schemePage, schemeDelete, schemeCopy, schemeMetadata } from 'api/redBook/copywriting';
 import { listTemplates } from 'api/redBook/batchIndex';
 import useUserStore from 'store/user';
+import './index.scss';
 
 export interface DraftConfig {}
 
@@ -161,7 +162,7 @@ const Copywriting: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            schemePage({ ...pageVO }).then((res) => {
+            schemePage({ ...pageVO, ...query }).then((res) => {
                 const fetchedRows = res?.list;
                 setRows([...fetchedRows]);
                 setTotal(res?.total);
@@ -274,6 +275,15 @@ const Copywriting: React.FC = () => {
         });
     }, []);
     const permissions = useUserStore((state) => state.permissions);
+
+    //搜索
+    const [query, setQuery] = useState<any>({});
+    const changeQuery = (data: any) => {
+        setQuery({
+            ...query,
+            [data.name]: data.value
+        });
+    };
     return (
         <MainCard
             content={false}
@@ -286,6 +296,49 @@ const Copywriting: React.FC = () => {
                 </div>
             }
         >
+            <Grid sx={{ my: 2 }} container spacing={2}>
+                <Grid item md={3}>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        color="secondary"
+                        InputLabelProps={{ shrink: true }}
+                        label="方案名称"
+                        name="name"
+                        value={query.name}
+                        onChange={(e: any) => {
+                            changeQuery(e.target);
+                        }}
+                    />
+                </Grid>
+                <Grid item md={3}>
+                    <div className="relative">
+                        <Select
+                            allowClear
+                            value={query.category}
+                            onChange={(e) => changeQuery({ name: 'category', value: e })}
+                            fieldNames={{ label: 'name', value: 'code' }}
+                            size="large"
+                            className="w-[100%] border border-solid border-[#b5b5b5] rounded-[8px]"
+                            options={categoryList}
+                        />
+                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                            类目
+                        </span>
+                    </div>
+                </Grid>
+                <Grid item md={3}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                            forceUpdate();
+                        }}
+                    >
+                        搜索
+                    </Button>
+                </Grid>
+            </Grid>
             <TableContainer>
                 <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
@@ -339,7 +392,7 @@ const Copywriting: React.FC = () => {
                                         <div>{categoryList?.filter((item: any) => item.code === row.category)[0]?.name}</div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex items-center justify-center">
+                                        <div className="flex items-center justify-center gap-2 flex-wrap">
                                             {row.tags?.map((item: string) => (
                                                 <Tag color="processing" key={item}>
                                                     {item}

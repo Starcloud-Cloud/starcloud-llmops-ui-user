@@ -16,8 +16,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Image, Tag, Row, Col, DatePicker } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps } from 'antd';
+import { SearchOutlined, ExportOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import formatDate from 'hooks/useDate';
@@ -29,7 +29,7 @@ import { DetailModal } from '../../redBookContentList/component/detailModal';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { singleDelete } from 'api/redBook/task';
+import { singleDelete, singleRefresh, singleExport } from 'api/redBook/task';
 const Announce = ({ status }: { status?: string }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -150,6 +150,14 @@ const Announce = ({ status }: { status?: string }) => {
             render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
+            title: '创建时间',
+            render: (_, row) => <div>{row.createTime && formatDate(row.createTime)}</div>
+        },
+        {
+            title: '更新时间',
+            render: (_, row) => <div>{row.updateTime && formatDate(row.updateTime)}</div>
+        },
+        {
             title: '操作',
             width: 140,
             align: 'center',
@@ -163,6 +171,7 @@ const Announce = ({ status }: { status?: string }) => {
                             console.log(row);
                             setTime({
                                 publishTime: row.publishTime && dayjs(row.publishTime),
+                                claimTime: row.claimTime && dayjs(row.claimTime),
                                 preSettlementTime: row.preSettlementTime && dayjs(row.preSettlementTime),
                                 settlementTime: row.settlementTime && dayjs(row.settlementTime)
                             });
@@ -171,6 +180,17 @@ const Announce = ({ status }: { status?: string }) => {
                         }}
                     >
                         编辑
+                    </Buttons>
+                    <Buttons
+                        disabled={
+                            row.status === 'init' || row.status === 'stay_claim' || row.status === 'claimed' || row.status === 'close'
+                        }
+                        aria-label="delete"
+                        size="small"
+                        color="secondary"
+                        onClick={() => bilingDetail(row.uid)}
+                    >
+                        计费花费
                     </Buttons>
                     <Buttons
                         onClick={() => {
@@ -186,6 +206,13 @@ const Announce = ({ status }: { status?: string }) => {
             )
         }
     ];
+    //计费明细
+    const bilingDetail = async (uid: string) => {
+        const result = await singleRefresh(uid);
+        if (result) {
+            getList();
+        }
+    };
     const [tableData, setTableData] = useState<any[]>([]);
     const [query, setQuery] = useState<any>({});
     const [pageNo, setPageNo] = useState(1);
@@ -315,8 +342,8 @@ const Announce = ({ status }: { status?: string }) => {
                         fullWidth
                         InputLabelProps={{ shrink: true }}
                         label="认领人"
-                        name="claimUser"
-                        value={query.claimUser}
+                        name="claimUsername"
+                        value={query.claimUsername}
                         onChange={handleChange}
                     />
                 </Col>
@@ -333,7 +360,7 @@ const Announce = ({ status }: { status?: string }) => {
                     </Button>
                 </Col>
             </Row>
-            <div className="flex justify-right my-[20px]">
+            <div className="flex gap-2 my-[20px]">
                 <Button
                     disabled={!searchParams.get('notificationUid') || status === 'published'}
                     onClick={() => {
@@ -342,6 +369,23 @@ const Announce = ({ status }: { status?: string }) => {
                     type="primary"
                 >
                     绑定创作计划
+                </Button>
+                <Button
+                    disabled={tableData.length === 0}
+                    onClick={async () => {
+                        const res = await singleExport({ ...query, notificationUid: searchParams.get('notificationUid') });
+                        if (res) {
+                            console.log(res);
+                            const link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(res);
+                            link.download = '绑定通告任务列表.xls';
+                            link.click();
+                        }
+                    }}
+                    type="primary"
+                    icon={<ExportOutlined rev={undefined} />}
+                >
+                    导出
                 </Button>
             </div>
             <Table
@@ -370,54 +414,88 @@ const Announce = ({ status }: { status?: string }) => {
                     }}
                     title={'编辑单条任务'}
                     content={false}
-                    className="w-[80%] max-w-[800px]"
+                    className="w-[90%]"
                     secondary={
                         <IconButton onClick={() => setEditOpen(false)} size="large" aria-label="close modal">
                             <CloseIcon fontSize="small" />
                         </IconButton>
                     }
                 >
-                    <CardContent>
+                    <CardContent sx={{ width: '100%' }}>
+                        <Steps
+                            current={statusList.findIndex((item) => item.value === editData.status)}
+                            size="small"
+                            progressDot
+                            items={statusList.map((item: any) => {
+                                return {
+                                    title: item.label
+                                };
+                            })}
+                        />
                         <Row gutter={20}>
-                            {
-                                // (editData.status==='claimed'||editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement')&&
+                            <Col span={24}>
+                                <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
+                                    <InputLabel id="status">状态</InputLabel>
+                                    <Select labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
+                                        {statusList.map((item: any) => (
+                                            <MenuItem disabled={item.value === 'init'} key={item.value} value={item.value}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Col>
+                            {(editData.status === 'claimed' ||
+                                editData.status === 'published' ||
+                                editData.status === 'pre_settlement' ||
+                                editData.status === 'settlement') && (
                                 <Col span={24}>
                                     <TextField
-                                        // disabled={editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement'}
+                                        disabled={
+                                            editData.status === 'published' ||
+                                            editData.status === 'pre_settlement' ||
+                                            editData.status === 'settlement'
+                                        }
                                         sx={{ mb: 2 }}
                                         size="small"
                                         color="secondary"
                                         fullWidth
                                         InputLabelProps={{ shrink: true }}
                                         label="认领 ID"
-                                        name="claimId"
-                                        value={editData.claimId}
+                                        name="claimUserId"
+                                        value={editData.claimUserId}
                                         onChange={handleEdit}
                                     />
                                 </Col>
-                            }
-                            {
-                                // (editData.status==='claimed'||editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement')&&
+                            )}
+                            {(editData.status === 'claimed' ||
+                                editData.status === 'published' ||
+                                editData.status === 'pre_settlement' ||
+                                editData.status === 'settlement') && (
                                 <Col span={24}>
                                     <TextField
-                                        // disabled={editData.status==='published'||editData.status==='pre_settlement'||editData.status==='settlement'}
+                                        disabled={
+                                            editData.status === 'published' ||
+                                            editData.status === 'pre_settlement' ||
+                                            editData.status === 'settlement'
+                                        }
                                         sx={{ mb: 2 }}
                                         size="small"
                                         color="secondary"
                                         fullWidth
                                         InputLabelProps={{ shrink: true }}
                                         label="认领人"
-                                        name="claimName"
-                                        value={editData.claimName}
+                                        name="claimUsername"
+                                        value={editData.claimUsername}
                                         onChange={handleEdit}
                                     />
                                 </Col>
-                            }
-                            {
-                                // editData.status==='claimed'&&
+                            )}
+                            {(editData.status === 'claimed' || editData.status === 'published' || editData.status === 'settlement') && (
                                 <Col span={24}>
                                     <div className="relative mb-[20px]">
                                         <DatePicker
+                                            disabled={editData.status === 'published' || editData.status === 'settlement'}
                                             showTime
                                             size="large"
                                             className="!w-full"
@@ -435,151 +513,172 @@ const Announce = ({ status }: { status?: string }) => {
                                         </span>
                                     </div>
                                 </Col>
-                            }
-                            <Col span={24}>
-                                <TextField
-                                    sx={{ mb: 2 }}
-                                    size="small"
-                                    color="secondary"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    label="发布链接"
-                                    name="publishUrl"
-                                    value={editData.publishUrl}
-                                    onChange={handleEdit}
-                                />
-                            </Col>
-                            <Col span={24}>
-                                <div className="relative">
-                                    <DatePicker
-                                        showTime
-                                        size="large"
-                                        className="!w-full mb-[20px]"
-                                        placeholder="请选择发布时间"
-                                        value={time.publishTime}
-                                        onChange={(date, dateString) => {
-                                            setTime({
-                                                ...time,
-                                                publishTime: date
-                                            });
-                                            handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
+                            )}
+                            {(editData.status === 'published' ||
+                                editData.status === 'pre_settlement' ||
+                                editData.status === 'settlement') && (
+                                <Col span={24}>
+                                    <TextField
+                                        sx={{ mb: 2 }}
+                                        disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="发布链接"
+                                        name="publishUrl"
+                                        value={editData.publishUrl}
+                                        onChange={handleEdit}
+                                    />
+                                </Col>
+                            )}
+                            {(editData.status === 'published' || editData.status === 'settlement') && (
+                                <Col span={24}>
+                                    <div className="relative">
+                                        <DatePicker
+                                            disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                            showTime
+                                            size="large"
+                                            className="!w-full mb-[20px]"
+                                            value={time.publishTime}
+                                            onChange={(date, dateString) => {
+                                                setTime({
+                                                    ...time,
+                                                    publishTime: date
+                                                });
+                                                handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
+                                            }}
+                                        />
+                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                            发布时间
+                                        </span>
+                                    </div>
+                                </Col>
+                            )}
+                            {editData.status === 'pre_settlement' && (
+                                <Col span={24}>
+                                    <TextField
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        type="number"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="点赞数"
+                                        name="likedCount"
+                                        value={editData.likedCount}
+                                        onChange={handleEdit}
+                                    />
+                                </Col>
+                            )}
+                            {editData.status === 'pre_settlement' && (
+                                <Col span={24}>
+                                    <TextField
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        type="number"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="评论数"
+                                        name="commentCount"
+                                        value={editData.commentCount}
+                                        onChange={handleEdit}
+                                    />
+                                </Col>
+                            )}
+                            {(editData.status === 'pre_settlement' || editData.status === 'settlement') && (
+                                <Col span={24}>
+                                    <div className="relative">
+                                        <DatePicker
+                                            disabled={editData.status === 'settlement'}
+                                            showTime
+                                            size="large"
+                                            className="!w-full mb-[20px]"
+                                            value={time.preSettlementTime}
+                                            onChange={(date, dateString) => {
+                                                setTime({
+                                                    ...time,
+                                                    preSettlementTime: date
+                                                });
+                                                handleEdit({ target: { name: 'preSettlementTime', value: date?.valueOf() } });
+                                            }}
+                                        />
+                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                            预结算时间
+                                        </span>
+                                    </div>
+                                </Col>
+                            )}
+                            {editData.status === 'pre_settlement' && (
+                                <Col span={24}>
+                                    <TextField
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="预计花费"
+                                        name="estimatedAmount"
+                                        value={editData.estimatedAmount}
+                                        onChange={(e) => {
+                                            if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                                setEditData({
+                                                    ...editData,
+                                                    [e.target.name]: e.target.value
+                                                });
+                                            }
                                         }}
                                     />
-                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                        预结算时间
-                                    </span>
-                                </div>
-                            </Col>
-                            <Col span={24}>
-                                <TextField
-                                    sx={{ mb: 2 }}
-                                    size="small"
-                                    type="number"
-                                    color="secondary"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    label="点赞数"
-                                    name="likedCount"
-                                    value={editData.likedCount}
-                                    onChange={handleEdit}
-                                />
-                            </Col>
-                            <Col span={24}>
-                                <TextField
-                                    sx={{ mb: 2 }}
-                                    size="small"
-                                    type="number"
-                                    color="secondary"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    label="评论数"
-                                    name="commentCount"
-                                    value={editData.commentCount}
-                                    onChange={handleEdit}
-                                />
-                            </Col>
-                            <Col span={24}>
-                                <div className="relative">
-                                    <DatePicker
-                                        showTime
-                                        size="large"
-                                        className="!w-full mb-[20px]"
-                                        value={time.preSettlementTime}
-                                        onChange={(date, dateString) => {
-                                            setTime({
-                                                ...time,
-                                                preSettlementTime: date
-                                            });
-                                            handleEdit({ target: { name: 'preSettlementTime', value: date?.valueOf() } });
+                                </Col>
+                            )}
+                            {editData.status === 'settlement' && (
+                                <Col span={24}>
+                                    <div className="relative">
+                                        <DatePicker
+                                            showTime
+                                            size="large"
+                                            className="!w-full mb-[20px]"
+                                            placeholder="请选择结算时间"
+                                            value={time.settlementTime}
+                                            onChange={(date, dateString) => {
+                                                setTime({
+                                                    ...time,
+                                                    settlementTime: date
+                                                });
+                                                handleEdit({ target: { name: 'settlementTime', value: date?.valueOf() } });
+                                            }}
+                                        />
+                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                            结算时间
+                                        </span>
+                                    </div>
+                                </Col>
+                            )}
+                            {editData.status === 'settlement' && (
+                                <Col span={24}>
+                                    <TextField
+                                        sx={{ mb: 2 }}
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        label="结算金额"
+                                        name="settlementAmount"
+                                        value={editData.settlementAmount}
+                                        onChange={(e) => {
+                                            if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                                setEditData({
+                                                    ...editData,
+                                                    [e.target.name]: e.target.value
+                                                });
+                                            }
                                         }}
                                     />
-                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                        预结算时间
-                                    </span>
-                                </div>
-                            </Col>
-                            <Col span={24}>
-                                <TextField
-                                    sx={{ mb: 2 }}
-                                    size="small"
-                                    color="secondary"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    label="预计花费"
-                                    name="estimatedAmount"
-                                    value={editData.estimatedAmount}
-                                    onChange={(e) => {
-                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
-                                            setEditData({
-                                                ...editData,
-                                                [e.target.name]: e.target.value
-                                            });
-                                        }
-                                    }}
-                                />
-                            </Col>
-                            <Col span={24}>
-                                <div className="relative">
-                                    <DatePicker
-                                        showTime
-                                        size="large"
-                                        className="!w-full mb-[20px]"
-                                        placeholder="请选择结算时间"
-                                        value={time.settlementTime}
-                                        onChange={(date, dateString) => {
-                                            setTime({
-                                                ...time,
-                                                settlementTime: date
-                                            });
-                                            handleEdit({ target: { name: 'settlementTime', value: date?.valueOf() } });
-                                        }}
-                                    />
-                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                        结算时间
-                                    </span>
-                                </div>
-                            </Col>
-                            <Col span={24}>
-                                <TextField
-                                    sx={{ mb: 2 }}
-                                    size="small"
-                                    color="secondary"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    label="结算金额"
-                                    name="settlementAmount"
-                                    value={editData.settlementAmount}
-                                    onChange={(e) => {
-                                        if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
-                                            setEditData({
-                                                ...editData,
-                                                [e.target.name]: e.target.value
-                                            });
-                                        }
-                                    }}
-                                />
-                            </Col>
-                            <Col span={24}>
+                                </Col>
+                            )}
+                            {/* <Col span={24}>
                                 <TextField
                                     sx={{ mb: 2 }}
                                     size="small"
@@ -591,19 +690,7 @@ const Announce = ({ status }: { status?: string }) => {
                                     value={editData.paymentOrder}
                                     onChange={handleEdit}
                                 />
-                            </Col>
-                            <Col span={24}>
-                                <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
-                                    <InputLabel id="status">状态</InputLabel>
-                                    <Select labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
-                                        {statusList.map((item: any) => (
-                                            <MenuItem disabled={item.value === 'init'} key={item.value} value={item.value}>
-                                                {item.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Col>
+                            </Col> */}
                         </Row>
                         <Divider />
                         <CardActions>

@@ -1045,29 +1045,38 @@ const AddModal = () => {
                             ),
                             children: (
                                 <div>
-                                    <Button
-                                        className="mb-[20px]"
-                                        onClick={() => {
-                                            const newData = _.cloneDeep(imageStyleData);
-                                            newData.push({
-                                                name: `风格 ${digui()}`,
-                                                key: digui().toString(),
-                                                id: digui().toString(),
-                                                templateList: [
-                                                    {
-                                                        key: '1',
-                                                        name: '首图',
-                                                        variables: []
-                                                    }
-                                                ]
-                                            });
-                                            setImageStyleData(newData);
-                                        }}
-                                        type="primary"
-                                        icon={<PlusOutlined rev={undefined} />}
-                                    >
-                                        增加风格
-                                    </Button>
+                                    <div className="flex items-end mb-[20px]">
+                                        <Button
+                                            onClick={() => {
+                                                const newData = _.cloneDeep(imageStyleData);
+                                                newData.push({
+                                                    name: `风格 ${digui()}`,
+                                                    key: digui().toString(),
+                                                    id: digui().toString(),
+                                                    templateList: [
+                                                        {
+                                                            key: '1',
+                                                            name: '首图',
+                                                            variables: []
+                                                        }
+                                                    ]
+                                                });
+                                                setImageStyleData(newData);
+                                            }}
+                                            type="primary"
+                                            icon={<PlusOutlined rev={undefined} />}
+                                        >
+                                            增加风格
+                                        </Button>
+                                        <div
+                                            onClick={() => {
+                                                window.open('http://cn-test.poster-ui.hotsalestar.com/#/');
+                                            }}
+                                            className="ml-[10px] font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
+                                        >
+                                            设计自己的海报风格
+                                        </div>
+                                    </div>
                                     <Tabs
                                         tabPosition="left"
                                         items={imageStyleData.map((item, i) => {

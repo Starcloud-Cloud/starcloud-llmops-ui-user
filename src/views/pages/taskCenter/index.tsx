@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { notificationPage, notificationDelete, notificationPublish, singleRefresh } from 'api/redBook/task';
+import { notificationPage, notificationDelete, notificationPublish } from 'api/redBook/task';
 
 export interface DraftConfig {}
 
@@ -55,11 +55,14 @@ const headCells = [
     { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
+    { id: 'settlementCount', numeric: false, disablePadding: false, label: '完成数/领取数/待领取数/总任务数' },
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '发帖单价' },
     { id: 'replyUnitPrice', numeric: false, disablePadding: false, label: '回复单价' },
     { id: 'likeUnitPrice', numeric: false, disablePadding: false, label: '点赞单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
+    { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
+    { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
 ];
 
@@ -244,13 +247,6 @@ const TaskCenter: React.FC = () => {
             }
         });
     };
-    //计费明细
-    const bilingDetail = async (uid: string) => {
-        const result = await singleRefresh(uid);
-        if (result) {
-            forceUpdate();
-        }
-    };
     return (
         <MainCard
             content={false}
@@ -328,11 +324,28 @@ const TaskCenter: React.FC = () => {
                                             <span> {row.endTime && dayjs(row.endTime).format('HH:mm:ss')}</span>
                                         </div>
                                     </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex justify-center">
+                                            {row.settlementCount + '/' + row.claimCount + '/' + row.stayClaimCount + '/' + row.total}
+                                        </div>
+                                    </TableCell>
                                     <TableCell align="center">{row.unitPrice?.postingUnitPrice}</TableCell>
                                     <TableCell align="center">{row.unitPrice?.replyUnitPrice}</TableCell>
                                     <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
                                     <TableCell align="center">{row.singleBudget}</TableCell>
                                     <TableCell align="center">{row.notificationBudget}</TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.createTime && dayjs(row.createTime).format('HH:mm:ss')}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex flex-col items-center">
+                                            <span> {row.updateTime && dayjs(row.updateTime).format('YYYY-MM-DD')}</span>
+                                            <span> {row.updateTime && dayjs(row.updateTime).format('HH:mm:ss')}</span>
+                                        </div>
+                                    </TableCell>
 
                                     <TableCell align="center">
                                         <div className="whitespace-nowrap">
@@ -366,14 +379,6 @@ const TaskCenter: React.FC = () => {
                                                 }}
                                             >
                                                 查看通告任务
-                                            </Button>
-                                            <Button
-                                                aria-label="delete"
-                                                size="small"
-                                                color="secondary"
-                                                onClick={() => bilingDetail(row.uid)}
-                                            >
-                                                计费明细
                                             </Button>
                                             <Button
                                                 variant="text"

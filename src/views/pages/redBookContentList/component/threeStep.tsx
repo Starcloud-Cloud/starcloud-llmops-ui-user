@@ -8,6 +8,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { retryContent, modify } from '../../../../api/redBook/index';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { Pagination } from 'swiper';
+
 import imgLoading from 'assets/images/picture/loading.gif';
 
 export const ThreeStep = ({ data }: { data: any }) => {
@@ -74,8 +76,8 @@ export const ThreeStep = ({ data }: { data: any }) => {
                 className="h-full"
                 title="小红书生成"
                 bodyStyle={{
-                    height: 'calc(100% - 50px)',
-                    overflow: 'auto'
+                    height: 'calc(100% - 30px)',
+                    overflow: 'hidden'
                 }}
                 extra={
                     <>
@@ -115,7 +117,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                         }}
                                     />
                                 </div>
-                                <div className="mt-[20px] h-full">
+                                <div className="h-full">
                                     {images.length > 0 && (
                                         <Swiper
                                             onSwiper={(swiper) => setSwiperRef(swiper)}
@@ -123,7 +125,8 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             spaceBetween={30}
                                             centeredSlides={false}
                                             loop
-                                            modules={[]}
+                                            pagination={{ clickable: true }}
+                                            modules={[Pagination]}
                                             className="mySwiper h-full"
                                             autoplay={{
                                                 delay: 2500,
@@ -141,7 +144,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                             </>
                         )}
                     </div>
-                    <div className="col-span-1 h-full">
+                    <div className="col-span-1 h-full overflow-auto">
                         {images.length > 0 && (
                             <div className="w-full h-full p-4">
                                 <div className="flex items-center justify-between">

@@ -6,6 +6,8 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useState, useRef } from 'react';
+import { Pagination } from 'swiper';
+
 const Swipers = ({ item }: { item: any }) => {
     const [swiperRef, setSwiperRef] = useState<any>(null);
     return (
@@ -18,7 +20,8 @@ const Swipers = ({ item }: { item: any }) => {
                 spaceBetween={30}
                 centeredSlides={false}
                 loop
-                modules={[]}
+                pagination={{ clickable: true }}
+                modules={[Pagination]}
                 className="mySwiper h-full"
                 autoplay={{
                     delay: 2500,

@@ -46,3 +46,7 @@ export const singleModify = (data: any) => {
 export const singleDelete = (data: any) => {
     return request.delete({ url: `/llm/single/delete/${data}` });
 };
+//刷新结算
+export const singleRefresh = (uid: string) => {
+    return request.post({ url: `/llm/single/refresh/note/${uid}` });
+};

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { notificationPage, notificationDelete, notificationPublish } from 'api/redBook/task';
+import { notificationPage, notificationDelete, notificationPublish, singleRefresh } from 'api/redBook/task';
 
 export interface DraftConfig {}
 
@@ -244,6 +244,13 @@ const TaskCenter: React.FC = () => {
             }
         });
     };
+    //计费明细
+    const bilingDetail = async (uid: string) => {
+        const result = await singleRefresh(uid);
+        if (result) {
+            forceUpdate();
+        }
+    };
     return (
         <MainCard
             content={false}
@@ -359,6 +366,14 @@ const TaskCenter: React.FC = () => {
                                                 }}
                                             >
                                                 查看通告任务
+                                            </Button>
+                                            <Button
+                                                aria-label="delete"
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() => bilingDetail(row.uid)}
+                                            >
+                                                计费明细
                                             </Button>
                                             <Button
                                                 variant="text"

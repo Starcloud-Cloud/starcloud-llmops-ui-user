@@ -12,6 +12,7 @@ import {
     InputAdornment
 } from '@mui/material';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import MainCard from 'ui-component/cards/MainCard';
@@ -167,6 +168,8 @@ const AddModal = () => {
                     });
                 }
             });
+        } else {
+            setParams({ type: 'posting' });
         }
     }, []);
     //tabs
@@ -256,7 +259,7 @@ const AddModal = () => {
                                             <FormControl
                                                 sx={{ mb: 2 }}
                                                 error={!params.field && fieldOpen}
-                                                key={params.category}
+                                                key={params.field}
                                                 color="secondary"
                                                 size="small"
                                                 fullWidth
@@ -266,11 +269,23 @@ const AddModal = () => {
                                                     name="field"
                                                     value={params.field}
                                                     onChange={(e: any) => {
-                                                        console.log(e.target.value);
-
                                                         setFieldOpen(true);
                                                         changeParams(e.target);
                                                     }}
+                                                    endAdornment={
+                                                        params.field && (
+                                                            <InputAdornment className="mr-[10px]" position="end">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => {
+                                                                        changeParams({ name: 'field', value: '' });
+                                                                    }}
+                                                                >
+                                                                    <ClearIcon />
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        )
+                                                    }
                                                     labelId="fields"
                                                     label="发布类目"
                                                 >
@@ -347,28 +362,21 @@ const AddModal = () => {
                                     <div className="text-[18px] font-[600]  mb-[10px]">2. 成本</div>
                                     <Row gutter={20}>
                                         <Col span={8}>
-                                            <FormControl
-                                                error={!params.type && typeOpen}
-                                                key={params.type}
-                                                color="secondary"
-                                                size="small"
-                                                fullWidth
-                                            >
-                                                <InputLabel id="categorys">任务类型</InputLabel>
-                                                <Select
-                                                    name="type"
-                                                    value={params.type}
-                                                    onChange={(e: any) => {
-                                                        setTypeOpen(true);
-                                                        changeParams(e.target);
+                                            <div className="text-[14px] font-600 mb-[10px]">任务类型</div>
+                                            <div className="flex gap-2 flex-wrap">
+                                                <div
+                                                    onClick={() => {
+                                                        changeParams({
+                                                            name: 'type',
+                                                            value: 'posting'
+                                                        });
                                                     }}
-                                                    labelId="categorys"
-                                                    label="任务类型"
+                                                    style={{ borderColor: params.type === 'posting' ? '#673ab7' : '#e2e2e3' }}
+                                                    className="cursor-pointer py-[10px] px-[20px] hover:shadow rounded-md border border-solid hover:border-[#673ab7]"
                                                 >
-                                                    <MenuItem value={'posting'}>发帖</MenuItem>
-                                                </Select>
-                                                <FormHelperText>{!params.type && typeOpen ? '任务类型必填' : ''}</FormHelperText>
-                                            </FormControl>
+                                                    发帖
+                                                </div>
+                                            </div>
                                         </Col>
                                         <Col span={8}>
                                             <TextField

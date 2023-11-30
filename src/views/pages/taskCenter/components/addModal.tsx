@@ -177,6 +177,21 @@ const AddModal = () => {
     const changeActive = (e: string) => {
         setActive(e);
     };
+    const setTaskTime = (num: number) => {
+        const today = new Date();
+        const threeDaysLater = new Date();
+        threeDaysLater.setDate(today.getDate() + num);
+        setTime({
+            ...time,
+            startTime: dayjs(new Date().getTime()),
+            endTime: dayjs(threeDaysLater.getTime())
+        });
+        setParams({
+            ...params,
+            startTime: new Date().getTime(),
+            endTime: threeDaysLater.getTime()
+        });
+    };
     return (
         <MainCard>
             <CardContent>
@@ -356,6 +371,19 @@ const AddModal = () => {
                                             {!params.endTime && endTimeOpen && (
                                                 <span className="ml-[10px] text-[#ff4d4f] text-[12px]">结束时间必选</span>
                                             )}
+                                        </Col>
+                                        <Col md={8} sm={24}>
+                                            <div className="w-full flex gap-2">
+                                                <Button onClick={() => setTaskTime(3)} type="primary">
+                                                    三天
+                                                </Button>
+                                                <Button onClick={() => setTaskTime(7)} type="primary">
+                                                    七天
+                                                </Button>
+                                                <Button onClick={() => setTaskTime(14)} type="primary">
+                                                    十四天
+                                                </Button>
+                                            </div>
                                         </Col>
                                     </Row>
                                     <Divider />

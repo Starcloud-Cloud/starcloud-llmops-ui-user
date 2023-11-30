@@ -13,7 +13,6 @@ import { Pagination } from 'swiper';
 import imgLoading from 'assets/images/picture/loading.gif';
 
 export const ThreeStep = ({ data }: { data: any }) => {
-    console.log(data, 'data');
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [images, setImages] = React.useState<any[]>([]);
@@ -97,7 +96,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
             >
                 <div className="w-full grid grid-cols-3 h-full">
                     <div className="col-span-2 relative h-full overflow-hidden">
-                        {images.length > 0 && (
+                        {images?.length > 0 && (
                             <>
                                 <div className="flex justify-between absolute top-[46%] w-full z-10">
                                     <Button
@@ -145,7 +144,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                         )}
                     </div>
                     <div className="col-span-1 h-full overflow-auto">
-                        {images.length > 0 && (
+                        {
                             <div className="w-full h-full p-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
@@ -183,7 +182,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                     )}
                                 </div>
                             </div>
-                        )}
+                        }
                     </div>
                 </div>
             </Card>

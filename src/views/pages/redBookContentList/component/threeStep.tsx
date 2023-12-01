@@ -1,4 +1,4 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input } from 'antd';
+import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, Tooltip } from 'antd';
 import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -11,6 +11,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { Pagination } from 'swiper';
 
 import imgLoading from 'assets/images/picture/loading.gif';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 export const ThreeStep = ({ data }: { data: any }) => {
     const [title, setTitle] = React.useState<string>('');
@@ -166,7 +167,30 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                         value={title}
                                     />
                                 ) : (
-                                    <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap">{title}</div>
+                                    <CopyToClipboard
+                                        text={title}
+                                        onCopy={() =>
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false,
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                    transition: 'SlideLeft'
+                                                })
+                                            )
+                                        }
+                                    >
+                                        <Tooltip title="点击复制">
+                                            <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap cursor-pointer select-none">
+                                                {title}
+                                            </div>
+                                        </Tooltip>
+                                    </CopyToClipboard>
                                 )}
                                 <Divider />
                                 <div className="max-h-[calc(100%-150px)] ">
@@ -178,7 +202,28 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             rows={10}
                                         />
                                     ) : (
-                                        <div className="text-base mb-2 whitespace-pre-wrap">{text}</div>
+                                        <CopyToClipboard
+                                            text={text}
+                                            onCopy={() =>
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '复制成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        close: false,
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        transition: 'SlideLeft'
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            <Tooltip title="点击复制">
+                                                <div className="text-base mb-2 whitespace-pre-wrap cursor-pointer select-none">{text}</div>
+                                            </Tooltip>
+                                        </CopyToClipboard>
                                     )}
                                 </div>
                             </div>

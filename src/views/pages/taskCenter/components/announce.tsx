@@ -30,7 +30,8 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { singleDelete, singleRefresh, singleExport } from 'api/redBook/task';
-const Announce = ({ status }: { status?: string }) => {
+import './addModal.scss';
+const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; singleMissionStatusEnumList: any[] }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleTransfer = (key: string) => {
@@ -102,17 +103,6 @@ const Announce = ({ status }: { status?: string }) => {
             )
         },
         {
-            title: '任务图片',
-            width: 170,
-            render: (_, row) => (
-                <div className="flex flex-wrap">
-                    {row?.content?.picture?.map((item: any) => (
-                        <Image className="mr-[5px]" width={50} height={50} key={item.index} src={item.url} preview={false} />
-                    ))}
-                </div>
-            )
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             render: (_, row) => <div>{handleTransfer(row.status)}</div>
@@ -124,6 +114,10 @@ const Announce = ({ status }: { status?: string }) => {
         {
             title: '认领时间',
             render: (_, row) => <div>{row.claimTime && formatDate(row.claimTime)}</div>
+        },
+        {
+            title: '发布时间',
+            render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
             title: '预估花费',
@@ -144,10 +138,6 @@ const Announce = ({ status }: { status?: string }) => {
         {
             title: '支付订单号',
             dataIndex: 'paymentOrder'
-        },
-        {
-            title: '发布时间',
-            render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
             title: '创建时间',
@@ -181,7 +171,7 @@ const Announce = ({ status }: { status?: string }) => {
                     >
                         编辑
                     </Buttons>
-                    <Buttons
+                    {/* <Buttons
                         disabled={
                             row.status === 'init' || row.status === 'stay_claim' || row.status === 'claimed' || row.status === 'close'
                         }
@@ -191,7 +181,7 @@ const Announce = ({ status }: { status?: string }) => {
                         onClick={() => bilingDetail(row.uid)}
                     >
                         计费花费
-                    </Buttons>
+                    </Buttons> */}
                     <Buttons
                         onClick={() => {
                             setUid(row.uid);
@@ -315,7 +305,7 @@ const Announce = ({ status }: { status?: string }) => {
                             label="任务状态"
                             onChange={handleChange}
                         >
-                            {statusList.map((item: any) => (
+                            {singleMissionStatusEnumList.map((item: any) => (
                                 <MenuItem key={item.value} value={item.value}>
                                     {item.label}
                                 </MenuItem>
@@ -360,7 +350,7 @@ const Announce = ({ status }: { status?: string }) => {
                     </Button>
                 </Col>
             </Row>
-            <div className="flex gap-2 my-[20px]">
+            <div className="flex justify-end gap-2 my-[20px]">
                 <Button
                     disabled={!searchParams.get('notificationUid') || status === 'published'}
                     onClick={() => {
@@ -423,6 +413,7 @@ const Announce = ({ status }: { status?: string }) => {
                 >
                     <CardContent sx={{ width: '100%' }}>
                         <Steps
+                            className="mb-[20px]"
                             current={statusList.findIndex((item) => item.value === editData.status)}
                             size="small"
                             progressDot
@@ -514,6 +505,12 @@ const Announce = ({ status }: { status?: string }) => {
                                     </div>
                                 </Col>
                             )}
+                            {editData.status === 'published' && (
+                                <div className="w-full px-[20px]">
+                                    <Divider />
+                                    <div className="font-[600] mt-[10px] mb-[20px]">更新字段</div>
+                                </div>
+                            )}
                             {(editData.status === 'published' ||
                                 editData.status === 'pre_settlement' ||
                                 editData.status === 'settlement') && (
@@ -554,6 +551,12 @@ const Announce = ({ status }: { status?: string }) => {
                                         </span>
                                     </div>
                                 </Col>
+                            )}
+                            {editData.status === 'pre_settlement' && (
+                                <div className="w-full px-[20px]">
+                                    <Divider />
+                                    <div className="font-[600] mt-[10px] mb-[20px]">更新字段</div>
+                                </div>
                             )}
                             {editData.status === 'pre_settlement' && (
                                 <Col span={24}>
@@ -632,6 +635,12 @@ const Announce = ({ status }: { status?: string }) => {
                                         }}
                                     />
                                 </Col>
+                            )}
+                            {editData.status === 'settlement' && (
+                                <div className="w-full px-[20px]">
+                                    <Divider />
+                                    <div className="font-[600] mt-[10px] mb-[20px]">更新字段</div>
+                                </div>
                             )}
                             {editData.status === 'settlement' && (
                                 <Col span={24}>

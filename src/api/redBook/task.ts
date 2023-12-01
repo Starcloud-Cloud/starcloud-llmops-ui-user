@@ -54,3 +54,7 @@ export const singleRefresh = (uid: string) => {
 export const singleExport = (params: any) => {
     return request.download({ url: `/llm/single/export`, params });
 };
+//导出任务
+export const singleMetadata = () => {
+    return request.get({ url: `/llm/notification/metadata` });
+};

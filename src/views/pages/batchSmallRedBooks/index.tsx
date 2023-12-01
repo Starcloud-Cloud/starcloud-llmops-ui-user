@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
+import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
 import type { RadioChangeEvent } from 'antd';
@@ -20,6 +21,7 @@ import Swipers from './components/swiper';
 import formatDate from 'hooks/useDate';
 import copy from 'clipboard-copy';
 import './index.scss';
+import Goods from './good';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -667,6 +669,7 @@ const BatcSmallRedBooks = () => {
                                 <Row gutter={20} className="h-[fit-content] w-full">
                                     {planList.map((item, index: number) => (
                                         <Col span={6} className="inline-block">
+                                            <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} />
                                             <div
                                                 key={index}
                                                 className="mb-[20px] w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]"
@@ -759,24 +762,14 @@ const BatcSmallRedBooks = () => {
                                                             setDetailOpen(true);
                                                         }}
                                                     >
-                                                        <Popover
-                                                            content={
-                                                                <div className="w-[500px] text-[12px]">
-                                                                    <div>
-                                                                        <span className="font-[600] h-[38px]">标题：</span>
-                                                                        {item.copyWritingTitle}
-                                                                    </div>
-                                                                    <div>
-                                                                        <span className="font-[600]">描述：</span>
-                                                                        <span className="text-[#15273799]">{item.copyWritingContent}</span>
-                                                                    </div>
-                                                                </div>
-                                                            }
-                                                        >
+                                                        <div className="flex justify-between items-start">
                                                             <div className="line-clamp-2 h-[37px] text-[14px] font-bold">
                                                                 {item.copyWritingTitle}
                                                             </div>
-                                                        </Popover>
+                                                            <div>
+                                                                <GradeOutlinedIcon sx={{ color: '#0003' }} />
+                                                            </div>
+                                                        </div>
                                                         <Popover
                                                             content={
                                                                 <div className="w-[500px] text-[12px]">

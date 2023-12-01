@@ -9,7 +9,9 @@ import {
     CardActions,
     Grid,
     FormHelperText,
-    InputAdornment
+    InputAdornment,
+    Typography,
+    Box
 } from '@mui/material';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -26,7 +28,8 @@ import _ from 'lodash-es';
 import './addModal.scss';
 import Announce from './announce';
 import { schemeMetadata } from 'api/redBook/copywriting';
-import { notificationCreate, notificationDetail, notificationModify } from 'api/redBook/task';
+import { notificationCreate, notificationDetail, notificationModify, singleMetadata } from 'api/redBook/task';
+import Item from 'antd/es/list/Item';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const location = useLocation();
@@ -146,10 +149,15 @@ const AddModal = () => {
             }
         }
     };
+
+    const [platformList, setPlatformList] = useState<any[]>([]);
     const [cateList, setCategoryList] = useState<any[]>([]);
+    const [singleMissionStatusEnumList, setSingleMissionStatusEnumList] = useState<any[]>([]);
     useEffect(() => {
-        schemeMetadata().then((res) => {
+        singleMetadata().then((res) => {
+            setPlatformList(res.platform);
             setCategoryList(res.category);
+            setSingleMissionStatusEnumList(res.singleMissionStatusEnum);
         });
         if (searchParams.get('view')) {
             setActive('2');
@@ -263,9 +271,11 @@ const AddModal = () => {
                                                     labelId="categorys"
                                                     label="发布平台"
                                                 >
-                                                    <MenuItem value={'xhs'}>小红书</MenuItem>
-                                                    <MenuItem value={'tiktok'}>抖音</MenuItem>
-                                                    <MenuItem value={'other'}>其他</MenuItem>
+                                                    {platformList?.map((item: any) => (
+                                                        <MenuItem value={item.value} key={item.value}>
+                                                            {item.label}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                                 <FormHelperText>{!params.platform && platformOpen ? '平台必选' : ''}</FormHelperText>
                                             </FormControl>
@@ -279,7 +289,7 @@ const AddModal = () => {
                                                 size="small"
                                                 fullWidth
                                             >
-                                                <InputLabel id="fields">发布类目</InputLabel>
+                                                <InputLabel id="fields">通告类目</InputLabel>
                                                 <Select
                                                     name="field"
                                                     value={params.field}
@@ -302,7 +312,7 @@ const AddModal = () => {
                                                         )
                                                     }
                                                     labelId="fields"
-                                                    label="发布类目"
+                                                    label="通告类目"
                                                 >
                                                     {cateList?.map((item) => (
                                                         <MenuItem key={item.code} value={item.code}>
@@ -310,7 +320,7 @@ const AddModal = () => {
                                                         </MenuItem>
                                                     ))}
                                                 </Select>
-                                                <FormHelperText>{!params.field && fieldOpen ? '发布类目必选' : ''}</FormHelperText>
+                                                <FormHelperText>{!params.field && fieldOpen ? '通告类目必选' : ''}</FormHelperText>
                                             </FormControl>
                                         </Col>
                                     </Row>
@@ -389,21 +399,33 @@ const AddModal = () => {
                                     <Divider />
                                     <div className="text-[18px] font-[600]  mb-[10px]">2. 成本</div>
                                     <Row gutter={20}>
-                                        <Col span={8}>
+                                        <Col span={24}>
                                             <div className="text-[14px] font-600 mb-[10px]">任务类型</div>
-                                            <div className="flex gap-2 flex-wrap">
-                                                <div
-                                                    onClick={() => {
-                                                        changeParams({
-                                                            name: 'type',
-                                                            value: 'posting'
-                                                        });
+                                            <div className="flex gap-2 flex-wrap mb-[10px]">
+                                                <SubCard
+                                                    sx={{
+                                                        mb: 1,
+                                                        cursor: 'pointer',
+                                                        borderColor: params.type === 'posting' ? '#673ab7' : 'rgba(230,230,231,1)'
                                                     }}
-                                                    style={{ borderColor: params.type === 'posting' ? '#673ab7' : '#e2e2e3' }}
-                                                    className="cursor-pointer py-[10px] px-[20px] hover:shadow rounded-md border border-solid hover:border-[#673ab7]"
+                                                    contentSX={{ p: '10px !important', width: '200px' }}
                                                 >
-                                                    发帖
-                                                </div>
+                                                    <Box
+                                                        onClick={() => {
+                                                            changeParams({
+                                                                name: 'type',
+                                                                value: 'posting'
+                                                            });
+                                                        }}
+                                                    >
+                                                        <Typography variant="h4" mb={1}>
+                                                            发帖
+                                                        </Typography>
+                                                        <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
+                                                            {'小红书发布贴子小红书发布贴子小红书发布贴子小红书发布贴子小红书发布贴子'}
+                                                        </Typography>
+                                                    </Box>
+                                                </SubCard>
                                             </div>
                                         </Col>
                                         <Col span={8}>
@@ -430,9 +452,11 @@ const AddModal = () => {
                                                     }
                                                 }}
                                             />
+                                        </Col>
+                                        <Col span={8}>
+                                            {' '}
                                             <TextField
                                                 size="small"
-                                                sx={{ mt: 2 }}
                                                 color="secondary"
                                                 fullWidth
                                                 InputProps={{
@@ -452,9 +476,10 @@ const AddModal = () => {
                                                     }
                                                 }}
                                             />
+                                        </Col>
+                                        <Col span={8}>
                                             <TextField
                                                 size="small"
-                                                sx={{ mt: 2 }}
                                                 color="secondary"
                                                 fullWidth
                                                 InputProps={{
@@ -476,54 +501,50 @@ const AddModal = () => {
                                             />
                                         </Col>
                                     </Row>
-                                    <Row className="mt-[20px]" gutter={20}>
-                                        <Col span={8}>
-                                            <TextField
-                                                size="small"
-                                                color="secondary"
-                                                fullWidth
-                                                InputProps={{
-                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
-                                                }}
-                                                InputLabelProps={{ shrink: true }}
-                                                label="单任务预算上限"
-                                                type="number"
-                                                name="singleBudget"
-                                                value={params.singleBudget}
-                                                error={!params.singleBudget && singleBudgetOpen}
-                                                helperText={!params.singleBudget && singleBudgetOpen ? '单任务预算上限必填' : ''}
-                                                onChange={(e: any) => {
-                                                    setSingleBudgetOpen(true);
-                                                    if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
-                                                        changeParams(e.target);
-                                                    }
-                                                }}
-                                            />
-                                        </Col>
-                                        <Col span={8}>
-                                            <TextField
-                                                size="small"
-                                                color="secondary"
-                                                fullWidth
-                                                InputProps={{
-                                                    startAdornment: <InputAdornment position="start">¥</InputAdornment>
-                                                }}
-                                                InputLabelProps={{ shrink: true }}
-                                                label="通告总预算"
-                                                type="number"
-                                                name="notificationBudget"
-                                                value={params.notificationBudget}
-                                                error={!params.notificationBudget && notificationBudgetOpen}
-                                                helperText={!params.notificationBudget && notificationBudgetOpen ? '通告总预算必填' : ''}
-                                                onChange={(e: any) => {
-                                                    setNotificationBudgetOpen(true);
-                                                    if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
-                                                        changeParams(e.target);
-                                                    }
-                                                }}
-                                            />
-                                        </Col>
-                                    </Row>
+                                    <Divider />
+                                    <TextField
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                        }}
+                                        InputLabelProps={{ shrink: true }}
+                                        label="单任务预算上限"
+                                        type="number"
+                                        name="singleBudget"
+                                        value={params.singleBudget}
+                                        error={!params.singleBudget && singleBudgetOpen}
+                                        helperText={!params.singleBudget && singleBudgetOpen ? '单任务预算上限必填' : ''}
+                                        onChange={(e: any) => {
+                                            setSingleBudgetOpen(true);
+                                            if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                                changeParams(e.target);
+                                            }
+                                        }}
+                                    />
+                                    <TextField
+                                        sx={{ mt: 2 }}
+                                        size="small"
+                                        color="secondary"
+                                        fullWidth
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">¥</InputAdornment>
+                                        }}
+                                        InputLabelProps={{ shrink: true }}
+                                        label="通告总预算"
+                                        type="number"
+                                        name="notificationBudget"
+                                        value={params.notificationBudget}
+                                        error={!params.notificationBudget && notificationBudgetOpen}
+                                        helperText={!params.notificationBudget && notificationBudgetOpen ? '通告总预算必填' : ''}
+                                        onChange={(e: any) => {
+                                            setNotificationBudgetOpen(true);
+                                            if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                                changeParams(e.target);
+                                            }
+                                        }}
+                                    />
                                     <Divider />
                                     <div className="text-[18px] font-[600] mb-[10px]">3. 通告说明</div>
                                     <Row gutter={20}>
@@ -579,7 +600,7 @@ const AddModal = () => {
                         {
                             label: '绑定通告任务',
                             key: '2',
-                            children: <Announce status={params.status} />
+                            children: <Announce singleMissionStatusEnumList={singleMissionStatusEnumList} status={params.status} />
                         }
                     ]}
                     onChange={changeActive}

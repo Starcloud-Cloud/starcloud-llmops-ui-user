@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { notificationPage, notificationDelete, notificationPublish } from 'api/redBook/task';
+import { notificationPage, notificationDelete, notificationPublish, singleMetadata } from 'api/redBook/task';
 
 export interface DraftConfig {}
 
@@ -51,14 +51,12 @@ const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '通告名称' },
     { id: 'type', numeric: false, disablePadding: false, label: '通告类型' },
     { id: 'platform', numeric: false, disablePadding: false, label: '发布平台' },
-    { id: 'field', numeric: false, disablePadding: false, label: '发布类目' },
+    { id: 'field', numeric: false, disablePadding: false, label: '通告类目' },
     { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
     { id: 'settlementCount', numeric: false, disablePadding: false, label: '完成数/领取数/待领取数/总任务数' },
-    { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '发帖单价' },
-    { id: 'replyUnitPrice', numeric: false, disablePadding: false, label: '回复单价' },
-    { id: 'likeUnitPrice', numeric: false, disablePadding: false, label: '点赞单价' },
+    { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -247,6 +245,15 @@ const TaskCenter: React.FC = () => {
             }
         });
     };
+    const [categoryList, setCategoryList] = useState<any[]>([]);
+    const [platformList, setPlatformList] = useState<any[]>([]);
+
+    useEffect(() => {
+        singleMetadata().then((res) => {
+            setCategoryList(res?.category);
+            setPlatformList(res?.platform);
+        });
+    }, []);
     return (
         <MainCard
             content={false}
@@ -302,15 +309,11 @@ const TaskCenter: React.FC = () => {
                                         <div className="flex items-center justify-center">{row.type === 'posting' ? '发帖' : row.type}</div>
                                     </TableCell>
                                     <TableCell align="center" className="w-[100px]">
-                                        {row.platform === 'xhs'
-                                            ? '小红书'
-                                            : row.platform === 'tiktok'
-                                            ? '抖音'
-                                            : row.platform === 'other'
-                                            ? '其他'
-                                            : ''}
+                                        {platformList?.filter((item) => item.value === row.platform)[0]?.label}
                                     </TableCell>
-                                    <TableCell align="center">{row.field}</TableCell>
+                                    <TableCell align="center">
+                                        {categoryList?.filter((item) => item.value === row.field)[0]?.label}
+                                    </TableCell>
                                     <TableCell align="center">{handleTransfer(row.status)}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
@@ -329,9 +332,22 @@ const TaskCenter: React.FC = () => {
                                             {row.settlementCount + '/' + row.claimCount + '/' + row.stayClaimCount + '/' + row.total}
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">{row.unitPrice?.postingUnitPrice}</TableCell>
-                                    <TableCell align="center">{row.unitPrice?.replyUnitPrice}</TableCell>
-                                    <TableCell align="center">{row.unitPrice?.likeUnitPrice}</TableCell>
+                                    <TableCell align="center">
+                                        <div className="!w-[120px] text-center">
+                                            <div>
+                                                发帖单价：
+                                                {row.unitPrice?.postingUnitPrice}元
+                                            </div>
+                                            <div>
+                                                回复单价：
+                                                {row.unitPrice?.replyUnitPrice}元
+                                            </div>
+                                            <div>
+                                                点赞单价：
+                                                {row.unitPrice?.likeUnitPrice}元
+                                            </div>
+                                        </div>
+                                    </TableCell>
                                     <TableCell align="center">{row.singleBudget}</TableCell>
                                     <TableCell align="center">{row.notificationBudget}</TableCell>
                                     <TableCell align="center">

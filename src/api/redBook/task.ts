@@ -46,3 +46,11 @@ export const singleModify = (data: any) => {
 export const singleDelete = (data: any) => {
     return request.delete({ url: `/llm/single/delete/${data}` });
 };
+//刷新结算
+export const singleRefresh = (uid: string) => {
+    return request.post({ url: `/llm/single/refresh/note/${uid}` });
+};
+//导出任务
+export const singleExport = (params: any) => {
+    return request.download({ url: `/llm/single/export`, params });
+};

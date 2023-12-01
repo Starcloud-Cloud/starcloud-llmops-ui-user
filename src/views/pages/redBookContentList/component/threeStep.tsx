@@ -1,4 +1,4 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, Tooltip } from 'antd';
+import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input } from 'antd';
 import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -12,6 +12,7 @@ import { Pagination } from 'swiper';
 
 import imgLoading from 'assets/images/picture/loading.gif';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import { Tooltip } from '@mui/material';
 
 export const ThreeStep = ({ data }: { data: any }) => {
     const [title, setTitle] = React.useState<string>('');

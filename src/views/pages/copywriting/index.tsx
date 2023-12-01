@@ -1,4 +1,18 @@
-import { Button, Checkbox, IconButton, Tooltip, Grid, TextField } from '@mui/material';
+import {
+    Button,
+    Checkbox,
+    IconButton,
+    Tooltip,
+    Grid,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    InputAdornment,
+    MenuItem,
+    Autocomplete,
+    Chip
+} from '@mui/material';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
@@ -11,7 +25,8 @@ import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Divider, Select } from 'antd';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Divider } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
@@ -296,7 +311,7 @@ const Copywriting: React.FC = () => {
                 </div>
             }
         >
-            <Grid sx={{ my: 2 }} container spacing={2}>
+            <Grid sx={{ my: 2, ml: 2 }} container spacing={2}>
                 <Grid item md={3}>
                     <TextField
                         fullWidth
@@ -312,20 +327,63 @@ const Copywriting: React.FC = () => {
                     />
                 </Grid>
                 <Grid item md={3}>
-                    <div className="relative">
+                    <FormControl key={query.category} color="secondary" size="small" fullWidth>
+                        <InputLabel id="fields">发布类目</InputLabel>
                         <Select
-                            allowClear
+                            name="field"
                             value={query.category}
-                            onChange={(e) => changeQuery({ name: 'category', value: e })}
-                            fieldNames={{ label: 'name', value: 'code' }}
-                            size="large"
-                            className="w-[100%] border border-solid border-[#b5b5b5] rounded-[8px]"
-                            options={categoryList}
+                            onChange={(e: any) => changeQuery({ name: 'category', value: e.target.value })}
+                            endAdornment={
+                                query.category && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'category', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId="fields"
+                            label="发布类目"
+                        >
+                            {categoryList?.map((item) => (
+                                <MenuItem key={item.code} value={item.code}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={3}>
+                    <FormControl key={query.tags} color="secondary" size="small" fullWidth>
+                        <Autocomplete
+                            multiple
+                            size="small"
+                            id="tags-filled"
+                            color="secondary"
+                            options={[]}
+                            defaultValue={query.tags}
+                            freeSolo
+                            renderTags={(value: readonly string[], getTagProps) =>
+                                value.map((option: string, index: number) => (
+                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                ))
+                            }
+                            onChange={(e: any, newValue) => {
+                                changeQuery({
+                                    name: 'tags',
+                                    value: newValue
+                                });
+                            }}
+                            renderInput={(param) => (
+                                <TextField color="secondary" {...param} label="标签" placeholder="请输入标签然后回车" />
+                            )}
                         />
-                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                            类目
-                        </span>
-                    </div>
+                    </FormControl>
                 </Grid>
                 <Grid item md={3}>
                     <Button

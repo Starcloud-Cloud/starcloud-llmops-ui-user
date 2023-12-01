@@ -1,5 +1,5 @@
-import { Button, IconButton, Tooltip } from '@mui/material';
-import { Popover, Spin, Tag } from 'antd';
+import { Button, Grid, IconButton, Tooltip, TextField, FormControl, InputLabel, Select, InputAdornment, MenuItem } from '@mui/material';
+import { Popover, Spin, Tag, DatePicker } from 'antd';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -7,10 +7,10 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import ReorderIcon from '@mui/icons-material/Reorder';
 
 import MainCard from 'ui-component/cards/MainCard';
-
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
+import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -160,6 +160,13 @@ const RedBookTaskList: React.FC = () => {
 
     const delOpen = Boolean(delAnchorEl);
     const navigate = useNavigate();
+    const [query, setQuery] = useState<any>({});
+    const changeQuery = (data: any) => {
+        setQuery({
+            ...query,
+            [data.name]: data.value
+        });
+    };
 
     const [total, setTotal] = useState(0);
     const [count, setCount] = useState(0);
@@ -172,7 +179,13 @@ const RedBookTaskList: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            planPage({ ...pageVO }).then((res) => {
+            planPage({
+                ...pageVO,
+                ...query,
+                startTime: query.createTime ? query.createTime[0]?.valueOf() : undefined,
+                endTime: query.createTime ? query.createTime[1]?.valueOf() : undefined,
+                createTime: undefined
+            }).then((res) => {
                 const fetchedRows = res.list;
                 setRows([...fetchedRows]);
                 setTotal(res?.page?.total);
@@ -318,7 +331,7 @@ const RedBookTaskList: React.FC = () => {
                 console.error('下载文件时发生错误:', error);
             });
     };
-
+    const { RangePicker } = DatePicker;
     return (
         <MainCard
             content={false}
@@ -385,6 +398,100 @@ const RedBookTaskList: React.FC = () => {
             //     </div>
             // }
         >
+            <Grid container sx={{ my: 2 }} spacing={2}>
+                <Grid item md={3}>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        color="secondary"
+                        InputLabelProps={{ shrink: true }}
+                        label="计划名称"
+                        name="name"
+                        value={query.name}
+                        onChange={(e: any) => {
+                            changeQuery(e.target);
+                        }}
+                    />
+                </Grid>
+                <Grid item md={3}>
+                    <FormControl key={query.type} color="secondary" size="small" fullWidth>
+                        <InputLabel id="types">渠道</InputLabel>
+                        <Select
+                            name="type"
+                            value={query.type}
+                            onChange={(e: any) => changeQuery({ name: 'type', value: e.target.value })}
+                            endAdornment={
+                                query.type && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'type', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId="types"
+                            label="渠道"
+                        >
+                            <MenuItem value={'XHS'}>小红书</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={3}>
+                    <FormControl key={query.status} color="secondary" size="small" fullWidth>
+                        <InputLabel id="statuss">状态</InputLabel>
+                        <Select
+                            name="status"
+                            value={query.status}
+                            onChange={(e: any) => changeQuery({ name: 'status', value: e.target.value })}
+                            endAdornment={
+                                query.status && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'status', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId="types"
+                            label="状态"
+                        >
+                            <MenuItem value={'PENDING'}>待执行</MenuItem>
+                            <MenuItem value={'RUNNING'}>执行中</MenuItem>
+                            <MenuItem value={'PAUSE'}>已暂停</MenuItem>
+                            <MenuItem value={'CANCELED'}>已取消</MenuItem>
+                            <MenuItem value={'COMPLETE'}>已完成</MenuItem>
+                            <MenuItem value={'FAILURE'}>已失败</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item md={3}>
+                    <RangePicker
+                        value={query.createTime}
+                        onChange={(day, days) => {
+                            setQuery({
+                                ...query,
+                                createTime: day
+                            });
+                        }}
+                        size="large"
+                    />
+                </Grid>
+                <Grid item md={3}>
+                    <Button variant="contained" color="secondary" onClick={forceUpdate}>
+                        搜索
+                    </Button>
+                </Grid>
+            </Grid>
             <TableContainer>
                 <Spin tip="请求中..." size={'large'} spinning={loading} indicator={<img width={60} src={imgLoading} />}>
                     <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
@@ -401,8 +508,6 @@ const RedBookTaskList: React.FC = () => {
                                 if (typeof row === 'number') {
                                     return null; // 忽略数字类型的行
                                 }
-                                console.log(row, 'row');
-
                                 const isItemSelected = isSelected(row.uid);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 

@@ -1,5 +1,6 @@
 import { Modal, IconButton, CardContent, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Table, Tag, Popover, Button, Image } from 'antd';
+import formatDate from 'hooks/useDate';
 import type { ColumnsType } from 'antd/es/table';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,17 +13,18 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
     const searchParams = new URLSearchParams(location.search);
     const addColumn: ColumnsType<any> = [
         {
-            title: '文案内容',
+            title: '文案标题',
+            width: 300,
             dataIndex: 'copyWritingTitle'
         },
         {
             title: '文案内容',
-            width: '35%',
+            width: '40%',
             render: (_, row) => <div className="line-clamp-3">{row.copyWritingContent}</div>
         },
         {
             title: '图片数量',
-            width: 50,
+            width: 100,
             dataIndex: 'pictureNum'
         },
         {
@@ -37,6 +39,10 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                     ))}
                 </div>
             )
+        },
+        {
+            title: '生成时间',
+            render: (_, row) => <div>{formatDate(row.pictureStartTime)}</div>
         }
     ];
     const [addTable, setAddTable] = useState<any[]>([]);

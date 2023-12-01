@@ -235,7 +235,7 @@ const ChatHistory = ({ data, theme, handleRetry, chatBoxHeight, handleExample }:
                                                     className="bg-[#f2f3f5]"
                                                 >
                                                     <CardContent className="px-[24px] !py-[12px]">
-                                                        <Grid container spacing={1}>
+                                                        <Grid container spacing={1} className="relative">
                                                             <Grid item xs={12}>
                                                                 {history?.process &&
                                                                     history?.process?.map((item: any, index: number) => {
@@ -435,6 +435,21 @@ const ChatHistory = ({ data, theme, handleRetry, chatBoxHeight, handleExample }:
                                                                                 history.status === 'ERROR' ? 'text-[red]' : 'text-[#364152]'
                                                                             }`}
                                                                         >
+                                                                            {history?.aiModel?.includes('gpt-4') && (
+                                                                                <div
+                                                                                    style={{
+                                                                                        borderWidth: '0 24px 24px 0',
+
+                                                                                        borderColor:
+                                                                                            'transparent #ede8f6 transparent transparent'
+                                                                                    }}
+                                                                                    className="w-0 h-0 border-solid rounded-tr-[8px] absolute right-[-24px] top-[-4px]"
+                                                                                >
+                                                                                    <span className="absolute top-[-1px] right-[-20px]">
+                                                                                        4
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
                                                                             <ChatMarkdown textContent={history.answer} />
                                                                         </div>
                                                                     ) : (

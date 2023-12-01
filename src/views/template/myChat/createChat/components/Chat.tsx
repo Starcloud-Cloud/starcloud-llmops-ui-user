@@ -60,6 +60,7 @@ import { isMobile } from 'react-device-detect';
 const { Option } = Select;
 
 export type IHistory = Partial<{
+    aiModel: string;
     uid: string;
     appConversationUid: string;
     appUid: string;
@@ -876,6 +877,7 @@ export const Chat = ({
         setMessage('');
         setMessageData('');
         const newMessage: IHistory = {
+            aiModel: selectModel === 'GPT4' ? 'gpt-4' : '',
             robotName: chatBotInfo.name,
             robotAvatar: chatBotInfo.avatar,
             message,
@@ -1531,7 +1533,7 @@ export const Chat = ({
                                         </>
                                     }
                                     aria-describedby="search-helper-text"
-                                    inputProps={{ 'aria-label': 'weight', maxLength: 200 }}
+                                    inputProps={{ 'aria-label': 'weight', maxLength: 800 }}
                                 />
                             </Grid>
                         </Grid>
@@ -1561,7 +1563,7 @@ export const Chat = ({
                                         }}
                                     />
                                 </div>
-                                <div className="text-right text-stone-600 w-[55px] ml-2">{message?.length || 0}/200</div>
+                                <div className="text-right text-stone-600 w-[55px] ml-2">{message?.length || 0}/800</div>
                             </div>
                         </div>
                         {mode !== 'market' && (

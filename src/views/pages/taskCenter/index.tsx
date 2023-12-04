@@ -112,7 +112,7 @@ const TaskCenter: React.FC = () => {
     const [selected, setSelected] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [delVisible, setDelVisible] = useState(false);
     const [delType, setDelType] = useState(0); //0.单个 1.多个
@@ -428,7 +428,7 @@ const TaskCenter: React.FC = () => {
 
             {/* table pagination */}
             <TablePagination
-                rowsPerPageOptions={[5, 10]}
+                rowsPerPageOptions={[20, 50, 100]}
                 component="div"
                 count={total}
                 rowsPerPage={rowsPerPage}

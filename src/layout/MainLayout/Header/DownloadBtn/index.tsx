@@ -3,6 +3,8 @@ import './index.css';
 import { usePWAInstall } from 'react-use-pwa-install';
 import { useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
+import { discountNewUser } from 'api/vip';
+import { useEffect, useState } from 'react';
 
 export const DownLoadBtn = () => {
     const install = usePWAInstall();
@@ -15,9 +17,18 @@ export const DownLoadBtn = () => {
 
 export const PayBtn = () => {
     const navigate = useNavigate();
+    const [text, setText] = useState('年末5折限时体验');
+    useEffect(() => {
+        discountNewUser().then((res) => {
+            if (res.code) {
+                setText('新用户限时体验9.9元/月');
+            }
+        });
+    }, []);
+
     return !isMobile ? (
         <button className="btn-grad flex items-center" onClick={() => navigate('/subscribe')}>
-            <span>新用户限时体验9.9元/月</span>
+            <span>{text}</span>
             <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1614" width="16" height="16">
                 <path d="M377.9 114.1h358.3l-136.4 268 231.5 0.3-485.1 559.3 139.5-356.4H222.6z" fill="#FED928" p-id="1615"></path>
             </svg>

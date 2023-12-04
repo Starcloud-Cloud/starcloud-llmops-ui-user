@@ -45,7 +45,11 @@ export const planModify = (data: any) => {
 export const planExecute = (data: any) => {
     return request.post({ url: '/llm/creative/plan/execute', data });
 };
-// //点赞
-// export const contentLike = (data: any) => {
-//     return request.post({ url: '/llm/xhs/content/like', data });
-// };
+//点赞
+export const contentLike = (data: any) => {
+    return request.post({ url: '/llm/xhs/content/like', data });
+};
+//取消点赞
+export const contentUnlike = (data: any) => {
+    return request.post({ url: '/llm/xhs/content/unlike', data });
+};

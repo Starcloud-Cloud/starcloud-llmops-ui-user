@@ -27,9 +27,9 @@ import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import './addModal.scss';
 import Announce from './announce';
-import { schemeMetadata } from 'api/redBook/copywriting';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { notificationCreate, notificationDetail, notificationModify, singleMetadata } from 'api/redBook/task';
-import Item from 'antd/es/list/Item';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const location = useLocation();
@@ -37,6 +37,7 @@ const AddModal = () => {
     const navigate = useNavigate();
     // 1.模板名称
     const [params, setParams] = useState<any>({});
+    const [value, setValue] = useState('');
     const [time, setTime] = useState<any>({});
     const [nameOpen, setNameOpen] = useState(false);
     const [platformOpen, setPlatformOpen] = useState(false);
@@ -98,6 +99,7 @@ const AddModal = () => {
         if (!searchParams.get('notificationUid')) {
             const result = await notificationCreate({
                 ...params,
+                description: value,
                 postingUnitPrice: undefined,
                 replyUnitPrice: undefined,
                 likeUnitPrice: undefined,
@@ -124,6 +126,7 @@ const AddModal = () => {
         } else {
             const result = await notificationModify({
                 ...params,
+                description: value,
                 postingUnitPrice: undefined,
                 replyUnitPrice: undefined,
                 likeUnitPrice: undefined,
@@ -174,6 +177,7 @@ const AddModal = () => {
                         ...res?.unitPrice,
                         unitPrice: undefined
                     });
+                    setValue(res?.description);
                 }
             });
         } else {
@@ -549,7 +553,8 @@ const AddModal = () => {
                                     <div className="text-[18px] font-[600] mb-[10px]">3. 通告说明</div>
                                     <Row gutter={20}>
                                         <Col span={24}>
-                                            <TextField
+                                            <ReactQuill className="h-[300px] mb-[60px]" theme="snow" value={value} onChange={setValue} />
+                                            {/* <TextField
                                                 sx={{ my: 2 }}
                                                 size="small"
                                                 color="secondary"
@@ -565,7 +570,7 @@ const AddModal = () => {
                                                 onChange={(e: any) => {
                                                     changeParams(e.target);
                                                 }}
-                                            />
+                                            /> */}
                                         </Col>
                                         <Col span={12}>
                                             <TextField

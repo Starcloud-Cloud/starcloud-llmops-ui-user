@@ -514,8 +514,8 @@ const BatcSmallRedBooks = () => {
                                     </Box>
                                 )}
                             >
-                                {mockData?.map((item) => (
-                                    <MenuItem key={item.uid} value={item.uid}>
+                                {mockData?.map((item, index) => (
+                                    <MenuItem key={index} value={item.uid}>
                                         {item.name}
                                     </MenuItem>
                                 ))}

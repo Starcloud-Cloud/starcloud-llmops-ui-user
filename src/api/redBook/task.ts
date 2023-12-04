@@ -21,6 +21,10 @@ export const notificationDetail = (data: any) => {
 export const notificationDelete = (data: any) => {
     return request.delete({ url: '/llm/notification/delete/' + data });
 };
+//批量删除
+export const bathDelete = (data: any) => {
+    return request.delete({ url: '/llm/single/batch/delete', data });
+};
 //发布取消任务
 export const notificationPublish = (data: any, publish: Boolean) => {
     return request.put({ url: '/llm/notification/publish/' + data + '?publish=' + publish });

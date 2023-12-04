@@ -29,7 +29,7 @@ import { DetailModal } from '../../redBookContentList/component/detailModal';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { singleDelete, singleRefresh, singleExport } from 'api/redBook/task';
+import { singleDelete, singleRefresh, singleExport, bathDelete } from 'api/redBook/task';
 import './addModal.scss';
 const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; singleMissionStatusEnumList: any[] }) => {
     const location = useLocation();
@@ -251,6 +251,25 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             setUids(selectedRowKeys);
         }
     };
+    const [delsOpen, setDelsOpen] = useState(false);
+    const handleDels = async () => {
+        const res = await bathDelete(uids);
+        if (res) {
+            setDelsOpen(false);
+            getList();
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '删除成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    close: false
+                })
+            );
+        }
+    };
     //删除
     const [uid, setUid] = useState('');
     const [executeOpen, setExecuteOpen] = useState(false);
@@ -368,9 +387,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             <div className="flex justify-end gap-2 my-[20px]">
                 <Button
                     disabled={uids?.length === 0}
-                    onClick={() => {
-                        console.log(uids);
-                    }}
+                    onClick={() => setDelsOpen(true)}
                     danger
                     icon={<DeleteOutlined rev={undefined} />}
                     type="primary"
@@ -765,6 +782,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
             {addOpen && <AddAnnounce addOpen={addOpen} setAddOpen={setAddOpen} />}
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
+            <Confirm open={delsOpen} handleClose={() => setDelsOpen(false)} handleOk={handleDels} />
         </div>
     );
 };

@@ -55,7 +55,7 @@ const headCells = [
     { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
-    { id: 'settlementCount', numeric: false, disablePadding: false, label: '完成数/领取数/待领取数/总任务数' },
+    { id: 'settlementCount', numeric: false, disablePadding: false, label: '结算数/用户发布数/领取数/待领取数/总任务数' },
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
@@ -312,7 +312,7 @@ const TaskCenter: React.FC = () => {
                                         {platformList?.filter((item) => item.value === row.platform)[0]?.label}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {categoryList?.filter((item) => item.value === row.field)[0]?.label}
+                                        <Tag color="blue">{categoryList?.filter((item) => item.code === row.field)[0]?.name}</Tag>
                                     </TableCell>
                                     <TableCell align="center">{handleTransfer(row.status)}</TableCell>
                                     <TableCell align="center">
@@ -329,7 +329,15 @@ const TaskCenter: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <div className="flex justify-center">
-                                            {row.settlementCount + '/' + row.claimCount + '/' + row.stayClaimCount + '/' + row.total}
+                                            {row.settlementCount +
+                                                '/' +
+                                                row.publishedCount +
+                                                '/' +
+                                                row.claimCount +
+                                                '/' +
+                                                row.stayClaimCount +
+                                                '/' +
+                                                row.total}
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

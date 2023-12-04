@@ -17,7 +17,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
 import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps } from 'antd';
-import { SearchOutlined, ExportOutlined } from '@ant-design/icons';
+import { SearchOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import formatDate from 'hooks/useDate';
@@ -197,10 +197,18 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
         }
     ];
     //计费明细
+    const [bilingLoading, setBilingLoading] = useState(false);
     const bilingDetail = async (uid: string) => {
-        const result = await singleRefresh(uid);
-        if (result) {
-            getList();
+        try {
+            setBilingLoading(true);
+            const result = await singleRefresh(uid);
+            setBilingLoading(false);
+            if (result) {
+                setEditOpen(false);
+                getList();
+            }
+        } catch (err) {
+            setBilingLoading(false);
         }
     };
     const [tableData, setTableData] = useState<any[]>([]);
@@ -236,6 +244,13 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             getList();
         }
     }, [addOpen, pageNo, pageSize]);
+    //多选
+    const [uids, setUids] = useState<React.Key[]>([]);
+    const rowSelection = {
+        onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+            setUids(selectedRowKeys);
+        }
+    };
     //删除
     const [uid, setUid] = useState('');
     const [executeOpen, setExecuteOpen] = useState(false);
@@ -352,6 +367,17 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             </Row>
             <div className="flex justify-end gap-2 my-[20px]">
                 <Button
+                    disabled={uids?.length === 0}
+                    onClick={() => {
+                        console.log(uids);
+                    }}
+                    danger
+                    icon={<DeleteOutlined rev={undefined} />}
+                    type="primary"
+                >
+                    批量删除
+                </Button>
+                <Button
                     disabled={!searchParams.get('notificationUid') || status === 'published'}
                     onClick={() => {
                         setAddOpen(true);
@@ -379,7 +405,11 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                 </Button>
             </div>
             <Table
+                rowKey={'uid'}
                 size="small"
+                rowSelection={{
+                    ...rowSelection
+                }}
                 columns={columns}
                 dataSource={tableData}
                 pagination={{
@@ -414,10 +444,10 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     <CardContent sx={{ width: '100%' }}>
                         <Steps
                             className="mb-[20px]"
-                            current={statusList.findIndex((item) => item.value === editData.status)}
+                            current={singleMissionStatusEnumList.findIndex((item) => item.value === editData.status)}
                             size="small"
                             progressDot
-                            items={statusList.map((item: any) => {
+                            items={singleMissionStatusEnumList.map((item: any) => {
                                 return {
                                     title: item.label
                                 };
@@ -428,7 +458,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                 <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
                                     <InputLabel id="status">状态</InputLabel>
                                     <Select labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
-                                        {statusList.map((item: any) => (
+                                        {singleMissionStatusEnumList.map((item: any) => (
                                             <MenuItem disabled={item.value === 'init'} key={item.value} value={item.value}>
                                                 {item.label}
                                             </MenuItem>
@@ -515,18 +545,35 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                 editData.status === 'pre_settlement' ||
                                 editData.status === 'settlement') && (
                                 <Col span={24}>
-                                    <TextField
-                                        sx={{ mb: 2 }}
-                                        disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
-                                        size="small"
-                                        color="secondary"
-                                        fullWidth
-                                        InputLabelProps={{ shrink: true }}
-                                        label="发布链接"
-                                        name="publishUrl"
-                                        value={editData.publishUrl}
-                                        onChange={handleEdit}
-                                    />
+                                    <div className="flex mb-[16px] items-center">
+                                        <TextField
+                                            disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                            size="small"
+                                            color="secondary"
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            label="发布链接"
+                                            name="publishUrl"
+                                            value={editData.publishUrl}
+                                            onChange={handleEdit}
+                                        />
+                                        <Button
+                                            disabled={
+                                                !editData.publishUrl &&
+                                                (editData.status !== 'published' ||
+                                                    editData.status !== 'pre_settlement' ||
+                                                    editData.status !== 'pre_settlement_error')
+                                            }
+                                            onClick={() => {
+                                                bilingDetail(editData?.uid);
+                                            }}
+                                            loading={bilingLoading}
+                                            className="ml-[10px]"
+                                            type="primary"
+                                        >
+                                            更新互动数据
+                                        </Button>
+                                    </div>
                                 </Col>
                             )}
                             {(editData.status === 'published' || editData.status === 'settlement') && (
@@ -569,6 +616,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                         InputLabelProps={{ shrink: true }}
                                         label="点赞数"
                                         name="likedCount"
+                                        defaultValue={0}
                                         value={editData.likedCount}
                                         onChange={handleEdit}
                                     />
@@ -583,6 +631,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                         color="secondary"
                                         fullWidth
                                         InputLabelProps={{ shrink: true }}
+                                        defaultValue={0}
                                         label="评论数"
                                         name="commentCount"
                                         value={editData.commentCount}
@@ -622,6 +671,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                         color="secondary"
                                         fullWidth
                                         InputLabelProps={{ shrink: true }}
+                                        helperText="点击保存，自动计算预计花费"
                                         label="预计花费"
                                         name="estimatedAmount"
                                         value={editData.estimatedAmount}

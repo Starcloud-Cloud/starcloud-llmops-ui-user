@@ -3,6 +3,7 @@ import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import Swipers from './components/swiper';
 import formatDate from 'hooks/useDate';
 import imgLoading from 'assets/images/picture/loading.gif';
+import { contentLike, contentUnlike } from 'api/redBook/batchIndex';
 const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
     //执行按钮
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
@@ -108,14 +109,12 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                 >
                     <div className="flex justify-between items-start">
                         <div className="line-clamp-2 h-[37px] text-[14px] font-bold">{item.copyWritingTitle}</div>
-                        {/* <div>
-                            <GradeOutlinedIcon
-                                onClick={(e: any) => {
-                                    e.stopPropagation();
-                                }}
-                                sx={{ color: '#0003' }}
-                            />
-                        </div> */}
+                        <GradeOutlinedIcon
+                            onClick={(e: any) => {
+                                e.stopPropagation();
+                            }}
+                            sx={{ color: '#0003' }}
+                        />
                     </div>
                     <Popover
                         content={

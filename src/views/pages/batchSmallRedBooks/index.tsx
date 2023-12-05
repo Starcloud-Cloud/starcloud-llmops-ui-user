@@ -68,6 +68,8 @@ const BatcSmallRedBooks = () => {
                     obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
                 });
                 variableRef.current = obj;
+                console.log(variableRef.current);
+
                 setVariables(variableRef.current);
             } else {
                 setPerform(preform + 1);
@@ -366,10 +368,7 @@ const BatcSmallRedBooks = () => {
             setErrorCount(res.errorCount);
             const newList = _.cloneDeep(plabListRef.current);
             newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
-            console.log(newList);
             plabListRef.current = newList;
-            console.log(plabListRef.current);
-
             setPlanList(plabListRef.current);
         });
     };
@@ -509,7 +508,11 @@ const BatcSmallRedBooks = () => {
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value, i) => (
-                                            <Chip size="small" key={value} label={mockData.filter((item) => item.uid === value)[0]?.name} />
+                                            <Chip
+                                                size="small"
+                                                key={value + '1'}
+                                                label={mockData.filter((item) => item.uid === value)[0]?.name}
+                                            />
                                         ))}
                                     </Box>
                                 )}
@@ -529,7 +532,7 @@ const BatcSmallRedBooks = () => {
                                 <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
                                 {variables &&
                                     Object.keys(variables)?.map((item) => (
-                                        <div key={item}>
+                                        <div key={item + '2'}>
                                             <div className="text-[14px] font-[600] mt-[10px]">
                                                 {mockData?.filter((val) => val?.uid === item)[0]?.name}
                                                 <span
@@ -545,7 +548,7 @@ const BatcSmallRedBooks = () => {
                                             </div>
                                             {variables[item]?.map((el: any, i: number) => (
                                                 <Form
-                                                    key={JSON.stringify(item)}
+                                                    key={JSON.stringify(item) + '3'}
                                                     item={el}
                                                     index={i}
                                                     changeValue={(data: any) => {

@@ -59,6 +59,7 @@ const headCells = [
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '单价' },
     { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
+    { id: 'createUser', numeric: false, disablePadding: false, label: '创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -358,6 +359,7 @@ const TaskCenter: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">{row.singleBudget}</TableCell>
                                     <TableCell align="center">{row.notificationBudget}</TableCell>
+                                    <TableCell align="center">{row.createUser}</TableCell>
                                     <TableCell align="center">
                                         <div className="flex flex-col items-center">
                                             <span> {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD')}</span>

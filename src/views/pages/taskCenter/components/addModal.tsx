@@ -603,7 +603,7 @@ const AddModal = () => {
                             )
                         },
                         {
-                            label: '绑定通告任务',
+                            label: '通告任务',
                             key: '2',
                             children: <Announce singleMissionStatusEnumList={singleMissionStatusEnumList} status={params.status} />
                         }

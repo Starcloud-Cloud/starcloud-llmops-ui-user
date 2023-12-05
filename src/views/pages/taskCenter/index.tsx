@@ -1,17 +1,30 @@
 import { Button, Tooltip } from '@mui/material';
-import { Tag } from 'antd';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
+import { Tag, Popover } from 'antd';
+import {
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TableSortLabel,
+    IconButton
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
 import AddIcon from '@mui/icons-material/Add';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNavigate } from 'react-router-dom';
 import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { notificationPage, notificationDelete, notificationPublish, singleMetadata } from 'api/redBook/task';
+import copy from 'clipboard-copy';
 
 export interface DraftConfig {}
 
@@ -49,15 +62,15 @@ export interface TableEnhancedCreateDataType {
 const headCells = [
     { id: 'uid', numeric: false, disablePadding: false, label: 'ID' },
     { id: 'title', numeric: false, disablePadding: false, label: '通告名称' },
-    { id: 'type', numeric: false, disablePadding: false, label: '通告类型' },
     { id: 'platform', numeric: false, disablePadding: false, label: '发布平台' },
+    { id: 'type', numeric: false, disablePadding: false, label: '通告类型' },
     { id: 'field', numeric: false, disablePadding: false, label: '通告类目' },
     { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
     { id: 'settlementCount', numeric: false, disablePadding: false, label: '结算数/用户发布数/领取数/待领取数/总任务数' },
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '单价' },
-    { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务预算' },
+    { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务最大预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
     { id: 'createUser', numeric: false, disablePadding: false, label: '创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -300,17 +313,54 @@ const TaskCenter: React.FC = () => {
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell align="center">{row.uid}</TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center">
+                                            <Popover
+                                                content={
+                                                    <div>
+                                                        <div>{row.uid}</div>
+                                                    </div>
+                                                }
+                                                title="内容ID"
+                                            >
+                                                <div className="line-clamp-1 w-[100px] break-words cursor-pointer">{row.uid}</div>
+                                            </Popover>
+                                            <Tooltip title={'复制'}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        copy(row.uid);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '复制成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                transition: 'SlideLeft'
+                                                            })
+                                                        );
+                                                    }}
+                                                >
+                                                    <ContentCopyIcon className="text-base" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </div>
+                                    </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex items-center justify-center">{row.type === 'posting' ? '发帖' : row.type}</div>
-                                    </TableCell>
                                     <TableCell align="center" className="w-[100px]">
                                         {platformList?.filter((item) => item.value === row.platform)[0]?.label}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <div className="flex items-center justify-center">{row.type === 'posting' ? '发帖' : row.type}</div>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tag color="blue">{categoryList?.filter((item) => item.code === row.field)[0]?.name}</Tag>
@@ -329,16 +379,27 @@ const TaskCenter: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="flex justify-center">
-                                            {row.settlementCount +
-                                                '/' +
-                                                row.publishedCount +
-                                                '/' +
-                                                row.claimCount +
-                                                '/' +
-                                                row.stayClaimCount +
-                                                '/' +
-                                                row.total}
+                                        <div className="text-center">
+                                            <div>
+                                                结算数：
+                                                {row.settlementCount}
+                                            </div>
+                                            <div>
+                                                用户发布数：
+                                                {row.publishedCount}
+                                            </div>
+                                            <div>
+                                                领取数：
+                                                {row.claimCount}
+                                            </div>
+                                            <div>
+                                                待领取数：
+                                                {row.stayClaimCount}
+                                            </div>
+                                            <div>
+                                                总任务数：
+                                                {row.total}
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">

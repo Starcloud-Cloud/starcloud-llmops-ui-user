@@ -36,7 +36,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm, Spin } from 'antd';
+import { UploadProps, Upload, Table, Button, Divider, Tabs, Popover, Image, TreeSelect, Input, Popconfirm, Spin, Modal } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -305,17 +305,62 @@ const AddModal = () => {
     const testColumn: ColumnsType<any> = [
         {
             title: '标题',
-            dataIndex: 'title'
+            render: (_, row, index) => <span>{row?.copyWriting?.title}</span>
         },
         {
             title: '内容',
-            width: '60%',
-            dataIndex: 'content'
+            render: (_, row) => <span>{row?.copyWriting?.content}</span>
+        },
+        {
+            title: '图片标题',
+            render: (_, row) => <span>{row?.copyWriting?.imgTitle}</span>
+        },
+        {
+            title: '图片副标题',
+            render: (_, row) => <span>{row?.copyWriting?.imgSubTitle}</span>
+        },
+        {
+            title: '图片内容',
+            render: (_, row) => (
+                <div>
+                    {row?.images?.map((item: any) => (
+                        <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
+                    ))}
+                </div>
+            )
         }
     ];
+    //测试
     const [testOpen, setTestOpen] = useState(false);
     const [testTableList, setTestTableList] = useState<any[]>([]);
     const [linkLoading, setLinkLoading] = useState(false);
+    //测试图片上传
+    const [imageOpen, setImageOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [testImageList, setTestImageList] = useState<any[]>([]);
+    const testProps: UploadProps = {
+        name: 'image',
+        listType: 'picture-card',
+        multiple: true,
+        fileList: testImageList,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 20,
+        onChange(info) {
+            console.log(info);
+
+            setTestImageList(info.fileList);
+        },
+        onPreview: (file) => {
+            setPreviewImage(file?.response?.data?.url);
+            setImageOpen(true);
+        },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        }
+    };
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -1060,6 +1105,20 @@ const AddModal = () => {
                     ]}
                     onChange={onChange}
                 />
+                <div className="text-[18px] my-[20px] font-[600]">测试上传图片</div>
+                <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                    <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
+                        <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                    </Modal>
+                    <div>
+                        <Upload {...testProps}>
+                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                <PlusOutlined rev={undefined} />
+                                <div style={{ marginTop: 8 }}>Upload</div>
+                            </div>
+                        </Upload>
+                    </div>
+                </div>
                 <Button
                     onClick={() => {
                         if (!params.name) {
@@ -1134,6 +1193,20 @@ const AddModal = () => {
                             );
                             return false;
                         }
+                        if (!testImageList || testImageList.length === 0) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '没有上传图片',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    close: false
+                                })
+                            );
+                            return false;
+                        }
                         setTestOpen(true);
                         try {
                             schemeExample({
@@ -1149,7 +1222,16 @@ const AddModal = () => {
                                     imageTemplate: {
                                         styleList: imageStyleData
                                     }
-                                }
+                                },
+                                useImages: testImageList
+                                    ?.map((item: any, i: number) => {
+                                        if (item?.response?.data?.url) {
+                                            return item?.response?.data?.url;
+                                        } else {
+                                            return undefined;
+                                        }
+                                    })
+                                    ?.filter((item) => item)
                             })
                                 .then((res) => {
                                     setTestOpen(false);

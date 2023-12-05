@@ -598,40 +598,12 @@ const AddModal = () => {
                                                                     );
                                                                     return false;
                                                                 }
-                                                                if (
-                                                                    imageStyleData
-                                                                        ?.map((i) => i?.templateList?.some((item: any) => !item.id))
-                                                                        ?.some((el) => el)
-                                                                ) {
-                                                                    dispatch(
-                                                                        openSnackbar({
-                                                                            open: true,
-                                                                            message: '图片生成模板风格必选',
-                                                                            variant: 'alert',
-                                                                            alert: {
-                                                                                color: 'error'
-                                                                            },
-                                                                            close: false
-                                                                        })
-                                                                    );
-                                                                    return false;
-                                                                }
                                                                 setButtonLoading(true);
                                                                 setValueLoading(true);
                                                                 const result: any = await schemeDemand({
                                                                     ...params,
                                                                     type: params.type ? 'SYSTEM' : 'USER',
-                                                                    refers: tableData,
-                                                                    configuration: {
-                                                                        copyWritingTemplate: {
-                                                                            ...copyWritingTemplate,
-                                                                            example: testTableList,
-                                                                            variables: rows
-                                                                        },
-                                                                        imageTemplate: {
-                                                                            styleList: imageStyleData
-                                                                        }
-                                                                    }
+                                                                    refers: tableData
                                                                 });
                                                                 const reader = result.getReader();
                                                                 const textDecoder = new TextDecoder();

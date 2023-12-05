@@ -1,10 +1,15 @@
 import { Image, Skeleton, Popover } from 'antd';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
+import GradeIcon from '@mui/icons-material/Grade';
 import Swipers from './components/swiper';
 import formatDate from 'hooks/useDate';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { contentLike, contentUnlike } from 'api/redBook/batchIndex';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { useState, memo } from 'react';
 const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
+    const [likeOpen, setLikeOpen] = useState(item?.liked);
     //执行按钮
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
@@ -109,12 +114,51 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                 >
                     <div className="flex justify-between items-start">
                         <div className="line-clamp-2 h-[37px] text-[14px] font-bold">{item.copyWritingTitle}</div>
-                        <GradeOutlinedIcon
-                            onClick={(e: any) => {
-                                e.stopPropagation();
-                            }}
-                            sx={{ color: '#0003' }}
-                        />
+                        {likeOpen ? (
+                            <GradeIcon
+                                onClick={async (e: any) => {
+                                    e.stopPropagation();
+                                    const result = await contentUnlike({ businessUid: item.businessUid });
+                                    if (result) {
+                                        setLikeOpen(false);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '取消点赞成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                    }
+                                }}
+                                sx={{ color: '#ecc94b99' }}
+                            />
+                        ) : (
+                            <GradeOutlinedIcon
+                                onClick={async (e: any) => {
+                                    e.stopPropagation();
+                                    const result = await contentLike({ businessUid: item.businessUid });
+                                    if (result) {
+                                        setLikeOpen(true);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '点赞成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                close: false
+                                            })
+                                        );
+                                    }
+                                }}
+                                sx={{ color: '#0003' }}
+                            />
+                        )}
                     </div>
                     <Popover
                         content={
@@ -173,4 +217,9 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
         </div>
     );
 };
-export default Goods;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    console.log(JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item));
+
+    return JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item);
+};
+export default memo(Goods, arePropsEqual);

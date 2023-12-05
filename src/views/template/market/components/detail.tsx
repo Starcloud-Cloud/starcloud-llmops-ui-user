@@ -50,8 +50,8 @@ function Deatail() {
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo');
-    const aimodeRef = useRef('gpt-3.5-turbo');
+    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo-16k');
+    const aimodeRef = useRef('gpt-3.5-turbo-16k');
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译

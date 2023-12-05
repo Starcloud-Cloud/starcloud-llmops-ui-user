@@ -42,8 +42,9 @@ import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 import ImageDetail from 'views/picture/components/detail';
-import DetailErr from '../../../ui-component/detailErr';
+import Echarts from './components/echart';
 import useUserStore from 'store/user';
+import { Charts } from 'types/chat';
 interface LogStatistics {
     createDate: string;
     completionCostPoints: number;
@@ -54,14 +55,6 @@ interface LogStatistics {
     chatTokens: number;
     imageSuccessCount: number;
     completionSuccessCount: number;
-}
-interface Charts {
-    title: string;
-    data: { x: string; y: string | number }[];
-    key?: boolean;
-    name?: string;
-    subTitle?: string;
-    successData?: { x: string; y: string | number }[];
 }
 interface TableData {
     uid: string;
@@ -89,6 +82,7 @@ interface Date {
 }
 interface Query {
     appName?: string;
+    userId?: string;
     timeType?: string;
     appMode?: string;
     fromScene?: string;
@@ -383,6 +377,17 @@ function ApplicationAnalysis({
                             />
                         </Grid>
                         <Grid item md={4} lg={3} xs={12}>
+                            <TextField
+                                label={'用户 ID'}
+                                value={queryParams.userId}
+                                name="userId"
+                                type="search"
+                                InputLabelProps={{ shrink: true }}
+                                onChange={handleChange}
+                                fullWidth
+                            />
+                        </Grid>
+                        <Grid item md={4} lg={3} xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel id="appMode">模式</InputLabel>
                                 <Select
@@ -435,18 +440,7 @@ function ApplicationAnalysis({
                     </Button>
                 </Grid>
             </Grid>
-            <Grid container spacing={2}>
-                {generate.map((item) => (
-                    <Grid item md={6} xs={12} key={item.title}>
-                        <SubCard sx={{ pb: 0 }}>
-                            <Typography variant="h4" gutterBottom>
-                                {item.title}
-                            </Typography>
-                            {item.key ? <Chart {...list(item, true)} /> : <Chart {...list(item)} />}
-                        </SubCard>
-                    </Grid>
-                ))}
-            </Grid>
+            <Echarts generate={generate} list={list} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>

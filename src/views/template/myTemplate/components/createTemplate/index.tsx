@@ -83,7 +83,7 @@ function CreateDetail() {
     const [tokenOpen, setTokenOpen] = useState(false);
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModel, setAiModel] = useState('gpt-3.5-turbo');
+    const [aiModel, setAiModel] = useState('gpt-3.5-turbo-16k');
     //判断是保存还是切换tabs
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;

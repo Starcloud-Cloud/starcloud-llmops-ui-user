@@ -21,3 +21,11 @@ export interface ChatStateProps {
     users: UserProfile[];
     error: object | string | null;
 }
+export interface Charts {
+    title: string;
+    data: { x: string; y: string | number }[];
+    key?: boolean;
+    name?: string;
+    subTitle?: string;
+    successData?: { x: string; y: string | number }[];
+}

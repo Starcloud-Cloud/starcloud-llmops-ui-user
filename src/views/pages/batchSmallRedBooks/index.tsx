@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
-import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
 import type { RadioChangeEvent } from 'antd';
@@ -15,11 +14,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import Form from '../smallRedBook/components/form';
-import imgLoading from 'assets/images/picture/loading.gif';
 import { DetailModal } from '../redBookContentList/component/detailModal';
-import Swipers from './components/swiper';
-import formatDate from 'hooks/useDate';
-import copy from 'clipboard-copy';
 import './index.scss';
 import Goods from './good';
 const BatcSmallRedBooks = () => {

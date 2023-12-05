@@ -181,7 +181,7 @@ export const modifyLimit = (data: any) => {
 };
 // 获取图片模板列表
 export const imageTemplates = () => {
-    return request.get({ url: `/llm/app/xhs/imageTemplates` });
+    return request.get({ url: `/llm/creative/scheme/templates` });
 };
 // 获取应用信息
 export const xhsApp = (uid: any) => {

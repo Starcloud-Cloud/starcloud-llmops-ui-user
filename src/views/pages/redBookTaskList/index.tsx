@@ -476,6 +476,8 @@ const RedBookTaskList: React.FC = () => {
                 </Grid>
                 <Grid item md={3}>
                     <RangePicker
+                        className="bg-[#f8fafc] w-full"
+                        placeholder={['创建开始时间', '创建结束时间']}
                         value={query.createTime}
                         onChange={(day, days) => {
                             setQuery({

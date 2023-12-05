@@ -78,6 +78,12 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                         关闭
                     </Tag>
                 );
+            case 'pre_settlement_error':
+                return (
+                    <Tag className="!mr-0" color="error">
+                        预结算异常
+                    </Tag>
+                );
             case 'settlement_error':
                 return (
                     <Tag className="!mr-0" color="error">
@@ -218,16 +224,6 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
     const [total, setTotal] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
-    const statusList = [
-        { label: '待发布', value: 'init' },
-        { label: '待认领', value: 'stay_claim' },
-        { label: '已认领', value: 'claimed' },
-        { label: '用户已发布', value: 'published' },
-        { label: '预结算', value: 'pre_settlement' },
-        { label: '结算', value: 'settlement' },
-        { label: '关闭', value: 'close' },
-        { label: '结算异常', value: 'settlement_error' }
-    ];
     const handleChange = (e: any) => {
         setQuery({
             ...query,
@@ -314,64 +310,68 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
     const [businessUid, setBusinessUid] = useState<string>('');
     return (
         <div>
-            <Row gutter={20} align-items="center">
-                <Col span={6}>
-                    <FormControl key={query.status} color="secondary" size="small" fullWidth>
-                        <InputLabel id="status">任务状态</InputLabel>
-                        <Select
-                            labelId="status"
-                            name="status"
-                            endAdornment={
-                                query.status && (
-                                    <InputAdornment className="mr-[10px]" position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                handleChange({ target: { name: 'status', value: '' } });
-                                            }}
-                                        >
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }
-                            value={query.status}
-                            label="任务状态"
-                            onChange={handleChange}
-                        >
-                            {singleMissionStatusEnumList.map((item: any) => (
-                                <MenuItem key={item.value} value={item.value}>
-                                    {item.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Col>
-                <Col span={6}>
-                    <TextField
-                        size="small"
-                        color="secondary"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label="认领人 ID"
-                        name="claimUserId"
-                        value={query.claimUserId}
-                        onChange={handleChange}
-                    />
-                </Col>
-                <Col span={6}>
-                    <TextField
-                        size="small"
-                        color="secondary"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        label="认领人"
-                        name="claimUsername"
-                        value={query.claimUsername}
-                        onChange={handleChange}
-                    />
-                </Col>
-                <Col>
+            <div className="flex justify-between gap-2 my-[20px]">
+                <div className="flex-1">
+                    <Row gutter={20} align-items="center">
+                        <Col xl={4} lg={8}>
+                            <FormControl key={query.status} color="secondary" size="small" fullWidth>
+                                <InputLabel id="status">任务状态</InputLabel>
+                                <Select
+                                    labelId="status"
+                                    name="status"
+                                    endAdornment={
+                                        query.status && (
+                                            <InputAdornment className="mr-[10px]" position="end">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => {
+                                                        handleChange({ target: { name: 'status', value: '' } });
+                                                    }}
+                                                >
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }
+                                    value={query.status}
+                                    label="任务状态"
+                                    onChange={handleChange}
+                                >
+                                    {singleMissionStatusEnumList.map((item: any) => (
+                                        <MenuItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Col>
+                        <Col xl={4} lg={8}>
+                            <TextField
+                                size="small"
+                                color="secondary"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label="认领人 ID"
+                                name="claimUserId"
+                                value={query.claimUserId}
+                                onChange={handleChange}
+                            />
+                        </Col>
+                        <Col xl={4} lg={8}>
+                            <TextField
+                                size="small"
+                                color="secondary"
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                label="认领人"
+                                name="claimUsername"
+                                value={query.claimUsername}
+                                onChange={handleChange}
+                            />
+                        </Col>
+                    </Row>
+                </div>
+                <div className="flex items-center gap-2">
                     <Button
                         type="primary"
                         disabled={!searchParams.get('notificationUid')}
@@ -382,44 +382,42 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     >
                         搜索
                     </Button>
-                </Col>
-            </Row>
-            <div className="flex justify-end gap-2 my-[20px]">
-                <Button
-                    disabled={uids?.length === 0}
-                    onClick={() => setDelsOpen(true)}
-                    danger
-                    icon={<DeleteOutlined rev={undefined} />}
-                    type="primary"
-                >
-                    批量删除
-                </Button>
-                <Button
-                    disabled={!searchParams.get('notificationUid') || status === 'published'}
-                    onClick={() => {
-                        setAddOpen(true);
-                    }}
-                    type="primary"
-                >
-                    绑定创作计划
-                </Button>
-                <Button
-                    disabled={tableData.length === 0}
-                    onClick={async () => {
-                        const res = await singleExport({ ...query, notificationUid: searchParams.get('notificationUid') });
-                        if (res) {
-                            console.log(res);
-                            const link = document.createElement('a');
-                            link.href = window.URL.createObjectURL(res);
-                            link.download = '绑定通告任务列表.xls';
-                            link.click();
-                        }
-                    }}
-                    type="primary"
-                    icon={<ExportOutlined rev={undefined} />}
-                >
-                    导出
-                </Button>
+                    <Button
+                        disabled={uids?.length === 0}
+                        onClick={() => setDelsOpen(true)}
+                        danger
+                        icon={<DeleteOutlined rev={undefined} />}
+                        type="primary"
+                    >
+                        批量删除
+                    </Button>
+                    <Button
+                        disabled={!searchParams.get('notificationUid') || status === 'published'}
+                        onClick={() => {
+                            setAddOpen(true);
+                        }}
+                        type="primary"
+                    >
+                        绑定创作计划
+                    </Button>
+                    <Button
+                        disabled={tableData.length === 0}
+                        onClick={async () => {
+                            const res = await singleExport({ ...query, notificationUid: searchParams.get('notificationUid') });
+                            if (res) {
+                                console.log(res);
+                                const link = document.createElement('a');
+                                link.href = window.URL.createObjectURL(res);
+                                link.download = '绑定通告任务列表.xls';
+                                link.click();
+                            }
+                        }}
+                        type="primary"
+                        icon={<ExportOutlined rev={undefined} />}
+                    >
+                        导出
+                    </Button>
+                </div>
             </div>
             <Table
                 rowKey={'uid'}

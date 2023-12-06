@@ -399,7 +399,7 @@ const RedBookTaskList: React.FC = () => {
             // }
         >
             <Grid container sx={{ my: 2 }} spacing={2}>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <TextField
                         fullWidth
                         size="small"
@@ -413,7 +413,7 @@ const RedBookTaskList: React.FC = () => {
                         }}
                     />
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <FormControl key={query.type} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">渠道</InputLabel>
                         <Select
@@ -441,7 +441,7 @@ const RedBookTaskList: React.FC = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <FormControl key={query.status} color="secondary" size="small" fullWidth>
                         <InputLabel id="statuss">状态</InputLabel>
                         <Select
@@ -474,7 +474,7 @@ const RedBookTaskList: React.FC = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <RangePicker
                         className="bg-[#f8fafc] w-full"
                         placeholder={['创建开始时间', '创建结束时间']}
@@ -488,7 +488,7 @@ const RedBookTaskList: React.FC = () => {
                         size="large"
                     />
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <Button variant="contained" color="secondary" onClick={forceUpdate}>
                         搜索
                     </Button>

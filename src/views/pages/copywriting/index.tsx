@@ -312,7 +312,7 @@ const Copywriting: React.FC = () => {
             }
         >
             <Grid sx={{ my: 2, ml: 2 }} container spacing={2}>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <TextField
                         fullWidth
                         size="small"
@@ -326,7 +326,7 @@ const Copywriting: React.FC = () => {
                         }}
                     />
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <FormControl key={query.category} color="secondary" size="small" fullWidth>
                         <InputLabel id="fields">发布类目</InputLabel>
                         <Select
@@ -358,7 +358,7 @@ const Copywriting: React.FC = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <FormControl key={query.tags} color="secondary" size="small" fullWidth>
                         <Autocomplete
                             multiple
@@ -385,7 +385,7 @@ const Copywriting: React.FC = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid item md={3}>
+                <Grid item xl={2} md={3}>
                     <Button
                         variant="contained"
                         color="secondary"

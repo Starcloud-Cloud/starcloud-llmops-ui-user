@@ -270,6 +270,19 @@ const AddModal = () => {
                         description: res.description
                     });
                     setTableData(res.refers);
+                    setTestImageList(
+                        res.useImages?.map((item: any) => {
+                            return {
+                                uid: uuidv4(),
+                                thumbUrl: item,
+                                response: {
+                                    data: {
+                                        url: item
+                                    }
+                                }
+                            };
+                        })
+                    );
                     setTestTableList(res.configuration.copyWritingTemplate.example);
                     setCopyWritingTemplate(res.configuration.copyWritingTemplate);
                     setImageStyleData(res.configuration.imageTemplate.styleList);
@@ -322,7 +335,7 @@ const AddModal = () => {
         {
             title: '图片内容',
             render: (_, row) => (
-                <div>
+                <div className="flex gap-2">
                     {row?.images?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}

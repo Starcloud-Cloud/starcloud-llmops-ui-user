@@ -9,6 +9,8 @@ import { useLocation } from 'react-router-dom';
 import { planPage } from 'api/redBook/batchIndex';
 import { contentPage, singleAdd } from 'api/redBook/task';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
+import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
+import GradeIcon from '@mui/icons-material/Grade';
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -17,7 +19,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
     const addColumn: ColumnsType<any> = [
         {
             title: '文案标题',
-            width: 300,
+            width: '30%',
             render: (_, row) => (
                 <span
                     className="hover:text-[#673ab7] cursor-pointer"
@@ -32,9 +34,11 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         },
         {
             title: '喜欢',
+            width: 100,
+            align: 'center',
             render: (_, row) => (
                 <div className="line-clamp-3">
-                    {row.liked ? <Tag color="success">已点亮喜欢</Tag> : <Tag color="blue">未点亮为喜欢</Tag>}
+                    {row.liked ? <GradeIcon sx={{ color: '#ecc94b99' }} /> : <GradeOutlinedIcon sx={{ color: '#0003' }} />}
                 </div>
             )
         },

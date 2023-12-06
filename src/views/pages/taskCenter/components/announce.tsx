@@ -126,6 +126,16 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
+            title: '互动数据',
+            width: 110,
+            render: (_, row) => (
+                <div>
+                    <div>点赞数：{row?.likedCount || 0}</div>
+                    <div>评论数：{row?.commentCount || 0}</div>
+                </div>
+            )
+        },
+        {
             title: '预估花费',
             dataIndex: 'estimatedAmount'
         },
@@ -313,7 +323,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             <div className="flex justify-between gap-2 my-[20px]">
                 <div className="flex-1">
                     <Row gutter={20} align-items="center">
-                        <Col xl={4} lg={8}>
+                        <Col span={6}>
                             <FormControl key={query.status} color="secondary" size="small" fullWidth>
                                 <InputLabel id="status">任务状态</InputLabel>
                                 <Select
@@ -345,7 +355,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                 </Select>
                             </FormControl>
                         </Col>
-                        <Col xl={4} lg={8}>
+                        <Col span={6}>
                             <TextField
                                 size="small"
                                 color="secondary"
@@ -357,7 +367,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                 onChange={handleChange}
                             />
                         </Col>
-                        <Col xl={4} lg={8}>
+                        <Col span={6}>
                             <TextField
                                 size="small"
                                 color="secondary"
@@ -369,19 +379,21 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                 onChange={handleChange}
                             />
                         </Col>
+                        <Col className="flex items-end" span={6}>
+                            <Button
+                                type="primary"
+                                disabled={!searchParams.get('notificationUid')}
+                                icon={<SearchOutlined rev={undefined} />}
+                                onClick={() => {
+                                    getList();
+                                }}
+                            >
+                                搜索
+                            </Button>
+                        </Col>
                     </Row>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button
-                        type="primary"
-                        disabled={!searchParams.get('notificationUid')}
-                        icon={<SearchOutlined rev={undefined} />}
-                        onClick={() => {
-                            getList();
-                        }}
-                    >
-                        搜索
-                    </Button>
+                <div className="flex items-end gap-2">
                     <Button
                         disabled={uids?.length === 0}
                         onClick={() => setDelsOpen(true)}
@@ -459,6 +471,12 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     <CardContent sx={{ width: '100%' }}>
                         <Steps
                             className="mb-[20px]"
+                            onChange={(value) => {
+                                setEditData({
+                                    ...editData,
+                                    status: singleMissionStatusEnumList[value].value
+                                });
+                            }}
                             current={singleMissionStatusEnumList.findIndex((item) => item.value === editData.status)}
                             size="small"
                             progressDot

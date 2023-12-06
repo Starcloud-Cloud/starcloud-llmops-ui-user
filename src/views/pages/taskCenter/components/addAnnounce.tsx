@@ -23,12 +23,22 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             render: (_, row) => <div className="line-clamp-3">{row.copyWritingContent}</div>
         },
         {
+            title: '喜欢',
+            render: (_, row) => (
+                <div className="line-clamp-3">
+                    {row.liked ? <Tag color="success">已点亮喜欢</Tag> : <Tag color="blue">未点亮为喜欢</Tag>}
+                </div>
+            )
+        },
+        {
             title: '图片数量',
+            align: 'center',
             width: 100,
             dataIndex: 'pictureNum'
         },
         {
             title: '图片内容',
+            align: 'center',
             dataIndex: 'pictureContent',
             render: (_, row) => (
                 <div className="flex flex-wrap">
@@ -119,9 +129,16 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         </Select>
                     </FormControl>
                     <br />
-                    <Button onClick={handleSave} className="mb-[20px]" disabled={businessUid?.length === 0} type="primary">
-                        确认选择
-                    </Button>
+                    <div className="flex justify-end mb-[20px]">
+                        <div className="flex items-center gap-2">
+                            <div className="text-[12px]">
+                                选中的数量：<span className="text-[#673ab7] font-bold">{businessUid?.length}</span>
+                            </div>
+                            <Button onClick={handleSave} disabled={businessUid?.length === 0} type="primary">
+                                确认选择
+                            </Button>
+                        </div>
+                    </div>
                     <Table
                         size="small"
                         columns={addColumn}

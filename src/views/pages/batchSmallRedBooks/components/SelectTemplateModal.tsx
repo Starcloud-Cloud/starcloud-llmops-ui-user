@@ -22,7 +22,7 @@ export const SelectTemplateModal = ({
     useEffect(() => {
         getImageTemplateTypes().then((res) => {
             const menus = res.map((item: any) => ({
-                label: item.name,
+                label: `${item.name}(${item.list.length})`,
                 value: item.id,
                 key: item.id,
                 list: item.list

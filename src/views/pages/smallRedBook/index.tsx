@@ -68,9 +68,9 @@ const SmallRedBook = () => {
         setDetaData(newData);
     };
     const getList = async () => {
-        imageTemplates().then((res) => {
-            setTypeList(res);
-        });
+        // imageTemplates().then((res) => {
+        //     setTypeList(res);
+        // });
         const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
         if (result) {
             setStyles(result[0].value);

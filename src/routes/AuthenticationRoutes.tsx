@@ -44,6 +44,7 @@ const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
 const PagesContactUS = Loadable(lazy(() => import('views/pages/contact-us')));
 const PagesFaqs = Loadable(lazy(() => import('views/pages/saas-pages/Faqs')));
 const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
+const PostTask = Loadable(lazy(() => import('views/pages/postTask')));
 // interface NavItemType {
 //     id: string;
 //     path: string;
@@ -198,6 +199,10 @@ const AuthenticationRoutes = {
         {
             path: '/pages/privacy-policy',
             element: <PagesPrivacyPolicy />
+        },
+        {
+            path: '/pages/post-task',
+            element: <PostTask />
         }
     ]
 };

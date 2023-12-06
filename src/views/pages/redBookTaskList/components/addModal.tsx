@@ -126,8 +126,8 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
             const result = await listMarketAppOption({ tagType: 'XIAO_HONG_SHU_WRITING' });
             setStyle(result[0]?.value);
             setStyleList(result);
-            const res = await imageTemplates();
-            setTypeList(res);
+            // const res = await imageTemplates();
+            // setTypeList(res);
         }
     };
     useEffect(() => {

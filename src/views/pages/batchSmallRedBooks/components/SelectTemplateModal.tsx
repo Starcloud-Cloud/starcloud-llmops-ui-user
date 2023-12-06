@@ -1,7 +1,7 @@
 import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import { Menu, MenuProps, Image } from 'antd';
+import { Menu, MenuProps, Image, Empty } from 'antd';
 import React, { useEffect } from 'react';
 import { getImageTemplateTypes } from 'api/template';
 
@@ -71,18 +71,24 @@ export const SelectTemplateModal = ({
                         <div className="w-[155px] overflow-y-auto h-[520px] pb-[30px]">
                             <Menu onClick={onClick} style={{ width: 150 }} selectedKeys={type} mode="inline" items={menuList} />
                         </div>
-                        <div className="grid grid-cols-4 gap-4 ml-3 overflow-y-auto h-[520px] flex-1 p-[3px] pb-[55px]">
-                            {templateList.map((v: any, i) => (
-                                <img
-                                    className={`h-auto max-w-full rounded-lg cursor-pointer ${
-                                        v.id === current && 'outline outline-offset-2 outline-1 outline-blue-500'
-                                    }`}
-                                    src={v.example}
-                                    key={i}
-                                    onClick={() => setCurrent(v.id)}
-                                />
-                            ))}
-                        </div>
+                        {templateList.length ? (
+                            <div className="grid grid-cols-4 gap-4 ml-3 overflow-y-auto h-[520px] flex-1 p-[3px] pb-[55px]">
+                                {templateList.map((v: any, i) => (
+                                    <img
+                                        className={`h-auto max-w-full rounded-lg cursor-pointer ${
+                                            v.id === current && 'outline outline-offset-2 outline-1 outline-blue-500'
+                                        }`}
+                                        src={v.example}
+                                        key={i}
+                                        onClick={() => setCurrent(v.id)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex justify-center items-center flex-1">
+                                <Empty />
+                            </div>
+                        )}
                     </div>
                 </CardContent>
                 <Divider />

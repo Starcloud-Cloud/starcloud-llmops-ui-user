@@ -247,8 +247,6 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
     );
 };
 const arePropsEqual = (prevProps: any, nextProps: any) => {
-    console.log(JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item));
-
     return JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item);
 };
 export default memo(Goods, arePropsEqual);

@@ -77,11 +77,11 @@ const AddModal = () => {
             !startTime ||
             !endTime ||
             !type ||
-            !postingUnitPrice ||
-            !replyUnitPrice ||
-            !likeUnitPrice ||
-            !singleBudget ||
-            !notificationBudget
+            (!postingUnitPrice && postingUnitPrice !== 0) ||
+            (!replyUnitPrice && replyUnitPrice !== 0) ||
+            (!likeUnitPrice && likeUnitPrice !== 0) ||
+            (!singleBudget && singleBudget !== 0) ||
+            (!notificationBudget && notificationBudget !== 0)
         ) {
             setNameOpen(true);
             setPlatformOpen(true);
@@ -96,19 +96,20 @@ const AddModal = () => {
             setNotificationBudgetOpen(true);
             return false;
         }
+        const basis = {
+            ...params,
+            description: value,
+            postingUnitPrice: undefined,
+            replyUnitPrice: undefined,
+            likeUnitPrice: undefined,
+            unitPrice: {
+                postingUnitPrice: params.postingUnitPrice,
+                replyUnitPrice: params.replyUnitPrice,
+                likeUnitPrice: params.likeUnitPrice
+            }
+        };
         if (!searchParams.get('notificationUid')) {
-            const result = await notificationCreate({
-                ...params,
-                description: value,
-                postingUnitPrice: undefined,
-                replyUnitPrice: undefined,
-                likeUnitPrice: undefined,
-                unitPrice: {
-                    postingUnitPrice: params.postingUnitPrice,
-                    replyUnitPrice: params.replyUnitPrice,
-                    likeUnitPrice: params.likeUnitPrice
-                }
-            });
+            const result = await notificationCreate(basis);
             if (result) {
                 dispatch(
                     openSnackbar({
@@ -124,18 +125,7 @@ const AddModal = () => {
                 navigate('/taskCenter');
             }
         } else {
-            const result = await notificationModify({
-                ...params,
-                description: value,
-                postingUnitPrice: undefined,
-                replyUnitPrice: undefined,
-                likeUnitPrice: undefined,
-                unitPrice: {
-                    postingUnitPrice: params.postingUnitPrice,
-                    replyUnitPrice: params.replyUnitPrice,
-                    likeUnitPrice: params.likeUnitPrice
-                }
-            });
+            const result = await notificationModify(basis);
             if (result) {
                 dispatch(
                     openSnackbar({
@@ -181,7 +171,14 @@ const AddModal = () => {
                 }
             });
         } else {
-            setParams({ type: 'posting' });
+            setParams({
+                type: 'posting',
+                postingUnitPrice: 0,
+                replyUnitPrice: 0,
+                likeUnitPrice: 0,
+                singleBudget: 0,
+                notificationBudget: 0
+            });
         }
     }, []);
     //tabs
@@ -447,8 +444,12 @@ const AddModal = () => {
                                                 type="number"
                                                 name="postingUnitPrice"
                                                 value={params.postingUnitPrice}
-                                                error={!params.postingUnitPrice && postingUnitPriceOpen}
-                                                helperText={!params.postingUnitPrice && postingUnitPriceOpen ? '发帖单价必填' : ''}
+                                                error={!params.postingUnitPrice && params.postingUnitPrice !== 0 && postingUnitPriceOpen}
+                                                helperText={
+                                                    !params.postingUnitPrice && params.postingUnitPrice !== 0 && postingUnitPriceOpen
+                                                        ? '发帖单价必填'
+                                                        : ''
+                                                }
                                                 onChange={(e) => {
                                                     setPostingUnitPriceOpen(true);
                                                     if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
@@ -471,8 +472,12 @@ const AddModal = () => {
                                                 type="number"
                                                 name="replyUnitPrice"
                                                 value={params.replyUnitPrice}
-                                                error={!params.replyUnitPrice && replyUnitPriceOpen}
-                                                helperText={!params.replyUnitPrice && replyUnitPriceOpen ? '回复单价必填' : ''}
+                                                error={!params.replyUnitPrice && params.replyUnitPrice !== 0 && replyUnitPriceOpen}
+                                                helperText={
+                                                    !params.replyUnitPrice && params.replyUnitPrice !== 0 && replyUnitPriceOpen
+                                                        ? '回复单价必填'
+                                                        : ''
+                                                }
                                                 onChange={(e: any) => {
                                                     setReplyUnitPriceOpen(true);
                                                     if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
@@ -494,8 +499,12 @@ const AddModal = () => {
                                                 type="number"
                                                 name="likeUnitPrice"
                                                 value={params.likeUnitPrice}
-                                                error={!params.likeUnitPrice && likeUnitPriceOpen}
-                                                helperText={!params.likeUnitPrice && likeUnitPriceOpen ? '点赞单价必填' : ''}
+                                                error={!params.likeUnitPrice && params.likeUnitPrice !== 0 && likeUnitPriceOpen}
+                                                helperText={
+                                                    !params.likeUnitPrice && params.likeUnitPrice !== 0 && likeUnitPriceOpen
+                                                        ? '点赞单价必填'
+                                                        : ''
+                                                }
                                                 onChange={(e: any) => {
                                                     setLikeUnitPriceOpen(true);
                                                     if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
@@ -518,8 +527,12 @@ const AddModal = () => {
                                         type="number"
                                         name="singleBudget"
                                         value={params.singleBudget}
-                                        error={!params.singleBudget && singleBudgetOpen}
-                                        helperText={!params.singleBudget && singleBudgetOpen ? '单任务预算上限必填' : ''}
+                                        error={!params.singleBudget && params.singleBudget !== 0 && singleBudgetOpen}
+                                        helperText={
+                                            !params.singleBudget && params.singleBudget !== 0 && singleBudgetOpen
+                                                ? '单任务预算上限必填'
+                                                : ''
+                                        }
                                         onChange={(e: any) => {
                                             setSingleBudgetOpen(true);
                                             if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
@@ -540,8 +553,12 @@ const AddModal = () => {
                                         type="number"
                                         name="notificationBudget"
                                         value={params.notificationBudget}
-                                        error={!params.notificationBudget && notificationBudgetOpen}
-                                        helperText={!params.notificationBudget && notificationBudgetOpen ? '通告总预算必填' : ''}
+                                        error={!params.notificationBudget && params.notificationBudget !== 0 && notificationBudgetOpen}
+                                        helperText={
+                                            !params.notificationBudget && params.notificationBudget !== 0 && notificationBudgetOpen
+                                                ? '通告总预算必填'
+                                                : ''
+                                        }
                                         onChange={(e: any) => {
                                             setNotificationBudgetOpen(true);
                                             if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
@@ -554,23 +571,6 @@ const AddModal = () => {
                                     <Row gutter={20}>
                                         <Col span={24}>
                                             <ReactQuill className="h-[300px] mb-[60px]" theme="snow" value={value} onChange={setValue} />
-                                            {/* <TextField
-                                                sx={{ my: 2 }}
-                                                size="small"
-                                                color="secondary"
-                                                fullWidth
-                                                InputLabelProps={{ shrink: true }}
-                                                label="通告说明"
-                                                multiline
-                                                minRows={4}
-                                                maxRows={6}
-                                                type="number"
-                                                name="description"
-                                                value={params.description}
-                                                onChange={(e: any) => {
-                                                    changeParams(e.target);
-                                                }}
-                                            /> */}
                                         </Col>
                                         <Col span={12}>
                                             <TextField

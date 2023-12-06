@@ -68,9 +68,9 @@ const headCells = [
     { id: 'status', numeric: false, disablePadding: false, label: '通告状态' },
     { id: 'startTime', numeric: false, disablePadding: false, label: '通告开始时间' },
     { id: 'endTime', numeric: false, disablePadding: false, label: '通告结束时间' },
-    { id: 'settlementCount', numeric: false, disablePadding: false, label: '结算数/用户发布数/领取数/待领取数/总任务数' },
+    { id: 'settlementCount', numeric: false, disablePadding: false, label: '任务状态' },
     { id: 'postingUnitPrice', numeric: false, disablePadding: false, label: '单价' },
-    { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务最大预算' },
+    // { id: 'singleBudget', numeric: false, disablePadding: false, label: '单个任务最大预算' },
     { id: 'notificationBudget', numeric: false, disablePadding: false, label: '通告总预算' },
     { id: 'createUser', numeric: false, disablePadding: false, label: '创建者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
@@ -316,14 +316,14 @@ const TaskCenter: React.FC = () => {
                                     <TableCell align="center">
                                         <div className="flex items-center">
                                             <Popover
+                                                zIndex={9999}
                                                 content={
                                                     <div>
                                                         <div>{row.uid}</div>
                                                     </div>
                                                 }
-                                                title="内容ID"
                                             >
-                                                <div className="line-clamp-1 w-[100px] break-words cursor-pointer">{row.uid}</div>
+                                                <div className="line-clamp-1 w-[70px] break-words cursor-pointer">{row.uid}</div>
                                             </Popover>
                                             <Tooltip title={'复制'}>
                                                 <IconButton
@@ -353,7 +353,7 @@ const TaskCenter: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={row.name}>
-                                            <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
+                                            <span className="line-clamp-1 w-[100px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="center" className="w-[100px]">
@@ -379,25 +379,25 @@ const TaskCenter: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="text-center">
+                                        <div className="text-center w-[150px]">
                                             <div>
-                                                结算数：
-                                                {row.settlementCount}
-                                            </div>
-                                            <div>
-                                                用户发布数：
-                                                {row.publishedCount}
+                                                待领取数：
+                                                {row.stayClaimCount}
                                             </div>
                                             <div>
                                                 领取数：
                                                 {row.claimCount}
                                             </div>
                                             <div>
-                                                待领取数：
-                                                {row.stayClaimCount}
+                                                用户发布数：
+                                                {row.publishedCount}
                                             </div>
                                             <div>
-                                                总任务数：
+                                                结算数：
+                                                {row.settlementCount}
+                                            </div>
+                                            <div>
+                                                任务总数：
                                                 {row.total}
                                             </div>
                                         </div>
@@ -418,7 +418,7 @@ const TaskCenter: React.FC = () => {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">{row.singleBudget}</TableCell>
+                                    {/* <TableCell align="center">{row.singleBudget}</TableCell> */}
                                     <TableCell align="center">{row.notificationBudget}</TableCell>
                                     <TableCell align="center">{row.createUser}</TableCell>
                                     <TableCell align="center">

@@ -16,8 +16,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps } from 'antd';
-import { SearchOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps, Tooltip } from 'antd';
+import { SearchOutlined, ExportOutlined, DeleteOutlined, ImportOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import formatDate from 'hooks/useDate';
@@ -44,7 +44,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                 );
             case 'stay_claim':
                 return (
-                    <Tag className="!mr-0" color="processing">
+                    <Tag className="!mr-0" color="warning">
                         待认领
                     </Tag>
                 );
@@ -68,13 +68,13 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                 );
             case 'settlement':
                 return (
-                    <Tag className="!mr-0" color="processing">
+                    <Tag className="!mr-0" color="success">
                         结算
                     </Tag>
                 );
             case 'close':
                 return (
-                    <Tag className="!mr-0" color="processing">
+                    <Tag className="!mr-0" color="error">
                         关闭
                     </Tag>
                 );
@@ -169,35 +169,30 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             align: 'center',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
-                    <Buttons
-                        disabled={status !== 'published'}
-                        size="small"
-                        color="secondary"
-                        onClick={() => {
-                            console.log(row);
-                            setTime({
-                                publishTime: row.publishTime && dayjs(row.publishTime),
-                                claimTime: row.claimTime && dayjs(row.claimTime),
-                                preSettlementTime: row.preSettlementTime && dayjs(row.preSettlementTime),
-                                settlementTime: row.settlementTime && dayjs(row.settlementTime)
-                            });
-                            setEditData(row);
-                            setEditOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Buttons>
-                    {/* <Buttons
-                        disabled={
-                            row.status === 'init' || row.status === 'stay_claim' || row.status === 'claimed' || row.status === 'close'
-                        }
-                        aria-label="delete"
-                        size="small"
-                        color="secondary"
-                        onClick={() => bilingDetail(row.uid)}
-                    >
-                        计费花费
-                    </Buttons> */}
+                    {status !== 'published' ? (
+                        <Tooltip title={<span className="text-[#000]">只有通告发布后才能编辑</span>} color={'#fff'}>
+                            <div className="text-[#000]/[0.26] w-[64px] h-[30.75px] inline-block text-center leading-[30.75px] items-center cursor-pointer">
+                                编辑
+                            </div>
+                        </Tooltip>
+                    ) : (
+                        <Buttons
+                            size="small"
+                            color="secondary"
+                            onClick={() => {
+                                setTime({
+                                    publishTime: row.publishTime && dayjs(row.publishTime),
+                                    claimTime: row.claimTime && dayjs(row.claimTime),
+                                    preSettlementTime: row.preSettlementTime && dayjs(row.preSettlementTime),
+                                    settlementTime: row.settlementTime && dayjs(row.settlementTime)
+                                });
+                                setEditData(row);
+                                setEditOpen(true);
+                            }}
+                        >
+                            编辑
+                        </Buttons>
+                    )}
                     <Buttons
                         onClick={() => {
                             setUid(row.uid);
@@ -300,6 +295,16 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
     //编辑
     const [time, setTime] = useState<any>({});
     const [editData, setEditData] = useState<any>({});
+    useEffect(() => {
+        if (editData.status === 'settlement') {
+            if (!editData.settlementAmount && editData.estimatedAmount) {
+                setEditData({
+                    ...editData,
+                    settlementAmount: editData.estimatedAmount
+                });
+            }
+        }
+    }, [editData]);
     const handleEdit = (e: any) => {
         setEditData({
             ...editData,
@@ -307,7 +312,12 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
         });
     };
     const handleSave = async () => {
-        const result = await singleModify(editData);
+        const result = await singleModify({
+            ...editData,
+            claimUserId: editData.claimUserId || 0,
+            likedCount: editData.likedCount || 0,
+            commentCount: editData.commentCount || 0
+        });
         if (result) {
             setEditData({});
             setTime({});
@@ -403,15 +413,26 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     >
                         批量删除
                     </Button>
-                    <Button
-                        disabled={!searchParams.get('notificationUid') || status === 'published'}
-                        onClick={() => {
-                            setAddOpen(true);
-                        }}
-                        type="primary"
+                    <Tooltip
+                        title={
+                            !searchParams.get('notificationUid') || status === 'published' ? (
+                                <span className="text-[#000]">只有待发布状态才能重新绑定创作计划</span>
+                            ) : (
+                                ''
+                            )
+                        }
+                        color="#fff"
                     >
-                        绑定创作计划
-                    </Button>
+                        <Button
+                            disabled={!searchParams.get('notificationUid') || status === 'published'}
+                            onClick={() => {
+                                setAddOpen(true);
+                            }}
+                            type="primary"
+                        >
+                            绑定创作计划
+                        </Button>
+                    </Tooltip>
                     <Button
                         disabled={tableData.length === 0}
                         onClick={async () => {
@@ -429,6 +450,23 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     >
                         导出
                     </Button>
+                    {/* <Button
+                        disabled={tableData.length === 0}
+                        onClick={async () => {
+                            const res = await singleExport({ ...query, notificationUid: searchParams.get('notificationUid') });
+                            if (res) {
+                                console.log(res);
+                                const link = document.createElement('a');
+                                link.href = window.URL.createObjectURL(res);
+                                link.download = '绑定通告任务列表.xls';
+                                link.click();
+                            }
+                        }}
+                        type="primary"
+                        icon={<ImportOutlined  rev={undefined} />}
+                    >
+                        导入
+                    </Button> */}
                 </div>
             </div>
             <Table
@@ -517,6 +555,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                         InputLabelProps={{ shrink: true }}
                                         label="认领 ID"
                                         name="claimUserId"
+                                        defaultValue={'0'}
                                         value={editData.claimUserId}
                                         onChange={handleEdit}
                                     />
@@ -545,11 +584,19 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                     />
                                 </Col>
                             )}
-                            {(editData.status === 'claimed' || editData.status === 'published' || editData.status === 'settlement') && (
+                            {(editData.status === 'claimed' ||
+                                editData.status === 'published' ||
+                                editData.status === 'settlement' ||
+                                editData.status === 'pre_settlement') && (
                                 <Col span={24}>
                                     <div className="relative mb-[20px]">
                                         <DatePicker
-                                            disabled={editData.status === 'published' || editData.status === 'settlement'}
+                                            disabled={
+                                                editData.status === 'published' ||
+                                                editData.status === 'settlement' ||
+                                                editData.status === 'pre_settlement'
+                                            }
+                                            placeholder="默认当前时间"
                                             showTime
                                             size="large"
                                             className="!w-full"
@@ -609,13 +656,20 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                     </div>
                                 </Col>
                             )}
-                            {(editData.status === 'published' || editData.status === 'settlement') && (
+                            {(editData.status === 'published' ||
+                                editData.status === 'settlement' ||
+                                editData.status === 'pre_settlement') && (
                                 <Col span={24}>
                                     <div className="relative">
                                         <DatePicker
-                                            disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                            disabled={
+                                                editData.status === 'pre_settlement' ||
+                                                editData.status === 'settlement' ||
+                                                editData.status === 'pre_settlement'
+                                            }
                                             showTime
                                             size="large"
+                                            placeholder="默认当前时间"
                                             className="!w-full mb-[20px]"
                                             value={time.publishTime}
                                             onChange={(date, dateString) => {
@@ -638,9 +692,10 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                     <div className="font-[600] mt-[10px] mb-[20px]">更新字段</div>
                                 </div>
                             )}
-                            {editData.status === 'pre_settlement' && (
+                            {(editData.status === 'pre_settlement' || editData.status === 'settlement') && (
                                 <Col span={24}>
                                     <TextField
+                                        disabled={editData.status === 'settlement'}
                                         sx={{ mb: 2 }}
                                         size="small"
                                         type="number"
@@ -655,9 +710,10 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                     />
                                 </Col>
                             )}
-                            {editData.status === 'pre_settlement' && (
+                            {(editData.status === 'pre_settlement' || editData.status === 'settlement') && (
                                 <Col span={24}>
                                     <TextField
+                                        disabled={editData.status === 'settlement'}
                                         sx={{ mb: 2 }}
                                         size="small"
                                         type="number"
@@ -680,6 +736,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                             showTime
                                             size="large"
                                             className="!w-full mb-[20px]"
+                                            placeholder="默认当前时间"
                                             value={time.preSettlementTime}
                                             onChange={(date, dateString) => {
                                                 setTime({
@@ -695,30 +752,31 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                     </div>
                                 </Col>
                             )}
-                            {editData.status === 'pre_settlement' && (
-                                <Col span={24}>
-                                    <TextField
-                                        sx={{ mb: 2 }}
-                                        size="small"
-                                        disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
-                                        color="secondary"
-                                        fullWidth
-                                        InputLabelProps={{ shrink: true }}
-                                        helperText="点击保存，自动计算预计花费"
-                                        label="预计花费"
-                                        name="estimatedAmount"
-                                        value={editData.estimatedAmount}
-                                        onChange={(e) => {
-                                            if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
-                                                setEditData({
-                                                    ...editData,
-                                                    [e.target.name]: e.target.value
-                                                });
-                                            }
-                                        }}
-                                    />
-                                </Col>
-                            )}
+                            {editData.status === 'pre_settlement' ||
+                                (editData.status === 'settlement' && (
+                                    <Col span={24}>
+                                        <TextField
+                                            sx={{ mb: 2 }}
+                                            size="small"
+                                            disabled={editData.status === 'pre_settlement' || editData.status === 'settlement'}
+                                            color="secondary"
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            helperText="点击保存，自动计算预结算金额"
+                                            label="预结算金额"
+                                            name="estimatedAmount"
+                                            value={editData.estimatedAmount}
+                                            onChange={(e) => {
+                                                if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+                                                    setEditData({
+                                                        ...editData,
+                                                        [e.target.name]: e.target.value
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+                                ))}
                             {editData.status === 'settlement' && (
                                 <div className="w-full px-[20px]">
                                     <Divider />
@@ -732,7 +790,7 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                                             showTime
                                             size="large"
                                             className="!w-full mb-[20px]"
-                                            placeholder="请选择结算时间"
+                                            placeholder="默认当前时间"
                                             value={time.settlementTime}
                                             onChange={(date, dateString) => {
                                                 setTime({

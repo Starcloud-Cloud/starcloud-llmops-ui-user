@@ -59,6 +59,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                         id="outlined-basic"
                         label="风格"
                         variant="outlined"
+                        InputLabelProps={{ shrink: true }}
                         value={currentTemp?.name}
                         onClick={() => setOpen(true)}
                     />

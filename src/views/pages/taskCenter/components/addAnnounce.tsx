@@ -8,30 +8,48 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { planPage } from 'api/redBook/batchIndex';
 import { contentPage, singleAdd } from 'api/redBook/task';
+import { DetailModal } from '../../redBookContentList/component/detailModal';
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [uid, setUid] = useState('');
     const addColumn: ColumnsType<any> = [
         {
             title: '文案标题',
             width: 300,
-            dataIndex: 'copyWritingTitle'
+            render: (_, row) => (
+                <span
+                    className="hover:text-[#673ab7] cursor-pointer"
+                    onClick={() => {
+                        setUid(row.businessUid);
+                        setDetailOpen(true);
+                    }}
+                >
+                    {row.copyWritingTitle}
+                </span>
+            )
         },
         {
-            title: '文案内容',
-            width: '40%',
-            render: (_, row) => <div className="line-clamp-3">{row.copyWritingContent}</div>
+            title: '喜欢',
+            render: (_, row) => (
+                <div className="line-clamp-3">
+                    {row.liked ? <Tag color="success">已点亮喜欢</Tag> : <Tag color="blue">未点亮为喜欢</Tag>}
+                </div>
+            )
         },
         {
             title: '图片数量',
+            align: 'center',
             width: 100,
             dataIndex: 'pictureNum'
         },
         {
             title: '图片内容',
+            align: 'center',
             dataIndex: 'pictureContent',
             render: (_, row) => (
-                <div className="flex flex-wrap">
+                <div className="flex justify-center flex-wrap">
                     {row.pictureContent.map((item: any) => (
                         <div className="w-[50px] h-[50px] mr-[10px]">
                             <Image width={50} height={50} preview={false} src={item.url} />
@@ -113,15 +131,22 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
                             {valueList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {item.name}
+                                    {item.name}（{item.successCount}）
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                     <br />
-                    <Button onClick={handleSave} className="mb-[20px]" disabled={businessUid?.length === 0} type="primary">
-                        确认选择
-                    </Button>
+                    <div className="flex justify-end mb-[20px]">
+                        <div className="flex items-center gap-2">
+                            <div className="text-[12px]">
+                                选中的数量：<span className="text-[#673ab7] font-bold">{businessUid?.length}</span>
+                            </div>
+                            <Button onClick={handleSave} disabled={businessUid?.length === 0} type="primary">
+                                确认选择
+                            </Button>
+                        </div>
+                    </div>
                     <Table
                         size="small"
                         columns={addColumn}
@@ -141,6 +166,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         }}
                         rowKey={'businessUid'}
                     />
+                    {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={uid} />}
                 </CardContent>
             </MainCard>
         </Modal>

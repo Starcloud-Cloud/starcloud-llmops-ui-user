@@ -231,9 +231,9 @@ const AddModal = () => {
     const [imageConent, setImageContent] = useState<any[]>([]);
     const [imageSubConent, setImageSubContent] = useState<any[]>([]);
     useEffect(() => {
-        imageTemplates().then((res) => {
-            setTypeList(res);
-        });
+        // imageTemplates().then((res) => {
+        //     setTypeList(res);
+        // });
         schemeMetadata().then((res) => {
             setCategoryList(res.category);
             setSourceList(res.refersSource);

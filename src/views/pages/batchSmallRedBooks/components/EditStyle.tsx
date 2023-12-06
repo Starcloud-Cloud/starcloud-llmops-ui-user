@@ -1,16 +1,49 @@
-import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField } from '@mui/material';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Image, Row, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
+import { SelectTemplateModal } from './SelectTemplateModal';
+
+import React from 'react';
+import { getImageTemplateTypes } from 'api/template';
 const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; imageStyleData: any; setData: (data: any) => void }) => {
+    const [open, setOpen] = React.useState(false);
+    const [currentTemp, setCurrentTemp] = React.useState<any>(null);
+    const [tempList, setTempList] = React.useState<any>([]);
+
+    const handleOk = (temp: any) => {
+        setCurrentTemp(temp);
+        const newData = _.cloneDeep(imageStyleData);
+        newData.id = temp.id;
+        newData.variables = temp.variables;
+        setData(newData);
+        setOpen(false);
+    };
+    useEffect(() => {
+        getImageTemplateTypes().then((res) => {
+            const list = res.map((element: any) => {
+                return element.list;
+            });
+            setTempList(list.flat());
+        });
+    }, []);
+    console.log(tempList, 'templist');
+
+    useEffect(() => {
+        if (imageStyleData.id) {
+            const data = tempList.find((v: any) => v.id === imageStyleData?.id);
+            setCurrentTemp(data);
+        }
+    }, [imageStyleData, tempList]);
+
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
+                <SelectTemplateModal open={open} handleClose={() => setOpen(false)} handleOk={handleOk} />
                 <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
-                    <InputLabel id="type">风格</InputLabel>
-                    <Select
+                    {/* <Select
                         value={imageStyleData?.id}
                         onChange={(e: any) => {
                             const newData = _.cloneDeep(imageStyleData);
@@ -20,11 +53,15 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                         }}
                         labelId="type"
                         label="风格"
-                    >
-                        {typeList?.map((item: any) => (
-                            <MenuItem value={item?.id}>{item?.name}</MenuItem>
-                        ))}
-                    </Select>
+                    ></Select> */}
+                    <TextField
+                        className="!cursor-pointer"
+                        id="outlined-basic"
+                        label="风格"
+                        variant="outlined"
+                        value={currentTemp?.name}
+                        onClick={() => setOpen(true)}
+                    />
                     <FormHelperText>{!imageStyleData?.id ? '风格是必选项' : ' '}</FormHelperText>
                 </FormControl>
                 {imageStyleData?.id && (
@@ -50,11 +87,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                         </Row>
                         <div className="float-right">
                             <div className="text-[12px]">风格示例图</div>
-                            <Image
-                                width={200}
-                                preview={false}
-                                src={typeList?.filter((item) => item.id === imageStyleData?.id)[0]?.example}
-                            />
+                            <Image width={200} preview={false} src={currentTemp?.example} />
                         </div>
                     </div>
                 )}

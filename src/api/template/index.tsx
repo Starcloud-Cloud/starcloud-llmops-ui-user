@@ -187,3 +187,8 @@ export const imageTemplates = () => {
 export const xhsApp = (uid: any) => {
     return request.get({ url: `/llm/app/xhs/app/${uid}` });
 };
+
+// 获取模版分类
+export const getImageTemplateTypes = () => {
+    return request.get({ url: `/llm/creative/scheme/templateGroupByType` });
+};

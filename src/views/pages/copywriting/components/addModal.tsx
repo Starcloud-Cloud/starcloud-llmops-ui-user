@@ -460,11 +460,53 @@ const AddModal = () => {
         if (!copyWritingTemplate.summary) {
             setDemandOpen(true);
             setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '参考文案分析必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
             return false;
         }
         if (!copyWritingTemplate.demand) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '文案生成要求必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
             setDemandOpen(true);
             setSummaryOpen(true);
+            return false;
+        }
+        if (imageStyleData?.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '图片生成模板中最少添加一个风格',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
             return false;
         }
         if (imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) {
@@ -487,7 +529,7 @@ const AddModal = () => {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '没有上传图片',
+                    message: '没有上传测试图片',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -526,10 +568,11 @@ const AddModal = () => {
                     </div>
                     <div></div>
                 </SubCard>
+                <div className="text-[18px] my-[20px] font-[600]">方案信息</div>
                 <Grid sx={{ ml: 0 }} container>
                     <Grid item md={12} sm={12}>
                         <TextField
-                            sx={{ width: '300px', mt: 2 }}
+                            sx={{ width: '300px' }}
                             size="small"
                             color="secondary"
                             InputLabelProps={{ shrink: true }}
@@ -662,6 +705,8 @@ const AddModal = () => {
                         changeParams(e.target);
                     }}
                 />
+                <Divider />
+                <div className="text-[18px] font-[600]">创作方式</div>
                 <div className="my-[20px] flex gap-2 flex-wrap">
                     <SubCard
                         sx={{
@@ -681,21 +726,49 @@ const AddModal = () => {
                             }}
                         >
                             <Typography variant="h4" mb={1}>
-                                参考文案
+                                图文随机组合
                             </Typography>
                             <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'参考内容-文案生成模板-图片生成模板'}
+                                {'根据参考文案，自动生成相似内容，并根据上传的图片自动替换风格模版中的图片'}
+                            </Typography>
+                        </Box>
+                    </SubCard>
+                    <SubCard
+                        sx={{
+                            mb: 1,
+                            cursor: 'not-allowed',
+                            borderColor: 'rgba(230,230,231,1)'
+                        }}
+                        contentSX={{ p: '10px !important', width: '200px' }}
+                    >
+                        <Box
+                            onClick={() => {
+                                changeParams({
+                                    name: 'type',
+                                    value: 'posting'
+                                });
+                            }}
+                        >
+                            <Typography variant="h4" mb={1}>
+                                干货文生成
+                            </Typography>
+                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
+                                {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
                             </Typography>
                         </Box>
                     </SubCard>
                 </div>
                 <Collapse
+                    bordered={false}
+                    style={{ background: 'transparent' }}
                     items={[
                         {
                             key: '1',
+                            style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
                             label: (
                                 <div className="relative">
-                                    参考内容
+                                    1.参考内容
+                                    {tableData?.length === 0 && <span className="text-[#ff4d4f] ml-[10px]">（参考内容最少添加一个）</span>}
                                     {tableData?.length === 0 && (
                                         <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
                                     )}
@@ -741,9 +814,16 @@ const AddModal = () => {
                         },
                         {
                             key: '2',
+                            style: {
+                                marginBottom: 20,
+                                background: '#fafafa',
+                                border: '1px solod #d9d9d9'
+                            },
                             label: (
                                 <div className="relative">
-                                    文案生成模板
+                                    2.文案生成模板
+                                    {!copyWritingTemplate.summary && <span className="text-[#ff4d4f] ml-[10px]">（参考文案分析必填）</span>}
+                                    {!copyWritingTemplate.demand && <span className="text-[#ff4d4f] ml-[10px]">（文案生成要求必填）</span>}
                                     {(!copyWritingTemplate.summary || !copyWritingTemplate.demand) && (
                                         <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
                                     )}
@@ -1097,13 +1177,19 @@ const AddModal = () => {
                         },
                         {
                             key: '3',
+                            style: {
+                                background: '#fafafa',
+                                border: '1px solod #d9d9d9'
+                            },
                             label: (
                                 <div className="relative">
-                                    图片生成模板
+                                    3.图片生成模板
+                                    {imageStyleData?.length === 0 && <span className="text-[#ff4d4f] ml-[10px]">（最少添加一个风格）</span>}
                                     {imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el) && (
-                                        <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />
+                                        <span className="text-[#ff4d4f] ml-[10px]">（图片风格必选）</span>
                                     )}
-                                    {imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el) && (
+                                    {(imageStyleData?.length === 0 ||
+                                        imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) && (
                                         <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
                                     )}
                                 </div>

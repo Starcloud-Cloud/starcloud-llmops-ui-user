@@ -10,13 +10,22 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    IconButton
+    IconButton,
+    Grid,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    InputAdornment,
+    MenuItem
 } from '@mui/material';
+import { DatePicker } from 'antd';
 import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
+import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNavigate } from 'react-router-dom';
@@ -143,7 +152,13 @@ const TaskCenter: React.FC = () => {
                 pageVO.sortField = orderBy;
                 pageVO.asc = order === 'asc';
             }
-            notificationPage({ ...pageVO }).then((res) => {
+            notificationPage({
+                ...pageVO,
+                ...query,
+                startTime: query.createTime ? query.createTime[0]?.valueOf() : undefined,
+                endTime: query.createTime ? query.createTime[1]?.valueOf() : undefined,
+                createTime: undefined
+            }).then((res) => {
                 const fetchedRows = res?.list;
                 setRows([...fetchedRows]);
                 setTotal(res?.total);
@@ -265,13 +280,25 @@ const TaskCenter: React.FC = () => {
     };
     const [categoryList, setCategoryList] = useState<any[]>([]);
     const [platformList, setPlatformList] = useState<any[]>([]);
+    const [notificationStatusEnumList, setNotificationStatusEnumList] = useState<any[]>([]);
 
     useEffect(() => {
         singleMetadata().then((res) => {
             setCategoryList(res?.category);
             setPlatformList(res?.platform);
+            setNotificationStatusEnumList(res?.notificationStatusEnum);
         });
     }, []);
+
+    //搜索
+    const { RangePicker } = DatePicker;
+    const [query, setQuery] = useState<any>({});
+    const changeQuery = (data: { name: string; value: string }) => {
+        setQuery({
+            ...query,
+            [data.name]: data.value
+        });
+    };
     return (
         <MainCard
             content={false}
@@ -290,6 +317,101 @@ const TaskCenter: React.FC = () => {
                 </div>
             }
         >
+            <Grid container sx={{ my: 2 }} spacing={2}>
+                <Grid item xl={2} md={3}>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        color="secondary"
+                        InputLabelProps={{ shrink: true }}
+                        label="通告名称"
+                        name="name"
+                        value={query.name}
+                        onChange={(e: any) => {
+                            changeQuery(e.target);
+                        }}
+                    />
+                </Grid>
+                <Grid item xl={2} md={3}>
+                    <FormControl key={query.field} color="secondary" size="small" fullWidth>
+                        <InputLabel id="types">通告类目</InputLabel>
+                        <Select
+                            name="field"
+                            value={query.field}
+                            onChange={(e: any) => changeQuery({ name: 'field', value: e.target.value })}
+                            endAdornment={
+                                query.field && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'field', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId="types"
+                            label="通告类目"
+                        >
+                            {categoryList?.map((item) => (
+                                <MenuItem value={item.code}>{item.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xl={2} md={3}>
+                    <FormControl key={query.status} color="secondary" size="small" fullWidth>
+                        <InputLabel id="statuss">通告状态</InputLabel>
+                        <Select
+                            name="status"
+                            value={query.status}
+                            onChange={(e: any) => changeQuery({ name: 'status', value: e.target.value })}
+                            endAdornment={
+                                query.status && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'status', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId="types"
+                            label="通告状态"
+                        >
+                            {notificationStatusEnumList?.map((item) => (
+                                <MenuItem value={item.value}>{item.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xl={2} md={3}>
+                    <RangePicker
+                        className="bg-[#f8fafc] w-full"
+                        placeholder={['创建开始时间', '创建结束时间']}
+                        value={query.createTime}
+                        onChange={(day, days) => {
+                            setQuery({
+                                ...query,
+                                createTime: day
+                            });
+                        }}
+                        size="large"
+                    />
+                </Grid>
+                <Grid item xl={2} md={3}>
+                    <Button variant="contained" color="secondary" onClick={forceUpdate}>
+                        搜索
+                    </Button>
+                </Grid>
+            </Grid>
             <TableContainer>
                 <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead

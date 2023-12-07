@@ -317,7 +317,7 @@ const TaskCenter: React.FC = () => {
                 </div>
             }
         >
-            <Grid container sx={{ my: 2 }} spacing={2}>
+            {/* <Grid container sx={{ my: 2 }} spacing={2}>
                 <Grid item xl={2} md={3}>
                     <TextField
                         fullWidth
@@ -411,7 +411,7 @@ const TaskCenter: React.FC = () => {
                         搜索
                     </Button>
                 </Grid>
-            </Grid>
+            </Grid> */}
             <TableContainer>
                 <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead

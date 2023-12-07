@@ -158,6 +158,8 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
                                                 close: false
                                             })
                                         );
@@ -180,6 +182,8 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
                                                 close: false
                                             })
                                         );

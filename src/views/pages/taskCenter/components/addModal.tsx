@@ -119,6 +119,8 @@ const AddModal = () => {
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
                         close: false
                     })
                 );
@@ -135,6 +137,8 @@ const AddModal = () => {
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
                         close: false
                     })
                 );
@@ -423,7 +427,7 @@ const AddModal = () => {
                                                             发帖
                                                         </Typography>
                                                         <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                                            {'小红书发布贴子小红书发布贴子小红书发布贴子小红书发布贴子小红书发布贴子'}
+                                                            {'小红书发布贴子'}
                                                         </Typography>
                                                     </Box>
                                                 </SubCard>

@@ -43,18 +43,8 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
             <div className="flex-1">
                 <SelectTemplateModal open={open} handleClose={() => setOpen(false)} handleOk={handleOk} />
                 <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
-                    {/* <Select
-                        value={imageStyleData?.id}
-                        onChange={(e: any) => {
-                            const newData = _.cloneDeep(imageStyleData);
-                            (newData.id = e.target.value),
-                                (newData.variables = typeList?.filter((value: any) => value.id === e.target.value)[0]?.variables);
-                            setData(newData);
-                        }}
-                        labelId="type"
-                        label="风格"
-                    ></Select> */}
                     <TextField
+                        color="secondary"
                         className="!cursor-pointer"
                         id="outlined-basic"
                         label="风格"
@@ -62,8 +52,9 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                         InputLabelProps={{ shrink: true }}
                         value={currentTemp?.name}
                         onClick={() => setOpen(true)}
+                        error={!imageStyleData?.id}
                     />
-                    <FormHelperText>{!imageStyleData?.id ? '风格是必选项' : ' '}</FormHelperText>
+                    <FormHelperText>{!imageStyleData?.id ? '图片风格是必选项' : ' '}</FormHelperText>
                 </FormControl>
                 {imageStyleData?.id && (
                     <div>

@@ -246,6 +246,8 @@ const Copywriting: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -258,18 +260,24 @@ const Copywriting: React.FC = () => {
     const [executeOpen, setExecuteOpen] = useState(false);
     const Execute = () => {
         schemeCopy({ uid: row?.uid }).then((res) => {
+            console.log(res);
+
             if (res) {
                 forceUpdate();
                 setExecuteOpen(false);
-                openSnackbar({
-                    open: true,
-                    message: '复制成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    close: false
-                });
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '创作方案复制成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
             }
         });
         // planExecute({ uid: row?.uid }).then((res) => {

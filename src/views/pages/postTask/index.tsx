@@ -134,9 +134,10 @@ const PostTask = () => {
                         {
                             key: '0',
                             label: (
-                                <div className="flex items-center" onClick={() => copyText(task?.notificationName)}>
+                                <div className="flex items-center cursor-pointer" onClick={() => copyText(task?.notificationName)}>
                                     <span>通告名称</span>
                                     <ContentCopyIcon color="secondary" className="text-sm" />
+                                    (点击复制)
                                 </div>
                             ),
                             children: <span onClick={() => copyText(task?.notificationName)}>{task?.notificationName}</span>,
@@ -145,9 +146,10 @@ const PostTask = () => {
                         {
                             key: '1',
                             label: (
-                                <div className="flex items-center" onClick={() => copyText(task?.title)}>
+                                <div className="flex items-center cursor-pointer" onClick={() => copyText(task?.title)}>
                                     <span>文案标题</span>
                                     <ContentCopyIcon color="secondary" className="text-sm" />
+                                    (点击复制)
                                 </div>
                             ),
                             children: <span onClick={() => copyText(task?.title)}>{task?.title}</span>,
@@ -156,9 +158,10 @@ const PostTask = () => {
                         {
                             key: '2',
                             label: (
-                                <div className="flex items-center" onClick={() => copyText(task?.text)}>
+                                <div className="flex items-center cursor-pointer" onClick={() => copyText(task?.text)}>
                                     <span>文案内容</span>
                                     <ContentCopyIcon color="secondary" className="text-sm" />
+                                    (点击复制)
                                 </div>
                             ),
                             children: (
@@ -171,9 +174,10 @@ const PostTask = () => {
                         {
                             key: '4',
                             label: (
-                                <div className="flex items-center" onClick={() => copyText(task?.tags?.join(' '))}>
+                                <div className="flex items-center cursor-pointer" onClick={() => copyText(task?.tags?.join(' '))}>
                                     <span>标签</span>
                                     <ContentCopyIcon color="secondary" className="text-sm" />
+                                    (点击复制)
                                 </div>
                             ),
                             children: <span onClick={() => copyText(task?.tags?.join(' '))}>{task?.tags?.join(' ')}</span>,

@@ -266,6 +266,8 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -287,6 +289,8 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );

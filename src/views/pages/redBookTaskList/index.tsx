@@ -249,11 +249,13 @@ const RedBookTaskList: React.FC = () => {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '操作成功',
+                    message: '删除成功',
                     variant: 'alert',
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -262,7 +264,30 @@ const RedBookTaskList: React.FC = () => {
             setSelected([]);
         }
     };
-
+    //复制
+    const [copyOpen, setCopyOpen] = useState(false);
+    const handleCopy = async () => {
+        const res = await planCopy({
+            uid: row?.uid
+        });
+        if (res) {
+            setCopyOpen(false);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '复制创作计划成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            forceUpdate();
+        }
+    };
     const [executeOpen, setExecuteOpen] = useState(false);
     const Execute = () => {
         planExecute({ uid: row?.uid }).then((res) => {
@@ -273,63 +298,10 @@ const RedBookTaskList: React.FC = () => {
 
     const addPlan = async () => {
         navigate('/batchSmallRedBook');
-        // setOpen(true);
     };
 
     const handleEdit = async (uid: string) => {
         navigate('/batchSmallRedBook?uid=' + uid);
-    };
-
-    const doClone = async (row: any) => {
-        const res = await planCopy({
-            uid: row.uid
-        });
-        if (res) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '操作成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    close: false
-                })
-            );
-            forceUpdate();
-        }
-    };
-
-    const doExport = async () => {
-        await axios({
-            url: `${base_url}/listing/draft/export`,
-            method: 'post',
-            data: selected,
-            responseType: 'blob', // 将响应数据视为二进制数据流
-            headers: {
-                Authorization: 'Bearer ' + getAccessToken()
-            }
-        })
-            .then((response) => {
-                // 创建一个blob对象
-                const blob = new Blob([response.data], { type: response.headers['content-type'] });
-
-                // 创建一个a标签用于下载
-                const downloadLink = document.createElement('a');
-                downloadLink.href = window.URL.createObjectURL(blob);
-                downloadLink.setAttribute('download', `listing-${new Date().getTime()}.xls`); // 设置下载文件的名称
-                document.body.appendChild(downloadLink);
-
-                // 触发点击事件以开始下载
-                downloadLink.click();
-
-                // 移除下载链接
-                document.body.removeChild(downloadLink);
-                setSelected([]);
-            })
-            .catch((error) => {
-                console.error('下载文件时发生错误:', error);
-            });
     };
     const { RangePicker } = DatePicker;
     return (
@@ -566,8 +538,8 @@ const RedBookTaskList: React.FC = () => {
                                                                         color: 'success'
                                                                     },
                                                                     close: false,
-                                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                    transition: 'SlideLeft'
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideDown'
                                                                 })
                                                             );
                                                         }}
@@ -652,28 +624,16 @@ const RedBookTaskList: React.FC = () => {
                                                         <EditIcon className="text-base" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                                <Tooltip title={'查看操作任务'}>
+                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
+                                                <Tooltip title={'复制'}>
                                                     <IconButton
                                                         aria-label="delete"
                                                         size="small"
                                                         onClick={() => {
-                                                            navigate(`/redBookContentList?uid=${row.uid}&name=${row.name}`);
+                                                            setCopyOpen(true);
+                                                            setRow(row);
                                                         }}
                                                     >
-                                                        <ReorderIcon className="text-base" />
-                                                    </IconButton>
-                                                </Tooltip> */}
-                                                {/* <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                        <Tooltip title={'开始'}>
-                                            <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
-                                                <PlayCircleOutlineIcon className="text-base" />
-                                                <StopIcon className="text-base" />
-                                            </IconButton>
-                                        </Tooltip> */}
-                                                <Divider type={'vertical'} style={{ marginInline: '4px' }} />
-                                                <Tooltip title={'复制'}>
-                                                    <IconButton aria-label="delete" size="small" onClick={() => doClone(row)}>
                                                         <ContentCopyIcon className="text-base" />
                                                     </IconButton>
                                                 </Tooltip>
@@ -726,6 +686,7 @@ const RedBookTaskList: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
+            <Confirm open={copyOpen} handleClose={() => setCopyOpen(false)} handleOk={handleCopy} />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
             <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
             <AddModal open={open} setOpen={setOpen} templateList={templateList} />

@@ -161,7 +161,11 @@ const PostTask = () => {
                                     <ContentCopyIcon color="secondary" className="text-sm" />
                                 </div>
                             ),
-                            children: <span onClick={() => copyText(task?.text)}>{task?.text}</span>,
+                            children: (
+                                <span className="whitespace-pre-wrap" onClick={() => copyText(task?.text)}>
+                                    {task?.text}
+                                </span>
+                            ),
                             span: 3
                         },
                         {

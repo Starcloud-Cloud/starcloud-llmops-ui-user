@@ -23,6 +23,8 @@ const PostTask = () => {
         if (uid) {
             getTaskDetail(uid).then((res) => {
                 setTask({ ...res.content, statusValue: res.status, notificationName: res.notificationName, tags: res.tags });
+                setRecipient(res.claimUsername || '');
+                setUrl(res.publishUrl || '');
             });
         }
     }, [uid, _]);
@@ -123,7 +125,7 @@ const PostTask = () => {
                     title={
                         <div className="items-center">
                             <span className="mr-1">通告信息</span>
-                            {status && <Tag>{status}</Tag>}
+                            {status && <Tag color={task?.statusValue === 'stay_claim' ? 'blue' : 'red'}>{status}</Tag>}
                         </div>
                     }
                     bordered
@@ -133,7 +135,7 @@ const PostTask = () => {
                             key: '0',
                             label: (
                                 <div className="flex items-center" onClick={() => copyText(task?.notificationName)}>
-                                    <span>通过名称</span>
+                                    <span>通告名称</span>
                                     <ContentCopyIcon color="secondary" className="text-sm" />
                                 </div>
                             ),
@@ -202,6 +204,7 @@ const PostTask = () => {
                             ),
                             children: (
                                 <TextField
+                                    disabled={task?.statusValue !== 'stay_claim'}
                                     value={recipient}
                                     onChange={(e) => {
                                         setRecipient(e.target.value);
@@ -225,6 +228,7 @@ const PostTask = () => {
                             ),
                             children: (
                                 <TextField
+                                    disabled={task?.statusValue !== 'stay_claim'}
                                     value={url}
                                     onChange={(e) => {
                                         setUrl(e.target.value);

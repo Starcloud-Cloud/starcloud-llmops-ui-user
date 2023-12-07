@@ -152,7 +152,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                     <div className="flex items-center">
                                         <Avatar />
 
-                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">沾不沾果酱</span>
+                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">不沾果酱</span>
                                     </div>
                                     <div
                                         className="bg-[#ff2e4d] text-white text-base w-[96px] font-semibold px-6 h-[40px] cursor-pointer rounded-2xl text-center"
@@ -180,7 +180,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                                         color: 'success'
                                                     },
                                                     close: false,
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                     transition: 'SlideLeft'
                                                 })
                                             )
@@ -215,7 +215,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                                             color: 'success'
                                                         },
                                                         close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         transition: 'SlideLeft'
                                                     })
                                                 )

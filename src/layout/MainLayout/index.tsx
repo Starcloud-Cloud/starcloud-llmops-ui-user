@@ -385,7 +385,7 @@ const MainLayout = () => {
         //     clearInterval(userVip);
         //};
         discountNewUser().then((res) => {
-            if (res.code) {
+            if (res.code === '00001') {
                 handleShowNewUserVip();
             }
         });

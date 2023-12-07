@@ -14,7 +14,7 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
 
     useEffect(() => {
         discountNewUser().then((res) => {
-            if (res?.code) {
+            if (res?.code === '00001') {
                 setEndTime(res.endTime);
                 setName(res.name);
             }

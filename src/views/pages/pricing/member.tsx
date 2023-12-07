@@ -398,7 +398,7 @@ const Price1 = () => {
 
     useEffect(() => {
         discountNewUser().then((res) => {
-            if (res?.code) {
+            if (res?.code === '00001') {
                 setShowTrial(true);
             }
         });
@@ -414,13 +414,13 @@ const Price1 = () => {
         }
     };
 
-    useEffect(() => {
-        discountNewUser().then((res: any) => {
-            if (res.name) {
-                setPlans([...plansDefault(1, res.name)]);
-            }
-        });
-    }, []);
+    // useEffect(() => {
+    //     discountNewUser().then((res: any) => {
+    //         if (res.code === '00001') {
+    //             setPlans([...plansDefault(1, res.name)]);
+    //         }
+    //     });
+    // }, []);
 
     // 从服务端请求vip数据
     // useEffect(() => {

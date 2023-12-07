@@ -16,7 +16,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps, Tooltip } from 'antd';
+import { Table, Button, Image, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover } from 'antd';
 import { SearchOutlined, ExportOutlined, DeleteOutlined, ImportOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -30,6 +30,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { singleDelete, singleRefresh, singleExport, bathDelete } from 'api/redBook/task';
+import copy from 'clipboard-copy';
 import './addModal.scss';
 const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; singleMissionStatusEnumList: any[] }) => {
     const location = useLocation();
@@ -152,8 +153,42 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             render: (_, row) => <div>{row.settlementTime && formatDate(row.settlementTime)}</div>
         },
         {
-            title: '支付订单号',
-            dataIndex: 'paymentOrder'
+            title: '发布链接',
+            render: (_, row) => (
+                <Popover content={'点击跳转'}>
+                    <div onClick={() => window.open(row.publishUrl)} className="w-[150px] cursor-pointer hover:text-[#673ab7]">
+                        {row.publishUrl}
+                    </div>
+                </Popover>
+            )
+        },
+        {
+            title: '认领链接',
+            render: (_, row) => (
+                <Popover content={'点击复制'}>
+                    <div
+                        onClick={() => {
+                            copy(row.claimUrl);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '复制成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        }}
+                        className="w-[150px] cursor-pointer hover:text-[#673ab7]"
+                    >
+                        {row.claimUrl}
+                    </div>
+                </Popover>
+            )
         },
         {
             title: '创建时间',
@@ -212,11 +247,11 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
     const bilingDetail = async (uid: string) => {
         try {
             setBilingLoading(true);
-            const result = await singleRefresh(uid);
+            const result = await singleRefresh({ uid, publishUrl: editData.publishUrl });
             setBilingLoading(false);
             if (result) {
-                setEditOpen(false);
-                getList();
+                console.log(result);
+                setEditData(result);
             }
         } catch (err) {
             setBilingLoading(false);

@@ -30,6 +30,7 @@ import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { singleDelete, singleRefresh, singleExport, bathDelete } from 'api/redBook/task';
+import copy from 'clipboard-copy';
 import './addModal.scss';
 const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; singleMissionStatusEnumList: any[] }) => {
     const location = useLocation();
@@ -165,7 +166,27 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             title: '认领链接',
             render: (_, row) => (
                 <Popover content={'点击复制'}>
-                    <div className="w-[150px] cursor-pointer hover:text-[#673ab7]">{row.claimUrl}</div>
+                    <div
+                        onClick={() => {
+                            copy(row.claimUrl);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '复制成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        }}
+                        className="w-[150px] cursor-pointer hover:text-[#673ab7]"
+                    >
+                        {row.claimUrl}
+                    </div>
                 </Popover>
             )
         },

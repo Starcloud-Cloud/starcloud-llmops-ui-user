@@ -51,8 +51,8 @@ export const singleDelete = (data: any) => {
     return request.delete({ url: `/llm/single/delete/${data}` });
 };
 //刷新结算
-export const singleRefresh = (uid: string) => {
-    return request.post({ url: `/llm/single/refresh/note/${uid}` });
+export const singleRefresh = (data: any) => {
+    return request.post({ url: `/llm/single/refresh/note`, data });
 };
 //导出任务
 export const singleExport = (params: any) => {

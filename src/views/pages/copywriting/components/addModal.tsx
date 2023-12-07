@@ -272,10 +272,12 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
+    const [oneLoading, setOneLoading] = useState(false);
     useEffect(() => {
         if (searchParams.get('uid')) {
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
+                    setOneLoading(true);
                     setRows(res.configuration?.copyWritingTemplate?.variables);
                     setParams({
                         name: res.name,
@@ -304,6 +306,7 @@ const AddModal = () => {
                 }
             });
         } else {
+            setOneLoading(true);
             setTableData(tableList);
         }
     }, []);
@@ -372,7 +375,7 @@ const AddModal = () => {
         listType: 'picture-card',
         multiple: true,
         fileList: testImageList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },
@@ -717,14 +720,7 @@ const AddModal = () => {
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box
-                            onClick={() => {
-                                changeParams({
-                                    name: 'type',
-                                    value: 'posting'
-                                });
-                            }}
-                        >
+                        <Box>
                             <Typography variant="h4" mb={1}>
                                 图文随机组合
                             </Typography>
@@ -741,14 +737,7 @@ const AddModal = () => {
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box
-                            onClick={() => {
-                                changeParams({
-                                    name: 'type',
-                                    value: 'posting'
-                                });
-                            }}
-                        >
+                        <Box>
                             <Typography variant="h4" mb={1}>
                                 干货文生成
                             </Typography>
@@ -768,8 +757,10 @@ const AddModal = () => {
                             label: (
                                 <div className="relative">
                                     1.参考内容
-                                    {tableData?.length === 0 && <span className="text-[#ff4d4f] ml-[10px]">（参考内容最少添加一个）</span>}
-                                    {tableData?.length === 0 && (
+                                    {oneLoading && tableData?.length === 0 && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（参考内容最少添加一个）</span>
+                                    )}
+                                    {oneLoading && tableData?.length === 0 && (
                                         <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
                                     )}
                                 </div>
@@ -822,9 +813,13 @@ const AddModal = () => {
                             label: (
                                 <div className="relative">
                                     2.文案生成模板
-                                    {!copyWritingTemplate.summary && <span className="text-[#ff4d4f] ml-[10px]">（参考文案分析必填）</span>}
-                                    {!copyWritingTemplate.demand && <span className="text-[#ff4d4f] ml-[10px]">（文案生成要求必填）</span>}
-                                    {(!copyWritingTemplate.summary || !copyWritingTemplate.demand) && (
+                                    {oneLoading && !copyWritingTemplate.summary && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（参考文案分析必填）</span>
+                                    )}
+                                    {oneLoading && !copyWritingTemplate.demand && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（文案生成要求必填）</span>
+                                    )}
+                                    {oneLoading && (!copyWritingTemplate.summary || !copyWritingTemplate.demand) && (
                                         <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
                                     )}
                                 </div>
@@ -836,6 +831,7 @@ const AddModal = () => {
                                         <Button
                                             disabled={buttonLoading}
                                             onClick={async () => {
+                                                setSummaryOpen(false);
                                                 if (!params.name) {
                                                     setTitleOpen(true);
                                                     setCategoryOpen(true);
@@ -1184,14 +1180,20 @@ const AddModal = () => {
                             label: (
                                 <div className="relative">
                                     3.图片生成模板
-                                    {imageStyleData?.length === 0 && <span className="text-[#ff4d4f] ml-[10px]">（最少添加一个风格）</span>}
-                                    {imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el) && (
-                                        <span className="text-[#ff4d4f] ml-[10px]">（图片风格必选）</span>
+                                    {oneLoading && imageStyleData?.length === 0 && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（最少添加一个风格）</span>
                                     )}
-                                    {(imageStyleData?.length === 0 ||
-                                        imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) && (
-                                        <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
-                                    )}
+                                    {oneLoading &&
+                                        imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el) && (
+                                            <span className="text-[#ff4d4f] ml-[10px]">（图片风格必选）</span>
+                                        )}
+                                    {oneLoading &&
+                                        (imageStyleData?.length === 0 ||
+                                            imageStyleData
+                                                ?.map((i) => i?.templateList?.some((item: any) => !item.id))
+                                                ?.some((el) => el)) && (
+                                            <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
+                                        )}
                                 </div>
                             ),
                             children: (

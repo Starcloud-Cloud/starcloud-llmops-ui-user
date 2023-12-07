@@ -34,7 +34,7 @@ const BatcSmallRedBooks = () => {
         multiple: true,
         listType: 'picture-card',
         fileList: imageList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

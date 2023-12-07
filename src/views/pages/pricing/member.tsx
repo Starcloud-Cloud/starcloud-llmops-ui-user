@@ -182,6 +182,14 @@ const plansDefault = (value: number, name?: string) => [
                 </Tag>
             </div>
         ),
+        btnTextNew: (
+            <div>
+                新用户体验包9.9
+                {/* <Tag className="ml-1" color="#f50">
+                    {name || '订阅立减10元'}
+                </Tag> */}
+            </div>
+        ),
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
@@ -747,6 +755,31 @@ const Price1 = () => {
                                                     </Button>
                                                 )}
                                             </Grid>
+                                            {plan.btnTextNew && (
+                                                <Grid item xs={12}>
+                                                    <Button
+                                                        className={'w-4/5'}
+                                                        variant={plan.active ? 'contained' : 'outlined'}
+                                                        onClick={() => {
+                                                            setCurrentSelect({
+                                                                title: plan.title,
+                                                                select: value,
+                                                                monthCode: plan.monthCode,
+                                                                yearCode: plan.yearCode,
+                                                                experience: true
+                                                            });
+                                                            handleClick(
+                                                                index,
+                                                                value === '1' ? plan.monthCode : plan.yearCode,
+                                                                value === '1' ? plan.yearCode : plan.monthCode
+                                                            );
+                                                        }}
+                                                        color="secondary"
+                                                    >
+                                                        {plan.btnTextNew}
+                                                    </Button>
+                                                </Grid>
+                                            )}
                                             <Grid item xs={12}>
                                                 <List
                                                     sx={{

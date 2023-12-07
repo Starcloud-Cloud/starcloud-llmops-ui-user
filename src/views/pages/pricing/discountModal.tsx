@@ -146,18 +146,20 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    <Tab
-                                        disabled={!currentSelect.monthCode.includes('basic')}
-                                        label={
-                                            <div className="flex justify-center items-center">
-                                                <span>订阅</span>
-                                                <Tag className="ml-1" color="#f50">
-                                                    立减10元
-                                                </Tag>
-                                            </div>
-                                        }
-                                        {...a11yProps(1)}
-                                    />
+                                    {!currentSelect.experience && (
+                                        <Tab
+                                            disabled={!currentSelect.monthCode.includes('basic')}
+                                            label={
+                                                <div className="flex justify-center items-center">
+                                                    <span>订阅</span>
+                                                    <Tag className="ml-1" color="#f50">
+                                                        立减10元
+                                                    </Tag>
+                                                </div>
+                                            }
+                                            {...a11yProps(1)}
+                                        />
+                                    )}
                                 </Tabs>
                                 <div className="flex justify-center flex-col items-center w-full p-3">
                                     <div className="flex justify-between items-center w-full mb-3">
@@ -173,20 +175,27 @@ export function DiscountModal({
                                             <span className="text-xs">/元</span>
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center w-full mb-3">
-                                        <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
-                                        {!value ? (
-                                            <span>
-                                                <Radio.Group onChange={handleRadio} value={selectCode}>
-                                                    <Radio value={currentSelect?.monthCode}>月</Radio>
-                                                    <Radio value={currentSelect?.yearCode}>年</Radio>
-                                                </Radio.Group>
-                                            </span>
-                                        ) : (
-                                            <span className="text-sm text-[#868A91]">月付</span>
-                                        )}
-                                    </div>
-                                    {!value && (
+                                    {currentSelect.experience ? (
+                                        <div className="flex justify-between items-center w-full mb-3">
+                                            <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
+                                            <span className="text-sm text-[#868A91]">周</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex justify-between items-center w-full mb-3">
+                                            <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
+                                            {!value ? (
+                                                <span>
+                                                    <Radio.Group onChange={handleRadio} value={selectCode}>
+                                                        <Radio value={currentSelect?.monthCode}>月</Radio>
+                                                        <Radio value={currentSelect?.yearCode}>年</Radio>
+                                                    </Radio.Group>
+                                                </span>
+                                            ) : (
+                                                <span className="text-sm text-[#868A91]">月付</span>
+                                            )}
+                                        </div>
+                                    )}
+                                    {!currentSelect.experience && !value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
                                             <span className="text-[#868A91] mb-2">折扣券</span>
                                             <div>

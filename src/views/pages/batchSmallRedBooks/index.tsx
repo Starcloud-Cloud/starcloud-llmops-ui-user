@@ -152,6 +152,8 @@ const BatcSmallRedBooks = () => {
                     alert: {
                         color: 'error'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -166,6 +168,8 @@ const BatcSmallRedBooks = () => {
                     alert: {
                         color: 'error'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -181,6 +185,8 @@ const BatcSmallRedBooks = () => {
                     alert: {
                         color: 'error'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -199,6 +205,8 @@ const BatcSmallRedBooks = () => {
                     alert: {
                         color: 'error'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -237,6 +245,8 @@ const BatcSmallRedBooks = () => {
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
                         close: false
                     })
                 );
@@ -288,6 +298,8 @@ const BatcSmallRedBooks = () => {
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
                         close: false
                     })
                 );

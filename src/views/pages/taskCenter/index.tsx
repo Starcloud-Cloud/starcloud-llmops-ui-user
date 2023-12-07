@@ -232,6 +232,8 @@ const TaskCenter: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 })
             );
@@ -254,6 +256,8 @@ const TaskCenter: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
                     close: false
                 });
             }
@@ -339,9 +343,9 @@ const TaskCenter: React.FC = () => {
                                                                 alert: {
                                                                     color: 'success'
                                                                 },
-                                                                close: false,
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                transition: 'SlideLeft'
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                transition: 'SlideDown',
+                                                                close: false
                                                             })
                                                         );
                                                     }}

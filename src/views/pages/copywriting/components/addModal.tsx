@@ -1264,7 +1264,7 @@ const AddModal = () => {
                                                                         const newList = _.cloneDeep(focuActive);
                                                                         newList[i] = false;
                                                                         setFocuActive(newList);
-                                                                        if (e.target.value) {
+                                                                        if (e.target.value && e.target.value.trim()) {
                                                                             const newData = _.cloneDeep(imageStyleData);
                                                                             newData[i].name = e.target.value;
                                                                             setImageStyleData(newData);

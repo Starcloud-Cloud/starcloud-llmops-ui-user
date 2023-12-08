@@ -43,9 +43,32 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                         format="D天H时m分s秒"
                     />
                 </div>
-                <div className={'absolute bottom-[120px] text-[#d4c399] left-[112px] text-lg font-semibold'}>{name}</div>
-                <div className={'absolute bottom-[104px] text-[#d4c399] left-[91px]  font-semibold'}>
-                    有效期至{dayjs(endTime).format('YYYY年MM月DD日HH时')}
+                <div
+                    style={{
+                        bottom: '131px',
+                        left: '35px'
+                    }}
+                    className={'absolute text-[#d4c399]'}
+                >
+                    1.基础套餐一周体验（含500魔法豆和50作图点）
+                </div>
+                <div
+                    style={{
+                        bottom: '116px',
+                        left: '35px'
+                    }}
+                    className={'absolute bottom-[104px] text-[#d4c399] left-[35px]'}
+                >
+                    2.体验期内购买基础版正式套餐可享8折
+                </div>
+                <div
+                    style={{
+                        bottom: '102px',
+                        left: '35px'
+                    }}
+                    className={'absolute  text-[#d4c399]'}
+                >
+                    3.仅限新用户注册72小时内有效
                 </div>
 
                 <div

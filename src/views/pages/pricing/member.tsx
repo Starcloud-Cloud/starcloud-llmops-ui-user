@@ -165,7 +165,7 @@ const plansDefault = (value: number, name?: string) => [
         btnText: '免费使用'
     },
     {
-        active: false,
+        active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
         description: value === 1 ? '3000魔法豆，300点作图' : '36000魔法豆，3600点作图',
@@ -184,7 +184,7 @@ const plansDefault = (value: number, name?: string) => [
         ),
         btnTextNew: (
             <div>
-                新用户体验包
+                用户一周体验包
                 <Tag className="ml-1" color="#f50">
                     <span className="text-base">9.9元</span>
                 </Tag>
@@ -194,7 +194,7 @@ const plansDefault = (value: number, name?: string) => [
         yearCode: 'basic_year'
     },
     {
-        active: true,
+        active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
         description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',

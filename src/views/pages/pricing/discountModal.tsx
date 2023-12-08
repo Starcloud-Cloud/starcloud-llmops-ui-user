@@ -218,8 +218,7 @@ export function DiscountModal({
                                                 输入/选择折扣券后系统会自动检测折扣券，如折扣券有效则显示在优惠金额
                                             </span>
 
-                                            {currentSelect.monthCode.includes('basic') &&
-                                                !!discount?.length &&
+                                            {!!discount?.length &&
                                                 discount.map((v: any, index: number) => (
                                                     <div key={index} className="mt-4">
                                                         <div className="text-[#919DA8]">请选择下面折扣券:</div>

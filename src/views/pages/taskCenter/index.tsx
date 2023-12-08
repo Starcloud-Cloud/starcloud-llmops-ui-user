@@ -1,5 +1,5 @@
 import { Button, Tooltip } from '@mui/material';
-import { Tag, Popover } from 'antd';
+import { Tag, Popover, DatePicker } from 'antd';
 import {
     Box,
     Table,
@@ -19,7 +19,6 @@ import {
     InputAdornment,
     MenuItem
 } from '@mui/material';
-import { DatePicker } from 'antd';
 import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
@@ -155,8 +154,8 @@ const TaskCenter: React.FC = () => {
             notificationPage({
                 ...pageVO,
                 ...query,
-                startTime: query.createTime ? query.createTime[0]?.valueOf() : undefined,
-                endTime: query.createTime ? query.createTime[1]?.valueOf() : undefined,
+                createStartTime: query.createTime ? query.createTime[0]?.format('YYYY-MM-DD') + ' 00:00:00' : undefined,
+                createEndTime: query.createTime ? query.createTime[1]?.format('YYYY-MM-DD') + ' 23:59:59' : undefined,
                 createTime: undefined
             }).then((res) => {
                 const fetchedRows = res?.list;
@@ -317,7 +316,7 @@ const TaskCenter: React.FC = () => {
                 </div>
             }
         >
-            {/* <Grid container sx={{ my: 2 }} spacing={2}>
+            <Grid container sx={{ my: 2 }} spacing={2}>
                 <Grid item xl={2} md={3}>
                     <TextField
                         fullWidth
@@ -411,7 +410,7 @@ const TaskCenter: React.FC = () => {
                         搜索
                     </Button>
                 </Grid>
-            </Grid> */}
+            </Grid>
             <TableContainer>
                 <Table sx={{ minWidth: 1000 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead

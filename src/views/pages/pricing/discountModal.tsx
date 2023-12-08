@@ -75,6 +75,13 @@ export function DiscountModal({
         await handleFetchPay(selectCode, currentSelect.monthCode === selectCode ? currentSelect.yearCode : currentSelect.monthCode, value);
     };
 
+    // 默认选择第一个优惠券
+    useEffect(() => {
+        if (discount.length) {
+            handleOnSearch(discount?.[0]?.code);
+        }
+    }, [discount]);
+
     const handleRadio = async (e: RadioChangeEvent) => {
         setCurrentSelect((pre: any) => {
             return {

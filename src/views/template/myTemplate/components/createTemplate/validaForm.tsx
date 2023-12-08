@@ -29,7 +29,7 @@ import copy from 'clipboard-copy';
 import ErrorIcon from '@mui/icons-material/Error';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import { t } from 'hooks/web/useI18n';
-import { Divider, Popconfirm } from 'antd';
+import { Divider, Popconfirm, Input } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
@@ -91,6 +91,7 @@ const Valida = ({
     editModal,
     delModal
 }: Validas) => {
+    const { TextArea } = Input;
     useEffect(() => {
         if (Object.values(formik.values).some((value) => value === '')) {
             formik.handleSubmit();
@@ -121,8 +122,8 @@ const Valida = ({
     const iptRef = useRef<any | null>(null);
     const changePrompt = (field: string, i: number) => {
         const newVal = _.cloneDeep(variables);
-        const part1 = newVal[i].value.slice(0, iptRef.current?.selectionStart);
-        const part2 = newVal[i].value.slice(iptRef.current?.selectionStart);
+        const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
+        const part2 = newVal[i].value.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
         newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
         formik.setFieldValue('prompt', newVal[i].value);
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
@@ -167,7 +168,29 @@ const Valida = ({
                                                 />
                                             </Box>
                                         </Box>
-                                        <TextField
+                                        <TextArea
+                                            className="mt-[16px]"
+                                            status={formik.touched[el.field] && Boolean(formik.errors[el.field]) ? 'error' : ''}
+                                            ref={iptRef}
+                                            style={{ height: '200px' }}
+                                            value={formik.values[el.field]}
+                                            name={el.field}
+                                            onChange={(e) => {
+                                                formik.handleChange(e);
+                                                clearTimeout(timeoutRef.current);
+                                                timeoutRef.current = setTimeout(() => {
+                                                    basisChange({ e: e.target, index, i, flag: false, values: true });
+                                                }, 300);
+                                            }}
+                                        />
+                                        {formik.touched[el.field] && formik.errors[el.field] ? (
+                                            <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                {String(formik.errors[el.field])}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[12px] mt-[5px] ml-[5px]">{el.description}</span>
+                                        )}
+                                        {/* <TextField
                                             color="secondary"
                                             sx={{ mt: 2 }}
                                             inputRef={iptRef}
@@ -194,7 +217,8 @@ const Valida = ({
                                                 }, 300);
                                             }}
                                             fullWidth
-                                        />
+                                        /> */}
+
                                         <Box mb={1}>
                                             {variable?.map((item) => (
                                                 <Tooltip key={item.field} placement="top" title={t('market.fields')}>

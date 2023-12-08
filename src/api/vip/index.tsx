@@ -61,3 +61,7 @@ export const getIsSign = (data: any) => {
 export const discountNewUser = () => {
     return request.post({ url: '/llm/pay/order/discount/newuser' });
 };
+
+export const getDiscountList = () => {
+    return request.post({ url: '/llm/pay/order/discount/list' });
+};

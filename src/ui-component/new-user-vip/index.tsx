@@ -1,19 +1,22 @@
 import { discountNewUser } from 'api/vip';
-import vipModal from 'assets/images/pay/vipModal.png';
+import vipModal from 'assets/images/pay/vip_pay.png';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CountdownProps } from 'antd';
 import { Statistic } from 'antd';
+import dayjs from 'dayjs';
 const { Countdown } = Statistic;
 
 export const NewUserVip = ({ onClose }: { onClose: any }) => {
     const navigate = useNavigate();
     const [endTime, setEndTime] = useState('');
+    const [name, setName] = useState('');
 
     useEffect(() => {
         discountNewUser().then((res) => {
             if (res?.code) {
                 setEndTime(res.endTime);
+                setName(res.name);
             }
         });
     }, []);
@@ -40,15 +43,19 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                         format="D天H时m分s秒"
                     />
                 </div>
-                {/* <div className={'absolute bottom-[120px] text-[#d4c399] left-[100px]'}>仅限基础版-月付首次购买用户</div> */}
-                {/* <div
+                <div className={'absolute bottom-[120px] text-[#d4c399] left-[112px] text-lg font-semibold'}>{name}</div>
+                <div className={'absolute bottom-[104px] text-[#d4c399] left-[91px]  font-semibold'}>
+                    有效期至{dayjs(endTime).format('YYYY年MM月DD日HH时')}
+                </div>
+
+                <div
                     onClick={() => {
                         navigate('/subscribe');
                     }}
-                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[155px] text-xl cursor-pointer font-semibold'}
+                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}
                 >
                     立即购买
-                </div> */}
+                </div>
                 <svg
                     onClick={() => {
                         onClose();

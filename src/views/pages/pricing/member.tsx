@@ -184,10 +184,10 @@ const plansDefault = (value: number, name?: string) => [
         ),
         btnTextNew: (
             <div>
-                新用户体验包9.9
-                {/* <Tag className="ml-1" color="#f50">
-                    {name || '订阅立减10元'}
-                </Tag> */}
+                新用户体验包
+                <Tag className="ml-1" color="#f50">
+                    <span className="text-base">9.9元</span>
+                </Tag>
             </div>
         ),
         monthCode: 'basic_month',
@@ -393,6 +393,16 @@ const Price1 = () => {
     const [payPrice, setPayPrice] = useState(0);
     const [currentSelect, setCurrentSelect] = useState<any>(null);
     const [openSignDialog, setOpenSignDialog] = useState(false);
+
+    const [showTrial, setShowTrial] = useState(false);
+
+    useEffect(() => {
+        discountNewUser().then((res) => {
+            if (res?.code) {
+                setShowTrial(true);
+            }
+        });
+    }, []);
 
     const { width } = useWindowSize();
     const navigate = useNavigate();
@@ -755,24 +765,20 @@ const Price1 = () => {
                                                     </Button>
                                                 )}
                                             </Grid>
-                                            {plan.btnTextNew && (
+                                            {plan.btnTextNew && showTrial && (
                                                 <Grid item xs={12}>
                                                     <Button
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
                                                         onClick={() => {
                                                             setCurrentSelect({
-                                                                title: plan.title,
+                                                                title: '体验版',
                                                                 select: value,
-                                                                monthCode: plan.monthCode,
-                                                                yearCode: plan.yearCode,
+                                                                monthCode: 'ai_trial',
+                                                                yearCode: 'ai_trial',
                                                                 experience: true
                                                             });
-                                                            handleClick(
-                                                                index,
-                                                                value === '1' ? plan.monthCode : plan.yearCode,
-                                                                value === '1' ? plan.yearCode : plan.monthCode
-                                                            );
+                                                            handleClick(index, 'ai_trial', 'ai_trial');
                                                         }}
                                                         color="secondary"
                                                     >

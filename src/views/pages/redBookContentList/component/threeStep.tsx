@@ -1,4 +1,4 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input } from 'antd';
+import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal } from 'antd';
 import React, { useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -13,15 +13,20 @@ import { Pagination } from 'swiper';
 import imgLoading from 'assets/images/picture/loading.gif';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Tooltip } from '@mui/material';
+import { getAccessToken } from 'utils/auth';
+import { PlusOutlined } from '@ant-design/icons';
 
 export const ThreeStep = ({ data }: { data: any }) => {
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
-    const [images, setImages] = React.useState<any[]>([]);
+    // const [images, setImages] = React.useState<any[]>([]);
     const [swiperRef, setSwiperRef] = React.useState<any>(null);
+    const [imageList, setImageList] = React.useState([]);
 
     const [editType, setEditType] = React.useState(false);
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [previewOpen, setPreviewOpen] = React.useState(false);
+    const [previewImage, setPreviewImage] = React.useState('');
 
     const handleModify = async () => {
         setLoading(true);
@@ -30,7 +35,12 @@ export const ThreeStep = ({ data }: { data: any }) => {
                 planUid: data.planUid,
                 businessUid: data.businessUid,
                 copyWritingTitle: title,
-                copyWritingContent: text
+                copyWritingContent: text,
+                pictureContent: imageList.map((item: any, index) => ({
+                    index: index + 1,
+                    url: item.url,
+                    isMain: index === 0
+                }))
             });
             setEditType(false);
             setLoading(false);
@@ -58,7 +68,15 @@ export const ThreeStep = ({ data }: { data: any }) => {
         if (data) {
             setText(data?.copyWritingContent);
             setTitle(data?.copyWritingTitle);
-            setImages(data?.pictureContent || []);
+            // setImages(data?.pictureContent || []);
+            const imgs = data?.pictureContent.map((item: any) => ({
+                uid: item.index,
+                status: 'done',
+                name: item.url,
+                url: item.url,
+                isMain: item.isMain
+            }));
+            setImageList(imgs);
         }
     }, [data]);
 
@@ -67,7 +85,52 @@ export const ThreeStep = ({ data }: { data: any }) => {
         if (res) {
             setText(res.copyWritingContent);
             setTitle(res.copyWritingTitle);
-            setImages(res.pictureContent || []);
+
+            // setImages(res.pictureContent || []);
+            const imgs = res?.pictureContent.map((item: any) => ({
+                uid: item.index,
+                status: 'done',
+                name: item.url,
+                url: item.url,
+                isMain: item.isMain
+            }));
+            setImageList(imgs);
+        }
+    };
+
+    const props: UploadProps = {
+        name: 'image',
+        multiple: true,
+        listType: 'picture-card',
+        defaultFileList: imageList,
+        showUploadList: {
+            showPreviewIcon: false
+        },
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 500,
+        onChange(info: any) {
+            const list = info.fileList.map((item: any) => {
+                if (item?.response) {
+                    return {
+                        uid: item?.response?.data?.uuid,
+                        status: 'done',
+                        name: item?.response?.data?.name,
+                        url: item?.response?.data?.url,
+                        isMain: false
+                    };
+                } else {
+                    return item;
+                }
+            });
+
+            setImageList(list);
+        },
+        onPreview: (file: any) => {
+            setPreviewImage(file.url);
+            setPreviewOpen(true);
         }
     };
 
@@ -98,52 +161,60 @@ export const ThreeStep = ({ data }: { data: any }) => {
             >
                 <div className="w-full grid grid-cols-3 h-full">
                     <div className="col-span-2 relative h-full overflow-hidden">
-                        {images?.length > 0 && (
-                            <>
-                                <div className="flex justify-between absolute top-[46%] w-full z-10">
-                                    <Button
-                                        icon={<KeyboardBackspaceIcon />}
-                                        shape="circle"
-                                        onClick={() => {
-                                            console.log(swiperRef, 'swiperRef');
-                                            swiperRef?.slidePrev();
-                                        }}
-                                    />
-                                    <Button
-                                        style={{ marginLeft: '10px' }}
-                                        icon={<ArrowForwardIcon />}
-                                        shape="circle"
-                                        onClick={() => {
-                                            swiperRef?.slideNext();
-                                        }}
-                                    />
-                                </div>
-                                <div className="h-full">
-                                    {images.length > 0 && (
-                                        <Swiper
-                                            onSwiper={(swiper) => setSwiperRef(swiper)}
-                                            slidesPerView={1}
-                                            spaceBetween={30}
-                                            centeredSlides={false}
-                                            loop
-                                            pagination={{ clickable: true }}
-                                            modules={[Pagination]}
-                                            className="mySwiper h-full"
-                                            autoplay={{
-                                                delay: 2500,
-                                                disableOnInteraction: false
+                        {imageList?.length > 0 &&
+                            (editType ? (
+                                <Upload {...props}>
+                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                        <PlusOutlined rev={undefined} />
+                                        <div style={{ marginTop: 8 }}>上传</div>
+                                    </div>
+                                </Upload>
+                            ) : (
+                                <>
+                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                        <Button
+                                            icon={<KeyboardBackspaceIcon />}
+                                            shape="circle"
+                                            onClick={() => {
+                                                console.log(swiperRef, 'swiperRef');
+                                                swiperRef?.slidePrev();
                                             }}
-                                        >
-                                            {images.map((item: any, index) => (
-                                                <SwiperSlide key={index}>
-                                                    <img className="w-full h-full object-contain" src={item.url} />
-                                                </SwiperSlide>
-                                            ))}
-                                        </Swiper>
-                                    )}
-                                </div>
-                            </>
-                        )}
+                                        />
+                                        <Button
+                                            style={{ marginLeft: '10px' }}
+                                            icon={<ArrowForwardIcon />}
+                                            shape="circle"
+                                            onClick={() => {
+                                                swiperRef?.slideNext();
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="h-full">
+                                        {imageList.length > 0 && (
+                                            <Swiper
+                                                onSwiper={(swiper) => setSwiperRef(swiper)}
+                                                slidesPerView={1}
+                                                spaceBetween={30}
+                                                centeredSlides={false}
+                                                loop
+                                                pagination={{ clickable: true }}
+                                                modules={[Pagination]}
+                                                className="mySwiper h-full"
+                                                autoplay={{
+                                                    delay: 2500,
+                                                    disableOnInteraction: false
+                                                }}
+                                            >
+                                                {imageList.map((item: any, index) => (
+                                                    <SwiperSlide key={index}>
+                                                        <img className="w-full h-full object-contain" src={item.url} />
+                                                    </SwiperSlide>
+                                                ))}
+                                            </Swiper>
+                                        )}
+                                    </div>
+                                </>
+                            ))}
                     </div>
                     <div className="col-span-1 h-full overflow-auto">
                         {
@@ -200,7 +271,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             onChange={(e) => setText(e.target.value)}
                                             className="text-base mb-2 whitespace-pre-wrap"
                                             value={text}
-                                            rows={10}
+                                            rows={16}
                                         />
                                     ) : (
                                         <CopyToClipboard
@@ -232,6 +303,10 @@ export const ThreeStep = ({ data }: { data: any }) => {
                     </div>
                 </div>
             </Card>
+
+            <Modal style={{ zIndex: 9999 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
+                <img alt="example" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
         </div>
     );
 };

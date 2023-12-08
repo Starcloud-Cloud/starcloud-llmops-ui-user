@@ -1,5 +1,5 @@
 import { Button, Tooltip } from '@mui/material';
-import { Tag, Popover } from 'antd';
+import { Tag, Popover, DatePicker } from 'antd';
 import {
     Box,
     Table,
@@ -19,7 +19,6 @@ import {
     InputAdornment,
     MenuItem
 } from '@mui/material';
-import { DatePicker } from 'antd';
 import { visuallyHidden } from '@mui/utils';
 import MainCard from 'ui-component/cards/MainCard';
 import React, { useEffect, useState } from 'react';
@@ -155,8 +154,8 @@ const TaskCenter: React.FC = () => {
             notificationPage({
                 ...pageVO,
                 ...query,
-                createStartTime: query.createTime ? query.createTime[0]?.valueOf() : undefined,
-                createEndTime: query.createTime ? query.createTime[1]?.valueOf() : undefined,
+                createStartTime: query.createTime ? query.createTime[0]?.format('YYYY-MM-DD') + ' 00:00:00' : undefined,
+                createEndTime: query.createTime ? query.createTime[1]?.format('YYYY-MM-DD') + ' 23:59:59' : undefined,
                 createTime: undefined
             }).then((res) => {
                 const fetchedRows = res?.list;

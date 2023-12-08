@@ -110,6 +110,10 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
             )
         },
         {
+            title: '创作计划',
+            dataIndex: 'planName'
+        },
+        {
             title: '状态',
             dataIndex: 'status',
             render: (_, row) => <div>{handleTransfer(row.status)}</div>

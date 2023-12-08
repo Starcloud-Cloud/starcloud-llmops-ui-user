@@ -184,7 +184,7 @@ const plansDefault = (value: number, name?: string) => [
         ),
         btnTextNew: (
             <div>
-                用户一周体验包
+                新用户一周体验包
                 <Tag className="ml-1" color="#f50">
                     <span className="text-base">9.9元</span>
                 </Tag>

@@ -182,6 +182,14 @@ const plansDefault = (value: number, name?: string) => [
                 </Tag>
             </div>
         ),
+        btnTextNew: (
+            <div>
+                新用户体验包
+                <Tag className="ml-1" color="#f50">
+                    <span className="text-base">9.9元</span>
+                </Tag>
+            </div>
+        ),
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
@@ -386,6 +394,16 @@ const Price1 = () => {
     const [currentSelect, setCurrentSelect] = useState<any>(null);
     const [openSignDialog, setOpenSignDialog] = useState(false);
 
+    const [showTrial, setShowTrial] = useState(false);
+
+    useEffect(() => {
+        discountNewUser().then((res) => {
+            if (res?.code === '00001') {
+                setShowTrial(true);
+            }
+        });
+    }, []);
+
     const { width } = useWindowSize();
     const navigate = useNavigate();
 
@@ -396,13 +414,13 @@ const Price1 = () => {
         }
     };
 
-    useEffect(() => {
-        discountNewUser().then((res: any) => {
-            if (res.name) {
-                setPlans([...plansDefault(1, res.name)]);
-            }
-        });
-    }, []);
+    // useEffect(() => {
+    //     discountNewUser().then((res: any) => {
+    //         if (res.code === '00001') {
+    //             setPlans([...plansDefault(1, res.name)]);
+    //         }
+    //     });
+    // }, []);
 
     // 从服务端请求vip数据
     // useEffect(() => {
@@ -747,6 +765,27 @@ const Price1 = () => {
                                                     </Button>
                                                 )}
                                             </Grid>
+                                            {plan.btnTextNew && showTrial && (
+                                                <Grid item xs={12}>
+                                                    <Button
+                                                        className={'w-4/5'}
+                                                        variant={plan.active ? 'contained' : 'outlined'}
+                                                        onClick={() => {
+                                                            setCurrentSelect({
+                                                                title: '体验版',
+                                                                select: value,
+                                                                monthCode: 'ai_trial',
+                                                                yearCode: 'ai_trial',
+                                                                experience: true
+                                                            });
+                                                            handleClick(index, 'ai_trial', 'ai_trial');
+                                                        }}
+                                                        color="secondary"
+                                                    >
+                                                        {plan.btnTextNew}
+                                                    </Button>
+                                                </Grid>
+                                            )}
                                             <Grid item xs={12}>
                                                 <List
                                                     sx={{

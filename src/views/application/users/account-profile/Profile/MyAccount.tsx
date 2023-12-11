@@ -123,10 +123,10 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
                                     fullWidth
                                     label={t('2profile.user.mobile')}
                                     value={mobile}
-                                    onClick={() => {
-                                        setPhoneOpen(true);
-                                    }}
-                                    // onChange={(e) => setMobile(e.target.value)}
+                                    // onClick={() => {
+                                    //     setPhoneOpen(true);
+                                    // }}
+                                    onChange={(e) => setMobile(e.target.value)}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>

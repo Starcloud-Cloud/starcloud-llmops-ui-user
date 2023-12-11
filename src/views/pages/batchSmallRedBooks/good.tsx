@@ -53,7 +53,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
     };
     return (
         <div className="mb-[20px] w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]">
-            {item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? (
+            {item.pictureStatus === 'init' || item.pictureStatus === 'executing' ? (
                 <div className="w-full flex justify-center items-center">
                     <div className="w-full aspect-[250/335] flex justify-center items-center">
                         <div className="text-center">
@@ -65,7 +65,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         </div>
                     </div>
                 </div>
-            ) : item.copyWritingStatus === 'execute_error' || item.copyWritingStatus === 'execute_error_finished' ? (
+            ) : item.pictureStatus === 'execute_error' || item.pictureStatus === 'execute_error_finished' ? (
                 <div className="w-full flex justify-center items-center">
                     <div className="w-full aspect-[250/335] flex justify-center items-center relative">
                         <Image

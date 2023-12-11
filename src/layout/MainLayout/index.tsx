@@ -446,7 +446,7 @@ const MainLayout = () => {
             }
         }
     }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);
-    const [phoneOpne, setPhoneOpen] = useState(true);
+    const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 
     const header = useMemo(

@@ -123,6 +123,8 @@ function Deatail() {
                     break;
                 }
                 let str = textDecoder.decode(value);
+                console.log(str);
+
                 const lines = str.split('\n');
                 lines.forEach((message, i: number) => {
                     if (i === 0 && joins) {

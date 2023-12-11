@@ -630,6 +630,7 @@ const TermTable = ({
                 </div>
             </div>
             <Table
+                className="termTable"
                 loading={loading}
                 sticky={{ offsetHeader: 76 }}
                 scroll={{ x: '1300px' }}

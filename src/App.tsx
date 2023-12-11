@@ -53,6 +53,7 @@ const App = () => {
                 alert: {
                     color: data.type
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );

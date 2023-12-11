@@ -35,7 +35,7 @@ import './addModal.scss';
 const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; singleMissionStatusEnumList: any[] }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const handleTransfer = (key: string) => {
+    const handleTransfer = (key: string, msg?: string) => {
         switch (key) {
             case 'init':
                 return (
@@ -81,9 +81,11 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
                 );
             case 'pre_settlement_error':
                 return (
-                    <Tag className="!mr-0" color="error">
-                        预结算异常
-                    </Tag>
+                    <Popover content={msg}>
+                        <Tag className="!mr-0 cursor-pointer" color="error">
+                            预结算异常
+                        </Tag>
+                    </Popover>
                 );
             case 'settlement_error':
                 return (
@@ -116,7 +118,9 @@ const Announce = ({ status, singleMissionStatusEnumList }: { status?: string; si
         {
             title: '状态',
             dataIndex: 'status',
-            render: (_, row) => <div>{handleTransfer(row.status)}</div>
+            render: (_, row) => (
+                <div>{handleTransfer(row.status, row.status === 'pre_settlement_error' ? row.preSettlementMsg : undefined)}</div>
+            )
         },
         {
             title: '认领人',

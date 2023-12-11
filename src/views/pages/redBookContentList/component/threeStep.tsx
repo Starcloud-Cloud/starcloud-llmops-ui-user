@@ -27,6 +27,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [previewOpen, setPreviewOpen] = React.useState(false);
     const [previewImage, setPreviewImage] = React.useState('');
+    const [claim, setClaim] = React.useState(true);
 
     const handleModify = async () => {
         setLoading(true);
@@ -68,6 +69,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
         if (data) {
             setText(data?.copyWritingContent);
             setTitle(data?.copyWritingTitle);
+            setClaim(data?.claim);
             // setImages(data?.pictureContent || []);
             const imgs = data?.pictureContent.map((item: any) => ({
                 uid: item.index,
@@ -86,7 +88,6 @@ export const ThreeStep = ({ data }: { data: any }) => {
             setText(res.copyWritingContent);
             setTitle(res.copyWritingTitle);
 
-            // setImages(res.pictureContent || []);
             const imgs = res?.pictureContent.map((item: any) => ({
                 uid: item.index,
                 status: 'done',
@@ -148,7 +149,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                         <Button onClick={doRetry}>重新生成</Button>
                         <Divider type="vertical" />
                         {!editType ? (
-                            <Button type="primary" onClick={() => setEditType(true)}>
+                            <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                 编辑
                             </Button>
                         ) : (

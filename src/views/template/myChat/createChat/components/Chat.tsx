@@ -314,16 +314,23 @@ export const Chat = ({
     const conversationUniKey = `conversationUid-${mediumUid}`;
 
     // 创建语音识别对象
-    const recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
+    let recognition: any;
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
+    } else {
+        console.error('SpeechRecognition is not supported in this browser.');
+    }
 
-    // 设置语言为中文
-    recognition.lang = navigator.language;
+    if (recognition) {
+        // 设置语言为中文
+        recognition.lang = navigator.language;
 
-    // 语音识别结果事件处理函数
-    recognition.onresult = (event: any) => {
-        const result = event.results[event.resultIndex][0].transcript;
-        setMessage(`${message}${result}`);
-    };
+        // 语音识别结果事件处理函数
+        recognition.onresult = (event: any) => {
+            const result = event.results[event.resultIndex][0].transcript;
+            setMessage(`${message}${result}`);
+        };
+    }
 
     // 左边联动右边,右边不联动左边
     useEffect(() => {
@@ -337,19 +344,23 @@ export const Chat = ({
 
     // 开始语音识别
     const startListening = () => {
-        timeOutRef.current = setInterval(() => {
-            setTime((time) => time + 1);
-        }, 1000);
-        setIsListening(true);
-        recognition.start();
+        if (recognition) {
+            timeOutRef.current = setInterval(() => {
+                setTime((time) => time + 1);
+            }, 1000);
+            setIsListening(true);
+            recognition.start();
+        }
     };
 
     // 停止语音识别
     const stopListening = () => {
-        timeOutRef.current && clearInterval(timeOutRef.current);
-        setTime(1);
-        setIsListening(false);
-        recognition.stop();
+        if (recognition) {
+            timeOutRef.current && clearInterval(timeOutRef.current);
+            setTime(1);
+            setIsListening(false);
+            recognition.stop();
+        }
     };
 
     useEffect(() => {
@@ -592,11 +603,13 @@ export const Chat = ({
     // mode market end
 
     React.useEffect(() => {
-        // 清理语音识别对象
-        return () => {
-            recognition.stop();
-            recognition.onresult = null;
-        };
+        if (recognition) {
+            // 清理语音识别对象
+            return () => {
+                recognition.stop();
+                recognition.onresult = null;
+            };
+        }
     }, []);
 
     function convertTextWithLinks(text: string): JSX.Element {
@@ -1480,32 +1493,36 @@ export const Chat = ({
                                     maxRows={3}
                                     endAdornment={
                                         <>
-                                            <InputAdornment position="end">
-                                                {!isListening ? (
-                                                    <Tooltip arrow placement="top" title={'语音输入'}>
-                                                        <IconButton
-                                                            disableRipple
-                                                            color={'default'}
-                                                            onClick={startListening}
-                                                            aria-label="voice"
-                                                            className="p-0"
-                                                        >
-                                                            <KeyboardVoiceIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                ) : (
-                                                    <Tooltip placement="top" arrow title={'停止语音输入'}>
-                                                        <div
-                                                            onClick={stopListening}
-                                                            className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
-                                                        >
-                                                            <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
-                                                                {time}
-                                                            </div>
-                                                        </div>
-                                                    </Tooltip>
-                                                )}
-                                            </InputAdornment>
+                                            {recognition && (
+                                                <>
+                                                    <InputAdornment position="end">
+                                                        {!isListening ? (
+                                                            <Tooltip arrow placement="top" title={'语音输入'}>
+                                                                <IconButton
+                                                                    disableRipple
+                                                                    color={'default'}
+                                                                    onClick={startListening}
+                                                                    aria-label="voice"
+                                                                    className="p-0"
+                                                                >
+                                                                    <KeyboardVoiceIcon />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        ) : (
+                                                            <Tooltip placement="top" arrow title={'停止语音输入'}>
+                                                                <div
+                                                                    onClick={stopListening}
+                                                                    className="w-[30px] h-[30px] rounded-full border-2 border-[#727374] border-solid flex justify-center items-center cursor-pointer"
+                                                                >
+                                                                    <div className="w-[16px] h-[16px] rounded-sm bg-[red] text-white flex justify-center items-center text-xs">
+                                                                        {time}
+                                                                    </div>
+                                                                </div>
+                                                            </Tooltip>
+                                                        )}
+                                                    </InputAdornment>
+                                                </>
+                                            )}
                                             <InputAdornment position="end" className="relative">
                                                 {isFetch ? (
                                                     <Tooltip placement="top" arrow title={'请求中'}>

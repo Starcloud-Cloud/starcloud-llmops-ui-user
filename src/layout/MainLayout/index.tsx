@@ -35,6 +35,7 @@ import React from 'react';
 import { ListingProvider } from 'contexts/ListingContext';
 import { NewUserVip } from 'ui-component/new-user-vip';
 import userInfoStore from 'store/entitlementAction';
+import StorageCache from 'web-storage-cache';
 
 interface MainStyleProps {
     theme: Theme;
@@ -302,6 +303,7 @@ function ChatLink({ navigate }: { navigate: (link: string) => void }) {
 
 let userVip: any;
 const MainLayout = () => {
+    const storage = new StorageCache();
     const navigation = getMenuItems();
     const theme = useTheme();
     const location = useLocation();
@@ -428,7 +430,12 @@ const MainLayout = () => {
     useEffect(() => {
         if (userInfo?.benefits) {
             if (status) {
-                if (use?.mobile === '' && !use?.mobile && JSON.stringify(twoUser) !== JSON.stringify(userInfo?.benefits)) {
+                if (
+                    use?.mobile === '' &&
+                    !storage.get('phonenumber') &&
+                    !use?.mobile &&
+                    JSON.stringify(twoUser) !== JSON.stringify(userInfo?.benefits)
+                ) {
                     setPhoneOpen(true);
                 } else {
                     setPhoneOpen(false);
@@ -551,6 +558,7 @@ const MainLayout = () => {
                                     title="绑定手机号"
                                     submitText="绑定"
                                     onClose={() => {
+                                        storage.set('phonenumber', '1', { exp: 60 * 60 * 24 });
                                         setPhoneOpen(false);
                                     }}
                                     emits={async () => {

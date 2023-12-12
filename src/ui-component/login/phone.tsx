@@ -77,20 +77,18 @@ const Phone = ({
                 title={title}
                 content={false}
             >
-                {title === '修改手机号' && (
-                    <IconButton
-                        onClick={() => onClose()}
-                        size="large"
-                        aria-label="close modal"
-                        sx={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8
-                        }}
-                    >
-                        <CloseIcon fontSize="small" />
-                    </IconButton>
-                )}
+                <IconButton
+                    onClick={() => onClose()}
+                    size="large"
+                    aria-label="close modal"
+                    sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8
+                    }}
+                >
+                    <CloseIcon fontSize="small" />
+                </IconButton>
                 <CardContent sx={{ p: '16px !important' }}>
                     <Formik
                         initialValues={{

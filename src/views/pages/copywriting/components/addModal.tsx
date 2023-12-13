@@ -50,7 +50,8 @@ import {
     Popconfirm,
     Spin,
     Modal,
-    Collapse
+    Collapse,
+    Tag
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
@@ -99,8 +100,17 @@ const AddModal = () => {
             dataIndex: 'title'
         },
         {
+            title: '参考标签',
+            render: (_, row) =>
+                row?.tagList?.map((item: string) => (
+                    <Tag color="blue" key={item}>
+                        {item}
+                    </Tag>
+                ))
+        },
+        {
             title: '参考内容',
-            width: '40%',
+            width: '30%',
             dataIndex: 'content',
             render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
@@ -266,7 +276,7 @@ const AddModal = () => {
         }
     }, [addOpen]);
     //改变值
-    const changeAccoutQuery = (data: { name: string; value: number | string }) => {
+    const changeAccoutQuery = (data: { name: string; value: number | string | string[] }) => {
         setAccoutQuery({
             ...accoutQuery,
             [data.name]: data.value
@@ -1477,7 +1487,8 @@ const AddModal = () => {
                                                             setAccoutQuery({
                                                                 ...accoutQuery,
                                                                 content: res.desc,
-                                                                title: res.title
+                                                                title: res.title,
+                                                                tagList: res.tagList?.map((item: any) => item.name)
                                                             });
                                                             res.desc;
                                                         }
@@ -1511,6 +1522,54 @@ const AddModal = () => {
                                     />
                                 </Grid>
                                 <Grid item md={12}>
+                                    <FormControl key={accoutQuery.tagList} color="secondary" fullWidth>
+                                        <Autocomplete
+                                            multiple
+                                            size="small"
+                                            id="tags-filled"
+                                            color="secondary"
+                                            options={[]}
+                                            defaultValue={accoutQuery.tagList}
+                                            freeSolo
+                                            renderTags={(value: readonly string[], getTagProps) =>
+                                                value.map((option: string, index: number) => (
+                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                                ))
+                                            }
+                                            onChange={(e: any, newValue) => {
+                                                changeAccoutQuery({
+                                                    name: 'tagList',
+                                                    value: newValue
+                                                });
+                                            }}
+                                            renderInput={(param) => (
+                                                <TextField
+                                                    onBlur={(e: any) => {
+                                                        if (e.target.value) {
+                                                            let newValue = accoutQuery.tagList;
+                                                            if (!newValue) {
+                                                                newValue = [];
+                                                            }
+                                                            newValue.push(e.target.value);
+                                                            changeAccoutQuery({
+                                                                name: 'tagList',
+                                                                value: newValue
+                                                            });
+                                                        }
+                                                    }}
+                                                    color="secondary"
+                                                    {...param}
+                                                    label="参考标签"
+                                                    placeholder="请输入标签然后回车"
+                                                />
+                                            )}
+                                        />
+                                        <FormHelperText>
+                                            {(!params.tags || params.tags.length === 0) && tagOpen ? '标签最少输入一个' : ''}
+                                        </FormHelperText>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item md={12}>
                                     <TextField
                                         fullWidth
                                         multiline
@@ -1526,7 +1585,7 @@ const AddModal = () => {
                                         label="参考内容"
                                         name="content"
                                         error={!accoutQuery.content && contentOpen}
-                                        helperText={!accoutQuery.content && contentOpen ? '参考标题必填' : ''}
+                                        helperText={!accoutQuery.content && contentOpen ? '参考内容必填' : ''}
                                         value={accoutQuery.content}
                                         onChange={(e: any) => {
                                             setContentOpen(true);

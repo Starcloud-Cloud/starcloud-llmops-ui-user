@@ -609,6 +609,7 @@ const AddModal = () => {
                         {
                             label: '通告任务',
                             key: '2',
+                            disabled: !searchParams.get('notificationUid'),
                             children: <Announce singleMissionStatusEnumList={singleMissionStatusEnumList} status={params.status} />
                         }
                     ]}

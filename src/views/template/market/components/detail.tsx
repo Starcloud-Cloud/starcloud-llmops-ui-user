@@ -1,5 +1,5 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-import { Image, Select } from 'antd';
+import { Image, Select, Popover } from 'antd';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -25,7 +25,7 @@ import _ from 'lodash-es';
 import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
-import { GradeOutlined, Grade } from '@mui/icons-material';
+import { GradeOutlined, Grade, ErrorOutline } from '@mui/icons-material';
 interface Items {
     label: string;
     value: string;
@@ -466,28 +466,43 @@ function Deatail() {
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
                 {appModels.aiModel && (
-                    <Select
-                        style={{ width: 100, height: 23 }}
-                        bordered={false}
-                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                        rootClassName="modelSelect"
-                        popupClassName="modelSelectPopup"
-                        value={aiModels}
-                        onChange={(value) => {
-                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                setOpenUpgradeModel(true);
-                                return;
+                    <div className="flex items-center">
+                        <Popover
+                            title="模型介绍"
+                            content={
+                                <>
+                                    <div>- 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用</div>
+                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                </>
                             }
-                            aimodeRef.current = value;
-                            setAiModels(value);
-                        }}
-                    >
-                        {appModels.aiModel.map((item: any) => (
-                            <Option key={item.value} value={item.value}>
-                                {item.label}
-                            </Option>
-                        ))}
-                    </Select>
+                        >
+                            <div className="h-[23px]">
+                                <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                            </div>
+                        </Popover>
+                        <Select
+                            style={{ width: 100, height: 23 }}
+                            bordered={false}
+                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                            rootClassName="modelSelect"
+                            popupClassName="modelSelectPopup"
+                            value={aiModels}
+                            onChange={(value) => {
+                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                    setOpenUpgradeModel(true);
+                                    return;
+                                }
+                                aimodeRef.current = value;
+                                setAiModels(value);
+                            }}
+                        >
+                            {appModels.aiModel.map((item: any) => (
+                                <Option key={item.value} value={item.value}>
+                                    {item.label}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
                 )}
             </Box>
             <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />

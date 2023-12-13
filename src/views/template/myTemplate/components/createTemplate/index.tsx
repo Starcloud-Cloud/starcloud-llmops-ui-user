@@ -14,7 +14,7 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import { Image, Select } from 'antd';
+import { Image, Select, Popover } from 'antd';
 import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { userBenefits, metadata } from 'api/template';
 import { executeApp } from 'api/template/fetch';
@@ -514,7 +514,7 @@ function CreateDetail() {
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-end">
+                            <div className="flex justify-between items-center">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                                     {detail?.icon && (
                                         <Image
@@ -537,28 +537,43 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                                 {appModels.aiModel && (
-                                    <Select
-                                        style={{ width: 100, height: 23 }}
-                                        bordered={false}
-                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                        rootClassName="modelSelect"
-                                        popupClassName="modelSelectPopup"
-                                        value={aiModel}
-                                        onChange={(value) => {
-                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                setOpenUpgradeModel(true);
-                                                return;
+                                    <div className="flex items-center">
+                                        <Popover
+                                            title="模型介绍"
+                                            content={
+                                                <>
+                                                    <div>
+                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                    </div>
+                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                </>
                                             }
-                                            setPerform(perform + 1);
-                                            setAiModel(value);
-                                        }}
-                                    >
-                                        {appModels.aiModel.map((item: any) => (
-                                            <Option key={item.value} value={item.value}>
-                                                {item.label}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                        >
+                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                        </Popover>
+                                        <Select
+                                            style={{ width: 100, height: 23 }}
+                                            bordered={false}
+                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                            rootClassName="modelSelect"
+                                            popupClassName="modelSelectPopup"
+                                            value={aiModel}
+                                            onChange={(value) => {
+                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                    setOpenUpgradeModel(true);
+                                                    return;
+                                                }
+                                                setPerform(perform + 1);
+                                                setAiModel(value);
+                                            }}
+                                        >
+                                            {appModels.aiModel.map((item: any) => (
+                                                <Option key={item.value} value={item.value}>
+                                                    {item.label}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </div>
                                 )}
                             </div>
                             <Divider sx={{ my: 1 }} />
@@ -604,7 +619,7 @@ function CreateDetail() {
                             {t('market.debug')}
                         </Typography>
                         <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-end">
+                            <div className="flex justify-between items-center">
                                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                                     {detail?.icon && (
                                         <Image
@@ -627,28 +642,43 @@ function CreateDetail() {
                                     </Box>
                                 </Box>
                                 {appModels.aiModel && (
-                                    <Select
-                                        style={{ width: 100, height: 23 }}
-                                        bordered={false}
-                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                        rootClassName="modelSelect"
-                                        popupClassName="modelSelectPopup"
-                                        value={aiModel}
-                                        onChange={(value) => {
-                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                setOpenUpgradeModel(true);
-                                                return;
+                                    <div className="flex items-center">
+                                        <Popover
+                                            title="模型介绍"
+                                            content={
+                                                <>
+                                                    <div>
+                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                    </div>
+                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                </>
                                             }
-                                            setPerform(perform + 1);
-                                            setAiModel(value);
-                                        }}
-                                    >
-                                        {appModels.aiModel.map((item: any) => (
-                                            <Option key={item.value} value={item.value}>
-                                                {item.label}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                        >
+                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                        </Popover>
+                                        <Select
+                                            style={{ width: 100, height: 23 }}
+                                            bordered={false}
+                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                            rootClassName="modelSelect"
+                                            popupClassName="modelSelectPopup"
+                                            value={aiModel}
+                                            onChange={(value) => {
+                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                    setOpenUpgradeModel(true);
+                                                    return;
+                                                }
+                                                setPerform(perform + 1);
+                                                setAiModel(value);
+                                            }}
+                                        >
+                                            {appModels.aiModel.map((item: any) => (
+                                                <Option key={item.value} value={item.value}>
+                                                    {item.label}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </div>
                                 )}
                             </div>
                             <Divider sx={{ my: 1 }} />

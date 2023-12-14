@@ -57,27 +57,29 @@ const Statistical = () => {
     };
     //评论分析
     const getAnalyze = () => {
+        if (!document.getElementById('analyze')) {
+            setTimeout(() => {
+                getAnalyze();
+            }, 1000);
+            return false;
+        }
         const myChart = echarts.init(document.getElementById('analyze'));
         const options = {
             legend: {
-                show: true
+                show: true,
+                icon: 'circle'
             },
             tooltip: {
                 trigger: 'item'
             },
             series: [
                 {
-                    name: 'Access From',
                     type: 'pie',
                     radius: ['40%', '70%'],
-                    avoidLabelOverlap: false,
-
                     data: [
-                        { value: 1048, name: 'Search Engine' },
-                        { value: 735, name: 'Direct' },
-                        { value: 580, name: 'Email' },
-                        { value: 484, name: 'Union Ads' },
-                        { value: 300, name: 'Video Ads' }
+                        { value: 1048, name: '积极评论' },
+                        { value: 735, name: '消极评论' },
+                        { value: 580, name: '中性评论' }
                     ]
                 }
             ]
@@ -88,7 +90,7 @@ const Statistical = () => {
         if (activeKey === '1') {
             getEchart();
         } else {
-            // getAnalyze();
+            getAnalyze();
         }
     }, [activeKey]);
 

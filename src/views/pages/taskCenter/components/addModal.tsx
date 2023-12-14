@@ -615,6 +615,7 @@ const AddModal = () => {
                         },
                         {
                             label: '统计分析',
+                            disabled: !searchParams.get('notificationUid'),
                             key: '3',
                             children: <Statistical />
                         }

@@ -39,7 +39,7 @@ export const getInfo = () => {
 
 // 路由 | Routes
 export const getAsyncRoutes = () => {
-    return request.get({ url: '/system/auth/get-permission-info' });
+    return request.get({ url: '/system/auth/list-menus' });
 };
 
 //获取登录验证码 | Get login verification code

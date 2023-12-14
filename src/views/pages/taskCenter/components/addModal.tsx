@@ -27,6 +27,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import './addModal.scss';
 import Announce from './announce';
+import Statistical from './statistical';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { notificationCreate, notificationDetail, notificationModify, singleMetadata } from 'api/redBook/task';
@@ -609,7 +610,14 @@ const AddModal = () => {
                         {
                             label: '通告任务',
                             key: '2',
+                            disabled: !searchParams.get('notificationUid'),
                             children: <Announce singleMissionStatusEnumList={singleMissionStatusEnumList} status={params.status} />
+                        },
+                        {
+                            label: '统计分析',
+                            disabled: !searchParams.get('notificationUid'),
+                            key: '3',
+                            children: <Statistical />
                         }
                     ]}
                     onChange={changeActive}

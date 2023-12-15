@@ -1,6 +1,6 @@
 import { useListing } from 'contexts/ListingContext';
 import _ from 'lodash-es';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 
 const mergeArray = (arr: any[]) => {
@@ -39,6 +39,9 @@ const FiledTextArea = ({
     const [currentList, setCurrentList] = useState<any>([]);
     const { list, setKeywordHighlight, keywordHighlight, keywordHighlightRef } = useListing();
     const copyHighlightWordList = highlightAllWordList.map((item: any) => item.keyword.toLowerCase());
+    const container1Ref = useRef(null);
+    const container2Ref = useRef(null);
+    const [scrollPosition, setScrollPosition] = useState(0);
 
     // 该文本的关键字数组
     const resultArray = useMemo(() => {
@@ -88,9 +91,22 @@ const FiledTextArea = ({
         handleInputChange(e, index);
     };
 
+    const handleContainer2Scroll = () => {
+        console.log((container2Ref.current as any).scrollTop, 'adsf');
+        if (container2Ref.current) {
+            setScrollPosition((container2Ref.current as any).scrollTop);
+        }
+    };
+
+    useEffect(() => {
+        if (container1Ref.current) {
+            (container1Ref.current as any).scrollTop = scrollPosition;
+        }
+    }, [scrollPosition]);
+
     return (
         <div className="relative w-full">
-            <div className="break-words w-full h-full absolute p-[2px]">
+            <div className="break-words w-full h-full absolute p-[2px] overflow-auto" ref={container1Ref}>
                 {resultArray?.map((item: any) => (
                     <pre
                         className={`${
@@ -104,6 +120,8 @@ const FiledTextArea = ({
                 ))}
             </div>
             <textarea
+                onScroll={handleContainer2Scroll}
+                ref={container2Ref}
                 rows={rows}
                 placeholder={placeholder}
                 spellCheck="false"

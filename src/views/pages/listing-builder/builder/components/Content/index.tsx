@@ -575,7 +575,27 @@ const Content = () => {
             // 智能推荐
             if (item.type === ListingBuilderEnum.SEARCH_WORD) {
                 setLoadingList([]);
-                const res = await getRecommend({ version, uid });
+                const result = list
+                    .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
+                    .reduce((acc: any, obj, index) => {
+                        acc[index + 1] = obj.value;
+                        return acc;
+                    }, {});
+                const data = {
+                    uid,
+                    version,
+                    endpoint: country.key,
+                    draftConfig: {
+                        enableAi,
+                        fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length
+                    },
+                    title: list.find((item) => item.type === ListingBuilderEnum.TITLE)?.value,
+                    productDesc: list.find((item) => item.type === ListingBuilderEnum.PRODUCT_DES)?.value,
+                    searchTerm: list.find((item) => item.type === ListingBuilderEnum.SEARCH_WORD)?.value,
+                    fiveDesc: result
+                };
+
+                const res = await getRecommend(data);
                 if (res) {
                     setList((pre: any[]) => {
                         const copyPre = [...pre];

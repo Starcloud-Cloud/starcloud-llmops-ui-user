@@ -656,6 +656,8 @@ const Content = () => {
                             setList((preList: any) => {
                                 const copyPreList = _.cloneDeep(preList);
                                 copyPreList[index].value = copyPreList[index].value + bufferObj.content;
+                                copyPreList[index].character = (copyPreList[index].value + bufferObj.content)?.length || 0;
+                                copyPreList[index].word = (copyPreList[index].value + bufferObj.content)?.trim()?.split(' ')?.length || 0;
                                 return copyPreList;
                             });
                         }

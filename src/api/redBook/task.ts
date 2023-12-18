@@ -11,7 +11,7 @@ export const notificationCreate = (data: any) => {
 };
 //编辑任务
 export const notificationModify = (data: any) => {
-    return request.delete({ url: '/llm/notification/modify', data });
+    return request.put({ url: '/llm/notification/modify', data });
 };
 //任务详情
 export const notificationDetail = (data: any) => {

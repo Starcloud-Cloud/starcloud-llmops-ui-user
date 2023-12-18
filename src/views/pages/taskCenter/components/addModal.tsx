@@ -57,7 +57,7 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
-    const handleSave = async () => {
+    const handleSave = async (flag?: boolean) => {
         const {
             name,
             platform,
@@ -143,7 +143,9 @@ const AddModal = () => {
                         close: false
                     })
                 );
-                navigate('/taskCenter');
+                if (!flag) {
+                    navigate('/taskCenter');
+                }
             }
         }
     };
@@ -151,11 +153,18 @@ const AddModal = () => {
     const [platformList, setPlatformList] = useState<any[]>([]);
     const [cateList, setCategoryList] = useState<any[]>([]);
     const [singleMissionStatusEnumList, setSingleMissionStatusEnumList] = useState<any[]>([]);
+    const [accountType, setaccountType] = useState<any[]>([]);
+    const [address, setaddress] = useState<any[]>([]);
+    const [gender, setgender] = useState<any[]>([]);
+
     useEffect(() => {
         singleMetadata().then((res) => {
             setPlatformList(res.platform);
             setCategoryList(res.category);
             setSingleMissionStatusEnumList(res.singleMissionStatusEnum);
+            setaccountType(res.accountType);
+            setaddress(res.address);
+            setgender(res.gender);
         });
         if (searchParams.get('view')) {
             setActive('2');
@@ -599,7 +608,7 @@ const AddModal = () => {
                                     <Divider />
                                     <CardActions>
                                         <Grid container justifyContent="flex-end">
-                                            <Button disabled={params.status === 'published'} type="primary" onClick={handleSave}>
+                                            <Button disabled={params.status === 'published'} type="primary" onClick={() => handleSave()}>
                                                 保存
                                             </Button>
                                         </Grid>
@@ -611,7 +620,29 @@ const AddModal = () => {
                             label: '通告任务',
                             key: '2',
                             disabled: !searchParams.get('notificationUid'),
-                            children: <Announce singleMissionStatusEnumList={singleMissionStatusEnumList} status={params.status} />
+                            children: (
+                                <Announce
+                                    singleMissionStatusEnumList={singleMissionStatusEnumList}
+                                    status={params.status}
+                                    isPublic={params.open}
+                                    setIsPublic={(data) => {
+                                        setParams({ ...params, open: data });
+                                    }}
+                                    claimLimit={params.claimLimit}
+                                    setclaimLimit={(data: any) => {
+                                        const newValue = _.cloneDeep(params);
+                                        newValue.claimLimit = {
+                                            ...newValue.claimLimit,
+                                            [data.name]: data.value
+                                        };
+                                        setParams({ ...params, claimLimit: data });
+                                    }}
+                                    limitSave={handleSave}
+                                    accountType={accountType}
+                                    address={address}
+                                    gender={gender}
+                                />
+                            )
                         },
                         {
                             label: '统计分析',

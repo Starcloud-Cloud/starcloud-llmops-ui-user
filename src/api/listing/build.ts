@@ -89,7 +89,7 @@ export const getListingByAsin = (data: any) => {
 
 // 只能推荐
 export const getRecommend = (data: any) => {
-    return request.get({ url: `/listing/draft/recommend/${data.uid}/${data.version}` });
+    return request.put({ url: `/listing/draft/recommend`, data });
 };
 
 // 获取元数据

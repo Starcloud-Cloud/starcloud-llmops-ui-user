@@ -12,7 +12,9 @@ import {
     CardActions,
     Grid,
     Divider,
-    InputAdornment
+    InputAdornment,
+    Box,
+    Chip
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -290,7 +292,7 @@ const Announce = ({
     };
     const [tableData, setTableData] = useState<any[]>([]);
 
-    const handleRes = (data: { name: string; value: string }) => {
+    const handleRes = (data: { name: string; value: string | string[] }) => {
         setclaimLimit({
             ...claimLimit,
             [data.name]: data.value
@@ -427,13 +429,14 @@ const Announce = ({
                                                 <Select
                                                     labelId="addres"
                                                     name="address"
+                                                    multiple
                                                     endAdornment={
                                                         claimLimit?.address && (
                                                             <InputAdornment className="mr-[10px]" position="end">
                                                                 <IconButton
                                                                     size="small"
                                                                     onClick={() => {
-                                                                        handleRes({ name: 'address', value: '' });
+                                                                        handleRes({ name: 'address', value: [] });
                                                                     }}
                                                                 >
                                                                     <ClearIcon />
@@ -441,6 +444,17 @@ const Announce = ({
                                                             </InputAdornment>
                                                         )
                                                     }
+                                                    renderValue={(selected) => (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {selected.map((value: any) => (
+                                                                <Chip
+                                                                    size="small"
+                                                                    key={value}
+                                                                    label={address?.filter((item) => item.value === value)[0]?.label}
+                                                                />
+                                                            ))}
+                                                        </Box>
+                                                    )}
                                                     value={claimLimit?.address}
                                                     label="地区限制"
                                                     onChange={(e: any) => handleRes(e.target)}
@@ -465,7 +479,7 @@ const Announce = ({
                                                         handleRes({ name: 'minFansNum', value: e });
                                                     }}
                                                 />
-                                                <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
+                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
                                                     粉丝数量最小值
                                                 </span>
                                             </div>
@@ -482,7 +496,7 @@ const Announce = ({
                                                         handleRes({ name: 'maxFansNum', value: e });
                                                     }}
                                                 />
-                                                <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
+                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
                                                     粉丝数量最大值
                                                 </span>
                                             </div>
@@ -562,7 +576,7 @@ const Announce = ({
                                                         handleRes({ name: 'claimNum', value: e });
                                                     }}
                                                 />
-                                                <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
+                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
                                                     每人领取数量
                                                 </span>
                                             </div>
@@ -863,7 +877,7 @@ const Announce = ({
                                                 handleEdit({ target: { name: 'claimTime', value: date?.valueOf() } });
                                             }}
                                         />
-                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                        <span className=" block px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
                                             认领时间
                                         </span>
                                     </div>
@@ -934,7 +948,7 @@ const Announce = ({
                                                 handleEdit({ target: { name: 'publishTime', value: date?.valueOf() } });
                                             }}
                                         />
-                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                        <span className=" block px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
                                             发布时间
                                         </span>
                                     </div>

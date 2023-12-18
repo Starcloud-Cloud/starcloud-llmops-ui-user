@@ -16,7 +16,6 @@ import {
     Box,
     Typography,
     Tooltip,
-    FormControlLabel,
     TableContainer,
     TableHead,
     Table as Tables,
@@ -25,6 +24,7 @@ import {
     TableBody,
     Button as Buttons
 } from '@mui/material';
+import { InputNumber } from 'antd';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
 import AddIcon from '@mui/icons-material/Add';
@@ -78,7 +78,9 @@ const AddModal = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     // 1.模板名称
-    const [params, setParams] = useState<any>({});
+    const [params, setParams] = useState<any>({
+        mode: 'RANDOM_IMAGE_TEXT'
+    });
     const [titleOpen, setTitleOpen] = useState(false);
     const [tagOpen, setTagOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -88,6 +90,7 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
+    const [paragraphCount, setparagraphCount] = useState<null | number>(1);
     //风格类型
     const [typeList, setTypeList] = useState<any[]>([]);
     //类目列表
@@ -294,7 +297,8 @@ const AddModal = () => {
                         category: res.category,
                         tags: res.tags,
                         type: res.type === 'USER' ? false : true,
-                        description: res.description
+                        description: res.description,
+                        mode: res.mode
                     });
                     setTableData(res.refers);
                     setTestImageList(
@@ -313,6 +317,7 @@ const AddModal = () => {
                     setTestTableList(res.configuration.copyWritingTemplate.example);
                     setCopyWritingTemplate(res.configuration.copyWritingTemplate);
                     setImageStyleData(res.configuration.imageTemplate.styleList);
+                    setparagraphCount(res.configuration.paragraphCount);
                 }
             });
         } else {
@@ -725,12 +730,15 @@ const AddModal = () => {
                         sx={{
                             mb: 1,
                             cursor: 'pointer',
-                            borderColor: '#673ab7'
-                            // borderColor: params.type === 'posting' ? '#673ab7' : 'rgba(230,230,231,1)'
+                            borderColor: params.mode === 'RANDOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box>
+                        <Box
+                            onClick={() => {
+                                setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
+                            }}
+                        >
                             <Typography variant="h4" mb={1}>
                                 图文随机组合
                             </Typography>
@@ -742,12 +750,16 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            cursor: 'not-allowed',
-                            borderColor: 'rgba(230,230,231,1)'
+                            cursor: 'pointer',
+                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box>
+                        <Box
+                            onClick={() => {
+                                setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
+                            }}
+                        >
                             <Typography variant="h4" mb={1}>
                                 干货文生成
                             </Typography>
@@ -1208,6 +1220,22 @@ const AddModal = () => {
                             ),
                             children: (
                                 <div>
+                                    {params.mode === 'PRACTICAL_IMAGE_TEXT' && (
+                                        <div className="relative mb-[20px]">
+                                            <InputNumber
+                                                size="large"
+                                                className="w-[300px] bg-[#f8fafc]"
+                                                min={1}
+                                                value={paragraphCount}
+                                                onChange={(value: number | null) => {
+                                                    setparagraphCount(value);
+                                                }}
+                                            />
+                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                文案段落数量
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex items-end mb-[20px]">
                                         <Button
                                             onClick={() => {
@@ -1361,7 +1389,8 @@ const AddModal = () => {
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData
-                                        }
+                                        },
+                                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                     },
                                     useImages: testImageList
                                         ?.map((item: any, i: number) => {
@@ -1729,7 +1758,8 @@ const AddModal = () => {
                                                 },
                                                 imageTemplate: {
                                                     styleList: imageStyleData
-                                                }
+                                                },
+                                                paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                             }
                                         }).then((res) => {
                                             if (res) {
@@ -1763,7 +1793,8 @@ const AddModal = () => {
                                             },
                                             imageTemplate: {
                                                 styleList: imageStyleData
-                                            }
+                                            },
+                                            paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                         }
                                     }).then((res) => {
                                         if (res) {

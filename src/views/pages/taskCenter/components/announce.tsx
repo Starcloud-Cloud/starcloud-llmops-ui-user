@@ -6,7 +6,7 @@ import {
     Switch,
     FormControl,
     InputLabel,
-    Select,
+    Select as Selects,
     MenuItem,
     TextField,
     CardActions,
@@ -19,7 +19,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber } from 'antd';
+import { Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber, Select, Form } from 'antd';
 import { SearchOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -41,10 +41,12 @@ const Announce = ({
     setIsPublic,
     singleMissionStatusEnumList,
     claimLimit,
+    minFansNum,
+    setminFansNum,
     setclaimLimit,
     limitSave,
-    accountType,
     address,
+    fansNum,
     gender
 }: {
     status?: string;
@@ -53,11 +55,14 @@ const Announce = ({
     singleMissionStatusEnumList: any[];
     claimLimit: any;
     setclaimLimit: (data: any) => void;
+    minFansNum: any;
+    setminFansNum: (data: any) => void;
     limitSave: (data: boolean) => void;
-    accountType: any[];
     address: any[];
+    fansNum: any[];
     gender: any[];
 }) => {
+    const { Option } = Select;
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleTransfer = (key: string, msg?: string) => {
@@ -292,7 +297,7 @@ const Announce = ({
     };
     const [tableData, setTableData] = useState<any[]>([]);
 
-    const handleRes = (data: { name: string; value: string | string[] }) => {
+    const handleRes = (data: { name: string; value: any }) => {
         setclaimLimit({
             ...claimLimit,
             [data.name]: data.value
@@ -414,29 +419,39 @@ const Announce = ({
                 items={[
                     {
                         key: '1',
-                        label: '领取人员限制',
+                        label: '通告发布配置',
                         children: (
                             <div>
+                                <div className="font-[500] mb-[20px]">是否公开通告</div>
                                 <div className="flex items-center mb-[20px]">
-                                    <span className="text-[#697586]">是否公开</span>
+                                    <span>是否公开</span>
                                     <Switch color="secondary" checked={isPublic} onChange={() => setIsPublic(!isPublic)} />
                                 </div>
+                                <div className="font-[500] mt-[40px] mb-[20px]">领取人员限制</div>
                                 <div className="flex justify-between items-center">
                                     <Row className="flex-1" gutter={20}>
-                                        <Col className="mb-[20px]" xxl={6} lg={8}>
-                                            <FormControl key={claimLimit?.address} color="secondary" size="small" fullWidth>
-                                                <InputLabel id="addres">地区限制</InputLabel>
-                                                <Select
+                                        <Col className="mb-[20px] flex justify-between items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap flex-1">地区限制</div>
+                                            <FormControl
+                                                className="w-[300px]  xl:w-[400px] ml-[10px]"
+                                                fullWidth
+                                                key={claimLimit?.address}
+                                                color="secondary"
+                                                size="small"
+                                            >
+                                                <Selects
+                                                    size="small"
                                                     labelId="addres"
                                                     name="address"
                                                     multiple
                                                     endAdornment={
-                                                        claimLimit?.address && (
+                                                        claimLimit?.address &&
+                                                        claimLimit?.address !== 'unlimited' && (
                                                             <InputAdornment className="mr-[10px]" position="end">
                                                                 <IconButton
                                                                     size="small"
                                                                     onClick={() => {
-                                                                        handleRes({ name: 'address', value: [] });
+                                                                        handleRes({ name: 'address', value: ['unlimited'] });
                                                                     }}
                                                                 >
                                                                     <ClearIcon />
@@ -456,64 +471,85 @@ const Announce = ({
                                                         </Box>
                                                     )}
                                                     value={claimLimit?.address}
-                                                    label="地区限制"
                                                     onChange={(e: any) => handleRes(e.target)}
                                                 >
-                                                    {address?.map((item) => (
-                                                        <MenuItem key={item.value} value={item.value}>
-                                                            {item.label}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
+                                                    {address?.map(
+                                                        (item) =>
+                                                            item.label !== '不限' && (
+                                                                <MenuItem key={item.value} value={item.value}>
+                                                                    {item.label}
+                                                                </MenuItem>
+                                                            )
+                                                    )}
+                                                </Selects>
                                             </FormControl>
                                         </Col>
-                                        <Col className="mb-[20px] flex items-center" xxl={6} lg={8}>
-                                            <div className="relative flex-1">
-                                                <InputNumber
-                                                    placeholder="最小值"
-                                                    className="w-full bg-[#f8fafc]"
-                                                    size="large"
-                                                    min={1}
-                                                    value={claimLimit?.minFansNum}
-                                                    onChange={(e) => {
-                                                        handleRes({ name: 'minFansNum', value: e });
-                                                    }}
-                                                />
-                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
-                                                    粉丝数量最小值
-                                                </span>
-                                            </div>
-
-                                            <span className="mx-[10px]">-</span>
-                                            <div className="relative flex-1">
-                                                <InputNumber
-                                                    placeholder="最大值"
-                                                    className="w-full bg-[#f8fafc]"
-                                                    size="large"
-                                                    min={1}
-                                                    value={claimLimit?.maxFansNum}
-                                                    onChange={(e) => {
-                                                        handleRes({ name: 'maxFansNum', value: e });
-                                                    }}
-                                                />
-                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
-                                                    粉丝数量最大值
-                                                </span>
+                                        <Col className="mb-[20px] flex justify-between items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap flex-1">粉丝</div>
+                                            <div className="relative">
+                                                <FormControl
+                                                    fullWidth
+                                                    className="w-[300px]  xl:w-[400px] ml-[10px]"
+                                                    key={minFansNum}
+                                                    color="secondary"
+                                                    size="small"
+                                                >
+                                                    <Selects
+                                                        size="small"
+                                                        name="address"
+                                                        endAdornment={
+                                                            minFansNum && (
+                                                                <InputAdornment className="mr-[10px]" position="end">
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => {
+                                                                            setminFansNum(0);
+                                                                        }}
+                                                                    >
+                                                                        <ClearIcon />
+                                                                    </IconButton>
+                                                                </InputAdornment>
+                                                            )
+                                                        }
+                                                        value={minFansNum}
+                                                        onChange={(e: any) => {
+                                                            setminFansNum(e.target.value);
+                                                        }}
+                                                    >
+                                                        {fansNum?.map((item) => (
+                                                            <MenuItem
+                                                                style={{ display: item.label !== '不限' ? 'block' : 'none' }}
+                                                                key={item.value}
+                                                                value={item.value}
+                                                            >
+                                                                {item.label}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Selects>
+                                                </FormControl>
+                                                <div className="bg-[#f8fafc] w-[10px] h-[10px] absolute right-[1px] top-[15px]"></div>
                                             </div>
                                         </Col>
-                                        <Col className="mb-[20px]" xxl={6} lg={8}>
-                                            <FormControl key={claimLimit?.gender} color="secondary" size="small" fullWidth>
-                                                <InputLabel id="genders">性别</InputLabel>
-                                                <Select
-                                                    labelId="genders"
+                                        <Col className="flex justify-between items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap flex-1">性别</div>
+                                            <FormControl
+                                                className="w-[300px]  xl:w-[400px] ml-[10px]"
+                                                key={claimLimit?.gender}
+                                                color="secondary"
+                                                size="small"
+                                                fullWidth
+                                            >
+                                                <Selects
+                                                    defaultValue={'不限'}
                                                     name="gender"
                                                     endAdornment={
-                                                        claimLimit?.gender && (
+                                                        claimLimit?.gender &&
+                                                        claimLimit?.gender !== 'unlimited' && (
                                                             <InputAdornment className="mr-[10px]" position="end">
                                                                 <IconButton
                                                                     size="small"
                                                                     onClick={() => {
-                                                                        handleRes({ name: 'gender', value: '' });
+                                                                        handleRes({ name: 'gender', value: 'unlimited' });
                                                                     }}
                                                                 >
                                                                     <ClearIcon />
@@ -522,64 +558,31 @@ const Announce = ({
                                                         )
                                                     }
                                                     value={claimLimit?.gender}
-                                                    label="性别"
                                                     onChange={(e: any) => handleRes(e.target)}
                                                 >
                                                     {gender?.map((item) => (
-                                                        <MenuItem key={item.value} value={item.value}>
+                                                        <MenuItem
+                                                            style={{ display: item.label !== '不限' ? 'block' : 'none' }}
+                                                            key={item.value}
+                                                            value={item.value}
+                                                        >
                                                             {item.label}
                                                         </MenuItem>
                                                     ))}
-                                                </Select>
+                                                </Selects>
                                             </FormControl>
                                         </Col>
-                                        <Col xxl={6} lg={8}>
-                                            <FormControl key={claimLimit?.accountType} color="secondary" size="small" fullWidth>
-                                                <InputLabel id="accountTypes">账号类型</InputLabel>
-                                                <Select
-                                                    labelId="accountTypes"
-                                                    name="accountType"
-                                                    endAdornment={
-                                                        claimLimit?.accountType && (
-                                                            <InputAdornment className="mr-[10px]" position="end">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        handleRes({ name: 'accountType', value: '' });
-                                                                    }}
-                                                                >
-                                                                    <ClearIcon />
-                                                                </IconButton>
-                                                            </InputAdornment>
-                                                        )
-                                                    }
-                                                    value={claimLimit?.accountType}
-                                                    label="账号类型"
-                                                    onChange={(e: any) => handleRes(e.target)}
-                                                >
-                                                    {accountType?.map((item: any) => (
-                                                        <MenuItem key={item.value} value={item.value}>
-                                                            {item.label}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Col>
-                                        <Col xxl={6} lg={8}>
-                                            <div className="relative">
-                                                <InputNumber
-                                                    className="w-full bg-[#f8fafc]"
-                                                    size="large"
-                                                    min={1}
-                                                    value={claimLimit?.claimNum}
-                                                    onChange={(e) => {
-                                                        handleRes({ name: 'claimNum', value: e });
-                                                    }}
-                                                />
-                                                <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px] text-[#697586]">
-                                                    每人领取数量
-                                                </span>
-                                            </div>
+                                        <Col className="flex justify-between items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap flex-1">每人领取数量</div>
+                                            <InputNumber
+                                                className="w-[300px]  xl:w-[400px] ml-[10px] bg-[#f8fafc]"
+                                                size="large"
+                                                min={1}
+                                                value={claimLimit?.claimNum}
+                                                onChange={(e) => {
+                                                    handleRes({ name: 'claimNum', value: e });
+                                                }}
+                                            />
                                         </Col>
                                     </Row>
                                     <Button
@@ -604,7 +607,7 @@ const Announce = ({
                         <Col span={6}>
                             <FormControl key={query.status} color="secondary" size="small" fullWidth>
                                 <InputLabel id="status">任务状态</InputLabel>
-                                <Select
+                                <Selects
                                     labelId="status"
                                     name="status"
                                     endAdornment={
@@ -630,7 +633,7 @@ const Announce = ({
                                             {item.label}
                                         </MenuItem>
                                     ))}
-                                </Select>
+                                </Selects>
                             </FormControl>
                         </Col>
                         <Col span={6}>
@@ -796,13 +799,13 @@ const Announce = ({
                             <Col span={24}>
                                 <FormControl sx={{ mb: 2 }} color="secondary" size="small" fullWidth>
                                     <InputLabel id="status">状态</InputLabel>
-                                    <Select labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
+                                    <Selects labelId="status" name="status" value={editData.status} label="状态" onChange={handleEdit}>
                                         {singleMissionStatusEnumList.map((item: any) => (
                                             <MenuItem disabled={item.value === 'init'} key={item.value} value={item.value}>
                                                 {item.label}
                                             </MenuItem>
                                         ))}
-                                    </Select>
+                                    </Selects>
                                 </FormControl>
                             </Col>
                             {(editData.status === 'claimed' ||

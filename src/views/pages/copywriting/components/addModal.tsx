@@ -1070,7 +1070,7 @@ const AddModal = () => {
                                     {demandOpen && !copyWritingTemplate.demand && (
                                         <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
                                     )}
-                                    <Box>
+                                    <Box mb={1}>
                                         <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                                         {rows.length > 0 &&
                                             rows?.map((item, index: number) => (
@@ -1181,6 +1181,22 @@ const AddModal = () => {
                                             </Tables>
                                         </TableContainer>
                                     </MainCard>
+                                    {params.mode === 'PRACTICAL_IMAGE_TEXT' && (
+                                        <div className="relative mt-[20px]">
+                                            <InputNumber
+                                                size="large"
+                                                className="w-[300px] bg-[#f8fafc]"
+                                                min={1}
+                                                value={paragraphCount}
+                                                onChange={(value: number | null) => {
+                                                    setparagraphCount(value);
+                                                }}
+                                            />
+                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                文案段落数量
+                                            </span>
+                                        </div>
+                                    )}
                                     {variableOpen && (
                                         <VariableModal
                                             title={title}
@@ -1220,22 +1236,6 @@ const AddModal = () => {
                             ),
                             children: (
                                 <div>
-                                    {params.mode === 'PRACTICAL_IMAGE_TEXT' && (
-                                        <div className="relative mb-[20px]">
-                                            <InputNumber
-                                                size="large"
-                                                className="w-[300px] bg-[#f8fafc]"
-                                                min={1}
-                                                value={paragraphCount}
-                                                onChange={(value: number | null) => {
-                                                    setparagraphCount(value);
-                                                }}
-                                            />
-                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                文案段落数量
-                                            </span>
-                                        </div>
-                                    )}
                                     <div className="flex items-end mb-[20px]">
                                         <Button
                                             onClick={() => {

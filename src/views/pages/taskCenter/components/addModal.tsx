@@ -49,8 +49,6 @@ const AddModal = () => {
     const [likeUnitPriceOpen, setLikeUnitPriceOpen] = useState(false);
     const [startTimeOpen, setStartTimeOpen] = useState(false);
     const [endTimeOpen, setEndTimeOpen] = useState(false);
-    const [singleBudgetOpen, setSingleBudgetOpen] = useState(false);
-    const [notificationBudgetOpen, setNotificationBudgetOpen] = useState(false);
     const changeParams = (data: any) => {
         setParams({
             ...params,
@@ -58,19 +56,7 @@ const AddModal = () => {
         });
     };
     const handleSave = async (flag?: boolean) => {
-        const {
-            name,
-            platform,
-            field,
-            startTime,
-            endTime,
-            type,
-            postingUnitPrice,
-            replyUnitPrice,
-            likeUnitPrice,
-            singleBudget,
-            notificationBudget
-        } = params;
+        const { name, platform, field, startTime, endTime, type, postingUnitPrice, replyUnitPrice, likeUnitPrice } = params;
         if (
             !name ||
             !platform ||
@@ -80,9 +66,7 @@ const AddModal = () => {
             !type ||
             (!postingUnitPrice && postingUnitPrice !== 0) ||
             (!replyUnitPrice && replyUnitPrice !== 0) ||
-            (!likeUnitPrice && likeUnitPrice !== 0) ||
-            (!singleBudget && singleBudget !== 0) ||
-            (!notificationBudget && notificationBudget !== 0)
+            (!likeUnitPrice && likeUnitPrice !== 0)
         ) {
             setNameOpen(true);
             setPlatformOpen(true);
@@ -93,8 +77,6 @@ const AddModal = () => {
             setLikeUnitPriceOpen(true);
             setStartTimeOpen(true);
             setEndTimeOpen(true);
-            setSingleBudgetOpen(true);
-            setNotificationBudgetOpen(true);
             return false;
         }
         const basis = {
@@ -153,7 +135,7 @@ const AddModal = () => {
     const [platformList, setPlatformList] = useState<any[]>([]);
     const [cateList, setCategoryList] = useState<any[]>([]);
     const [singleMissionStatusEnumList, setSingleMissionStatusEnumList] = useState<any[]>([]);
-    const [accountType, setaccountType] = useState<any[]>([]);
+    const [fansNum, setfansNum] = useState<any[]>([]);
     const [address, setaddress] = useState<any[]>([]);
     const [gender, setgender] = useState<any[]>([]);
 
@@ -162,8 +144,8 @@ const AddModal = () => {
             setPlatformList(res.platform);
             setCategoryList(res.category);
             setSingleMissionStatusEnumList(res.singleMissionStatusEnum);
-            setaccountType(res.accountType);
             setaddress(res.address);
+            setfansNum(res.fansNum);
             setgender(res.gender);
         });
         if (searchParams.get('view')) {
@@ -541,14 +523,7 @@ const AddModal = () => {
                                         type="number"
                                         name="singleBudget"
                                         value={params.singleBudget}
-                                        error={!params.singleBudget && params.singleBudget !== 0 && singleBudgetOpen}
-                                        helperText={
-                                            !params.singleBudget && params.singleBudget !== 0 && singleBudgetOpen
-                                                ? '单任务预算上限必填'
-                                                : ''
-                                        }
                                         onChange={(e: any) => {
-                                            setSingleBudgetOpen(true);
                                             if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
                                                 changeParams(e.target);
                                             }
@@ -567,14 +542,7 @@ const AddModal = () => {
                                         type="number"
                                         name="notificationBudget"
                                         value={params.notificationBudget}
-                                        error={!params.notificationBudget && params.notificationBudget !== 0 && notificationBudgetOpen}
-                                        helperText={
-                                            !params.notificationBudget && params.notificationBudget !== 0 && notificationBudgetOpen
-                                                ? '通告总预算必填'
-                                                : ''
-                                        }
                                         onChange={(e: any) => {
-                                            setNotificationBudgetOpen(true);
                                             if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
                                                 changeParams(e.target);
                                             }
@@ -629,6 +597,13 @@ const AddModal = () => {
                                         setParams({ ...params, open: data });
                                     }}
                                     claimLimit={params.claimLimit}
+                                    minFansNum={params.minFansNum}
+                                    setminFansNum={(data: any) => {
+                                        setParams({
+                                            ...params,
+                                            minFansNum: data
+                                        });
+                                    }}
                                     setclaimLimit={(data: any) => {
                                         const newValue = _.cloneDeep(params);
                                         newValue.claimLimit = {
@@ -638,8 +613,8 @@ const AddModal = () => {
                                         setParams({ ...params, claimLimit: data });
                                     }}
                                     limitSave={handleSave}
-                                    accountType={accountType}
                                     address={address}
+                                    fansNum={fansNum}
                                     gender={gender}
                                 />
                             )

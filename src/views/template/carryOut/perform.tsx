@@ -11,8 +11,10 @@ import copy from 'clipboard-copy';
 import FormExecute from 'views/template/components/validaForm';
 import { translateText } from 'api/picture/create';
 import { openSnackbar } from 'store/slices/snackbar';
+import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 function Perform({
+    detaData,
     config,
     changeSon,
     source,
@@ -105,26 +107,37 @@ function Perform({
     }, [config?.steps?.map((item: any) => item?.flowStep.response.answer)]);
     const theme = useTheme();
     const isDarkMode = theme.palette.mode === 'dark';
+    const navigate = useNavigate();
     return (
         <Box>
-            {config?.steps.length > 1 && (
-                <div>
-                    <Button
-                        disabled={allDisable() || history}
-                        color="secondary"
-                        startIcon={<Album />}
-                        variant="contained"
-                        onClick={allExecute}
+            <div className="flex items-center">
+                {config?.steps.length > 1 && (
+                    <div>
+                        <Button
+                            disabled={allDisable() || history}
+                            color="secondary"
+                            startIcon={<Album />}
+                            variant="contained"
+                            onClick={allExecute}
+                        >
+                            {t('market.allExecute')}
+                        </Button>
+                        <Tooltip title={t('market.allStepTips')}>
+                            <IconButton sx={{ mr: '20px' }} size="small">
+                                <ErrorOutline />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                )}
+                {detaData?.tags?.includes('Listing') && source === 'market' && (
+                    <div
+                        onClick={() => navigate('/listingBuilderPage')}
+                        className="text-[18px] font-bold text-[#ff4d4f] cursor-pointer hover:underline"
                     >
-                        {t('market.allExecute')}
-                    </Button>
-                    <Tooltip title={t('market.allStepTips')}>
-                        <IconButton size="small">
-                            <ErrorOutline />
-                        </IconButton>
-                    </Tooltip>
-                </div>
-            )}
+                        超级 Listing 已上线，立即体验
+                    </div>
+                )}
+            </div>
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
                     {item.flowStep?.response.style !== 'BUTTON' && (

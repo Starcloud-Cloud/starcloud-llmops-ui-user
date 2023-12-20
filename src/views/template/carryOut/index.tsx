@@ -18,6 +18,7 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                     {config && (
                         <Perform
                             config={config?.workflowConfig}
+                            detaData={config}
                             changeConfigs={changeConfigs}
                             isShows={isShows}
                             changeSon={changeData}

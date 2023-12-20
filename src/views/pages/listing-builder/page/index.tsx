@@ -1,4 +1,4 @@
-import { Button, Checkbox, IconButton, Tooltip } from '@mui/material';
+import { Button, Checkbox, IconButton, Tooltip, Modal, CardContent } from '@mui/material';
 
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -10,6 +10,7 @@ import { ArrangementOrder, EnhancedTableHeadProps } from 'types';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Divider, Progress } from 'antd';
 import AddIcon from '@mui/icons-material/Add';
@@ -23,6 +24,7 @@ import { COUNTRY_LIST } from '../data';
 import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
+import StorageCache from 'web-storage-cache';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -142,6 +144,13 @@ const ListingBuilderPage: React.FC = () => {
     const [count, setCount] = useState(0);
     const forceUpdate = () => setCount((pre) => pre + 1);
 
+    const storage = new StorageCache();
+    const [videoOpne, setVideoOpen] = useState(false);
+    useEffect(() => {
+        if (!storage.get('video')) {
+            setVideoOpen(true);
+        }
+    }, []);
     useEffect(() => {
         const fetchPageData = async () => {
             const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
@@ -320,7 +329,17 @@ const ListingBuilderPage: React.FC = () => {
             title="Listing草稿箱"
             secondary={
                 <div>
-                    <Button color="secondary" startIcon={<AddIcon />} onClick={() => addListing()} variant="contained" size="small">
+                    <Button color="secondary" onClick={() => setVideoOpen(true)} variant="contained" size="small">
+                        查看使用视频
+                    </Button>
+                    <Button
+                        className="ml-1"
+                        color="secondary"
+                        startIcon={<AddIcon />}
+                        onClick={() => addListing()}
+                        variant="contained"
+                        size="small"
+                    >
                         新增Listing
                     </Button>
                     <Button
@@ -570,6 +589,46 @@ const ListingBuilderPage: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="每页行数"
             />
+            <Modal disableAutoFocus open={videoOpne}>
+                <MainCard
+                    sx={{
+                        position: 'absolute',
+                        width: '80%',
+                        aspectRatio: '3/2',
+                        top: '10%',
+                        left: '50%',
+                        transform: 'translate(-50%, 0)'
+                    }}
+                    headerSX={{ p: '16px !important' }}
+                    contentSX={{ p: '16px !important' }}
+                    title={'使用视频'}
+                    content={false}
+                >
+                    <IconButton
+                        onClick={() => {
+                            storage.set('video', 1);
+                            setVideoOpen(false);
+                        }}
+                        size="large"
+                        aria-label="close modal"
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8
+                        }}
+                    >
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                    <CardContent sx={{ p: '0 !important', height: 'calc(100% - 73px)' }}>
+                        <iframe
+                            src="//player.bilibili.com/player.html?aid=707499588&bvid=BV1tQ4y137ee&cid=1372711174&p=1"
+                            scrolling="no"
+                            width={'100%'}
+                            height={'100%'}
+                        ></iframe>
+                    </CardContent>
+                </MainCard>
+            </Modal>
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
         </MainCard>
     );

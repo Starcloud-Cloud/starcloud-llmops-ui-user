@@ -410,7 +410,6 @@ function Deatail() {
                     sx={{ cursor: 'pointer' }}
                     underline="hover"
                     onClick={() => {
-                        console.log(detailData?.category);
                         if (detailData?.category.startsWith('SEO_WRITING')) {
                             navigate('/appMarket?category=SEO_WRITING');
                         } else if (detailData?.category.startsWith('SOCIAL_MEDIA')) {

@@ -96,7 +96,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 }
 const Thesaurus = () => {
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const [total, setTotal] = useState(0);
     const [dense] = useState(false);
     const [order, setOrder] = useState<ArrangementOrder>('asc');
@@ -445,7 +445,7 @@ const Thesaurus = () => {
                         </Table>
                     </TableContainer>
                     <TablePagination
-                        rowsPerPageOptions={[5, 10]}
+                        rowsPerPageOptions={[20, 50, 100]}
                         component="div"
                         count={total}
                         rowsPerPage={rowsPerPage}

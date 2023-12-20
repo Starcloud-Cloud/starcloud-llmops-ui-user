@@ -64,6 +64,9 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
     const categoryIcon = [
         { icon: 'hot', name: '热门', code: 'HOT' },
         { icon: 'amazon', name: '亚马逊', code: 'AMAZON' },
+        { icon: 'wal-mart', name: '沃尔玛', code: 'WAL_MART' },
+        { icon: 'ebay', name: 'eBay', code: 'EBAY' },
+        { icon: 'aliexpress', name: '速卖通', code: 'ALI_EXPRESS' },
         { icon: 'website', name: '独立站', code: 'WEBSITE' },
         { icon: 'social-media', name: '社交媒体', code: 'SOCIAL_MEDIA' },
         { icon: 'email', name: '邮件营销', code: 'EMAIL' },

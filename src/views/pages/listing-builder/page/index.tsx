@@ -326,12 +326,16 @@ const ListingBuilderPage: React.FC = () => {
     return (
         <MainCard
             content={false}
-            title="Listing草稿箱"
+            title={
+                <div>
+                    Listing草稿箱
+                    <span className="cursor-pointer text-[#6839b7] ml-1 text-[14px]" onClick={() => setVideoOpen(true)}>
+                        查看视频教程
+                    </span>
+                </div>
+            }
             secondary={
                 <div>
-                    <Button color="secondary" onClick={() => setVideoOpen(true)} variant="contained" size="small">
-                        查看使用视频
-                    </Button>
                     <Button
                         className="ml-1"
                         color="secondary"
@@ -594,10 +598,11 @@ const ListingBuilderPage: React.FC = () => {
                     sx={{
                         position: 'absolute',
                         width: '80%',
-                        aspectRatio: '3/2',
-                        top: '10%',
+                        aspectRatio: '1695/950',
+                        maxWidth: '960px',
+                        top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, 0)'
+                        transform: 'translate(-50%, -50%)'
                     }}
                     headerSX={{ p: '16px !important' }}
                     contentSX={{ p: '16px !important' }}
@@ -623,8 +628,10 @@ const ListingBuilderPage: React.FC = () => {
                         <iframe
                             src="//player.bilibili.com/player.html?aid=707499588&bvid=BV1tQ4y137ee&cid=1372711174&p=1"
                             scrolling="no"
-                            width={'100%'}
-                            height={'100%'}
+                            style={{
+                                width: '100%',
+                                height: '100%'
+                            }}
                         ></iframe>
                     </CardContent>
                 </MainCard>

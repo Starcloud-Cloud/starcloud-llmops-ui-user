@@ -430,10 +430,10 @@ const Announce = ({
                                 <div className="font-[500] mt-[40px] mb-[20px]">领取人员限制</div>
                                 <div className="flex justify-between items-center">
                                     <Row className="flex-1" gutter={20}>
-                                        <Col className="mb-[20px] flex justify-between items-center" lg={12}>
-                                            <div className="font-[500] whitespace-nowrap flex-1">地区限制</div>
+                                        <Col className="mb-[20px] flex items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap w-[100px]">地区限制</div>
                                             <FormControl
-                                                className="w-[300px]  xl:w-[400px] ml-[10px]"
+                                                className="w-[300px] 2xl:w-[400px] ml-[10px]"
                                                 fullWidth
                                                 key={claimLimit?.address}
                                                 color="secondary"
@@ -471,7 +471,17 @@ const Announce = ({
                                                         </Box>
                                                     )}
                                                     value={claimLimit?.address}
-                                                    onChange={(e: any) => handleRes(e.target)}
+                                                    onChange={(e: any) => {
+                                                        console.log(e.target.value);
+                                                        if (e.target.value?.length > 1) {
+                                                            handleRes({
+                                                                name: 'address',
+                                                                value: e.target.value?.filter((value: any) => value !== 'unlimited')
+                                                            });
+                                                        } else {
+                                                            handleRes(e.target);
+                                                        }
+                                                    }}
                                                 >
                                                     {address?.map(
                                                         (item) =>
@@ -484,8 +494,8 @@ const Announce = ({
                                                 </Selects>
                                             </FormControl>
                                         </Col>
-                                        <Col className="mb-[20px] flex justify-between items-center" lg={12}>
-                                            <div className="font-[500] whitespace-nowrap flex-1">粉丝</div>
+                                        <Col className="mb-[20px] flex items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap w-[100px]">粉丝</div>
                                             <div className="relative">
                                                 <FormControl
                                                     fullWidth
@@ -530,8 +540,8 @@ const Announce = ({
                                                 <div className="bg-[#f8fafc] w-[10px] h-[10px] absolute right-[1px] top-[15px]"></div>
                                             </div>
                                         </Col>
-                                        <Col className="flex justify-between items-center" lg={12}>
-                                            <div className="font-[500] whitespace-nowrap flex-1">性别</div>
+                                        <Col className="flex items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap w-[100px]">性别</div>
                                             <FormControl
                                                 className="w-[300px]  xl:w-[400px] ml-[10px]"
                                                 key={claimLimit?.gender}
@@ -572,8 +582,8 @@ const Announce = ({
                                                 </Selects>
                                             </FormControl>
                                         </Col>
-                                        <Col className="flex justify-between items-center" lg={12}>
-                                            <div className="font-[500] whitespace-nowrap flex-1">每人领取数量</div>
+                                        <Col className="flex items-center" lg={12}>
+                                            <div className="font-[500] whitespace-nowrap w-[100px]">每人领取数量</div>
                                             <InputNumber
                                                 className="w-[300px]  xl:w-[400px] ml-[10px] bg-[#f8fafc]"
                                                 size="large"

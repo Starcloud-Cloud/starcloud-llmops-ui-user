@@ -582,7 +582,7 @@ const AddModal = () => {
                             <KeyboardBackspace fontSize="small" />
                         </IconButton>
                         <span className="text-[#000c] font-[500]">创作方案</span>&nbsp;
-                        <span className="text-[#673ab7] font-[500]">- {'新建创作方案'}</span>
+                        <span className="text-[#673ab7] font-[500]">- {!searchParams.get('uid') ? '新建创作方案' : '编辑创作方案'}</span>
                     </div>
                     <div></div>
                 </SubCard>
@@ -729,14 +729,16 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            cursor: 'pointer',
+                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
                             borderColor: params.mode === 'RANDOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
                         <Box
                             onClick={() => {
-                                setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
+                                if (!searchParams.get('uid')) {
+                                    setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
+                                }
                             }}
                         >
                             <Typography variant="h4" mb={1}>
@@ -750,14 +752,16 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            cursor: 'pointer',
-                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
+                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
+                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
                         <Box
                             onClick={() => {
-                                setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
+                                if (!searchParams.get('uid')) {
+                                    setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
+                                }
                             }}
                         >
                             <Typography variant="h4" mb={1}>

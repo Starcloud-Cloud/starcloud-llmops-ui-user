@@ -571,6 +571,9 @@ const ListingBuilderPage: React.FC = () => {
                 labelRowsPerPage="每页行数"
             />
             <Confirm open={delVisible} handleClose={() => setDelVisible(false)} handleOk={delDraft} />
+            <iframe src="//player.bilibili.com/player.html?aid=707499588&bvid=BV1tQ4y137ee&cid=1372711174&p=1" width={400} height={300}>
+                {' '}
+            </iframe>
         </MainCard>
     );
 };

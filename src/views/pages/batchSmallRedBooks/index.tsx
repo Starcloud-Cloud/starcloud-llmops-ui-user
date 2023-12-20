@@ -159,22 +159,22 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
-        if (!imageList || imageList.length === 0) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '没有上传图片',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
+        // if (!imageList || imageList.length === 0) {
+        //     dispatch(
+        //         openSnackbar({
+        //             open: true,
+        //             message: '没有上传图片',
+        //             variant: 'alert',
+        //             alert: {
+        //                 color: 'error'
+        //             },
+        //             anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        //             transition: 'SlideDown',
+        //             close: false
+        //         })
+        //     );
+        //     return false;
+        // }
         if (!targetKeys || targetKeys.length === 0) {
             settargetKeysOpen(true);
             dispatch(

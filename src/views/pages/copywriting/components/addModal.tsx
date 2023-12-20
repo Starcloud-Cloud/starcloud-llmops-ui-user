@@ -16,7 +16,6 @@ import {
     Box,
     Typography,
     Tooltip,
-    FormControlLabel,
     TableContainer,
     TableHead,
     Table as Tables,
@@ -25,6 +24,7 @@ import {
     TableBody,
     Button as Buttons
 } from '@mui/material';
+import { InputNumber } from 'antd';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
 import AddIcon from '@mui/icons-material/Add';
@@ -78,7 +78,9 @@ const AddModal = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     // 1.模板名称
-    const [params, setParams] = useState<any>({});
+    const [params, setParams] = useState<any>({
+        mode: 'RANDOM_IMAGE_TEXT'
+    });
     const [titleOpen, setTitleOpen] = useState(false);
     const [tagOpen, setTagOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -88,6 +90,7 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
+    const [paragraphCount, setparagraphCount] = useState<null | number>(1);
     //风格类型
     const [typeList, setTypeList] = useState<any[]>([]);
     //类目列表
@@ -294,7 +297,8 @@ const AddModal = () => {
                         category: res.category,
                         tags: res.tags,
                         type: res.type === 'USER' ? false : true,
-                        description: res.description
+                        description: res.description,
+                        mode: res.mode
                     });
                     setTableData(res.refers);
                     setTestImageList(
@@ -313,6 +317,7 @@ const AddModal = () => {
                     setTestTableList(res.configuration.copyWritingTemplate.example);
                     setCopyWritingTemplate(res.configuration.copyWritingTemplate);
                     setImageStyleData(res.configuration.imageTemplate.styleList);
+                    setparagraphCount(res.configuration.paragraphCount);
                 }
             });
         } else {
@@ -577,7 +582,7 @@ const AddModal = () => {
                             <KeyboardBackspace fontSize="small" />
                         </IconButton>
                         <span className="text-[#000c] font-[500]">创作方案</span>&nbsp;
-                        <span className="text-[#673ab7] font-[500]">- {'新建创作方案'}</span>
+                        <span className="text-[#673ab7] font-[500]">- {!searchParams.get('uid') ? '新建创作方案' : '编辑创作方案'}</span>
                     </div>
                     <div></div>
                 </SubCard>
@@ -724,13 +729,18 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            cursor: 'pointer',
-                            borderColor: '#673ab7'
-                            // borderColor: params.type === 'posting' ? '#673ab7' : 'rgba(230,230,231,1)'
+                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
+                            borderColor: params.mode === 'RANDOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box>
+                        <Box
+                            onClick={() => {
+                                if (!searchParams.get('uid')) {
+                                    setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
+                                }
+                            }}
+                        >
                             <Typography variant="h4" mb={1}>
                                 图文随机组合
                             </Typography>
@@ -742,12 +752,18 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            cursor: 'not-allowed',
-                            borderColor: 'rgba(230,230,231,1)'
+                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
+                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
                     >
-                        <Box>
+                        <Box
+                            onClick={() => {
+                                if (!searchParams.get('uid')) {
+                                    setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
+                                }
+                            }}
+                        >
                             <Typography variant="h4" mb={1}>
                                 干货文生成
                             </Typography>
@@ -1058,7 +1074,7 @@ const AddModal = () => {
                                     {demandOpen && !copyWritingTemplate.demand && (
                                         <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
                                     )}
-                                    <Box>
+                                    <Box mb={1}>
                                         <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                                         {rows.length > 0 &&
                                             rows?.map((item, index: number) => (
@@ -1169,6 +1185,22 @@ const AddModal = () => {
                                             </Tables>
                                         </TableContainer>
                                     </MainCard>
+                                    {params.mode === 'PRACTICAL_IMAGE_TEXT' && (
+                                        <div className="relative mt-[20px]">
+                                            <InputNumber
+                                                size="large"
+                                                className="w-[300px] bg-[#f8fafc]"
+                                                min={1}
+                                                value={paragraphCount}
+                                                onChange={(value: number | null) => {
+                                                    setparagraphCount(value);
+                                                }}
+                                            />
+                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                文案段落数量
+                                            </span>
+                                        </div>
+                                    )}
                                     {variableOpen && (
                                         <VariableModal
                                             title={title}
@@ -1361,7 +1393,8 @@ const AddModal = () => {
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData
-                                        }
+                                        },
+                                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                     },
                                     useImages: testImageList
                                         ?.map((item: any, i: number) => {
@@ -1729,7 +1762,8 @@ const AddModal = () => {
                                                 },
                                                 imageTemplate: {
                                                     styleList: imageStyleData
-                                                }
+                                                },
+                                                paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                             }
                                         }).then((res) => {
                                             if (res) {
@@ -1763,7 +1797,8 @@ const AddModal = () => {
                                             },
                                             imageTemplate: {
                                                 styleList: imageStyleData
-                                            }
+                                            },
+                                            paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
                                         }
                                     }).then((res) => {
                                         if (res) {

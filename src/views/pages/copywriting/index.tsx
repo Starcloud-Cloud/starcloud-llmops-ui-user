@@ -72,6 +72,7 @@ export interface TableEnhancedCreateDataType {
 
 const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '方案名称' },
+    { id: ' mode', numeric: false, disablePadding: false, label: '创作方式' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '是否公开' },
     { id: 'score', numeric: false, disablePadding: false, label: '类目' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 方案标签' },
@@ -335,6 +336,35 @@ const Copywriting: React.FC = () => {
                     />
                 </Grid>
                 <Grid item xl={2} md={3}>
+                    <FormControl key={query.mode} color="secondary" size="small" fullWidth>
+                        <InputLabel id="types">创作方式</InputLabel>
+                        <Select
+                            name="mode"
+                            value={query.mode}
+                            onChange={(e: any) => changeQuery({ name: 'mode', value: e.target.value })}
+                            endAdornment={
+                                query.mode && (
+                                    <InputAdornment className="mr-[10px]" position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                changeQuery({ name: 'mode', value: '' });
+                                            }}
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                            labelId=" types"
+                            label="创作方式"
+                        >
+                            <MenuItem value={'RANDOM_IMAGE_TEXT'}>随机图文生成</MenuItem>
+                            <MenuItem value={'PRACTICAL_IMAGE_TEXT'}>干货文生成</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xl={2} md={3}>
                     <FormControl key={query.category} color="secondary" size="small" fullWidth>
                         <InputLabel id="fields">发布类目</InputLabel>
                         <Select
@@ -446,6 +476,11 @@ const Copywriting: React.FC = () => {
                                         <Tooltip title={row.name}>
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <span className="line-clamp-1 w-[200px] mx-auto">
+                                            {row.model === 'RANDOM_IMAGE_TEXT' ? '随机图文生成' : '干货文生成'}
+                                        </span>
                                     </TableCell>
                                     {permissions.includes('creative:scheme:publish') && (
                                         <TableCell align="center">

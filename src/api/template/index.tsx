@@ -1,4 +1,5 @@
 import request from 'utils/axios';
+import { vipSwitch } from 'utils/vipSwtich';
 //模板市场列表
 export const marketPage = (params: PageParam) => {
     return request.get({ url: '/llm/app/market/page', params });
@@ -19,9 +20,18 @@ export const marketDeatail = (data: { uid: string }) => {
 export const delMarket = (uid: any) => {
     return request.delete({ url: `/llm/app/market/delete/${uid}` });
 };
-//获取等级
-export const userBenefits = () => {
-    return request.post({ url: '/llm/user-benefits/info' });
+
+// //获取等级
+// export const userBenefits = () => {
+//     return request.post({ url: '/llm/user-benefits/info' });
+// };
+
+export const userBenefits = async () => {
+    const res = await request.get({ url: '/llm/auth/user/all_detail' });
+    const { rights, levels } = res;
+    const { levelName, levelId } = levels?.[0];
+
+    return { benefits: rights, userLevelName: levelName, userLevel: vipSwitch(levelId) };
 };
 //获取分类
 export const categories = () => {

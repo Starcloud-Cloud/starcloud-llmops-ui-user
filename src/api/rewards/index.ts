@@ -2,12 +2,12 @@ import request from 'utils/axios';
 
 // 检查是否签到 | Check sign in status
 export const checkSignInStatus = () => {
-    return request.post({ url: '/llm/user-benefits/checkSignIn' });
+    return request.get({ url: '/admin/sign-in/record/u/get-summary' });
 };
 
 // 进行签到 | Sign in
 export const signIn = () => {
-    return request.post({ url: '/llm/user-benefits/signIn' });
+    return request.post({ url: '/admin/sign-in/record/u/create' });
 };
 
 // 兑换权益 | Redeem benefits

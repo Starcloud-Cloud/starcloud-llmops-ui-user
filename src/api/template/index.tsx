@@ -29,9 +29,9 @@ export const delMarket = (uid: any) => {
 export const userBenefits = async () => {
     const res = await request.get({ url: '/llm/auth/user/all_detail' });
     const { rights, levels } = res;
-    const { levelName, levelId } = levels?.[0];
+    const { levelName, levelId, levelConfig } = levels?.[0];
 
-    return { benefits: rights, userLevelName: levelName, userLevel: vipSwitch(levelId) };
+    return { benefits: rights, userLevelName: levelName, userLevel: vipSwitch(levelId), levelConfig };
 };
 //获取分类
 export const categories = () => {

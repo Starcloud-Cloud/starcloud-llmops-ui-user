@@ -858,7 +858,7 @@ export const Chat = ({
             } else if (bufferObj?.code === 300900000 || !bufferObj?.code) {
                 // 不处理
                 return;
-            } else if (bufferObj?.code === 2008002007) {
+            } else if (bufferObj?.code === 2004008003) {
                 // 处理token不足
                 const copyData = [...dataRef.current];
                 copyData[copyData.length - 1].answer = '当前使用的魔法豆不足';

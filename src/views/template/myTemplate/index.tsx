@@ -145,11 +145,11 @@ function MyTemplate() {
     //弹窗
     const handleDetail = (data: { uid: string }) => {
         if (
-            userInfo.benefits[2].totalNum === -1 ||
-            totalList.filter((item) => Number(item.creator) === user.id).length < userInfo.benefits[2].totalNum
+            userInfo?.levelConfig?.usableApp === -1 ||
+            totalList.filter((item) => Number(item.creator) === user.id).length < userInfo?.levelConfig?.usableApp
         ) {
             navigate('/createApp?recommend=' + data.uid);
-        } else if (totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo.benefits[2].totalNum) {
+        } else if (totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo?.levelConfig?.usableApp) {
             setBotOpen(true);
         }
     };
@@ -278,7 +278,7 @@ function MyTemplate() {
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加应用个数(${userInfo?.benefits[2].totalNum})已用完`}
+                    title={`添加应用个数(${userInfo?.levelConfig?.usableApp})已用完`}
                 />
             )}
             {totals > 0 && (

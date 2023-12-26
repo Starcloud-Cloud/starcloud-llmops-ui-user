@@ -3,7 +3,7 @@ import {
     Grid,
     FormControl,
     InputLabel,
-    Select,
+    Select as Selects,
     MenuItem,
     Typography,
     Table,
@@ -25,7 +25,7 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag, Image } from 'antd';
+import { Tag, Image, Select } from 'antd';
 import formatDate from 'hooks/useDate';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
@@ -40,6 +40,7 @@ import Perform from '../carryOut/perform';
 import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
+import { metadata } from 'api/template';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 import ImageDetail from 'views/picture/components/detail';
 import Echarts from './components/echart';
@@ -114,6 +115,7 @@ function ApplicationAnalysis({
     value: number;
     type: string;
 }) {
+    const { Option } = Select;
     const [queryParams, setQuery] = useState<Query>({
         timeType: 'LAST_7D'
     });
@@ -201,6 +203,8 @@ function ApplicationAnalysis({
     const [dateList, setDateList] = useState([] as Date[]);
     //模式
     const [appMode, setAppMode] = useState([] as Date[]);
+    //执行模式（3.5 4.0）
+    const [exeList, setExeList] = useState<any[]>([]);
     //场景
     const [appScene, setAppScene] = useState([] as Date[]);
 
@@ -209,6 +213,9 @@ function ApplicationAnalysis({
             setDateList(res.timeType);
             setAppMode(res.appMode);
             setAppScene(res.appScene);
+        });
+        metadata().then((res) => {
+            setExeList(res.aiModel);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -354,6 +361,7 @@ function ApplicationAnalysis({
     const [detailData, setDetailData] = useState<any>({});
     //接口请求出来的全部内容
     const [result, setResult] = useState<any>({});
+    const [aimodel, setAiModel] = useState('');
     const [exeDetail, setExeDetail] = useState<any>({});
     //聊天
     const [chatVisible, setChatVisible] = useState(false);
@@ -390,7 +398,7 @@ function ApplicationAnalysis({
                         <Grid item md={4} lg={3} xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel id="appMode">模式</InputLabel>
-                                <Select
+                                <Selects
                                     type="search"
                                     labelId="appMode"
                                     name="appMode"
@@ -401,7 +409,7 @@ function ApplicationAnalysis({
                                     {appMode.map((item) => (
                                         <MenuItem value={item.value}>{item.label}</MenuItem>
                                     ))}
-                                </Select>
+                                </Selects>
                             </FormControl>
                         </Grid>
                     </>
@@ -409,17 +417,17 @@ function ApplicationAnalysis({
                 <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="fromScene">场景</InputLabel>
-                        <Select labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
+                        <Selects labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
                             {appScene.map((item) => (
                                 <MenuItem value={item.value}>{item.label}</MenuItem>
                             ))}
-                        </Select>
+                        </Selects>
                     </FormControl>
                 </Grid>
                 <Grid item md={4} lg={3} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
-                        <Select
+                        <Selects
                             labelId="demo-simple-select-label"
                             name="timeType"
                             label={t('generateLog.date')}
@@ -431,7 +439,7 @@ function ApplicationAnalysis({
                                     {item.label}
                                 </MenuItem>
                             ))}
-                        </Select>
+                        </Selects>
                     </FormControl>
                 </Grid>
                 <Grid item md={4} lg={3} xs={12}>
@@ -495,7 +503,7 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (
-                                        row.errorCode === '2008002007' ? (
+                                        row.errorCode === '2004008003' ? (
                                             <Link
                                                 onClick={() =>
                                                     window.open(window.location.protocol + '//' + window.location.host + '/subscribe')
@@ -574,6 +582,7 @@ function ApplicationAnalysis({
                                                 detailApp({ appConversationUid: row.uid }).then((res) => {
                                                     if (res) {
                                                         setExeDetail(res.appInfo);
+                                                        setAiModel(res.aiModel);
                                                         setResult(res);
                                                         setConversationUid(res.conversationUid);
                                                         setExeOpen(true);
@@ -653,6 +662,7 @@ function ApplicationAnalysis({
                     onClose={() => {
                         setExeOpen(false);
                         setExeDetail({});
+                        setAiModel('');
                         setResult({});
                         setConversationUid('');
                     }}
@@ -718,6 +728,21 @@ function ApplicationAnalysis({
                                                     </Box>
                                                 </Box>
                                             </Box>
+                                            <Select
+                                                style={{ width: 100, height: 23 }}
+                                                bordered={false}
+                                                className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                rootClassName="modelSelect"
+                                                popupClassName="modelSelectPopup"
+                                                value={aimodel}
+                                                disabled
+                                            >
+                                                {exeList?.map((item: any) => (
+                                                    <Option key={item.value} value={item.value}>
+                                                        {item.label}
+                                                    </Option>
+                                                ))}
+                                            </Select>
                                         </Box>
                                         {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>

@@ -4,8 +4,6 @@ import React, { useEffect } from 'react';
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
 import { Input, Radio, RadioChangeEvent, Tag } from 'antd';
 
-const { Search } = Input;
-
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -14,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { gridSpacing } from 'store/constant';
 import dayjs from 'dayjs';
 import Checkbox from '@mui/material/Checkbox';
-import { getDiscountList } from 'api/vip';
+import { getDiscountList, getLickNameProduct } from 'api/vip';
 
 // generate random
 function rand() {
@@ -56,29 +54,47 @@ export function DiscountModal({
     currentSelect,
     handleFetchPay,
     setCurrentSelect,
-    handleCreateOrder
+    handleCreateOrder,
+    categoryId
 }: {
     open: boolean;
     handleClose: () => void;
-    handleFetchPay: (productCode?: string, noNeedProductCode?: string, discountCode?: string) => void;
+    handleFetchPay: (payId: number, discountCode?: number) => void;
     currentSelect: any;
     setCurrentSelect: (currentSelect: any) => void;
-    handleCreateOrder: (code?: string, discountCode?: string, type?: number) => void;
+    handleCreateOrder: (payId?: number, discountCode?: number, type?: number) => void;
+    categoryId: number;
 }) {
-    const [selectCode, setSelectCode] = React.useState('');
-    const [discountCode, setDiscountCode] = React.useState('');
-    const [value, setValue] = React.useState(0);
+    const [selectCode, setSelectCode] = React.useState<any>(); // payId
+    const [discountCode, setDiscountCode] = React.useState<any>();
+    const [value, setValue] = React.useState(0); // tab
     const [checked, setChecked] = React.useState(false);
     const [discount, setDiscount] = React.useState<any>({});
-    const handleOnSearch = async (value: string) => {
-        setDiscountCode(value);
-        await handleFetchPay(selectCode, currentSelect.monthCode === selectCode ? currentSelect.yearCode : currentSelect.monthCode, value);
+
+    const [timeList, setTimeList] = React.useState([]);
+
+    const handleOnSearch = async (value: number) => {
+        if (discountCode) {
+            setDiscountCode('');
+            await handleFetchPay(selectCode);
+        } else {
+            setDiscountCode(value);
+            await handleFetchPay(selectCode, value);
+        }
     };
+
+    // 获取年月和把payId 复制给selectCOde
+    useEffect(() => {
+        getLickNameProduct({ id: currentSelect.payId }).then((res) => {
+            setTimeList(res);
+        });
+        setSelectCode(currentSelect.payId);
+    }, [currentSelect]);
 
     // 默认选择第一个优惠券
     useEffect(() => {
         if (discount.length) {
-            handleOnSearch(discount?.[0]?.code);
+            handleOnSearch(discount?.[0]?.id);
         }
     }, [discount]);
 
@@ -86,22 +102,22 @@ export function DiscountModal({
         setCurrentSelect((pre: any) => {
             return {
                 ...pre,
-                select: e.target.value === pre.monthCode ? '1' : '2'
+                payId: e.target.value
             };
         });
-        setSelectCode(e.target.value);
-        await handleFetchPay(e.target.value, currentSelect.monthCode === e.target.value ? currentSelect.yearCode : currentSelect.monthCode);
+        await handleFetchPay(e.target.value, discountCode);
     };
 
     useEffect(() => {
-        getDiscountList().then((res: any) => {
+        getDiscountList({
+            price: currentSelect.payPrice,
+            spuIds: [currentSelect.spuId],
+            skuIds: [currentSelect.payId],
+            categoryIds: [categoryId]
+        }).then((res: any) => {
             setDiscount(res);
         });
     }, []);
-
-    useEffect(() => {
-        setSelectCode(currentSelect?.select === '1' ? currentSelect?.monthCode : currentSelect?.yearCode);
-    }, [currentSelect]);
 
     const canSubmit = React.useMemo(() => {
         if (discountCode && !currentSelect.discountCouponStatus) {
@@ -153,9 +169,9 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    {!currentSelect.experience && (
+                                    {/* {!currentSelect.experience && (
                                         <Tab
-                                            disabled={!currentSelect.monthCode.includes('basic')}
+                                            // disabled={!currentSelect.monthCode.includes('basic')}
                                             label={
                                                 <div className="flex justify-center items-center">
                                                     <span>订阅</span>
@@ -166,7 +182,7 @@ export function DiscountModal({
                                             }
                                             {...a11yProps(1)}
                                         />
-                                    )}
+                                    )} */}
                                 </Tabs>
                                 <div className="flex justify-center flex-col items-center w-full p-3">
                                     <div className="flex justify-between items-center w-full mb-3">
@@ -177,7 +193,7 @@ export function DiscountModal({
                                         <span className="text-[#868A91]">套餐原价</span>
                                         <div className="flex items-center">
                                             <span className="text-[#de4437] text-lg ">
-                                                ￥{(currentSelect?.originalAmount / 100).toFixed(2)}
+                                                ￥{(currentSelect?.totalPrice / 100).toFixed(2)}
                                             </span>
                                             <span className="text-xs">/元</span>
                                         </div>
@@ -193,8 +209,8 @@ export function DiscountModal({
                                             {!value ? (
                                                 <span>
                                                     <Radio.Group onChange={handleRadio} value={selectCode}>
-                                                        <Radio value={currentSelect?.monthCode}>月</Radio>
-                                                        <Radio value={currentSelect?.yearCode}>年</Radio>
+                                                        <Radio value={timeList?.[0]}>月</Radio>
+                                                        <Radio value={timeList?.[1]}>年</Radio>
                                                     </Radio.Group>
                                                 </span>
                                             ) : (
@@ -204,7 +220,7 @@ export function DiscountModal({
                                     )}
                                     {!currentSelect.experience && !value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
-                                            <span className="text-[#868A91] mb-2">折扣券</span>
+                                            {/* <span className="text-[#868A91] mb-2">折扣券</span>
                                             <div>
                                                 <Search
                                                     placeholder="请输入折扣码"
@@ -223,14 +239,18 @@ export function DiscountModal({
                                             </div>
                                             <span className="text-[#919DA8] mt-1">
                                                 输入/选择折扣券后系统会自动检测折扣券，如折扣券有效则显示在优惠金额
-                                            </span>
+                                            </span> */}
 
                                             {!!discount?.length &&
                                                 discount.map((v: any, index: number) => (
                                                     <div key={index} className="mt-4">
                                                         <div className="text-[#919DA8]">请选择下面折扣券:</div>
                                                         <div className="mt-2">
-                                                            <div className="flex items-center justify-center px-4 max-w-[210px] rounded-lg bg-[#ff5500] cursor-pointer border border-[#333] border-solid">
+                                                            <div
+                                                                className={`flex items-center justify-center px-4 max-w-[210px] rounded-lg bg-[#ff5500] cursor-pointer ${
+                                                                    discountCode && 'outline outline-offset-2 outline-1 outline-blue-500'
+                                                                }`}
+                                                            >
                                                                 <div className="mr-[2px]">
                                                                     <svg
                                                                         viewBox="0 0 1024 1024"
@@ -257,7 +277,7 @@ export function DiscountModal({
                                                                         ></path>
                                                                     </svg>
                                                                 </div>
-                                                                <div className="flex flex-col py-1" onClick={() => handleOnSearch(v?.code)}>
+                                                                <div className="flex flex-col py-1" onClick={() => handleOnSearch(v?.id)}>
                                                                     <span className="text-white text-sm">{v?.name}</span>
                                                                     <div className="text-white text-sm">
                                                                         结束时间：{dayjs(v.endTime).format('YYYY-MM-DD')}
@@ -282,10 +302,10 @@ export function DiscountModal({
                                             <div className="flex flex-col">
                                                 <span className="text-[#868A91] mb-2">
                                                     优惠金额
-                                                    {currentSelect.discountCouponName ? `（${currentSelect?.discountCouponName}）` : ''}
+                                                    {/* {currentSelect.name && `（${currentSelect?.name}）`} */}
                                                 </span>
                                                 <span className="text-[#de4437] text-2xl ">
-                                                    ￥{(currentSelect?.discountAmount / 100).toFixed(2)}
+                                                    ￥{(currentSelect?.discountPrice / 100).toFixed(2)}
                                                 </span>
                                             </div>
                                         ) : (
@@ -298,7 +318,7 @@ export function DiscountModal({
                                             <div className="flex flex-col ml-[30%]">
                                                 <span className="text-[#868A91] mb-2">订单总价</span>
                                                 <span className="text-[#de4437] text-2xl font-semibold">
-                                                    ￥{(currentSelect?.discountedAmount / 100).toFixed(2)}
+                                                    ￥{(currentSelect?.payPrice / 100).toFixed(2)}
                                                 </span>
                                             </div>
                                         ) : (
@@ -324,11 +344,12 @@ export function DiscountModal({
                                         </div>
                                     )}
                                     <Button
-                                        disabled={!value ? !canSubmit : !checked}
+                                        // disabled={!value ? !canSubmit : !checked}
                                         onClick={() =>
-                                            !value
-                                                ? handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
-                                                : handleCreateOrder(currentSelect.monthCode, '', 2)
+                                            // !value
+                                            //     ? handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
+                                            //     : handleCreateOrder(currentSelect.payId, '', 2)
+                                            handleCreateOrder(currentSelect.payId)
                                         }
                                         className="w-[300px] mt-4"
                                         color="secondary"

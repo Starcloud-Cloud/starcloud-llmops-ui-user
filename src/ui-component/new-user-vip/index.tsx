@@ -10,13 +10,11 @@ const { Countdown } = Statistic;
 export const NewUserVip = ({ onClose }: { onClose: any }) => {
     const navigate = useNavigate();
     const [endTime, setEndTime] = useState('');
-    const [name, setName] = useState('');
 
     useEffect(() => {
         discountNewUser().then((res) => {
-            if (res?.code === '00001') {
+            if (res.isNewUser) {
                 setEndTime(res.endTime);
-                setName(res.name);
             }
         });
     }, []);

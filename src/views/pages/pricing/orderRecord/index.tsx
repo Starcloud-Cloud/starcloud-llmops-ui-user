@@ -66,7 +66,7 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 const headCells = [
     { id: 'merchantOrderId', numeric: false, disablePadding: false, label: '商户订单编号' },
     { id: 'subject', numeric: false, disablePadding: false, label: '商品标题' },
-    { id: 'body', numeric: false, disablePadding: false, label: '商品描述' },
+    // { id: 'body', numeric: false, disablePadding: false, label: '商品描述' },
     { id: 'amount', numeric: false, disablePadding: false, label: '支付金额(元)' },
     { id: 'status', numeric: false, disablePadding: false, label: '支付状态' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '支付时间' },
@@ -183,12 +183,12 @@ const Record: React.FC = () => {
 
     const transformValue = (v: number) => {
         switch (v) {
-            case 10:
-                return '支付成功';
-            case 20:
-                return '支付关闭';
             case 0:
                 return '未支付';
+            case 30:
+                return '支付成功';
+            case 40:
+                return '支付关闭';
         }
     };
 
@@ -209,44 +209,15 @@ const Record: React.FC = () => {
 
     const onRefresh = async () => {
         const resOrder = await submitOrder({
-            orderId,
-            channelCode: 'alipay_pc',
+            id: record.payOrderId,
+            channelCode: 'alipay_qr',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);
         setIsTimeout(false);
         interval = setInterval(() => {
-            getOrderIsPay({ orderId }).then((isPayRes) => {
-                if (isPayRes) {
-                    handleClose();
-                    setOpenPayDialog(true);
-                    setTimeout(() => {
-                        setOpenPayDialog(false);
-                        forceUpdate();
-                    }, 3000);
-                }
-            });
-        }, 1000);
-
-        setTimeout(() => {
-            clearInterval(interval);
-            setIsTimeout(true);
-        }, 5 * 60 * 1000);
-    };
-
-    const handlePay = async (id: string) => {
-        setOrderId(id);
-        const resOrder = await submitOrder({
-            orderId: id,
-            channelCode: 'alipay_pc',
-            channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-            displayMode: 'qr_code'
-        });
-        setPayUrl(resOrder.displayContent);
-        handleOpen();
-        interval = setInterval(() => {
-            getOrderIsPay({ orderId: id }).then((isPayRes) => {
+            getOrderIsPay({ id: record.id }).then((isPayRes) => {
                 if (isPayRes) {
                     handleClose();
                     clearInterval(interval);
@@ -264,6 +235,41 @@ const Record: React.FC = () => {
             setIsTimeout(true);
         }, 5 * 60 * 1000);
     };
+
+    const handlePay = async (row: any) => {
+        const resOrder = await submitOrder({
+            id: row.payOrderId,
+            channelCode: 'alipay_qr',
+            channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+            displayMode: 'qr_code'
+        });
+        setPayUrl(resOrder.displayContent);
+        handleOpen();
+        interval = setInterval(() => {
+            getOrderIsPay({ id: row.id }).then((isPayRes) => {
+                if (isPayRes) {
+                    handleClose();
+                    clearInterval(interval);
+                    setOpenPayDialog(true);
+                    setTimeout(() => {
+                        setOpenPayDialog(false);
+                        forceUpdate();
+                    }, 3000);
+                }
+            });
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            setIsTimeout(true);
+        }, 5 * 60 * 1000);
+    };
+
+    useEffect(() => {
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
 
     return (
         <MainCard content={false} title="订单记录">
@@ -283,7 +289,7 @@ const Record: React.FC = () => {
                             getComparator(order, orderBy)
                         )
                             // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => {
+                            .map((row: any, index) => {
                                 if (typeof row === 'number') {
                                     return null; // 忽略数字类型的行
                                 }
@@ -291,10 +297,10 @@ const Record: React.FC = () => {
                                 return (
                                     <TableRow hover key={row.id}>
                                         {/* <TableCell align="center">{row.id}</TableCell> */}
-                                        <TableCell align="center">{row.merchantOrderId}</TableCell>
-                                        <TableCell align="center">{row.subject}</TableCell>
-                                        <TableCell align="center">{row.body}</TableCell>
-                                        <TableCell align="center">{(row.amount / 100).toFixed(2)}</TableCell>
+                                        <TableCell align="center">{row.no}</TableCell>
+                                        <TableCell align="center">{row?.items?.[0]?.spuName}</TableCell>
+                                        {/* <TableCell align="center">{row.body}</TableCell> */}
+                                        <TableCell align="center">{(row?.payPrice / 100).toFixed(2)}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>
                                         <TableCell align="center">
                                             {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
@@ -303,10 +309,10 @@ const Record: React.FC = () => {
                                             <Button
                                                 variant="text"
                                                 color="secondary"
-                                                disabled={row.status === 10 || row.status === 20}
+                                                disabled={row.status === 30 || row.status === 40}
                                                 onClick={() => {
                                                     setRecord(row);
-                                                    handlePay(row.merchantOrderId);
+                                                    handlePay(row);
                                                 }}
                                             >
                                                 支付
@@ -336,7 +342,7 @@ const Record: React.FC = () => {
                 url={payUrl}
                 isTimeout={isTimeout}
                 onRefresh={onRefresh}
-                payPrice={record.amount / 100}
+                payPrice={record.payPrice / 100}
             />
             <Dialog
                 open={openPayDialog}

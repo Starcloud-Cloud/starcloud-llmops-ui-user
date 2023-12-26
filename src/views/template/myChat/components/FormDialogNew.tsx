@@ -51,7 +51,8 @@ export default function FormDialogNew({
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
     const { userInfo }: any = userInfoStore();
-    const { totalNum } = userInfo?.benefits?.find((v: any) => v.type === 'BOT') || 0;
+    const totalNum = userInfo?.levelConfig?.usableBasicBot || 0;
+
     const { user } = useUserStore();
 
     const handleClose = () => {

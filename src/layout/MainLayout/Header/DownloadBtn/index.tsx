@@ -20,7 +20,7 @@ export const PayBtn = () => {
     const [text, setText] = useState('年末5折限时体验');
     useEffect(() => {
         discountNewUser().then((res) => {
-            if (res.code === '00001') {
+            if (res.isNewUser) {
                 setText('新用户限时体验9.9元');
             }
         });

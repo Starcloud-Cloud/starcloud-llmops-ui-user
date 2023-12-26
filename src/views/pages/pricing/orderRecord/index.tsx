@@ -220,6 +220,7 @@ const Record: React.FC = () => {
             getOrderIsPay({ id: record.id }).then((isPayRes) => {
                 if (isPayRes) {
                     handleClose();
+                    clearInterval(interval);
                     setOpenPayDialog(true);
                     setTimeout(() => {
                         setOpenPayDialog(false);
@@ -264,6 +265,12 @@ const Record: React.FC = () => {
         }, 5 * 60 * 1000);
     };
 
+    useEffect(() => {
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
     return (
         <MainCard content={false} title="订单记录">
             <TableContainer>
@@ -302,7 +309,7 @@ const Record: React.FC = () => {
                                             <Button
                                                 variant="text"
                                                 color="secondary"
-                                                disabled={row.status === 10 || row.status === 20}
+                                                disabled={row.status === 30 || row.status === 40}
                                                 onClick={() => {
                                                     setRecord(row);
                                                     handlePay(row);

@@ -421,7 +421,7 @@ const Price1 = () => {
 
     const [isTimeout, setIsTimeout] = useState(false);
 
-    const [orderId, setOrderId] = useState('');
+    const [order, setOrder] = useState<any>({});
 
     const [discountOpen, setDiscountOpen] = useState(false);
 
@@ -538,15 +538,15 @@ const Price1 = () => {
 
     const onRefresh = async () => {
         const resOrder = await submitOrder({
-            id: orderId,
-            channelCode: 'alipay_pc',
+            id: order.payOrderId,
+            channelCode: 'alipay_qr',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
         setPayUrl(resOrder.displayContent);
         setIsTimeout(false);
         interval = setInterval(() => {
-            getOrderIsPay({ id: orderId }).then((isPayRes) => {
+            getOrderIsPay({ id: order.id }).then((isPayRes) => {
                 if (isPayRes) {
                     handleClose();
                     setOpenPayDialog(true);
@@ -582,7 +582,7 @@ const Price1 = () => {
                 });
                 if (res) {
                     handleOpen();
-                    setOrderId(res.id);
+                    setOrder(res);
                     const resOrder = await submitOrder({
                         id: res.payOrderId,
                         channelCode: 'alipay_qr',

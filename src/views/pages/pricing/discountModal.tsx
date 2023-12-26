@@ -117,7 +117,7 @@ export function DiscountModal({
         }).then((res: any) => {
             setDiscount(res);
         });
-    }, [currentSelect]);
+    }, []);
 
     const canSubmit = React.useMemo(() => {
         if (discountCode && !currentSelect.discountCouponStatus) {

@@ -103,6 +103,12 @@ const Announce = ({
                         结算
                     </Tag>
                 );
+            case 'complete':
+                return (
+                    <Tag className="!mr-0" color="success">
+                        完成
+                    </Tag>
+                );
             case 'close':
                 return (
                     <Tag className="!mr-0" color="error">

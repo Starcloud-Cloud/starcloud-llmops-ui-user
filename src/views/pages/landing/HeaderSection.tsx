@@ -202,15 +202,12 @@ const HeaderSection = () => {
                                     <Grid item>
                                         <AnimateButton>
                                             <Button
-                                                // component={RouterLink}
-                                                // to="/appMarket"
                                                 onClick={() => {
                                                     navigate('/appMarket');
                                                     setRoutesIndex(0);
                                                 }}
-                                                // target="_blank"
-                                                size="large"
                                                 variant="contained"
+                                                size="large"
                                                 color="secondary"
                                                 startIcon={<StarIcon />}
                                             >

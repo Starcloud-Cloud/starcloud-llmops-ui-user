@@ -90,6 +90,7 @@ interface BenefitItem {
     percentage: number;
     usedNum: number;
     totalNum: number;
+    remaining: number;
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
@@ -121,8 +122,13 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                         </Grid>
                     </Grid>
                     <Grid item>
-                        <Tooltip title={item?.usedNum + '/' + item?.totalNum} placement="top">
-                            <BorderLinearProgress level={info?.userLevel} variant="determinate" value={item?.percentage} theme={theme} />
+                        <Tooltip title={item?.remaining + '/' + item?.totalNum} placement="top">
+                            <BorderLinearProgress
+                                level={info?.userLevel}
+                                variant="determinate"
+                                value={(item?.remaining / item?.totalNum) * 100}
+                                theme={theme}
+                            />
                         </Tooltip>
                     </Grid>
                 </Grid>

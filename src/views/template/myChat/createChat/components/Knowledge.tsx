@@ -1166,9 +1166,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (userInfo.benefits[5].totalNum === -1) {
+                                    if (userInfo?.levelConfig?.usableBotDocument === -1) {
                                         setDocumentVisible(true);
-                                    } else if (documentList.length < userInfo.benefits[5].totalNum) {
+                                    } else if (documentList.length < userInfo?.levelConfig?.usableBotDocument) {
                                         setDocumentVisible(true);
                                     } else {
                                         setBotOpen(true);
@@ -1626,9 +1626,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (userInfo.benefits[5].totalNum === -1) {
+                                                if (userInfo?.levelConfig?.usableBotDocument === -1) {
                                                     setDocumentVisible(true);
-                                                } else if (documentList.length < userInfo.benefits[5].totalNum) {
+                                                } else if (documentList.length < userInfo?.levelConfig?.usableBotDocument) {
                                                     setDocumentVisible(true);
                                                 } else {
                                                     setBotOpen(true);
@@ -1668,7 +1668,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 <UpgradeModel
                                     open={botOpen}
                                     handleClose={() => setBotOpen(false)}
-                                    title={`添加文档个数(${userInfo?.benefits[5].totalNum})已用完`}
+                                    title={`添加文档个数(${userInfo?.levelConfig?.usableBotDocument})已用完`}
                                 />
                             )}
                         </MainCard>

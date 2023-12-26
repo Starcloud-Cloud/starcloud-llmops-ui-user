@@ -32,7 +32,18 @@ import { HeaderWrapper } from '../landing';
 import { VipBar } from './VipBar';
 // import PeopleSection from './PeopleSection'
 import type { RadioChangeEvent } from 'antd';
-import { createOrder, getOrderIsPay, getPrice, createSign, submitSign, getIsSign, discountNewUser } from 'api/vip';
+import {
+    createOrder,
+    getOrderIsPay,
+    getPrice,
+    createSign,
+    submitSign,
+    getIsSign,
+    discountNewUser,
+    getPayType,
+    getPayList,
+    getNewUserProduct
+} from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
@@ -152,8 +163,9 @@ const recommendList = [
     }
 ];
 
-const plansDefault = (value: number, name?: string) => [
+const plansDefault = (value: number) => [
     {
+        keyword: 'free',
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
@@ -165,6 +177,7 @@ const plansDefault = (value: number, name?: string) => [
         btnText: '免费使用'
     },
     {
+        keyword: 'basic',
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
@@ -177,9 +190,9 @@ const plansDefault = (value: number, name?: string) => [
         btnText: (
             <div>
                 立即购买
-                <Tag className="ml-1" color="#f50">
-                    {name || '订阅立减10元'}
-                </Tag>
+                {/* <Tag className="ml-1" color="#f50">
+                    {'订阅立减10元'}
+                </Tag> */}
             </div>
         ),
         btnTextNew: (
@@ -194,6 +207,7 @@ const plansDefault = (value: number, name?: string) => [
         yearCode: 'basic_year'
     },
     {
+        keyword: 'plus',
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
@@ -208,6 +222,7 @@ const plansDefault = (value: number, name?: string) => [
         yearCode: 'plus_year'
     },
     {
+        keyword: 'pro',
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
@@ -222,6 +237,7 @@ const plansDefault = (value: number, name?: string) => [
         yearCode: 'pro_year'
     },
     {
+        keyword: 'business',
         active: false,
         icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
         title: '企业版',
@@ -383,54 +399,20 @@ const planListDefault = (value: number) => [
 let interval: any;
 
 const Price1 = () => {
-    const [planList, setPlanList] = useState(planListDefault(1));
-    const [plans, setPlans] = useState(plansDefault(1));
+    const [planList, setPlanList] = useState<any[]>([]);
+    const [plans, setPlans] = useState<any[]>([]);
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
     const [openPayDialog, setOpenPayDialog] = useState(false);
     const [swiperRef, setSwiperRef] = useState<any>(null);
-    const [payPrice, setPayPrice] = useState(0);
     const [currentSelect, setCurrentSelect] = useState<any>(null);
     const [openSignDialog, setOpenSignDialog] = useState(false);
 
     const [showTrial, setShowTrial] = useState(false);
+    const [tabs, setTabs] = useState<any[]>([]);
 
-    useEffect(() => {
-        discountNewUser().then((res) => {
-            if (res?.code === '00001') {
-                setShowTrial(true);
-            }
-        });
-    }, []);
-
-    const { width } = useWindowSize();
-    const navigate = useNavigate();
-
-    const priceListDisable = {
-        opacity: '0.4',
-        '& >div> svg': {
-            fill: theme.palette.secondary.light
-        }
-    };
-
-    // useEffect(() => {
-    //     discountNewUser().then((res: any) => {
-    //         if (res.code === '00001') {
-    //             setPlans([...plansDefault(1, res.name)]);
-    //         }
-    //     });
-    // }, []);
-
-    // 从服务端请求vip数据
-    // useEffect(() => {
-    //     getVipList().then((res) => {
-    //         if (res.code === 0) {
-    //         }
-    //     });
-    // }, []);
-
-    const [value, setValue] = useState('1');
+    const [value, setValue] = useState<any>();
 
     const [open, setOpen] = React.useState(false);
     const [openSign, setOpenSign] = React.useState(false);
@@ -443,15 +425,88 @@ const Price1 = () => {
 
     const [discountOpen, setDiscountOpen] = useState(false);
 
-    useEffect(() => {
-        if (value === '1') {
-            setPlanList(planListDefault(1));
-            setPlans(plansDefault(1));
-        }
+    const [newUserProductId, setNewUserProductId] = useState<any>();
 
-        if (value === '2') {
-            setPlanList(planListDefault(2));
-            setPlans(plansDefault(2));
+    const { width } = useWindowSize();
+
+    const navigate = useNavigate();
+
+    const priceListDisable = {
+        opacity: '0.4',
+        '& >div> svg': {
+            fill: theme.palette.secondary.light
+        }
+    };
+
+    useEffect(() => {
+        discountNewUser().then((res) => {
+            if (res.isNewUser) {
+                setShowTrial(true);
+                getNewUserProduct().then((res) => {
+                    setNewUserProductId(res?.skus?.[0]?.id);
+                });
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        getPayType().then((res) => {
+            const result = res.filter((item: any) => item.parentId === 0) || [];
+            setValue(result?.[0]?.id);
+            setTabs(result);
+        });
+    }, []);
+
+    useEffect(() => {
+        const monthId = tabs?.find((v) => v.name === '月付')?.id;
+        if (value) {
+            getPayList(value).then((res) => {
+                let newList: any[] = [];
+                res.list.forEach((item: any, index: number) => {
+                    // 是月付
+                    if (value === monthId) {
+                        const monthPlans = plansDefault(1);
+                        monthPlans.forEach((v: any) => {
+                            if (item.keyword?.startsWith(v.keyword)) {
+                                if (index === 0) {
+                                    newList.push({ ...v, payPrice: '免费', id: item?.skus?.[0]?.id });
+                                } else if (index === 4) {
+                                    newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
+                                } else {
+                                    newList.push({
+                                        ...v,
+                                        id: item?.skus?.[0]?.id,
+                                        payPrice: item.price / 100,
+                                        marketPrice: item.marketPrice / 100
+                                    });
+                                }
+                            }
+                        });
+                        setPlans(newList);
+                        setPlanList(planListDefault(1));
+                    } else {
+                        const yearPlans = plansDefault(2);
+                        yearPlans.forEach((v: any) => {
+                            if (item.keyword?.startsWith(v.keyword)) {
+                                if (index === 0) {
+                                    newList.push({ ...v, payPrice: '免费', id: item?.skus?.[0]?.id });
+                                } else if (index === 4) {
+                                    newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
+                                } else {
+                                    newList.push({
+                                        ...v,
+                                        id: item?.skus?.[0]?.id,
+                                        payPrice: (item.price / 100 / 12).toFixed(2),
+                                        marketPrice: item.marketPrice / 100
+                                    });
+                                }
+                            }
+                        });
+                        setPlans(newList);
+                        setPlanList(planListDefault(2));
+                    }
+                });
+            });
         }
     }, [value]);
 
@@ -483,7 +538,7 @@ const Price1 = () => {
 
     const onRefresh = async () => {
         const resOrder = await submitOrder({
-            orderId,
+            id: orderId,
             channelCode: 'alipay_pc',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
@@ -491,7 +546,7 @@ const Price1 = () => {
         setPayUrl(resOrder.displayContent);
         setIsTimeout(false);
         interval = setInterval(() => {
-            getOrderIsPay({ orderId }).then((isPayRes) => {
+            getOrderIsPay({ id: orderId }).then((isPayRes) => {
                 if (isPayRes) {
                     handleClose();
                     setOpenPayDialog(true);
@@ -508,7 +563,7 @@ const Price1 = () => {
         }, 5 * 60 * 1000);
     };
 
-    const handleCreateOrder = async (code?: string, discountCode?: string, type = 1) => {
+    const handleCreateOrder = async (payId?: number, discountCode?: number, type = 1) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -518,20 +573,26 @@ const Price1 = () => {
             if (type === 1) {
                 const options = Intl.DateTimeFormat().resolvedOptions();
                 const timeZone = options.timeZone;
-                const res = await createOrder({ productCode: code, discountCode, timestamp: new Date().getTime(), timeZone });
+                const res = await createOrder({
+                    terminal: 20,
+                    items: [{ skuId: payId, count: 1 }],
+                    couponId: discountCode,
+                    pointStatus: false,
+                    deliveryType: 3
+                });
                 if (res) {
                     handleOpen();
-                    setOrderId(res);
+                    setOrderId(res.id);
                     const resOrder = await submitOrder({
-                        orderId: res,
-                        channelCode: 'alipay_pc',
+                        id: res.payOrderId,
+                        channelCode: 'alipay_qr',
                         channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
                         displayMode: 'qr_code'
                     });
                     setPayUrl(resOrder.displayContent);
 
                     interval = setInterval(() => {
-                        getOrderIsPay({ orderId: res }).then((isPayRes) => {
+                        getOrderIsPay({ id: res.id }).then((isPayRes) => {
                             if (isPayRes) {
                                 handleClose();
                                 setOpenPayDialog(true);
@@ -548,34 +609,33 @@ const Price1 = () => {
                     }, 5 * 60 * 1000);
                 }
             } else {
-                const resSign = await createSign({
-                    productCode: code
-                });
-                const res = await submitSign({ merchantSignId: resSign });
-                setOpenSign(true);
-                setPayUrl(res);
-
-                interval = setInterval(() => {
-                    getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
-                        if (isSignRes) {
-                            handleSignClose();
-                            setOpenSignDialog(true);
-                            setTimeout(() => {
-                                navigate('/orderRecord');
-                            }, 3000);
-                        }
-                    });
-                }, 1000);
-
-                setTimeout(() => {
-                    clearInterval(interval);
-                    setIsTimeout(true);
-                }, 5 * 60 * 1000);
+                // 应该是签约
+                // const resSign = await createSign({
+                //     productCode: code
+                // });
+                // const res = await submitSign({ merchantSignId: resSign });
+                // setOpenSign(true);
+                // setPayUrl(res);
+                // interval = setInterval(() => {
+                //     getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
+                //         if (isSignRes) {
+                //             handleSignClose();
+                //             setOpenSignDialog(true);
+                //             setTimeout(() => {
+                //                 navigate('/orderRecord');
+                //             }, 3000);
+                //         }
+                //     });
+                // }, 1000);
+                // setTimeout(() => {
+                //     clearInterval(interval);
+                //     setIsTimeout(true);
+                // }, 5 * 60 * 1000);
             }
         }
     };
 
-    const handleFetchPay = async (productCode?: string, noNeedProductCode?: string, discountCode?: string) => {
+    const handleFetchPay = async (payId?: number, discountCode?: number) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -583,13 +643,14 @@ const Price1 = () => {
             }, 3000);
             return;
         }
-        const res = await getPrice({ productCode, noNeedProductCode, discountCode });
+        const res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
         if (res) {
             setDiscountOpen(true);
             setCurrentSelect((pre: any) => {
                 return {
                     ...pre,
-                    ...res
+                    ...res.price,
+                    spuId: res?.items?.[0]?.spuId
                 };
             });
             if (res.discountCouponStatus === false && discountCode) {
@@ -608,16 +669,14 @@ const Price1 = () => {
         }
     };
 
-    const handleClick = (index: number, productCode?: string, noNeedProductCode?: string) => {
+    const handleClick = (index: number, payId?: number) => {
         switch (index) {
             case 0:
                 return navigate('/exchange');
             case 1:
-                return handleFetchPay(productCode, noNeedProductCode);
             case 2:
-                return handleFetchPay(productCode, noNeedProductCode);
             case 3:
-                return handleFetchPay(productCode, noNeedProductCode);
+                return handleFetchPay(payId);
             case 4:
                 return;
         }
@@ -643,12 +702,13 @@ const Price1 = () => {
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
                         <Radio.Group onChange={onChange} buttonStyle="solid" size="large" value={value}>
-                            <Radio.Button value="1" style={{ width: '150px', textAlign: 'center' }}>
-                                月付
-                            </Radio.Button>
-                            <Radio.Button value="2" style={{ width: '150px', textAlign: 'center' }}>
-                                年付 <Tag color="#f50">8折优惠</Tag>
-                            </Radio.Button>
+                            {tabs.map((item: any) => {
+                                return (
+                                    <Radio.Button value={item.id} style={{ width: '150px', textAlign: 'center' }}>
+                                        {item.name} {item.name === '年付' && <Tag color="#f50">8折优惠</Tag>}
+                                    </Radio.Button>
+                                );
+                            })}
                         </Radio.Group>
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
@@ -696,7 +756,7 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 {index === 1 || index === 2 || index === 3 ? (
                                                     <div className="text-sm text-center text-[#d7d7d7] line-through">
-                                                        ￥{(plan?.monthPrice as number) * 2}/月
+                                                        ￥{plan?.marketPrice}/月
                                                     </div>
                                                 ) : (
                                                     <div className="h-[24px]"></div>
@@ -715,7 +775,7 @@ const Price1 = () => {
                                                     }}
                                                 >
                                                     {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
-                                                    {value === '1' ? plan.monthPrice : plan.preMonthPrice ?? plan.monthPrice}
+                                                    {plan.payPrice}
                                                     {(index === 1 || index === 2 || index === 3) && (
                                                         <span className="text-[#aaa]">/月</span>
                                                     )}
@@ -750,14 +810,9 @@ const Price1 = () => {
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                monthCode: plan.monthCode,
-                                                                yearCode: plan.yearCode
+                                                                payId: plan.id
                                                             });
-                                                            handleClick(
-                                                                index,
-                                                                value === '1' ? plan.monthCode : plan.yearCode,
-                                                                value === '1' ? plan.yearCode : plan.monthCode
-                                                            );
+                                                            handleClick(index, plan.id);
                                                         }}
                                                         color="secondary"
                                                     >
@@ -774,11 +829,10 @@ const Price1 = () => {
                                                             setCurrentSelect({
                                                                 title: '体验版',
                                                                 select: value,
-                                                                monthCode: 'ai_trial',
-                                                                yearCode: 'ai_trial',
+                                                                payId: newUserProductId,
                                                                 experience: true
                                                             });
-                                                            handleClick(index, 'ai_trial', 'ai_trial');
+                                                            handleClick(index, newUserProductId);
                                                         }}
                                                         color="secondary"
                                                     >
@@ -801,7 +855,7 @@ const Price1 = () => {
                                                     }}
                                                     component="ul"
                                                 >
-                                                    {planList[index].map((list, i) => (
+                                                    {planList?.[index]?.map((list: any, i: number) => (
                                                         <React.Fragment key={i}>
                                                             <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
                                                                 <ListItemIcon>
@@ -894,7 +948,7 @@ const Price1 = () => {
                 url={payUrl}
                 isTimeout={isTimeout}
                 onRefresh={onRefresh}
-                payPrice={currentSelect?.discountedAmount / 100 || 0}
+                payPrice={currentSelect?.payPrice / 100 || 0}
             />
             <SignModal open={openSign} handleClose={() => setOpenSign(false)} url={payUrl} isTimeout={isTimeout} onRefresh={() => null} />
             {discountOpen && (
@@ -905,6 +959,7 @@ const Price1 = () => {
                     setCurrentSelect={setCurrentSelect}
                     currentSelect={currentSelect}
                     handleCreateOrder={handleCreateOrder}
+                    categoryId={value}
                 />
             )}
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}

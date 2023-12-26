@@ -387,7 +387,7 @@ const MainLayout = () => {
         //     clearInterval(userVip);
         //};
         discountNewUser().then((res) => {
-            if (res.code === '00001') {
+            if (res.isNewUser) {
                 handleShowNewUserVip();
             }
         });
@@ -396,24 +396,18 @@ const MainLayout = () => {
     useEffect(() => {
         (async () => {
             const res = await getVipTimeOut();
-            if (res.userLevel.expirationTime) {
+            if (res.notifyExpiringLevelRespVO.isNotify) {
                 setTimeOutObj({
                     type: 1,
-                    time: dayjs(res.userLevel.expirationTime).diff(dayjs(), 'day')
+                    time: dayjs(res.notifyExpiringLevelRespVO.validEndTime).diff(dayjs(), 'day')
                 });
                 return;
             }
-            // if (res.userBenefits.expirationTime) {
-            //     setTimeOutObj({
-            //         type: 2,
-            //         time: dayjs(res.userBenefits.expirationTime).diff(dayjs(), 'day')
-            //     });
-            //     return;
-            // }
-            if (res.tokenExpiredReminderVO.isReminder) {
+
+            if (res.notifyExpiringRightsRespVO.isNotify) {
                 setTimeOutObj({
                     type: 3,
-                    num: res.tokenExpiredReminderVO.expiredNum
+                    num: res.notifyExpiringRightsRespVO.expiredNum
                 });
             }
         })();

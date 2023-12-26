@@ -50,27 +50,27 @@ function formatTime(timestamp: number): string {
 
 let uniqueId = 0;
 
-function createData(
-    benefitsName: string,
-    effectiveTime: number,
-    benefitsList: string[],
-    validity: number,
-    validityUnit: string,
-    expirationTime: number,
-    enabled: boolean
-) {
-    uniqueId += 1;
-    return {
-        id: uniqueId,
-        benefitsName,
-        effectiveTime,
-        benefitsList,
-        validity,
-        validityUnit,
-        expirationTime,
-        enabled
-    };
-}
+// function createData(
+//     benefitsName: string,
+//     effectiveTime: number,
+//     benefitsList: string[],
+//     validity: number,
+//     validityUnit: string,
+//     expirationTime: number,
+//     enabled: boolean
+// ) {
+//     uniqueId += 1;
+//     return {
+//         id: uniqueId,
+//         benefitsName,
+//         effectiveTime,
+//         benefitsList,
+//         validity,
+//         validityUnit,
+//         expirationTime,
+//         enabled
+//     };
+// }
 
 // table filter
 function descendingComparator(a: KeyedObject, b: KeyedObject, orderBy: string) {
@@ -100,12 +100,12 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'benefitsName', numeric: false, disablePadding: false, label: '权益名称' },
+    { id: 'title', numeric: false, disablePadding: false, label: '权益名称' },
     { id: 'status', numeric: false, disablePadding: false, label: '权益状态' },
     { id: 'benefitsList', numeric: false, disablePadding: false, label: '创作额度' },
-    { id: 'effectiveTime', numeric: true, disablePadding: false, label: '到账时间' },
-    { id: 'validity', numeric: true, disablePadding: false, label: '有效期' },
-    { id: 'expirationTime', numeric: true, disablePadding: false, label: '过期时间' }
+    { id: 'validStartTime', numeric: true, disablePadding: false, label: '到账时间' },
+    // { id: 'validity', numeric: true, disablePadding: false, label: '有效期' },
+    { id: 'validEndTime', numeric: true, disablePadding: false, label: '过期时间' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -166,17 +166,10 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
             getUserBenefitsPage(pageVO)
                 .then((res) => {
                     // Once the data is fetched, map it and update rows state
-                    const fetchedRows = res.list.map((item) =>
-                        createData(
-                            item.benefitsName,
-                            item.effectiveTime,
-                            item.benefitsList.map((benefit) => `${benefit.name} · ${benefit.amount}`),
-                            item.validity,
-                            item.validityUnit,
-                            item.expirationTime,
-                            item.enabled
-                        )
-                    );
+                    // const fetchedRows = res.list.map((item) =>
+                    //     createData(item.title, item.status, item.magicImageInit, item.magicBeanInit, item.validEndTime, item.validStartTime)
+                    // );
+                    const fetchedRows: any = res.list;
 
                     setRows(fetchedRows);
 
@@ -192,7 +185,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     }, [page, rowsPerPage]);
 
     // Add a new state for rows
-    const [rows, setRows] = useState<TableEnhancedCreateDataType[]>([]);
+    const [rows, setRows] = useState<any[]>([]);
 
     const handleRequestSort = (event: React.SyntheticEvent, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -284,7 +277,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                             {stableSort(
                                 rows.filter((row) => typeof row !== 'number'),
                                 getComparator(order, orderBy)
-                            ).map((row, index) => {
+                            ).map((row: any, index) => {
                                 if (typeof row === 'number') {
                                     return null; // 忽略数字类型的行
                                 }
@@ -303,29 +296,35 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         selected={isItemSelected}
                                     >
                                         <TableCell align="center" sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
-                                            {row.benefitsName}
+                                            {row?.title}
                                         </TableCell>
                                         <TableCell align="center">
-                                            {row?.enabled ? (
+                                            {row?.status === 0 ? (
                                                 <Chip label="生效中" size="small" color="primary" />
-                                            ) : (
+                                            ) : row?.status === 1 ? (
                                                 <Chip size={'small'} label="已过期" />
+                                            ) : (
+                                                <Chip size={'small'} label="取消" />
                                             )}
                                         </TableCell>
                                         <TableCell align="center">
-                                            {row.benefitsList.map((benefit, id) => (
+                                            <Fragment key={1}>
+                                                魔法豆 · {row?.magicBeanInit} <br />
+                                            </Fragment>
+                                            <Fragment key={2}>图片 · {row?.magicImageInit}</Fragment>
+                                            {/* {row.benefitsList.map((benefit, id) => (
                                                 <Fragment key={id}>
                                                     {benefit}
                                                     <br />
                                                 </Fragment>
-                                            ))}
+                                            ))} */}
                                         </TableCell>
-                                        <TableCell align="center">{formatTime(row.effectiveTime)}</TableCell>
-                                        <TableCell align="center">
+                                        <TableCell align="center">{formatTime(row?.validStartTime)}</TableCell>
+                                        {/* <TableCell align="center">
                                             {row.validity} {row.validityUnit === 'MONTH' ? '月' : row.validityUnit === 'WEEK' ? '周' : '年'}
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell sx={{ pr: 3 }} align="center">
-                                            {formatTime(row.expirationTime)}
+                                            {formatTime(row?.validEndTime)}
                                         </TableCell>
                                     </TableRow>
                                 );

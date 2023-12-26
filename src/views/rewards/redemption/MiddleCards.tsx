@@ -13,8 +13,10 @@ const MiddleCards = () => {
     const setSignInStatus = useUserStore((state) => state.setSignInStatus);
     const { setUserInfo }: any = userInfoStore();
     useEffect(() => {
-        checkSignInStatus().then((status) => {
-            setSignInStatus(status);
+        checkSignInStatus().then((data) => {
+            if (data.todaySignIn) {
+                setSignInStatus(true);
+            }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

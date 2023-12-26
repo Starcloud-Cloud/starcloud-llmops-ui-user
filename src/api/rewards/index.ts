@@ -2,12 +2,12 @@ import request from 'utils/axios';
 
 // 检查是否签到 | Check sign in status
 export const checkSignInStatus = () => {
-    return request.post({ url: '/llm/user-benefits/checkSignIn' });
+    return request.get({ url: '/admin/sign-in/record/u/get-summary' });
 };
 
 // 进行签到 | Sign in
 export const signIn = () => {
-    return request.post({ url: '/llm/user-benefits/signIn' });
+    return request.post({ url: '/admin/sign-in/record/u/create' });
 };
 
 // 兑换权益 | Redeem benefits
@@ -40,8 +40,12 @@ export interface GetUserBenefitsPageRes {
  * @param {string} pageVO 管理后台 - 用户权益分页 Request VO
  * @returns
  */
+// export const getUserBenefitsPage = (pageVO: any): Promise<GetUserBenefitsPageRes> => {
+//     return request.get({ url: `llm/user-benefits/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}` });
+// };
+
 export const getUserBenefitsPage = (pageVO: any): Promise<GetUserBenefitsPageRes> => {
-    return request.get({ url: `llm/user-benefits/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}` });
+    return request.get({ url: `/llm/rights/u/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}` });
 };
 
 // 响应接口

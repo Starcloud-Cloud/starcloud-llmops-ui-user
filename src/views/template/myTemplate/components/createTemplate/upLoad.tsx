@@ -178,17 +178,26 @@ function Upload({
                     title: '创建群聊',
                     icon: 'contentPaste',
                     onclick: () => {
-                        userInfo.benefits.map((value: any) => {
-                            if (value.name === '微信机器人') {
-                                if (value.totalNum === -1) {
-                                    setOpenWchat(true);
-                                } else if (updateBtn.channelMap[7].length < value.totalNum) {
-                                    setOpenWchat(true);
-                                } else {
-                                    setBotOpen(true);
-                                }
-                            }
-                        });
+                        // userInfo.benefits.map((value: any) => {
+                        //     if (value.name === '微信机器人') {
+                        //         if (value.totalNum === -1) {
+                        //             setOpenWchat(true);
+                        //         } else if (updateBtn.channelMap[7].length < value.totalNum) {
+                        //             setOpenWchat(true);
+                        //         } else {
+                        //             setBotOpen(true);
+                        //
+                        //     }
+                        // });
+                        const totalNum = userInfo?.levelConfig?.usableWechatBot;
+
+                        if (totalNum === -1) {
+                            setOpenWchat(true);
+                        } else if (updateBtn.channelMap[7].length < totalNum) {
+                            setOpenWchat(true);
+                        } else {
+                            setBotOpen(true);
+                        }
                     }
                 },
                 {
@@ -1348,7 +1357,7 @@ function Upload({
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加文档个数(${userInfo?.benefits[4].totalNum})已用完`}
+                    title={`添加文档个数(${userInfo?.levelConfig?.usableBotDocument})已用完`}
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

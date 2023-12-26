@@ -391,7 +391,7 @@ export const PictureCreateMenu = ({
                 setImgList([res?.response, ...imgList] || []);
             }
         } catch (e: any) {
-            if (e?.code === 2008002007) {
+            if (e?.code === 2004008004) {
                 setOpenToken(true);
             }
             setLoading && setLoading(false);

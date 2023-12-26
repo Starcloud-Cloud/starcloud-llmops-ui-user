@@ -117,7 +117,7 @@ function CreateDetail() {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2008002007')) {
+                if (textDecoder.decode(value).includes('2004008003')) {
                     setTokenOpen(true);
                     const newValue1 = [...loadings];
                     newValue1[index] = false;

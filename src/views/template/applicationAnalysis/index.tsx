@@ -503,7 +503,7 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (
-                                        row.errorCode === '2008002007' ? (
+                                        row.errorCode === '2004008003' ? (
                                             <Link
                                                 onClick={() =>
                                                     window.open(window.location.protocol + '//' + window.location.host + '/subscribe')

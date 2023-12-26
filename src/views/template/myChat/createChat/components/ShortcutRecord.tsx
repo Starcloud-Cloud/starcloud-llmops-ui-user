@@ -19,7 +19,6 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { getOrderRecord } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';

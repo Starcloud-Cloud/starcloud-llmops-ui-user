@@ -34,7 +34,7 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                     <Countdown
                         valueStyle={{
                             color: '#f0d6a4',
-                            fontSize: '16px'
+                            fontSize: '14px'
                         }}
                         title=""
                         value={endTime}
@@ -43,7 +43,7 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                 </div>
                 <div
                     style={{
-                        bottom: '131px',
+                        bottom: '133px',
                         left: '35px'
                     }}
                     className={'absolute text-[#d4c399]'}
@@ -55,13 +55,13 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                         bottom: '116px',
                         left: '35px'
                     }}
-                    className={'absolute bottom-[104px] text-[#d4c399] left-[35px]'}
+                    className={'absolute bottom-[104px] text-[#d4c399] left-[35px] '}
                 >
                     2.体验期内购买基础版正式套餐可享8折
                 </div>
                 <div
                     style={{
-                        bottom: '102px',
+                        bottom: '99px',
                         left: '35px'
                     }}
                     className={'absolute  text-[#d4c399]'}

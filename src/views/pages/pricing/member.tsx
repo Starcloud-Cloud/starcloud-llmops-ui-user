@@ -539,10 +539,11 @@ const Price1 = () => {
     const onRefresh = async () => {
         const resOrder = await submitOrder({
             id: order.payOrderId,
-            channelCode: 'alipay_qr',
+            channelCode: 'alipay_pc',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
+        window.open(resOrder.displayContent);
         setPayUrl(resOrder.displayContent);
         setIsTimeout(false);
         interval = setInterval(() => {
@@ -581,14 +582,15 @@ const Price1 = () => {
                     deliveryType: 3
                 });
                 if (res) {
-                    handleOpen();
+                    // handleOpen();
                     setOrder(res);
                     const resOrder = await submitOrder({
                         id: res.payOrderId,
-                        channelCode: 'alipay_qr',
+                        channelCode: 'alipay_pc',
                         channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
                         displayMode: 'qr_code'
                     });
+                    window.open(resOrder.displayContent);
                     setPayUrl(resOrder.displayContent);
 
                     interval = setInterval(() => {

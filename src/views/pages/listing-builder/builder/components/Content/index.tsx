@@ -621,7 +621,6 @@ const Content = () => {
                     bulletPoints: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES).map((item) => item.value)
                 });
                 let resp: any = await promise;
-                // controllerRef.current = controller;
 
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
@@ -630,11 +629,9 @@ const Content = () => {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
-                        console.log(isAll, 'isAll');
                         if (isAll) {
                             const filterList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD);
                             const length = filterList.length;
-                            console.log(length, 'length');
                             if (index < length - 1) {
                                 doAiWrite(filterList[index + 1], index + 1, true);
                             }
@@ -651,15 +648,34 @@ const Content = () => {
                         const eventData = outerJoins.slice(0, eventEndIndex + 1);
                         const subString = eventData.substring(5);
                         const bufferObj = JSON.parse(subString);
-                        if (bufferObj.type === 'm') {
+                        // 300900000 为链接成功 type为null
+                        if (bufferObj.code === 200 || bufferObj.code === 300900000) {
+                            if (bufferObj.type === 'm') {
+                                setLoadingList([]);
+                                setList((preList: any) => {
+                                    const copyPreList = _.cloneDeep(preList);
+                                    copyPreList[index].value = copyPreList[index].value + bufferObj.content;
+                                    copyPreList[index].character = (copyPreList[index].value + bufferObj.content)?.length || 0;
+                                    copyPreList[index].word =
+                                        (copyPreList[index].value + bufferObj.content)?.trim()?.split(' ')?.length || 0;
+                                    return copyPreList;
+                                });
+                            }
+                        } else {
                             setLoadingList([]);
-                            setList((preList: any) => {
-                                const copyPreList = _.cloneDeep(preList);
-                                copyPreList[index].value = copyPreList[index].value + bufferObj.content;
-                                copyPreList[index].character = (copyPreList[index].value + bufferObj.content)?.length || 0;
-                                copyPreList[index].word = (copyPreList[index].value + bufferObj.content)?.trim()?.split(' ')?.length || 0;
-                                return copyPreList;
-                            });
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '请求异常，请重新再试',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                            break;
                         }
                         outerJoins = outerJoins.slice(eventEndIndex + 3);
                         eventEndIndex = outerJoins.indexOf('}\n');
@@ -667,6 +683,18 @@ const Content = () => {
                 }
             }
         } catch (e) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请求异常，请重新再试',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
             setLoadingList([]);
         }
     };

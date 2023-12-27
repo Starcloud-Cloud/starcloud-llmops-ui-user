@@ -399,8 +399,8 @@ const planListDefault = (value: number) => [
 let interval: any;
 
 const Price1 = () => {
-    const [planList, setPlanList] = useState<any[]>([]);
-    const [plans, setPlans] = useState<any[]>([]);
+    const [planList, setPlanList] = useState<any[]>(planListDefault(1));
+    const [plans, setPlans] = useState<any[]>(plansDefault(1));
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
@@ -539,7 +539,7 @@ const Price1 = () => {
     const onRefresh = async () => {
         const resOrder = await submitOrder({
             id: order.payOrderId,
-            channelCode: 'alipay_qr',
+            channelCode: 'alipay_pc',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
@@ -585,7 +585,7 @@ const Price1 = () => {
                     setOrder(res);
                     const resOrder = await submitOrder({
                         id: res.payOrderId,
-                        channelCode: 'alipay_qr',
+                        channelCode: 'alipay_pc',
                         channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
                         displayMode: 'qr_code'
                     });
@@ -635,6 +635,7 @@ const Price1 = () => {
         }
     };
 
+    // 获取价格
     const handleFetchPay = async (payId?: number, discountCode?: number) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
@@ -653,19 +654,6 @@ const Price1 = () => {
                     spuId: res?.items?.[0]?.spuId
                 };
             });
-            if (res.discountCouponStatus === false && discountCode) {
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '折扣券无效',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        close: false
-                    })
-                );
-            }
         }
     };
 

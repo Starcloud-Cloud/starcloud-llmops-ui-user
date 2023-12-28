@@ -666,7 +666,7 @@ const Content = () => {
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: '请求异常，请重新再试',
+                                    message: bufferObj?.content || '请求异常，请重新再试',
                                     variant: 'alert',
                                     alert: {
                                         color: 'error'

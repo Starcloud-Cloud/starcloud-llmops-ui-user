@@ -138,6 +138,19 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
     const { version, uid, setUpdate, update, setDetail, keywordHighlight, setItemScore, setCountry, handleReGrade, list, setEnableAi } =
         useListing();
 
+    const [fetching, setFetching] = useState(true);
+
+    const timeRef = React.useRef<any>(null);
+
+    useEffect(() => {
+        clearTimeout(timeRef.current);
+        // 15s 之后关闭请求
+        timeRef.current = setTimeout(() => {
+            setFetching(false);
+        }, 1000 * 15);
+        return () => clearTimeout(timeRef.current);
+    }, []);
+
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
@@ -165,16 +178,19 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                             setUpdate({ type: 1 });
                         }
                     } else {
-                        setDetail({ ...res, keywordResume: res?.keywordMetaData?.map((item: any) => item?.keyword) || [] });
-                        setEnableAi(res?.draftConfig?.enableAi);
-                        setItemScore({
-                            ...res.itemScore,
-                            score: res.score,
-                            matchSearchers: res.matchSearchers,
-                            totalSearches: res.totalSearches
-                        });
+                        // ANALYSIS 的情况不回显值
+                        if (res.status !== 'ANALYSIS') {
+                            setDetail({ ...res, keywordResume: res?.keywordMetaData?.map((item: any) => item?.keyword) || [] });
+                            setEnableAi(res?.draftConfig?.enableAi);
+                            setItemScore({
+                                ...res.itemScore,
+                                score: res.score,
+                                matchSearchers: res.matchSearchers,
+                                totalSearches: res.totalSearches
+                            });
+                        }
                         if (res.status === 'ANALYSIS') {
-                            setUpdate({});
+                            fetching && setUpdate({});
                         }
                     }
                 })

@@ -280,7 +280,7 @@ export function DiscountModal({
                                                                 <div className="flex flex-col py-1" onClick={() => handleOnSearch(v?.id)}>
                                                                     <span className="text-white text-sm">{v?.name}</span>
                                                                     <div className="text-white text-sm">
-                                                                        结束时间：{dayjs(v.endTime).format('YYYY-MM-DD')}
+                                                                        结束时间：{dayjs(v.validEndTime).format('YYYY-MM-DD')}
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -349,7 +349,7 @@ export function DiscountModal({
                                             // !value
                                             //     ? handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
                                             //     : handleCreateOrder(currentSelect.payId, '', 2)
-                                            handleCreateOrder(currentSelect.payId)
+                                            handleCreateOrder(currentSelect.payId, discountCode)
                                         }
                                         className="w-[300px] mt-4"
                                         color="secondary"

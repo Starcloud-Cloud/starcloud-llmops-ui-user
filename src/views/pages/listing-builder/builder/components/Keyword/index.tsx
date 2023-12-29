@@ -19,7 +19,7 @@ const containerStyle: React.CSSProperties = {
     background: '#fff'
 };
 
-const KeyWord = () => {
+const KeyWord = ({ setIsLoading }: { setIsLoading: any }) => {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState<any[]>([]);
     const [hiddenUse, setHiddenUse] = React.useState(false); // 隐藏已使用
@@ -125,7 +125,7 @@ const KeyWord = () => {
                 )}
             </div>
             <div className="max-h-[calc(100vh-100px)] overflow-y-auto">
-                <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} />
+                <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} setIsLoading={setIsLoading} />
             </div>
 
             {open && <AddKeywordModal open={open} handleClose={handleClose} />}

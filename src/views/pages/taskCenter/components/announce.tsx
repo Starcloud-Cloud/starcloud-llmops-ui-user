@@ -66,6 +66,7 @@ const Announce = ({
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleTransfer = (key: string, msg?: string) => {
+        console.log(msg);
         switch (key) {
             case 'init':
                 return (
@@ -111,9 +112,19 @@ const Announce = ({
                 );
             case 'close':
                 return (
-                    <Tag className="!mr-0" color="error">
-                        关闭
-                    </Tag>
+                    <Popover content={msg}>
+                        <Tag className="!mr-0 cursor-pointer" color="error">
+                            关闭
+                        </Tag>
+                    </Popover>
+                );
+            case 'settlement_error':
+                return (
+                    <Popover content={msg}>
+                        <Tag className="cursor-pointer !mr-0" color="error">
+                            结算异常
+                        </Tag>
+                    </Popover>
                 );
             case 'pre_settlement_error':
                 return (
@@ -122,12 +133,6 @@ const Announce = ({
                             预结算异常
                         </Tag>
                     </Popover>
-                );
-            case 'settlement_error':
-                return (
-                    <Tag className="!mr-0" color="error">
-                        结算异常
-                    </Tag>
                 );
         }
     };
@@ -155,7 +160,18 @@ const Announce = ({
             title: '状态',
             dataIndex: 'status',
             render: (_, row) => (
-                <div>{handleTransfer(row.status, row.status === 'pre_settlement_error' ? row.preSettlementMsg : undefined)}</div>
+                <div>
+                    {handleTransfer(
+                        row.status,
+                        row.status === 'close'
+                            ? row.closeMsg
+                            : row.status === 'pre_settlement_error'
+                            ? row.preSettlementMsg
+                            : row.status === 'settlement_error'
+                            ? row.settlementMsg
+                            : undefined
+                    )}
+                </div>
             )
         },
         {

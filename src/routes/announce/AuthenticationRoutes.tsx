@@ -40,7 +40,6 @@ const MaintenanceComingSoon2 = Loadable(lazy(() => import('views/pages/maintenan
 const MaintenanceUnderConstruction = Loadable(lazy(() => import('views/pages/maintenance/UnderConstruction')));
 
 // landing & contact-us routing
-const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
 const PagesContactUS = Loadable(lazy(() => import('views/pages/contact-us')));
 const PagesFaqs = Loadable(lazy(() => import('views/pages/saas-pages/Faqs')));
 const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
@@ -184,10 +183,6 @@ const AuthenticationRoutes = {
             element: <MaintenanceUnderConstruction />
         },
 
-        {
-            path: '/pages/landing',
-            element: <PagesLanding />
-        },
         {
             path: '/pages/contact-us',
             element: <PagesContactUS />

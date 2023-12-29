@@ -7,10 +7,9 @@ import NavMotion from 'layout/NavMotion';
 import Loadable from 'ui-component/Loadable';
 
 // login routing
-const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication/Login')));
-const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication/Register')));
-const AuthForgotPassword = Loadable(lazy(() => import('views/pages/authentication/authentication/ForgotPassword')));
-const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
+const AuthLogin = Loadable(lazy(() => import('views/announce/authentication/authentication/Login')));
+const AuthRegister = Loadable(lazy(() => import('views/announce/authentication/authentication/Register')));
+const AuthForgotPassword = Loadable(lazy(() => import('views/announce/authentication/authentication/ForgotPassword')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -35,10 +34,6 @@ const LoginRoutes = {
         {
             path: '/forgot',
             element: <AuthForgotPassword />
-        },
-        {
-            path: '/pages/privacy-policy',
-            element: <PagesPrivacyPolicy />
         }
     ]
 };

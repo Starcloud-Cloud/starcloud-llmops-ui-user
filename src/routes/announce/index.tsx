@@ -22,9 +22,9 @@ export default function ThemeRoutes() {
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
-        AuthenticationRoutes,
         LoginRoutes,
         MainRoutes,
+        AuthenticationRoutes,
         { path: '*', element: <PageNotFound /> }
     ]);
 }

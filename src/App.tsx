@@ -1,5 +1,6 @@
 // routing
 import Routes from 'routes';
+import AnnounceRoutes from 'routes/announce';
 import './App.scss';
 import zhCN from 'antd/locale/zh_CN';
 // project imports
@@ -20,6 +21,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import usePubSubEvent from 'hooks/usePubsub';
 import { ConfigProvider } from 'antd';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 
 // import { t } from 'hooks/web/useI18n';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
@@ -59,6 +61,8 @@ const App = () => {
         );
     });
 
+    console.log(getTenant(), 'getTenant');
+
     // if (!loading) return <Loader />;
     return (
         <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }} locale={zhCN}>
@@ -67,7 +71,7 @@ const App = () => {
                     <NavigationScroll>
                         <AuthProvider>
                             <>
-                                <Routes />
+                                {getTenant() === ENUM_TENANT.AI ? <Routes /> : <AnnounceRoutes />}
                                 <Snackbar />
                             </>
                         </AuthProvider>

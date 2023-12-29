@@ -129,7 +129,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 
 // ==============================|| TABLE - ENHANCED ||============================== //
 
-export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
+export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: any) => {
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
 
@@ -147,7 +147,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
         // 15s 之后关闭请求
         timeRef.current = setTimeout(() => {
             setFetching(false);
-        }, 1000 * 15);
+        }, 1000 * 10);
         return () => clearTimeout(timeRef.current);
     }, []);
 
@@ -180,6 +180,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                     } else {
                         // ANALYSIS 的情况不回显值
                         if (res.status !== 'ANALYSIS') {
+                            setIsLoading(false);
                             setDetail({ ...res, keywordResume: res?.keywordMetaData?.map((item: any) => item?.keyword) || [] });
                             setEnableAi(res?.draftConfig?.enableAi);
                             setItemScore({
@@ -190,11 +191,15 @@ export const KeywordList = ({ selected, setSelected, hiddenUse }: any) => {
                             });
                         }
                         if (res.status === 'ANALYSIS') {
-                            fetching && setUpdate({});
+                            fetching &&
+                                setTimeout(() => {
+                                    setUpdate({});
+                                }, 1000);
                         }
                     }
                 })
                 .catch((error: any) => {
+                    setIsLoading(false);
                     console.error(error);
                 });
         } else {

@@ -61,8 +61,6 @@ const App = () => {
         );
     });
 
-    console.log(getTenant(), 'getTenant');
-
     // if (!loading) return <Loader />;
     return (
         <ConfigProvider theme={{ token: { colorPrimary: '#673ab7' } }} locale={zhCN}>

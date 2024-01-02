@@ -10,12 +10,11 @@ import AuthenticationRoutes from './AuthenticationRoutes';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
-const PagesPrice = Loadable(lazy(() => import('views/pages/pricing/member')));
+const PagesPrice = Loadable(lazy(() => import('views/announce/pricing/member')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
 export default function ThemeRoutes() {
-    console.log('🚀 ~ file: announceIndex.tsx:18 ~ ThemeRoutes ~ ThemeRoutes:');
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
         { path: '/', element: <PagesLanding /> },

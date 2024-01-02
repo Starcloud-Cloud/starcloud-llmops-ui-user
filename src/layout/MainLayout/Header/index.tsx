@@ -34,6 +34,7 @@ import useRouteStore from 'store/router';
 import { isMobile } from 'react-device-detect';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -177,65 +178,68 @@ const Header = () => {
                             <Tab key={index} label={<span className="text-lg font-semibold"> {item.name} </span>} {...a11yProps(index)} />
                         ))}
                     </Tabs>
-                    <div className="mr-2">
-                        <PayBtn />
-                    </div>
+                    {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON) && (
+                        <div className="mr-2">
+                            <PayBtn />
+                        </div>
+                    )}
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ flexGrow: 1 }} />
                 </>
             )}
-            <Popover
-                zIndex={9999}
-                placement="bottom"
-                content={
-                    <Box display="flex" textAlign="center">
-                        <Box width="200px">
-                            <Typography mt={2} variant="h3">
-                                微信扫码入群
-                            </Typography>
-                            <Typography my={1} fontSize="12px" color="#697586">
-                                魔法AI跨境交流群
-                            </Typography>
-                            <Box display="flex" justifyContent="center">
-                                <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: '50%' }} />
+            {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
+                <Popover
+                    zIndex={9999}
+                    placement="bottom"
+                    content={
+                        <Box display="flex" textAlign="center">
+                            <Box width="200px">
+                                <Typography mt={2} variant="h3">
+                                    微信扫码入群
+                                </Typography>
+                                <Typography my={1} fontSize="12px" color="#697586">
+                                    魔法AI跨境交流群
+                                </Typography>
+                                <Box display="flex" justifyContent="center">
+                                    <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: '50%' }} />
+                                </Box>
+                                <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
+                                    讨论如何使用、使用技巧、新场景开发、亚马逊，独立者，外贸B2B成功案例、以及跨境相关运营、热点、技能、经营技巧等。
+                                </Typography>
                             </Box>
-                            <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
-                                讨论如何使用、使用技巧、新场景开发、亚马逊，独立者，外贸B2B成功案例、以及跨境相关运营、热点、技能、经营技巧等。
-                            </Typography>
-                        </Box>
-                        <Box width="200px" ml={3}>
-                            <Typography mt={2} variant="h3">
-                                专属客服企微
-                            </Typography>
-                            <Typography my={1} fontSize="12px" color="#697586">
-                                专属客服
-                            </Typography>
-                            <Box display="flex" justifyContent="center">
-                                <CardMedia component="img" image={workWechatPay} alt="img1" sx={{ width: '50%' }} />
+                            <Box width="200px" ml={3}>
+                                <Typography mt={2} variant="h3">
+                                    专属客服企微
+                                </Typography>
+                                <Typography my={1} fontSize="12px" color="#697586">
+                                    专属客服
+                                </Typography>
+                                <Box display="flex" justifyContent="center">
+                                    <CardMedia component="img" image={workWechatPay} alt="img1" sx={{ width: '50%' }} />
+                                </Box>
+                                <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
+                                    产品功能吐槽、改进建议、跨境AI合作等， 不定期有折扣码发放哦~
+                                </Typography>
                             </Box>
-                            <Typography textAlign="left" my={1} fontSize="12px" color="#697586">
-                                产品功能吐槽、改进建议、跨境AI合作等， 不定期有折扣码发放哦~
-                            </Typography>
                         </Box>
-                    </Box>
-                }
-                arrow={false}
-            >
-                <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{ cursor: 'pointer', marginRight: '12px' }}
-                    onClick={handleClick}
-                    className="sm:ml-[47px] xs:ml-[20px]"
+                    }
+                    arrow={false}
                 >
-                    <QrCode2Icon />
-                    <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
-                        跨境卖家AI工具群
-                    </Typography>
-                    <KeyboardArrowDownIcon />
-                </Box>
-            </Popover>
-
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        sx={{ cursor: 'pointer', marginRight: '12px' }}
+                        onClick={handleClick}
+                        className="sm:ml-[47px] xs:ml-[20px]"
+                    >
+                        <QrCode2Icon />
+                        <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
+                            跨境卖家AI工具群
+                        </Typography>
+                        <KeyboardArrowDownIcon />
+                    </Box>
+                </Popover>
+            )}
             {/* header search */}
             <SearchSection />
 

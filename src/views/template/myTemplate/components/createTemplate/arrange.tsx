@@ -75,9 +75,8 @@ const validationSchema = yup.object({
     label: yup.string().required('label is required')
 });
 
-function Arrange({ config, editChange, basisChange, statusChange, changeConfigs }: any) {
+function Arrange({ detail, config, editChange, basisChange, statusChange, changeConfigs }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
-
     const formik = useFormik({
         initialValues: {
             field: '',
@@ -491,7 +490,7 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
                         aria-haspopup="true"
                         aria-expanded={addOpen[index] ? 'true' : undefined}
                         onClick={(e) => {
-                            stepList().then((res) => {
+                            stepList(detail?.type).then((res) => {
                                 setStepList(res);
                             });
                             addClick(e, index);
@@ -648,6 +647,9 @@ function Arrange({ config, editChange, basisChange, statusChange, changeConfigs 
     );
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps);
+    return (
+        JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
+        JSON.stringify(prevProps?.detail?.type) === JSON.stringify(nextProps?.detail?.type)
+    );
 };
 export default memo(Arrange, arePropsEqual);

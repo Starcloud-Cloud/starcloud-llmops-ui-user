@@ -10,23 +10,33 @@ import {
     IconButton,
     Button,
     ListItemText,
-    Table,
+    Table as Tables,
     TableHead,
     TableRow,
     TableCell,
     TableBody,
     Pagination,
-    Divider
+    Divider,
+    Modal,
+    CardContent,
+    CardActions
 } from '@mui/material';
+import straw from '../../assets/images/users/straw.svg';
+import { Upload, UploadProps, Image, ColorPicker, Input, Table } from 'antd';
+import { PlusOutlined, FormOutlined } from '@ant-design/icons';
+import { getAccessToken } from 'utils/auth';
 import { useEffect, useState } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
+import MainCard from 'ui-component/cards/MainCard';
 import nothing from 'assets/images/upLoad/nothing.svg';
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import { getUserInfo } from 'api/login';
 import Link from 'assets/images/share/fenxianglianjie.svg';
 import register from 'assets/images/share/zhuce.svg';
 import Reward from 'assets/images/share/yaoqingjiangli.svg';
 import infoStore from 'store/entitlementAction';
+import './index.scss';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -105,11 +115,57 @@ const SpaceEquity = () => {
     useEffect(() => {
         // getList();
     }, [pageQuery.pageNo]);
+
+    //用户设置
+    const [avatarOpen, setavatarOpen] = useState(false);
+    const [imageUrl, setimageUrl] = useState('');
+    const [active, setActive] = useState('');
+    const [color, setColor] = useState<string>('');
+    const uploadButton = (
+        <button style={{ border: 0, background: 'none' }} type="button">
+            <PlusOutlined rev={undefined} />
+        </button>
+    );
+    const props: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        listType: 'picture-circle',
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 20,
+        onChange(info) {
+            if (info.file.status === 'done') {
+                setActive('');
+                setColor('');
+                setimageUrl(info?.file?.response?.data?.url);
+            }
+        }
+    };
+    const [nameOpen, setNameOpen] = useState(false);
+    const [name, setName] = useState('用户名称');
+    const colorList = [{ color: '#3698f8' }, { color: '#673ab7' }, { color: '#fcc666' }, { color: '#62d078' }];
+
+    const columns = [
+        {
+            title: '用户名称',
+            dataIndex: 'name',
+            key: 'name'
+        },
+        {
+            title: '操作',
+            width: 200,
+            dataIndex: 'name',
+            key: 'name'
+        }
+    ];
     return (
-        <Card sx={{ p: 2 }}>
+        <Card sx={{ p: 2 }} className="">
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab label="版本权益" {...a11yProps(0)} />
-                <Tab label="邀请记录" {...a11yProps(1)} />
+                {/* <Tab label="邀请记录" {...a11yProps(1)} /> */}
+                <Tab label="成员设置" {...a11yProps(1)} />
             </Tabs>
             <CustomTabPanel value={value} index={0}>
                 <>
@@ -155,7 +211,7 @@ const SpaceEquity = () => {
                     </Grid>
                 </>
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
+            {/* <CustomTabPanel value={value} index={1}>
                 <Box textAlign="center">
                     <Typography variant="h2">邀请你的朋友并赚取魔法豆</Typography>
                     <Typography variant="h4" fontWeight={400} my={2}>
@@ -229,7 +285,7 @@ const SpaceEquity = () => {
                 </Typography>
                 {tableList.length > 0 && (
                     <Box>
-                        <Table>
+                        <Tables>
                             <TableHead>
                                 <TableRow>
                                     <TableCell align="center">名称</TableCell>
@@ -248,7 +304,7 @@ const SpaceEquity = () => {
                                     </TableRow>
                                 ))}
                             </TableBody>
-                        </Table>
+                        </Tables>
                         <Box my={2}>
                             <Pagination page={pageQuery.pageNo} count={Math.ceil(total / pageQuery.pageSize)} onChange={paginationChange} />
                         </Box>
@@ -262,6 +318,141 @@ const SpaceEquity = () => {
                         </Box>
                     </Box>
                 )}
+            </CustomTabPanel> */}
+            <CustomTabPanel value={value} index={1}>
+                <SubCard
+                    sx={{ p: '0 !important', background: '#ede7f6', mb: 2 }}
+                    contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between' }}
+                >
+                    <Box display="flex" alignItems="center" gap={2}>
+                        <div
+                            className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white"
+                            style={{ background: active ? active : color ? color : '#3698f8' }}
+                            onClick={() => setavatarOpen(true)}
+                        >
+                            {imageUrl ? <Image width={56} height={56} src={imageUrl} alt="" /> : '用户'}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {!nameOpen ? (
+                                <Typography ml={1} color="#697586">
+                                    {name}
+                                </Typography>
+                            ) : (
+                                <Input
+                                    defaultValue={name}
+                                    onBlur={(e) => {
+                                        if (e.target.value) {
+                                            setName(e.target.value);
+                                        }
+                                        setNameOpen(false);
+                                    }}
+                                    showCount
+                                    maxLength={20}
+                                    className="w-[600px]"
+                                    width={600}
+                                />
+                            )}
+                            {!nameOpen && <FormOutlined onClick={() => setNameOpen(true)} className="cursor-pointer" rev={undefined} />}
+                        </div>
+                    </Box>
+                </SubCard>
+                <Table columns={columns} dataSource={[]} />
+                <Modal
+                    open={avatarOpen}
+                    onClose={() => setavatarOpen(false)}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
+                    <MainCard
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '50%',
+                            transform: 'translate(-50%,0%)'
+                        }}
+                        title={'选择头像'}
+                        content={false}
+                        className="sm:w-[700px] xs:w-[300px]"
+                        secondary={
+                            <IconButton onClick={() => setavatarOpen(false)} size="large" aria-label="close modal">
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        }
+                    >
+                        <CardContent>
+                            <div className="flex justify-center">
+                                <div
+                                    className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white"
+                                    style={{ background: active ? active : color ? color : '#3698f8' }}
+                                >
+                                    {imageUrl ? <Image width={56} height={56} src={imageUrl} alt="" /> : '用户'}
+                                </div>
+                            </div>
+                            <div className="my-[20px] text-[15px] font-bold">自定义头像颜色</div>
+                            <div className="flex justify-center spaceEquity gap-4 text-white">
+                                <Upload {...props} className="!w-[auto] cursor-pointer">
+                                    {uploadButton}
+                                </Upload>
+                                {colorList.map((item) => (
+                                    <div
+                                        className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden outline-2 outline outline-offset-2"
+                                        onClick={() => {
+                                            setActive(item.color);
+                                            setColor('');
+                                            setimageUrl('');
+                                        }}
+                                        key={item.color}
+                                        style={{
+                                            outlineColor: active === item.color ? '#673ab7' : 'transparent',
+                                            background: item.color
+                                        }}
+                                    >
+                                        用户
+                                    </div>
+                                ))}
+                                <ColorPicker
+                                    value={color}
+                                    onChange={(value) => {
+                                        setColor(value.toHexString().slice(0, 7));
+                                        setActive('');
+                                        setimageUrl('');
+                                    }}
+                                >
+                                    <div className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden bg-[#f0f1f3]">
+                                        <Image width={20} height={20} src={straw} preview={false} alt="" />
+                                    </div>
+                                </ColorPicker>
+                            </div>
+                        </CardContent>
+                        <Divider />
+                        <CardActions>
+                            <Grid container justifyContent="flex-end">
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        // setActive('')
+                                        // setimageUrl('')
+                                        // setColor('')
+                                        setavatarOpen(false);
+                                    }}
+                                >
+                                    取消
+                                </Button>
+                                <Button
+                                    ml-1
+                                    variant="contained"
+                                    type="button"
+                                    color="secondary"
+                                    onClick={() => {
+                                        setavatarOpen(false);
+                                    }}
+                                >
+                                    保存
+                                </Button>
+                            </Grid>
+                        </CardActions>
+                    </MainCard>
+                </Modal>
             </CustomTabPanel>
         </Card>
     );

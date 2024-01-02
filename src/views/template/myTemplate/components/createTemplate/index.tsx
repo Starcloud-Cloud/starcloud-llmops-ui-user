@@ -606,6 +606,7 @@ function CreateDetail() {
                     <Grid item lg={6} sx={{ width: '100%' }}>
                         {detail?.workflowConfig && (
                             <Arrange
+                                detail={detail}
                                 config={_.cloneDeep(detail.workflowConfig)}
                                 editChange={editChange}
                                 basisChange={basisChange}

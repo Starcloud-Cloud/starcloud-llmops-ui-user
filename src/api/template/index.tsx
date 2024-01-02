@@ -114,8 +114,8 @@ export const appModify = (data: any) => {
     return request.putOriginal({ url: `/llm/app/modify`, data });
 };
 //增加步骤
-export const stepList = () => {
-    return request.get({ url: `/llm/app/stepList` });
+export const stepList = (secnse: any) => {
+    return request.get({ url: `/llm/app/stepList/${secnse}` });
 };
 
 //创建发布记录

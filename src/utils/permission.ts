@@ -49,7 +49,7 @@ export const getPermission = (key: ENUM_PERMISSION) => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return announceList[key];
     } else {
-        // return announceList[key];
         return list[key];
+        // return announceList[key];
     }
 };

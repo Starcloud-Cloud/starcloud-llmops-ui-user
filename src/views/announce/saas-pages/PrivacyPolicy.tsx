@@ -26,7 +26,7 @@ const HeaderWrapper = styled('div')(({ theme }) => ({
 // ============================|| SAAS PAGES - PRIVCY POLICY ||============================ //
 
 const PrivacyPolicy = () => {
-    console.log('kkksss');
+    console.log('announce');
     const theme = useTheme();
 
     return (
@@ -58,7 +58,7 @@ const PrivacyPolicy = () => {
                                     sx={{ fontWeight: 400, lineHeight: 1.4, [theme.breakpoints.up('md')]: { my: 0, mx: 12.5 } }}
                                     color="white"
                                 >
-                                    更新于2023年6月30日
+                                    更新于2023年6月31日
                                 </Typography>
                             </Grid>
                         </Grid>

@@ -154,6 +154,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
+            setIsLoading(true);
             getListingDetail(uid, version)
                 .then((res: any) => {
                     // 设置站点
@@ -176,6 +177,9 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                         setItemScore(res.itemScore);
                         if (res.status === 'ANALYSIS') {
                             setUpdate({ type: 1 });
+                            setIsLoading(false);
+                        } else {
+                            setIsLoading(false);
                         }
                     } else {
                         // ANALYSIS 的情况不回显值

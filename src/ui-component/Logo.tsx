@@ -1,5 +1,6 @@
 import { Box, Typography, useScrollTrigger, useTheme } from '@mui/material';
 import { ReactElement, cloneElement } from 'react';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 interface ElevationScrollProps {
     children: ReactElement;
     window?: Window | Node;
@@ -214,11 +215,12 @@ const Logo = ({ ...others }) => {
                 </svg>
                 <Box
                     sx={{
-                        width: 100,
+                        width: 115,
                         height: 48,
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        alignItems: 'flex-start'
                     }}
                 >
                     <Typography
@@ -232,7 +234,7 @@ const Logo = ({ ...others }) => {
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        魔法AI
+                        {getPermission(ENUM_PERMISSION.APP_NAME)}
                     </Typography>
                     <Typography
                         variant="body1"
@@ -245,7 +247,7 @@ const Logo = ({ ...others }) => {
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        跨境营销创意大师
+                        {getPermission(ENUM_PERMISSION.APP_DES)}
                     </Typography>
                 </Box>
             </Typography>

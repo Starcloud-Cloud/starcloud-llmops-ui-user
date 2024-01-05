@@ -11,8 +11,12 @@ export const signIn = () => {
 };
 
 // 兑换权益 | Redeem benefits
+// export const redeemBenefits = (data: string) => {
+//     return request.postOriginal({ url: `/llm/user-benefits/code?code=${data}` });
+// };
+
 export const redeemBenefits = (data: string) => {
-    return request.postOriginal({ url: `/llm/user-benefits/code?code=${data}` });
+    return request.postOriginal({ url: `/llm/promotion/code/u/use_rights_code?code=${data}` });
 };
 
 // 参数接口
@@ -60,4 +64,8 @@ export function submitPayOrder(data: any): Promise<SubmitPayOrder> {
 
 export function getProductList() {
     return request.post({ url: `/llm/pay/order/product/list` });
+}
+
+export function getCouponCode(data: any) {
+    return request.get({ url: `/llm/promotion/code/u/get_coupon_code`, params: data });
 }

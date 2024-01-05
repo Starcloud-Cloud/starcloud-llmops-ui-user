@@ -513,6 +513,16 @@ function ApplicationAnalysis({
                                             >
                                                 魔法豆不足，去升级
                                             </Link>
+                                        ) : row.errorCode === '2004008004' ? (
+                                            <Link
+                                                onClick={() =>
+                                                    window.open(window.location.protocol + '//' + window.location.host + '/subscribe')
+                                                }
+                                                color="secondary"
+                                                className="cursor-pointer"
+                                            >
+                                                图片不足，去升级
+                                            </Link>
                                         ) : (
                                             <>
                                                 <Tooltip placement="top" title={<Typography>{`系统异常（${row.errorCode}）`}</Typography>}>

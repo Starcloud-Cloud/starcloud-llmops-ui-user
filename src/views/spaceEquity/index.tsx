@@ -21,14 +21,16 @@ import {
     CardContent,
     CardActions
 } from '@mui/material';
+import copy from 'clipboard-copy';
 import straw from '../../assets/images/users/straw.svg';
-import { Upload, UploadProps, Image, ColorPicker, Input, Table } from 'antd';
-import { PlusOutlined, FormOutlined } from '@ant-design/icons';
+import { Upload, UploadProps, Image, ColorPicker, Input, Table, Popover } from 'antd';
+import { PlusOutlined, FormOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import nothing from 'assets/images/upLoad/nothing.svg';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { getUserInfo } from 'api/login';
@@ -36,6 +38,8 @@ import Link from 'assets/images/share/fenxianglianjie.svg';
 import register from 'assets/images/share/zhuce.svg';
 import Reward from 'assets/images/share/yaoqingjiangli.svg';
 import infoStore from 'store/entitlementAction';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import './index.scss';
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -144,9 +148,14 @@ const SpaceEquity = () => {
         }
     };
     const [nameOpen, setNameOpen] = useState(false);
+    const nameRef: any = useRef(null);
     const [name, setName] = useState('用户名称');
+    useEffect(() => {
+        if (nameOpen) {
+            nameRef.current.focus();
+        }
+    }, [nameOpen]);
     const colorList = [{ color: '#3698f8' }, { color: '#673ab7' }, { color: '#fcc666' }, { color: '#62d078' }];
-
     const columns = [
         {
             title: '用户名称',
@@ -330,29 +339,59 @@ const SpaceEquity = () => {
                             style={{ background: active ? active : color ? color : '#3698f8' }}
                             onClick={() => setavatarOpen(true)}
                         >
-                            {imageUrl ? <Image width={56} height={56} src={imageUrl} alt="" /> : '用户'}
+                            {imageUrl ? <Image width={56} height={56} preview={false} src={imageUrl} alt="" /> : '用户'}
                         </div>
-                        <div className="flex items-center gap-2">
-                            {!nameOpen ? (
-                                <Typography ml={1} color="#697586">
-                                    {name}
-                                </Typography>
-                            ) : (
-                                <Input
-                                    defaultValue={name}
-                                    onBlur={(e) => {
-                                        if (e.target.value) {
-                                            setName(e.target.value);
-                                        }
-                                        setNameOpen(false);
-                                    }}
-                                    showCount
-                                    maxLength={20}
-                                    className="w-[600px]"
-                                    width={600}
-                                />
-                            )}
-                            {!nameOpen && <FormOutlined onClick={() => setNameOpen(true)} className="cursor-pointer" rev={undefined} />}
+                        <div>
+                            <div className="flex items-center gap-2">
+                                {!nameOpen ? (
+                                    <Typography ml={1} color="#697586">
+                                        {name}
+                                    </Typography>
+                                ) : (
+                                    <Input
+                                        ref={nameRef}
+                                        defaultValue={name}
+                                        onBlur={(e) => {
+                                            if (e.target.value) {
+                                                setName(e.target.value);
+                                            }
+                                            setNameOpen(false);
+                                        }}
+                                        showCount
+                                        maxLength={20}
+                                        className="w-[600px]"
+                                    />
+                                )}
+                                {!nameOpen && <FormOutlined onClick={() => setNameOpen(true)} className="cursor-pointer" rev={undefined} />}
+                            </div>
+                            <span className="font-bold">
+                                添加成员链接
+                                <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
+                                    <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
+                                </Popover>
+                            </span>
+                            https://chato.cn/invite?invite_ticket=287f04d26c55471db360752dd42f6406&inviteType=b3duZXI=
+                            <IconButton
+                                onClick={() => {
+                                    copy('https://chato.cn/invite?invite_ticket=287f04d26c55471db360752dd42f6406&inviteType=b3duZXI=');
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '复制成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            transition: 'SlideDown',
+                                            close: false
+                                        })
+                                    );
+                                }}
+                                sx={{ ml: '10px' }}
+                            >
+                                <ContentCopyIcon sx={{ fontSize: '16px' }} />
+                            </IconButton>
                         </div>
                     </Box>
                 </SubCard>
@@ -385,7 +424,7 @@ const SpaceEquity = () => {
                                     className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white"
                                     style={{ background: active ? active : color ? color : '#3698f8' }}
                                 >
-                                    {imageUrl ? <Image width={56} height={56} src={imageUrl} alt="" /> : '用户'}
+                                    {imageUrl ? <Image width={56} height={56} preview={false} src={imageUrl} alt="" /> : '用户'}
                                 </div>
                             </div>
                             <div className="my-[20px] text-[15px] font-bold">自定义头像颜色</div>

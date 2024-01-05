@@ -517,10 +517,18 @@ const Content = () => {
             setLoadingList([]);
             let copyList: any[] = _.cloneDeep(list);
             copyList[0].value = res.title;
+            copyList[0].character = res?.title?.length || 0;
+            copyList[0].word = res?.title?.trim()?.split(' ')?.length || 0;
+
             const productIndex = copyList.findIndex((item) => item.type === ListingBuilderEnum.PRODUCT_DES);
             copyList[productIndex].value = res.description;
+            copyList[productIndex].character = res.description?.length || 0;
+            copyList[productIndex].word = res.description?.trim()?.split(' ')?.length || 0;
+
             res.features?.forEach((item: any, index: number) => {
                 copyList[index + 1].value = item;
+                copyList[index + 1].character = item?.length || 0;
+                copyList[index + 1].word = item?.trim()?.split(' ')?.length || 0;
             });
             setList(copyList);
         } catch (e) {

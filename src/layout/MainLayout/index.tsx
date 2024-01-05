@@ -36,6 +36,7 @@ import { ListingProvider } from 'contexts/ListingContext';
 import { NewUserVip } from 'ui-component/new-user-vip';
 import userInfoStore from 'store/entitlementAction';
 import StorageCache from 'web-storage-cache';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 
 interface MainStyleProps {
     theme: Theme;
@@ -545,7 +546,7 @@ const MainLayout = () => {
                                     <Outlet />
                                 </Container>
                             )}
-                            <ChatLink navigate={navigate} />
+                            {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL) && <ChatLink navigate={navigate} />}
                             {phoneOpne && (
                                 <Phone
                                     phoneOpne={phoneOpne}

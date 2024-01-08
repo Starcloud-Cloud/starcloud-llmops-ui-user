@@ -10,6 +10,7 @@ import PubSub from 'pubsub-js';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { responsiveArray } from 'antd/es/_util/responsiveObserver';
+import { getTenant } from 'utils/permission';
 
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
@@ -61,10 +62,9 @@ service.interceptors.request.use(
         }
 
         // 设置租户
-        if (tenantEnable && tenantEnable === 'true') {
-            const tenantId = getTenantId();
-            if (tenantId) (config as Recordable).headers['tenant-id'] = tenantId;
-        }
+        const tenantId = getTenant();
+        if (tenantId) (config as Recordable).headers['tenant-id'] = tenantId;
+
         const params = config.params || {};
         const data = config.data || false;
         if (

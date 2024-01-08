@@ -20,6 +20,12 @@ module.exports = function override(config) {
         }
     });
 
+    if (config.output) {
+        const version = new Date().getTime();
+        config.output.filename = `static/js/[name].${version}.[contenthash:8].js`;
+        config.output.chunkFilename = `static/js/[name].${version}.[contenthash:8].chunk.js`;
+    }
+
     config.plugins = [
         ...config.plugins,
         new CompressionWebpackPlugin({

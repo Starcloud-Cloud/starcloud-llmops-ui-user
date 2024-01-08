@@ -103,7 +103,7 @@ const Valida = ({
     ];
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
-        data.forEach((item: { field: string; value: string }) => {
+        data?.forEach((item: { field: string; value: string }) => {
             const { field, value } = item;
             Data[field] = value !== null && value !== undefined ? value : '';
         });

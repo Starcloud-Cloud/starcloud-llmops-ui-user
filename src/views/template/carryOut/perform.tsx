@@ -198,8 +198,8 @@ function Perform({
                                                 </Grid>
                                             ) : null
                                         )}
-                                        {item.flowStep.variable.variables.length !== 0 &&
-                                            item.flowStep.variable?.variables?.map((el: any, i: number) =>
+                                        {item.flowStep?.variable?.variables.length !== 0 &&
+                                            item.flowStep?.variable?.variables?.map((el: any, i: number) =>
                                                 el.isShow ? (
                                                     <Grid
                                                         item

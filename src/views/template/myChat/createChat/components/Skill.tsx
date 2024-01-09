@@ -474,7 +474,7 @@ const WorkflowCreateModal = ({
                     </CardContent>
                 </MainCard>
             </Modal>
-            <PermissionUpgradeModal open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+            <PermissionUpgradeModal from={'upgradeSkills'} open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
         </>
     );
 };
@@ -688,6 +688,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                 open={skillCountVisible}
                 handleClose={() => setSkillCountVisible(false)}
                 title={`添加技能个数(${totalNum})已用完`}
+                from="usableSkillPlugin"
             />
         </div>
     );

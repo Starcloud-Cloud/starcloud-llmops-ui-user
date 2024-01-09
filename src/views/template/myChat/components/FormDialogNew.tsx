@@ -209,7 +209,14 @@ export default function FormDialogNew({
                     </CardActions>
                 </MainCard>
             </Modal>
-            {botOpen && <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={`添加机器人个数(${totalNum})已用完`} />}
+            {botOpen && (
+                <UpgradeModel
+                    from="usableBasicBot"
+                    open={botOpen}
+                    handleClose={() => setBotOpen(false)}
+                    title={`添加机器人个数(${totalNum})已用完`}
+                />
+            )}
         </>
     );
 }

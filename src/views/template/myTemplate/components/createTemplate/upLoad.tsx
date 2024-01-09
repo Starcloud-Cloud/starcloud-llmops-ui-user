@@ -1358,6 +1358,7 @@ function Upload({
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
                     title={`添加文档个数(${userInfo?.levelConfig?.usableBotDocument})已用完`}
+                    from="usableBotDocument"
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

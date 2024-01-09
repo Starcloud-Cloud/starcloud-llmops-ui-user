@@ -4,7 +4,17 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 
-export const UpgradeModel = ({ handleClose, open, title }: { handleClose: () => void; open: boolean; title: string }) => {
+export const UpgradeModel = ({
+    handleClose,
+    open,
+    title,
+    from
+}: {
+    handleClose: () => void;
+    open: boolean;
+    title: string;
+    from: string;
+}) => {
     const navigate = useNavigate();
     return (
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -37,7 +47,7 @@ export const UpgradeModel = ({ handleClose, open, title }: { handleClose: () => 
                                     variant="contained"
                                     color={'secondary'}
                                     className="w-[200px] my-2"
-                                    onClick={() => navigate('/subscribe')}
+                                    onClick={() => navigate(`/subscribe?from=${from}`)}
                                 >
                                     直接升级
                                 </Button>

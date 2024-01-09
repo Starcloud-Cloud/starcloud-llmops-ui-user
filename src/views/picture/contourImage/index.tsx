@@ -17,6 +17,7 @@ import { translateText } from 'api/picture/create';
 import userInfoStore from 'store/entitlementAction';
 import AppModal from '../create/Menu/appModal';
 import { formatNumber } from 'hooks/useDate';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 const ContourImage = () => {
     const { setUserInfo }: any = userInfoStore();
     const navigate = useNavigate();
@@ -36,6 +37,9 @@ const ContourImage = () => {
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>({});
     const [inputValueTranslate, setInputValueTranslate] = useState(false);
+
+    const [openToken, setOpenToken] = useState(false);
+    const [from, setFrom] = useState('');
 
     const handleMouseDown = (e: any) => {
         hisRef.current = false;
@@ -306,7 +310,11 @@ const ContourImage = () => {
                                             setUserInfo(res);
                                         });
                                     }
-                                } catch (err) {
+                                } catch (err: any) {
+                                    if (err?.code === 2004008004) {
+                                        setFrom(`${err?.scene}_${err?.bizUid}`);
+                                        setOpenToken(true);
+                                    }
                                     setLoading(false);
                                 }
                             } else {
@@ -375,6 +383,12 @@ const ContourImage = () => {
                 )}
                 {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
             </div>
+            <PermissionUpgradeModal
+                from={from}
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前图片数不足，升级会员，立享五折优惠！'}
+            />
         </Card>
     );
 };

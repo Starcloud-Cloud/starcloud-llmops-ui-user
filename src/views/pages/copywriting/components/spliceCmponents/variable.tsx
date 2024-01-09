@@ -16,18 +16,18 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { Error, Add, Delete, Settings } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import _ from 'lodash-es';
 import VariableModal from '../variableModal';
 interface Variable {
     pre: number;
-    copyWritingTemplate: any;
-    setCopyWritingTemplate: (data: any) => void;
+    value: any;
+    setValue: (data: any) => void;
     rows: any[];
     setRows: (data: any[]) => void;
 }
 
-const CreateVariable = ({ pre, copyWritingTemplate, setCopyWritingTemplate, rows, setRows }: Variable) => {
+const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
     const { TextArea } = Input;
     const iptRef: any = useRef(null);
     const [demandOpen, setDemandOpen] = useState(false);
@@ -72,21 +72,17 @@ const CreateVariable = ({ pre, copyWritingTemplate, setCopyWritingTemplate, rows
                 </Popover>
             </div>
             <TextArea
-                status={demandOpen && !copyWritingTemplate.demand ? 'error' : ''}
+                status={demandOpen && !value ? 'error' : ''}
                 ref={iptRef}
                 style={{ height: '200px' }}
-                value={copyWritingTemplate.demand}
-                onChange={(e) => {
+                key={value}
+                defaultValue={value}
+                onBlur={(e) => {
                     setDemandOpen(true);
-                    setCopyWritingTemplate({
-                        ...copyWritingTemplate,
-                        demand: e.target.value
-                    });
+                    setValue(e.target.value);
                 }}
             />
-            {demandOpen && !copyWritingTemplate.demand && (
-                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
-            )}
+            {demandOpen && !value && <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>}
             <Box mb={1}>
                 <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                 {rows.length > 0 &&
@@ -97,19 +93,15 @@ const CreateVariable = ({ pre, copyWritingTemplate, setCopyWritingTemplate, rows
                                 size="small"
                                 color="primary"
                                 onClick={() => {
-                                    const newVal = _.cloneDeep(copyWritingTemplate.demand);
+                                    const newVal = _.cloneDeep(value);
                                     if (newVal) {
                                         const part1 = newVal?.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
                                         const part2 = newVal?.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-                                        setCopyWritingTemplate({
-                                            ...copyWritingTemplate,
-                                            demand: `${part1}{${item.field}}${part2}`
-                                        });
+                                        console.log(`${part1}{${item.field}}${part2}`);
+
+                                        setValue(`${part1}{${item.field}}${part2}`);
                                     } else {
-                                        setCopyWritingTemplate({
-                                            ...copyWritingTemplate,
-                                            demand: `{${item.field}}`
-                                        });
+                                        setValue(`{${item.field}}`);
                                     }
                                 }}
                                 label={item.field}
@@ -199,4 +191,11 @@ const CreateVariable = ({ pre, copyWritingTemplate, setCopyWritingTemplate, rows
         </>
     );
 };
-export default CreateVariable;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return (
+        JSON.stringify(prevProps?.pre) === JSON.stringify(nextProps?.pre) &&
+        JSON.stringify(prevProps?.value) === JSON.stringify(nextProps?.value) &&
+        JSON.stringify(prevProps?.rows) === JSON.stringify(nextProps?.rows)
+    );
+};
+export default memo(CreateVariable, arePropsEqual);

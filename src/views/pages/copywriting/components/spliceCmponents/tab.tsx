@@ -4,6 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
+import { memo } from 'react';
 interface Tabs {
     imageStyleData: any;
     setImageStyleData: (data: any) => void;
@@ -26,7 +27,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                 {
                                     key: '1',
                                     name: '首图',
-                                    variables: []
+                                    variableList: []
                                 }
                             ]
                         });
@@ -133,4 +134,10 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
         </div>
     );
 };
-export default CreateTab;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return (
+        JSON.stringify(prevProps?.imageStyleData) === JSON.stringify(nextProps?.imageStyleData) &&
+        JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive)
+    );
+};
+export default memo(CreateTab, arePropsEqual);

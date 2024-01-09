@@ -97,7 +97,7 @@ const AddModal = () => {
                 {
                     key: '1',
                     name: '首图',
-                    variables: []
+                    variableList: []
                 }
             ]
         }
@@ -121,6 +121,7 @@ const AddModal = () => {
         schemeMetadata().then((res) => {
             setCategoryList(res.category);
             setSourceList(res.refersSource);
+            setModeList(res.generateMode);
         });
     }, []);
     const [oneLoading, setOneLoading] = useState(false);
@@ -129,7 +130,7 @@ const AddModal = () => {
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
                     setOneLoading(true);
-                    setRows(res.configuration?.copyWritingTemplate?.variables);
+                    setRows(res.configuration?.copyWritingTemplate?.variableList);
                     setParams({
                         name: res.name,
                         category: res.category,
@@ -191,7 +192,7 @@ const AddModal = () => {
             title: '图片内容',
             render: (_, row) => (
                 <div className="flex gap-2">
-                    {row?.images?.map((item: any) => (
+                    {row?.imageList?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}
                 </div>
@@ -380,15 +381,237 @@ const AddModal = () => {
         }
         return true;
     };
+    //保存
+    const handleSave = () => {
+        console.log(3);
+
+        if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
+            console.log(1);
+            if (searchParams.get('uid')) {
+                schemeModify({
+                    uid: searchParams.get('uid'),
+                    ...params,
+                    type: params.type ? 'SYSTEM' : 'USER',
+                    refers: tableData,
+                    configuration: {
+                        copyWritingTemplate: {
+                            ...copyWritingTemplate,
+                            example: testTableList,
+                            variableList: rows
+                        },
+                        imageTemplate: {
+                            styleList: imageStyleData
+                        },
+                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+                    }
+                }).then((res) => {
+                    if (res) {
+                        navigate('/copywriting');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: ' 编辑成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                transition: 'SlideDown',
+                                close: false
+                            })
+                        );
+                    }
+                });
+                return false;
+            }
+            schemeCreate({
+                ...params,
+                type: params.type ? 'SYSTEM' : 'USER',
+                refers: tableData,
+                configuration: {
+                    copyWritingTemplate: {
+                        ...copyWritingTemplate,
+                        example: testTableList,
+                        variableList: rows
+                    },
+                    imageTemplate: {
+                        styleList: imageStyleData
+                    },
+                    paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+                }
+            }).then((res) => {
+                if (res) {
+                    setTableList([]);
+                    navigate('/copywriting');
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: ' 创建成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            transition: 'SlideDown',
+                            close: false
+                        })
+                    );
+                }
+            });
+        } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
+            console.log(2);
+            if (!params.name) {
+                setTitleOpen(true);
+                setCategoryOpen(true);
+                setTagOpen(true);
+                setPre(pre + 1);
+                setSummaryOpen(true);
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '方案名称必填',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
+                return false;
+            }
+            if (!params.category) {
+                setTitleOpen(true);
+                setCategoryOpen(true);
+                setTagOpen(true);
+                setPre(pre + 1);
+                setSummaryOpen(true);
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '类目必选',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
+                return false;
+            }
+            if (!params.tags || params.tags?.length === 0) {
+                setTitleOpen(true);
+                setCategoryOpen(true);
+                setTagOpen(true);
+                setPre(pre + 1);
+                setSummaryOpen(true);
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '标签最少输入一个',
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
+                return false;
+            }
+            if (searchParams.get('uid')) {
+                schemeModify({
+                    uid: searchParams.get('uid'),
+                    ...params,
+                    type: params.type ? 'SYSTEM' : 'USER',
+                    customConfiguration: {
+                        ...splitList.filter((item) => item.appUid === splitValue)[0],
+                        steps: valueList
+                    }
+                }).then((res) => {
+                    if (res) {
+                        navigate('/copywriting');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: ' 编辑成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                transition: 'SlideDown',
+                                close: false
+                            })
+                        );
+                    }
+                });
+                return false;
+            }
+            schemeCreate({
+                ...params,
+                type: params.type ? 'SYSTEM' : 'USER',
+                customConfiguration: {
+                    ...splitList.filter((item) => item.appUid === splitValue)[0],
+                    steps: valueList
+                }
+            }).then((res) => {
+                if (res) {
+                    setTableList([]);
+                    navigate('/copywriting');
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: ' 创建成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            transition: 'SlideDown',
+                            close: false
+                        })
+                    );
+                }
+            });
+        }
+    };
 
     //自定义内容拼接
     const [splitValue, setSplitValue] = useState<any>(null);
     const [splitList, setSplitList] = useState<any[]>([]);
+    //选中应用之后需要循环的数据
+    const [valueList, setValueList] = useState<any[]>([]);
+    const valueListRef: any = useRef(null);
+    //生成模式
+    const [modeList, setModeList] = useState<any[]>([]);
     useEffect(() => {
         appList().then((res) => {
             setSplitList(res);
         });
     }, []);
+    useEffect(() => {
+        if (splitValue) {
+            valueListRef.current = splitList.filter((item) => item.appUid === splitValue)[0]?.steps;
+            setValueList(splitList.filter((item) => item.appUid === splitValue)[0]?.steps);
+        } else {
+            valueListRef.current = [];
+            setValueList([]);
+        }
+    }, [splitValue]);
+    const setValues = (key: string, data: any, index: number) => {
+        const newData = _.cloneDeep(valueListRef.current);
+        newData[index] = {
+            ...newData[index],
+            [key]: data
+        };
+        valueListRef.current = newData;
+        setValueList(newData);
+    };
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -603,7 +826,7 @@ const AddModal = () => {
                     <SubCard
                         sx={{
                             mb: 1,
-                            borderColor: params.mode === 'aaa' ? '#673ab7' : 'rgba(230,230,231,1)',
+                            borderColor: params.mode === 'CUSTOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
                             cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
                         }}
                         contentSX={{ p: '10px !important', width: '200px' }}
@@ -611,7 +834,7 @@ const AddModal = () => {
                         <Box
                             onClick={() => {
                                 if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'aaa' });
+                                    setParams({ ...params, mode: 'CUSTOM_IMAGE_TEXT' });
                                 }
                             }}
                         >
@@ -624,7 +847,7 @@ const AddModal = () => {
                         </Box>
                     </SubCard>
                 </div>
-                {params.mode !== 'aaa' ? (
+                {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
                     <Collapse
                         bordered={false}
                         style={{ background: 'transparent' }}
@@ -870,8 +1093,13 @@ const AddModal = () => {
                                         </div>
                                         <CreateVariable
                                             pre={pre}
-                                            copyWritingTemplate={copyWritingTemplate}
-                                            setCopyWritingTemplate={setCopyWritingTemplate}
+                                            value={copyWritingTemplate.demand}
+                                            setValue={(data) => {
+                                                setCopyWritingTemplate({
+                                                    ...copyWritingTemplate,
+                                                    demand: data
+                                                });
+                                            }}
                                             rows={rows}
                                             setRows={setRows}
                                         />
@@ -927,124 +1155,6 @@ const AddModal = () => {
                                         setFocuActive={setFocuActive}
                                         digui={digui}
                                     />
-                                    // <div>
-                                    //     <div className="flex items-end mb-[20px]">
-                                    //         <Button
-                                    //             onClick={() => {
-                                    //                 const newData = _.cloneDeep(imageStyleData);
-                                    //                 newData.push({
-                                    //                     name: `风格 ${digui()}`,
-                                    //                     key: digui().toString(),
-                                    //                     id: digui().toString(),
-                                    //                     templateList: [
-                                    //                         {
-                                    //                             key: '1',
-                                    //                             name: '首图',
-                                    //                             variables: []
-                                    //                         }
-                                    //                     ]
-                                    //                 });
-                                    //                 setImageStyleData(newData);
-                                    //             }}
-                                    //             type="primary"
-                                    //             icon={<PlusOutlined rev={undefined} />}
-                                    //         >
-                                    //             增加风格
-                                    //         </Button>
-                                    //         <div
-                                    //             onClick={() => {
-                                    //                 window.open('http://cn-test.poster-ui.hotsalestar.com/#/');
-                                    //             }}
-                                    //             className="ml-[10px] font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
-                                    //         >
-                                    //             设计自己的海报风格
-                                    //         </div>
-                                    //     </div>
-                                    //     <Tabs
-                                    //         tabPosition="left"
-                                    //         items={imageStyleData.map((item, i) => {
-                                    //             return {
-                                    //                 label: (
-                                    //                     <div>
-                                    //                         {item.name}
-                                    //                         {item?.templateList?.some((item: any) => !item.id) && (
-                                    //                             <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />
-                                    //                         )}
-                                    //                     </div>
-                                    //                 ),
-                                    //                 key: item.id,
-                                    //                 children: (
-                                    //                     <div>
-                                    //                         <div className="bg-[#edf0f2]/80 rounded py-[12px] px-[16px] flex justify-between items-center">
-                                    //                             {!focuActive[i] ? (
-                                    //                                 <div
-                                    //                                     className="cursor-pointer"
-                                    //                                     onClick={() => {
-                                    //                                         const newData = _.cloneDeep(focuActive);
-                                    //                                         newData[i] = true;
-                                    //                                         setFocuActive(newData);
-                                    //                                     }}
-                                    //                                 >
-                                    //                                     {item.name}
-                                    //                                 </div>
-                                    //                             ) : (
-                                    //                                 <TextField
-                                    //                                     autoFocus
-                                    //                                     onBlur={(e) => {
-                                    //                                         const newList = _.cloneDeep(focuActive);
-                                    //                                         newList[i] = false;
-                                    //                                         setFocuActive(newList);
-                                    //                                         if (e.target.value && e.target.value.trim()) {
-                                    //                                             const newData = _.cloneDeep(imageStyleData);
-                                    //                                             newData[i].name = e.target.value;
-                                    //                                             setImageStyleData(newData);
-                                    //                                         }
-                                    //                                     }}
-                                    //                                     color="secondary"
-                                    //                                     variant="standard"
-                                    //                                 />
-                                    //                             )}
-
-                                    //                             <div>
-                                    //                                 <Popover
-                                    //                                     zIndex={9999}
-                                    //                                     content={
-                                    //                                         <Button
-                                    //                                             onClick={(e: any) => {
-                                    //                                                 const newData = _.cloneDeep(imageStyleData);
-                                    //                                                 newData.splice(i, 1);
-                                    //                                                 setImageStyleData(newData);
-                                    //                                                 e.stopPropagation();
-                                    //                                             }}
-                                    //                                             danger
-                                    //                                             icon={<DeleteOutlined rev={undefined} />}
-                                    //                                         >
-                                    //                                             删除
-                                    //                                         </Button>
-                                    //                                     }
-                                    //                                     trigger="click"
-                                    //                                 >
-                                    //                                     <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
-                                    //                                         <MoreVertIcon />
-                                    //                                     </IconButton>
-                                    //                                 </Popover>
-                                    //                             </div>
-                                    //                         </div>
-                                    //                         <StyleTabs
-                                    //                             imageStyleData={item?.templateList}
-                                    //                             typeList={typeList}
-                                    //                             setDetailData={(data: any) => {
-                                    //                                 const newData = _.cloneDeep(imageStyleData);
-                                    //                                 newData[i].templateList = data;
-                                    //                                 setImageStyleData(newData);
-                                    //                             }}
-                                    //                         />
-                                    //                     </div>
-                                    //                 )
-                                    //             };
-                                    //         })}
-                                    //     />
-                                    // </div>
                                 )
                             }
                         ]}
@@ -1056,53 +1166,94 @@ const AddModal = () => {
                             <Select
                                 label="选择应用"
                                 name="source"
+                                value={splitValue}
                                 onChange={(e) => {
                                     setSplitValue(e.target.value);
                                 }}
                             >
                                 {splitList.map((item) => (
-                                    <MenuItem key={item.uid} value={item.uid}>
-                                        {item.name}
+                                    <MenuItem key={item.appUid} value={item.appUid}>
+                                        {item.appName}
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
-
-                        <div>
-                            <div className="text-[18px] my-[20px] font-[600]">1.参考文案</div>
-                            <CreateTable tableData={tableData} sourceList={sourceList} setTableData={setTableData} params={params} />
-                            <div className="text-[18px] my-[20px] font-[600]">2. 生成模式</div>
-                            <Radio.Group>
-                                <Radio value={1}>随机获取</Radio>
-                                <Radio value={2}>AI 仿写</Radio>
-                                <Radio value={2}>AI 自定义</Radio>
-                            </Radio.Group>
-                            <CreateVariable
-                                pre={pre}
-                                copyWritingTemplate={copyWritingTemplate}
-                                setCopyWritingTemplate={setCopyWritingTemplate}
-                                rows={rows}
-                                setRows={setRows}
-                            />
-                        </div>
-                        <div>
-                            <div className="text-[18px] my-[20px] font-[600]">1.参考文案</div>
-                            <CreateTable tableData={tableData} sourceList={sourceList} setTableData={setTableData} params={params} />
-                            <div className="text-[18px] my-[20px] font-[600]">2. 生成段落</div>
-                            <Input />
-                            <div className="text-[18px] my-[20px] font-[600]">3. 生成模式</div>
-                            <Radio.Group>
-                                <Radio value={1}>随机获取</Radio>
-                                <Radio value={2}>AI 仿写</Radio>
-                            </Radio.Group>
-                            <CreateVariable
-                                pre={pre}
-                                copyWritingTemplate={copyWritingTemplate}
-                                setCopyWritingTemplate={setCopyWritingTemplate}
-                                rows={rows}
-                                setRows={setRows}
-                            />
-                        </div>
+                        {valueList?.map((el: any, index: number) => (
+                            <div>
+                                {
+                                    <>
+                                        {(el.code === 'ContentActionHandler' || el.code === 'ParagraphActionHandler') && (
+                                            <SubCard sx={{ mt: 2 }}>
+                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
+                                                <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
+                                                <CreateTable
+                                                    tableData={el?.referList}
+                                                    sourceList={sourceList}
+                                                    setTableData={(data) => setValues('referList', data, index)}
+                                                    params={params}
+                                                />
+                                                <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
+                                                <Radio.Group value={el.model}>
+                                                    {modeList?.map((item) => (
+                                                        <Radio key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Radio>
+                                                    ))}
+                                                </Radio.Group>
+                                                <CreateVariable
+                                                    pre={pre}
+                                                    value={el?.requirement}
+                                                    setValue={(data: string) => setValues('requirement', data, index)}
+                                                    rows={el?.variableList}
+                                                    setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                />
+                                                {el.code === 'ParagraphActionHandler' && (
+                                                    <div className="relative mt-[20px]">
+                                                        <InputNumber
+                                                            size="large"
+                                                            className="w-[300px] bg-[#f8fafc]"
+                                                            min={1}
+                                                            value={el?.paragraphCount}
+                                                            onChange={(data) => setValues('paragraphCount', data, index)}
+                                                        />
+                                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                            文案段落数量
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </SubCard>
+                                        )}
+                                        {el.code === 'AssembleActionHandler' && (
+                                            <SubCard sx={{ mt: 2 }}>
+                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
+                                                <div className="relative">
+                                                    <TextArea
+                                                        defaultValue={el?.requirement}
+                                                        onBlur={(data) => setValues('requirement', data.target.value, index)}
+                                                        rows={4}
+                                                    />
+                                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                        文案拼接配置
+                                                    </span>
+                                                </div>
+                                            </SubCard>
+                                        )}
+                                        {el.code === 'PosterActionHandler' && (
+                                            <SubCard sx={{ mt: 2 }}>
+                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
+                                                <CreateTab
+                                                    imageStyleData={el?.styleList}
+                                                    setImageStyleData={(data) => setValues('styleList', data, index)}
+                                                    focuActive={focuActive}
+                                                    setFocuActive={setFocuActive}
+                                                    digui={digui}
+                                                />
+                                            </SubCard>
+                                        )}
+                                    </>
+                                }
+                            </div>
+                        ))}
                     </div>
                 )}
                 <Divider />
@@ -1133,7 +1284,7 @@ const AddModal = () => {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
                                             example: testTableList,
-                                            variables: rows
+                                            variableList: rows
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData
@@ -1181,84 +1332,7 @@ const AddModal = () => {
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                if (verify()) {
-                                    if (searchParams.get('uid')) {
-                                        schemeModify({
-                                            uid: searchParams.get('uid'),
-                                            ...params,
-                                            type: params.type ? 'SYSTEM' : 'USER',
-                                            refers: tableData,
-                                            configuration: {
-                                                copyWritingTemplate: {
-                                                    ...copyWritingTemplate,
-                                                    example: testTableList,
-                                                    variables: rows
-                                                },
-                                                imageTemplate: {
-                                                    styleList: imageStyleData
-                                                },
-                                                paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                                            }
-                                        }).then((res) => {
-                                            if (res) {
-                                                navigate('/copywriting');
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: ' 编辑成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideDown',
-                                                        close: false
-                                                    })
-                                                );
-                                            }
-                                        });
-                                        return false;
-                                    }
-                                    schemeCreate({
-                                        ...params,
-                                        type: params.type ? 'SYSTEM' : 'USER',
-                                        refers: tableData,
-                                        configuration: {
-                                            copyWritingTemplate: {
-                                                ...copyWritingTemplate,
-                                                example: testTableList,
-                                                variables: rows
-                                            },
-                                            imageTemplate: {
-                                                styleList: imageStyleData
-                                            },
-                                            paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                                        }
-                                    }).then((res) => {
-                                        if (res) {
-                                            setTableList([]);
-                                            navigate('/copywriting');
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: ' 创建成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    });
-                                }
-                            }}
-                        >
+                        <Button type="primary" onClick={handleSave}>
                             保存
                         </Button>
                     </Grid>

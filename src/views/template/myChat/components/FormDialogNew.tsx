@@ -211,7 +211,7 @@ export default function FormDialogNew({
             </Modal>
             {botOpen && (
                 <UpgradeModel
-                    from="usableBasicBot"
+                    from="usableBasicBot_0"
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
                     title={`添加机器人个数(${totalNum})已用完`}

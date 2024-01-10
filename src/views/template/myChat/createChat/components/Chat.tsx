@@ -1792,10 +1792,10 @@ export const Chat = ({
                     </div>
                 </div>
             )}
-            <PermissionUpgradeModal from={'upgradeWebsearch'} open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
-            <PermissionUpgradeModal from={'upgradeGpt4'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <PermissionUpgradeModal from={'upgradeWebsearch_0'} open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal
-                from={'upgradeSkills'}
+                from={'upgradeSkills_0'}
                 open={openUpgradeSkillModel}
                 handleClose={() => setOpenUpgradeSkillModel(false)}
             />

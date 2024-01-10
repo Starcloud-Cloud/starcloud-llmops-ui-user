@@ -521,7 +521,7 @@ function Deatail() {
                 }}
             />
             {openUpgradeModel && (
-                <PermissionUpgradeModal from="upgradeGpt4" open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+                <PermissionUpgradeModal from="upgradeGpt4_0" open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             )}
             {tokenOpen && (
                 <PermissionUpgradeModal

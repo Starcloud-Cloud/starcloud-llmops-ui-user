@@ -20,6 +20,7 @@ import { userBenefits } from 'api/template';
 import userInfoStore from 'store/entitlementAction';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import { formatNumber } from 'hooks/useDate';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
@@ -35,6 +36,9 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     //图片详情
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>({});
+    const [openToken, setOpenToken] = useState(false);
+    const [from, setFrom] = useState('');
+
     //上传图片
     const { Dragger } = Upload;
     const imageprops: UploadProps = {
@@ -97,7 +101,11 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
             userBenefits().then((res) => {
                 setUserInfo(res);
             });
-        } catch (err) {
+        } catch (err: any) {
+            if (err?.code === 2004008004) {
+                setFrom(`${err?.scene}_${err?.bizUid}`);
+                setOpenToken(true);
+            }
             suRef.current.splice(index, 1, { images: [{ url: 'error' }] });
             setSucImageList(_.cloneDeep(suRef.current));
             userBenefits().then((res) => {
@@ -314,6 +322,12 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     </div>
                 </MainCard>
             </Modal>
+            <PermissionUpgradeModal
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前图片数不足，升级会员，立享五折优惠！'}
+                from={from}
+            />
         </Card>
         // <div>
         //     <Grid container spacing={2}>

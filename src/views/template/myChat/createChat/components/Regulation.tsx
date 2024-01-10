@@ -699,8 +699,8 @@ export const Regulation = ({
                     setOpen={setAppOpen}
                 />
             )}
-            <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
-            <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            <PermissionUpgradeModal from={'upgradeWebsearch_0'} open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
         </div>
     );
 };

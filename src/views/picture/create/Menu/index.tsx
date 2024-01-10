@@ -191,6 +191,7 @@ export const PictureCreateMenu = ({
     const [voidInputValueTranslate, setVoidInputValueTranslate] = useState(true);
     const [appOpen, setAppOpen] = useState(false);
     const [openToken, setOpenToken] = useState(false);
+    const [from, setFrom] = useState('');
     const emits = (data: any) => {
         setAppOpen(false);
         setInputValue(data);
@@ -392,6 +393,7 @@ export const PictureCreateMenu = ({
             }
         } catch (e: any) {
             if (e?.code === 2004008004) {
+                setFrom(`${e?.scene}_${e?.bizUid}`);
                 setOpenToken(true);
             }
             setLoading && setLoading(false);
@@ -1075,9 +1077,10 @@ export const PictureCreateMenu = ({
                 </Row>
             </Col>
             <PermissionUpgradeModal
+                from={from}
                 open={openToken}
                 handleClose={() => setOpenToken(false)}
-                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                title={'当前图片数不足，升级会员，立享五折优惠！'}
             />
         </>
     );

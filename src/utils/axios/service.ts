@@ -214,7 +214,7 @@ service.interceptors.response.use(
 );
 
 const refreshToken = async () => {
-    // axios.defaults.headers.common['tenant-id'] = getTenantId();
+    axios.defaults.headers.common['tenant-id'] = getTenant();
     return axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken());
 };
 const handleAuthorized = () => {

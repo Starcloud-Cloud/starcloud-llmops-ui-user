@@ -317,7 +317,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     handleOk={handleDelete}
                 />
             </Card>
-            <PermissionUpgradeModal open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+            <PermissionUpgradeModal from="upgradeSkills_0" open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
         </>
     );
 }

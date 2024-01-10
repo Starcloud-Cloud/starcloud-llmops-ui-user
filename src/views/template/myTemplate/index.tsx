@@ -279,6 +279,7 @@ function MyTemplate() {
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
                     title={`添加应用个数(${userInfo?.levelConfig?.usableApp})已用完`}
+                    from={'usableApp_0'}
                 />
             )}
             {totals > 0 && (

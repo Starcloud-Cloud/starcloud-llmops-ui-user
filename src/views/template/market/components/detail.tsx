@@ -47,6 +47,7 @@ function Deatail() {
     const detailRef: any = useRef(null);
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    const [from, setFrom] = useState('');
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
@@ -90,15 +91,7 @@ function Deatail() {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2004008003')) {
-                    setTokenOpen(true);
-                    const newValue1 = [...loadings];
-                    newValue1.forEach((item) => {
-                        item = false;
-                    });
-                    setLoadings(newValue1);
-                    return;
-                }
+
                 if (done) {
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
@@ -165,6 +158,15 @@ function Deatail() {
                                 close: false
                             })
                         );
+                    } else if (bufferObj?.code === 2004008003) {
+                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                        setTokenOpen(true);
+                        const newValue1 = [...loadings];
+                        newValue1.forEach((item) => {
+                            item = false;
+                        });
+                        setLoadings(newValue1);
+                        return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
@@ -518,10 +520,13 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
-            {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
+            {openUpgradeModel && (
+                <PermissionUpgradeModal from="upgradeGpt4_0" open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            )}
             {tokenOpen && (
                 <PermissionUpgradeModal
                     open={tokenOpen}
+                    from={from}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
                 />

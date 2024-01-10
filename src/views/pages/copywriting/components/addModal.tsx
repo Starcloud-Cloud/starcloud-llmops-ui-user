@@ -125,12 +125,13 @@ const AddModal = () => {
         });
     }, []);
     const [oneLoading, setOneLoading] = useState(false);
+    const valueListRef: any = useRef(null);
     useEffect(() => {
         if (searchParams.get('uid')) {
+            setChangeFalg(true);
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
                     setOneLoading(true);
-                    setRows(res.configuration?.copyWritingTemplate?.variableList);
                     setParams({
                         name: res.name,
                         category: res.category,
@@ -139,24 +140,31 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    setTableData(res.refers);
-                    setTestImageList(
-                        res.useImages?.map((item: any) => {
-                            return {
-                                uid: uuidv4(),
-                                thumbUrl: item,
-                                response: {
-                                    data: {
-                                        url: item
+                    if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
+                        setRows(res.configuration?.copyWritingTemplate?.variableList);
+                        setTableData(res.refers);
+                        setTestImageList(
+                            res.useImages?.map((item: any) => {
+                                return {
+                                    uid: uuidv4(),
+                                    thumbUrl: item,
+                                    response: {
+                                        data: {
+                                            url: item
+                                        }
                                     }
-                                }
-                            };
-                        })
-                    );
-                    setTestTableList(res.configuration.copyWritingTemplate.example);
-                    setCopyWritingTemplate(res.configuration.copyWritingTemplate);
-                    setImageStyleData(res.configuration.imageTemplate.styleList);
-                    setparagraphCount(res.configuration.paragraphCount);
+                                };
+                            })
+                        );
+                        setTestTableList(res.configuration.copyWritingTemplate.example);
+                        setCopyWritingTemplate(res.configuration.copyWritingTemplate);
+                        setImageStyleData(res.configuration.imageTemplate.styleList);
+                        setparagraphCount(res.configuration.paragraphCount);
+                    } else {
+                        setSplitValue(res.customConfiguration?.appUid);
+                        valueListRef.current = res.customConfiguration?.steps;
+                        setValueList(valueListRef.current);
+                    }
                 }
             });
         } else {
@@ -383,10 +391,7 @@ const AddModal = () => {
     };
     //保存
     const handleSave = () => {
-        console.log(3);
-
         if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
-            console.log(1);
             if (searchParams.get('uid')) {
                 schemeModify({
                     uid: searchParams.get('uid'),
@@ -459,7 +464,6 @@ const AddModal = () => {
                 }
             });
         } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
-            console.log(2);
             if (!params.name) {
                 setTitleOpen(true);
                 setCategoryOpen(true);
@@ -586,7 +590,7 @@ const AddModal = () => {
     const [splitList, setSplitList] = useState<any[]>([]);
     //选中应用之后需要循环的数据
     const [valueList, setValueList] = useState<any[]>([]);
-    const valueListRef: any = useRef(null);
+
     //生成模式
     const [modeList, setModeList] = useState<any[]>([]);
     useEffect(() => {
@@ -594,10 +598,13 @@ const AddModal = () => {
             setSplitList(res);
         });
     }, []);
+    const [changeFalg, setChangeFalg] = useState(false);
     useEffect(() => {
         if (splitValue) {
-            valueListRef.current = splitList.filter((item) => item.appUid === splitValue)[0]?.steps;
-            setValueList(splitList.filter((item) => item.appUid === splitValue)[0]?.steps);
+            if (!changeFalg) {
+                valueListRef.current = splitList.filter((item) => item.appUid === splitValue)[0]?.steps;
+                setValueList(splitList.filter((item) => item.appUid === splitValue)[0]?.steps);
+            }
         } else {
             valueListRef.current = [];
             setValueList([]);
@@ -610,6 +617,7 @@ const AddModal = () => {
             [key]: data
         };
         valueListRef.current = newData;
+
         setValueList(newData);
     };
     return (
@@ -1168,6 +1176,7 @@ const AddModal = () => {
                                 name="source"
                                 value={splitValue}
                                 onChange={(e) => {
+                                    setChangeFalg(false);
                                     setSplitValue(e.target.value);
                                 }}
                             >
@@ -1193,7 +1202,12 @@ const AddModal = () => {
                                                     params={params}
                                                 />
                                                 <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
-                                                <Radio.Group value={el.model}>
+                                                <Radio.Group
+                                                    value={el.model}
+                                                    onChange={(e) => {
+                                                        setValues('model', e.target.value, index);
+                                                    }}
+                                                >
                                                     {modeList?.map((item) => (
                                                         <Radio key={item.value} value={item.value}>
                                                             {item.label}

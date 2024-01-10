@@ -41,3 +41,7 @@ export const schemeExample = (data: any) => {
 export const noteDetail = (data: any) => {
     return request.post({ url: `/llm/xhs/note/detail`, data });
 };
+//自定义内容拼接生成
+export const appList = () => {
+    return request.get({ url: `/llm/creative/scheme/appList/CUSTOM_IMAGE_TEXT` });
+};

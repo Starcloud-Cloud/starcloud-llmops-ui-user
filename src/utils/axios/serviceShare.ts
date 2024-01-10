@@ -10,6 +10,7 @@ import PubSub from 'pubsub-js';
 
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
+import { getTenant } from 'utils/permission';
 
 const tenantEnable = process.env.REACT_APP_TENANT_ENABLE;
 const { result_code, base_url, share_base_url, request_timeout } = config;
@@ -187,7 +188,7 @@ service.interceptors.response.use(
 );
 
 const refreshToken = async () => {
-    // axios.defaults.headers.common['tenant-id'] = getTenantId();
+    axios.defaults.headers.common['tenant-id'] = getTenant();
     return axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken());
 };
 const handleAuthorized = () => {

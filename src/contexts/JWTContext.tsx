@@ -20,6 +20,7 @@ import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import useAuthorizedStore from 'store/authorize';
 import useRouteStore from 'store/router';
+import { useLocation } from 'react-router-dom';
 
 // import Dialog from '@mui/material/Dialog';
 // import DialogActions from '@mui/material/DialogActions';
@@ -45,6 +46,7 @@ const initialState: InitialLoginContextProps = {
 const JWTContext = createContext<JWTContextType | null>(null);
 
 export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
+    const location = useLocation();
     const [state, dispatch] = useReducer(accountReducer, initialState);
     const isSetUser = useUserStore((states) => states.isSetUser);
     const setUserInfoAction = useUserStore((states) => states.setUserInfoAction);
@@ -61,7 +63,8 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             try {
                 const serviceToken = await getAccessToken();
                 if (serviceToken) {
-                    if (!isSetUser) {
+                    if (!isSetUser && location.pathname !== '/' && location.pathname !== '/login') {
+                        console.log(location);
                         await setUserInfoAction();
                         await generateRoutes();
                     }

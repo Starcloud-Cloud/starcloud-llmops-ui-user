@@ -197,7 +197,7 @@ const ProfileSection = () => {
                                                 <Stack direction="row" spacing={0.5} alignItems="center">
                                                     <Typography variant="h4">{t('market.welcome')},</Typography>
                                                     <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                        {data.user.nickname}
+                                                        {data.user?.nickname}
                                                     </Typography>
                                                 </Stack>
                                             </Stack>

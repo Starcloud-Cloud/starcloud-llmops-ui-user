@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import MainCard from 'ui-component/cards/MainCard';
 import { Close } from '@mui/icons-material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -60,10 +60,9 @@ const CreateTable = ({ tableData, sourceList, setTableData, params }: Table) => 
         },
         {
             title: '参考图片',
-            key: 'images',
             render: (_, row) => (
                 <div className="flex wrap gap-2">
-                    {row.images?.map((item: any, index: number) => (
+                    {row.imageList?.map((item: any, index: number) => (
                         <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
                     ))}
                 </div>
@@ -91,7 +90,7 @@ const CreateTable = ({ tableData, sourceList, setTableData, params }: Table) => 
                             setRowIndex(index);
                             setAccoutQuery({
                                 ...row,
-                                fileList: row?.images?.map((item: any) => {
+                                fileList: row?.imageList?.map((item: any) => {
                                     return {
                                         uid: uuidv4(),
                                         percent: 100,
@@ -105,12 +104,12 @@ const CreateTable = ({ tableData, sourceList, setTableData, params }: Table) => 
                                 })
                             });
                             setImageContent(
-                                row?.images?.map((item: any) => {
+                                row?.imageList?.map((item: any) => {
                                     return item.title;
                                 })
                             );
                             setImageSubContent(
-                                row?.images?.map((item: any) => {
+                                row?.imageList?.map((item: any) => {
                                     return item.subTitle;
                                 })
                             );
@@ -494,7 +493,7 @@ const CreateTable = ({ tableData, sourceList, setTableData, params }: Table) => 
                                         const obj = {
                                             ...accoutQuery,
                                             fileList: undefined,
-                                            images:
+                                            imageList:
                                                 accoutQuery.fileList
                                                     ?.map((item: any, i: number) => {
                                                         if (item?.response?.data?.url) {
@@ -530,4 +529,7 @@ const CreateTable = ({ tableData, sourceList, setTableData, params }: Table) => 
         </>
     );
 };
-export default CreateTable;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return JSON.stringify(prevProps?.tableData) === JSON.stringify(nextProps?.tableData);
+};
+export default memo(CreateTable, arePropsEqual);

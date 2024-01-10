@@ -209,7 +209,7 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
-                {flag && (
+                {/* {flag && (
                     <div className="flex items-center gap-2 text-black my-[10px]">
                         <Image
                             preview={false}
@@ -245,7 +245,7 @@ const Cards = ({ flag = false }) => {
                             <SwapOutlined className="cursor-pointer" rev={undefined} />
                         </Popover>
                     </div>
-                )}
+                )} */}
                 <LinearProgressWithLabel info={userInfo} />
                 {flag && (
                     <Box mt={1} color={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black}>

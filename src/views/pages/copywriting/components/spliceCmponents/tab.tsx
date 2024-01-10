@@ -27,7 +27,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                 {
                                     key: '1',
                                     name: '首图',
-                                    variableList: []
+                                    variables: []
                                 }
                             ]
                         });

@@ -97,7 +97,7 @@ const AddModal = () => {
                 {
                     key: '1',
                     name: '首图',
-                    variableList: []
+                    variables: []
                 }
             ]
         }
@@ -141,7 +141,7 @@ const AddModal = () => {
                         mode: res.mode
                     });
                     if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                        setRows(res.configuration?.copyWritingTemplate?.variableList);
+                        setRows(res.configuration?.copyWritingTemplate?.variables);
                         setTableData(res.refers);
                         setTestImageList(
                             res.useImages?.map((item: any) => {
@@ -200,7 +200,7 @@ const AddModal = () => {
             title: '图片内容',
             render: (_, row) => (
                 <div className="flex gap-2">
-                    {row?.imageList?.map((item: any) => (
+                    {row?.images?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}
                 </div>
@@ -402,7 +402,7 @@ const AddModal = () => {
                         copyWritingTemplate: {
                             ...copyWritingTemplate,
                             example: testTableList,
-                            variableList: rows
+                            variables: rows
                         },
                         imageTemplate: {
                             styleList: imageStyleData
@@ -437,7 +437,7 @@ const AddModal = () => {
                     copyWritingTemplate: {
                         ...copyWritingTemplate,
                         example: testTableList,
-                        variableList: rows
+                        variables: rows
                     },
                     imageTemplate: {
                         styleList: imageStyleData
@@ -831,7 +831,7 @@ const AddModal = () => {
                             </Typography>
                         </Box>
                     </SubCard>
-                    <SubCard
+                    {/* <SubCard
                         sx={{
                             mb: 1,
                             borderColor: params.mode === 'CUSTOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
@@ -853,7 +853,7 @@ const AddModal = () => {
                                 {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
                             </Typography>
                         </Box>
-                    </SubCard>
+                    </SubCard> */}
                 </div>
                 {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
                     <Collapse
@@ -1298,7 +1298,7 @@ const AddModal = () => {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
                                             example: testTableList,
-                                            variableList: rows
+                                            variables: rows
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData

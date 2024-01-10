@@ -29,8 +29,6 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
             setTempList(list.flat());
         });
     }, []);
-    console.log(tempList, 'templist');
-
     useEffect(() => {
         if (imageStyleData.id) {
             const data = tempList.find((v: any) => v.id === imageStyleData?.id);

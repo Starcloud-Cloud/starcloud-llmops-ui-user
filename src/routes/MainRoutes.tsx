@@ -67,6 +67,8 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
+//空间权益
+const SpaceEquity = Loadable(lazy(() => import('views/spaceEquity')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -223,6 +225,10 @@ const MainRoutes = {
         {
             path: '/announce',
             element: <Announce />
+        },
+        {
+            path: '/spaceEquity',
+            element: <SpaceEquity />
         }
     ]
 };

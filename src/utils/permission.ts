@@ -1,6 +1,6 @@
 export const enum ENUM_TENANT {
-    AI = 'ai',
-    ANNOUNCE = 'announce'
+    AI = 2,
+    ANNOUNCE = 3
 }
 
 export const getTenant = () => {
@@ -50,6 +50,5 @@ export const getPermission = (key: ENUM_PERMISSION) => {
         return announceList[key];
     } else {
         return list[key];
-        // return announceList[key];
     }
 };

@@ -16,6 +16,8 @@ import {
     Typography,
     linearProgressClasses
 } from '@mui/material';
+import { Image, Popover, Menu } from 'antd';
+import { SwapOutlined } from '@ant-design/icons';
 import { styled, useTheme } from '@mui/material/styles';
 import { userBenefits } from 'api/template';
 import Share from 'assets/images/share/share.png';
@@ -23,7 +25,7 @@ import copy from 'clipboard-copy';
 import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
 import { t } from 'hooks/web/useI18n';
 import QRCode from 'qrcode.react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
@@ -156,6 +158,7 @@ const Cards = ({ flag = false }) => {
             })
         );
     };
+    const [open, setOpen] = useState(false);
     useEffect(() => {
         userBenefits().then((res) => {
             setUserInfo(res);
@@ -206,6 +209,43 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
+                {flag && (
+                    <div className="flex items-center gap-2 text-black my-[10px]">
+                        <Image
+                            preview={false}
+                            className="rounded-full overflow-hidden"
+                            width={36}
+                            height={36}
+                            src={require('../assets/images/users/avatar-1.png')}
+                        />
+                        <div className="w-[140px] line-clamp-1">用户 1001 的空间</div>
+                        <Popover
+                            title="我的空间"
+                            placement="right"
+                            arrow={false}
+                            content={
+                                <div className="w-[250px]">
+                                    <Menu
+                                        onClick={() => {}}
+                                        mode="inline"
+                                        selectedKeys={['mail']}
+                                        items={[
+                                            {
+                                                label: 'Navigation One',
+                                                key: 'mail'
+                                            }
+                                        ]}
+                                    />
+                                </div>
+                            }
+                            trigger="click"
+                            open={open}
+                            onOpenChange={(newOpen: boolean) => setOpen(newOpen)}
+                        >
+                            <SwapOutlined className="cursor-pointer" rev={undefined} />
+                        </Popover>
+                    </div>
+                )}
                 <LinearProgressWithLabel info={userInfo} />
                 {flag && (
                     <Box mt={1} color={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black}>

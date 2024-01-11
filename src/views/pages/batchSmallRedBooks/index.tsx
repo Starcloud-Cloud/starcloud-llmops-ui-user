@@ -58,14 +58,17 @@ const BatcSmallRedBooks = () => {
     useEffect(() => {
         if (targetKeys && targetKeys.length > 0) {
             if (preform > 1) {
-                const obj: any = {};
-                targetKeys.map((item: string) => {
-                    obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
-                });
-                variableRef.current = obj;
-                console.log(variableRef.current);
-
-                setVariables(variableRef.current);
+                if (mockData.filter((value) => value.uid === targetKeys[0])[0]?.mode === 'CUSTOM_IMAGE_TEXT') {
+                    schemeRef.current = mockData.filter((value) => value.uid === targetKeys[0])[0]?.steps;
+                    setSchemeList(schemeRef.current);
+                } else {
+                    const obj: any = {};
+                    targetKeys.map((item: string) => {
+                        obj[item] = mockData?.filter((el: any) => el.uid === item)[0]?.variables;
+                    });
+                    variableRef.current = obj;
+                    setVariables(variableRef.current);
+                }
             } else {
                 setPerform(preform + 1);
             }
@@ -85,6 +88,9 @@ const BatcSmallRedBooks = () => {
         });
         variableRef.current = res.config?.paramMap;
         setVariables(variableRef.current);
+        schemeRef.current = res.config?.schemeList;
+        setSchemeList(schemeRef.current);
+
         setImageList(
             res.config?.imageUrlList?.map((item: any) => {
                 return {
@@ -192,11 +198,30 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
+        const custom = mockData.filter((value) => value.uid === targetKeys[0])[0]?.mode === 'CUSTOM_IMAGE_TEXT';
         if (
+            variables &&
             Object.values(variables)
                 .flat()
-                ?.some((item: any) => !item.value)
+                ?.some((item: any) => !item.value && !custom)
         ) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '方案参数全部必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+
+        if (custom && schemesList?.some((item) => item?.variableList.some((el: any) => !el.value))) {
             dispatch(
                 openSnackbar({
                     open: true,
@@ -230,9 +255,18 @@ const BatcSmallRedBooks = () => {
                     randomType: undefined,
                     imageStyleList: undefined,
                     variableList: undefined,
-                    paramMap: { ...variables }
+                    paramMap: !custom ? { ...variables } : undefined,
+                    schemeList: !custom
+                        ? undefined
+                        : [
+                              {
+                                  ...mockData.filter((value) => value.uid === targetKeys[0])[0],
+                                  steps: schemesList
+                              }
+                          ]
                 },
                 type: 'XHS',
+
                 uid: searchParams.get('uid')
             });
             if (res) {
@@ -284,7 +318,15 @@ const BatcSmallRedBooks = () => {
                     randomType: undefined,
                     imageStyleList: undefined,
                     variableList: undefined,
-                    paramMap: { ...variables }
+                    paramMap: !custom ? { ...variables } : undefined,
+                    schemeList: !custom
+                        ? undefined
+                        : [
+                              {
+                                  ...mockData.filter((value) => value.uid === targetKeys[0])[0],
+                                  steps: schemesList
+                              }
+                          ]
                 },
                 type: 'XHS'
             });
@@ -403,6 +445,9 @@ const BatcSmallRedBooks = () => {
     //变量
     const [variables, setVariables] = useState<any>({});
     const variableRef: any = useRef(null);
+    const [schemesList, setSchemeList] = useState<any[]>([]);
+    const schemeRef: any = useRef(null);
+
     //执行按钮
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
@@ -509,7 +554,11 @@ const BatcSmallRedBooks = () => {
                                 onChange={(e: any) => {
                                     setPerform(preform + 1);
                                     settargetKeysOpen(true);
-                                    setTargetKeys(e.target.value);
+                                    if (e.target.value?.length > 1) {
+                                        setTargetKeys([e.target.value[1]]);
+                                    } else {
+                                        setTargetKeys(e.target.value);
+                                    }
                                 }}
                                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                                 renderValue={(selected) => (
@@ -537,7 +586,42 @@ const BatcSmallRedBooks = () => {
                         {targetKeys && targetKeys.length > 0 && (
                             <div>
                                 <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
-                                {variables &&
+                                {mockData.filter((value) => value.uid === targetKeys[0])[0]?.mode === 'CUSTOM_IMAGE_TEXT' ? (
+                                    <>
+                                        <div className="text-[14px] font-[600] mt-[10px]">
+                                            {mockData.filter((value) => value.uid === targetKeys[0])[0]?.name}
+                                            <span
+                                                onClick={() => {
+                                                    navigate(
+                                                        `/copywritingModal?uid=${
+                                                            mockData?.filter((val) => val?.uid === targetKeys[0])[0]?.uid
+                                                        }`
+                                                    );
+                                                }}
+                                                className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
+                                            >
+                                                查看方案
+                                            </span>
+                                        </div>
+                                        {schemesList?.map((item, de) =>
+                                            item?.variableList?.map((el: any, i: number) => (
+                                                <Form
+                                                    key={el?.field}
+                                                    item={el}
+                                                    index={i}
+                                                    changeValue={(data: any) => {
+                                                        const newData = _.cloneDeep(schemeRef.current);
+                                                        newData[de].variableList[data.index].value = data.value;
+                                                        schemeRef.current = newData;
+                                                        setSchemeList(schemeRef.current);
+                                                    }}
+                                                    flag={false}
+                                                />
+                                            ))
+                                        )}
+                                    </>
+                                ) : (
+                                    variables &&
                                     Object.keys(variables)?.map((item) => (
                                         <div key={item + '2'}>
                                             <div className="text-[14px] font-[600] mt-[10px]">
@@ -555,7 +639,7 @@ const BatcSmallRedBooks = () => {
                                             </div>
                                             {variables[item]?.map((el: any, i: number) => (
                                                 <Form
-                                                    key={JSON.stringify(item) + '3'}
+                                                    key={JSON.stringify(el) + '3'}
                                                     item={el}
                                                     index={i}
                                                     changeValue={(data: any) => {
@@ -567,7 +651,8 @@ const BatcSmallRedBooks = () => {
                                                 />
                                             ))}
                                         </div>
-                                    ))}
+                                    ))
+                                )}
                             </div>
                         )}
                         <div className="text-[18px] font-[600] my-[20px]">4. 批量生成参数</div>

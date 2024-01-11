@@ -1169,7 +1169,7 @@ const AddModal = () => {
                     />
                 ) : (
                     <div>
-                        <FormControl fullWidth>
+                        <FormControl sx={{ mb: 2 }} fullWidth>
                             <FormLabel>选择应用</FormLabel>
                             <Select
                                 label="选择应用"
@@ -1187,87 +1187,94 @@ const AddModal = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        {valueList?.map((el: any, index: number) => (
-                            <div>
-                                {
-                                    <>
-                                        {(el.code === 'ContentActionHandler' || el.code === 'ParagraphActionHandler') && (
-                                            <SubCard sx={{ mt: 2 }}>
-                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
-                                                <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
-                                                <CreateTable
-                                                    tableData={el?.referList}
-                                                    sourceList={sourceList}
-                                                    setTableData={(data) => setValues('referList', data, index)}
-                                                    params={params}
-                                                />
-                                                <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
-                                                <Radio.Group
-                                                    value={el.model}
-                                                    onChange={(e) => {
-                                                        setValues('model', e.target.value, index);
-                                                    }}
-                                                >
-                                                    {modeList?.map((item) => (
-                                                        <Radio key={item.value} value={item.value}>
-                                                            {item.label}
-                                                        </Radio>
-                                                    ))}
-                                                </Radio.Group>
-                                                <CreateVariable
-                                                    pre={pre}
-                                                    value={el?.requirement}
-                                                    setValue={(data: string) => setValues('requirement', data, index)}
-                                                    rows={el?.variableList}
-                                                    setRows={(data: any[]) => setValues('variableList', data, index)}
-                                                />
-                                                {el.code === 'ParagraphActionHandler' && (
-                                                    <div className="relative mt-[20px]">
-                                                        <InputNumber
-                                                            size="large"
-                                                            className="w-[300px] bg-[#f8fafc]"
-                                                            min={1}
-                                                            value={el?.paragraphCount}
-                                                            onChange={(data) => setValues('paragraphCount', data, index)}
+                        <Collapse
+                            bordered={false}
+                            style={{ background: 'transparent' }}
+                            items={valueList?.map((el: any, index: number) => {
+                                return {
+                                    key: index,
+                                    style: {
+                                        background: '#fafafa',
+                                        border: '1px solod #d9d9d9'
+                                    },
+                                    label: el?.name,
+                                    children: (
+                                        <>
+                                            {(el.code === 'ContentActionHandler' || el.code === 'ParagraphActionHandler') && (
+                                                <>
+                                                    <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
+                                                    <CreateTable
+                                                        tableData={el?.referList}
+                                                        sourceList={sourceList}
+                                                        setTableData={(data) => setValues('referList', data, index)}
+                                                        params={params}
+                                                    />
+                                                    <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
+                                                    <Radio.Group
+                                                        value={el.model}
+                                                        onChange={(e) => {
+                                                            setValues('model', e.target.value, index);
+                                                        }}
+                                                    >
+                                                        {modeList?.map((item) => (
+                                                            <Radio key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </Radio>
+                                                        ))}
+                                                    </Radio.Group>
+                                                    <CreateVariable
+                                                        pre={pre}
+                                                        value={el?.requirement}
+                                                        setValue={(data: string) => setValues('requirement', data, index)}
+                                                        rows={el?.variableList}
+                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                    />
+                                                    {el.code === 'ParagraphActionHandler' && (
+                                                        <div className="relative mt-[20px]">
+                                                            <InputNumber
+                                                                size="large"
+                                                                className="w-[300px] bg-[#f8fafc]"
+                                                                min={1}
+                                                                value={el?.paragraphCount}
+                                                                onChange={(data) => setValues('paragraphCount', data, index)}
+                                                            />
+                                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                                文案段落数量
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                            {el.code === 'AssembleActionHandler' && (
+                                                <>
+                                                    <div className="relative">
+                                                        <TextArea
+                                                            defaultValue={el?.requirement}
+                                                            onBlur={(data) => setValues('requirement', data.target.value, index)}
+                                                            rows={4}
                                                         />
-                                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                            文案段落数量
+                                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                                            文案拼接配置
                                                         </span>
                                                     </div>
-                                                )}
-                                            </SubCard>
-                                        )}
-                                        {el.code === 'AssembleActionHandler' && (
-                                            <SubCard sx={{ mt: 2 }}>
-                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
-                                                <div className="relative">
-                                                    <TextArea
-                                                        defaultValue={el?.requirement}
-                                                        onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                        rows={4}
+                                                </>
+                                            )}
+                                            {el.code === 'PosterActionHandler' && (
+                                                <>
+                                                    <CreateTab
+                                                        imageStyleData={el?.styleList}
+                                                        setImageStyleData={(data) => setValues('styleList', data, index)}
+                                                        focuActive={focuActive}
+                                                        setFocuActive={setFocuActive}
+                                                        digui={digui}
                                                     />
-                                                    <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                        文案拼接配置
-                                                    </span>
-                                                </div>
-                                            </SubCard>
-                                        )}
-                                        {el.code === 'PosterActionHandler' && (
-                                            <SubCard sx={{ mt: 2 }}>
-                                                <div className="text-[18px] mb-[20px] font-[600]">{el?.name}</div>
-                                                <CreateTab
-                                                    imageStyleData={el?.styleList}
-                                                    setImageStyleData={(data) => setValues('styleList', data, index)}
-                                                    focuActive={focuActive}
-                                                    setFocuActive={setFocuActive}
-                                                    digui={digui}
-                                                />
-                                            </SubCard>
-                                        )}
-                                    </>
-                                }
-                            </div>
-                        ))}
+                                                </>
+                                            )}
+                                        </>
+                                    )
+                                };
+                            })}
+                        />
                     </div>
                 )}
                 <Divider />

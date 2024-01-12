@@ -158,7 +158,7 @@ function ApplicationAnalysis({
         const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.createDate }));
         const chatTokens = res?.map((item: LogStatistics) => ({ y: item.chatTokens, x: item.createDate }));
         const newList = [];
-        permissions.includes('log:app:analysis:completionCostPoints') &&
+        permissions?.includes('log:app:analysis:completionCostPoints') &&
             newList.push({
                 title:
                     type === 'GENERATE_RECORD'
@@ -172,7 +172,7 @@ function ApplicationAnalysis({
                 successData: completionSuccessCount,
                 key: true
             });
-        permissions.includes('log:app:analysis:imageCostPoints') &&
+        permissions?.includes('log:app:analysis:imageCostPoints') &&
             type === 'GENERATE_RECORD' &&
             newList.push({
                 title: '生成图片消耗数',
@@ -182,19 +182,19 @@ function ApplicationAnalysis({
                 successData: imageSuccessCount,
                 key: true
             });
-        permissions.includes('log:app:analysis:completionAvgElapsed') &&
+        permissions?.includes('log:app:analysis:completionAvgElapsed') &&
             newList.push({
                 title:
                     type === 'GENERATE_RECORD' ? '生成/聊天平均耗时(S)' : type === 'APP_ANALYSIS' ? '生成平均耗时(S)' : '聊天平均耗时(S)',
                 data: completionAvgElapsed
             });
-        permissions.includes('log:app:analysis:imageAvgElapsed') &&
+        permissions?.includes('log:app:analysis:imageAvgElapsed') &&
             type === 'GENERATE_RECORD' &&
             newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
-        permissions.includes('log:app:analysis:completionTokens') &&
+        permissions?.includes('log:app:analysis:completionTokens') &&
             (type === 'APP_ANALYSIS' || type === 'GENERATE_RECORD') &&
             newList.push({ title: '生成消耗Tokens', data: completionTokens });
-        permissions.includes('log:app:analysis:chatTokens') &&
+        permissions?.includes('log:app:analysis:chatTokens') &&
             (type === 'CHAT_ANALYSIS' || type === 'GENERATE_RECORD') &&
             newList.push({ title: '聊天消耗Tokens', data: chatTokens });
         setGenerate(newList);
@@ -477,12 +477,12 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '150px' }} align="center">
                                 更新时间
                             </TableCell>
-                            {permissions.includes('log:app:page:adminColumns') && (
+                            {permissions?.includes('log:app:page:adminColumns') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">
                                     消耗总Token
                                 </TableCell>
                             )}
-                            {permissions.includes('log:app:page:adminColumns') && (
+                            {permissions?.includes('log:app:page:adminColumns') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">
                                     用户等级
                                 </TableCell>
@@ -541,8 +541,8 @@ function ApplicationAnalysis({
                                     )}
                                 </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
-                                {permissions.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
-                                {permissions.includes('log:app:page:adminColumns') && (
+                                {permissions?.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
+                                {permissions?.includes('log:app:page:adminColumns') && (
                                     <TableCell align="center">
                                         {row.userLevels?.map((item) => (
                                             <p className="mt-[5px]">

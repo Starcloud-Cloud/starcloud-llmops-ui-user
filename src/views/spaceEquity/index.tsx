@@ -150,7 +150,7 @@ const SpaceEquity = () => {
     };
     const [nameOpen, setNameOpen] = useState(false);
     const nameRef: any = useRef(null);
-    const [name, setName] = useState('用户名称');
+    const [user, setUser] = useState<any>(null);
     useEffect(() => {
         if (nameOpen) {
             nameRef.current.focus();
@@ -223,7 +223,7 @@ const SpaceEquity = () => {
     const getUser = async () => {
         const result = await spaceDetail(all_detail?.allDetail?.deptId);
         const res = await spaceUserList(all_detail?.allDetail?.deptId);
-
+        setUser(result);
         setTableData(res);
     };
     useEffect(() => {
@@ -408,15 +408,18 @@ const SpaceEquity = () => {
                             <div className="flex items-center gap-2">
                                 {!nameOpen ? (
                                     <Typography ml={1} color="#697586">
-                                        {name}
+                                        {user?.name}
                                     </Typography>
                                 ) : (
                                     <Input
                                         ref={nameRef}
-                                        defaultValue={name}
+                                        defaultValue={user?.name}
                                         onBlur={(e) => {
                                             if (e.target.value) {
-                                                setName(e.target.value);
+                                                setUser({
+                                                    ...user,
+                                                    name: e.target.value
+                                                });
                                             }
                                             setNameOpen(false);
                                         }}
@@ -434,10 +437,10 @@ const SpaceEquity = () => {
                                         <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
                                     </Popover>
                                 </span>
-                                http://localhost:3000/invite
+                                {window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode}
                                 <ContentCopyIcon
                                     onClick={() => {
-                                        copy('http://localhost:3000/invite');
+                                        copy(window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode);
                                         dispatch(
                                             openSnackbar({
                                                 open: true,

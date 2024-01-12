@@ -12,17 +12,18 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
-
+    const [imageTypeList, setImageTypeList] = React.useState<any[]>([]);
     const handleOk = (temp: any) => {
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
         newData.id = temp.id;
-        newData.variables = temp.variables;
+        newData.variableList = temp.variableList;
         setData(newData);
         setOpen(false);
     };
     useEffect(() => {
         getImageTemplateTypes().then((res) => {
+            setImageTypeList(res);
             const list = res.map((element: any) => {
                 return element.list;
             });
@@ -39,7 +40,9 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
-                <SelectTemplateModal open={open} handleClose={() => setOpen(false)} handleOk={handleOk} />
+                {open && (
+                    <SelectTemplateModal open={open} imageTypeList={imageTypeList} handleClose={() => setOpen(false)} handleOk={handleOk} />
+                )}
                 <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
                     <TextField
                         color="secondary"
@@ -57,7 +60,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 {imageStyleData?.id && (
                     <div>
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variables?.map(
+                            {imageStyleData?.variableList?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
                                         <Col key={index} sm={12} xs={24} md={6}>
@@ -66,7 +69,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 index={index}
                                                 changeValue={(data: any) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.variables[data.index].value = data.value;
+                                                    newData.variableList[data.index].value = data.value;
                                                     setData(newData);
                                                 }}
                                                 item={el}

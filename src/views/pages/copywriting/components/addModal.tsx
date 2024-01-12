@@ -1200,7 +1200,9 @@ const AddModal = () => {
                                     label: el?.name,
                                     children: (
                                         <>
-                                            {(el.code === 'ContentActionHandler' || el.code === 'ParagraphActionHandler') && (
+                                            {(el.code === 'CustomActionHandler' ||
+                                                el.code === 'ParagraphActionHandler' ||
+                                                el.code === 'TitleActionHandler') && (
                                                 <>
                                                     <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
                                                     <CreateTable

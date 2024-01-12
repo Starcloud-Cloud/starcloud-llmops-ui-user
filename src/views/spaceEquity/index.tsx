@@ -17,13 +17,13 @@ import {
     TableBody,
     Pagination,
     Divider,
-    Modal,
+    Modal as Modals,
     CardContent,
     CardActions
 } from '@mui/material';
 import copy from 'clipboard-copy';
 import straw from '../../assets/images/users/straw.svg';
-import { Upload, UploadProps, Image, ColorPicker, Input, Table, Popover } from 'antd';
+import { Upload, UploadProps, Image, ColorPicker, Input, Table, Popover, Popconfirm } from 'antd';
 import { PlusOutlined, FormOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { useEffect, useState, useRef } from 'react';
@@ -124,7 +124,6 @@ const SpaceEquity = () => {
     const [avatarOpen, setavatarOpen] = useState(false);
     const [imageUrl, setimageUrl] = useState('');
     const [active, setActive] = useState('');
-    const [color, setColor] = useState<string>('');
     const uploadButton = (
         <button style={{ border: 0, background: 'none' }} type="button">
             <PlusOutlined rev={undefined} />
@@ -142,7 +141,6 @@ const SpaceEquity = () => {
         onChange(info) {
             if (info.file.status === 'done') {
                 setActive('');
-                setColor('');
                 setimageUrl(info?.file?.response?.data?.url);
             }
         }
@@ -155,28 +153,64 @@ const SpaceEquity = () => {
             nameRef.current.focus();
         }
     }, [nameOpen]);
-    const colorList = [{ color: '#3698f8' }, { color: '#673ab7' }, { color: '#fcc666' }, { color: '#62d078' }];
+    const colorList = [{ color: 'avatar-1.png' }, { color: 'avatar-2.png' }, { color: 'avatar-3.png' }, { color: 'avatar-4.png' }];
     const columns = [
         {
             title: '用户名称',
-            dataIndex: 'name',
-            key: 'name'
+            dataIndex: 'nickname'
+        },
+        {
+            title: '手机号',
+            dataIndex: 'mobile'
+        },
+        {
+            title: '已使用魔法豆/图片',
+            dataIndex: 'consume_total'
+        },
+        {
+            title: '角色',
+            dataIndex: 'role'
         },
         {
             title: '操作',
             width: 200,
-            dataIndex: 'name',
-            key: 'name'
+            render: () => (
+                <Popconfirm
+                    title="移除成员"
+                    description="移除后该成员将无法访问此空间，是否确认移除该成员？"
+                    onConfirm={() => {
+                        console.log(11111);
+                    }}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <Button color="secondary">移除</Button>
+                </Popconfirm>
+            )
         }
     ];
+    const [tableData, setTableData] = useState([
+        {
+            nickname: '张三',
+            mobile: '138****8888',
+            consume_total: '100',
+            role: '超级管理员'
+        },
+        {
+            nickname: '李四',
+            mobile: '138****8888',
+            consume_total: '1000'
+        }
+    ]);
     return (
         <Card sx={{ p: 2 }} className="">
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                <Tab label="版本权益" {...a11yProps(0)} />
+                {/* <Tab label="版本权益" {...a11yProps(0)} /> */}
                 {/* <Tab label="邀请记录" {...a11yProps(1)} /> */}
-                <Tab label="成员设置" {...a11yProps(1)} />
+                <Tab label="成员设置" {...a11yProps(0)} />
             </Tabs>
-            <CustomTabPanel value={value} index={0}>
+            <div>
+                {/* <CustomTabPanel value={value} index={0}>
                 <>
                     <SubCard
                         sx={{ p: '0 !important', background: '#ede7f6', mb: 2 }}
@@ -219,8 +253,10 @@ const SpaceEquity = () => {
                         ))}
                     </Grid>
                 </>
-            </CustomTabPanel>
-            {/* <CustomTabPanel value={value} index={1}>
+            </CustomTabPanel> */}
+            </div>
+            <div>
+                {/* <CustomTabPanel value={value} index={1}>
                 <Box textAlign="center">
                     <Typography variant="h2">邀请你的朋友并赚取魔法豆</Typography>
                     <Typography variant="h4" fontWeight={400} my={2}>
@@ -328,7 +364,8 @@ const SpaceEquity = () => {
                     </Box>
                 )}
             </CustomTabPanel> */}
-            <CustomTabPanel value={value} index={1}>
+            </div>
+            <CustomTabPanel value={value} index={0}>
                 <SubCard
                     sx={{ p: '0 !important', background: '#ede7f6', mb: 2 }}
                     contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between' }}
@@ -336,12 +373,11 @@ const SpaceEquity = () => {
                     <Box display="flex" alignItems="center" gap={2}>
                         <div
                             className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white"
-                            style={{ background: active ? active : color ? color : '#3698f8' }}
                             onClick={() => setavatarOpen(true)}
                         >
-                            {imageUrl ? <Image width={56} height={56} preview={false} src={imageUrl} alt="" /> : '用户'}
+                            <Image width={56} height={56} preview={false} src={imageUrl} alt="" />
                         </div>
-                        <div>
+                        <div className="flex flex-1 h-full flex-col justify-between">
                             <div className="flex items-center gap-2">
                                 {!nameOpen ? (
                                     <Typography ml={1} color="#697586">
@@ -364,39 +400,39 @@ const SpaceEquity = () => {
                                 )}
                                 {!nameOpen && <FormOutlined onClick={() => setNameOpen(true)} className="cursor-pointer" rev={undefined} />}
                             </div>
-                            <span className="font-bold">
-                                添加成员链接
-                                <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
-                                    <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
-                                </Popover>
-                            </span>
-                            https://chato.cn/invite?invite_ticket=287f04d26c55471db360752dd42f6406&inviteType=b3duZXI=
-                            <IconButton
-                                onClick={() => {
-                                    copy('https://chato.cn/invite?invite_ticket=287f04d26c55471db360752dd42f6406&inviteType=b3duZXI=');
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '复制成功',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'success'
-                                            },
-                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                            transition: 'SlideDown',
-                                            close: false
-                                        })
-                                    );
-                                }}
-                                sx={{ ml: '10px' }}
-                            >
-                                <ContentCopyIcon sx={{ fontSize: '16px' }} />
-                            </IconButton>
+                            <div className="flex items-end">
+                                <span className="font-bold">
+                                    添加成员链接
+                                    <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
+                                        <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
+                                    </Popover>
+                                </span>
+                                http://localhost:3000/invite
+                                <ContentCopyIcon
+                                    onClick={() => {
+                                        copy('http://localhost:3000/invite');
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '复制成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
+                                                close: false
+                                            })
+                                        );
+                                    }}
+                                    sx={{ fontSize: '16px', ml: '10px' }}
+                                />
+                            </div>
                         </div>
                     </Box>
                 </SubCard>
-                <Table columns={columns} dataSource={[]} />
-                <Modal
+                <Table columns={columns} dataSource={tableData} />
+                <Modals
                     open={avatarOpen}
                     onClose={() => setavatarOpen(false)}
                     aria-labelledby="modal-title"
@@ -420,10 +456,7 @@ const SpaceEquity = () => {
                     >
                         <CardContent>
                             <div className="flex justify-center">
-                                <div
-                                    className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white"
-                                    style={{ background: active ? active : color ? color : '#3698f8' }}
-                                >
+                                <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white">
                                     {imageUrl ? <Image width={56} height={56} preview={false} src={imageUrl} alt="" /> : '用户'}
                                 </div>
                             </div>
@@ -432,35 +465,38 @@ const SpaceEquity = () => {
                                 <Upload {...props} className="!w-[auto] cursor-pointer">
                                     {uploadButton}
                                 </Upload>
-                                {colorList.map((item) => (
-                                    <div
-                                        className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden outline-2 outline outline-offset-2"
+                                {colorList.map((item, index) => (
+                                    <Image
+                                        key={index}
+                                        className="cursor-pointer outline-2 outline outline-offset-2 rounded-full"
+                                        width={56}
+                                        height={56}
                                         onClick={() => {
                                             setActive(item.color);
-                                            setColor('');
                                             setimageUrl('');
                                         }}
-                                        key={item.color}
+                                        src={require('../../assets/images/users/' + item.color)}
+                                        preview={false}
                                         style={{
                                             outlineColor: active === item.color ? '#673ab7' : 'transparent',
                                             background: item.color
                                         }}
-                                    >
-                                        用户
-                                    </div>
+                                    />
+                                    // <div
+                                    //     className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden outline-2 outline outline-offset-2"
+                                    //     onClick={() => {
+                                    //         setActive(item.color);
+                                    //         setimageUrl('');
+                                    //     }}
+                                    //     key={item.color}
+                                    //     style={{
+                                    //         outlineColor: active === item.color ? '#673ab7' : 'transparent',
+                                    //         background: item.color
+                                    //     }}
+                                    // >
+                                    //     用户
+                                    // </div>
                                 ))}
-                                <ColorPicker
-                                    value={color}
-                                    onChange={(value) => {
-                                        setColor(value.toHexString().slice(0, 7));
-                                        setActive('');
-                                        setimageUrl('');
-                                    }}
-                                >
-                                    <div className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden bg-[#f0f1f3]">
-                                        <Image width={20} height={20} src={straw} preview={false} alt="" />
-                                    </div>
-                                </ColorPicker>
                             </div>
                         </CardContent>
                         <Divider />
@@ -491,7 +527,7 @@ const SpaceEquity = () => {
                             </Grid>
                         </CardActions>
                     </MainCard>
-                </Modal>
+                </Modals>
             </CustomTabPanel>
         </Card>
     );

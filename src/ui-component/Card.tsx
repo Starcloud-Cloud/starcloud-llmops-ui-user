@@ -30,6 +30,7 @@ import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
+import useUserStore from 'store/user';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -140,6 +141,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
 }
 
 const Cards = ({ flag = false }) => {
+    const permissions = useUserStore((state) => state.permissions);
     const theme = useTheme();
     const { use } = infoStore();
     const navigate = useNavigate();
@@ -209,20 +211,24 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
-                {flag && (
+                {flag && permissions.includes('space:member:switch') && (
                     <div className="flex items-center gap-2 text-black my-[10px]">
                         <Image
+                            onClick={() => navigate('spaceEquity')}
                             preview={false}
-                            className="rounded-full overflow-hidden"
+                            className="rounded-full overflow-hidden cursor-pointer"
                             width={36}
                             height={36}
                             src={require('../assets/images/users/avatar-1.png')}
                         />
-                        <div className="w-[140px] line-clamp-1">用户 1001 的空间</div>
+                        <div className="w-[140px] line-clamp-1 cursor-pointer" onClick={() => navigate('spaceEquity')}>
+                            用户 1001 的空间
+                        </div>
                         <Popover
                             title="我的空间"
                             placement="right"
                             arrow={false}
+                            zIndex={9999}
                             content={
                                 <div className="w-[250px]">
                                     <Menu

@@ -18,6 +18,7 @@ export const RuoyiMenu = () => {
                 //@ts-ignore
                 icon: routeObj?.icon,
                 url: routeObj?.path,
+                visible: routeObj?.visible,
                 title: routeObj?.name,
                 type: routeObj?.children ? 'collapse' : 'item',
                 ...(isTopLevel && { color: 'primary', type: 'group' }) // Only add color if it's a top-level item

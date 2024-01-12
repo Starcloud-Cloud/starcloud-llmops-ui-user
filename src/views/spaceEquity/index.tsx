@@ -375,7 +375,13 @@ const SpaceEquity = () => {
                             className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white"
                             onClick={() => setavatarOpen(true)}
                         >
-                            <Image width={56} height={56} preview={false} src={imageUrl} alt="" />
+                            <Image
+                                width={56}
+                                height={56}
+                                preview={false}
+                                src={imageUrl ? imageUrl : require('../../assets/images/users/' + active)}
+                                alt=""
+                            />
                         </div>
                         <div className="flex flex-1 h-full flex-col justify-between">
                             <div className="flex items-center gap-2">
@@ -482,20 +488,6 @@ const SpaceEquity = () => {
                                             background: item.color
                                         }}
                                     />
-                                    // <div
-                                    //     className="w-[56px] h-[56px] cursor-pointer flex justify-center items-center rounded-full overflow-hidden outline-2 outline outline-offset-2"
-                                    //     onClick={() => {
-                                    //         setActive(item.color);
-                                    //         setimageUrl('');
-                                    //     }}
-                                    //     key={item.color}
-                                    //     style={{
-                                    //         outlineColor: active === item.color ? '#673ab7' : 'transparent',
-                                    //         background: item.color
-                                    //     }}
-                                    // >
-                                    //     用户
-                                    // </div>
                                 ))}
                             </div>
                         </CardContent>

@@ -1268,7 +1268,13 @@ const AddModal = () => {
                                                         setImageStyleData={(data) => setValues('styleList', data, index)}
                                                         focuActive={focuActive}
                                                         setFocuActive={setFocuActive}
-                                                        digui={digui}
+                                                        digui={() => {
+                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                            if (newData.every((i: any) => !i)) {
+                                                                return 1;
+                                                            }
+                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                        }}
                                                     />
                                                 </>
                                             )}

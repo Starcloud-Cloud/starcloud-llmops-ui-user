@@ -88,7 +88,7 @@ const BatcSmallRedBooks = () => {
         });
         variableRef.current = res.config?.paramMap;
         setVariables(variableRef.current);
-        schemeRef.current = res.config?.schemeList?.steps;
+        schemeRef.current = res.config?.schemeList[0]?.steps;
         setSchemeList(schemeRef.current);
 
         setImageList(

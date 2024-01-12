@@ -3,35 +3,34 @@ import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
 import { Menu, MenuProps, Image, Empty } from 'antd';
 import React, { useEffect } from 'react';
-import { getImageTemplateTypes } from 'api/template';
 
 export const SelectTemplateModal = ({
     open,
+    imageTypeList,
     handleClose,
     handleOk
 }: {
     open: boolean;
+    imageTypeList: any[];
     handleClose: () => void;
     handleOk: (temp: any) => void;
 }) => {
-    const [menuList, setMenuList] = React.useState([]);
+    const [menuList, setMenuList] = React.useState<any[]>([]);
     const [templateList, setTemplateList] = React.useState<any[]>([]);
     const [current, setCurrent] = React.useState('');
     const [type, setType] = React.useState<any[]>([]);
 
     useEffect(() => {
-        getImageTemplateTypes().then((res) => {
-            const menus = res.map((item: any) => ({
-                label: `${item.name}(${item.list.length})`,
-                value: item.id,
-                key: item.id,
-                list: item.list
-            }));
-            setMenuList(menus);
-            const firstType = menus?.[0]?.value;
-            setType([firstType]);
-            setTemplateList(menus?.[0]?.list);
-        });
+        const menus = imageTypeList?.map((item: any) => ({
+            label: `${item.name}(${item.list.length})`,
+            value: item.id,
+            key: item.id,
+            list: item.list
+        }));
+        setMenuList(menus);
+        const firstType = menus?.[0]?.value;
+        setType([firstType]);
+        setTemplateList(menus?.[0]?.list);
     }, []);
 
     const onClick: MenuProps['onClick'] = ({ item }: { item: any }) => {

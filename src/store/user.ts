@@ -47,7 +47,7 @@ const useUserStore = create<UserStore>((set) => ({
             });
             return null;
         }
-        let userInfo = wsCache.get(CACHE_KEY.USER);
+        let userInfo = wsCache.get(CACHE_KEY.INFO);
         if (!userInfo) {
             userInfo = await getInfo();
         }
@@ -57,13 +57,14 @@ const useUserStore = create<UserStore>((set) => ({
             user: userInfo.user,
             isSetUser: true
         });
-        wsCache.set(CACHE_KEY.USER, userInfo);
+        wsCache.set(CACHE_KEY.INFO, userInfo);
         wsCache.set(CACHE_KEY.ROLE_ROUTERS, userInfo?.menus);
     },
     loginOut: async () => {
         await loginOut();
         removeToken();
-        wsCache.delete('user');
+        wsCache.delete(CACHE_KEY.USER);
+        wsCache.delete(CACHE_KEY.INFO);
         wsCache.delete('roleRouters');
         // wsCache.clear();
         set({

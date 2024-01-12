@@ -57,7 +57,7 @@ const useUserStore = create<UserStore>((set) => ({
             user: userInfo.user,
             isSetUser: true
         });
-        wsCache.set(CACHE_KEY.USER, userInfo?.user);
+        wsCache.set(CACHE_KEY.USER, userInfo);
         wsCache.set(CACHE_KEY.ROLE_ROUTERS, userInfo?.menus);
     },
     loginOut: async () => {

@@ -63,9 +63,9 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             try {
                 const serviceToken = await getAccessToken();
                 if (serviceToken) {
-                    if (!isSetUser && location.pathname !== '/' && location.pathname !== '/login') {
-                        await setUserInfoAction();
-                    }
+                    // if (!isSetUser && location.pathname !== '/' && location.pathname !== '/login') {
+                    await setUserInfoAction();
+                    // }
                     await generateRoutes();
                     // setSession(serviceToken);
                     // const response = await axios.get('/api/account/me');

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
 
 // third-party
 // import { Chance } from 'chance';
@@ -30,6 +30,8 @@ import useRouteStore from 'store/router';
 // import { t } from 'hooks/web/useI18n';
 // import { Typography, useTheme } from '@mui/material';
 import { oriregister } from 'api/login';
+
+import { discountNewUser } from 'api/vip';
 // import * as LoginApi from 'api/login';
 
 // const chance = new Chance();
@@ -181,6 +183,17 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
 
     const updateProfile = () => {};
 
+    //用户信息
+    const [allDetail, setAllDetail] = useState(null);
+    const [pre, setPre] = useState(1);
+    useEffect(() => {
+        const getList = async () => {
+            const result = await discountNewUser();
+            setAllDetail(result);
+        };
+        getList();
+    }, [pre]);
+
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
     }
@@ -195,9 +208,10 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     //     logout();
     //     resetUnauthorized();
     // };
-
     return (
-        <JWTContext.Provider value={{ ...state, login, logout, register, forgotPassword, resetPassword, updateProfile }}>
+        <JWTContext.Provider
+            value={{ ...state, allDetail, pre, setPre, login, logout, register, forgotPassword, resetPassword, updateProfile }}
+        >
             {children}
             {/* <Dialog
                 open={open}
@@ -233,6 +247,11 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             </Dialog> */}
         </JWTContext.Provider>
     );
+};
+
+export const useAllDetail = () => {
+    const allDetail = useContext(JWTContext);
+    return allDetail;
 };
 
 export default JWTContext;

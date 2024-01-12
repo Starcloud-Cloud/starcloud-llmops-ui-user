@@ -31,6 +31,8 @@ import { dispatch } from 'store';
 import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import useUserStore from 'store/user';
+import { useAllDetail } from 'contexts/JWTContext';
+import { deptList } from 'api/section';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -167,6 +169,16 @@ const Cards = ({ flag = false }) => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    //获取切换列表
+    const allDetail = useAllDetail();
+    const [spaceList, setSpaceList] = useState<any[]>([]);
+    useEffect(() => {
+        const getList = async () => {
+            const result = await deptList();
+            setSpaceList(result);
+        };
+        if (flag) getList();
+    }, []);
     return (
         <CardStyle
             sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
@@ -211,7 +223,8 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
-                {flag && permissions.includes('space:member:switch') && (
+                {flag && (
+                    // permissions.includes('space:member:switch') &&
                     <div className="flex items-center gap-2 text-black my-[10px]">
                         <Image
                             onClick={() => navigate('spaceEquity')}
@@ -222,7 +235,7 @@ const Cards = ({ flag = false }) => {
                             src={require('../assets/images/users/avatar-1.png')}
                         />
                         <div className="w-[140px] line-clamp-1 cursor-pointer" onClick={() => navigate('spaceEquity')}>
-                            用户 1001 的空间
+                            {spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.deptName} 的空间
                         </div>
                         <Popover
                             title="我的空间"
@@ -232,15 +245,17 @@ const Cards = ({ flag = false }) => {
                             content={
                                 <div className="w-[250px]">
                                     <Menu
-                                        onClick={() => {}}
+                                        onClick={(e) => {
+                                            console.log(e);
+                                        }}
                                         mode="inline"
-                                        selectedKeys={['mail']}
-                                        items={[
-                                            {
-                                                label: 'Navigation One',
-                                                key: 'mail'
-                                            }
-                                        ]}
+                                        selectedKeys={[allDetail?.allDetail?.deptId?.toString()]}
+                                        items={spaceList?.map((item: any) => {
+                                            return {
+                                                label: item.deptName + ' 的空间',
+                                                key: item.deptId
+                                            };
+                                        })}
                                     />
                                 </div>
                             }

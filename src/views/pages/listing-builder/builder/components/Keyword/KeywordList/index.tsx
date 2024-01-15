@@ -149,7 +149,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
             setFetching(false);
         }, 1000 * 10);
         return () => clearTimeout(timeRef.current);
-    }, []);
+    }, [update]);
 
     // 获取详情
     useEffect(() => {
@@ -206,6 +206,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                     console.error(error);
                 });
         } else {
+            setIsLoading(false);
+            setFetching(false);
             // 初始化分数
             handleReGrade(list);
         }

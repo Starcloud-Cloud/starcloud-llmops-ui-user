@@ -482,7 +482,8 @@ const Price1 = () => {
                                         ...v,
                                         id: item?.skus?.[0]?.id,
                                         payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100
+                                        marketPrice: item.marketPrice / 100,
+                                        unitName: item.unitName
                                     });
                                 }
                             }
@@ -501,8 +502,9 @@ const Price1 = () => {
                                     newList.push({
                                         ...v,
                                         id: item?.skus?.[0]?.id,
-                                        payPrice: (item.price / 100 / 12).toFixed(2),
-                                        marketPrice: item.marketPrice / 100
+                                        payPrice: item.price / 100,
+                                        marketPrice: item.marketPrice / 100,
+                                        unitName: item.unitName
                                     });
                                 }
                             }
@@ -765,7 +767,7 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 {index === 1 || index === 2 || index === 3 ? (
                                                     <div className="text-sm text-center text-[#d7d7d7] line-through">
-                                                        ￥{plan?.marketPrice}/月
+                                                        ￥{plan?.marketPrice}/{plan?.unitName}
                                                     </div>
                                                 ) : (
                                                     <div className="h-[24px]"></div>
@@ -786,7 +788,7 @@ const Price1 = () => {
                                                     {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
                                                     {plan.payPrice}
                                                     {(index === 1 || index === 2 || index === 3) && (
-                                                        <span className="text-[#aaa]">/月</span>
+                                                        <span className="text-[#aaa]">/{plan?.unitName}</span>
                                                     )}
                                                 </Typography>
                                                 <div className="text-[#aaa] text-sm text-center">{plan?.des}</div>

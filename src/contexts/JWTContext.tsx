@@ -113,6 +113,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             if (!isSetUser) {
                 await setUserInfoAction();
                 await generateRoutes();
+                setPre(pre + 1);
             }
             dispatch({
                 type: LOGIN,
@@ -193,8 +194,12 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             const result = await discountNewUser();
             setAllDetail(result);
         };
-        getList();
+        if (location?.pathname !== '/invite') {
+            getList();
+        }
     }, [pre]);
+    //切换部门刷新页面
+    const [invite, setInvite] = useState(0);
 
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
@@ -212,7 +217,20 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     // };
     return (
         <JWTContext.Provider
-            value={{ ...state, allDetail, pre, setPre, login, logout, register, forgotPassword, resetPassword, updateProfile }}
+            value={{
+                ...state,
+                allDetail,
+                pre,
+                invite,
+                setInvite,
+                setPre,
+                login,
+                logout,
+                register,
+                forgotPassword,
+                resetPassword,
+                updateProfile
+            }}
         >
             {children}
             {/* <Dialog

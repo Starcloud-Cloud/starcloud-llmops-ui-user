@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import copy from 'clipboard-copy';
 import straw from '../../assets/images/users/straw.svg';
-import { Upload, UploadProps, Image, ColorPicker, Input, Table, Popover, Popconfirm } from 'antd';
+import { Upload, UploadProps, Image, Select, Input, Table, Popover, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, FormOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -43,7 +43,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import './index.scss';
 import { useAllDetail } from 'contexts/JWTContext';
-import { spaceDetail, spaceUserList } from 'api/section';
+import { spaceDetail, spaceUserList, spaceUpdate, spaceMetadata, spaceRole, spaceRemove } from 'api/section';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -144,6 +144,8 @@ const SpaceEquity = () => {
         onChange(info) {
             if (info.file.status === 'done') {
                 setActive('');
+                console.log(info?.file?.response?.data?.url);
+
                 setimageUrl(info?.file?.response?.data?.url);
             }
         }
@@ -156,28 +158,37 @@ const SpaceEquity = () => {
             nameRef.current.focus();
         }
     }, [nameOpen]);
-    const colorList = [{ color: 'avatar-1.png' }, { color: 'avatar-2.png' }, { color: 'avatar-3.png' }, { color: 'avatar-4.png' }];
-    const getActive = () => {
+    const colorList = [{ color: 'avatar-1' }, { color: 'avatar-2' }, { color: 'avatar-3' }, { color: 'avatar-4' }];
+    const getActive = (active: string) => {
         let image;
         try {
-            image = require('../../assets/images/users/' + active);
+            image = require('../../assets/images/users/' + active + '.png');
         } catch (_) {
             image =
                 'data:image/png;base64,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';
         }
         return image;
     };
+    const [roleList, setRoleList] = useState<any[]>([]);
+    const all_detail = useAllDetail();
     const columns: ColumnsType<any> = [
         {
             title: '用户名称',
-            dataIndex: 'username'
+            align: 'center',
+            render: (_, row) => (
+                <span>
+                    {row.username} {row.userId === all_detail?.allDetail?.id && '(我自己)'}
+                </span>
+            )
         },
         {
             title: '手机号',
+            align: 'center',
             dataIndex: 'mobile'
         },
         {
             title: '已使用魔法豆/图片',
+            align: 'center',
             render: (_, row) => (
                 <span>
                     {row.costPoints}/{row.imageCount}
@@ -186,24 +197,78 @@ const SpaceEquity = () => {
         },
         {
             title: '角色',
-            dataIndex: 'deptRole'
+            align: 'center',
+            render: (_, row) =>
+                row.userId !== all_detail?.allDetail?.id ? (
+                    <Select
+                        className="w-[200px]"
+                        value={row.deptRole && Number(row.deptRole)}
+                        onChange={async (e) => {
+                            const result = await spaceRole(row.userDeptId, e);
+                            if (result) {
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '更新成功',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                        transition: 'SlideDown',
+                                        close: false
+                                    })
+                                );
+                                getTableList();
+                            }
+                        }}
+                    >
+                        {roleList?.map((item: any) => (
+                            <Option key={item.value} value={item.value}>
+                                {item.label}
+                            </Option>
+                        ))}
+                    </Select>
+                ) : (
+                    <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
+                )
         },
         {
             title: '操作',
-            width: 200,
-            render: () => (
-                <Popconfirm
-                    title="移除成员"
-                    description="移除后该成员将无法访问此空间，是否确认移除该成员？"
-                    onConfirm={() => {
-                        console.log(11111);
-                    }}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <Button color="secondary">移除</Button>
-                </Popconfirm>
-            )
+            align: 'center',
+            width: 70,
+            render: (_, row) =>
+                row.userId !== all_detail?.allDetail?.id ? (
+                    <Popconfirm
+                        title="移除成员"
+                        description="移除后该成员将无法访问此空间，是否确认移除该成员？"
+                        onConfirm={async () => {
+                            const result = await spaceRemove(row.userDeptId);
+                            if (result) {
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '删除成功',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                        transition: 'SlideDown',
+                                        close: false
+                                    })
+                                );
+                                getTableList();
+                            }
+                        }}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <Button color="secondary">移除</Button>
+                    </Popconfirm>
+                ) : (
+                    '-'
+                )
         }
     ];
     const [tableData, setTableData] = useState([
@@ -219,16 +284,24 @@ const SpaceEquity = () => {
             consume_total: '1000'
         }
     ]);
-    const all_detail = useAllDetail();
     const getUser = async () => {
         const result = await spaceDetail(all_detail?.allDetail?.deptId);
-        const res = await spaceUserList(all_detail?.allDetail?.deptId);
         setUser(result);
-        setTableData(res);
+    };
+    const getTableList = async () => {
+        const result = await spaceUserList(all_detail?.allDetail?.deptId);
+        setTableData(result);
+    };
+    const getRoleList = async () => {
+        const result = await spaceMetadata();
+        setRoleList(result);
     };
     useEffect(() => {
+        getTableList();
+        getRoleList();
         getUser();
-    }, []);
+    }, [all_detail?.invite]);
+    const { Option } = Select;
     return (
         <Card sx={{ p: 2 }} className="">
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -400,9 +473,22 @@ const SpaceEquity = () => {
                     <Box display="flex" alignItems="center" gap={2}>
                         <div
                             className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white"
-                            onClick={() => setavatarOpen(true)}
+                            onClick={() => {
+                                if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
+                                    setimageUrl(user?.avatar);
+                                } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
+                                    setActive(user?.avatar);
+                                }
+                                setavatarOpen(true);
+                            }}
                         >
-                            <Image width={56} height={56} preview={false} src={imageUrl ? imageUrl : getActive()} alt="" />
+                            <Image
+                                width={56}
+                                height={56}
+                                preview={false}
+                                src={user?.avatar && user?.avatar?.indexOf('https') !== -1 ? user?.avatar : getActive(user?.avatar)}
+                                alt=""
+                            />
                         </div>
                         <div className="flex flex-1 h-full flex-col justify-between">
                             <div className="flex items-center gap-2">
@@ -414,12 +500,25 @@ const SpaceEquity = () => {
                                     <Input
                                         ref={nameRef}
                                         defaultValue={user?.name}
-                                        onBlur={(e) => {
+                                        onBlur={async (e) => {
                                             if (e.target.value) {
-                                                setUser({
-                                                    ...user,
-                                                    name: e.target.value
-                                                });
+                                                const result = await spaceUpdate({ ...user, name: e.target.value });
+                                                if (result) {
+                                                    getUser();
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '更新成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideDown',
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
                                             }
                                             setNameOpen(false);
                                         }}
@@ -455,7 +554,7 @@ const SpaceEquity = () => {
                                             })
                                         );
                                     }}
-                                    sx={{ fontSize: '16px', ml: '10px' }}
+                                    sx={{ fontSize: '16px', ml: '10px', cursor: 'pointer' }}
                                 />
                             </div>
                         </div>
@@ -485,15 +584,13 @@ const SpaceEquity = () => {
                         }
                     >
                         <CardContent>
-                            <div className="flex justify-center">
-                                <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white">
-                                    {imageUrl ? <Image width={56} height={56} preview={false} src={imageUrl} alt="" /> : '用户'}
-                                </div>
-                            </div>
-                            <div className="my-[20px] text-[15px] font-bold">自定义头像颜色</div>
                             <div className="flex justify-center spaceEquity gap-4 text-white">
                                 <Upload {...props} className="!w-[auto] cursor-pointer">
-                                    {uploadButton}
+                                    {imageUrl ? (
+                                        <img className="rounded-full" src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                                    ) : (
+                                        uploadButton
+                                    )}
                                 </Upload>
                                 {colorList.map((item, index) => (
                                     <Image
@@ -505,7 +602,7 @@ const SpaceEquity = () => {
                                             setActive(item.color);
                                             setimageUrl('');
                                         }}
-                                        src={require('../../assets/images/users/' + item.color)}
+                                        src={require('../../assets/images/users/' + item.color + '.png')}
                                         preview={false}
                                         style={{
                                             outlineColor: active === item.color ? '#673ab7' : 'transparent',
@@ -521,9 +618,6 @@ const SpaceEquity = () => {
                                 <Button
                                     type="button"
                                     onClick={() => {
-                                        // setActive('')
-                                        // setimageUrl('')
-                                        // setColor('')
                                         setavatarOpen(false);
                                     }}
                                 >
@@ -533,8 +627,27 @@ const SpaceEquity = () => {
                                     variant="contained"
                                     type="button"
                                     color="secondary"
-                                    onClick={() => {
-                                        setavatarOpen(false);
+                                    onClick={async () => {
+                                        if (imageUrl || active) {
+                                            const result = await spaceUpdate({ ...user, avatar: imageUrl || active });
+                                            if (result) {
+                                                setavatarOpen(false);
+                                                getUser();
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '更新成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideDown',
+                                                        close: false
+                                                    })
+                                                );
+                                            }
+                                        }
                                     }}
                                 >
                                     保存

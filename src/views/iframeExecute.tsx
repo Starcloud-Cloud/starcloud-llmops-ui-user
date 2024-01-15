@@ -60,6 +60,7 @@ const IframeExecute = () => {
     const detailRef: any = useRef(null);
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    const [from, setFrom] = useState('');
     const [loadings, setLoadings] = useState<any[]>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
@@ -140,13 +141,7 @@ const IframeExecute = () => {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2004008003')) {
-                    setTokenOpen(true);
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    return;
-                }
+
                 if (done) {
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
@@ -208,6 +203,13 @@ const IframeExecute = () => {
                                 close: false
                             })
                         );
+                    } else if (bufferObj?.code === 2004008003) {
+                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                        setTokenOpen(true);
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
+                        return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
@@ -288,6 +290,7 @@ const IframeExecute = () => {
                 source="myApp"
             />
             <PermissionUpgradeModal
+                from={from}
                 open={tokenOpen}
                 handleClose={() => setTokenOpen(false)}
                 title={'当前魔法豆不足，升级会员，立享五折优惠！'}

@@ -1671,6 +1671,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                     open={botOpen}
                                     handleClose={() => setBotOpen(false)}
                                     title={`添加文档个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                                    from="usableBotDocument_0"
                                 />
                             )}
                         </MainCard>

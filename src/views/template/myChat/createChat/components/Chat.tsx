@@ -300,6 +300,7 @@ export const Chat = ({
     const [isFreedomChat, setIsFreedomChat] = useState(false);
     const [openChatMask, setOpenChatMask] = useState(false);
     const [visibleTip, setVisibleTip] = useState(false);
+    const [from, setFrom] = useState('');
 
     const { messageData, setMessageData } = useChatMessage();
     const [state, copyToClipboard] = useCopyToClipboard();
@@ -864,6 +865,7 @@ export const Chat = ({
                 copyData[copyData.length - 1].answer = '当前使用的魔法豆不足';
                 copyData[copyData.length - 1].status = 'ERROR';
                 copyData[copyData.length - 1].isNew = false;
+                setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
                 setOpenToken(true);
             } else {
                 console.log('error', bufferObj);
@@ -1790,10 +1792,15 @@ export const Chat = ({
                     </div>
                 </div>
             )}
-            <PermissionUpgradeModal open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
-            <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-            <PermissionUpgradeModal open={openUpgradeSkillModel} handleClose={() => setOpenUpgradeSkillModel(false)} />
+            <PermissionUpgradeModal from={'upgradeWebsearch_0'} open={openUpgradeOnline} handleClose={() => setOpenUpgradeOnline(false)} />
+            <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
             <PermissionUpgradeModal
+                from={'upgradeSkills_0'}
+                open={openUpgradeSkillModel}
+                handleClose={() => setOpenUpgradeSkillModel(false)}
+            />
+            <PermissionUpgradeModal
+                from={from}
                 open={openToken}
                 handleClose={() => setOpenToken(false)}
                 title={'当前魔法豆不足，升级会员，立享五折优惠！'}

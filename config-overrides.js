@@ -20,6 +20,12 @@ module.exports = function override(config) {
         }
     });
 
+    if (config.output) {
+        const version = new Date().getTime();
+        config.output.filename = `static/js/[name].${version}.[contenthash:8].js`;
+        config.output.chunkFilename = `static/js/[name].${version}.[contenthash:8].chunk.js`;
+    }
+
     config.plugins = [
         ...config.plugins,
         new CompressionWebpackPlugin({
@@ -33,31 +39,6 @@ module.exports = function override(config) {
             Buffer: ['buffer', 'Buffer']
         })
     ];
-
-    // config.optimization = {
-    //     usedExports: true,
-    //     splitChunks: {
-    //         chunks: 'all',
-    //         minSize: 30000,
-    //         maxSize: 100000, // 根据需要设置最大大小
-    //         minChunks: 1,
-    //         maxAsyncRequests: 5,
-    //         maxInitialRequests: 3,
-    //         automaticNameDelimiter: '~',
-    //         name: 'mofa',
-    //         cacheGroups: {
-    //             vendors: {
-    //                 test: /[\\/]node_modules[\\/]/,
-    //                 priority: -10
-    //             },
-    //             default: {
-    //                 minChunks: 2, // 根据需要调整引用次数
-    //                 priority: -20,
-    //                 reuseExistingChunk: true
-    //             }
-    //         }
-    //     }
-    // };
 
     return config;
 };

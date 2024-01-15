@@ -306,6 +306,7 @@ let userVip: any;
 const MainLayout = () => {
     const storage = new StorageCache();
     const navigation = getMenuItems();
+    const allDetail = useAllDetail();
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -379,7 +380,7 @@ const MainLayout = () => {
             setNewUserVipOpen(true);
         }
     };
-
+    const [act, setAct] = useState(0);
     useEffect(() => {
         // userVip = setInterval(() => {
         //     handleShowNewUserVip();
@@ -387,11 +388,18 @@ const MainLayout = () => {
         // () => {
         //     clearInterval(userVip);
         //};
-        discountNewUser().then((res) => {
-            if (res.isNewUser) {
+        if (act === 0) {
+            if (allDetail?.allDetail?.isNewUser) {
                 handleShowNewUserVip();
             }
-        });
+        } else {
+            discountNewUser().then((res) => {
+                if (res.isNewUser) {
+                    handleShowNewUserVip();
+                }
+            });
+        }
+        setAct(act + 1);
     }, [location.pathname]);
 
     useEffect(() => {
@@ -415,7 +423,6 @@ const MainLayout = () => {
     }, []);
 
     //绑定手机号
-    const allDetail = useAllDetail();
     const { use, setuse, status, setStatus, userInfo, setUserInfo, twoUser, setTwoUser } = infoStore();
     useEffect(() => {
         return () => {

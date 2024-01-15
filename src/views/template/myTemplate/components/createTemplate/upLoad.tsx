@@ -1357,7 +1357,8 @@ function Upload({
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加群聊个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                    title={`添加微信群聊个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                    from="usableWechatBot_0"
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

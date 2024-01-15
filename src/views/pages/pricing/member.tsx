@@ -45,7 +45,7 @@ import {
     getNewUserProduct
 } from 'api/vip';
 import useAuth from 'hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
 import FooterSection from '../landing/FooterSection';
 import { SectionWrapper } from '../landing/index';
@@ -432,6 +432,10 @@ const Price1 = () => {
 
     const navigate = useNavigate();
 
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const from = searchParams.get('from');
+
     const priceListDisable = {
         opacity: '0.4',
         '& >div> svg': {
@@ -581,7 +585,8 @@ const Price1 = () => {
                     items: [{ skuId: payId, count: 1 }],
                     promoCode: discountCode,
                     pointStatus: false,
-                    deliveryType: 3
+                    deliveryType: 3,
+                    from
                 });
             } else {
                 res = await createOrder({
@@ -589,7 +594,8 @@ const Price1 = () => {
                     items: [{ skuId: payId, count: 1 }],
                     couponId: discountCode,
                     pointStatus: false,
-                    deliveryType: 3
+                    deliveryType: 3,
+                    from
                 });
             }
             if (res) {

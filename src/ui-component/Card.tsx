@@ -229,8 +229,7 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
-                {flag && (
-                    // permissions.includes('space:member:switch') &&
+                {flag && permissions.includes('space:member:switch') && (
                     <div className="flex items-center gap-2 text-black my-[10px]">
                         <Image
                             onClick={() => navigate('spaceEquity')}

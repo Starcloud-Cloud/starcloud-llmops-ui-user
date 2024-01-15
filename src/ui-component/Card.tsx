@@ -19,7 +19,6 @@ import {
 import { Image, Popover, Menu } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { styled, useTheme } from '@mui/material/styles';
-import { userBenefits } from 'api/template';
 import Share from 'assets/images/share/share.png';
 import copy from 'clipboard-copy';
 import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
@@ -28,9 +27,10 @@ import QRCode from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
-import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
+import infoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import useUserStore from 'store/user';
+import { vipSwitch } from 'utils/vipSwtich';
 import { useAllDetail } from 'contexts/JWTContext';
 import { deptList } from 'api/section';
 // styles
@@ -99,7 +99,7 @@ interface BenefitItem {
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
-    const list = info?.benefits?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
+    const list = info?.allDetail?.rights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
     return (
         <Box>
             {list?.map((item: BenefitItem) => (
@@ -113,7 +113,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                         color:
                                             theme.palette.mode === 'dark'
                                                 ? theme.palette.dark.light
-                                                : themesLight(info?.userLevel, theme, 3)
+                                                : themesLight(vipSwitch(info?.allDetail?.levels[0]?.levelId), theme, 3)
                                     }}
                                 >
                                     {t('user.' + item.name)}
@@ -129,7 +129,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                     <Grid item>
                         <Tooltip title={item?.remaining + '/' + item?.totalNum} placement="top">
                             <BorderLinearProgress
-                                level={info?.userLevel}
+                                level={vipSwitch(info?.allDetail?.levels[0]?.levelId)}
                                 variant="determinate"
                                 value={(item?.remaining / item?.totalNum) * 100}
                                 theme={theme}
@@ -144,10 +144,10 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
 
 const Cards = ({ flag = false }) => {
     const permissions = useUserStore((state) => state.permissions);
+    const allDetail = useAllDetail();
     const theme = useTheme();
     const { use } = infoStore();
     const navigate = useNavigate();
-    const { userInfo, setUserInfo }: any = userInfoStore();
     const copyCode = () => {
         copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         dispatch(
@@ -158,19 +158,13 @@ const Cards = ({ flag = false }) => {
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
     };
     const [open, setOpen] = useState(false);
-    useEffect(() => {
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
     //获取切换列表
-    const allDetail = useAllDetail();
     const [spaceList, setSpaceList] = useState<any[]>([]);
     useEffect(() => {
         const getList = async () => {
@@ -182,7 +176,7 @@ const Cards = ({ flag = false }) => {
     return (
         <CardStyle
             sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
-            level={userInfo?.userLevel}
+            level={vipSwitch(allDetail?.allDetail?.levels[0]?.levelId)}
             theme={theme}
         >
             <CardContent sx={{ p: '16px !important' }}>
@@ -191,11 +185,11 @@ const Cards = ({ flag = false }) => {
                         <ListItemText sx={{ mt: 0 }}>
                             <Box display="inline-block" padding="4px 10px" border="1px solid #bdbdbd" borderRadius="5px">
                                 {/* {userInfo?.userLevel ? t('user.' + userInfo?.userLevel) : t('user.free')} */}
-                                {userInfo?.userLevelName}
+                                {allDetail?.allDetail?.levels[0]?.levelName}
                             </Box>
                         </ListItemText>
                         <ListItemText sx={{ mt: 0 }}>
-                            {userInfo?.userLevel !== 'pro' && (
+                            {vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) !== 'pro' && (
                                 <Button
                                     onClick={() => {
                                         navigate('/exchange');
@@ -204,15 +198,15 @@ const Cards = ({ flag = false }) => {
                                     variant="contained"
                                     sx={{ boxShadow: 'none' }}
                                     color={
-                                        userInfo?.userLevel === 'free'
+                                        vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'free'
                                             ? 'primary'
-                                            : userInfo?.userLevel === 'basic'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'basic'
                                             ? 'secondary'
-                                            : userInfo?.userLevel === 'plus'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'plus'
                                             ? 'warning'
-                                            : userInfo?.userLevel === 'media'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'media'
                                             ? 'success'
-                                            : userInfo?.userLevel === 'pro'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'pro'
                                             ? 'warning'
                                             : 'primary'
                                     }
@@ -267,7 +261,7 @@ const Cards = ({ flag = false }) => {
                         </Popover>
                     </div>
                 )}
-                <LinearProgressWithLabel info={userInfo} />
+                <LinearProgressWithLabel info={allDetail} />
                 {flag && (
                     <Box mt={1} color={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black}>
                         <Divider sx={{ mb: 1 }} />

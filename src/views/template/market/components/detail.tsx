@@ -18,8 +18,7 @@ import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
 import useCategory from 'hooks/useCategory';
@@ -37,7 +36,7 @@ interface AppModels {
 }
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const { categoryTrees } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const location = useLocation();
@@ -106,9 +105,7 @@ function Deatail() {
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfo(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detailData.workflowConfig.steps.length - 1 &&
@@ -123,8 +120,6 @@ function Deatail() {
                     break;
                 }
                 let str = textDecoder.decode(value);
-                console.log(str);
-
                 const lines = str.split('\n');
                 lines.forEach((message, i: number) => {
                     if (i === 0 && joins) {

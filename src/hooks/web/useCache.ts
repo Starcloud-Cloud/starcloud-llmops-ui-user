@@ -8,7 +8,7 @@ type CacheType = 'localStorage' | 'sessionStorage';
 
 export const CACHE_KEY = {
     IS_DARK: 'isDark',
-    USER: 'user',
+    USER: 'permissionInfo',
     LANG: 'lang',
     THEME: 'theme',
     LAYOUT: 'layout',

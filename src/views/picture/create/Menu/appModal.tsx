@@ -29,8 +29,7 @@ import { listMarketAppOption, marketDeatail } from 'api/template';
 import Perform from 'views/template/carryOut/perform';
 import nothing from 'assets/images/upLoad/nothing.svg';
 import _ from 'lodash-es';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import formatDate from 'hooks/useDate';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Details {
@@ -68,7 +67,7 @@ const AppModal = ({
     setOpen: (data: boolean) => void;
     emits: (data: any) => void;
 }) => {
-    const { userInfo, setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     useEffect(() => {
         if (open && tags.length > 0) {
             const fn = async () => {
@@ -217,9 +216,7 @@ const AppModal = ({
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfos(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -292,10 +289,6 @@ const AppModal = ({
             }
         };
         fetchData();
-    };
-    useEffect(() => {}, [userInfo]);
-    const setUserInfos = (res: any) => {
-        setUserInfo(res);
     };
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {

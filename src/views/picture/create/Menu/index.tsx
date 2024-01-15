@@ -16,10 +16,9 @@ import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
-import { userBenefits } from 'api/template';
+import { useAllDetail } from 'contexts/JWTContext';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
-import userInfoStore from 'store/entitlementAction';
 import { containsChineseCharactersAndSymbols, removeFalseProperties } from 'utils/validate';
 import { createText2Img, variantsImage, getImgMeta, translateText } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
@@ -175,6 +174,7 @@ export const PictureCreateMenu = ({
     inputValueTranslate,
     mode
 }: IPictureCreateMenuProps) => {
+    const allDetail = useAllDetail();
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
     const [voidInputValue, setVoidInputValue] = useState('');
@@ -222,7 +222,6 @@ export const PictureCreateMenu = ({
     };
 
     const size = useWindowSize();
-    const { setUserInfo }: any = userInfoStore();
 
     useEffect(() => {
         if (params?.stylePreset) {
@@ -371,8 +370,7 @@ export const PictureCreateMenu = ({
                     appUid: 'VARIANTS_IMAGE',
                     imageRequest: removeFalseProperties(imageRequest)
                 });
-                const benefitsRes = await userBenefits();
-                setUserInfo(benefitsRes);
+                allDetail?.setPre(allDetail?.pre + 1);
 
                 setIsFetch(false);
                 setIsFirst(false);
@@ -383,9 +381,7 @@ export const PictureCreateMenu = ({
                     appUid: 'GENERATE_IMAGE',
                     imageRequest: removeFalseProperties(imageRequest)
                 });
-                const benefitsRes = await userBenefits();
-                setUserInfo(benefitsRes);
-
+                allDetail?.setPre(allDetail?.pre + 1);
                 setIsFetch(false);
                 setIsFirst(false);
                 setImgList([res?.response, ...imgList] || []);

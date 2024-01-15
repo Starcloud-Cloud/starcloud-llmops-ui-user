@@ -18,7 +18,7 @@ import marketStore from 'store/market';
 import myApp from 'store/myApp';
 import { Item } from 'types/template';
 import { t } from 'hooks/web/useI18n';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import './index.css';
@@ -140,16 +140,18 @@ function MyTemplate() {
         setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
     };
     const [botOpen, setBotOpen] = useState(false);
-    const { userInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const { user } = useUserStore();
     //弹窗
     const handleDetail = (data: { uid: string }) => {
         if (
-            userInfo?.levelConfig?.usableApp === -1 ||
-            totalList.filter((item) => Number(item.creator) === user.id).length < userInfo?.levelConfig?.usableApp
+            allDetail?.allDetail?.levels[0]?.levelConfig?.usableApp === -1 ||
+            totalList.filter((item) => Number(item.creator) === user.id).length < allDetail?.allDetail?.levels[0]?.levelConfig?.usableApp
         ) {
             navigate('/createApp?recommend=' + data.uid);
-        } else if (totalList.filter((item) => Number(item.creator) === user.id).length >= userInfo?.levelConfig?.usableApp) {
+        } else if (
+            totalList.filter((item) => Number(item.creator) === user.id).length >= allDetail?.allDetail?.levels[0]?.levelConfig?.usableApp
+        ) {
             setBotOpen(true);
         }
     };
@@ -278,7 +280,7 @@ function MyTemplate() {
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加应用个数(${userInfo?.levelConfig?.usableApp})已用完`}
+                    title={`添加应用个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableApp})已用完`}
                 />
             )}
             {totals > 0 && (

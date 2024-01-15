@@ -34,9 +34,9 @@ import { isMobile } from 'react-device-detect';
 import React from 'react';
 import { ListingProvider } from 'contexts/ListingContext';
 import { NewUserVip } from 'ui-component/new-user-vip';
-import userInfoStore from 'store/entitlementAction';
 import StorageCache from 'web-storage-cache';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { useAllDetail } from 'contexts/JWTContext';
 
 interface MainStyleProps {
     theme: Theme;
@@ -415,6 +415,7 @@ const MainLayout = () => {
     }, []);
 
     //绑定手机号
+    const allDetail = useAllDetail();
     const { use, setuse, status, setStatus, userInfo, setUserInfo, twoUser, setTwoUser } = infoStore();
     useEffect(() => {
         return () => {
@@ -423,13 +424,13 @@ const MainLayout = () => {
         };
     }, []);
     useEffect(() => {
-        if (userInfo?.benefits) {
+        if (allDetail?.allDetail?.rights) {
             if (status) {
                 if (
                     use?.mobile === '' &&
                     !storage.get('phonenumber') &&
                     !use?.mobile &&
-                    JSON.stringify(twoUser) !== JSON.stringify(userInfo?.benefits)
+                    JSON.stringify(twoUser) !== JSON.stringify(allDetail?.allDetail?.rights)
                 ) {
                     setPhoneOpen(true);
                 } else {
@@ -437,10 +438,10 @@ const MainLayout = () => {
                 }
             } else {
                 setStatus(true);
-                setTwoUser(userInfo?.benefits);
+                setTwoUser(allDetail?.allDetail?.rights);
             }
         }
-    }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);
+    }, [JSON.stringify(allDetail?.allDetail?.rights?.map((item: any) => item.usedNum))]);
     const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 

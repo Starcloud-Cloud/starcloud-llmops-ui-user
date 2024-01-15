@@ -18,15 +18,14 @@ import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import { upscale } from 'api/picture/images';
 import downLoadImages from 'hooks/useDownLoadImage';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import { formatNumber } from 'hooks/useDate';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
     //抠图完成的图片
@@ -139,15 +138,11 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
             });
             suRef.current.splice(index, 1, res.response);
             setSucImageList(_.cloneDeep(suRef.current));
-            userBenefits().then((res) => {
-                setUserInfo(res);
-            });
+            allDetail?.setPre(allDetail?.pre + 1);
         } catch (err) {
             suRef.current.splice(index, 1, { images: [{ url: 'error' }] });
             setSucImageList(_.cloneDeep(suRef.current));
-            userBenefits().then((res) => {
-                setUserInfo(res);
-            });
+            allDetail?.setPre(allDetail?.pre + 1);
         }
     };
     useEffect(() => {

@@ -26,7 +26,7 @@ import Template from './template';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import myChat from 'store/myChat';
 import { UpgradeModel } from './upgradeRobotModel';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import useUserStore from 'store/user';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
@@ -44,14 +44,14 @@ export default function FormDialogNew({
     handleOk: (uid: string) => void;
     setValue: (value: string) => void;
 }) {
+    const allDetail = useAllDetail();
     const [checked, setChecked] = useState(false);
     const [recommendList, setRecommends] = useState([]);
     const [uid, setUid] = useState('');
     const theme = useTheme();
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
-    const { userInfo }: any = userInfoStore();
-    const totalNum = userInfo?.levelConfig?.usableBasicBot || 0;
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableBasicBot || 0;
 
     const { user } = useUserStore();
 

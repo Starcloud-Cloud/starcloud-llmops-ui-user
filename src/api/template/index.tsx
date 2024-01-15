@@ -21,11 +21,7 @@ export const delMarket = (uid: any) => {
     return request.delete({ url: `/llm/app/market/delete/${uid}` });
 };
 
-// //获取等级
-// export const userBenefits = () => {
-//     return request.post({ url: '/llm/user-benefits/info' });
-// };
-
+//获取等级
 export const userBenefits = async () => {
     const res = await request.get({ url: '/llm/auth/user/all_detail' });
     const { rights, levels } = res;

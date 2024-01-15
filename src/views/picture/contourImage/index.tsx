@@ -11,14 +11,13 @@ import { EyeOutlined } from '@ant-design/icons';
 import ImageDetail from '../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
 import SubCard from 'ui-component/cards/SubCard';
-import { userBenefits } from 'api/template';
 import { getImgMeta } from 'api/picture/create';
 import { translateText } from 'api/picture/create';
-import userInfoStore from 'store/entitlementAction';
 import AppModal from '../create/Menu/appModal';
 import { formatNumber } from 'hooks/useDate';
+import { useAllDetail } from 'contexts/JWTContext';
 const ContourImage = () => {
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const navigate = useNavigate();
     const [descOpen, setDescOpen] = useState(false);
     const [desc, setDesc] = useState('');
@@ -302,9 +301,7 @@ const ContourImage = () => {
                                     if (res) {
                                         setLoading(false);
                                         setResult(res.response);
-                                        userBenefits().then((res) => {
-                                            setUserInfo(res);
-                                        });
+                                        allDetail?.setPre(allDetail?.pre + 1);
                                     }
                                 } catch (err) {
                                     setLoading(false);

@@ -17,7 +17,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
         newData.id = temp.id;
-        newData.variableList = temp.variableList;
+        newData.variables = temp.variables;
         setData(newData);
         setOpen(false);
     };
@@ -60,7 +60,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 {imageStyleData?.id && (
                     <div>
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variableList?.map(
+                            {imageStyleData?.variables?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
                                         <Col key={index} sm={12} xs={24} md={6}>
@@ -69,7 +69,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 index={index}
                                                 changeValue={(data: any) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.variableList[data.index].value = data.value;
+                                                    newData.variables[data.index].value = data.value;
                                                     setData(newData);
                                                 }}
                                                 item={el}

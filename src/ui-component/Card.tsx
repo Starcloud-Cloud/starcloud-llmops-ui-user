@@ -14,9 +14,11 @@ import {
     ListItemText,
     Tooltip,
     Typography,
-    linearProgressClasses
+    linearProgressClasses,
+    Backdrop,
+    CircularProgress
 } from '@mui/material';
-import { Image, Popover, Menu, Spin } from 'antd';
+import { Image, Popover, Menu } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { styled, useTheme } from '@mui/material/styles';
 import Share from 'assets/images/share/share.png';
@@ -256,27 +258,33 @@ const Cards = ({ flag = false }) => {
                             arrow={false}
                             zIndex={9999}
                             content={
-                                <div className="w-[250px]">
-                                    <Menu
-                                        onClick={async (e) => {
-                                            setCheckoutLoading(true);
-                                            await spaceCheckout(e?.key);
-                                            allDetail?.setPre(allDetail?.pre + 1);
-                                            setTimeout(() => {
-                                                allDetail?.setInvite(allDetail?.invite + 1);
-                                            }, 1000);
-                                            setCheckoutLoading(false);
-                                        }}
-                                        mode="inline"
-                                        selectedKeys={[allDetail?.allDetail?.deptId?.toString()]}
-                                        items={spaceList?.map((item: any) => {
-                                            return {
-                                                label: item.deptName + ' 的空间',
-                                                key: item.deptId
-                                            };
-                                        })}
-                                    />
-                                </div>
+                                <>
+                                    <div className="w-[250px]">
+                                        <Menu
+                                            onClick={async (e) => {
+                                                setCheckoutLoading(true);
+                                                await spaceCheckout(e?.key);
+                                                allDetail?.setPre(allDetail?.pre + 1);
+                                                setTimeout(() => {
+                                                    allDetail?.setInvite(allDetail?.invite + 1);
+                                                }, 1000);
+                                                setCheckoutLoading(false);
+                                                setOpen(false);
+                                            }}
+                                            mode="inline"
+                                            selectedKeys={[allDetail?.allDetail?.deptId?.toString()]}
+                                            items={spaceList?.map((item: any) => {
+                                                return {
+                                                    label: item.deptName + ' 的空间',
+                                                    key: item.deptId
+                                                };
+                                            })}
+                                        />
+                                    </div>
+                                    <Backdrop sx={{ color: '#fff', zIndex: 9999 }} open={checkLoading}>
+                                        <CircularProgress color="inherit" />
+                                    </Backdrop>
+                                </>
                             }
                             trigger="click"
                             open={open}

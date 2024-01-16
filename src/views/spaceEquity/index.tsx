@@ -25,7 +25,7 @@ import copy from 'clipboard-copy';
 import straw from '../../assets/images/users/straw.svg';
 import { Upload, UploadProps, Image, Select, Input, Table, Popover, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, FormOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, SettingOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { useEffect, useState, useRef } from 'react';
 import SubCard from 'ui-component/cards/SubCard';
@@ -43,6 +43,8 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import './index.scss';
 import { useAllDetail } from 'contexts/JWTContext';
+import _ from 'lodash-es';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { spaceDetail, spaceUserList, spaceUpdate, spaceMetadata, spaceRole, spaceRemove } from 'api/section';
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -150,14 +152,18 @@ const SpaceEquity = () => {
             }
         }
     };
-    const [nameOpen, setNameOpen] = useState(false);
-    const nameRef: any = useRef(null);
-    const [user, setUser] = useState<any>(null);
-    useEffect(() => {
-        if (nameOpen) {
-            nameRef.current.focus();
+    //添加成员
+    const [inviteLinkOpen, setInviteLinkOpen] = useState(false);
+    const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
+    const addMember = () => {
+        if (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers > tableData?.length) {
+            setInviteLinkOpen(true);
+        } else {
+            setOpenUpgradeModel(true);
         }
-    }, [nameOpen]);
+    };
+    const [user, setUser] = useState<any>(null);
+    const [params, setParams] = useState<any>(null);
     const colorList = [{ color: 'avatar-1' }, { color: 'avatar-2' }, { color: 'avatar-3' }, { color: 'avatar-4' }];
     const getActive = (active: string) => {
         let image;
@@ -199,7 +205,7 @@ const SpaceEquity = () => {
             title: '角色',
             align: 'center',
             render: (_, row) =>
-                row.userId !== all_detail?.allDetail?.id ? (
+                row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
                     <Select
                         className="w-[200px]"
                         value={row.deptRole && Number(row.deptRole)}
@@ -238,7 +244,7 @@ const SpaceEquity = () => {
             align: 'center',
             width: 70,
             render: (_, row) =>
-                row.userId !== all_detail?.allDetail?.id ? (
+                row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
                     <Popconfirm
                         title="移除成员"
                         description="移除后该成员将无法访问此空间，是否确认移除该成员？"
@@ -271,19 +277,7 @@ const SpaceEquity = () => {
                 )
         }
     ];
-    const [tableData, setTableData] = useState([
-        {
-            nickname: '张三',
-            mobile: '138****8888',
-            consume_total: '100',
-            role: '超级管理员'
-        },
-        {
-            nickname: '李四',
-            mobile: '138****8888',
-            consume_total: '1000'
-        }
-    ]);
+    const [tableData, setTableData] = useState([]);
     const getUser = async () => {
         const result = await spaceDetail(all_detail?.allDetail?.deptId);
         setUser(result);
@@ -468,20 +462,10 @@ const SpaceEquity = () => {
             <CustomTabPanel value={value} index={0}>
                 <SubCard
                     sx={{ p: '0 !important', background: '#ede7f6', mb: 2 }}
-                    contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between' }}
+                    contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between', alignItem: 'center' }}
                 >
                     <Box display="flex" alignItems="center" gap={2}>
-                        <div
-                            className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white"
-                            onClick={() => {
-                                if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
-                                    setimageUrl(user?.avatar);
-                                } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
-                                    setActive(user?.avatar);
-                                }
-                                setavatarOpen(true);
-                            }}
-                        >
+                        <div className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white">
                             <Image
                                 width={56}
                                 height={56}
@@ -490,75 +474,34 @@ const SpaceEquity = () => {
                                 alt=""
                             />
                         </div>
-                        <div className="flex flex-1 h-full flex-col justify-between">
-                            <div className="flex items-center gap-2">
-                                {!nameOpen ? (
-                                    <Typography ml={1} color="#697586">
-                                        {user?.name}
-                                    </Typography>
-                                ) : (
-                                    <Input
-                                        ref={nameRef}
-                                        defaultValue={user?.name}
-                                        onBlur={async (e) => {
-                                            if (e.target.value) {
-                                                const result = await spaceUpdate({ ...user, name: e.target.value });
-                                                if (result) {
-                                                    getUser();
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '更新成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideDown',
-                                                            close: false
-                                                        })
-                                                    );
-                                                }
-                                            }
-                                            setNameOpen(false);
-                                        }}
-                                        showCount
-                                        maxLength={20}
-                                        className="w-[600px]"
-                                    />
-                                )}
-                                {!nameOpen && <FormOutlined onClick={() => setNameOpen(true)} className="cursor-pointer" rev={undefined} />}
-                            </div>
-                            <div className="flex items-end">
-                                <span className="font-bold">
-                                    添加成员链接
-                                    <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
-                                        <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
-                                    </Popover>
-                                </span>
-                                {window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode}
-                                <ContentCopyIcon
-                                    onClick={() => {
-                                        copy(window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode);
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '复制成功',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'success'
-                                                },
-                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                transition: 'SlideDown',
-                                                close: false
-                                            })
-                                        );
-                                    }}
-                                    sx={{ fontSize: '16px', ml: '10px', cursor: 'pointer' }}
-                                />
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <Typography ml={1} className="font-bold">
+                                {user?.name}
+                            </Typography>
+                            <SettingOutlined
+                                onClick={() => {
+                                    if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
+                                        setimageUrl(user?.avatar);
+                                    } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
+                                        setActive(user?.avatar);
+                                    }
+                                    setParams(_.cloneDeep(user));
+                                    setavatarOpen(true);
+                                }}
+                                className="cursor-pointer"
+                                rev={undefined}
+                            />
                         </div>
                     </Box>
+                    <div className="flex items-center">
+                        （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 1)}）
+                        <div
+                            onClick={addMember}
+                            className="py-2 px-6 text-[#7C5CFC] text-sm bg-[#fff] rounded-lg cursor-pointer lg:text-xs shrink-0 hover:opacity-80"
+                        >
+                            添加成员
+                        </div>
+                    </div>
                 </SubCard>
                 <Table columns={columns} dataSource={tableData} />
                 <Modals
@@ -584,6 +527,20 @@ const SpaceEquity = () => {
                         }
                     >
                         <CardContent>
+                            <div className="font-[500] text-[14px] mb-[20px]">部门名称</div>
+                            <Input
+                                value={params?.name}
+                                onChange={(e) => {
+                                    setParams({
+                                        ...params,
+                                        name: e.target.value
+                                    });
+                                }}
+                                showCount
+                                maxLength={20}
+                                className="w-[600px]"
+                            />
+                            <div className="font-[500] text-[14px] my-[20px]">部门头像</div>
                             <div className="flex justify-center spaceEquity gap-4 text-white">
                                 <Upload {...props} className="!w-[auto] cursor-pointer">
                                     {imageUrl ? (
@@ -628,25 +585,37 @@ const SpaceEquity = () => {
                                     type="button"
                                     color="secondary"
                                     onClick={async () => {
-                                        if (imageUrl || active) {
-                                            const result = await spaceUpdate({ ...user, avatar: imageUrl || active });
-                                            if (result) {
-                                                setavatarOpen(false);
-                                                getUser();
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '更新成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideDown',
-                                                        close: false
-                                                    })
-                                                );
-                                            }
+                                        if ((imageUrl || active) && params?.name) {
+                                            await spaceUpdate({ ...params, avatar: imageUrl || active });
+                                            setavatarOpen(false);
+                                            getUser();
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '更新成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
+                                        } else {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '部门名称和部门头像必填',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'error'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
                                         }
                                     }}
                                 >
@@ -656,6 +625,63 @@ const SpaceEquity = () => {
                         </CardActions>
                     </MainCard>
                 </Modals>
+                <Modals
+                    open={inviteLinkOpen}
+                    onClose={() => setInviteLinkOpen(false)}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
+                    <MainCard
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '50%',
+                            transform: 'translate(-50%,0%)'
+                        }}
+                        title={'添加成员'}
+                        content={false}
+                        className="sm:w-[700px] xs:w-[300px]"
+                        secondary={
+                            <IconButton onClick={() => setInviteLinkOpen(false)} size="large" aria-label="close modal">
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                        }
+                    >
+                        <CardContent>
+                            <div className="flex items-center justify-center mb-[20px]">
+                                <span className="font-bold">
+                                    添加成员链接
+                                    <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
+                                        <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
+                                    </Popover>
+                                </span>
+                                {window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode}
+                                <ContentCopyIcon
+                                    onClick={() => {
+                                        copy(window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode);
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '复制成功',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'success'
+                                                },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
+                                                close: false
+                                            })
+                                        );
+                                    }}
+                                    sx={{ fontSize: '16px', ml: '10px', cursor: 'pointer' }}
+                                />
+                            </div>
+                        </CardContent>
+                    </MainCard>
+                </Modals>
+                {openUpgradeModel && (
+                    <PermissionUpgradeModal from={'upgradeTeam'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+                )}
             </CustomTabPanel>
         </Card>
     );

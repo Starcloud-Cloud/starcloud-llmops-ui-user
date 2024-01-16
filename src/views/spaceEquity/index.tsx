@@ -128,7 +128,7 @@ const SpaceEquity = () => {
     //用户设置
     const [avatarOpen, setavatarOpen] = useState(false);
     const [imageUrl, setimageUrl] = useState('');
-    const [active, setActive] = useState('');
+    const [active, setActive] = useState<string | null>(null);
     const uploadButton = (
         <button style={{ border: 0, background: 'none' }} type="button">
             <PlusOutlined rev={undefined} />
@@ -145,7 +145,7 @@ const SpaceEquity = () => {
         maxCount: 20,
         onChange(info) {
             if (info.file.status === 'done') {
-                setActive('');
+                setActive(null);
                 console.log(info?.file?.response?.data?.url);
 
                 setimageUrl(info?.file?.response?.data?.url);
@@ -179,11 +179,11 @@ const SpaceEquity = () => {
     const all_detail = useAllDetail();
     const columns: ColumnsType<any> = [
         {
-            title: '用户名称',
+            title: '用户昵称',
             align: 'center',
             render: (_, row) => (
                 <span>
-                    {row.username} {row.userId === all_detail?.allDetail?.id && '(我自己)'}
+                    {row.nickname} {row.userId === all_detail?.allDetail?.id && '(我自己)'}
                 </span>
             )
         },
@@ -294,7 +294,7 @@ const SpaceEquity = () => {
         getTableList();
         getRoleList();
         getUser();
-    }, [all_detail?.invite]);
+    }, []);
     const { Option } = Select;
     return (
         <Card sx={{ p: 2 }} className="">
@@ -465,22 +465,29 @@ const SpaceEquity = () => {
                     contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between', alignItem: 'center' }}
                 >
                     <Box display="flex" alignItems="center" gap={2}>
-                        <div className="w-[56px] h-[56px] rounded-full overflow-hidden cursor-pointer flex justify-center items-center text-white">
-                            <Image
-                                width={56}
-                                height={56}
-                                preview={false}
-                                src={user?.avatar && user?.avatar?.indexOf('https') !== -1 ? user?.avatar : getActive(user?.avatar)}
-                                alt=""
-                            />
+                        <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white bg-[#62d078]">
+                            {user?.avatar ? (
+                                <Image
+                                    width={56}
+                                    height={56}
+                                    preview={false}
+                                    src={user?.avatar && user?.avatar?.indexOf('https') !== -1 ? user?.avatar : getActive(user?.avatar)}
+                                    alt=""
+                                />
+                            ) : (
+                                '空间'
+                            )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-4">
                             <Typography ml={1} className="font-bold">
                                 {user?.name}
                             </Typography>
+
                             <SettingOutlined
                                 onClick={() => {
-                                    if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
+                                    if (!user?.avatar) {
+                                        setActive('');
+                                    } else if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
                                         setimageUrl(user?.avatar);
                                     } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
                                         setActive(user?.avatar);
@@ -494,7 +501,7 @@ const SpaceEquity = () => {
                         </div>
                     </Box>
                     <div className="flex items-center">
-                        （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 1)}）
+                        （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 0)}）
                         <div
                             onClick={addMember}
                             className="py-2 px-6 text-[#7C5CFC] text-sm bg-[#fff] rounded-lg cursor-pointer lg:text-xs shrink-0 hover:opacity-80"
@@ -517,7 +524,7 @@ const SpaceEquity = () => {
                             left: '50%',
                             transform: 'translate(-50%,0%)'
                         }}
-                        title={'选择头像'}
+                        title={'空间设置'}
                         content={false}
                         className="sm:w-[700px] xs:w-[300px]"
                         secondary={
@@ -527,7 +534,7 @@ const SpaceEquity = () => {
                         }
                     >
                         <CardContent>
-                            <div className="font-[500] text-[14px] mb-[20px]">部门名称</div>
+                            <div className="font-[500] text-[14px] mb-[20px]">空间名称</div>
                             <Input
                                 value={params?.name}
                                 onChange={(e) => {
@@ -540,7 +547,7 @@ const SpaceEquity = () => {
                                 maxLength={20}
                                 className="w-[600px]"
                             />
-                            <div className="font-[500] text-[14px] my-[20px]">部门头像</div>
+                            <div className="font-[500] text-[14px] my-[20px]">空间头像</div>
                             <div className="flex justify-center spaceEquity gap-4 text-white">
                                 <Upload {...props} className="!w-[auto] cursor-pointer">
                                     {imageUrl ? (
@@ -549,6 +556,18 @@ const SpaceEquity = () => {
                                         uploadButton
                                     )}
                                 </Upload>
+                                <div
+                                    onClick={() => {
+                                        setActive('');
+                                        setimageUrl('');
+                                    }}
+                                    className="w-[56px] h-[56px] cursor-pointer outline-2 outline outline-offset-2 rounded-full bg-[#62d078] flex justify-center items-center"
+                                    style={{
+                                        outlineColor: active === '' ? '#673ab7' : 'transparent'
+                                    }}
+                                >
+                                    空间
+                                </div>
                                 {colorList.map((item, index) => (
                                     <Image
                                         key={index}
@@ -585,7 +604,7 @@ const SpaceEquity = () => {
                                     type="button"
                                     color="secondary"
                                     onClick={async () => {
-                                        if ((imageUrl || active) && params?.name) {
+                                        if (params?.name) {
                                             await spaceUpdate({ ...params, avatar: imageUrl || active });
                                             setavatarOpen(false);
                                             getUser();
@@ -606,7 +625,7 @@ const SpaceEquity = () => {
                                             dispatch(
                                                 openSnackbar({
                                                     open: true,
-                                                    message: '部门名称和部门头像必填',
+                                                    message: '部门名称必填',
                                                     variant: 'alert',
                                                     alert: {
                                                         color: 'error'
@@ -680,7 +699,12 @@ const SpaceEquity = () => {
                     </MainCard>
                 </Modals>
                 {openUpgradeModel && (
-                    <PermissionUpgradeModal from={'upgradeTeam'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+                    <PermissionUpgradeModal
+                        title={'您暂无法增加新成员，升级会员，立享五折优惠！'}
+                        from={'upgradeTeam'}
+                        open={openUpgradeModel}
+                        handleClose={() => setOpenUpgradeModel(false)}
+                    />
                 )}
             </CustomTabPanel>
         </Card>

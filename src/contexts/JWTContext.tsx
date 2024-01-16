@@ -198,8 +198,6 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             getList();
         }
     }, [pre]);
-    //切换部门刷新页面
-    const [invite, setInvite] = useState(0);
 
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
@@ -221,8 +219,6 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                 ...state,
                 allDetail,
                 pre,
-                invite,
-                setInvite,
                 setPre,
                 login,
                 logout,

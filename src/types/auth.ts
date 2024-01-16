@@ -43,8 +43,6 @@ export type JWTContextType = {
     user?: UserProfile | null | undefined;
     allDetail?: any;
     pre: number;
-    invite: number;
-    setInvite: (data: number) => void;
     setPre: (data: number) => void;
     logout: () => void;
     login: () => Promise<void>;

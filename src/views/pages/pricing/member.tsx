@@ -487,7 +487,7 @@ const Price1 = () => {
                                         payPrice: item.price / 100,
                                         marketPrice: item.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig.isSubscribe
+                                        isSubscribe: item.subscribeConfig?.isSubscribe
                                     });
                                 }
                             }
@@ -509,7 +509,7 @@ const Price1 = () => {
                                         payPrice: item.price / 100,
                                         marketPrice: item.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig.isSubscribe
+                                        isSubscribe: item.subscribeConfig?.isSubscribe
                                     });
                                 }
                             }

@@ -200,7 +200,7 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    {currentSelect.isSubscribe && (
+                                    {currentSelect?.isSubscribe && (
                                         <Tab
                                             label={
                                                 <div className="flex justify-center items-center">

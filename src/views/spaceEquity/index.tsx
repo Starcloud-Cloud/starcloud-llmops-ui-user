@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import copy from 'clipboard-copy';
 import straw from '../../assets/images/users/straw.svg';
-import { Upload, UploadProps, Image, Select, Input, Table, Popover, Popconfirm } from 'antd';
+import { Upload, UploadProps, Image, Select, Input, Table, Popover, Popconfirm, Radio } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, SettingOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -164,7 +164,13 @@ const SpaceEquity = () => {
     };
     const [user, setUser] = useState<any>(null);
     const [params, setParams] = useState<any>(null);
-    const colorList = [{ color: 'avatar-1' }, { color: 'avatar-2' }, { color: 'avatar-3' }, { color: 'avatar-4' }];
+    const colorList = [
+        { color: 'avatar-20' },
+        { color: 'avatar-21' },
+        { color: 'avatar-22' },
+        { color: 'avatar-23' },
+        { color: 'avatar-24' }
+    ];
     const getActive = (active: string) => {
         let image;
         try {
@@ -465,8 +471,8 @@ const SpaceEquity = () => {
                     contentSX={{ p: '16px !important', display: 'flex', justifyContent: 'space-between', alignItem: 'center' }}
                 >
                     <Box display="flex" alignItems="center" gap={2}>
-                        <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white bg-[#62d078]">
-                            {user?.avatar ? (
+                        {user?.avatar ? (
+                            <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center border border-solid border-white">
                                 <Image
                                     width={56}
                                     height={56}
@@ -474,10 +480,12 @@ const SpaceEquity = () => {
                                     src={user?.avatar && user?.avatar?.indexOf('https') !== -1 ? user?.avatar : getActive(user?.avatar)}
                                     alt=""
                                 />
-                            ) : (
-                                '空间'
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white bg-[#62d078]">
+                                空间
+                            </div>
+                        )}
                         <div className="flex items-center gap-4">
                             <Typography ml={1} className="font-bold">
                                 {user?.name}
@@ -578,7 +586,7 @@ const SpaceEquity = () => {
                                             setActive(item.color);
                                             setimageUrl('');
                                         }}
-                                        src={require('../../assets/images/users/' + item.color + '.png')}
+                                        src={getActive(item?.color)}
                                         preview={false}
                                         style={{
                                             outlineColor: active === item.color ? '#673ab7' : 'transparent',
@@ -657,7 +665,12 @@ const SpaceEquity = () => {
                             left: '50%',
                             transform: 'translate(-50%,0%)'
                         }}
-                        title={'添加成员'}
+                        title={
+                            <>
+                                <div>添加成员</div>
+                                <div className="text-[#9DA3AF] text-xs">对方登录后打开链接，点击“确认”，即可加入该空间</div>
+                            </>
+                        }
                         content={false}
                         className="sm:w-[700px] xs:w-[300px]"
                         secondary={
@@ -667,7 +680,16 @@ const SpaceEquity = () => {
                         }
                     >
                         <CardContent>
-                            <div className="flex items-center justify-center mb-[20px]">
+                            <div className="mb-[20px] flex items-center">
+                                <div className="font-bold mr-[34px]">权限设置</div>
+                                <Radio.Group value={'b'}>
+                                    <Radio disabled value="a">
+                                        管理者
+                                    </Radio>
+                                    <Radio value="b">使用者</Radio>
+                                </Radio.Group>
+                            </div>
+                            <div className="flex items-center mb-[20px]">
                                 <span className="font-bold">
                                     添加成员链接
                                     <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>

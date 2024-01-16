@@ -58,14 +58,16 @@ export function DiscountModal({
     handleFetchPay,
     setCurrentSelect,
     handleCreateOrder,
+    handleCreateSignPay,
     categoryId
 }: {
     open: boolean;
     handleClose: () => void;
-    handleFetchPay: (payId: number, discountCode?: number, type?: number) => void;
+    handleFetchPay: (payId: number, discountCode?: number, type?: number, isSign?: boolean) => void;
     currentSelect: any;
     setCurrentSelect: (currentSelect: any) => void;
     handleCreateOrder: (payId?: number, discountCode?: number, type?: number) => void;
+    handleCreateSignPay: (payId?: number) => void;
     categoryId: number;
 }) {
     const [selectCode, setSelectCode] = React.useState<any>(); // payId
@@ -159,15 +161,13 @@ export function DiscountModal({
     }, [discountCode, currentSelect.discountCouponStatus]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-        setCurrentSelect((pre: any) => {
-            return {
-                ...pre,
-                select: '1'
-            };
-        });
-        setSelectCode(currentSelect.monthCode);
-        handleFetchPay(currentSelect.monthCode);
+        if (newValue === 1) {
+            setValue(newValue);
+            handleFetchPay(currentSelect?.payId, 0, 0, true);
+        } else {
+            setValue(newValue);
+            handleFetchPay(currentSelect?.payId);
+        }
     };
 
     return (
@@ -200,9 +200,8 @@ export function DiscountModal({
                                     indicatorColor="secondary"
                                 >
                                     <Tab label="购买" {...a11yProps(0)} />
-                                    {/* {!currentSelect.experience && (
+                                    {currentSelect.isSubscribe && (
                                         <Tab
-                                            // disabled={!currentSelect.monthCode.includes('basic')}
                                             label={
                                                 <div className="flex justify-center items-center">
                                                     <span>订阅</span>
@@ -213,7 +212,7 @@ export function DiscountModal({
                                             }
                                             {...a11yProps(1)}
                                         />
-                                    )} */}
+                                    )}
                                 </Tabs>
                                 <div className="flex justify-center flex-col items-center w-full p-3">
                                     <div className="flex justify-between items-center w-full mb-3">
@@ -344,44 +343,31 @@ export function DiscountModal({
                                         </div>
                                     )}
                                     <div className="flex  items-center w-full mb-3 mt-3">
-                                        {!value ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-[#868A91] mb-2">
-                                                    优惠金额
-                                                    {/* {currentSelect.name && `（${currentSelect?.name}）`} */}
-                                                </span>
-                                                <span className="text-[#de4437] text-2xl ">
-                                                    ￥
-                                                    {(
-                                                        (currentSelect?.discountPrice +
-                                                            currentSelect.vipPrice +
-                                                            currentSelect.pointPrice +
-                                                            currentSelect.couponPrice) /
-                                                        100
-                                                    ).toFixed(2)}
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col">
-                                                <span className="text-[#868A91] mb-2">优惠金额</span>
-                                                <span className="text-[#de4437] text-2xl ">￥{(1000 / 100).toFixed(2)}</span>
-                                            </div>
-                                        )}
-                                        {!value ? (
-                                            <div className="flex flex-col ml-[30%]">
-                                                <span className="text-[#868A91] mb-2">订单总价</span>
-                                                <span className="text-[#de4437] text-2xl font-semibold">
-                                                    ￥{(currentSelect?.payPrice / 100).toFixed(2)}
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col ml-[30%]">
-                                                <span className="text-[#868A91] mb-2">订单总价</span>
-                                                <span className="text-[#de4437] text-2xl font-semibold">￥{(4900 / 100).toFixed(2)}</span>
-                                            </div>
-                                        )}
+                                        <div className="flex flex-col">
+                                            <span className="text-[#868A91] mb-2">
+                                                优惠金额
+                                                {/* {currentSelect.name && `（${currentSelect?.name}）`} */}
+                                            </span>
+                                            <span className="text-[#de4437] text-2xl ">
+                                                ￥
+                                                {(
+                                                    (currentSelect?.discountPrice +
+                                                        currentSelect.vipPrice +
+                                                        currentSelect.pointPrice +
+                                                        currentSelect.couponPrice) /
+                                                    100
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex flex-col ml-[30%]">
+                                            <span className="text-[#868A91] mb-2">订单总价</span>
+                                            <span className="text-[#de4437] text-2xl font-semibold">
+                                                ￥{(currentSelect?.payPrice / 100).toFixed(2)}
+                                            </span>
+                                        </div>
                                     </div>
-                                    {!!value && (
+                                    {value === 1 && (
                                         <div className="flex items-center">
                                             <Checkbox
                                                 checked={checked}
@@ -397,12 +383,11 @@ export function DiscountModal({
                                         </div>
                                     )}
                                     <Button
-                                        // disabled={!value ? !canSubmit : !checked}
+                                        disabled={value === 1 && !checked}
                                         onClick={() =>
-                                            // !value
-                                            //     ? handleCreateOrder(selectCode, currentSelect.discountCouponStatus ? discountCode : '')
-                                            //     : handleCreateOrder(currentSelect.payId, '', 2)
-                                            handleCreateOrder(currentSelect.payId, discountCode, discountCodeType)
+                                            value === 1
+                                                ? handleCreateSignPay(currentSelect.payId)
+                                                : handleCreateOrder(currentSelect.payId, discountCode, discountCodeType)
                                         }
                                         className="w-[300px] mt-4"
                                         color="secondary"

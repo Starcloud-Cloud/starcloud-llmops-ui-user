@@ -16,8 +16,7 @@ import _ from 'lodash-es';
 import SubCard from 'ui-component/cards/SubCard';
 import ImageDetail from '../../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import { formatNumber } from 'hooks/useDate';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
@@ -26,7 +25,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     const [value, setValue] = useState(0);
     const [scale, setScale] = useState<number | null>(100);
     const navigate = useNavigate();
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     //上传图片
     const [imageList, setImageList] = useState<any[]>([]);
     //抠图完成的图片
@@ -98,9 +97,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
             });
             suRef.current.splice(index, 1, res.response);
             setSucImageList(_.cloneDeep(suRef.current));
-            userBenefits().then((res) => {
-                setUserInfo(res);
-            });
+            allDetail?.setPre(allDetail?.pre + 1);
         } catch (err: any) {
             if (err?.code === 2004008004) {
                 setFrom(`${err?.scene}_${err?.bizUid}`);
@@ -108,9 +105,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
             }
             suRef.current.splice(index, 1, { images: [{ url: 'error' }] });
             setSucImageList(_.cloneDeep(suRef.current));
-            userBenefits().then((res) => {
-                setUserInfo(res);
-            });
+            allDetail?.setPre(allDetail?.pre + 1);
         }
     };
     useEffect(() => {

@@ -135,17 +135,19 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
     const itemIcon = currentItem?.icon ? <Icon stroke={1.5} size="20px" /> : null;
     // menu list collapse & items
     const items = currentItem.children?.map((menu) => {
-        switch (menu.type) {
-            case 'collapse':
-                return <NavCollapse key={menu.id} menu={menu} level={1} parentId={currentItem.id!} />;
-            case 'item':
-                return <NavItem key={menu.id} item={menu} level={1} parentId={currentItem.id!} />;
-            default:
-                return (
-                    <Typography key={menu.id} variant="h6" color="error" align="center">
-                        Menu Items Error
-                    </Typography>
-                );
+        if (menu?.visible) {
+            switch (menu.type) {
+                case 'collapse':
+                    return <NavCollapse key={menu.id} menu={menu} level={1} parentId={currentItem.id!} />;
+                case 'item':
+                    return <NavItem key={menu.id} item={menu} level={1} parentId={currentItem.id!} />;
+                default:
+                    return (
+                        <Typography key={menu.id} variant="h6" color="error" align="center">
+                            Menu Items Error
+                        </Typography>
+                    );
+            }
         }
     });
 

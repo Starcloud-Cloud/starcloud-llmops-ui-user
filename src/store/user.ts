@@ -65,6 +65,10 @@ const useUserStore = create<UserStore>((set) => ({
         removeToken();
         wsCache.delete(CACHE_KEY.USER);
         wsCache.delete(CACHE_KEY.INFO);
+        wsCache.delete('userInfo');
+        wsCache.delete('market');
+        wsCache.delete('myChat');
+        wsCache.delete('myApp');
         wsCache.delete('roleRouters');
         // wsCache.clear();
         set({

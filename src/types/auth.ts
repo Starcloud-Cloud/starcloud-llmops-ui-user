@@ -41,6 +41,9 @@ export type JWTContextType = {
     isLoggedIn: boolean;
     isInitialized?: boolean;
     user?: UserProfile | null | undefined;
+    allDetail?: any;
+    pre: number;
+    setPre: (data: number) => void;
     logout: () => void;
     login: () => Promise<void>;
     register: (

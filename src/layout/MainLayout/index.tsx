@@ -34,9 +34,9 @@ import { isMobile } from 'react-device-detect';
 import React from 'react';
 import { ListingProvider } from 'contexts/ListingContext';
 import { NewUserVip } from 'ui-component/new-user-vip';
-import userInfoStore from 'store/entitlementAction';
 import StorageCache from 'web-storage-cache';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { useAllDetail } from 'contexts/JWTContext';
 
 interface MainStyleProps {
     theme: Theme;
@@ -306,6 +306,7 @@ let userVip: any;
 const MainLayout = () => {
     const storage = new StorageCache();
     const navigation = getMenuItems();
+    const allDetail = useAllDetail();
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -379,7 +380,7 @@ const MainLayout = () => {
             setNewUserVipOpen(true);
         }
     };
-
+    const [act, setAct] = useState(0);
     useEffect(() => {
         // userVip = setInterval(() => {
         //     handleShowNewUserVip();
@@ -387,11 +388,18 @@ const MainLayout = () => {
         // () => {
         //     clearInterval(userVip);
         //};
-        discountNewUser().then((res) => {
-            if (res.isNewUser) {
+        if (act === 0) {
+            if (allDetail?.allDetail?.isNewUser) {
                 handleShowNewUserVip();
             }
-        });
+        } else {
+            discountNewUser().then((res) => {
+                if (res.isNewUser) {
+                    handleShowNewUserVip();
+                }
+            });
+        }
+        setAct(act + 1);
     }, [location.pathname]);
 
     useEffect(() => {
@@ -423,13 +431,13 @@ const MainLayout = () => {
         };
     }, []);
     useEffect(() => {
-        if (userInfo?.benefits) {
+        if (allDetail?.allDetail?.rights) {
             if (status) {
                 if (
                     use?.mobile === '' &&
                     !storage.get('phonenumber') &&
                     !use?.mobile &&
-                    JSON.stringify(twoUser) !== JSON.stringify(userInfo?.benefits)
+                    JSON.stringify(twoUser) !== JSON.stringify(allDetail?.allDetail?.rights)
                 ) {
                     setPhoneOpen(true);
                 } else {
@@ -437,10 +445,10 @@ const MainLayout = () => {
                 }
             } else {
                 setStatus(true);
-                setTwoUser(userInfo?.benefits);
+                setTwoUser(allDetail?.allDetail?.rights);
             }
         }
-    }, [JSON.stringify(userInfo?.benefits?.map((item: any) => item.usedNum))]);
+    }, [JSON.stringify(allDetail?.allDetail?.rights?.map((item: any) => item.usedNum))]);
     const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 

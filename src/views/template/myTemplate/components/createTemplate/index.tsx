@@ -16,14 +16,14 @@ import {
 } from '@mui/material';
 import { Image, Select, Popover } from 'antd';
 import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
-import { userBenefits, metadata } from 'api/template';
+import { metadata } from 'api/template';
+import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
-import userInfoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
@@ -69,7 +69,7 @@ function CreateDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     //是否全部执行
     let isAllExecute = false;
     const [detail, setDetail] = useState(null as unknown as Details);
@@ -126,9 +126,7 @@ function CreateDetail() {
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfo(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&

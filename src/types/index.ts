@@ -93,6 +93,7 @@ export type NavItemType = {
     external?: boolean;
     url?: string | undefined;
     type?: string;
+    visible?: boolean;
     title?: ReactNode | string;
     color?: 'primary' | 'secondary' | 'default' | undefined;
     caption?: ReactNode | string;

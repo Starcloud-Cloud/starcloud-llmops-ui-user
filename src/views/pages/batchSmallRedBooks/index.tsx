@@ -643,6 +643,7 @@ const BatcSmallRedBooks = () => {
                                                     item={el}
                                                     index={i}
                                                     changeValue={(data: any) => {
+                                                        console.log(data, variables);
                                                         const newData = _.cloneDeep(variables);
                                                         newData[item][data.index].value = data.value;
                                                         setVariables(newData);

@@ -38,11 +38,14 @@ import {
     getPrice,
     createSign,
     submitSign,
-    getIsSign,
+    getIsSignV2,
     discountNewUser,
     getPayType,
     getPayList,
-    getNewUserProduct
+    getNewUserProduct,
+    getSignPrice,
+    createSignV2,
+    submitSignV2
 } from 'api/vip';
 import useAuth from 'hooks/useAuth';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -483,7 +486,8 @@ const Price1 = () => {
                                         id: item?.skus?.[0]?.id,
                                         payPrice: item.price / 100,
                                         marketPrice: item.marketPrice / 100,
-                                        unitName: item.unitName
+                                        unitName: item.unitName,
+                                        isSubscribe: item.subscribeConfig.isSubscribe
                                     });
                                 }
                             }
@@ -504,7 +508,8 @@ const Price1 = () => {
                                         id: item?.skus?.[0]?.id,
                                         payPrice: item.price / 100,
                                         marketPrice: item.marketPrice / 100,
-                                        unitName: item.unitName
+                                        unitName: item.unitName,
+                                        isSubscribe: item.subscribeConfig.isSubscribe
                                     });
                                 }
                             }
@@ -628,33 +633,52 @@ const Price1 = () => {
                     setIsTimeout(true);
                 }, 5 * 60 * 1000);
             }
-            // 应该是签约
-            // const resSign = await createSign({
-            //     productCode: code
-            // });
-            // const res = await submitSign({ merchantSignId: resSign });
-            // setOpenSign(true);
-            // setPayUrl(res);
-            // interval = setInterval(() => {
-            //     getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
-            //         if (isSignRes) {
-            //             handleSignClose();
-            //             setOpenSignDialog(true);
-            //             setTimeout(() => {
-            //                 navigate('/orderRecord');
-            //             }, 3000);
-            //         }
-            //     });
-            // }, 1000);
-            // setTimeout(() => {
-            //     clearInterval(interval);
-            //     setIsTimeout(true);
-            // }, 5 * 60 * 1000);
+        }
+    };
+
+    const handleCreateSignPay = async (payId?: number) => {
+        if (!isLoggedIn) {
+            setOpenDialog(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
+        } else {
+            let res: any;
+
+            res = await createSignV2({
+                terminal: 20,
+                items: [{ skuId: payId, count: 1 }],
+                pointStatus: false,
+                deliveryType: 3,
+                from
+            });
+            if (res) {
+                const resOrder = await submitSignV2({
+                    id: res.paySignId,
+                    channelCode: 'alipay_pc',
+                    displayMode: 'url'
+                });
+                setPayUrl(resOrder);
+                setOpenSign(true);
+
+                interval = setInterval(() => {
+                    getIsSignV2({ id: res.id }).then((isPayRes) => {
+                        if (isPayRes) {
+                            handleSignClose();
+                        }
+                    });
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    setIsTimeout(true);
+                }, 5 * 60 * 1000);
+            }
         }
     };
 
     // 获取价格
-    const handleFetchPay = async (payId?: number, discountCode?: number, type?: number) => {
+    const handleFetchPay = async (payId?: number, discountCode?: number, type?: number, isSign = false) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -663,10 +687,16 @@ const Price1 = () => {
             return;
         }
         let res: any;
-        if (type === 1) {
-            res = await getPrice({ items: [{ skuId: payId, count: 1 }], promoCode: discountCode, pointStatus: false, deliveryType: 3 });
+        if (!isSign) {
+            // 不是签约
+            if (type === 1) {
+                res = await getPrice({ items: [{ skuId: payId, count: 1 }], promoCode: discountCode, pointStatus: false, deliveryType: 3 });
+            } else {
+                res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
+            }
         } else {
-            res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
+            // 是签约
+            res = await getSignPrice({ items: [{ skuId: payId, count: 1 }], pointStatus: false, deliveryType: 3 });
         }
         if (res) {
             setDiscountOpen(true);
@@ -821,7 +851,8 @@ const Price1 = () => {
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                payId: plan.id
+                                                                payId: plan.id,
+                                                                isSubscribe: plan?.isSubscribe
                                                             });
                                                             handleClick(index, plan.id);
                                                         }}
@@ -841,7 +872,8 @@ const Price1 = () => {
                                                                 title: '体验版',
                                                                 select: value,
                                                                 payId: newUserProductId,
-                                                                experience: true
+                                                                experience: true,
+                                                                isSubscribe: false
                                                             });
                                                             handleClick(index, newUserProductId);
                                                         }}
@@ -972,6 +1004,7 @@ const Price1 = () => {
                     setCurrentSelect={setCurrentSelect}
                     currentSelect={currentSelect}
                     handleCreateOrder={handleCreateOrder}
+                    handleCreateSignPay={handleCreateSignPay}
                     categoryId={value}
                 />
             )}

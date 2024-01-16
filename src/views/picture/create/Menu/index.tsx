@@ -16,10 +16,9 @@ import MuiTooltip from '@mui/material/Tooltip';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import { RcFile } from 'antd/es/upload';
-import { userBenefits } from 'api/template';
+import { useAllDetail } from 'contexts/JWTContext';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
-import userInfoStore from 'store/entitlementAction';
 import { containsChineseCharactersAndSymbols, removeFalseProperties } from 'utils/validate';
 import { createText2Img, variantsImage, getImgMeta, translateText } from '../../../../api/picture/create';
 import { useWindowSize } from '../../../../hooks/useWindowSize';
@@ -175,6 +174,7 @@ export const PictureCreateMenu = ({
     inputValueTranslate,
     mode
 }: IPictureCreateMenuProps) => {
+    const allDetail = useAllDetail();
     const [visible, setVisible] = useState(false);
     const [showVoidInputValue, setShowVoidInputValue] = useState(false);
     const [voidInputValue, setVoidInputValue] = useState('');
@@ -191,6 +191,7 @@ export const PictureCreateMenu = ({
     const [voidInputValueTranslate, setVoidInputValueTranslate] = useState(true);
     const [appOpen, setAppOpen] = useState(false);
     const [openToken, setOpenToken] = useState(false);
+    const [from, setFrom] = useState('');
     const emits = (data: any) => {
         setAppOpen(false);
         setInputValue(data);
@@ -222,7 +223,6 @@ export const PictureCreateMenu = ({
     };
 
     const size = useWindowSize();
-    const { setUserInfo }: any = userInfoStore();
 
     useEffect(() => {
         if (params?.stylePreset) {
@@ -371,8 +371,7 @@ export const PictureCreateMenu = ({
                     appUid: 'VARIANTS_IMAGE',
                     imageRequest: removeFalseProperties(imageRequest)
                 });
-                const benefitsRes = await userBenefits();
-                setUserInfo(benefitsRes);
+                allDetail?.setPre(allDetail?.pre + 1);
 
                 setIsFetch(false);
                 setIsFirst(false);
@@ -383,15 +382,14 @@ export const PictureCreateMenu = ({
                     appUid: 'GENERATE_IMAGE',
                     imageRequest: removeFalseProperties(imageRequest)
                 });
-                const benefitsRes = await userBenefits();
-                setUserInfo(benefitsRes);
-
+                allDetail?.setPre(allDetail?.pre + 1);
                 setIsFetch(false);
                 setIsFirst(false);
                 setImgList([res?.response, ...imgList] || []);
             }
         } catch (e: any) {
             if (e?.code === 2004008004) {
+                setFrom(`${e?.scene}_${e?.bizUid}`);
                 setOpenToken(true);
             }
             setLoading && setLoading(false);
@@ -1075,9 +1073,10 @@ export const PictureCreateMenu = ({
                 </Row>
             </Col>
             <PermissionUpgradeModal
+                from={from}
                 open={openToken}
                 handleClose={() => setOpenToken(false)}
-                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                title={'当前图片数不足，升级会员，立享五折优惠！'}
             />
         </>
     );

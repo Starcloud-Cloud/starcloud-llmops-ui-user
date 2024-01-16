@@ -11,14 +11,14 @@ import { EyeOutlined } from '@ant-design/icons';
 import ImageDetail from '../components/detail';
 import downLoadImages from 'hooks/useDownLoadImage';
 import SubCard from 'ui-component/cards/SubCard';
-import { userBenefits } from 'api/template';
 import { getImgMeta } from 'api/picture/create';
 import { translateText } from 'api/picture/create';
-import userInfoStore from 'store/entitlementAction';
 import AppModal from '../create/Menu/appModal';
 import { formatNumber } from 'hooks/useDate';
+import { useAllDetail } from 'contexts/JWTContext';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 const ContourImage = () => {
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const navigate = useNavigate();
     const [descOpen, setDescOpen] = useState(false);
     const [desc, setDesc] = useState('');
@@ -36,6 +36,9 @@ const ContourImage = () => {
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>({});
     const [inputValueTranslate, setInputValueTranslate] = useState(false);
+
+    const [openToken, setOpenToken] = useState(false);
+    const [from, setFrom] = useState('');
 
     const handleMouseDown = (e: any) => {
         hisRef.current = false;
@@ -302,11 +305,13 @@ const ContourImage = () => {
                                     if (res) {
                                         setLoading(false);
                                         setResult(res.response);
-                                        userBenefits().then((res) => {
-                                            setUserInfo(res);
-                                        });
+                                        allDetail?.setPre(allDetail?.pre + 1);
                                     }
-                                } catch (err) {
+                                } catch (err: any) {
+                                    if (err?.code === 2004008004) {
+                                        setFrom(`${err?.scene}_${err?.bizUid}`);
+                                        setOpenToken(true);
+                                    }
                                     setLoading(false);
                                 }
                             } else {
@@ -375,6 +380,12 @@ const ContourImage = () => {
                 )}
                 {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
             </div>
+            <PermissionUpgradeModal
+                from={from}
+                open={openToken}
+                handleClose={() => setOpenToken(false)}
+                title={'当前图片数不足，升级会员，立享五折优惠！'}
+            />
         </Card>
     );
 };

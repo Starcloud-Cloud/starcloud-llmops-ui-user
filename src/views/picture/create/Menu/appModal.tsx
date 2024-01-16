@@ -29,8 +29,7 @@ import { listMarketAppOption, marketDeatail } from 'api/template';
 import Perform from 'views/template/carryOut/perform';
 import nothing from 'assets/images/upLoad/nothing.svg';
 import _ from 'lodash-es';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import formatDate from 'hooks/useDate';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 interface Details {
@@ -68,7 +67,7 @@ const AppModal = ({
     setOpen: (data: boolean) => void;
     emits: (data: any) => void;
 }) => {
-    const { userInfo, setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     useEffect(() => {
         if (open && tags.length > 0) {
             const fn = async () => {
@@ -94,6 +93,7 @@ const AppModal = ({
     const [isShows, setIsShow] = useState<any[]>([]);
     //历史记录
     const [historyList, setHistoryList] = useState<any[]>([]);
+    const [from, setFrom] = useState('');
 
     //点击历史记录填入数据
     const setPreForm = (row: { appInfo: any }) => {
@@ -203,13 +203,7 @@ const AppModal = ({
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2004008003')) {
-                    setTokenOpen(true);
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    return;
-                }
+
                 if (done) {
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
@@ -217,9 +211,7 @@ const AppModal = ({
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfos(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -274,6 +266,13 @@ const AppModal = ({
                                 close: false
                             })
                         );
+                    } else if (bufferObj?.code === 2004008003) {
+                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                        setTokenOpen(true);
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
+                        return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
@@ -292,10 +291,6 @@ const AppModal = ({
             }
         };
         fetchData();
-    };
-    useEffect(() => {}, [userInfo]);
-    const setUserInfos = (res: any) => {
-        setUserInfo(res);
     };
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {
@@ -476,6 +471,7 @@ const AppModal = ({
                     </CardContent>
                 </MainCard>
                 <PermissionUpgradeModal
+                    from={from}
                     open={tokenOpen}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}

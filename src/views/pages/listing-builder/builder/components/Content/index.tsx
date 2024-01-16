@@ -40,6 +40,7 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { fetchRequestCanCancel } from 'utils/fetch';
 import { useLocation } from 'react-router-dom';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 
 const { Search } = Input;
 
@@ -96,6 +97,9 @@ const Content = () => {
     const [productFeature, setProductFeature] = React.useState('');
     const [loadingList, setLoadingList] = React.useState<any[]>([]);
     const [openGrade, setOpenGrade] = React.useState(false);
+    const [tokenOpen, setTokenOpen] = React.useState(false);
+    const [from, setFrom] = React.useState('');
+
     const location = useLocation();
 
     const {
@@ -657,7 +661,7 @@ const Content = () => {
                         const subString = eventData.substring(5);
                         const bufferObj = JSON.parse(subString);
                         // 300900000 为链接成功 type为null
-                        if (bufferObj.code === 200 || bufferObj.code === 300900000) {
+                        if (bufferObj?.code === 200 || bufferObj?.code === 300900000) {
                             if (bufferObj.type === 'm') {
                                 setLoadingList([]);
                                 setList((preList: any) => {
@@ -669,6 +673,10 @@ const Content = () => {
                                     return copyPreList;
                                 });
                             }
+                        } else if (bufferObj?.code === 2004008003) {
+                            setTokenOpen(true);
+                            setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                            setLoadingList([]);
                         } else {
                             setLoadingList([]);
                             dispatch(
@@ -1371,6 +1379,12 @@ const Content = () => {
             <FloatButton.Group shape="circle" style={{ bottom: '100px' }}>
                 <FloatButton.BackTop visibilityHeight={0} />
             </FloatButton.Group>
+            <PermissionUpgradeModal
+                from={from}
+                open={tokenOpen}
+                handleClose={() => setTokenOpen(false)}
+                title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+            />
         </div>
     );
 };

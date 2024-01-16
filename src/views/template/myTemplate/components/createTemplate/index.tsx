@@ -16,14 +16,14 @@ import {
 } from '@mui/material';
 import { Image, Select, Popover } from 'antd';
 import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
-import { userBenefits, metadata } from 'api/template';
+import { metadata } from 'api/template';
+import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
-import userInfoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
@@ -69,7 +69,7 @@ function CreateDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     //是否全部执行
     let isAllExecute = false;
     const [detail, setDetail] = useState(null as unknown as Details);
@@ -81,6 +81,7 @@ function CreateDetail() {
     let conversationUid: undefined | string = undefined;
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    const [from, setFrom] = useState('');
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
     const [aiModel, setAiModel] = useState('gpt-3.5-turbo-16k');
@@ -117,13 +118,7 @@ function CreateDetail() {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2004008003')) {
-                    setTokenOpen(true);
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    return;
-                }
+
                 if (done) {
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
@@ -131,9 +126,7 @@ function CreateDetail() {
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfo(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detail.workflowConfig.steps.length - 1 &&
@@ -176,6 +169,13 @@ function CreateDetail() {
                             detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
+                    } else if (bufferObj?.code === 2004008003) {
+                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                        setTokenOpen(true);
+                        const newValue1 = [...loadings];
+                        newValue1[index] = false;
+                        setLoadings(newValue1);
+                        return;
                     } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
                         dispatch(
                             openSnackbar({
@@ -722,9 +722,12 @@ function CreateDetail() {
                     />
                 )}
             </TabPanel>
-            {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
+            {openUpgradeModel && (
+                <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            )}
             {tokenOpen && (
                 <PermissionUpgradeModal
+                    from={from}
                     open={tokenOpen}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}

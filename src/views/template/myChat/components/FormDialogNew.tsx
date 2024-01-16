@@ -26,7 +26,7 @@ import Template from './template';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import myChat from 'store/myChat';
 import { UpgradeModel } from './upgradeRobotModel';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import useUserStore from 'store/user';
 
 // ===============================|| UI DIALOG - FORMS ||=============================== //
@@ -44,14 +44,14 @@ export default function FormDialogNew({
     handleOk: (uid: string) => void;
     setValue: (value: string) => void;
 }) {
+    const allDetail = useAllDetail();
     const [checked, setChecked] = useState(false);
     const [recommendList, setRecommends] = useState([]);
     const [uid, setUid] = useState('');
     const theme = useTheme();
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
-    const { userInfo }: any = userInfoStore();
-    const totalNum = userInfo?.levelConfig?.usableBasicBot || 0;
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableBasicBot || 0;
 
     const { user } = useUserStore();
 
@@ -209,7 +209,14 @@ export default function FormDialogNew({
                     </CardActions>
                 </MainCard>
             </Modal>
-            {botOpen && <UpgradeModel open={botOpen} handleClose={() => setBotOpen(false)} title={`添加机器人个数(${totalNum})已用完`} />}
+            {botOpen && (
+                <UpgradeModel
+                    from="usableBasicBot_0"
+                    open={botOpen}
+                    handleClose={() => setBotOpen(false)}
+                    title={`添加机器人个数(${totalNum})已用完`}
+                />
+            )}
         </>
     );
 }

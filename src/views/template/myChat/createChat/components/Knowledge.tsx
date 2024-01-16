@@ -61,7 +61,7 @@ import { TabsProps } from 'types';
 import { Confirm } from 'ui-component/Confirm';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import * as yup from 'yup';
 import {
     delDataset,
@@ -1121,7 +1121,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
 
     //增加规则弹窗
     const [ruleOpen, setRuleOpen] = useState(false);
-    const { userInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const { user } = useUserStore();
     return (
         <div>
@@ -1166,9 +1166,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (userInfo?.levelConfig?.usableBotDocument === -1) {
+                                    if (allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument === -1) {
                                         setDocumentVisible(true);
-                                    } else if (documentList.length < userInfo?.levelConfig?.usableBotDocument) {
+                                    } else if (documentList.length < allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument) {
                                         setDocumentVisible(true);
                                     } else {
                                         setBotOpen(true);
@@ -1626,9 +1626,11 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (userInfo?.levelConfig?.usableBotDocument === -1) {
+                                                if (allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument === -1) {
                                                     setDocumentVisible(true);
-                                                } else if (documentList.length < userInfo?.levelConfig?.usableBotDocument) {
+                                                } else if (
+                                                    documentList.length < allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument
+                                                ) {
                                                     setDocumentVisible(true);
                                                 } else {
                                                     setBotOpen(true);
@@ -1668,7 +1670,8 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 <UpgradeModel
                                     open={botOpen}
                                     handleClose={() => setBotOpen(false)}
-                                    title={`添加文档个数(${userInfo?.levelConfig?.usableBotDocument})已用完`}
+                                    title={`添加文档个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                                    from="usableBotDocument_0"
                                 />
                             )}
                         </MainCard>

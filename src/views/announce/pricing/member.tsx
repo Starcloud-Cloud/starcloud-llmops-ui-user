@@ -367,7 +367,6 @@ const planListDefault = (value: number) => [
     ],
     [
         <div className="flex items-center">
-            <span>25000魔法豆</span>
             <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />

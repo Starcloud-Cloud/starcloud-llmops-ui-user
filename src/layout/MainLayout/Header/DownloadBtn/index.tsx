@@ -3,7 +3,7 @@ import './index.css';
 import { usePWAInstall } from 'react-use-pwa-install';
 import { useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
-import { discountNewUser } from 'api/vip';
+import { useAllDetail } from 'contexts/JWTContext';
 import { useEffect, useState } from 'react';
 
 export const DownLoadBtn = () => {
@@ -17,13 +17,12 @@ export const DownLoadBtn = () => {
 
 export const PayBtn = () => {
     const navigate = useNavigate();
+    const allDetail = useAllDetail();
     const [text, setText] = useState('年末5折限时体验');
     useEffect(() => {
-        discountNewUser().then((res) => {
-            if (res.isNewUser) {
-                setText('新用户限时体验9.9元');
-            }
-        });
+        if (allDetail?.allDetail?.isNewUser) {
+            setText('新用户限时体验9.9元');
+        }
     }, []);
 
     return !isMobile ? (

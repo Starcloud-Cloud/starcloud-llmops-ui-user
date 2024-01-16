@@ -18,8 +18,7 @@ import marketStore from 'store/market';
 import { t } from 'hooks/web/useI18n';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { userBenefits } from 'api/template';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
 import useCategory from 'hooks/useCategory';
@@ -37,7 +36,7 @@ interface AppModels {
 }
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
-    const { setUserInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const { categoryTrees } = marketStore();
     const { uid = '' } = useParams<{ uid?: string }>();
     const location = useLocation();
@@ -47,6 +46,7 @@ function Deatail() {
     const detailRef: any = useRef(null);
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
+    const [from, setFrom] = useState('');
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
@@ -90,15 +90,7 @@ function Deatail() {
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-                if (textDecoder.decode(value).includes('2004008003')) {
-                    setTokenOpen(true);
-                    const newValue1 = [...loadings];
-                    newValue1.forEach((item) => {
-                        item = false;
-                    });
-                    setLoadings(newValue1);
-                    return;
-                }
+
                 if (done) {
                     const newValue1 = [...loadings];
                     newValue1[index] = false;
@@ -106,9 +98,7 @@ function Deatail() {
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
-                    userBenefits().then((res) => {
-                        setUserInfo(res);
-                    });
+                    allDetail?.setPre(allDetail?.pre + 1);
                     if (
                         isAllExecute &&
                         index < detailData.workflowConfig.steps.length - 1 &&
@@ -123,8 +113,6 @@ function Deatail() {
                     break;
                 }
                 let str = textDecoder.decode(value);
-                console.log(str);
-
                 const lines = str.split('\n');
                 lines.forEach((message, i: number) => {
                     if (i === 0 && joins) {
@@ -165,6 +153,15 @@ function Deatail() {
                                 close: false
                             })
                         );
+                    } else if (bufferObj?.code === 2004008003) {
+                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                        setTokenOpen(true);
+                        const newValue1 = [...loadings];
+                        newValue1.forEach((item) => {
+                            item = false;
+                        });
+                        setLoadings(newValue1);
+                        return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
                         dispatch(
                             openSnackbar({
@@ -518,10 +515,13 @@ function Deatail() {
                     isAllExecute = value;
                 }}
             />
-            {openUpgradeModel && <PermissionUpgradeModal open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />}
+            {openUpgradeModel && (
+                <PermissionUpgradeModal from="upgradeGpt4_0" open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            )}
             {tokenOpen && (
                 <PermissionUpgradeModal
                     open={tokenOpen}
+                    from={from}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
                 />

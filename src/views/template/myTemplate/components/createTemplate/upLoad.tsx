@@ -66,7 +66,7 @@ import DomainModal from './components/DomainModal';
 import WPAccountModal from './components/WPAccountModal';
 import _ from 'lodash-es';
 import CopySiteModal from './components/CopySiteModal';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 import useUserStore from 'store/user';
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -130,7 +130,7 @@ function Upload({
     getStatus: (data: boolean) => void;
     handleSave?: () => void;
 }) {
-    const { userInfo }: any = userInfoStore();
+    const allDetail = useAllDetail();
     const defaultUpLoadList = [
         {
             title: '网页',
@@ -189,7 +189,7 @@ function Upload({
                         //
                         //     }
                         // });
-                        const totalNum = userInfo?.levelConfig?.usableWechatBot;
+                        const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableWechatBot;
 
                         if (totalNum === -1) {
                             setOpenWchat(true);
@@ -1357,7 +1357,8 @@ function Upload({
                 <UpgradeModel
                     open={botOpen}
                     handleClose={() => setBotOpen(false)}
-                    title={`添加文档个数(${userInfo?.levelConfig?.usableBotDocument})已用完`}
+                    title={`添加微信群聊个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                    from="usableWechatBot_0"
                 />
             )}
             <DomainModal open={openDomain} setOpen={setOpenDomain} />

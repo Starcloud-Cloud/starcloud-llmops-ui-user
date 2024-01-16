@@ -49,7 +49,7 @@ import _ from 'lodash';
 import useUserStore from 'store/user';
 import { UpgradeModel } from '../../components/upgradeRobotModel';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
-import userInfoStore from 'store/entitlementAction';
+import { useAllDetail } from 'contexts/JWTContext';
 
 const WorkflowEditModal = ({
     open,
@@ -242,8 +242,8 @@ const WorkflowCreateModal = ({
     const [pageData, setPageData] = useState<any[]>([]);
     const [page, setPage] = useState(1);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
-    const { userInfo }: any = userInfoStore();
-    const totalNum = userInfo?.levelConfig?.usableSkillPlugin || 0;
+    const allDetail = useAllDetail();
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableSkillPlugin || 0;
 
     useEffect(() => {
         (async () => {
@@ -474,7 +474,7 @@ const WorkflowCreateModal = ({
                     </CardContent>
                 </MainCard>
             </Modal>
-            <PermissionUpgradeModal open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
+            <PermissionUpgradeModal from={'upgradeSkills_0'} open={skillUpgradeOnline} handleClose={() => setSkillUpgradeOnline(false)} />
         </>
     );
 };
@@ -493,8 +493,8 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
 
     const [skillCountVisible, setSkillCountVisible] = useState(false);
     const forceUpdate = () => setCount((pre) => pre + 1);
-    const { userInfo }: any = userInfoStore();
-    const totalNum = userInfo?.levelConfig?.usableSkillPlugin || 0;
+    const allDetail = useAllDetail();
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableSkillPlugin || 0;
 
     useEffect(() => {
         getSkillList(appId || '').then((res) => {
@@ -688,6 +688,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
                 open={skillCountVisible}
                 handleClose={() => setSkillCountVisible(false)}
                 title={`添加技能个数(${totalNum})已用完`}
+                from="usableSkillPlugin_0"
             />
         </div>
     );

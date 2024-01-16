@@ -16,10 +16,9 @@ import {
     Typography,
     linearProgressClasses
 } from '@mui/material';
-import { Image, Popover, Menu } from 'antd';
+import { Image, Popover, Menu, Spin } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { styled, useTheme } from '@mui/material/styles';
-import { userBenefits } from 'api/template';
 import Share from 'assets/images/share/share.png';
 import copy from 'clipboard-copy';
 import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
@@ -28,11 +27,12 @@ import QRCode from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
-import { default as infoStore, default as userInfoStore } from 'store/entitlementAction';
+import infoStore from 'store/entitlementAction';
 import { openSnackbar } from 'store/slices/snackbar';
 import useUserStore from 'store/user';
+import { vipSwitch } from 'utils/vipSwtich';
 import { useAllDetail } from 'contexts/JWTContext';
-import { deptList } from 'api/section';
+import { deptList, spaceCheckout } from 'api/section';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -99,7 +99,7 @@ interface BenefitItem {
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
-    const list = info?.benefits?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
+    const list = info?.allDetail?.rights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
     return (
         <Box>
             {list?.map((item: BenefitItem) => (
@@ -113,7 +113,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                         color:
                                             theme.palette.mode === 'dark'
                                                 ? theme.palette.dark.light
-                                                : themesLight(info?.userLevel, theme, 3)
+                                                : themesLight(vipSwitch(info?.allDetail?.levels[0]?.levelId), theme, 3)
                                     }}
                                 >
                                     {t('user.' + item.name)}
@@ -129,7 +129,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                     <Grid item>
                         <Tooltip title={item?.remaining + '/' + item?.totalNum} placement="top">
                             <BorderLinearProgress
-                                level={info?.userLevel}
+                                level={vipSwitch(info?.allDetail?.levels[0]?.levelId)}
                                 variant="determinate"
                                 value={(item?.remaining / item?.totalNum) * 100}
                                 theme={theme}
@@ -144,10 +144,20 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
 
 const Cards = ({ flag = false }) => {
     const permissions = useUserStore((state) => state.permissions);
+    const getActive = (active: string) => {
+        let image;
+        try {
+            image = require('../assets/images/users/' + active + '.png');
+        } catch (_) {
+            image =
+                'data:image/png;base64,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';
+        }
+        return image;
+    };
+    const allDetail = useAllDetail();
     const theme = useTheme();
     const { use } = infoStore();
     const navigate = useNavigate();
-    const { userInfo, setUserInfo }: any = userInfoStore();
     const copyCode = () => {
         copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         dispatch(
@@ -158,19 +168,13 @@ const Cards = ({ flag = false }) => {
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
     };
     const [open, setOpen] = useState(false);
-    useEffect(() => {
-        userBenefits().then((res) => {
-            setUserInfo(res);
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
     //获取切换列表
-    const allDetail = useAllDetail();
     const [spaceList, setSpaceList] = useState<any[]>([]);
     useEffect(() => {
         const getList = async () => {
@@ -179,10 +183,12 @@ const Cards = ({ flag = false }) => {
         };
         if (flag) getList();
     }, []);
+    //切换部门
+    const [checkLoading, setCheckoutLoading] = useState(false);
     return (
         <CardStyle
             sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
-            level={userInfo?.userLevel}
+            level={vipSwitch(allDetail?.allDetail?.levels[0]?.levelId)}
             theme={theme}
         >
             <CardContent sx={{ p: '16px !important' }}>
@@ -191,11 +197,11 @@ const Cards = ({ flag = false }) => {
                         <ListItemText sx={{ mt: 0 }}>
                             <Box display="inline-block" padding="4px 10px" border="1px solid #bdbdbd" borderRadius="5px">
                                 {/* {userInfo?.userLevel ? t('user.' + userInfo?.userLevel) : t('user.free')} */}
-                                {userInfo?.userLevelName}
+                                {allDetail?.allDetail?.levels[0]?.levelName}
                             </Box>
                         </ListItemText>
                         <ListItemText sx={{ mt: 0 }}>
-                            {userInfo?.userLevel !== 'pro' && (
+                            {vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) !== 'pro' && (
                                 <Button
                                     onClick={() => {
                                         navigate('/exchange');
@@ -204,15 +210,15 @@ const Cards = ({ flag = false }) => {
                                     variant="contained"
                                     sx={{ boxShadow: 'none' }}
                                     color={
-                                        userInfo?.userLevel === 'free'
+                                        vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'free'
                                             ? 'primary'
-                                            : userInfo?.userLevel === 'basic'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'basic'
                                             ? 'secondary'
-                                            : userInfo?.userLevel === 'plus'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'plus'
                                             ? 'warning'
-                                            : userInfo?.userLevel === 'media'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'media'
                                             ? 'success'
-                                            : userInfo?.userLevel === 'pro'
+                                            : vipSwitch(allDetail?.allDetail?.levels[0]?.levelId) === 'pro'
                                             ? 'warning'
                                             : 'primary'
                                     }
@@ -223,18 +229,25 @@ const Cards = ({ flag = false }) => {
                         </ListItemText>
                     </ListItem>
                 </List>
-                {flag && (
-                    // permissions.includes('space:member:switch') &&
+                {flag && permissions.includes('space:member:switch') && (
                     <div className="flex items-center gap-2 text-black my-[10px]">
                         <Image
                             onClick={() => navigate('spaceEquity')}
                             preview={false}
                             className="rounded-full overflow-hidden cursor-pointer"
+                            fallback="data:image/png;base64,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"
                             width={36}
                             height={36}
-                            src={require('../assets/images/users/avatar-1.png')}
+                            src={
+                                spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.avatar?.indexOf('https') !== -1
+                                    ? spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.avatar
+                                    : getActive(spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.avatar)
+                            }
                         />
-                        <div className="w-[140px] line-clamp-1 cursor-pointer" onClick={() => navigate('spaceEquity')}>
+                        <div
+                            className="!w-[140px] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
+                            onClick={() => navigate('spaceEquity')}
+                        >
                             {spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.deptName} 的空间
                         </div>
                         <Popover
@@ -245,8 +258,14 @@ const Cards = ({ flag = false }) => {
                             content={
                                 <div className="w-[250px]">
                                     <Menu
-                                        onClick={(e) => {
-                                            console.log(e);
+                                        onClick={async (e) => {
+                                            setCheckoutLoading(true);
+                                            await spaceCheckout(e?.key);
+                                            allDetail?.setPre(allDetail?.pre + 1);
+                                            setTimeout(() => {
+                                                allDetail?.setInvite(allDetail?.invite + 1);
+                                            }, 1000);
+                                            setCheckoutLoading(false);
                                         }}
                                         mode="inline"
                                         selectedKeys={[allDetail?.allDetail?.deptId?.toString()]}
@@ -267,7 +286,7 @@ const Cards = ({ flag = false }) => {
                         </Popover>
                     </div>
                 )}
-                <LinearProgressWithLabel info={userInfo} />
+                <LinearProgressWithLabel info={allDetail} />
                 {flag && (
                     <Box mt={1} color={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black}>
                         <Divider sx={{ mb: 1 }} />

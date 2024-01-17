@@ -679,6 +679,10 @@ const Price1 = () => {
                     getIsSignV2({ id: res.id }).then((isPayRes) => {
                         if (isPayRes) {
                             handleSignClose();
+                            setOpenSignDialog(true);
+                            setTimeout(() => {
+                                navigate('/orderRecord');
+                            }, 3000);
                         }
                     });
                 }, 1000);
@@ -1009,7 +1013,14 @@ const Price1 = () => {
                 onRefresh={onRefresh}
                 payPrice={currentSelect?.payPrice / 100 || 0}
             />
-            <SignModal open={openSign} handleClose={() => setOpenSign(false)} url={payUrl} isTimeout={isTimeout} onRefresh={() => null} />
+            <SignModal
+                open={openSign}
+                handleClose={() => setOpenSign(false)}
+                url={payUrl}
+                isTimeout={isTimeout}
+                onRefresh={() => null}
+                payPrice={currentSelect?.payPrice / 100 || 0}
+            />
             {discountOpen && (
                 <DiscountModal
                     open={discountOpen}

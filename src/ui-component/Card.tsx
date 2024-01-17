@@ -178,8 +178,8 @@ const Cards = ({ flag = false }) => {
     const [spaceList, setSpaceList] = useState<any[]>([]);
     useEffect(() => {
         const getList = async () => {
-            // const result = await deptList();
-            // setSpaceList(result);
+            const result = await deptList();
+            setSpaceList(result);
         };
         if (flag) getList();
     }, []);

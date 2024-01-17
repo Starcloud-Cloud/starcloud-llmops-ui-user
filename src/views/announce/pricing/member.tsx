@@ -38,14 +38,17 @@ import {
     getPrice,
     createSign,
     submitSign,
-    getIsSign,
+    getIsSignV2,
     discountNewUser,
     getPayType,
     getPayList,
-    getNewUserProduct
+    getNewUserProduct,
+    getSignPrice,
+    createSignV2,
+    submitSignV2
 } from 'api/vip';
 import useAuth from 'hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { submitOrder } from '../../../api/vip/index';
 import FooterSection from '../landing/FooterSection';
 import { SectionWrapper } from '../landing/index';
@@ -367,6 +370,7 @@ const planListDefault = (value: number) => [
     ],
     [
         <div className="flex items-center">
+            <span>25000魔法豆</span>
             <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
@@ -431,6 +435,10 @@ const Price1 = () => {
 
     const navigate = useNavigate();
 
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const from = searchParams.get('from');
+
     const priceListDisable = {
         opacity: '0.4',
         '& >div> svg': {
@@ -477,7 +485,9 @@ const Price1 = () => {
                                         ...v,
                                         id: item?.skus?.[0]?.id,
                                         payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100
+                                        marketPrice: item.marketPrice / 100,
+                                        unitName: item.unitName,
+                                        isSubscribe: item.subscribeConfig?.isSubscribe
                                     });
                                 }
                             }
@@ -496,8 +506,10 @@ const Price1 = () => {
                                     newList.push({
                                         ...v,
                                         id: item?.skus?.[0]?.id,
-                                        payPrice: (item.price / 100 / 12).toFixed(2),
-                                        marketPrice: item.marketPrice / 100
+                                        payPrice: item.price / 100,
+                                        marketPrice: item.marketPrice / 100,
+                                        unitName: item.unitName,
+                                        isSubscribe: item.subscribeConfig?.isSubscribe
                                     });
                                 }
                             }
@@ -563,80 +575,110 @@ const Price1 = () => {
         }, 5 * 60 * 1000);
     };
 
-    const handleCreateOrder = async (payId?: number, discountCode?: number, type = 1) => {
+    // type之前用来判断是否是签约，现在用来判断折扣码类型
+    const handleCreateOrder = async (payId?: number, discountCode?: number, type?: number) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
                 navigate('/login');
             }, 3000);
         } else {
+            let res: any;
+            const options = Intl.DateTimeFormat().resolvedOptions();
+            const timeZone = options.timeZone;
             if (type === 1) {
-                const options = Intl.DateTimeFormat().resolvedOptions();
-                const timeZone = options.timeZone;
-                const res = await createOrder({
+                res = await createOrder({
+                    terminal: 20,
+                    items: [{ skuId: payId, count: 1 }],
+                    promoCode: discountCode,
+                    pointStatus: false,
+                    deliveryType: 3,
+                    from
+                });
+            } else {
+                res = await createOrder({
                     terminal: 20,
                     items: [{ skuId: payId, count: 1 }],
                     couponId: discountCode,
                     pointStatus: false,
-                    deliveryType: 3
+                    deliveryType: 3,
+                    from
                 });
-                if (res) {
-                    handleOpen();
-                    setOrder(res);
-                    const resOrder = await submitOrder({
-                        id: res.payOrderId,
-                        channelCode: 'alipay_pc',
-                        channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
-                        displayMode: 'qr_code'
+            }
+            if (res) {
+                handleOpen();
+                setOrder(res);
+                const resOrder = await submitOrder({
+                    id: res.payOrderId,
+                    channelCode: 'alipay_pc',
+                    channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
+                    displayMode: 'qr_code'
+                });
+                setPayUrl(resOrder.displayContent);
+
+                interval = setInterval(() => {
+                    getOrderIsPay({ id: res.id }).then((isPayRes) => {
+                        if (isPayRes) {
+                            handleClose();
+                            setOpenPayDialog(true);
+                            setTimeout(() => {
+                                navigate('/orderRecord');
+                            }, 3000);
+                        }
                     });
-                    setPayUrl(resOrder.displayContent);
+                }, 1000);
 
-                    interval = setInterval(() => {
-                        getOrderIsPay({ id: res.id }).then((isPayRes) => {
-                            if (isPayRes) {
-                                handleClose();
-                                setOpenPayDialog(true);
-                                setTimeout(() => {
-                                    navigate('/orderRecord');
-                                }, 3000);
-                            }
-                        });
-                    }, 1000);
+                setTimeout(() => {
+                    clearInterval(interval);
+                    setIsTimeout(true);
+                }, 5 * 60 * 1000);
+            }
+        }
+    };
 
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        setIsTimeout(true);
-                    }, 5 * 60 * 1000);
-                }
-            } else {
-                // 应该是签约
-                // const resSign = await createSign({
-                //     productCode: code
-                // });
-                // const res = await submitSign({ merchantSignId: resSign });
-                // setOpenSign(true);
-                // setPayUrl(res);
-                // interval = setInterval(() => {
-                //     getIsSign({ merchantSignId: resSign }).then((isSignRes) => {
-                //         if (isSignRes) {
-                //             handleSignClose();
-                //             setOpenSignDialog(true);
-                //             setTimeout(() => {
-                //                 navigate('/orderRecord');
-                //             }, 3000);
-                //         }
-                //     });
-                // }, 1000);
-                // setTimeout(() => {
-                //     clearInterval(interval);
-                //     setIsTimeout(true);
-                // }, 5 * 60 * 1000);
+    const handleCreateSignPay = async (payId?: number) => {
+        if (!isLoggedIn) {
+            setOpenDialog(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
+        } else {
+            let res: any;
+
+            res = await createSignV2({
+                terminal: 20,
+                items: [{ skuId: payId, count: 1 }],
+                pointStatus: false,
+                deliveryType: 3,
+                from
+            });
+            if (res) {
+                const resOrder = await submitSignV2({
+                    id: res.paySignId,
+                    channelCode: 'alipay_pc',
+                    displayMode: 'url'
+                });
+                setPayUrl(resOrder);
+                setOpenSign(true);
+
+                interval = setInterval(() => {
+                    getIsSignV2({ id: res.id }).then((isPayRes) => {
+                        if (isPayRes) {
+                            handleSignClose();
+                        }
+                    });
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    setIsTimeout(true);
+                }, 5 * 60 * 1000);
             }
         }
     };
 
     // 获取价格
-    const handleFetchPay = async (payId?: number, discountCode?: number) => {
+    const handleFetchPay = async (payId?: number, discountCode?: number, type?: number, isSign = false) => {
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -644,7 +686,18 @@ const Price1 = () => {
             }, 3000);
             return;
         }
-        const res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
+        let res: any;
+        if (!isSign) {
+            // 不是签约
+            if (type === 1) {
+                res = await getPrice({ items: [{ skuId: payId, count: 1 }], promoCode: discountCode, pointStatus: false, deliveryType: 3 });
+            } else {
+                res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
+            }
+        } else {
+            // 是签约
+            res = await getSignPrice({ items: [{ skuId: payId, count: 1 }], pointStatus: false, deliveryType: 3 });
+        }
         if (res) {
             setDiscountOpen(true);
             setCurrentSelect((pre: any) => {
@@ -744,7 +797,7 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 {index === 1 || index === 2 || index === 3 ? (
                                                     <div className="text-sm text-center text-[#d7d7d7] line-through">
-                                                        ￥{plan?.marketPrice}/月
+                                                        ￥{plan?.marketPrice}/{plan?.unitName}
                                                     </div>
                                                 ) : (
                                                     <div className="h-[24px]"></div>
@@ -765,7 +818,7 @@ const Price1 = () => {
                                                     {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
                                                     {plan.payPrice}
                                                     {(index === 1 || index === 2 || index === 3) && (
-                                                        <span className="text-[#aaa]">/月</span>
+                                                        <span className="text-[#aaa]">/{plan?.unitName}</span>
                                                     )}
                                                 </Typography>
                                                 <div className="text-[#aaa] text-sm text-center">{plan?.des}</div>
@@ -798,7 +851,8 @@ const Price1 = () => {
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                payId: plan.id
+                                                                payId: plan.id,
+                                                                isSubscribe: plan?.isSubscribe
                                                             });
                                                             handleClick(index, plan.id);
                                                         }}
@@ -818,7 +872,8 @@ const Price1 = () => {
                                                                 title: '体验版',
                                                                 select: value,
                                                                 payId: newUserProductId,
-                                                                experience: true
+                                                                experience: true,
+                                                                isSubscribe: false
                                                             });
                                                             handleClick(index, newUserProductId);
                                                         }}
@@ -868,68 +923,65 @@ const Price1 = () => {
                         })}
                     </Grid>
                     <div className="flex justify-center mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
-
-                    {false && (
-                        <>
+                    <>
+                        <div className="flex justify-center">
+                            <Divider className="py-3 w-[70%]" />
+                        </div>
+                        <div>
+                            <div className="text-3xl font-semibold w-full text-center my-[20px]">
+                                跨境人都选择
+                                <span className="text-violet-500">“魔法AI”</span>
+                            </div>
                             <div className="flex justify-center">
-                                <Divider className="py-3 w-[70%]" />
+                                <AntButton
+                                    icon={<KeyboardBackspaceIcon className="text-white" />}
+                                    type="primary"
+                                    shape="circle"
+                                    onClick={() => {
+                                        swiperRef?.slidePrev();
+                                    }}
+                                />
+                                <AntButton
+                                    style={{ marginLeft: '10px' }}
+                                    icon={<ArrowForwardIcon className="text-white" />}
+                                    type="primary"
+                                    shape="circle"
+                                    onClick={() => {
+                                        swiperRef?.slideNext();
+                                    }}
+                                />
                             </div>
-                            <div>
-                                <div className="text-3xl font-semibold w-full text-center my-[20px]">
-                                    跨境人都选择
-                                    <span className="text-violet-500">“魔法AI”</span>
-                                </div>
-                                <div className="flex justify-center">
-                                    <AntButton
-                                        icon={<KeyboardBackspaceIcon className="text-white" />}
-                                        type="primary"
-                                        shape="circle"
-                                        onClick={() => {
-                                            swiperRef?.slidePrev();
-                                        }}
-                                    />
-                                    <AntButton
-                                        style={{ marginLeft: '10px' }}
-                                        icon={<ArrowForwardIcon className="text-white" />}
-                                        type="primary"
-                                        shape="circle"
-                                        onClick={() => {
-                                            swiperRef?.slideNext();
-                                        }}
-                                    />
-                                </div>
-                                <div className="mt-[20px]">
-                                    <Swiper
-                                        onSwiper={(swiper) => setSwiperRef(swiper)}
-                                        slidesPerView={onCol()}
-                                        spaceBetween={30}
-                                        centeredSlides={false}
-                                        loop
-                                        modules={[]}
-                                        className="mySwiper"
-                                        autoplay={{
-                                            delay: 2500,
-                                            disableOnInteraction: false
-                                        }}
-                                    >
-                                        {recommendList.map((item, index) => (
-                                            <SwiperSlide>
-                                                <div className="!bg-white rounded-2xl p-5 space-y-2.5 border border-neutral-100">
-                                                    <div className="flex items-center gap-2">
-                                                        <div>
-                                                            <img src={item.avatar} className="rounded-full w-9 h-9" />
-                                                        </div>
-                                                        <div className="text-xs font-semibold">{item.title}</div>
+                            <div className="mt-[20px]">
+                                <Swiper
+                                    onSwiper={(swiper) => setSwiperRef(swiper)}
+                                    slidesPerView={onCol()}
+                                    spaceBetween={30}
+                                    centeredSlides={false}
+                                    loop
+                                    modules={[]}
+                                    className="mySwiper"
+                                    autoplay={{
+                                        delay: 2500,
+                                        disableOnInteraction: false
+                                    }}
+                                >
+                                    {recommendList.map((item, index) => (
+                                        <SwiperSlide>
+                                            <div className="!bg-white rounded-2xl p-5 space-y-2.5 border border-neutral-100">
+                                                <div className="flex items-center gap-2">
+                                                    <div>
+                                                        <img src={item.avatar} className="rounded-full w-9 h-9" />
                                                     </div>
-                                                    <div className="font-semibold leading-7">“{item.content}”</div>
+                                                    <div className="text-xs font-semibold">{item.title}</div>
                                                 </div>
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
-                                </div>
+                                                <div className="font-semibold leading-7">“{item.content}”</div>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
                             </div>
-                        </>
-                    )}
+                        </div>
+                    </>
                 </div>
             </div>
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
@@ -952,6 +1004,7 @@ const Price1 = () => {
                     setCurrentSelect={setCurrentSelect}
                     currentSelect={currentSelect}
                     handleCreateOrder={handleCreateOrder}
+                    handleCreateSignPay={handleCreateSignPay}
                     categoryId={value}
                 />
             )}

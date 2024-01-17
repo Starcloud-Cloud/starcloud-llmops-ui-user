@@ -11,6 +11,7 @@ import axios from 'utils/axios';
 import { closeSnackbar, openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import Follow from './Follow';
+import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 
 const BottomCards: React.FC = () => {
     const [openGroupAdd, setOpenGroupAdd] = useState(false);
@@ -122,13 +123,15 @@ const BottomCards: React.FC = () => {
     ];
     return (
         <div>
-            <Grid container spacing={2}>
-                {cardsData.map((card, index) => (
-                    <Grid item xs={12} md={6} lg={4} xl={3} key={index}>
-                        <BottomCard {...card} height={{ xs: '220px', md: '240px', lg: '240px', xl: '240px' }} onClick={card.onClick} />
-                    </Grid>
-                ))}
-            </Grid>
+            {getPermission(ENUM_PERMISSION.EQUITY) && (
+                <Grid container spacing={2}>
+                    {cardsData.map((card, index) => (
+                        <Grid item xs={12} md={6} lg={4} xl={3} key={index}>
+                            <BottomCard {...card} height={{ xs: '220px', md: '240px', lg: '240px', xl: '240px' }} onClick={card.onClick} />
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
 
             <GroupAdd open={openGroupAdd} handleClose={handleCloseGroupAdd} />
             <Share open={openShare} handleClose={handleCloseShare} />

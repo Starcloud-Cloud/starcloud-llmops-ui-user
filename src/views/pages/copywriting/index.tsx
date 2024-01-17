@@ -479,9 +479,9 @@ const Copywriting: React.FC = () => {
                                     </TableCell>
                                     <TableCell align="center">
                                         <span className="line-clamp-1 w-[200px] mx-auto">
-                                            {row.model === 'RANDOM_IMAGE_TEXT'
+                                            {row.mode === 'RANDOM_IMAGE_TEXT'
                                                 ? '随机图文生成'
-                                                : row.model === 'PRACTICAL_IMAGE_TEXT'
+                                                : row.mode === 'PRACTICAL_IMAGE_TEXT'
                                                 ? '干货文生成'
                                                 : '自定义内容拼接'}
                                         </span>

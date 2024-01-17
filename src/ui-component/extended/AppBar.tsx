@@ -27,6 +27,7 @@ import Logo from 'ui-component/Logo';
 import { IconDashboard, IconHome2 } from '@tabler/icons';
 import MenuIcon from '@mui/icons-material/Menu';
 import useRouteStore from 'store/router';
+import { DASHBOARD_PATH } from 'config';
 
 // elevation scroll
 interface ElevationScrollProps {
@@ -73,12 +74,8 @@ const AppBar = ({ ...others }) => {
                         <Logo />
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button
-                                // component={RouterLink}
-                                // to="/appMarket"
-                                // target="_blank"
-
                                 onClick={() => {
-                                    navigate('/appMarket');
+                                    navigate(DASHBOARD_PATH);
                                     setRoutesIndex(0);
                                 }}
                                 disableElevation

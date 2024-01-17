@@ -7,6 +7,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { useEffect, useState } from 'react';
 import { spaceSimple, spaceJoin } from 'api/section';
 import { useAllDetail } from 'contexts/JWTContext';
+import { DASHBOARD_PATH } from 'config';
 const Invite = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -29,7 +30,7 @@ const Invite = () => {
             const result = await spaceJoin(searchParams.get('invite'));
             if (result) {
                 setTimeout(() => {
-                    navigate('/appMarket');
+                    navigate(DASHBOARD_PATH);
                 }, 1000);
                 dispatch(
                     openSnackbar({

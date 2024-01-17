@@ -28,6 +28,7 @@ import amzon from 'assets/images/landing/pre-apps/amzon.jpg';
 import site from 'assets/images/landing/pre-apps/site.jpg';
 import social from 'assets/images/landing/pre-apps/social.jpg';
 import template from 'assets/images/landing/pre-apps/template.jpg';
+import { DASHBOARD_PATH } from 'config';
 
 // styles
 const Images = styled('img')({
@@ -207,11 +208,11 @@ const PreBuildDashBoard = () => {
                                 hasNext && <SampleNextArrow onClickHandler={onClickHandler} hasNext={hasNext} label={label} />
                             }
                         >
-                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link="/appMarket" />
-                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link="/appMarket" />
-                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link="/appMarket" />
-                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link="/appMarket" />
-                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link="/appMarket" />
+                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link={DASHBOARD_PATH} />
+                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link={DASHBOARD_PATH} />
+                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link={DASHBOARD_PATH} />
+                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link={DASHBOARD_PATH} />
+                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link={DASHBOARD_PATH} />
                         </Carousel>
                     </Box>
                 </Grid>

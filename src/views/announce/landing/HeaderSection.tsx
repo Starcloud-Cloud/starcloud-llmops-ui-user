@@ -35,6 +35,7 @@ import BgLight from 'assets/images/landing/bg-hero-block-light.png';
 import { t } from 'hooks/web/useI18n';
 import Slider from 'react-slick';
 import useRouteStore from 'store/router';
+import { DASHBOARD_PATH } from 'config';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -203,7 +204,7 @@ const HeaderSection = () => {
                                         <AnimateButton>
                                             <Button
                                                 onClick={() => {
-                                                    navigate('/appMarket');
+                                                    navigate(DASHBOARD_PATH);
                                                     setRoutesIndex(0);
                                                 }}
                                                 variant="contained"

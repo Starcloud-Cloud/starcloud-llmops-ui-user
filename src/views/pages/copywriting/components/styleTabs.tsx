@@ -20,7 +20,7 @@ const StyleTabs = ({
     };
     const add = () => {
         const newPanes = _.cloneDeep(imageStyleData);
-        newPanes.push({ id: '', name: `图片 ${newTabIndex.current++}`, key: newTabIndex.current.toString(), variables: [] });
+        newPanes.push({ id: '', name: `图片 ${newTabIndex.current++}`, key: newTabIndex.current.toString(), variableList: [] });
         setDetailData(newPanes);
         setActiveKey((newPanes.length - 1).toString());
     };

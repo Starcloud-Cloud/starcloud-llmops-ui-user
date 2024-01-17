@@ -35,7 +35,7 @@ const list: IList = {
 };
 
 const announceList: IList = {
-    [ENUM_PERMISSION.APP_NAME]: '魔法通告',
+    [ENUM_PERMISSION.APP_NAME]: '魔法矩阵',
     [ENUM_PERMISSION.APP_DES]: '跨境营销创意大师',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,

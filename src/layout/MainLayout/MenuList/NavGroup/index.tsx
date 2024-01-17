@@ -181,53 +181,56 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
         <>
             {layout === LAYOUT_CONST.VERTICAL_LAYOUT || (layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && matchDownMd) ? (
                 <>
-                    <List
-                        disablePadding={!drawerOpen}
-                        subheader={
-                            currentItem.title &&
-                            drawerOpen && (
-                                <Typography variant="caption" sx={{ ...theme.typography.menuCaption }} display="block" gutterBottom>
-                                    {currentItem.id === '2208' ? (
-                                        <div className="flex items-center">
-                                            <span>{currentItem.title}</span>
-                                            <svg
-                                                viewBox="0 0 1024 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="1594"
-                                                width="36"
-                                                height="36"
-                                            >
-                                                <path
-                                                    d="M889.6 272l-758.4 0c-41.6 0-73.6 32-73.6 73.6l0 361.6c0 41.6 32 73.6 73.6 73.6l758.4 0c41.6 0 73.6-32 73.6-73.6l0-361.6C963.2 304 931.2 272 889.6 272zM320 646.4l-51.2 0-99.2-195.2 0 195.2-32 0 0-233.6 44.8 0 102.4 201.6 3.2 0 0-201.6 32 0L320 646.4zM400 512l124.8 0 0 32-124.8 0c0 3.2 0 3.2 0 6.4l0 0c0 41.6 12.8 60.8 38.4 60.8l89.6 0 0 32-89.6 0c-19.2 0-35.2-6.4-48-22.4-12.8-16-19.2-41.6-19.2-70.4 0-12.8 0-28.8 0-54.4 0-54.4 35.2-76.8 70.4-83.2l0 0c12.8 0 80 0 86.4 0l0 32c-28.8 0-73.6 0-83.2 0-12.8 3.2-41.6 12.8-41.6 51.2C400 502.4 400 505.6 400 512zM816 646.4l-44.8 0-44.8-185.6-51.2 185.6-48 0-67.2-233.6 35.2 0 57.6 192 3.2 0 51.2-192 38.4 0 51.2 201.6 60.8-201.6 32 0L816 646.4z"
-                                                    p-id="1595"
-                                                    fill="#f82307"
-                                                ></path>
-                                            </svg>
-                                        </div>
-                                    ) : (
-                                        currentItem.title
-                                    )}
+                    {currentItem?.visible && (
+                        <>
+                            <List
+                                disablePadding={!drawerOpen}
+                                subheader={
+                                    currentItem.title &&
+                                    drawerOpen && (
+                                        <Typography variant="caption" sx={{ ...theme.typography.menuCaption }} display="block" gutterBottom>
+                                            {currentItem.id === '2208' ? (
+                                                <div className="flex items-center">
+                                                    <span>{currentItem.title}</span>
+                                                    <svg
+                                                        viewBox="0 0 1024 1024"
+                                                        version="1.1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        p-id="1594"
+                                                        width="36"
+                                                        height="36"
+                                                    >
+                                                        <path
+                                                            d="M889.6 272l-758.4 0c-41.6 0-73.6 32-73.6 73.6l0 361.6c0 41.6 32 73.6 73.6 73.6l758.4 0c41.6 0 73.6-32 73.6-73.6l0-361.6C963.2 304 931.2 272 889.6 272zM320 646.4l-51.2 0-99.2-195.2 0 195.2-32 0 0-233.6 44.8 0 102.4 201.6 3.2 0 0-201.6 32 0L320 646.4zM400 512l124.8 0 0 32-124.8 0c0 3.2 0 3.2 0 6.4l0 0c0 41.6 12.8 60.8 38.4 60.8l89.6 0 0 32-89.6 0c-19.2 0-35.2-6.4-48-22.4-12.8-16-19.2-41.6-19.2-70.4 0-12.8 0-28.8 0-54.4 0-54.4 35.2-76.8 70.4-83.2l0 0c12.8 0 80 0 86.4 0l0 32c-28.8 0-73.6 0-83.2 0-12.8 3.2-41.6 12.8-41.6 51.2C400 502.4 400 505.6 400 512zM816 646.4l-44.8 0-44.8-185.6-51.2 185.6-48 0-67.2-233.6 35.2 0 57.6 192 3.2 0 51.2-192 38.4 0 51.2 201.6 60.8-201.6 32 0L816 646.4z"
+                                                            p-id="1595"
+                                                            fill="#f82307"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            ) : (
+                                                currentItem.title
+                                            )}
 
-                                    {currentItem.caption && (
-                                        <Typography
-                                            variant="caption"
-                                            sx={{ ...theme.typography.subMenuCaption }}
-                                            display="block"
-                                            gutterBottom
-                                        >
-                                            {currentItem.caption}
+                                            {currentItem.caption && (
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{ ...theme.typography.subMenuCaption }}
+                                                    display="block"
+                                                    gutterBottom
+                                                >
+                                                    {currentItem.caption}
+                                                </Typography>
+                                            )}
                                         </Typography>
-                                    )}
-                                </Typography>
-                            )
-                        }
-                    >
-                        {items}
-                    </List>
+                                    )
+                                }
+                            >
+                                {items}
+                            </List>
 
-                    {/* group divider */}
-                    {drawerOpen && <Divider sx={{ mt: 0.25, mb: 1.25 }} />}
+                            {drawerOpen && <Divider sx={{ mt: 0.25, mb: 1.25 }} />}
+                        </>
+                    )}
                 </>
             ) : (
                 <List>

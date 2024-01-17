@@ -20,7 +20,7 @@ module.exports = function override(config) {
             plugin.config.maximumFileSizeToCacheInBytes = 50 * 1024 * 1024;
         }
     });
-    config.plugins.push(new BundleAnalyzerPlugin());
+    // config.plugins.push(new BundleAnalyzerPlugin());
 
     if (config.output) {
         const version = new Date().getTime();

@@ -11,7 +11,8 @@ import Loadable from 'ui-component/Loadable';
 import AuthenticationRoutes from './AuthenticationRoutes';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
-const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
+// const PagesLanding = Loadable(lazy(() => import('views/pages/landing')));
+import PagesLanding from 'views/pages/landing';
 const PagesPrice = Loadable(lazy(() => import('views/pages/pricing/member')));
 const Invite = Loadable(lazy(() => import('views/invite')));
 const PagesChatBot = Loadable(lazy(() => import('views/chat/bot')));

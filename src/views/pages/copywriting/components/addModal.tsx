@@ -1253,7 +1253,7 @@ const AddModal = () => {
                                                         <TextArea
                                                             defaultValue={el?.requirement}
                                                             onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                            rows={4}
+                                                            rows={10}
                                                         />
                                                         <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
                                                             文案拼接配置

@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'store';
 import { openDrawer } from 'store/slices/menu';
 
 import wechat1 from 'assets/images/landing/wechat.png';
+import wechat2 from 'assets/images/landing/wechat_2.png';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 // assets
 import { IconMenu2 } from '@tabler/icons';
@@ -235,6 +236,42 @@ const Header = () => {
                         <QrCode2Icon />
                         <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
                             跨境卖家AI工具群
+                        </Typography>
+                        <KeyboardArrowDownIcon />
+                    </Box>
+                </Popover>
+            )}
+            {!getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
+                <Popover
+                    zIndex={9999}
+                    placement="bottom"
+                    content={
+                        <Box display="flex" textAlign="center">
+                            <Box width="200px">
+                                <Typography mt={2} variant="h3">
+                                    微信扫码入群
+                                </Typography>
+                                <Typography my={1} fontSize="12px" color="#697586">
+                                    魔法AI矩阵交流群
+                                </Typography>
+                                <Box display="flex" justifyContent="center">
+                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '50%' }} />
+                                </Box>
+                            </Box>
+                        </Box>
+                    }
+                    arrow={false}
+                >
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        sx={{ cursor: 'pointer', marginRight: '12px' }}
+                        onClick={handleClick}
+                        className="sm:ml-[47px] xs:ml-[20px]"
+                    >
+                        <QrCode2Icon />
+                        <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
+                            魔法矩阵AI工具群
                         </Typography>
                         <KeyboardArrowDownIcon />
                     </Box>

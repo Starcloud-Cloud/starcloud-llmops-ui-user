@@ -73,7 +73,8 @@ const BatcSmallRedBooks = () => {
                 setPerform(preform + 1);
             }
         } else if (targetKeys && targetKeys.length === 0) {
-            setVariables({});
+            variableRef.current = {};
+            setVariables(variableRef.current);
         }
     }, [targetKeys]);
     const setDetail = (result: any) => {
@@ -88,9 +89,8 @@ const BatcSmallRedBooks = () => {
         });
         variableRef.current = res.config?.paramMap;
         setVariables(variableRef.current);
-        schemeRef.current = res.config?.schemeList[0]?.steps;
+        schemeRef.current = res.config?.schemeList ? res.config?.schemeList[0]?.steps : [];
         setSchemeList(schemeRef.current);
-
         setImageList(
             res.config?.imageUrlList?.map((item: any) => {
                 return {
@@ -642,13 +642,14 @@ const BatcSmallRedBooks = () => {
                                             </div>
                                             {variables[item]?.map((el: any, i: number) => (
                                                 <Form
-                                                    key={JSON.stringify(el) + '3'}
+                                                    key={i + '3'}
                                                     item={el}
                                                     index={i}
                                                     changeValue={(data: any) => {
-                                                        const newData = _.cloneDeep(variables);
+                                                        const newData = _.cloneDeep(variableRef.current);
                                                         newData[item][data.index].value = data.value;
-                                                        setVariables(newData);
+                                                        variableRef.current = newData;
+                                                        setVariables(variableRef.current);
                                                     }}
                                                     flag={false}
                                                 />

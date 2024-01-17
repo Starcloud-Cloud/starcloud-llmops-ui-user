@@ -27,6 +27,7 @@ import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
 type IAddKeywordModalProps = {
     open: boolean;
     handleClose: () => void;
+    setIsLoading: (isLoading: boolean) => void;
 };
 
 function a11yProps(index: number) {
@@ -39,7 +40,7 @@ function a11yProps(index: number) {
 /**
  * 添加导入关键词弹窗
  */
-export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) => {
+export const AddKeywordModal = ({ open, handleClose, setIsLoading }: IAddKeywordModalProps) => {
     const [tab, setTab] = useState(0);
     const [keyWord, setKeyWord] = useState<string>('');
     const [dictList, setDictList] = useState([]);
@@ -49,6 +50,7 @@ export const AddKeywordModal = ({ open, handleClose }: IAddKeywordModalProps) =>
 
     // 添加关键词
     const handleOk = async () => {
+        setIsLoading(true);
         const result = list
             .filter((item) => item.type === ListingBuilderEnum.FIVE_DES)
             .reduce((acc: any, obj, index) => {

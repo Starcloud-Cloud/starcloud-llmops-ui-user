@@ -66,16 +66,33 @@ export const getPrice = (data: any) => {
     return request.post({ url: '/llm/trade/order/u/settlement', data });
 };
 
+// 获取签约价格
+export const getSignPrice = (data: any) => {
+    return request.post({ url: '/llm/trade/sign/u/settlement', data });
+};
+
 export const createSign = (data: any) => {
     return request.post({ url: '/llm/pay/sign/createSign', data });
+};
+
+export const createSignV2 = (data: any) => {
+    return request.post({ url: '/llm/trade/sign/u/create', data });
 };
 
 export const submitSign = (data: any) => {
     return request.post({ url: '/llm/pay/sign/submitSign', data });
 };
 
+export const submitSignV2 = (data: any) => {
+    return request.put({ url: '/pay/sign/submit_sign', data });
+};
+
 export const getIsSign = (data: any) => {
     return request.post({ url: '/llm/pay/sign/IsSuccess', data });
+};
+
+export const getIsSignV2 = (data: any) => {
+    return request.get({ url: '/llm/trade/sign/u/is-success', params: data });
 };
 
 // export const discountNewUser = () => {

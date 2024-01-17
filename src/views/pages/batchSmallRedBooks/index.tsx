@@ -605,7 +605,7 @@ const BatcSmallRedBooks = () => {
                                         </div>
                                         {schemesList?.map((item, de) => (
                                             <>
-                                                <div className="text-[12px] font-[500] mt-[5px]"></div>
+                                                <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
                                                 {item?.variableList?.map((el: any, i: number) => (
                                                     <Form
                                                         key={el?.field}
@@ -686,7 +686,7 @@ const BatcSmallRedBooks = () => {
                             className="w-full"
                         />
                     </div>
-                    <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
+                    <div className="z-100 absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
                         <Button
                             className="w-full"
                             disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}

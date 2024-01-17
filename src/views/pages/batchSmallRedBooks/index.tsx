@@ -605,7 +605,9 @@ const BatcSmallRedBooks = () => {
                                         </div>
                                         {schemesList?.map((item, de) => (
                                             <>
-                                                <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
+                                                {item?.variableList?.length > 0 && (
+                                                    <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
+                                                )}
                                                 {item?.variableList?.map((el: any, i: number) => (
                                                     <Form
                                                         key={el?.field}

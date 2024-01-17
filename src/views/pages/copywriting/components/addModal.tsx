@@ -141,7 +141,7 @@ const AddModal = () => {
                         mode: res.mode
                     });
                     if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                        setRows(res.configuration?.copyWritingTemplate?.variableList);
+                        setRows(res.configuration?.copyWritingTemplate?.variables);
                         setTableData(res.refers);
                         setTestImageList(
                             res.useImages?.map((item: any) => {
@@ -402,7 +402,7 @@ const AddModal = () => {
                         copyWritingTemplate: {
                             ...copyWritingTemplate,
                             example: testTableList,
-                            variableList: rows
+                            variables: rows
                         },
                         imageTemplate: {
                             styleList: imageStyleData
@@ -437,7 +437,7 @@ const AddModal = () => {
                     copyWritingTemplate: {
                         ...copyWritingTemplate,
                         example: testTableList,
-                        variableList: rows
+                        variables: rows
                     },
                     imageTemplate: {
                         styleList: imageStyleData
@@ -1228,8 +1228,8 @@ const AddModal = () => {
                                                         pre={pre}
                                                         value={el?.requirement}
                                                         setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variableList}
-                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                        rows={el?.variables}
+                                                        setRows={(data: any[]) => setValues('variables', data, index)}
                                                     />
                                                     {el.code === 'ParagraphActionHandler' && (
                                                         <div className="relative mt-[20px]">
@@ -1313,7 +1313,7 @@ const AddModal = () => {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
                                             example: testTableList,
-                                            variableList: rows
+                                            variables: rows
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData

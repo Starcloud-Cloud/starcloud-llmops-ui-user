@@ -45,7 +45,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SkillWorkflowCard from './SkillWorkflowCard';
 import imgLoading from 'assets/images/picture/loading.gif';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import useUserStore from 'store/user';
 import { UpgradeModel } from '../../components/upgradeRobotModel';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';

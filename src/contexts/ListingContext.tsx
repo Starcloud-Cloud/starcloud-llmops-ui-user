@@ -1,5 +1,5 @@
 import { getGrade } from 'api/listing/build';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';

@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const WorkBoxPlugin = require('workbox-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = function override(config) {
     config.resolve.fallback = {
@@ -19,6 +20,7 @@ module.exports = function override(config) {
             plugin.config.maximumFileSizeToCacheInBytes = 50 * 1024 * 1024;
         }
     });
+    config.plugins.push(new BundleAnalyzerPlugin());
 
     if (config.output) {
         const version = new Date().getTime();

@@ -210,40 +210,41 @@ const SpaceEquity = () => {
         {
             title: '角色',
             align: 'center',
-            render: (_, row) =>
-                row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
-                    <Select
-                        className="w-[200px]"
-                        value={row.deptRole && Number(row.deptRole)}
-                        onChange={async (e) => {
-                            const result = await spaceRole(row.userDeptId, e);
-                            if (result) {
-                                dispatch(
-                                    openSnackbar({
-                                        open: true,
-                                        message: '更新成功',
-                                        variant: 'alert',
-                                        alert: {
-                                            color: 'success'
-                                        },
-                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                        transition: 'SlideDown',
-                                        close: false
-                                    })
-                                );
-                                getTableList();
-                            }
-                        }}
-                    >
-                        {roleList?.map((item: any) => (
-                            <Option key={item.value} value={item.value}>
-                                {item.label}
-                            </Option>
-                        ))}
-                    </Select>
-                ) : (
-                    <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
-                )
+            render: (_, row) => (
+                // row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
+                //     <Select
+                //         className="w-[200px]"
+                //         value={row.deptRole && Number(row.deptRole)}
+                //         onChange={async (e) => {
+                //             const result = await spaceRole(row.userDeptId, e);
+                //             if (result) {
+                //                 dispatch(
+                //                     openSnackbar({
+                //                         open: true,
+                //                         message: '更新成功',
+                //                         variant: 'alert',
+                //                         alert: {
+                //                             color: 'success'
+                //                         },
+                //                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                //                         transition: 'SlideDown',
+                //                         close: false
+                //                     })
+                //                 );
+                //                 getTableList();
+                //             }
+                //         }}
+                //     >
+                //         {roleList?.map((item: any) => (
+                //             <Option key={item.value} value={item.value}>
+                //                 {item.label}
+                //             </Option>
+                //         ))}
+                //     </Select>
+                // ) : (
+                <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
+            )
+            // )
         },
         {
             title: '操作',
@@ -491,32 +492,36 @@ const SpaceEquity = () => {
                                 {user?.name}
                             </Typography>
 
-                            <SettingOutlined
-                                onClick={() => {
-                                    if (!user?.avatar) {
-                                        setActive('');
-                                    } else if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
-                                        setimageUrl(user?.avatar);
-                                    } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
-                                        setActive(user?.avatar);
-                                    }
-                                    setParams(_.cloneDeep(user));
-                                    setavatarOpen(true);
-                                }}
-                                className="cursor-pointer"
-                                rev={undefined}
-                            />
+                            {all_detail?.allDetail?.id === user?.adminUserId && (
+                                <SettingOutlined
+                                    onClick={() => {
+                                        if (!user?.avatar) {
+                                            setActive('');
+                                        } else if (user?.avatar && user?.avatar.indexOf('https') !== -1) {
+                                            setimageUrl(user?.avatar);
+                                        } else if (user?.avatar && user?.avatar.indexOf('https') === -1) {
+                                            setActive(user?.avatar);
+                                        }
+                                        setParams(_.cloneDeep(user));
+                                        setavatarOpen(true);
+                                    }}
+                                    className="cursor-pointer"
+                                    rev={undefined}
+                                />
+                            )}
                         </div>
                     </Box>
-                    <div className="flex items-center">
-                        （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 0)}）
-                        <div
-                            onClick={addMember}
-                            className="py-2 px-6 text-[#7C5CFC] text-sm bg-[#fff] rounded-lg cursor-pointer lg:text-xs shrink-0 hover:opacity-80"
-                        >
-                            添加成员
+                    {all_detail?.allDetail?.id === user?.adminUserId && (
+                        <div className="flex items-center">
+                            （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 0)}）
+                            <div
+                                onClick={addMember}
+                                className="py-2 px-6 text-[#7C5CFC] text-sm bg-[#fff] rounded-lg cursor-pointer lg:text-xs shrink-0 hover:opacity-80"
+                            >
+                                添加成员
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </SubCard>
                 <Table columns={columns} dataSource={tableData} />
                 <Modals
@@ -652,12 +657,7 @@ const SpaceEquity = () => {
                         </CardActions>
                     </MainCard>
                 </Modals>
-                <Modals
-                    open={inviteLinkOpen}
-                    onClose={() => setInviteLinkOpen(false)}
-                    aria-labelledby="modal-title"
-                    aria-describedby="modal-description"
-                >
+                <Modals open={inviteLinkOpen} onClose={() => setInviteLinkOpen(false)}>
                     <MainCard
                         style={{
                             position: 'absolute',
@@ -683,9 +683,9 @@ const SpaceEquity = () => {
                             <div className="mb-[20px] flex items-center">
                                 <div className="font-bold mr-[34px]">权限设置</div>
                                 <Radio.Group value={'b'}>
-                                    <Radio disabled value="a">
+                                    {/* <Radio disabled value="a">
                                         管理者
-                                    </Radio>
+                                    </Radio> */}
                                     <Radio value="b">使用者</Radio>
                                 </Radio.Group>
                             </div>

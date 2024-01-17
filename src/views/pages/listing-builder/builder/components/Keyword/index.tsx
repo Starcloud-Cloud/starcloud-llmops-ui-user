@@ -128,7 +128,7 @@ const KeyWord = ({ setIsLoading }: { setIsLoading: any }) => {
                 <KeywordList selected={selected} setSelected={setSelected} hiddenUse={hiddenUse} setIsLoading={setIsLoading} />
             </div>
 
-            {open && <AddKeywordModal open={open} handleClose={handleClose} />}
+            {open && <AddKeywordModal open={open} handleClose={handleClose} setIsLoading={setIsLoading} />}
             <Confirm open={delOpen} handleOk={handleDel} handleClose={() => setDelOpen(false)} />
         </div>
     );

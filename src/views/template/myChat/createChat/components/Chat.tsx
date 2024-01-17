@@ -1004,6 +1004,7 @@ export const Chat = ({
 
     // handle new message form
     const handleOnSend = async () => {
+        setVisibleTip(false);
         if (!message.trim()) {
             return;
         }

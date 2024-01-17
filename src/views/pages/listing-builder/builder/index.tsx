@@ -45,7 +45,7 @@ const ListingBuilder = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
     const [open, setOpen] = React.useState(false);
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     const {
         country,

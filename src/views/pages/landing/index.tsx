@@ -16,6 +16,7 @@ import StartupProjectSection from './StartupProjectSection';
 import { useLocation } from 'react-router-dom';
 import CustomizeSection from './CustomizeSection';
 import VideoSection from './VideoSection';
+import { getTenant, ENUM_TENANT } from 'utils/permission';
 // import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
@@ -57,9 +58,11 @@ const Landing = () => {
                 <HeaderSection />
             </HeaderWrapper>
 
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default', pt: '45px' }}>
-                <VideoSection />
-            </SectionWrapper>
+            {getTenant() === ENUM_TENANT.AI && (
+                <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default', pt: '45px' }}>
+                    <VideoSection />
+                </SectionWrapper>
+            )}
 
             {/* 2. card section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>

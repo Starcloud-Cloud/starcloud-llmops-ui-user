@@ -831,7 +831,7 @@ const AddModal = () => {
                             </Typography>
                         </Box>
                     </SubCard>
-                    {/* <SubCard
+                    <SubCard
                         sx={{
                             mb: 1,
                             borderColor: params.mode === 'CUSTOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
@@ -853,7 +853,7 @@ const AddModal = () => {
                                 {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
                             </Typography>
                         </Box>
-                    </SubCard> */}
+                    </SubCard>
                 </div>
                 {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
                     <Collapse
@@ -1228,8 +1228,8 @@ const AddModal = () => {
                                                         pre={pre}
                                                         value={el?.requirement}
                                                         setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variableList}
-                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                        rows={el?.variables}
+                                                        setRows={(data: any[]) => setValues('variables', data, index)}
                                                     />
                                                     {el.code === 'ParagraphActionHandler' && (
                                                         <div className="relative mt-[20px]">

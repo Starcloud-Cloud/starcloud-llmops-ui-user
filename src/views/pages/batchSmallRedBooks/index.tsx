@@ -89,9 +89,8 @@ const BatcSmallRedBooks = () => {
         });
         variableRef.current = res.config?.paramMap;
         setVariables(variableRef.current);
-        schemeRef.current = res.config?.schemeList[0]?.steps;
+        schemeRef.current = res.config?.schemeList ? res.config?.schemeList[0]?.steps : [];
         setSchemeList(schemeRef.current);
-
         setImageList(
             res.config?.imageUrlList?.map((item: any) => {
                 return {
@@ -604,22 +603,25 @@ const BatcSmallRedBooks = () => {
                                                 查看方案
                                             </span>
                                         </div>
-                                        {schemesList?.map((item, de) =>
-                                            item?.variableList?.map((el: any, i: number) => (
-                                                <Form
-                                                    key={el?.field}
-                                                    item={el}
-                                                    index={i}
-                                                    changeValue={(data: any) => {
-                                                        const newData = _.cloneDeep(schemeRef.current);
-                                                        newData[de].variableList[data.index].value = data.value;
-                                                        schemeRef.current = newData;
-                                                        setSchemeList(schemeRef.current);
-                                                    }}
-                                                    flag={false}
-                                                />
-                                            ))
-                                        )}
+                                        {schemesList?.map((item, de) => (
+                                            <>
+                                                <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
+                                                {item?.variableList?.map((el: any, i: number) => (
+                                                    <Form
+                                                        key={el?.field}
+                                                        item={el}
+                                                        index={i}
+                                                        changeValue={(data: any) => {
+                                                            const newData = _.cloneDeep(schemeRef.current);
+                                                            newData[de].variableList[data.index].value = data.value;
+                                                            schemeRef.current = newData;
+                                                            setSchemeList(schemeRef.current);
+                                                        }}
+                                                        flag={false}
+                                                    />
+                                                ))}
+                                            </>
+                                        ))}
                                     </>
                                 ) : (
                                     variables &&
@@ -685,7 +687,7 @@ const BatcSmallRedBooks = () => {
                             className="w-full"
                         />
                     </div>
-                    <div className="absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
+                    <div className="z-100 absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
                         <Button
                             className="w-full"
                             disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}

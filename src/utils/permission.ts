@@ -23,7 +23,8 @@ export const enum ENUM_PERMISSION {
     APP_DES = 'app_des', // 应用描述
     LAYOUT_SHOW_QRCODE = 'layout_show_qrcode', // 是否显示二维码
     LAYOUT_SHOW_CHAT_MODAL = 'layout_show_chat_modal', // 是否显示底部聊天弹窗
-    LAYOUT_SHOW_SUBSCRIBE_BUTTON = 'layout_show_subscribe_button' // 是否显示顶部订阅按钮
+    LAYOUT_SHOW_SUBSCRIBE_BUTTON = 'layout_show_subscribe_button', // 是否显示顶部订阅按钮
+    EQUITY = 'equity' //权益兑换 加入社区等
 }
 
 const list: IList = {
@@ -31,15 +32,17 @@ const list: IList = {
     [ENUM_PERMISSION.APP_DES]: '跨境营销创意大师',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: true,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: true,
-    [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: true
+    [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: true,
+    [ENUM_PERMISSION.EQUITY]: true
 };
 
 const announceList: IList = {
-    [ENUM_PERMISSION.APP_NAME]: '魔法通告',
+    [ENUM_PERMISSION.APP_NAME]: '魔法矩阵',
     [ENUM_PERMISSION.APP_DES]: '跨境营销创意大师',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,
-    [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: false
+    [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: false,
+    [ENUM_PERMISSION.EQUITY]: false
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

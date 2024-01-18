@@ -97,8 +97,6 @@ const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
                                     if (newVal) {
                                         const part1 = newVal?.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
                                         const part2 = newVal?.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-                                        console.log(`${part1}{${item.field}}${part2}`);
-
                                         setValue(`${part1}{${item.field}}${part2}`);
                                     } else {
                                         setValue(`{${item.field}}`);

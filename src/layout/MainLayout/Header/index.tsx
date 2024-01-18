@@ -241,7 +241,7 @@ const Header = () => {
                     </Box>
                 </Popover>
             )}
-            {!getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
+            {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
                 <Popover
                     zIndex={9999}
                     placement="bottom"
@@ -255,7 +255,7 @@ const Header = () => {
                                     魔法AI矩阵交流群
                                 </Typography>
                                 <Box display="flex" justifyContent="center">
-                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '50%' }} />
+                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '100%' }} />
                                 </Box>
                             </Box>
                         </Box>

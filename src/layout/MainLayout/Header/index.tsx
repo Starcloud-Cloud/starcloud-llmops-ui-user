@@ -241,7 +241,7 @@ const Header = () => {
                     </Box>
                 </Popover>
             )}
-            {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
+            {!getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
                 <Popover
                     zIndex={9999}
                     placement="bottom"

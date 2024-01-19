@@ -876,12 +876,16 @@ const Price1 = () => {
                                                         }}
                                                         color="secondary"
                                                     >
-                                                        {plan.btnText}
-                                                        {plan?.isSubscribe && (
-                                                            <Tag className="ml-1" color="#f50">
-                                                                订阅优惠10元
-                                                            </Tag>
-                                                        )}
+                                                        <div className="flex flex-col">
+                                                            <div> {plan.btnText}</div>
+                                                            {plan?.isSubscribe && (
+                                                                <div>
+                                                                    <Tag className="ml-1" color="#f50">
+                                                                        订阅优惠10元
+                                                                    </Tag>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </Button>
                                                 )}
                                             </Grid>

@@ -877,6 +877,11 @@ const Price1 = () => {
                                                         color="secondary"
                                                     >
                                                         {plan.btnText}
+                                                        {plan?.isSubscribe && (
+                                                            <Tag className="ml-1" color="#f50">
+                                                                订阅优惠10元
+                                                            </Tag>
+                                                        )}
                                                     </Button>
                                                 )}
                                             </Grid>

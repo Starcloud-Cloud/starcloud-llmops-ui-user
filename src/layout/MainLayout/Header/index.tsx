@@ -255,7 +255,7 @@ const Header = () => {
                                     魔法AI矩阵交流群
                                 </Typography>
                                 <Box display="flex" justifyContent="center">
-                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '50%' }} />
+                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '100%' }} />
                                 </Box>
                             </Box>
                         </Box>

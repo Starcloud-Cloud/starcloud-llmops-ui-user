@@ -1,6 +1,25 @@
 import { TextField, MenuItem } from '@mui/material';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { t } from 'i18next';
+import _ from 'lodash-es';
+export const verifyJSON = (value: any) => {
+    const newValue = value?.replace(/'/g, '"');
+    let parsedJson;
+    try {
+        JSON.parse(newValue);
+        parsedJson = true;
+    } catch (error) {
+        parsedJson = false;
+    }
+    return parsedJson;
+};
+export const changeJSONValue = (value: string) => {
+    let parsedJson: any = value?.replace(/'/g, '"');
+    try {
+        parsedJson = JSON.stringify(JSON.parse(parsedJson), null, 2);
+    } catch (error) {}
+    return parsedJson;
+};
 function FormExecute({ item, onChange }: any) {
     const mt = {
         marginTop: 2
@@ -51,6 +70,32 @@ function FormExecute({ item, onChange }: any) {
                     }}
                     fullWidth
                 />
+            ) : item.style === 'JSON_TEXTAREA' ? (
+                <TextField
+                    sx={mt}
+                    size="small"
+                    color="secondary"
+                    label={item.label === 'Prompt' ? t('market.' + item.field) : item.label}
+                    value={item.value}
+                    id={item.field}
+                    required
+                    name={item.field}
+                    multiline
+                    minRows={3}
+                    maxRows={3}
+                    InputLabelProps={{ shrink: true }}
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!verifyJSON(item.value) && value}
+                    helperText={!verifyJSON(item.value) && value ? `${item.label}必须为 JSON 格式` : item.description}
+                    onChange={(e) => {
+                        setValue(true);
+                        onChange(e.target);
+                    }}
+                    onBlur={(e) => {
+                        onChange({ name: item.field, value: changeJSONValue(e.target.value) });
+                    }}
+                    fullWidth
+                />
             ) : item.style === 'SELECT' ? (
                 <TextField
                     sx={mt}
@@ -82,4 +127,7 @@ function FormExecute({ item, onChange }: any) {
         </>
     );
 }
-export default FormExecute;
+const arePropsEqual = (prevProps: any, nextProps: any) => {
+    return JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item);
+};
+export default memo(FormExecute, arePropsEqual);

@@ -141,7 +141,6 @@ function ApplicationAnalysis({
         }
     };
     const permissions = useUserStore((state) => state.permissions);
-    console.log(permissions);
     //获取标数据
     const getStatistic = async () => {
         let res: any;

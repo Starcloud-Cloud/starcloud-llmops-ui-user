@@ -15,7 +15,7 @@ export const addKey = (data: any) => {
  * @returns
  */
 export const delKey = (data: any) => {
-    return request.delete({ url: '/listing/draft/key/remove', data });
+    return request.post({ url: '/listing/draft/key/remove', data });
 };
 
 /**
@@ -50,7 +50,7 @@ export const saveListing = (data: any) => {
  * @returns
  */
 export const delListing = (data: any) => {
-    return request.delete({ url: '/listing/draft/delete', data });
+    return request.post({ url: '/listing/draft/delete', data });
 };
 
 /**

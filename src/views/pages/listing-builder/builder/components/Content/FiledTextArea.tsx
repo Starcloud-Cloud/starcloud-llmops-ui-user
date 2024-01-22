@@ -92,7 +92,6 @@ const FiledTextArea = ({
     };
 
     const handleContainer2Scroll = () => {
-        console.log((container2Ref.current as any).scrollTop, 'adsf');
         if (container2Ref.current) {
             setScrollPosition((container2Ref.current as any).scrollTop);
         }

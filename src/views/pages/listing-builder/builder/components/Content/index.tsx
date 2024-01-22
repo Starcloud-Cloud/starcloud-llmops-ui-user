@@ -1133,7 +1133,8 @@ const Content = () => {
                                                 variant="contained"
                                                 onClick={() => handleAIGenerateAll()}
                                             >
-                                                AI生成完整Listing(消耗{fiveLen + 2}点)
+                                                {/* AI生成完整Listing(消耗{fiveLen + 2}点) */}
+                                                AI生成完整Listing(消耗4点)
                                             </Button>
                                         </Tooltip>
                                     </Grid>

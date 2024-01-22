@@ -487,7 +487,7 @@ const BatcSmallRedBooks = () => {
                         <KeyboardBackspace fontSize="small" />
                     </IconButton>
                     <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
-                    <span className="text-[#673ab7] font-[500]">- {'新建创作计划'}</span>
+                    <span className="text-[#673ab7] font-[500]">- {searchParams.get('uid') ? '新建创作计划' : '编辑创作计划'}</span>
                 </div>
                 <div></div>
             </SubCard>
@@ -605,7 +605,9 @@ const BatcSmallRedBooks = () => {
                                         </div>
                                         {schemesList?.map((item, de) => (
                                             <>
-                                                <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
+                                                {item?.variableList?.length > 0 && (
+                                                    <div className="text-[12px] font-[500] mt-[10px]">{item?.name}</div>
+                                                )}
                                                 {item?.variableList?.map((el: any, i: number) => (
                                                     <Form
                                                         key={el?.field}

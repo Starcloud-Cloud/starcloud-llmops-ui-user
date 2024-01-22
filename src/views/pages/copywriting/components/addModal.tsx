@@ -141,7 +141,7 @@ const AddModal = () => {
                         mode: res.mode
                     });
                     if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                        setRows(res.configuration?.copyWritingTemplate?.variables);
+                        setRows(res.configuration?.copyWritingTemplate?.variableList);
                         setTableData(res.refers);
                         setTestImageList(
                             res.useImages?.map((item: any) => {
@@ -402,7 +402,7 @@ const AddModal = () => {
                         copyWritingTemplate: {
                             ...copyWritingTemplate,
                             example: testTableList,
-                            variables: rows
+                            variableList: rows
                         },
                         imageTemplate: {
                             styleList: imageStyleData
@@ -437,7 +437,7 @@ const AddModal = () => {
                     copyWritingTemplate: {
                         ...copyWritingTemplate,
                         example: testTableList,
-                        variables: rows
+                        variableList: rows
                     },
                     imageTemplate: {
                         styleList: imageStyleData
@@ -1204,32 +1204,48 @@ const AddModal = () => {
                                                 el.code === 'ParagraphActionHandler' ||
                                                 el.code === 'TitleActionHandler') && (
                                                 <>
-                                                    <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
-                                                    <CreateTable
-                                                        tableData={el?.referList}
-                                                        sourceList={sourceList}
-                                                        setTableData={(data) => setValues('referList', data, index)}
-                                                        params={params}
-                                                    />
-                                                    <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
+                                                    <div className="text-[14px] mb-[10px] font-[600]">1. 生成模式</div>
                                                     <Radio.Group
                                                         value={el.model}
                                                         onChange={(e) => {
                                                             setValues('model', e.target.value, index);
                                                         }}
                                                     >
-                                                        {modeList?.map((item) => (
-                                                            <Radio key={item.value} value={item.value}>
-                                                                {item.label}
-                                                            </Radio>
-                                                        ))}
+                                                        {modeList?.map((item) =>
+                                                            el?.code === 'ParagraphActionHandler' ? (
+                                                                item.label !== '随机获取' && (
+                                                                    <Radio key={item.value} value={item.value}>
+                                                                        {item.label}
+                                                                    </Radio>
+                                                                )
+                                                            ) : (
+                                                                <Radio key={item.value} value={item.value}>
+                                                                    {item.label}
+                                                                </Radio>
+                                                            )
+                                                        )}
                                                     </Radio.Group>
+                                                    {el.model !== 'AI_CUSTOM' && (
+                                                        <>
+                                                            <div className="text-[14px] my-[10px] font-[600]">2.参考文案</div>
+                                                            <CreateTable
+                                                                tableData={el?.referList}
+                                                                sourceList={sourceList}
+                                                                code={el?.code}
+                                                                setTableData={(data) => setValues('referList', data, index)}
+                                                                params={params}
+                                                            />
+                                                        </>
+                                                    )}
+                                                    <div className="text-[14px] my-[10px] font-[600]">
+                                                        {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                    </div>
                                                     <CreateVariable
                                                         pre={pre}
                                                         value={el?.requirement}
                                                         setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variables}
-                                                        setRows={(data: any[]) => setValues('variables', data, index)}
+                                                        rows={el?.variableList}
+                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
                                                     />
                                                     {el.code === 'ParagraphActionHandler' && (
                                                         <div className="relative mt-[20px]">
@@ -1253,7 +1269,7 @@ const AddModal = () => {
                                                         <TextArea
                                                             defaultValue={el?.requirement}
                                                             onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                            rows={4}
+                                                            rows={10}
                                                         />
                                                         <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
                                                             文案拼接配置
@@ -1313,7 +1329,7 @@ const AddModal = () => {
                                         copyWritingTemplate: {
                                             ...copyWritingTemplate,
                                             example: testTableList,
-                                            variables: rows
+                                            variableList: rows
                                         },
                                         imageTemplate: {
                                             styleList: imageStyleData

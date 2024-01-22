@@ -1197,7 +1197,7 @@ const Content = () => {
                                                     size="small"
                                                     variant="contained"
                                                 >
-                                                    {index !== 1 ? item.btnText : `ai生成全部描述(消耗${fiveLen}点)`}
+                                                    {index !== 1 ? item.btnText : `ai生成全部描述(消耗2点)`}
                                                 </Button>
                                             </Tooltip>
                                         )}

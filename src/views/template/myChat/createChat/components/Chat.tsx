@@ -38,7 +38,7 @@ import { conversation, marketMessageSSE } from 'api/chat/mark';
 import { useChatMessage } from 'store/chatMessage';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { v4 as uuidv4 } from 'uuid';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { BpCheckbox } from 'ui-component/BpCheckbox';
 import useUserStore from 'store/user';
 import './chat.scss';

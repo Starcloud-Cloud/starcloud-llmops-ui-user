@@ -1,5 +1,5 @@
 import { getGrade } from 'api/listing/build';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ListingBuilderEnum } from 'utils/enums/listingBuilderEnums';
@@ -106,7 +106,7 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
     }, [queryUid, queryVersion]);
 
     const fiveLen = useMemo(() => {
-        return list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length || 0;
+        return list?.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length || 0;
     }, [list]);
 
     //匹配到列表 回显推荐关键词 & 是否开启 & 文本 && 星号
@@ -133,7 +133,8 @@ export const ListingProvider = ({ children }: { children: React.ReactElement }) 
                         word: 0,
                         value: '',
                         row: 4,
-                        btnText: 'AI生成描述(消耗1点)',
+                        btnText: 'AI生成全部描述',
+                        // btnText: 'AI生成描述(消耗1点)',
                         enable: true,
                         keyword: [],
                         grade: 0

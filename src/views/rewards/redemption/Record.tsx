@@ -237,6 +237,19 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+    const handleTransformState = (state: number) => {
+        switch (state) {
+            case 0:
+                return <Chip label="生效中" size="small" color="primary" />;
+            case 1:
+                return <Chip size={'small'} label="已过期" />;
+            case 2:
+                return <Chip size={'small'} label="取消" />;
+            case 3:
+                return <Chip size={'small'} label="待生效" />;
+        }
+    };
+
     return (
         <Modal
             open={open}
@@ -298,15 +311,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         <TableCell align="center" sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
                                             {row?.title}
                                         </TableCell>
-                                        <TableCell align="center">
-                                            {row?.status === 0 ? (
-                                                <Chip label="生效中" size="small" color="primary" />
-                                            ) : row?.status === 1 ? (
-                                                <Chip size={'small'} label="已过期" />
-                                            ) : (
-                                                <Chip size={'small'} label="取消" />
-                                            )}
-                                        </TableCell>
+                                        <TableCell align="center">{handleTransformState(row?.status)}</TableCell>
                                         <TableCell align="center">
                                             <Fragment key={1}>
                                                 魔法豆 · {row?.magicBeanInit} <br />

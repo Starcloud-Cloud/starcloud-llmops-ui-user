@@ -3,7 +3,6 @@ import { Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
 import { ArrowDownOutlined } from '@ant-design/icons';
 import React, { useState, useEffect, memo, useRef } from 'react';
-import * as echarts from 'echarts';
 import AddLexicon from './addLexicon';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -501,7 +500,8 @@ const TermTable = ({
     ];
     const getChartsList = (index: number, Axis: string[], rankList: number[], searchList: number[]) => {
         const chartContainer = document.getElementById('chart' + index);
-        const myChart = echarts.init(chartContainer);
+        // @ts-ignore
+        const myChart = window.echarts.init(chartContainer);
         const options = {
             grid: {
                 left: '0%',

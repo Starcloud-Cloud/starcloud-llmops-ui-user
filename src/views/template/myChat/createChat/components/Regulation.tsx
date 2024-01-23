@@ -22,7 +22,7 @@ import useUserStore from 'store/user';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getSkillList } from 'api/chat';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import styled from '@emotion/styled';
 import { PermissionUpgradeModal } from './modal/permissionUpgradeModal';
 import { Popover, Space, Tabs, TabsProps, Tag } from 'antd';

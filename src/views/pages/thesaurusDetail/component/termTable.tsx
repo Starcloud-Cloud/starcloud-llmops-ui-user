@@ -2,7 +2,6 @@ import { Button, Select, Table, Popover, Tooltip, Image } from 'antd';
 import { Card, Pagination } from '@mui/material';
 import type { ColumnsType } from 'antd/es/table';
 import React, { useState, useEffect, memo } from 'react';
-import * as echarts from 'echarts';
 import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
@@ -484,7 +483,8 @@ const TermTable = ({
     ];
     const getChartsList = (index: number, Axis: string[], rankList: number[], searchList: number[]) => {
         const chartContainer = document.getElementById('chart' + index);
-        const myChart = echarts.init(chartContainer);
+        // @ts-ignore
+        const myChart = window.echarts.init(chartContainer);
         const options = {
             grid: {
                 left: '0%',

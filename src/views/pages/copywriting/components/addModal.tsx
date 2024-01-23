@@ -97,7 +97,7 @@ const AddModal = () => {
                 {
                     key: '1',
                     name: '首图',
-                    variableList: []
+                    variables: []
                 }
             ]
         }
@@ -200,7 +200,7 @@ const AddModal = () => {
             title: '图片内容',
             render: (_, row) => (
                 <div className="flex gap-2">
-                    {row?.imageList?.map((item: any) => (
+                    {row?.images?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}
                 </div>

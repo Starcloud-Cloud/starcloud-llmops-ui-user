@@ -17,7 +17,7 @@ import cheerio from 'cheerio';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { channelUpload, channelDelete } from 'api/template';
 import ReactMarkdown from 'react-markdown';
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import { PrismAsyncLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './SiteDrawerCode.scss';
 import CopyToClipboard from 'react-copy-to-clipboard';

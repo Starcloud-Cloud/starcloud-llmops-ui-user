@@ -181,6 +181,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                             setIsLoading(false);
                         }
                     } else {
+                        console.log(res.status, 'res.status');
                         // ANALYSIS 的情况不回显值
                         if (res.status !== 'ANALYSIS') {
                             setIsLoading(false);
@@ -195,10 +196,10 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                             });
                         }
                         if (res.status === 'ANALYSIS') {
-                            fetching &&
-                                setTimeout(() => {
-                                    setUpdate({});
-                                }, 1000);
+                            // fetching &&
+                            setTimeout(() => {
+                                setUpdate({});
+                            }, 1000);
                         }
                     }
                 })

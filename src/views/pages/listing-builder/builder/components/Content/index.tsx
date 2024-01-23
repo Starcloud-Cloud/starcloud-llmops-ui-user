@@ -575,10 +575,12 @@ const Content = () => {
         }
     };
 
-    const getFiveDesAllKeys = (fiveDescConfig: any) =>
+    const getFiveDesAllKeys = (fiveDescConfig: any) => {
+        console.log(fiveDescConfig);
         Object.values(fiveDescConfig).reduce((acc: any, cur: any) => {
             return acc.concat(cur.keys);
         }, []);
+    };
     const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
         try {
             if (item.type !== ListingBuilderEnum.FIVE_DES) {
@@ -645,7 +647,9 @@ const Content = () => {
                             : 'LISTING_PRODUCT_DESCRIPTION',
                     keywords:
                         item.type === ListingBuilderEnum.FIVE_DES
-                            ? getFiveDesAllKeys(detail?.draftConfig.fiveDescConfig)
+                            ? detail?.draftConfig?.fiveDescConfig
+                                ? getFiveDesAllKeys(detail?.draftConfig.fiveDescConfig)
+                                : []
                             : item.keyword.map((item: any) => item.text),
                     ...formik.values,
                     draftUid: uid,

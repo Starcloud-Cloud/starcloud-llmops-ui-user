@@ -154,6 +154,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
+            setFetching(true);
             getListingDetail(uid, version)
                 .then((res: any) => {
                     // 设置站点

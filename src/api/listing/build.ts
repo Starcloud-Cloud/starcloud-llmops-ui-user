@@ -32,7 +32,7 @@ export const getListingPage = (data: any) => {
  * @returns
  */
 export const getListingDetail = (uid: string, version: number) => {
-    return request.get({ url: `/listing/draft/detail/${uid}/${version} ` });
+    return request.get({ url: `/listing/draft/detail/${uid}/${version}` });
 };
 
 /**

@@ -17,7 +17,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
         newData.id = temp.id;
-        newData.variables = temp.variables;
+        newData.variableList = temp.variableList;
         setData(newData);
         setOpen(false);
     };
@@ -59,8 +59,31 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 </FormControl>
                 {imageStyleData?.id && (
                     <div>
+                        {imageStyleData?.variableList?.some((value: any) => value?.label === '主标题') &&
+                            imageStyleData?.variableList?.some((value: any) => value?.label === '副标题') && (
+                                <div className="mb-[20px]">
+                                    <FormControl fullWidth>
+                                        <InputLabel id="model">生成模式</InputLabel>
+                                        <Select
+                                            labelId="model"
+                                            value={imageStyleData?.model}
+                                            label="生成模式"
+                                            onChange={(e) => {
+                                                const newData = _.cloneDeep(imageStyleData);
+                                                newData.model = e.target.value;
+                                                setData(newData);
+                                            }}
+                                        >
+                                            <MenuItem value="USER">用户填写</MenuItem>
+                                            <MenuItem value="VARIABLE">变量替换</MenuItem>
+                                            <MenuItem value="AI">AI生成</MenuItem>
+                                            <MenuItem value="MULTIMODAL">AI多模态生成</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                            )}
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variables?.map(
+                            {imageStyleData?.variableList?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
                                         <Col key={index} sm={12} xs={24} md={6}>
@@ -69,7 +92,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 index={index}
                                                 changeValue={(data: any) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.variables[data.index].value = data.value;
+                                                    newData.variableList[data.index].value = data.value;
                                                     setData(newData);
                                                 }}
                                                 item={el}

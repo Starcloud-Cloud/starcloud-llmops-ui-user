@@ -97,7 +97,8 @@ const AddModal = () => {
                 {
                     key: '1',
                     name: '首图',
-                    variables: []
+                    model: '',
+                    variableList: []
                 }
             ]
         }
@@ -112,6 +113,7 @@ const AddModal = () => {
     };
 
     //文案生成模板
+    const copyWritingTemplateRef: any = useRef({});
     const [copyWritingTemplate, setCopyWritingTemplate] = useState<any>({});
 
     useEffect(() => {
@@ -157,7 +159,8 @@ const AddModal = () => {
                             })
                         );
                         setTestTableList(res.configuration.copyWritingTemplate.example);
-                        setCopyWritingTemplate(res.configuration.copyWritingTemplate);
+                        copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
+                        setCopyWritingTemplate(copyWritingTemplateRef.current);
                         setImageStyleData(res.configuration.imageTemplate.styleList);
                         setparagraphCount(res.configuration.paragraphCount);
                     } else {
@@ -200,7 +203,7 @@ const AddModal = () => {
             title: '图片内容',
             render: (_, row) => (
                 <div className="flex gap-2">
-                    {row?.images?.map((item: any) => (
+                    {row?.imageList?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}
                 </div>
@@ -981,10 +984,11 @@ const AddModal = () => {
                                                     const reader = result.getReader();
                                                     const textDecoder = new TextDecoder();
                                                     valueRef.current = '';
-                                                    setCopyWritingTemplate({
-                                                        ...copyWritingTemplate,
+                                                    copyWritingTemplateRef.current = {
+                                                        ...copyWritingTemplateRef.current,
                                                         summary: ''
-                                                    });
+                                                    };
+                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                     let outerJoins: any;
                                                     while (1) {
                                                         let joins = outerJoins;
@@ -1029,10 +1033,11 @@ const AddModal = () => {
                                                             }
                                                             if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
                                                                 valueRef.current = valueRef.current + bufferObj.content;
-                                                                setCopyWritingTemplate({
-                                                                    ...copyWritingTemplate,
+                                                                copyWritingTemplateRef.current = {
+                                                                    ...copyWritingTemplateRef.current,
                                                                     summary: valueRef.current
-                                                                });
+                                                                };
+                                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                             } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
                                                                 dispatch(
                                                                     openSnackbar({
@@ -1081,10 +1086,11 @@ const AddModal = () => {
                                                 style={{ height: '300px' }}
                                                 value={copyWritingTemplate.summary}
                                                 onChange={(e) => {
-                                                    setCopyWritingTemplate({
-                                                        ...copyWritingTemplate,
+                                                    copyWritingTemplateRef.current = {
+                                                        ...copyWritingTemplateRef.current,
                                                         summary: e.target.value
-                                                    });
+                                                    };
+                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                 }}
                                             />
                                             {summaryOpen && !copyWritingTemplate.summary && (
@@ -1103,10 +1109,11 @@ const AddModal = () => {
                                             pre={pre}
                                             value={copyWritingTemplate.demand}
                                             setValue={(data) => {
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
+                                                copyWritingTemplateRef.current = {
+                                                    ...copyWritingTemplateRef.current,
                                                     demand: data
-                                                });
+                                                };
+                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
                                             }}
                                             rows={rows}
                                             setRows={setRows}

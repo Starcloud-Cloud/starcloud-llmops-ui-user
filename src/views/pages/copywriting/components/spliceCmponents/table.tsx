@@ -63,7 +63,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             title: '参考图片',
             render: (_, row) => (
                 <div className="flex wrap gap-2">
-                    {row.images?.map((item: any, index: number) => (
+                    {row.imageList?.map((item: any, index: number) => (
                         <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
                     ))}
                 </div>
@@ -91,7 +91,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                             setRowIndex(index);
                             setAccoutQuery({
                                 ...row,
-                                fileList: row?.images?.map((item: any) => {
+                                fileList: row?.imageList?.map((item: any) => {
                                     return {
                                         uid: uuidv4(),
                                         percent: 100,
@@ -105,12 +105,12 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                 })
                             });
                             setImageContent(
-                                row?.images?.map((item: any) => {
+                                row?.imageList?.map((item: any) => {
                                     return item.title;
                                 })
                             );
                             setImageSubContent(
-                                row?.images?.map((item: any) => {
+                                row?.imageList?.map((item: any) => {
                                     return item.subTitle;
                                 })
                             );
@@ -669,7 +669,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                         const obj = {
                                             ...accoutQuery,
                                             fileList: undefined,
-                                            images:
+                                            imageList:
                                                 accoutQuery.fileList
                                                     ?.map((item: any, i: number) => {
                                                         if (item?.response?.data?.url) {

@@ -247,11 +247,11 @@ function CreateDetail() {
     //设置name desc
     const setData = (data: any) => {
         detailRef.current = {
-            ..._.cloneDeep(detail),
+            ...detailRef.current,
             [data.name]: data.value
         };
         setDetail({
-            ..._.cloneDeep(detailRef.current),
+            ...detailRef.current,
             [data.name]: data.value
         });
     };
@@ -268,7 +268,7 @@ function CreateDetail() {
     };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
-        const newValue = _.cloneDeep(detail);
+        const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);

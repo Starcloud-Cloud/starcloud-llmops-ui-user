@@ -5,7 +5,7 @@ import { Box, CardMedia, Container, Grid, Link, Stack, Typography } from '@mui/m
 // assets
 import wechat1 from 'assets/images/landing/wechat.png';
 import wechat2 from 'assets/images/landing/wechattube.jpg';
-import wechat3 from 'assets/images/landing/wechatpublic.bmp';
+import wechat3 from 'assets/images/landing/wechatpublic.jpg';
 import tiktok from 'assets/images/landing/douyin.png';
 
 import { t } from 'hooks/web/useI18n';

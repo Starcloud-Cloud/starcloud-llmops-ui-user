@@ -16,10 +16,9 @@ const validationSchema = yup.object({
     category: yup.string().required(t('myApp.isrequire'))
 });
 
-const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setDetail_icon }: Anyevent, ref) => {
+const Basis = forwardRef(({ basisPre, initialValues, appModel, sort, type, setValues, setDetail_icon }: Anyevent, ref) => {
     const { Option } = Select;
     const permissions = useUserStore((state) => state.permissions);
-    const categoryList = marketStore((state) => state.categoryList);
     useImperativeHandle(ref, () => ({
         submit: () => {
             formik.handleSubmit();
@@ -73,6 +72,9 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
         { icon: 'seo', name: 'SEO写作', code: 'SEO_WRITING' },
         { icon: 'other', name: '其他应用', code: 'OTHER' }
     ];
+    useEffect(() => {
+        formik.handleSubmit();
+    }, [basisPre]);
     return (
         <Card sx={{ overflow: 'visible' }}>
             <form>
@@ -178,11 +180,11 @@ const Basis = forwardRef(({ initialValues, appModel, sort, type, setValues, setD
                         <TextField
                             color="secondary"
                             fullWidth
-                            required
+                            // required
                             sx={{ mt: 2 }}
                             InputLabelProps={{ shrink: true }}
-                            error={formik?.touched.name && Boolean(formik?.errors.name)}
-                            helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ''}
+                            // error={formik?.touched.name && Boolean(formik?.errors.name)}
+                            // helperText={formik?.touched.name && formik?.errors.name ? formik?.errors.name : ''}
                             label="应用市场排序"
                             value={sort}
                             type="number"

@@ -1,10 +1,10 @@
-import { Button, Tabs, Popover } from 'antd';
+import { Button, Tabs, Popover, Input } from 'antd';
 import { TextField, IconButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 interface Tabs {
     imageStyleData: any;
     setImageStyleData: (data: any) => void;
@@ -13,6 +13,8 @@ interface Tabs {
     digui: () => number;
 }
 const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
+    const [promptOpen, setpromptOpen] = useState(false);
+    const { TextArea } = Input;
     return (
         <div>
             <div className="flex items-end mb-[20px]">
@@ -27,6 +29,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                 {
                                     key: '1',
                                     name: '首图',
+                                    model: '',
                                     variableList: []
                                 }
                             ]
@@ -93,6 +96,33 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                     )}
 
                                     <div>
+                                        <Popover
+                                            content={
+                                                <TextArea
+                                                    className="w-[300px] h-[200px]"
+                                                    defaultValue={item?.prompt}
+                                                    onBlur={(e) => {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData[i].prompt = e.target.value;
+                                                        setImageStyleData(newData);
+                                                    }}
+                                                    placeholder="请输入生成要求"
+                                                />
+                                            }
+                                            trigger="click"
+                                            open={promptOpen}
+                                            onOpenChange={(e) => setpromptOpen(e)}
+                                        >
+                                            <span
+                                                onClick={() => {
+                                                    if (!promptOpen) setpromptOpen(true);
+                                                }}
+                                                className="mr-[10px] cursor-pointer"
+                                            >
+                                                生成要求
+                                            </span>
+                                        </Popover>
+
                                         <Popover
                                             zIndex={9999}
                                             content={

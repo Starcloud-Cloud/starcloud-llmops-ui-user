@@ -214,7 +214,7 @@ export function DiscountModal({
                                         />
                                     )}
                                 </Tabs>
-                                <div className="flex justify-center flex-col items-center w-full p-3">
+                                <div className="flex justify-center flex-col items-center w-full p-3 h-[400px]">
                                     <div className="flex justify-between items-center w-full mb-3">
                                         <span className="text-[#868A91]">套餐类型</span>
                                         <span className="text-base font-semibold text-[#2B2D2F]">{currentSelect?.title}</span>

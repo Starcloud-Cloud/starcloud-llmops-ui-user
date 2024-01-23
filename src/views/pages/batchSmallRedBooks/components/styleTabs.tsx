@@ -33,9 +33,15 @@ const StyleTabs = ({
         const newPanes = _.cloneDeep(imageStyleData);
         const newData = imageStyleData.map((item) => item.name.split(' ')[1]);
         if (newData.every((item) => !item)) {
-            newPanes.push({ id: '', name: `图片 1`, key: newTabIndex.current, variables: [] });
+            newPanes.push({ id: '', name: `图片 1`, model: '', key: newTabIndex.current, variableList: [] });
         } else {
-            newPanes.push({ id: '', name: `图片 ${newData?.sort((a, b) => b - a)[0] * 1 + 1}`, key: newTabIndex.current, variables: [] });
+            newPanes.push({
+                id: '',
+                name: `图片 ${newData?.sort((a, b) => b - a)[0] * 1 + 1}`,
+                model: '',
+                key: newTabIndex.current,
+                variableList: []
+            });
         }
 
         setDetailData(newPanes);

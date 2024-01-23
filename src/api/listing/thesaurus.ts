@@ -12,7 +12,7 @@ export const dictPage = (data: any) => {
 
 // 删除词库
 export const delDict = (data: any) => {
-    return request.delete({ url: '/listing/dict/delete', data });
+    return request.post({ url: '/listing/dict/delete', data });
 };
 
 // 修改词库

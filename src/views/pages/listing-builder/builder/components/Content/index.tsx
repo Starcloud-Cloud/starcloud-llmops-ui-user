@@ -577,13 +577,26 @@ const Content = () => {
 
     const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
         try {
-            setLoadingList([index]);
-            // 清空当前value
-            setList((preList: any) => {
-                const copyPreList = _.cloneDeep(preList);
-                copyPreList[index].value = '';
-                return copyPreList;
-            });
+            if (item.type !== ListingBuilderEnum.FIVE_DES) {
+                setLoadingList([index]);
+                // 清空当前value
+                setList((preList: any) => {
+                    const copyPreList = _.cloneDeep(preList);
+                    copyPreList[index].value = '';
+                    return copyPreList;
+                });
+            } else {
+                const array = Array.from({ length: index + fiveLen - 1 }, (_, i) => index + i);
+                setLoadingList(array);
+                array.forEach((v) => {
+                    setList((preList: any) => {
+                        const copyPreList = _.cloneDeep(preList);
+                        copyPreList[v].value = '';
+                        return copyPreList;
+                    });
+                });
+            }
+
             // 智能推荐
             if (item.type === ListingBuilderEnum.SEARCH_WORD) {
                 setLoadingList([]);
@@ -630,22 +643,43 @@ const Content = () => {
                     ...formik.values,
                     draftUid: uid,
                     title: list[0].value,
-                    bulletPoints: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES).map((item) => item.value)
+                    bulletPoints: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES).map((item) => item.value),
+                    bulletPointsCount: fiveLen
                 });
                 let resp: any = await promise;
 
                 const reader = resp.getReader();
                 const textDecoder = new TextDecoder();
                 let outerJoins = '';
+                let fiveDesString = '';
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
+                        if (item.type === ListingBuilderEnum.FIVE_DES) {
+                            setLoadingList([]);
+                            const fiveList = fiveDesString?.split('#####');
+                            fiveList.forEach((v, i) => {
+                                setList((preList: any) => {
+                                    const copyPreList = _.cloneDeep(preList);
+                                    copyPreList[index + i].value = v;
+                                    copyPreList[index + i].character = v.length || 0;
+                                    copyPreList[index + i].word = v?.trim()?.split(' ')?.length || 0;
+                                    return copyPreList;
+                                });
+                            });
+                        }
+
                         if (isAll) {
                             const filterList = list.filter((item) => item.type !== ListingBuilderEnum.SEARCH_WORD);
                             const length = filterList.length;
+
                             if (index < length - 1) {
-                                doAiWrite(filterList[index + 1], index + 1, true);
+                                if (item.type !== ListingBuilderEnum.FIVE_DES) {
+                                    doAiWrite(filterList[index + 1], index + 1, true);
+                                } else {
+                                    doAiWrite(filterList[index + fiveLen], fiveLen + index, true);
+                                }
                             }
                         }
                         break;
@@ -663,15 +697,21 @@ const Content = () => {
                         // 300900000 为链接成功 type为null
                         if (bufferObj?.code === 200 || bufferObj?.code === 300900000) {
                             if (bufferObj.type === 'm') {
-                                setLoadingList([]);
-                                setList((preList: any) => {
-                                    const copyPreList = _.cloneDeep(preList);
-                                    copyPreList[index].value = copyPreList[index].value + bufferObj.content;
-                                    copyPreList[index].character = (copyPreList[index].value + bufferObj.content)?.length || 0;
-                                    copyPreList[index].word =
-                                        (copyPreList[index].value + bufferObj.content)?.trim()?.split(' ')?.length || 0;
-                                    return copyPreList;
-                                });
+                                // 非5点描述
+                                if (item.type !== ListingBuilderEnum.FIVE_DES) {
+                                    setLoadingList([]);
+                                    setList((preList: any) => {
+                                        const copyPreList = _.cloneDeep(preList);
+                                        copyPreList[index].value = copyPreList[index].value + bufferObj.content;
+                                        copyPreList[index].character = (copyPreList[index].value + bufferObj.content)?.length || 0;
+                                        copyPreList[index].word =
+                                            (copyPreList[index].value + bufferObj.content)?.trim()?.split(' ')?.length || 0;
+                                        return copyPreList;
+                                    });
+                                } else {
+                                    // 5点描述
+                                    fiveDesString = fiveDesString + bufferObj.content;
+                                }
                             }
                         } else if (bufferObj?.code === 2004008003) {
                             setTokenOpen(true);
@@ -699,6 +739,7 @@ const Content = () => {
                 }
             }
         } catch (e) {
+            console.log('🚀 ~ Content ~ e:', e);
             dispatch(
                 openSnackbar({
                     open: true,
@@ -1092,7 +1133,8 @@ const Content = () => {
                                                 variant="contained"
                                                 onClick={() => handleAIGenerateAll()}
                                             >
-                                                AI生成完整Listing(消耗{fiveLen + 2}点)
+                                                {/* AI生成完整Listing(消耗{fiveLen + 2}点) */}
+                                                AI生成完整Listing(消耗4点)
                                             </Button>
                                         </Tooltip>
                                     </Grid>
@@ -1104,7 +1146,7 @@ const Content = () => {
             )}
             <Card className="mt-2 p-5">
                 <div className="text-xl font-bold py-1">Listing优化</div>
-                {list.map((item, index) => (
+                {list?.map((item, index) => (
                     <>
                         {item.type === ListingBuilderEnum.PRODUCT_DES && (
                             <>
@@ -1142,21 +1184,24 @@ const Content = () => {
                                     </Button>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    {enableAi && item.type !== ListingBuilderEnum.SEARCH_WORD && (
-                                        <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
-                                            <Button
-                                                className="!cursor-pointer !pointer-events-auto"
-                                                disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
-                                                onClick={() => handleClick(item, index)}
-                                                startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
-                                                color="secondary"
-                                                size="small"
-                                                variant="contained"
-                                            >
-                                                {item.btnText}
-                                            </Button>
-                                        </Tooltip>
-                                    )}
+                                    {enableAi &&
+                                        (item.type == ListingBuilderEnum.TITLE ||
+                                            item.type == ListingBuilderEnum.PRODUCT_DES ||
+                                            index === 1) && (
+                                            <Tooltip title="请输入关键词和产品特征" placement={'top'} arrow>
+                                                <Button
+                                                    className="!cursor-pointer !pointer-events-auto"
+                                                    disabled={!productFeature || !detail?.keywordMetaData?.length || loadingList.length > 0}
+                                                    onClick={() => handleClick(item, index)}
+                                                    startIcon={<TipsAndUpdatesIcon className="!text-sm" />}
+                                                    color="secondary"
+                                                    size="small"
+                                                    variant="contained"
+                                                >
+                                                    {index !== 1 ? item.btnText : `ai生成全部描述(消耗2点)`}
+                                                </Button>
+                                            </Tooltip>
+                                        )}
                                     {item.type === ListingBuilderEnum.SEARCH_WORD && (
                                         <Tooltip title="请输入关键词" placement={'top'} arrow>
                                             <Button

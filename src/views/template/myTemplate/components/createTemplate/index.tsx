@@ -49,11 +49,11 @@ interface AppModels {
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
         <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            {/* {value === index && ( */}
-            <Box sx={{ p: 2, display: value === index ? 'block' : 'none' }}>
-                <Box>{children}</Box>
-            </Box>
-            {/* )} */}
+            {value === index && (
+                <Box sx={{ p: 2 }}>
+                    <Box>{children}</Box>
+                </Box>
+            )}
         </div>
     );
 }
@@ -247,11 +247,11 @@ function CreateDetail() {
     //设置name desc
     const setData = (data: any) => {
         detailRef.current = {
-            ..._.cloneDeep(detail),
+            ...detailRef.current,
             [data.name]: data.value
         };
         setDetail({
-            ..._.cloneDeep(detailRef.current),
+            ...detailRef.current,
             [data.name]: data.value
         });
     };
@@ -268,7 +268,7 @@ function CreateDetail() {
     };
     //设置执行的步骤
     const exeChange = ({ e, steps, i }: any) => {
-        const newValue = _.cloneDeep(detail);
+        const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
@@ -347,9 +347,11 @@ function CreateDetail() {
         detailRef.current = newValue;
         setDetail(newValue);
     };
+    //判断基础设置
+    const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const saveDetail = () => {
-        if (!basis?.current?.submit()) {
+        if (detail.name && detail.category) {
             if (searchParams.get('uid')) {
                 appModify(detail).then((res) => {
                     if (res.data) {
@@ -387,6 +389,7 @@ function CreateDetail() {
                 });
             }
         } else {
+            setBasisPre(basisPre + 1);
             setValue(0);
         }
     };
@@ -501,6 +504,7 @@ function CreateDetail() {
                                     category: detail?.category,
                                     tags: detail?.tags
                                 }}
+                                basisPre={basisPre}
                                 sort={detail?.sort}
                                 type={detail?.type}
                                 appModel={appModels?.type}
@@ -708,12 +712,12 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={2}>
-                {detailRef.current?.uid && searchParams.get('uid') && (
+                {value === 2 && detailRef.current?.uid && searchParams.get('uid') && (
                     <ApplicationAnalysis appUid={detail?.uid} value={value} type="APP_ANALYSIS" />
                 )}
             </TabPanel>
             <TabPanel value={value} index={3}>
-                {searchParams.get('uid') && (
+                {value === 3 && searchParams.get('uid') && (
                     <Upload
                         appUid={searchParams.get('uid') as string}
                         saveState={saveState}

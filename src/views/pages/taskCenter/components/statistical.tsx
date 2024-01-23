@@ -1,11 +1,11 @@
 import { Tabs, Row, Col, Divider } from 'antd';
 import { useEffect, useState } from 'react';
-import * as echarts from 'echarts';
 const Statistical = () => {
     const [activeKey, setActiveKey] = useState('1');
     //基础数据
     const getEchart = () => {
-        const myChart = echarts.init(document.getElementById('echarts'));
+        // @ts-ignore
+        const myChart = window.echarts.init(document.getElementById('echarts'));
         const options = {
             xAxis: {
                 type: 'category',
@@ -63,7 +63,8 @@ const Statistical = () => {
             }, 1000);
             return false;
         }
-        const myChart = echarts.init(document.getElementById('analyze'));
+        // @ts-ignore
+        const myChart = window.echarts.init(document.getElementById('analyze'));
         const options = {
             legend: {
                 show: true,

@@ -537,7 +537,22 @@ const AddModal = () => {
                     type: params.type ? 'SYSTEM' : 'USER',
                     customConfiguration: {
                         ...splitList.filter((item) => item.appUid === splitValue)[0],
-                        steps: valueList
+                        steps: valueList?.map((item) => {
+                            if (item?.model === 'RANDOM') {
+                                return {
+                                    ...item,
+                                    variableList: [],
+                                    requirement: ''
+                                };
+                            } else if (item?.model === 'AI_CUSTOM') {
+                                return {
+                                    ...item,
+                                    referList: []
+                                };
+                            } else {
+                                return item;
+                            }
+                        })
                     }
                 }).then((res) => {
                     if (res) {
@@ -564,7 +579,22 @@ const AddModal = () => {
                 type: params.type ? 'SYSTEM' : 'USER',
                 customConfiguration: {
                     ...splitList.filter((item) => item.appUid === splitValue)[0],
-                    steps: valueList
+                    steps: valueList?.map((item) => {
+                        if (item?.model === 'RANDOM') {
+                            return {
+                                ...item,
+                                variableList: [],
+                                requirement: ''
+                            };
+                        } else if (item?.model === 'AI_CUSTOM') {
+                            return {
+                                ...item,
+                                referList: []
+                            };
+                        } else {
+                            return item;
+                        }
+                    })
                 }
             }).then((res) => {
                 if (res) {
@@ -1244,16 +1274,20 @@ const AddModal = () => {
                                                             />
                                                         </>
                                                     )}
-                                                    <div className="text-[14px] my-[10px] font-[600]">
-                                                        {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
-                                                    </div>
-                                                    <CreateVariable
-                                                        pre={pre}
-                                                        value={el?.requirement}
-                                                        setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variableList}
-                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
-                                                    />
+                                                    {el.model !== 'RANDOM' && (
+                                                        <>
+                                                            <div className="text-[14px] my-[10px] font-[600]">
+                                                                {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                            </div>
+                                                            <CreateVariable
+                                                                pre={pre}
+                                                                value={el?.requirement}
+                                                                setValue={(data: string) => setValues('requirement', data, index)}
+                                                                rows={el?.variableList}
+                                                                setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                            />
+                                                        </>
+                                                    )}
                                                     {el.code === 'ParagraphActionHandler' && (
                                                         <div className="relative mt-[20px]">
                                                             <InputNumber
@@ -1282,6 +1316,7 @@ const AddModal = () => {
                                                             文案拼接配置
                                                         </span>
                                                     </div>
+                                                    {/* <span>文案拼接必填</span> */}
                                                 </>
                                             )}
                                             {el.code === 'PosterActionHandler' && (

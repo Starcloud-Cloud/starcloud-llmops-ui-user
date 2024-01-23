@@ -83,7 +83,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                         <InputLabel id="model">生成模式</InputLabel>
                                                         <Select
                                                             labelId="model"
-                                                            value={imageStyleData?.model}
+                                                            value={el?.model}
                                                             label="生成模式"
                                                             onChange={(e) => {
                                                                 const newData = _.cloneDeep(imageStyleData);

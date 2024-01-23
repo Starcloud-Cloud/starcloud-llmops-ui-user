@@ -208,6 +208,12 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     ];
     const otherColumns: ColumnsType<any> = [
         {
+            title: '参考内容',
+            width: '30%',
+            dataIndex: 'content',
+            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
+        },
+        {
             title: '参考来源',
             render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
@@ -215,12 +221,6 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             title: '参考链接地址',
             dataIndex: 'link',
             key: 'link'
-        },
-        {
-            title: '参考内容',
-            width: '30%',
-            dataIndex: 'content',
-            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
         {
             title: '操作',

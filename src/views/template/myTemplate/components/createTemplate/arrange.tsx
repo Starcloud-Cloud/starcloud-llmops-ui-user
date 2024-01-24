@@ -258,9 +258,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     useEffect(() => {
         setallvalidas(
             config?.steps.map((item: any) => {
-                return item.flowStep.variable?.variables?.some((el: { defaultValue: string | null }) => {
-                    return el.defaultValue === '';
-                });
+                return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
             })
         );
     }, [expanded]);

@@ -70,11 +70,11 @@ function Perform({
     //执行按钮是否禁用
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
-            if (el.isShow) {
-                return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
-            } else {
-                return el.defaultValue || el.defaultValue === false ? false : true;
-            }
+            // if (!el.isShow) {
+            return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
+            // } else {
+            //     return el.defaultValue || el.defaultValue === false ? false : true;
+            // }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {

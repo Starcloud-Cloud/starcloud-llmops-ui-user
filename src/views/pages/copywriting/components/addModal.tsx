@@ -675,7 +675,9 @@ const AddModal = () => {
     useEffect(() => {
         appList().then((res) => {
             setSplitList(res);
-            setSplitValue(res[0]?.appUid);
+            if (!searchParams.get('uid')) {
+                setSplitValue(res[0]?.appUid);
+            }
         });
     }, []);
     const [changeFalg, setChangeFalg] = useState(false);

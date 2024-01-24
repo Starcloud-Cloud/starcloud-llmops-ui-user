@@ -66,7 +66,7 @@ const AddModal = () => {
     const searchParams = new URLSearchParams(location.search);
     // 1.模板名称
     const [params, setParams] = useState<any>({
-        mode: 'RANDOM_IMAGE_TEXT'
+        mode: 'CUSTOM_IMAGE_TEXT'
     });
     const [titleOpen, setTitleOpen] = useState(false);
     const [tagOpen, setTagOpen] = useState(false);
@@ -142,32 +142,32 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                        setRows(res.configuration?.copyWritingTemplate?.variableList);
-                        setTableData(res.refers);
-                        setTestImageList(
-                            res.useImages?.map((item: any) => {
-                                return {
-                                    uid: uuidv4(),
-                                    thumbUrl: item,
-                                    response: {
-                                        data: {
-                                            url: item
-                                        }
-                                    }
-                                };
-                            })
-                        );
-                        setTestTableList(res.configuration.copyWritingTemplate.example);
-                        copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
-                        setCopyWritingTemplate(copyWritingTemplateRef.current);
-                        setImageStyleData(res.configuration.imageTemplate.styleList);
-                        setparagraphCount(res.configuration.paragraphCount);
-                    } else {
-                        setSplitValue(res.customConfiguration?.appUid);
-                        valueListRef.current = res.customConfiguration?.steps;
-                        setValueList(valueListRef.current);
-                    }
+                    // if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
+                    //     setRows(res.configuration?.copyWritingTemplate?.variableList);
+                    //     setTableData(res.refers);
+                    //     setTestImageList(
+                    //         res.useImages?.map((item: any) => {
+                    //             return {
+                    //                 uid: uuidv4(),
+                    //                 thumbUrl: item,
+                    //                 response: {
+                    //                     data: {
+                    //                         url: item
+                    //                     }
+                    //                 }
+                    //             };
+                    //         })
+                    //     );
+                    //     setTestTableList(res.configuration.copyWritingTemplate.example);
+                    //     copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
+                    //     setCopyWritingTemplate(copyWritingTemplateRef.current);
+                    //     setImageStyleData(res.configuration.imageTemplate.styleList);
+                    //     setparagraphCount(res.configuration.paragraphCount);
+                    // } else {
+                    setSplitValue(res.customConfiguration?.appUid);
+                    valueListRef.current = res.customConfiguration?.steps;
+                    setValueList(valueListRef.current);
+                    // }
                 }
             });
         } else {
@@ -240,7 +240,37 @@ const AddModal = () => {
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-
+    //每一个内容校验
+    const verifyItem = (item: any) => {
+        let content = '';
+        let flag;
+        if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
+            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
+                flag = true;
+                content = '参考来源最少一个';
+            } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
+                flag = true;
+                content = '文案生成要求必填';
+            } else if (item.code === 'ParagraphActionHandler' && !item.paragraphCount) {
+                flag = true;
+                content = '文案段落数量必填';
+            } else {
+                flag = false;
+            }
+        } else if (item.code === 'AssembleActionHandler' && !item.requirement) {
+            flag = true;
+            content = '文案拼接配置必填';
+        } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
+            flag = true;
+            content = '风格必选';
+        } else {
+            flag = false;
+        }
+        return {
+            flag,
+            content
+        };
+    };
     //校验
     const verify = (flag?: boolean) => {
         if (!params.name) {
@@ -394,187 +424,161 @@ const AddModal = () => {
     };
     //保存
     const handleSave = () => {
-        if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
-            if (searchParams.get('uid')) {
-                schemeModify({
-                    uid: searchParams.get('uid'),
-                    ...params,
-                    type: params.type ? 'SYSTEM' : 'USER',
-                    refers: tableData,
-                    configuration: {
-                        copyWritingTemplate: {
-                            ...copyWritingTemplate,
-                            example: testTableList,
-                            variableList: rows
-                        },
-                        imageTemplate: {
-                            styleList: imageStyleData
-                        },
-                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                    }
-                }).then((res) => {
-                    if (res) {
-                        navigate('/copywriting');
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: ' 编辑成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                transition: 'SlideDown',
-                                close: false
-                            })
-                        );
-                    }
-                });
-                return false;
-            }
-            schemeCreate({
-                ...params,
-                type: params.type ? 'SYSTEM' : 'USER',
-                refers: tableData,
-                configuration: {
-                    copyWritingTemplate: {
-                        ...copyWritingTemplate,
-                        example: testTableList,
-                        variableList: rows
+        // if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
+        //     if (searchParams.get('uid')) {
+        //         schemeModify({
+        //             uid: searchParams.get('uid'),
+        //             ...params,
+        //             type: params.type ? 'SYSTEM' : 'USER',
+        //             refers: tableData,
+        //             configuration: {
+        //                 copyWritingTemplate: {
+        //                     ...copyWritingTemplate,
+        //                     example: testTableList,
+        //                     variableList: rows
+        //                 },
+        //                 imageTemplate: {
+        //                     styleList: imageStyleData
+        //                 },
+        //                 paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+        //             }
+        //         }).then((res) => {
+        //             if (res) {
+        //                 navigate('/copywriting');
+        //                 dispatch(
+        //                     openSnackbar({
+        //                         open: true,
+        //                         message: ' 编辑成功',
+        //                         variant: 'alert',
+        //                         alert: {
+        //                             color: 'success'
+        //                         },
+        //                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        //                         transition: 'SlideDown',
+        //                         close: false
+        //                     })
+        //                 );
+        //             }
+        //         });
+        //         return false;
+        //     }
+        //     schemeCreate({
+        //         ...params,
+        //         type: params.type ? 'SYSTEM' : 'USER',
+        //         refers: tableData,
+        //         configuration: {
+        //             copyWritingTemplate: {
+        //                 ...copyWritingTemplate,
+        //                 example: testTableList,
+        //                 variableList: rows
+        //             },
+        //             imageTemplate: {
+        //                 styleList: imageStyleData
+        //             },
+        //             paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+        //         }
+        //     }).then((res) => {
+        //         if (res) {
+        //             setTableList([]);
+        //             navigate('/copywriting');
+        //             dispatch(
+        //                 openSnackbar({
+        //                     open: true,
+        //                     message: ' 创建成功',
+        //                     variant: 'alert',
+        //                     alert: {
+        //                         color: 'success'
+        //                     },
+        //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        //                     transition: 'SlideDown',
+        //                     close: false
+        //                 })
+        //             );
+        //         }
+        //     });
+        // } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
+        if (!params.name) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '方案名称必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
                     },
-                    imageTemplate: {
-                        styleList: imageStyleData
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!params.category) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '类目必选',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
                     },
-                    paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                }
-            }).then((res) => {
-                if (res) {
-                    setTableList([]);
-                    navigate('/copywriting');
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: ' 创建成功',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            transition: 'SlideDown',
-                            close: false
-                        })
-                    );
-                }
-            });
-        } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
-            if (!params.name) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '方案名称必填',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (!params.category) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '类目必选',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (!params.tags || params.tags?.length === 0) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '标签最少输入一个',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (searchParams.get('uid')) {
-                schemeModify({
-                    uid: searchParams.get('uid'),
-                    ...params,
-                    type: params.type ? 'SYSTEM' : 'USER',
-                    customConfiguration: {
-                        ...splitList.filter((item) => item.appUid === splitValue)[0],
-                        steps: valueList?.map((item) => {
-                            if (item?.model === 'RANDOM') {
-                                return {
-                                    ...item,
-                                    variableList: [],
-                                    requirement: ''
-                                };
-                            } else if (item?.model === 'AI_CUSTOM') {
-                                return {
-                                    ...item,
-                                    referList: []
-                                };
-                            } else {
-                                return item;
-                            }
-                        })
-                    }
-                }).then((res) => {
-                    if (res) {
-                        navigate('/copywriting');
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: ' 编辑成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                transition: 'SlideDown',
-                                close: false
-                            })
-                        );
-                    }
-                });
-                return false;
-            }
-            schemeCreate({
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!params.tags || params.tags?.length === 0) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '标签最少输入一个',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (valueList?.some((item) => verifyItem(item).flag)) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '创作方式有未填项',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (searchParams.get('uid')) {
+            schemeModify({
+                uid: searchParams.get('uid'),
                 ...params,
                 type: params.type ? 'SYSTEM' : 'USER',
                 customConfiguration: {
@@ -598,12 +602,11 @@ const AddModal = () => {
                 }
             }).then((res) => {
                 if (res) {
-                    setTableList([]);
                     navigate('/copywriting');
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: ' 创建成功',
+                            message: ' 编辑成功',
                             variant: 'alert',
                             alert: {
                                 color: 'success'
@@ -615,7 +618,50 @@ const AddModal = () => {
                     );
                 }
             });
+            return false;
         }
+        schemeCreate({
+            ...params,
+            type: params.type ? 'SYSTEM' : 'USER',
+            customConfiguration: {
+                ...splitList.filter((item) => item.appUid === splitValue)[0],
+                steps: valueList?.map((item) => {
+                    if (item?.model === 'RANDOM') {
+                        return {
+                            ...item,
+                            variableList: [],
+                            requirement: ''
+                        };
+                    } else if (item?.model === 'AI_CUSTOM') {
+                        return {
+                            ...item,
+                            referList: []
+                        };
+                    } else {
+                        return item;
+                    }
+                })
+            }
+        }).then((res) => {
+            if (res) {
+                setTableList([]);
+                navigate('/copywriting');
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: ' 创建成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
+            }
+        });
+        // }
     };
 
     //自定义内容拼接
@@ -629,6 +675,7 @@ const AddModal = () => {
     useEffect(() => {
         appList().then((res) => {
             setSplitList(res);
+            setSplitValue(res[0]?.appUid);
         });
     }, []);
     const [changeFalg, setChangeFalg] = useState(false);
@@ -818,77 +865,33 @@ const AddModal = () => {
                 <Divider />
                 <div className="text-[18px] font-[600]">创作方式</div>
                 <div className="my-[20px] flex gap-2 flex-wrap">
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
-                            borderColor: params.mode === 'RANDOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
-                                }
+                    {splitList?.map((item) => (
+                        <SubCard
+                            sx={{
+                                mb: 1,
+                                cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
+                                borderColor: splitValue === item.appUid ? '#673ab7' : 'rgba(230,230,231,1)'
                             }}
+                            contentSX={{ p: '10px !important', width: '200px' }}
                         >
-                            <Typography variant="h4" mb={1}>
-                                图文随机组合
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据参考文案，自动生成相似内容，并根据上传的图片自动替换风格模版中的图片'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
-                                }
-                            }}
-                        >
-                            <Typography variant="h4" mb={1}>
-                                干货文生成
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            borderColor: params.mode === 'CUSTOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'CUSTOM_IMAGE_TEXT' });
-                                }
-                            }}
-                        >
-                            <Typography variant="h4" mb={1}>
-                                自定义内容拼接生成
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
+                            <Box
+                                onClick={() => {
+                                    if (!searchParams.get('uid')) {
+                                        setSplitValue(item.appUid);
+                                    }
+                                }}
+                            >
+                                <Typography variant="h4" mb={1}>
+                                    {item.appName}
+                                </Typography>
+                                <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
+                                    {'根据参考文案，自动生成相似内容，并根据上传的图片自动替换风格模版中的图片'}
+                                </Typography>
+                            </Box>
+                        </SubCard>
+                    ))}
                 </div>
-                {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
+                {/* {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
                     <Collapse
                         bordered={false}
                         style={{ background: 'transparent' }}
@@ -1204,145 +1207,147 @@ const AddModal = () => {
                             }
                         ]}
                     />
-                ) : (
-                    <div>
-                        <FormControl sx={{ mb: 2 }} fullWidth>
-                            <FormLabel>选择应用</FormLabel>
-                            <Select
-                                label="选择应用"
-                                name="source"
-                                value={splitValue}
-                                onChange={(e) => {
-                                    setChangeFalg(false);
-                                    setSplitValue(e.target.value);
-                                }}
-                            >
-                                {splitList.map((item) => (
-                                    <MenuItem key={item.appUid} value={item.appUid}>
-                                        {item.appName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Collapse
-                            bordered={false}
-                            style={{ background: 'transparent' }}
-                            items={valueList?.map((el: any, index: number) => {
-                                return {
-                                    key: index,
-                                    style: {
-                                        background: '#fafafa',
-                                        border: '1px solod #d9d9d9'
-                                    },
-                                    label: el?.name,
-                                    children: (
+                ) : ( */}
+                <Collapse
+                    bordered={false}
+                    style={{ background: 'transparent' }}
+                    items={valueList?.map((el: any, index: number) => {
+                        return {
+                            key: index,
+                            style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
+                            label: (
+                                <div className="relative">
+                                    {el?.name}
+                                    {verifyItem(el)?.flag && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
+                                    )}
+                                </div>
+                            ),
+                            children: (
+                                <>
+                                    {(el.code === 'CustomActionHandler' ||
+                                        el.code === 'ParagraphActionHandler' ||
+                                        el.code === 'TitleActionHandler') && (
                                         <>
-                                            {(el.code === 'CustomActionHandler' ||
-                                                el.code === 'ParagraphActionHandler' ||
-                                                el.code === 'TitleActionHandler') && (
+                                            <div className="text-[14px] mb-[10px] font-[600]">1. 生成模式</div>
+                                            <Radio.Group
+                                                value={el.model}
+                                                onChange={(e) => {
+                                                    setValues('model', e.target.value, index);
+                                                }}
+                                            >
+                                                {modeList?.map((item) =>
+                                                    el?.code === 'ParagraphActionHandler' ? (
+                                                        item.label !== '随机获取' && (
+                                                            <Radio key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </Radio>
+                                                        )
+                                                    ) : (
+                                                        <Radio key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Radio>
+                                                    )
+                                                )}
+                                            </Radio.Group>
+                                            {el.model !== 'AI_CUSTOM' && (
                                                 <>
-                                                    <div className="text-[14px] mb-[10px] font-[600]">1. 生成模式</div>
-                                                    <Radio.Group
-                                                        value={el.model}
-                                                        onChange={(e) => {
-                                                            setValues('model', e.target.value, index);
-                                                        }}
-                                                    >
-                                                        {modeList?.map((item) =>
-                                                            el?.code === 'ParagraphActionHandler' ? (
-                                                                item.label !== '随机获取' && (
-                                                                    <Radio key={item.value} value={item.value}>
-                                                                        {item.label}
-                                                                    </Radio>
-                                                                )
-                                                            ) : (
-                                                                <Radio key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                </Radio>
-                                                            )
-                                                        )}
-                                                    </Radio.Group>
-                                                    {el.model !== 'AI_CUSTOM' && (
-                                                        <>
-                                                            <div className="text-[14px] my-[10px] font-[600]">2.参考文案</div>
-                                                            <CreateTable
-                                                                tableData={el?.referList}
-                                                                sourceList={sourceList}
-                                                                code={el?.code}
-                                                                setTableData={(data) => setValues('referList', data, index)}
-                                                                params={params}
-                                                            />
-                                                        </>
-                                                    )}
-                                                    {el.model !== 'RANDOM' && (
-                                                        <>
-                                                            <div className="text-[14px] my-[10px] font-[600]">
-                                                                {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
-                                                            </div>
-                                                            <CreateVariable
-                                                                pre={pre}
-                                                                value={el?.requirement}
-                                                                setValue={(data: string) => setValues('requirement', data, index)}
-                                                                rows={el?.variableList}
-                                                                setRows={(data: any[]) => setValues('variableList', data, index)}
-                                                            />
-                                                        </>
-                                                    )}
-                                                    {el.code === 'ParagraphActionHandler' && (
-                                                        <div className="relative mt-[20px]">
-                                                            <InputNumber
-                                                                size="large"
-                                                                className="w-[300px] bg-[#f8fafc]"
-                                                                min={1}
-                                                                value={el?.paragraphCount}
-                                                                onChange={(data) => setValues('paragraphCount', data, index)}
-                                                            />
-                                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                                文案段落数量
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
-                                            {el.code === 'AssembleActionHandler' && (
-                                                <>
-                                                    <div className="relative">
-                                                        <TextArea
-                                                            defaultValue={el?.requirement}
-                                                            onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                            rows={10}
-                                                        />
-                                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                            文案拼接配置
-                                                        </span>
-                                                    </div>
-                                                    {/* <span>文案拼接必填</span> */}
-                                                </>
-                                            )}
-                                            {el.code === 'PosterActionHandler' && (
-                                                <>
-                                                    <CreateTab
-                                                        imageStyleData={el?.styleList}
-                                                        setImageStyleData={(data) => setValues('styleList', data, index)}
-                                                        focuActive={focuActive}
-                                                        setFocuActive={setFocuActive}
-                                                        digui={() => {
-                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                                            if (newData.every((i: any) => !i)) {
-                                                                return 1;
-                                                            }
-                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                                        }}
+                                                    <div className="text-[14px] my-[10px] font-[600]">2.参考文案</div>
+                                                    <CreateTable
+                                                        tableData={el?.referList}
+                                                        sourceList={sourceList}
+                                                        code={el?.code}
+                                                        setTableData={(data) => setValues('referList', data, index)}
+                                                        params={params}
                                                     />
                                                 </>
                                             )}
+                                            {el.model !== 'RANDOM' && (
+                                                <>
+                                                    <div className="text-[14px] my-[10px] font-[600]">
+                                                        {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                    </div>
+                                                    <CreateVariable
+                                                        pre={pre}
+                                                        model={el?.model}
+                                                        value={el?.requirement}
+                                                        setValue={(data: string) => setValues('requirement', data, index)}
+                                                        rows={el?.variableList}
+                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
+                                                    />
+                                                </>
+                                            )}
+                                            {el.code === 'ParagraphActionHandler' && (
+                                                <>
+                                                    <div className="relative mt-[20px]">
+                                                        <InputNumber
+                                                            status={!el?.paragraphCount ? 'error' : ''}
+                                                            size="large"
+                                                            className="w-[300px] bg-[#f8fafc]"
+                                                            min={1}
+                                                            value={el?.paragraphCount}
+                                                            onChange={(data) => setValues('paragraphCount', data, index)}
+                                                        />
+                                                        <span
+                                                            style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
+                                                            className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                        >
+                                                            文案段落数量
+                                                        </span>
+                                                    </div>
+                                                    {!el?.paragraphCount && (
+                                                        <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                            文案段落数量必填
+                                                        </span>
+                                                    )}
+                                                </>
+                                            )}
                                         </>
-                                    )
-                                };
-                            })}
-                        />
-                    </div>
-                )}
+                                    )}
+                                    {el.code === 'AssembleActionHandler' && (
+                                        <>
+                                            <div className="relative">
+                                                <TextArea
+                                                    status={!el?.requirement ? 'error' : ''}
+                                                    defaultValue={el?.requirement}
+                                                    onBlur={(data) => setValues('requirement', data.target.value, index)}
+                                                    rows={10}
+                                                />
+                                                <span
+                                                    style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                    className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                >
+                                                    文案拼接配置
+                                                </span>
+                                            </div>
+                                            {!el?.requirement && (
+                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案拼接配置必填</span>
+                                            )}
+                                        </>
+                                    )}
+                                    {el.code === 'PosterActionHandler' && (
+                                        <>
+                                            <CreateTab
+                                                imageStyleData={el?.styleList}
+                                                setImageStyleData={(data) => setValues('styleList', data, index)}
+                                                focuActive={focuActive}
+                                                setFocuActive={setFocuActive}
+                                                digui={() => {
+                                                    const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                    if (newData.every((i: any) => !i)) {
+                                                        return 1;
+                                                    }
+                                                    return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                }}
+                                            />
+                                        </>
+                                    )}
+                                </>
+                            )
+                        };
+                    })}
+                />
+                {/*  )} */}
                 <Divider />
                 <div className="text-[18px] my-[20px] font-[600]">测试生成</div>
                 <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">

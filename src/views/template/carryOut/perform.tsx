@@ -78,7 +78,7 @@ function Perform({
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
-                if (el.style === 'JSON_TEXTAREA') {
+                if (el.style === 'JSON') {
                     if (el.value) {
                         return !verifyJSON(el.value);
                     } else {
@@ -202,12 +202,7 @@ function Perform({
                                     <Grid container spacing={1}>
                                         {item.variable?.variables?.map((el: any, i: number) =>
                                             el.isShow ? (
-                                                <Grid
-                                                    item
-                                                    key={i}
-                                                    md={el.style === 'JSON_TEXTAREA' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
-                                                    xs={12}
-                                                >
+                                                <Grid item key={i} md={el.style === 'JSON' ? 12 : el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
                                                     <FormExecute item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
                                                 </Grid>
                                             ) : null

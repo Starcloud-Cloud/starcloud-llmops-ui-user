@@ -47,6 +47,7 @@ export interface Anyevent {
 }
 export type Rows = {
     field: string;
+    group: string;
     label: string;
     type: string;
     style: string;

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
-import { Input, Radio, RadioChangeEvent, Tag } from 'antd';
+import { Input, Popover, Radio, RadioChangeEvent, Tag } from 'antd';
 
 const { Search } = Input;
 
@@ -377,8 +377,19 @@ export function DiscountModal({
                                             />
                                             <span className="text-[#6E7378]">
                                                 我已知晓 订阅后将
-                                                <span className="text-[red]">每月自动续费</span>
-                                                ，可随时一键取消
+                                                <span className="text-[red]">每月自动续费</span>，
+                                                <Popover
+                                                    zIndex={999999}
+                                                    content={
+                                                        <div>
+                                                            <div>（1）移动端：在支付宝钱包-我的-设置-支付设置-免密支付/自动扣款</div>
+                                                            <div>（2）PC端：在支付宝官方平台-账户设置-应用授权和代扣-代扣</div>
+                                                        </div>
+                                                    }
+                                                    title="如何取消自动续费："
+                                                >
+                                                    <span className="cursor-pointer text-blue-500">可随时一键取消</span>
+                                                </Popover>
                                             </span>
                                         </div>
                                     )}

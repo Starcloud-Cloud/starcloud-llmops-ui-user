@@ -299,8 +299,10 @@ const SpaceEquity = () => {
     };
     useEffect(() => {
         getTableList();
-        getRoleList();
         getUser();
+    }, [all_detail?.allDetail?.deptId]);
+    useEffect(() => {
+        getRoleList();
     }, []);
     const { Option } = Select;
     return (

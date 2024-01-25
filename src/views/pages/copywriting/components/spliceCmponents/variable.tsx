@@ -76,9 +76,8 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
                 status={demandOpen && !value && model === 'AI_CUSTOM' ? 'error' : ''}
                 ref={iptRef}
                 style={{ height: '200px' }}
-                key={value}
-                defaultValue={value}
-                onBlur={(e) => {
+                value={value}
+                onChange={(e) => {
                     setDemandOpen(true);
                     setValue(e.target.value);
                 }}

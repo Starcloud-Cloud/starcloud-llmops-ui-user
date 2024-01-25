@@ -1220,7 +1220,7 @@ const AddModal = () => {
                             label: (
                                 <div className="relative">
                                     <span className="text-[18px] font-[600]">
-                                        {el?.name} {index + 1}
+                                        {index + 1 + '.'} {el?.name}
                                     </span>
                                     {verifyItem(el)?.flag && (
                                         <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
@@ -1234,26 +1234,35 @@ const AddModal = () => {
                                         el.code === 'TitleActionHandler') && (
                                         <>
                                             <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
-                                            <Radio.Group
-                                                value={el.model}
-                                                onChange={(e) => {
-                                                    setValues('model', e.target.value, index);
-                                                }}
-                                            >
-                                                {modeList?.map((item) =>
-                                                    el?.code === 'ParagraphActionHandler' ? (
-                                                        item.label !== '随机获取' && (
+                                            <div>
+                                                <Radio.Group
+                                                    value={el.model}
+                                                    onChange={(e) => {
+                                                        setValues('model', e.target.value, index);
+                                                    }}
+                                                >
+                                                    {modeList?.map((item) =>
+                                                        el?.code === 'ParagraphActionHandler' ? (
+                                                            item.label !== '随机获取' && (
+                                                                <Radio key={item.value} value={item.value}>
+                                                                    {item.label}
+                                                                </Radio>
+                                                            )
+                                                        ) : (
                                                             <Radio key={item.value} value={item.value}>
                                                                 {item.label}
                                                             </Radio>
                                                         )
-                                                    ) : (
-                                                        <Radio key={item.value} value={item.value}>
-                                                            {item.label}
-                                                        </Radio>
-                                                    )
-                                                )}
-                                            </Radio.Group>
+                                                    )}
+                                                </Radio.Group>
+                                            </div>
+                                            <div className="border border-solid border-[#bdbdbd]/50 p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                {el.model === 'RANDOM'
+                                                    ? '随机获取：从参考内容中随机获取一条内容使用'
+                                                    : el.model === 'AI_PARODY'
+                                                    ? 'AI仿写：从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                    : 'AI自定义：直接让AI生成内容，要求越详细越好'}
+                                            </div>
                                             {el.model !== 'AI_CUSTOM' && (
                                                 <>
                                                     <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>

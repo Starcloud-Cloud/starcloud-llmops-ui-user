@@ -64,13 +64,13 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             <div className="flex items-center gap-4">
                                 <span>图片标题生成</span>
                                 <Switch
-                                    checked={imageStyleData?.titleGenerateMode === 1 ? true : false}
+                                    checked={imageStyleData?.titleGenerateMode === 'DEFAULT' ? true : false}
                                     onChange={(e) => {
                                         const newData = _.cloneDeep(imageStyleData);
                                         if (e) {
-                                            newData.titleGenerateMode = 1;
+                                            newData.titleGenerateMode = 'AI';
                                         } else {
-                                            newData.titleGenerateMode = 0;
+                                            newData.titleGenerateMode = 'DEFAULT';
                                         }
                                         setData(newData);
                                     }}

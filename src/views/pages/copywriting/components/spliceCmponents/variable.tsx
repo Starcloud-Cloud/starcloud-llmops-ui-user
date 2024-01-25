@@ -55,7 +55,7 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
     };
     return (
         <>
-            <div className="mt-[20px] mb-[10px] text-[16px] font-[600] flex items-end">
+            <div className="mt-[20px] mb-[10px] text-[14px] font-[600] flex items-end">
                 文案生成要求
                 <span className="text-[12px] text-[#15273799]">（对生成的文案内容就行自定义要求，直接告诉AI你想怎么改文案）</span>
                 <Popover
@@ -87,7 +87,7 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
                 <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
             )}
             <Box mb={1}>
-                <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
+                <div className="text-xs my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                 {rows.length > 0 &&
                     rows?.map((item, index: number) => (
                         <Tooltip key={index} placement="top" title={t('market.fields')}>

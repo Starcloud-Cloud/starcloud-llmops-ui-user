@@ -887,7 +887,7 @@ const AddModal = () => {
                                     {item.appName}
                                 </Typography>
                                 <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                    {'根据参考文案，自动生成相似内容，并根据上传的图片自动替换风格模版中的图片'}
+                                    {item?.description}
                                 </Typography>
                             </Box>
                         </SubCard>
@@ -1219,7 +1219,9 @@ const AddModal = () => {
                             style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
                             label: (
                                 <div className="relative">
-                                    {el?.name}
+                                    <span className="text-[18px] font-[600]">
+                                        {el?.name} {index + 1}
+                                    </span>
                                     {verifyItem(el)?.flag && (
                                         <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
                                     )}
@@ -1231,7 +1233,7 @@ const AddModal = () => {
                                         el.code === 'ParagraphActionHandler' ||
                                         el.code === 'TitleActionHandler') && (
                                         <>
-                                            <div className="text-[14px] mb-[10px] font-[600]">1. 生成模式</div>
+                                            <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
                                             <Radio.Group
                                                 value={el.model}
                                                 onChange={(e) => {
@@ -1254,7 +1256,7 @@ const AddModal = () => {
                                             </Radio.Group>
                                             {el.model !== 'AI_CUSTOM' && (
                                                 <>
-                                                    <div className="text-[14px] my-[10px] font-[600]">2.参考文案</div>
+                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
                                                     <CreateTable
                                                         tableData={el?.referList}
                                                         sourceList={sourceList}
@@ -1266,7 +1268,7 @@ const AddModal = () => {
                                             )}
                                             {el.model !== 'RANDOM' && (
                                                 <>
-                                                    <div className="text-[14px] my-[10px] font-[600]">
+                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
                                                         {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
                                                     </div>
                                                     <CreateVariable

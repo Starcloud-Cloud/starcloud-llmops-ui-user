@@ -441,6 +441,7 @@ const Price1 = () => {
     const [order, setOrder] = useState<any>({});
 
     const [discountOpen, setDiscountOpen] = useState(false);
+    const [beanTypeId, setBeanTypeId] = useState('');
 
     const [newUserProductId, setNewUserProductId] = useState<any>();
     const [beanProducts, setBeanProducts] = useState<any[]>([]);
@@ -475,12 +476,13 @@ const Price1 = () => {
 
     useEffect(() => {
         getPayType().then((res) => {
-            const result = res.filter((item: any) => item.parentId === 0 && item.name !== '加油包') || [];
+            const result = res.filter((item: any) => item.parentId === 0) || [];
             setValue(result?.[0]?.id);
             setTabs(result);
 
             // 加油包
             const data = res.filter((v: any) => v.name === '加油包' && v.parentId === 0);
+            setBeanTypeId(data?.[0]?.id);
             getPayList(data?.[0]?.id).then((payRes) => {
                 setBeanProducts(payRes.list);
             });
@@ -567,7 +569,11 @@ const Price1 = () => {
     }, []);
 
     const onChange = (e: RadioChangeEvent) => {
-        setValue(e.target.value);
+        if (e.target.value === beanTypeId) {
+            handleClickRef();
+        } else {
+            setValue(e.target.value);
+        }
     };
 
     const onRefresh = async () => {
@@ -782,9 +788,9 @@ const Price1 = () => {
                                 );
                             })}
                         </Radio.Group>
-                        <span className="flex items-end ml-1 cursor-pointer text-blue-500" onClick={handleClickRef}>
+                        {/* <span className="flex items-end ml-1 cursor-pointer text-blue-500" onClick={handleClickRef}>
                             加油包购买
-                        </span>
+                        </span> */}
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {

@@ -378,7 +378,6 @@ const planListDefault = (value: number) => [
     ],
     [
         <div className="flex items-center">
-            <span>25000魔法豆</span>
             <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
@@ -448,6 +447,7 @@ const Price1 = () => {
     console.log('🚀 ~ Price1 ~ beanProducts:', beanProducts);
 
     const { width } = useWindowSize();
+    const myRef = React.useRef<any>(null);
 
     const navigate = useNavigate();
 
@@ -759,6 +759,11 @@ const Price1 = () => {
         }
     };
 
+    const handleClickRef = () => {
+        if (myRef?.current) {
+            myRef?.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
     return (
         <div>
             <HeaderWrapper id="vip">
@@ -777,6 +782,9 @@ const Price1 = () => {
                                 );
                             })}
                         </Radio.Group>
+                        <span className="flex items-end ml-1 cursor-pointer text-blue-500" onClick={handleClickRef}>
+                            加油包购买
+                        </span>
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
@@ -957,20 +965,22 @@ const Price1 = () => {
                             );
                         })}
                     </Grid>
-                    <div className="flex justify-center mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
+                    <div className="flex justify-center mt-10" ref={myRef}>
+                        注：如之前已购买权益并在有效期内的，将自动升级到新权益
+                    </div>
 
                     <div className="flex justify-center">
                         <Divider className="py-3 w-[70%]" />
                     </div>
                     <div className="flex w-full mt-[40px]  pb-10 justify-center flex-col items-center">
                         <div className="xs:w-[100%] md:w-[40%]">
-                            <div className="flex justify-center mb-5 xs:text-2xl md:text-5xl">加油包</div>
+                            <div className="flex justify-center mt-3 mb-5 xs:text-2xl md:text-5xl">加油包</div>
                             <div className="flex justify-center mt-5 mb-7">购买后7天生效，有效期7天</div>
                         </div>
                         <div className="xs:w-[100%] md:w-[40%]">
-                            <Grid container spacing={gridSpacing} columns={20}>
+                            <Grid container spacing={gridSpacing} columns={20} className="flex justify-center">
                                 {beanProducts.map((plan, index) => (
-                                    <Grid item xs={20} sm={10} md={10} key={index}>
+                                    <Grid item xs={20} sm={10} md={10} key={index} className="max-w-[320px] ">
                                         <MainCard
                                             boxShadow
                                             sx={{

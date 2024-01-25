@@ -92,7 +92,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         },
         validationSchema,
         onSubmit: (values) => {
-            if (values.style === 'JSON_TEXTAREA' && values.defaultValue) {
+            if (values.style === 'JSON' && values.defaultValue) {
                 if (!verifyJSON(values.defaultValue)) {
                     dispatch(
                         openSnackbar({
@@ -141,7 +141,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     const typeList = [
         { label: t('myApp.input'), value: 'INPUT' },
         { label: t('myApp.textarea'), value: 'TEXTAREA' },
-        { label: t('myApp.json_textarea'), value: 'JSON_TEXTAREA' },
+        { label: t('myApp.json_textarea'), value: 'JSON' },
         { label: t('myApp.select'), value: 'SELECT' }
     ];
     //关闭弹窗
@@ -154,6 +154,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     const addVariable = () => {
         setOptions([..._.cloneDeep(options), { label: 'label', value: 'value' }]);
     };
+    const [row, setRow] = useState<any>(null);
     //编辑变量
     const editModal = (row: any, i: number, index: number) => {
         for (let key in formik.values) {
@@ -161,6 +162,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
         if (row.options) setOptions(row.options);
         setTitle(t('myApp.edit'));
+        setRow(row);
         setModal(index);
         setStepIndex(i);
         setOpen(true);
@@ -258,9 +260,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     useEffect(() => {
         setallvalidas(
             config?.steps.map((item: any) => {
-                return item.flowStep.variable?.variables?.some((el: { defaultValue: string | null }) => {
-                    return el.defaultValue === '';
-                });
+                return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
             })
         );
     }, [expanded]);
@@ -607,7 +607,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             name="defaultValue"
                             sx={{ mt: 2 }}
                             label={t('myApp.value')}
-                            multiline={formik.values.style === 'JSON_TEXTAREA' ? true : false}
+                            multiline={formik.values.style === 'JSON' ? true : false}
                             minRows={4}
                             value={formik.values.defaultValue}
                             onChange={formik.handleChange}
@@ -677,6 +677,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                 </DialogContent>
                 <DialogActions>
                     <Button
+                        disabled={row?.group === 'SYSTEM'}
                         autoFocus
                         onClick={() => {
                             formik.handleSubmit();

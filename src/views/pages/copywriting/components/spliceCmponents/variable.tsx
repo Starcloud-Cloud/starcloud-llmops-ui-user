@@ -21,13 +21,14 @@ import _ from 'lodash-es';
 import VariableModal from '../variableModal';
 interface Variable {
     pre: number;
+    model: string;
     value: any;
     setValue: (data: any) => void;
     rows: any[];
     setRows: (data: any[]) => void;
 }
 
-const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
+const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable) => {
     const { TextArea } = Input;
     const iptRef: any = useRef(null);
     const [demandOpen, setDemandOpen] = useState(false);
@@ -72,7 +73,7 @@ const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
                 </Popover>
             </div>
             <TextArea
-                status={demandOpen && !value ? 'error' : ''}
+                status={demandOpen && !value && model === 'AI_CUSTOM' ? 'error' : ''}
                 ref={iptRef}
                 style={{ height: '200px' }}
                 key={value}
@@ -82,7 +83,9 @@ const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
                     setValue(e.target.value);
                 }}
             />
-            {demandOpen && !value && <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>}
+            {demandOpen && !value && model === 'AI_CUSTOM' && (
+                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
+            )}
             <Box mb={1}>
                 <div className="my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
                 {rows.length > 0 &&
@@ -192,6 +195,7 @@ const CreateVariable = ({ pre, value, setValue, rows, setRows }: Variable) => {
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.pre) === JSON.stringify(nextProps?.pre) &&
+        JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
         JSON.stringify(prevProps?.value) === JSON.stringify(nextProps?.value) &&
         JSON.stringify(prevProps?.rows) === JSON.stringify(nextProps?.rows)
     );

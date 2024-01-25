@@ -298,9 +298,13 @@ const SpaceEquity = () => {
         setRoleList(result);
     };
     useEffect(() => {
-        getTableList();
+        if (all_detail?.allDetail?.deptId) {
+            getTableList();
+            getUser();
+        }
+    }, [all_detail?.allDetail?.deptId]);
+    useEffect(() => {
         getRoleList();
-        getUser();
     }, []);
     const { Option } = Select;
     return (

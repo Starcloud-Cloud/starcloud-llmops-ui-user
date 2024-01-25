@@ -137,12 +137,13 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     ];
     const titColumns: ColumnsType<any> = [
         {
-            title: '参考标题',
-            dataIndex: 'title'
-        },
-        {
             title: '参考来源',
             render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
+        },
+        {
+            title: '参考标题',
+            dataIndex: 'title',
+            width: 200
         },
         {
             title: '参考链接地址',
@@ -212,15 +213,15 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
         {
-            title: '参考链接地址',
-            dataIndex: 'link',
-            key: 'link'
-        },
-        {
             title: '参考内容',
             width: '30%',
             dataIndex: 'content',
             render: (_, row) => <div className="line-clamp-3">{row.content}</div>
+        },
+        {
+            title: '参考链接地址',
+            dataIndex: 'link',
+            key: 'link'
         },
         {
             title: '操作',
@@ -486,7 +487,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                         className="ml-[10px]"
                                         type="primary"
                                     >
-                                        分析链接
+                                        {code === 'TitleActionHandler' ? '提取标题' : '分析链接'}
                                     </Button>
                                 )}
                             </Grid>

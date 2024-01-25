@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField } from '@mui/material';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Image, Row, Col } from 'antd';
+import { Image, Row, Col, Switch, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
@@ -59,47 +59,53 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 </FormControl>
                 {imageStyleData?.id && (
                     <div>
+                        {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
+                            imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
+                            <div className="flex items-center gap-4">
+                                <span>图片标题生成</span>
+                                <Switch
+                                    checked={imageStyleData?.titleGenerateMode === 1 ? true : false}
+                                    onChange={(e) => {
+                                        const newData = _.cloneDeep(imageStyleData);
+                                        if (e) {
+                                            newData.titleGenerateMode = 1;
+                                        } else {
+                                            newData.titleGenerateMode = 0;
+                                        }
+                                        setData(newData);
+                                    }}
+                                />
+                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 1 ? 'AI 生成' : '默认'}</span>
+                                {imageStyleData?.titleGenerateMode === 1 && (
+                                    <Input
+                                        className="w-[300px]"
+                                        value={imageStyleData?.titleGenerateRequirement}
+                                        onChange={(e) => {
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            newData.titleGenerateRequirement = e.target.value;
+                                            setData(newData);
+                                        }}
+                                        placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                    />
+                                )}
+                            </div>
+                        )}
                         <Row className="items-center mt-[20px]" gutter={20}>
                             {imageStyleData?.variableList?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
-                                        <>
-                                            <Col key={index} sm={12}>
-                                                <Form
-                                                    flag={true}
-                                                    index={index}
-                                                    changeValue={(data: any) => {
-                                                        const newData = _.cloneDeep(imageStyleData);
-                                                        newData.variableList[data.index].value = data.value;
-                                                        setData(newData);
-                                                    }}
-                                                    item={el}
-                                                />
-                                            </Col>
-                                            <Col key={index} sm={12}>
-                                                {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
-                                                    imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
-                                                    <FormControl sx={{ mt: 2 }} size="small" color="secondary" fullWidth>
-                                                        <InputLabel id="model">生成模式</InputLabel>
-                                                        <Select
-                                                            labelId="model"
-                                                            value={imageStyleData?.model}
-                                                            label="生成模式"
-                                                            onChange={(e) => {
-                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                newData.variableList[index].model = e.target.value;
-                                                                setData(newData);
-                                                            }}
-                                                        >
-                                                            <MenuItem value="USER">用户填写</MenuItem>
-                                                            <MenuItem value="VARIABLE">变量替换</MenuItem>
-                                                            <MenuItem value="AI">AI生成</MenuItem>
-                                                            <MenuItem value="MULTIMODAL">AI多模态生成</MenuItem>
-                                                        </Select>
-                                                    </FormControl>
-                                                )}
-                                            </Col>
-                                        </>
+                                        <Col key={index} sm={12} xs={24} md={6}>
+                                            <Form
+                                                flag={true}
+                                                index={index}
+                                                changeValue={(data: any) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData.variableList[data.index].value = data.value;
+                                                    setData(newData);
+                                                }}
+                                                item={el}
+                                            />
+                                        </Col>
                                     )
                             )}
                         </Row>

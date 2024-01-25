@@ -61,24 +61,24 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                     <div>
                         {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
                             imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 min-h-[32px]">
                                 <span>图片标题生成</span>
                                 <Switch
-                                    checked={imageStyleData?.titleGenerateMode === 1 ? true : false}
+                                    checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                     onChange={(e) => {
                                         const newData = _.cloneDeep(imageStyleData);
                                         if (e) {
-                                            newData.titleGenerateMode = 1;
+                                            newData.titleGenerateMode = 'AI';
                                         } else {
-                                            newData.titleGenerateMode = 0;
+                                            newData.titleGenerateMode = 'DEFAULT';
                                         }
                                         setData(newData);
                                     }}
                                 />
-                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 1 ? 'AI 生成' : '默认'}</span>
-                                {imageStyleData?.titleGenerateMode === 1 && (
+                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}</span>
+                                {imageStyleData?.titleGenerateMode === 'AI' && (
                                     <Input
-                                        className="w-[300px]"
+                                        className="w-[400px]"
                                         value={imageStyleData?.titleGenerateRequirement}
                                         onChange={(e) => {
                                             const newData = _.cloneDeep(imageStyleData);

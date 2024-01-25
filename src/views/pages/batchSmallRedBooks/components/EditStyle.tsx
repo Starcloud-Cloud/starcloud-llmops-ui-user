@@ -75,8 +75,8 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                         setData(newData);
                                     }}
                                 />
-                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 1 ? 'AI 生成' : '默认'}</span>
-                                {imageStyleData?.titleGenerateMode === 1 && (
+                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}</span>
+                                {imageStyleData?.titleGenerateMode === 'AI' && (
                                     <Input
                                         className="w-[300px]"
                                         value={imageStyleData?.titleGenerateRequirement}

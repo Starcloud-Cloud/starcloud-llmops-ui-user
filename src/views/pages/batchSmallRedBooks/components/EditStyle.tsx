@@ -64,7 +64,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             <div className="flex items-center gap-4">
                                 <span>图片标题生成</span>
                                 <Switch
-                                    checked={imageStyleData?.titleGenerateMode === 'DEFAULT' ? true : false}
+                                    checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                     onChange={(e) => {
                                         const newData = _.cloneDeep(imageStyleData);
                                         if (e) {

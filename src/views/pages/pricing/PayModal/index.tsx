@@ -35,10 +35,11 @@ interface BodyProps extends CardProps {
     isTimeout?: boolean;
     onRefresh: () => void;
     payPrice?: number;
+    isDataPlus?: boolean;
 }
 
 const Body = React.forwardRef(
-    ({ modalStyle, handleClose, url, isTimeout, onRefresh, payPrice }: BodyProps, ref: React.Ref<HTMLDivElement>) => (
+    ({ modalStyle, handleClose, url, isTimeout, onRefresh, payPrice, isDataPlus }: BodyProps, ref: React.Ref<HTMLDivElement>) => (
         <div ref={ref} tabIndex={-1}>
             <MainCard
                 style={{
@@ -48,7 +49,7 @@ const Body = React.forwardRef(
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="套餐购买"
+                title={isDataPlus ? '加油包购买' : '套餐购买'}
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">
@@ -94,6 +95,7 @@ export function PayModal({
     url,
     isTimeout,
     onRefresh,
+    isDataPlus,
     payPrice
 }: {
     open: boolean;
@@ -101,6 +103,7 @@ export function PayModal({
     url: string;
     isTimeout?: boolean;
     onRefresh: () => void;
+    isDataPlus?: boolean;
     payPrice?: number;
 }) {
     // getModalStyle is not a pure function, we roll the style only on the first render
@@ -124,6 +127,7 @@ export function PayModal({
                     isTimeout={isTimeout}
                     onRefresh={onRefresh}
                     payPrice={payPrice}
+                    isDataPlus={isDataPlus}
                 />
             </Modal>
         </Grid>

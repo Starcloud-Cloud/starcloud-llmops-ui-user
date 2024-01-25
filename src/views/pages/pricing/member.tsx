@@ -444,6 +444,8 @@ const Price1 = () => {
     const [discountOpen, setDiscountOpen] = useState(false);
 
     const [newUserProductId, setNewUserProductId] = useState<any>();
+    const [beanProducts, setBeanProducts] = useState<any[]>([]);
+    console.log('🚀 ~ Price1 ~ beanProducts:', beanProducts);
 
     const { width } = useWindowSize();
 
@@ -473,9 +475,15 @@ const Price1 = () => {
 
     useEffect(() => {
         getPayType().then((res) => {
-            const result = res.filter((item: any) => item.parentId === 0) || [];
+            const result = res.filter((item: any) => item.parentId === 0 && item.name !== '加油包') || [];
             setValue(result?.[0]?.id);
             setTabs(result);
+
+            // 加油包
+            const data = res.filter((v: any) => v.name === '加油包' && v.parentId === 0);
+            getPayList(data?.[0]?.id).then((payRes) => {
+                setBeanProducts(payRes.list);
+            });
         });
     }, []);
 
@@ -950,6 +958,102 @@ const Price1 = () => {
                         })}
                     </Grid>
                     <div className="flex justify-center mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
+
+                    <div className="flex justify-center">
+                        <Divider className="py-3 w-[70%]" />
+                    </div>
+                    <div className="flex w-full mt-[40px]  pb-10 justify-center flex-col items-center">
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <div className="flex justify-center mb-5 xs:text-2xl md:text-5xl">加油包</div>
+                            <div className="flex justify-center mt-5">购买后7天生效，有效期7天</div>
+                        </div>
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <Grid container spacing={gridSpacing} columns={20}>
+                                {beanProducts.map((plan, index) => (
+                                    <Grid item xs={20} sm={10} md={10} key={index}>
+                                        <MainCard
+                                            boxShadow
+                                            sx={{
+                                                pt: 1.75,
+                                                border: '1px solid',
+                                                borderColor: 'secondary.main'
+                                            }}
+                                        >
+                                            <Grid container textAlign="center" spacing={gridSpacing}>
+                                                <Grid item xs={12}>
+                                                    <Typography
+                                                        variant="h6"
+                                                        sx={{
+                                                            fontSize: '1.5625rem',
+                                                            fontWeight: 500,
+                                                            position: 'relative',
+                                                            mb: 1.875,
+                                                            '&:after': {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                bottom: -15,
+                                                                left: 'calc(50% - 25px)',
+                                                                width: 50,
+                                                                height: 4,
+                                                                background: theme.palette.primary.main,
+                                                                borderRadius: '3px'
+                                                            }
+                                                        }}
+                                                    >
+                                                        {plan.name}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography variant="body2">{`${plan?.giveRights?.giveMagicBean}魔法豆, ${plan?.giveRights?.giveImage}点作图`}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
+                                                        ￥{plan?.marketPrice / 100}/{plan?.unitName}
+                                                    </div> */}
+                                                    <Typography
+                                                        component="div"
+                                                        variant="body2"
+                                                        sx={{
+                                                            fontSize: '2.1875rem',
+                                                            fontWeight: 700,
+                                                            lineHeight: '1.2em',
+                                                            '& > span': {
+                                                                fontSize: '1.25rem',
+                                                                fontWeight: 500
+                                                            }
+                                                        }}
+                                                    >
+                                                        <span>￥</span>
+                                                        {plan.price / 100}
+                                                    </Typography>
+                                                    <div className="text-[#aaa] text-sm text-center">{'七天加油包'}</div>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Button
+                                                        className={'w-4/5'}
+                                                        variant={plan.active ? 'contained' : 'outlined'}
+                                                        onClick={() => {
+                                                            setCurrentSelect({
+                                                                isDataPlus: true,
+                                                                payPrice: plan.price
+                                                            });
+                                                            handleCreateOrder(plan?.skus?.[0]?.id);
+                                                        }}
+                                                        color="secondary"
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <div>购买加油包</div>
+                                                        </div>
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </MainCard>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </div>
+                    </div>
+
                     <>
                         <div className="flex justify-center">
                             <Divider className="py-3 w-[70%]" />
@@ -1021,6 +1125,7 @@ const Price1 = () => {
                 isTimeout={isTimeout}
                 onRefresh={onRefresh}
                 payPrice={currentSelect?.payPrice / 100 || 0}
+                isDataPlus={currentSelect?.isDataPlus}
             />
             <SignModal
                 open={openSign}

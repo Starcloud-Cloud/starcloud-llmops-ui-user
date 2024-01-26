@@ -981,7 +981,7 @@ const Price1 = () => {
                     <div className="flex w-full mt-[40px]  pb-10 justify-center flex-col items-center">
                         <div className="xs:w-[100%] md:w-[40%]">
                             <div className="flex justify-center mt-3 mb-5 xs:text-2xl md:text-5xl">加油包</div>
-                            <div className="flex justify-center mt-5 mb-7">购买后7天生效，有效期7天</div>
+                            <div className="flex justify-center mt-5 mb-7">购买后立即生效，有效期7天</div>
                         </div>
                         <div className="xs:w-[100%] md:w-[40%]">
                             <Grid container spacing={gridSpacing} columns={20} className="flex justify-center">

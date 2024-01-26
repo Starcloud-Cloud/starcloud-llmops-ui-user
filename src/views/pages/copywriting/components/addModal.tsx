@@ -1256,12 +1256,13 @@ const AddModal = () => {
                                                     )}
                                                 </Radio.Group>
                                             </div>
-                                            <div className="border border-solid border-[#bdbdbd]/50 p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                            <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                <span className="font-[600]">Tip：</span>
                                                 {el.model === 'RANDOM'
-                                                    ? '随机获取：从参考内容中随机获取一条内容使用'
+                                                    ? '从参考内容中随机获取一条内容使用'
                                                     : el.model === 'AI_PARODY'
-                                                    ? 'AI仿写：从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
-                                                    : 'AI自定义：直接让AI生成内容，要求越详细越好'}
+                                                    ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                    : '直接让AI生成内容，要求越详细越好'}
                                             </div>
                                             {el.model !== 'AI_CUSTOM' && (
                                                 <>

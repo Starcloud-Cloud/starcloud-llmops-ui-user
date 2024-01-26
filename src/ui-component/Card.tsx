@@ -246,14 +246,14 @@ const Cards = ({ flag = false }) => {
                             />
                         ) : (
                             <div className="w-[36px] h-[36px] rounded-full flex justify-center items-center text-xs text-white bg-[#62d078]">
-                                空间
+                                团队
                             </div>
                         )}
                         <div
                             className="!w-[140px] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
                             onClick={() => navigate('spaceEquity')}
                         >
-                            {spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.deptName} 的空间
+                            {spaceList?.find((item) => item.deptId === allDetail?.allDetail?.deptId)?.deptName} 的团队
                         </div>
                         <Popover
                             title="我的空间"
@@ -287,11 +287,11 @@ const Cards = ({ flag = false }) => {
                                                                 />
                                                             ) : (
                                                                 <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center text-xs text-white bg-[#62d078]">
-                                                                    空间
+                                                                    团队
                                                                 </div>
                                                             )}
                                                             <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                                                                {item.deptName + ' 的空间'}
+                                                                {item.deptName + ' 的团队'}
                                                             </div>
                                                         </div>
                                                     ),

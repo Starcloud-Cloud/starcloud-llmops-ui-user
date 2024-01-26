@@ -42,10 +42,12 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     const columns: ColumnsType<any> = [
         {
             title: '参考标题',
+            align: 'center',
             dataIndex: 'title'
         },
         {
             title: '参考标签',
+            align: 'center',
             render: (_, row) =>
                 row?.tagList?.map((item: string) => (
                     <Tag color="blue" key={item}>
@@ -55,12 +57,14 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
         },
         {
             title: '参考内容',
+            align: 'center',
             width: '30%',
             dataIndex: 'content',
             render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
         {
             title: '参考图片',
+            align: 'center',
             render: (_, row) => (
                 <div className="flex wrap gap-2">
                     {row.imageList?.map((item: any, index: number) => (
@@ -71,15 +75,19 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
         },
         {
             title: '参考来源',
+            align: 'center',
+            width: 100,
             render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
         {
             title: '参考链接地址',
+            align: 'center',
             dataIndex: 'link',
             key: 'link'
         },
         {
             title: '操作',
+            align: 'center',
             width: 140,
             key: 'action',
             render: (_, row, index) => (
@@ -114,7 +122,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                     return item.subTitle;
                                 })
                             );
-                            setAddTitle('编辑参考账号');
+                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
                             setAddOpen(true);
                         }}
                     >
@@ -137,16 +145,20 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     ];
     const titColumns: ColumnsType<any> = [
         {
+            title: '参考标题',
+            align: 'center',
+            dataIndex: 'title'
+        },
+        {
             title: '参考来源',
+            align: 'center',
+            width: '20%',
             render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
         },
         {
-            title: '参考标题',
-            dataIndex: 'title',
-            width: 200
-        },
-        {
             title: '参考链接地址',
+            align: 'center',
+            width: '30%',
             dataIndex: 'link',
             key: 'link'
         },
@@ -186,7 +198,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                     return item.subTitle;
                                 })
                             );
-                            setAddTitle('编辑参考账号');
+                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
                             setAddOpen(true);
                         }}
                     >
@@ -209,23 +221,28 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     ];
     const otherColumns: ColumnsType<any> = [
         {
-            title: '参考来源',
-            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
-        },
-        {
             title: '参考内容',
-            width: '30%',
+            align: 'center',
             dataIndex: 'content',
             render: (_, row) => <div className="line-clamp-3">{row.content}</div>
         },
         {
+            title: '参考来源',
+            width: '20%',
+            align: 'center',
+            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
+        },
+        {
             title: '参考链接地址',
+            align: 'center',
+            width: '30%',
             dataIndex: 'link',
             key: 'link'
         },
         {
             title: '操作',
             width: 140,
+            align: 'center',
             key: 'action',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
@@ -259,7 +276,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                     return item.subTitle;
                                 })
                             );
-                            setAddTitle('编辑参考账号');
+                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
                             setAddOpen(true);
                         }}
                     >
@@ -345,7 +362,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             <div className="flex justify-end">
                 <Button
                     onClick={() => {
-                        setAddTitle('新增参考账号');
+                        setAddTitle(code === 'TitleActionHandler' ? '新增参考标题' : '新增参考内容');
                         setAddOpen(true);
                     }}
                     className="mb-[20px]"
@@ -487,7 +504,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                         className="ml-[10px]"
                                         type="primary"
                                     >
-                                        {code === 'TitleActionHandler' ? '提取标题' : '分析链接'}
+                                        {code === 'TitleActionHandler' ? '提取链接标题' : '提取链接内容'}
                                     </Button>
                                 )}
                             </Grid>
@@ -685,7 +702,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                                     })
                                                     ?.filter((el: any) => el !== undefined) || []
                                         };
-                                        if (addTitle === '新增参考账号') {
+                                        if (addTitle === '新增参考标题' || addTitle === '新增参考内容') {
                                             newList.push(obj);
                                             setTableData(newList);
                                             setAddOpen(false);

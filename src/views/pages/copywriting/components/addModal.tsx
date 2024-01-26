@@ -1257,7 +1257,7 @@ const AddModal = () => {
                                                 </Radio.Group>
                                             </div>
                                             <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
-                                                <span className="font-[600]">Tip：</span>
+                                                <span className="font-[600] text-[#673ab7]">Tips：</span>
                                                 {el.model === 'RANDOM'
                                                     ? '从参考内容中随机获取一条内容使用'
                                                     : el.model === 'AI_PARODY'

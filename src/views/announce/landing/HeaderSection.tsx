@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Button, CardMedia, Container, Grid, Stack, Typography } from '@mui/material';
+import { Image } from 'antd';
 
 // third party
 import { motion } from 'framer-motion';
@@ -24,6 +25,8 @@ import img6 from 'assets/images/landing/6.png';
 import img7 from 'assets/images/landing/7.png';
 import img8 from 'assets/images/landing/8.png';
 import img9 from 'assets/images/landing/9.png';
+import iosFill from 'assets/images/landing/ios.svg';
+import windowsFill from 'assets/images/landing/windows-fill.svg';
 import downArrow from 'assets/images/landing/down-arrow.gif';
 // import TechLight from 'assets/images/landing/tech-light.svg';
 // import TechDark from 'assets/images/landing/tech-dark.svg';
@@ -122,10 +125,14 @@ const HeaderSection = () => {
                             >
                                 <Stack spacing={2}>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
-                                        {t('homepage.title.slogan')}
+                                        {/* {t('homepage.title.slogan')} */}
+                                        免费下载使用
+                                    </Typography>
+                                    <Typography fontWeight={400} textAlign={{ xs: 'center', md: 'left' }} variant="h2">
+                                        多平台多账号内容 AI 创作运营工具
                                     </Typography>
 
-                                    <Typography
+                                    {/* <Typography
                                         textAlign={{ xs: 'center', md: 'left' }}
                                         variant="h2"
                                         color="primary"
@@ -173,7 +180,7 @@ const HeaderSection = () => {
                                                 </Typography>
                                             </div>
                                         </Slider>
-                                    </Typography>
+                                    </Typography> */}
                                 </Stack>
                             </motion.div>
                         </Grid>
@@ -189,7 +196,8 @@ const HeaderSection = () => {
                                     variant="body1"
                                     sx={{ fontSize: { xs: '1rem', md: '1.125rem' } }}
                                 >
-                                    {t('homepage.title.spread')}
+                                    {/* {t('homepage.title.spread')} */}
+                                    主流内容创作平台多账号登录，多模态 AI 生成，作品一键分发，数据综合分析
                                 </Typography>
                             </motion.div>
                         </Grid>
@@ -200,9 +208,9 @@ const HeaderSection = () => {
                                 transition={{ type: 'spring', stiffness: 150, damping: 30, delay: 0.4 }}
                             >
                                 <Grid container spacing={2} sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                                    <Grid item>
-                                        <AnimateButton>
-                                            <Button
+                                    <Grid item className="flex gap-4">
+                                        {/* <AnimateButton> */}
+                                        {/* <Button
                                                 onClick={() => {
                                                     navigate(DASHBOARD_PATH);
                                                     setRoutesIndex(0);
@@ -213,8 +221,27 @@ const HeaderSection = () => {
                                                 startIcon={<StarIcon />}
                                             >
                                                 开始免费创作
-                                            </Button>
-                                        </AnimateButton>
+                                            </Button> */}
+                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                            <Image width={20} src={windowsFill} preview={false} />
+                                            <div className="ml-[5px] leading-0">Windows 下载</div>
+                                        </div>
+                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                            <Image width={20} src={iosFill} preview={false} />
+                                            <div className="ml-[5px] leading-0">MacOS 下载</div>
+                                        </div>
+                                        {/* <Button
+                                                onClick={() => {
+                                                    navigate(DASHBOARD_PATH);
+                                                    setRoutesIndex(0);
+                                                }}
+                                                variant="contained"
+                                                color="secondary"
+                                                startIcon={<StarIcon />}
+                                            >
+                                                Windows 下载
+                                            </Button> */}
+                                        {/* </AnimateButton> */}
                                     </Grid>
                                 </Grid>
                             </motion.div>

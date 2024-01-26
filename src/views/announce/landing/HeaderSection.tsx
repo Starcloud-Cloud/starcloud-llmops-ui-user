@@ -224,11 +224,11 @@ const HeaderSection = () => {
                                             </Button> */}
                                         <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
                                             <Image width={20} src={windowsFill} preview={false} />
-                                            <div className="ml-[5px] leading-0">Windows 下载</div>
+                                            <div className="ml-[5px] mt-[4px]">Windows 下载</div>
                                         </div>
                                         <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
                                             <Image width={20} src={iosFill} preview={false} />
-                                            <div className="ml-[5px] leading-0">MacOS 下载</div>
+                                            <div className="ml-[5px] mt-[4px]">MacOS 下载</div>
                                         </div>
                                         {/* <Button
                                                 onClick={() => {

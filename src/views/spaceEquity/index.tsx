@@ -488,7 +488,7 @@ const SpaceEquity = () => {
                             </div>
                         ) : (
                             <div className="w-[56px] h-[56px] rounded-full overflow-hidden flex justify-center items-center text-white bg-[#62d078]">
-                                空间
+                                团队
                             </div>
                         )}
                         <div className="flex items-center gap-4">
@@ -583,7 +583,7 @@ const SpaceEquity = () => {
                                         outlineColor: active === '' ? '#673ab7' : 'transparent'
                                     }}
                                 >
-                                    空间
+                                    团队
                                 </div>
                                 {colorList.map((item, index) => (
                                     <Image

@@ -262,7 +262,7 @@ const Invite = () => {
                                     </div>
                                 ) : (
                                     <div className="w-10 h-10 lg:w-8 lg:h-8 rounded-full overflow-hidden shrink-0 mr-2 flex justify-center items-center text-white bg-[#62d078] text-xs">
-                                        空间
+                                        团队
                                     </div>
                                 )}
                                 <p className="truncate break-all">{user?.deptName}</p>

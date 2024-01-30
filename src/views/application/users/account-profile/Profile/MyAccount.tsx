@@ -12,6 +12,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { t } from 'hooks/web/useI18n';
 import { dispatch } from 'store';
 import Phone from 'ui-component/login/phone';
+import { useAllDetail } from 'contexts/JWTContext';
 
 interface MyAccountProps {
     userProfile: ProfileVO | null;
@@ -31,6 +32,7 @@ const currencies = [
 // ==============================|| PROFILE 1 - MY ACCOUNT ||============================== //
 
 const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate: () => void }) => {
+    const all_detail = useAllDetail();
     const initialSex = userProfile?.sex === 1 ? 'man' : 'woman';
     const [sex, setSex] = useState(initialSex);
     const [username, setUsername] = useState(userProfile?.username || '');
@@ -62,6 +64,7 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
         });
         if (res) {
             forceUpdate();
+            all_detail?.setPre(all_detail?.pre + 1);
             dispatch(
                 openSnackbar({
                     open: true,

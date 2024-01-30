@@ -3,6 +3,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import copy from 'clipboard-copy';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAllDetail } from 'contexts/JWTContext';
 // material-ui
 import {
     Avatar,
@@ -58,6 +59,7 @@ import useConfig from 'hooks/useConfig';
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
+    const all_detail = useAllDetail();
     const data = useUserStore();
     const theme = useTheme();
     const { borderRadius } = useConfig();
@@ -197,7 +199,7 @@ const ProfileSection = () => {
                                                 <Stack direction="row" spacing={0.5} alignItems="center">
                                                     <Typography variant="h4">{t('market.welcome')},</Typography>
                                                     <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                        {data.user?.nickname}
+                                                        {all_detail?.allDetail?.nickname}
                                                     </Typography>
                                                 </Stack>
                                             </Stack>

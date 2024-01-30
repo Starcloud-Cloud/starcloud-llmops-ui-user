@@ -231,7 +231,7 @@ export function DiscountModal({
                                     {currentSelect.experience ? (
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
-                                            <span className="text-sm text-[#868A91]">1周</span>
+                                            <span className="text-sm text-[#868A91]">1{currentSelect?.unitName}</span>
                                         </div>
                                     ) : (
                                         <div className="flex justify-between items-center w-full mb-3">

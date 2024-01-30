@@ -199,14 +199,7 @@ const plansDefault = (value: number) => [
                 </Tag> */}
             </div>
         ),
-        btnTextNew: (
-            <div>
-                新用户一周体验包
-                <Tag className="ml-1" color="#f50">
-                    <span className="text-base">9.9元</span>
-                </Tag>
-            </div>
-        ),
+        btnTextNew: true,
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
@@ -445,7 +438,7 @@ const Price1 = () => {
 
     const [newUserProductId, setNewUserProductId] = useState<any>();
     const [beanProducts, setBeanProducts] = useState<any[]>([]);
-    console.log('🚀 ~ Price1 ~ beanProducts:', beanProducts);
+    const [newUserProducts, setNewUserProducts] = useState<any[]>([]);
 
     const { width } = useWindowSize();
     const myRef = React.useRef<any>(null);
@@ -476,7 +469,7 @@ const Price1 = () => {
 
     useEffect(() => {
         getPayType().then((res) => {
-            const result = res.filter((item: any) => item.parentId === 0) || [];
+            const result = res.filter((item: any) => item.parentId === 0 && item.name !== '专享特惠') || [];
             setValue(result?.[0]?.id);
             setTabs(result);
 
@@ -485,6 +478,13 @@ const Price1 = () => {
             setBeanTypeId(data?.[0]?.id);
             getPayList(data?.[0]?.id).then((payRes) => {
                 setBeanProducts(payRes.list);
+            });
+
+            // 新人特惠
+            const newUserData = res.filter((v: any) => v.name === '专享特惠' && v.parentId === 0);
+            getPayList(newUserData?.[0]?.id).then((payRes) => {
+                const current = payRes?.list?.length ? [payRes.list[0]] : [];
+                setNewUserProducts(current);
             });
         });
     }, []);
@@ -911,27 +911,30 @@ const Price1 = () => {
                                                     </Button>
                                                 )}
                                             </Grid>
-                                            {plan.btnTextNew && showTrial && (
-                                                <Grid item xs={12}>
-                                                    <Button
-                                                        className={'w-4/5'}
-                                                        variant={plan.active ? 'contained' : 'outlined'}
-                                                        onClick={() => {
-                                                            setCurrentSelect({
-                                                                title: '体验版',
-                                                                select: value,
-                                                                payId: newUserProductId,
-                                                                experience: true,
-                                                                isSubscribe: false
-                                                            });
-                                                            handleClick(index, newUserProductId);
-                                                        }}
-                                                        color="secondary"
-                                                    >
-                                                        {plan.btnTextNew}
-                                                    </Button>
-                                                </Grid>
-                                            )}
+
+                                            {plan.btnTextNew &&
+                                                newUserProducts?.map((item, index) => (
+                                                    <Grid item xs={12} key={index}>
+                                                        <Button
+                                                            className={'w-4/5'}
+                                                            variant={plan.active ? 'contained' : 'outlined'}
+                                                            onClick={() => {
+                                                                setCurrentSelect({
+                                                                    title: item.name,
+                                                                    select: value,
+                                                                    payId: item?.skus?.[0]?.id,
+                                                                    experience: true,
+                                                                    unitName: item.unitName,
+                                                                    isSubscribe: false
+                                                                });
+                                                                handleClick(3, item?.skus?.[0]?.id);
+                                                            }}
+                                                            color="secondary"
+                                                        >
+                                                            {item.name}
+                                                        </Button>
+                                                    </Grid>
+                                                ))}
                                             <Grid item xs={12}>
                                                 <List
                                                     sx={{

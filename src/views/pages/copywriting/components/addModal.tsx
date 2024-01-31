@@ -1383,19 +1383,27 @@ const AddModal = () => {
                             setTestOpen(true);
                             try {
                                 schemeExample({
+                                    uid: searchParams.get('uid'),
                                     ...params,
                                     type: params.type ? 'SYSTEM' : 'USER',
-                                    refers: tableData,
-                                    configuration: {
-                                        copyWritingTemplate: {
-                                            ...copyWritingTemplate,
-                                            example: testTableList,
-                                            variableList: rows
-                                        },
-                                        imageTemplate: {
-                                            styleList: imageStyleData
-                                        },
-                                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+                                    customConfiguration: {
+                                        ...splitList.filter((item) => item.appUid === splitValue)[0],
+                                        steps: valueList?.map((item) => {
+                                            if (item?.model === 'RANDOM') {
+                                                return {
+                                                    ...item,
+                                                    variableList: [],
+                                                    requirement: ''
+                                                };
+                                            } else if (item?.model === 'AI_CUSTOM') {
+                                                return {
+                                                    ...item,
+                                                    referList: []
+                                                };
+                                            } else {
+                                                return item;
+                                            }
+                                        })
                                     },
                                     useImages: testImageList
                                         ?.map((item: any, i: number) => {

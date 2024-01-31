@@ -1379,7 +1379,7 @@ const AddModal = () => {
                 </div>
                 <Button
                     onClick={() => {
-                        if (verify(true)) {
+                        if (searchParams.get('uid')) {
                             setTestOpen(true);
                             try {
                                 schemeExample({
@@ -1417,6 +1417,20 @@ const AddModal = () => {
                             } catch (err) {
                                 setTestOpen(false);
                             }
+                        } else {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '保存之后才能测试生成',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
                         }
                     }}
                     loading={testOpen}

@@ -24,7 +24,8 @@ export const enum ENUM_PERMISSION {
     LAYOUT_SHOW_QRCODE = 'layout_show_qrcode', // 是否显示二维码
     LAYOUT_SHOW_CHAT_MODAL = 'layout_show_chat_modal', // 是否显示底部聊天弹窗
     LAYOUT_SHOW_SUBSCRIBE_BUTTON = 'layout_show_subscribe_button', // 是否显示顶部订阅按钮
-    EQUITY = 'equity' //权益兑换 加入社区等
+    EQUITY = 'equity', //权益兑换 加入社区等
+    LOGINDESC = 'login_desc' //登录右边的描述
 }
 
 const list: IList = {
@@ -33,7 +34,8 @@ const list: IList = {
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: true,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: true,
     [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: true,
-    [ENUM_PERMISSION.EQUITY]: true
+    [ENUM_PERMISSION.EQUITY]: true,
+    [ENUM_PERMISSION.LOGINDESC]: true
 };
 
 const announceList: IList = {
@@ -42,7 +44,8 @@ const announceList: IList = {
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: false,
-    [ENUM_PERMISSION.EQUITY]: false
+    [ENUM_PERMISSION.EQUITY]: false,
+    [ENUM_PERMISSION.LOGINDESC]: false
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

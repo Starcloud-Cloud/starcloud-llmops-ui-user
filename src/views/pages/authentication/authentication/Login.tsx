@@ -19,6 +19,7 @@ import infoStore from 'store/entitlementAction';
 // assets
 import imgMain from 'assets/images/auth/img-a2-login.svg';
 // import imgMain from 'assets/images/auth/des.png';
+import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -33,6 +34,20 @@ const items: AuthSliderProps[] = [
     {
         title: '定制机器人',
         description: '通过角色设定和学习素材，生成定制版机器人'
+    }
+];
+const juzhenItem: AuthSliderProps[] = [
+    {
+        title: '',
+        description: '多平台多账号内容一键发布'
+    },
+    {
+        title: '',
+        description: '多平台内容AI一键批量创作'
+    },
+    {
+        title: '',
+        description: '多平台数据综合分析'
     }
 ];
 
@@ -94,7 +109,7 @@ const Login = () => {
                             <Grid item xs={12}>
                                 <Grid item container justifyContent="center" sx={{ pb: 8 }}>
                                     <Grid item xs={10} lg={8} sx={{ '& .slick-list': { pb: 2 } }}>
-                                        <AuthSlider items={items} />
+                                        <AuthSlider items={getPermission(ENUM_PERMISSION.LOGINDESC) ? items : juzhenItem} />
                                     </Grid>
                                 </Grid>
                             </Grid>

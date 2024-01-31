@@ -5,7 +5,18 @@ import './index.css';
 import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
-function CarryOut({ config, changeData, loadings, allExecute, variableChange, promptChange, changeanswer, isShows, changeConfigs }: any) {
+function CarryOut({
+    config,
+    changeData,
+    loadings,
+    isDisables,
+    allExecute,
+    variableChange,
+    promptChange,
+    changeanswer,
+    isShows,
+    changeConfigs
+}: any) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     return (
@@ -23,6 +34,7 @@ function CarryOut({ config, changeData, loadings, allExecute, variableChange, pr
                             isShows={isShows}
                             changeSon={changeData}
                             loadings={loadings}
+                            isDisables={isDisables}
                             changeanswer={changeanswer}
                             isallExecute={allExecute}
                             variableChange={variableChange}

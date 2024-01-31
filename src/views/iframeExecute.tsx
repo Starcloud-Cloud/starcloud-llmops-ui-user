@@ -281,6 +281,7 @@ const IframeExecute = () => {
                 changeConfigs={changeConfigs}
                 changeanswer={changeanswer}
                 loadings={loadings}
+                isDisables={[]}
                 isShows={isShows}
                 variableChange={exeChange}
                 promptChange={promptChange}

@@ -766,6 +766,7 @@ function ApplicationAnalysis({
                                             changeSon={() => {}}
                                             changeanswer={() => {}}
                                             loadings={[]}
+                                            isDisables={[]}
                                             isShows={[]}
                                             variableChange={() => {}}
                                             promptChange={() => {}}

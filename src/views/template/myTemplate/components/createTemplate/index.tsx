@@ -75,6 +75,10 @@ function CreateDetail() {
     const [detail, setDetail] = useState(null as unknown as Details);
     const detailRef: any = useRef(null);
     const [loadings, setLoadings] = useState<any[]>([]);
+    const loadingsRef: any = useRef([]);
+    //执行禁用
+    const isDisableRef: any = useRef([]);
+    const [isDisables, setIsDisables] = useState<any>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
     const basis = useRef<any>(null);
@@ -85,124 +89,136 @@ function CreateDetail() {
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
     const [aiModel, setAiModel] = useState('gpt-3.5-turbo-16k');
-    //判断是保存还是切换tabs
+    //数组方法封装
+    const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
+        const newData = _.cloneDeep(data);
+        newData[index] = flag;
+        setData(newData);
+    };
+    const allChangeArr = (stepLength: number, flag: boolean) => {
+        const value: any[] = [];
+        for (let i = 0; i < stepLength; i++) {
+            value[i] = flag;
+        }
+        isDisableRef.current = value;
+        loadingsRef.current = value;
+        setIsDisables(isDisableRef?.current);
+        setLoadings(loadingsRef?.current);
+    };
+    //执行
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
-        const newValue = [...loadings];
-        newValue[index] = true;
         if (!isAllExecute) {
-            setLoadings(newValue);
+            changeArr(isDisableRef.current, setIsDisables, index, true);
+            changeArr(loadingsRef.current, setLoadings, index, true);
         } else {
-            const value: any[] = [];
-            for (let i = index; i < detail.workflowConfig.steps.length; i++) {
-                value[i] = true;
-            }
-            setLoadings(value);
+            allChangeArr(detail.workflowConfig.steps.length, true);
         }
         const fetchData = async () => {
-            let resp: any = await executeApp({
-                appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
-                stepId: stepId,
-                appReqVO: detailRef.current,
-                aiModel,
-                conversationUid
-            });
-
-            const contentData = _.cloneDeep(detailRef.current);
-            contentData.workflowConfig.steps[index].flowStep.response.answer = '';
-            detailRef.current = _.cloneDeep(contentData);
-            setDetail(contentData);
-            const reader = resp.getReader();
-            const textDecoder = new TextDecoder();
-            let outerJoins: any;
-            while (1) {
-                let joins = outerJoins;
-                const { done, value } = await reader.read();
-
-                if (done) {
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    const newShow = _.cloneDeep(isShows);
-                    newShow[index] = true;
-                    setIsShow(newShow);
-                    allDetail?.setPre(allDetail?.pre + 1);
-                    if (
-                        isAllExecute &&
-                        index < detail.workflowConfig.steps.length - 1 &&
-                        detail.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
-                    ) {
-                        changeData({
-                            index: index + 1,
-                            stepId: detail.workflowConfig.steps[index + 1].field,
-                            steps: detail.workflowConfig.steps[index + 1]
-                        });
-                    }
-                    break;
-                }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((message, i: number) => {
-                    if (i === 0 && joins) {
-                        message = joins + message;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (message && message.indexOf('}') === -1) {
-                            joins = message;
-                            return;
-                        }
-                    }
-                    let bufferObj;
-                    if (message?.startsWith('data:')) {
-                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                    }
-                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                        const newValue1 = [...loadings];
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
-                        if (!conversationUid && index === 0 && isAllExecute) {
-                            conversationUid = bufferObj.conversationUid;
-                        }
-                        const contentData1 = _.cloneDeep(contentData);
-                        contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                        detailRef.current = _.cloneDeep(contentData1);
-                        setDetail(contentData1);
-                    } else if (bufferObj?.code === 2004008003) {
-                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
-                        setTokenOpen(true);
-                        const newValue1 = [...loadings];
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
-                        return;
-                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: bufferObj.content,
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
-                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
+            try {
+                let resp: any = await executeApp({
+                    appUid: searchParams.get('uid') ? searchParams.get('uid') : searchParams.get('recommend'),
+                    stepId: stepId,
+                    appReqVO: detailRef.current,
+                    aiModel,
+                    conversationUid
                 });
-                outerJoins = joins;
+
+                const contentData = _.cloneDeep(detailRef.current);
+                contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+                detailRef.current = _.cloneDeep(contentData);
+                setDetail(contentData);
+                const reader = resp.getReader();
+                const textDecoder = new TextDecoder();
+                let outerJoins: any;
+                while (1) {
+                    let joins = outerJoins;
+                    const { done, value } = await reader.read();
+
+                    if (done) {
+                        changeArr(isDisableRef.current, setIsDisables, index, false);
+                        const newShow = _.cloneDeep(isShows);
+                        newShow[index] = true;
+                        setIsShow(newShow);
+                        allDetail?.setPre(allDetail?.pre + 1);
+                        if (
+                            isAllExecute &&
+                            index < detail.workflowConfig.steps.length - 1 &&
+                            detail.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
+                        ) {
+                            changeData({
+                                index: index + 1,
+                                stepId: detail.workflowConfig.steps[index + 1].field,
+                                steps: detail.workflowConfig.steps[index + 1]
+                            });
+                        }
+                        break;
+                    }
+                    let str = textDecoder.decode(value);
+                    const lines = str.split('\n');
+                    lines.forEach((message, i: number) => {
+                        if (i === 0 && joins) {
+                            message = joins + message;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (message && message.indexOf('}') === -1) {
+                                joins = message;
+                                return;
+                            }
+                        }
+                        let bufferObj;
+                        if (message?.startsWith('data:')) {
+                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                        }
+                        if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                            changeArr(loadingsRef.current, setLoadings, index, false);
+                            if (!conversationUid && index === 0 && isAllExecute) {
+                                conversationUid = bufferObj.conversationUid;
+                            }
+                            const contentData1 = _.cloneDeep(contentData);
+                            contentData1.workflowConfig.steps[index].flowStep.response.answer =
+                                detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current = _.cloneDeep(contentData1);
+                            setDetail(contentData1);
+                        } else if (bufferObj?.code === 2004008003) {
+                            setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                            setTokenOpen(true);
+                            allChangeArr(detail.workflowConfig.steps.length, false);
+                            return;
+                        } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: bufferObj.content,
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    close: false
+                                })
+                            );
+                            return;
+                        } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: t('market.warning'),
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                            allChangeArr(detail.workflowConfig.steps.length, false);
+                        }
+                    });
+                    outerJoins = joins;
+                }
+            } catch (err) {
+                allChangeArr(detail.workflowConfig.steps.length, false);
             }
         };
         fetchData();
@@ -592,6 +608,7 @@ function CreateDetail() {
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}
                                     loadings={loadings}
+                                    isDisables={isDisables}
                                     variableChange={exeChange}
                                     changeanswer={changeanswer}
                                     promptChange={promptChange}
@@ -699,6 +716,7 @@ function CreateDetail() {
                                     changeSon={changeData}
                                     changeanswer={changeanswer}
                                     loadings={loadings}
+                                    isDisables={isDisables}
                                     variableChange={exeChange}
                                     promptChange={promptChange}
                                     isallExecute={(flag: boolean) => {

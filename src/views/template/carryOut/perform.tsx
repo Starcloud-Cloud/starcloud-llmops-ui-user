@@ -20,6 +20,7 @@ function Perform({
     changeSon,
     source,
     loadings,
+    isDisables,
     isallExecute,
     variableChange,
     promptChange,
@@ -181,14 +182,14 @@ function Perform({
                                     ) : null}
                                     <Box sx={{ display: { xs: 'none', md: 'block' } }}></Box>
                                     <Box whiteSpace="nowrap">
-                                        <Tooltip title={t('market.stepTips')}>
+                                        <Tooltip placement="top" title={t('market.stepTips')}>
                                             <IconButton size="small">
                                                 <ErrorOutline />
                                             </IconButton>
                                         </Tooltip>
                                         <Button
                                             onClick={() => executeAPP(steps)}
-                                            disabled={disSteps(steps) || history}
+                                            disabled={disSteps(steps) || history || isDisables[steps]}
                                             color="secondary"
                                             size="small"
                                             startIcon={<NotStarted />}
@@ -386,6 +387,7 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
         JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
+        JSON.stringify(prevProps?.isDisables) === JSON.stringify(nextProps?.isDisables) &&
         JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)
     );
 };

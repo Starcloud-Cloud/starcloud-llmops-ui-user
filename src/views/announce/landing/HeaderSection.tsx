@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Button, CardMedia, Container, Grid, Stack, Typography } from '@mui/material';
-import { Image } from 'antd';
+import { Image, Divider } from 'antd';
 
 // third party
 import { motion } from 'framer-motion';
@@ -25,6 +25,9 @@ import img6 from 'assets/images/landing/6.png';
 import img7 from 'assets/images/landing/7.png';
 import img8 from 'assets/images/landing/8.png';
 import img9 from 'assets/images/landing/9.png';
+import vodeo from 'assets/images/landing/视频号.svg';
+import bili from 'assets/images/landing/哔哩哔哩.svg';
+import kuai from 'assets/images/landing/快手.svg';
 import iosFill from 'assets/images/landing/ios.svg';
 import windowsFill from 'assets/images/landing/windows-fill.svg';
 import downArrow from 'assets/images/landing/down-arrow.gif';
@@ -124,12 +127,12 @@ const HeaderSection = () => {
                                 transition={{ type: 'spring', stiffness: 150, damping: 30 }}
                             >
                                 <Stack spacing={2}>
-                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
+                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
                                         {/* {t('homepage.title.slogan')} */}
-                                        免费下载使用
+                                        多平台多账号内容 AI 创作运营工具
                                     </Typography>
                                     <Typography fontWeight={400} textAlign={{ xs: 'center', md: 'left' }} variant="h2">
-                                        多平台多账号内容 AI 创作运营工具
+                                        免费下载使用
                                     </Typography>
 
                                     {/* <Typography
@@ -244,6 +247,11 @@ const HeaderSection = () => {
                                         {/* </AnimateButton> */}
                                     </Grid>
                                 </Grid>
+                                <div className="text-[14px] text-[#000]/50 mt-[20px]">
+                                    版本：1.0.8
+                                    <Divider type="vertical" /> 更新：2023-6-27 <Divider type="vertical" />
+                                    适应系统：Win7以上 / Mac
+                                </div>
                             </motion.div>
                         </Grid>
                         <Grid item xs={12}>
@@ -254,14 +262,17 @@ const HeaderSection = () => {
                             >
                                 <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }}>
                                     <CardMedia component="img" image={img1} alt="img1" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img2} alt="img2" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    {/* <CardMedia component="img" image={img2} alt="img2" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} /> */}
                                     <CardMedia component="img" image={img3} alt="img3" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img4} alt="img4" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={vodeo} alt="img4" sx={{ width: { xs: '7%', sm: '7%', md: '10%' } }} />
+                                    <CardMedia component="img" image={bili} alt="bili" sx={{ width: { xs: '6%', sm: '6%', md: '9%' } }} />
+                                    <CardMedia component="img" image={kuai} alt="kuai" sx={{ width: { xs: '6%', sm: '6%', md: '9%' } }} />
+                                    {/* <CardMedia component="img" image={img4} alt="img4" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img5} alt="img5" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img6} alt="img6" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img7} alt="img7" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img8} alt="img8" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img9} alt="img9" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img9} alt="img9" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} /> */}
                                 </Stack>
                             </motion.div>
                         </Grid>

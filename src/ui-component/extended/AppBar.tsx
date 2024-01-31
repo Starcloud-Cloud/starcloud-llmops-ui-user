@@ -82,7 +82,7 @@ const AppBar = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                免费使用
+                                免费下载
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'none', sm: 'none' } }}>

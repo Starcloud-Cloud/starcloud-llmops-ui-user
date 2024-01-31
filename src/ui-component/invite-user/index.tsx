@@ -69,25 +69,11 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
 
                 <div
                     onClick={() => {
-                        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '复制成功, 快去邀请吧~',
-                                variant: 'alert',
-                                zIndex: 9999,
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                transition: 'SlideDown',
-                                close: false
-                            })
-                        );
+                        navigate('/subscribe');
                     }}
-                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[90px] text-xl cursor-pointer font-semibold'}
+                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}
                 >
-                    复制链接发送给好友
+                    立即购买
                 </div>
                 <svg
                     onClick={() => {

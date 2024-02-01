@@ -154,6 +154,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
     // 获取详情
     useEffect(() => {
         if (uid && version !== undefined) {
+            setFetching(true);
             getListingDetail(uid, version)
                 .then((res: any) => {
                     // 设置站点
@@ -180,6 +181,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                             setIsLoading(false);
                         }
                     } else {
+                        console.log(res.status, 'res.status');
                         // ANALYSIS 的情况不回显值
                         if (res.status !== 'ANALYSIS') {
                             setIsLoading(false);
@@ -194,10 +196,10 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                             });
                         }
                         if (res.status === 'ANALYSIS') {
-                            fetching &&
-                                setTimeout(() => {
-                                    setUpdate({});
-                                }, 1000);
+                            // fetching &&
+                            setTimeout(() => {
+                                setUpdate({});
+                            }, 1000);
                         }
                     }
                 })

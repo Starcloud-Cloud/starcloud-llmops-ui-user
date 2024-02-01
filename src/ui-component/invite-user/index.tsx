@@ -1,20 +1,25 @@
 import { discountNewUser } from 'api/vip';
-import vipModal from 'assets/images/pay/vip_pay.png';
+import vipModal from 'assets/images/pay/inviteUser.png';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CountdownProps } from 'antd';
 import { Statistic } from 'antd';
 import dayjs from 'dayjs';
+import infoStore from 'store/entitlementAction';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const { Countdown } = Statistic;
 
-export const NewUserVip = ({ onClose }: { onClose: any }) => {
+export const InviteUser = ({ onClose }: { onClose: any }) => {
+    const { use } = infoStore();
     const navigate = useNavigate();
     const [endTime, setEndTime] = useState('');
 
     useEffect(() => {
         discountNewUser().then((res) => {
-            if (res.isNewUser) {
-                setEndTime(res.endTime);
+            if (res.isInviteUser) {
+                setEndTime(res.inviteEndTime);
             }
         });
     }, []);
@@ -45,30 +50,21 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                 </div>
                 <div
                     style={{
-                        bottom: '133px',
-                        left: '35px'
+                        bottom: '125px',
+                        left: '50px'
                     }}
                     className={'absolute text-[#d4c399]'}
                 >
-                    1.基础套餐一周体验（含500魔法豆和50作图点）
+                    每邀请3名好友注册即可以9.9元享周体验包
                 </div>
                 <div
                     style={{
-                        bottom: '116px',
-                        left: '35px'
+                        bottom: '105px',
+                        left: '45px'
                     }}
                     className={'absolute bottom-[104px] text-[#d4c399] left-[35px] '}
                 >
-                    2.体验期内购买基础版正式套餐可享8折
-                </div>
-                <div
-                    style={{
-                        bottom: '99px',
-                        left: '35px'
-                    }}
-                    className={'absolute  text-[#d4c399]'}
-                >
-                    3.仅限新用户注册72小时内有效
+                    {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
                 </div>
 
                 <div

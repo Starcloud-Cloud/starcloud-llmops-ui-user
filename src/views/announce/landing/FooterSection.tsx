@@ -95,7 +95,7 @@ const FooterSection = () => {
                                             </Typography>
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={3} sm={2}>
+                                    {/* <Grid item xs={3} sm={2}>
                                         <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
                                             <CardMedia
                                                 component="img"
@@ -133,7 +133,7 @@ const FooterSection = () => {
                                                 公众号
                                             </Typography>
                                         </Stack>
-                                    </Grid>
+                                    </Grid> */}
                                 </Grid>
                             </Grid>
                         </Grid>

@@ -80,27 +80,34 @@ const RtlInfoSection = () => {
                                     fontSize: { xs: '1.2rem', md: '2.5rem', xl: '3.125rem' }
                                 }}
                             >
-                                {t('homepage.startup.pro')}
+                                {/* {t('homepage.startup.pro')} */}
+                                一键批量生成爆款
                             </Typography>
                         </Box>
                         <Slider {...settings}>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro1')}
+                                干货合集
+                                {/* {t('homepage.startup.pro1')} */}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro2')}
+                                案例展示
+                                {/* {t('homepage.startup.pro2')} */}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro3')}
+                                资料引流
+                                {/* {t('homepage.startup.pro3')} */}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro4')}
+                                体验分享
+                                {/* {t('homepage.startup.pro4')} */}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro5')}
+                                产品种草
+                                {/* {t('homepage.startup.pro5')} */}
                             </Typography>
                             <Typography color="text.hint" variant="h2">
-                                {t('homepage.startup.pro6')}
+                                故事名片
+                                {/* {t('homepage.startup.pro6')} */}
                             </Typography>
                         </Slider>
                     </Stack>

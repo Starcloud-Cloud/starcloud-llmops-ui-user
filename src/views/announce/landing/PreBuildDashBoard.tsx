@@ -32,7 +32,7 @@ import { DASHBOARD_PATH } from 'config';
 
 // styles
 const Images = styled('img')({
-    width: '100%',
+    width: '60% !important',
     height: 'auto',
     marginBottom: 32,
     backgroundSize: 'cover',
@@ -119,21 +119,28 @@ interface ItemProps {
     caption?: string;
     image: string;
     link: string;
+    subTitle: string;
+    description: string;
 }
 
-const Items = ({ title, caption, image, link }: ItemProps) => {
+const Items = ({ title, caption, image, link, subTitle, description }: ItemProps) => {
     const theme = useTheme();
     return (
         <>
-            <Images
-                src={image}
-                alt="dashboard"
-                sx={{
-                    width: { xs: '100%', xl: 743 },
-                    objectFit: 'contain',
-                    direction: 'initial'
-                }}
-            />
+            <div className="flex gap-4 items-center">
+                <Images
+                    src={image}
+                    alt="dashboard"
+                    sx={{
+                        objectFit: 'contain',
+                        direction: 'initial'
+                    }}
+                />
+                <div className="w-[50%]">
+                    <h3 className="text-[32px] text-[#051d32] font-[500]">{subTitle}</h3>
+                    <p className="text-[#76838f] text-[16px] mt-[24px] leading-[30px]">{description}</p>
+                </div>
+            </div>
             <Stack spacing={1} sx={{ pt: 1 }}>
                 <Stack
                     direction="row"
@@ -171,12 +178,12 @@ const PreBuildDashBoard = () => {
                     <Grid container spacing={1.5}>
                         <Grid item xs={12}>
                             <Typography variant="h2" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
-                                AI个性模板
+                                多平台场景营销
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="h4" sx={{ fontWeight: 400 }} align="center">
-                                丰富多样的AI模板，10秒生成专业内容，使得写作更加简单和高效。
+                                AIGC智能引擎,丰富的平台内容模板,专为内容营销而生,有效提升各大平台曝光，种草等内容工作的效率
                             </Typography>
                         </Grid>
                     </Grid>
@@ -194,7 +201,7 @@ const PreBuildDashBoard = () => {
                             showThumbs={false}
                             showIndicators={false}
                             centerMode={matchUpSM ? false : true}
-                            centerSlidePercentage={50}
+                            centerSlidePercentage={70}
                             infiniteLoop={true}
                             autoFocus={true}
                             emulateTouch={true}
@@ -208,11 +215,34 @@ const PreBuildDashBoard = () => {
                                 hasNext && <SampleNextArrow onClickHandler={onClickHandler} hasNext={hasNext} label={label} />
                             }
                         >
-                            <Items title="应用市场" image={theme.palette.mode === 'dark' ? market : market} link={DASHBOARD_PATH} />
-                            <Items title="亚马逊" image={theme.palette.mode === 'dark' ? amzon : amzon} link={DASHBOARD_PATH} />
-                            <Items title="独立站" image={theme.palette.mode === 'dark' ? site : site} link={DASHBOARD_PATH} />
-                            <Items title="社交媒体" image={theme.palette.mode === 'dark' ? social : social} link={DASHBOARD_PATH} />
-                            <Items title="生成示例" image={theme.palette.mode === 'dark' ? template : template} link={DASHBOARD_PATH} />
+                            <Items
+                                title="多平台账号登录"
+                                subTitle="多平台账号登录"
+                                description="支持小红书等多个主流内容创作平台等多个账号同时登录；保存长时间在线状态；一站式管理您多平台账号，提高内容运营效率。"
+                                image={theme.palette.mode === 'dark' ? market : market}
+                                link={DASHBOARD_PATH}
+                            />
+                            <Items
+                                title="多平台内容AI一键批量创作"
+                                subTitle="多平台内容AI一键批量创作"
+                                description="支持多种平台和场景的文案AI生成，可精细化控制AI生成的内容。同时支持图片自动拼接，图片内容识别等最新多模态大模型能力。"
+                                image={theme.palette.mode === 'dark' ? amzon : amzon}
+                                link={DASHBOARD_PATH}
+                            />
+                            <Items
+                                title="多平台作品一键发布"
+                                subTitle="多平台作品一键发布"
+                                description="支持一键分发多个作品到多个主流媒体平台；减少重复性工作，提高内容发布效率与管理效率"
+                                image={theme.palette.mode === 'dark' ? site : site}
+                                link={DASHBOARD_PATH}
+                            />
+                            <Items
+                                title="多平台数据综合分析"
+                                subTitle="多平台数据综合分析"
+                                description="支持小红书等多个主流内容创作平台的账号作品数据，粉丝数据以及互动数据进行聚合查看，并支持指定时间段数据统计与图表展示；提高数据分析效率，助力您的数据运营。"
+                                image={theme.palette.mode === 'dark' ? social : social}
+                                link={DASHBOARD_PATH}
+                            />
                         </Carousel>
                     </Box>
                 </Grid>

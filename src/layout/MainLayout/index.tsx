@@ -37,6 +37,7 @@ import { NewUserVip } from 'ui-component/new-user-vip';
 import StorageCache from 'web-storage-cache';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 import { useAllDetail } from 'contexts/JWTContext';
+import { InviteUser } from 'ui-component/invite-user';
 
 interface MainStyleProps {
     theme: Theme;
@@ -316,6 +317,7 @@ const MainLayout = () => {
     const { drawerOpen } = useSelector((state) => state.menu);
     const { drawerType, container, layout } = useConfig();
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
+    const [openInvite, setOpenInvite] = useState(false);
 
     const [timeOutObj, setTimeOutObj] = useState<{
         type: number;
@@ -388,19 +390,24 @@ const MainLayout = () => {
         // () => {
         //     clearInterval(userVip);
         //};
-        if (act === 0) {
-            if (allDetail?.allDetail?.isNewUser) {
-                handleShowNewUserVip();
-            }
-        } else {
-            discountNewUser().then((res) => {
-                if (res.isNewUser) {
-                    handleShowNewUserVip();
-                }
-            });
+        if (allDetail?.allDetail?.isNewUser) {
+            handleShowNewUserVip();
+            return;
         }
-        setAct(act + 1);
-    }, [location.pathname]);
+        if (allDetail?.allDetail?.isInviteUser) {
+            const dateTime = localStorage.getItem('inviteUserVipEndTime');
+            console.log('🚀 ~ useEffect ~ dateTime:', dateTime);
+            if (dateTime) {
+                if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                    setOpenInvite(true);
+                } else {
+                    setOpenInvite(false);
+                }
+            } else {
+                setOpenInvite(true);
+            }
+        }
+    }, [location.pathname, allDetail]);
 
     useEffect(() => {
         (async () => {
@@ -577,6 +584,15 @@ const MainLayout = () => {
                                         const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
                                         localStorage.setItem('newUserVipEndTime', newUserVipEndTime);
                                         setNewUserVipOpen(false);
+                                    }}
+                                />
+                            )}
+                            {openInvite && (
+                                <InviteUser
+                                    onClose={() => {
+                                        const inviteUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                                        localStorage.setItem('inviteUserVipEndTime', inviteUserVipEndTime);
+                                        setOpenInvite(false);
                                     }}
                                 />
                             )}

@@ -575,6 +575,12 @@ const Content = () => {
         }
     };
 
+    const getFiveDesAllKeys = (fiveDescConfig: any) => {
+        console.log(fiveDescConfig);
+        Object.values(fiveDescConfig).reduce((acc: any, cur: any) => {
+            return acc.concat(cur.keys);
+        }, []);
+    };
     const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
         try {
             if (item.type !== ListingBuilderEnum.FIVE_DES) {
@@ -639,7 +645,12 @@ const Content = () => {
                             : item.type === ListingBuilderEnum.FIVE_DES
                             ? 'LISTING_BULLET_POINT'
                             : 'LISTING_PRODUCT_DESCRIPTION',
-                    keywords: item.keyword.map((item: any) => item.text),
+                    keywords:
+                        item.type === ListingBuilderEnum.FIVE_DES
+                            ? detail?.draftConfig?.fiveDescConfig
+                                ? getFiveDesAllKeys(detail?.draftConfig.fiveDescConfig)
+                                : []
+                            : item.keyword.map((item: any) => item.text),
                     ...formik.values,
                     draftUid: uid,
                     title: list[0].value,
@@ -662,8 +673,8 @@ const Content = () => {
                             fiveList.forEach((v, i) => {
                                 setList((preList: any) => {
                                     const copyPreList = _.cloneDeep(preList);
-                                    copyPreList[index + i].value = v;
-                                    copyPreList[index + i].character = v.length || 0;
+                                    copyPreList[index + i].value = v.trim();
+                                    copyPreList[index + i].character = v.trim().length || 0;
                                     copyPreList[index + i].word = v?.trim()?.split(' ')?.length || 0;
                                     return copyPreList;
                                 });

@@ -1,5 +1,6 @@
 import { cloneElement, useState, ReactElement } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 
 // material-ui
 import {
@@ -82,7 +83,7 @@ const AppBar = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                免费使用
+                                {getPermission(ENUM_PERMISSION.App_DOWNLOAD)}
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'none', sm: 'none' } }}>

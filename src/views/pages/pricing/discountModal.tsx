@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
-import { Input, Radio, RadioChangeEvent, Tag } from 'antd';
+import { Input, Popover, Radio, RadioChangeEvent, Tag } from 'antd';
 
 const { Search } = Input;
 
@@ -214,7 +214,7 @@ export function DiscountModal({
                                         />
                                     )}
                                 </Tabs>
-                                <div className="flex justify-center flex-col items-center w-full p-3 h-[400px]">
+                                <div className="flex justify-center flex-col items-center w-full p-3 min-h-[400px]">
                                     <div className="flex justify-between items-center w-full mb-3">
                                         <span className="text-[#868A91]">套餐类型</span>
                                         <span className="text-base font-semibold text-[#2B2D2F]">{currentSelect?.title}</span>
@@ -231,7 +231,7 @@ export function DiscountModal({
                                     {currentSelect.experience ? (
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
-                                            <span className="text-sm text-[#868A91]">1周</span>
+                                            <span className="text-sm text-[#868A91]">1{currentSelect?.unitName}</span>
                                         </div>
                                     ) : (
                                         <div className="flex justify-between items-center w-full mb-3">
@@ -248,7 +248,7 @@ export function DiscountModal({
                                             )}
                                         </div>
                                     )}
-                                    {!currentSelect.experience && !value && (
+                                    {!value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
                                             <span className="text-[#868A91] mb-2">折扣券</span>
                                             <div>
@@ -377,8 +377,19 @@ export function DiscountModal({
                                             />
                                             <span className="text-[#6E7378]">
                                                 我已知晓 订阅后将
-                                                <span className="text-[red]">每月自动续费</span>
-                                                ，可随时一键取消
+                                                <span className="text-[red]">每月自动续费</span>，
+                                                <Popover
+                                                    zIndex={999999}
+                                                    content={
+                                                        <div>
+                                                            <div>（1）移动端：在支付宝钱包-我的-设置-支付设置-免密支付/自动扣款</div>
+                                                            <div>（2）PC端：在支付宝官方平台-账户设置-应用授权和代扣-代扣</div>
+                                                        </div>
+                                                    }
+                                                    title="如何取消自动续费："
+                                                >
+                                                    <span className="cursor-pointer text-blue-500">可随时一键取消</span>
+                                                </Popover>
                                             </span>
                                         </div>
                                     )}

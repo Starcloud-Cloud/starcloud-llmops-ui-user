@@ -165,6 +165,7 @@ const ListingBuilder = () => {
             version,
             endpoint: country.key,
             draftConfig: {
+                ...detail?.draftConfig,
                 enableAi,
                 fiveDescNum: list.filter((item) => item.type === ListingBuilderEnum.FIVE_DES)?.length,
                 aiConfigDTO: listingParam

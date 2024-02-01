@@ -87,7 +87,7 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                     }}
                     className={'absolute  bottom-[38px] text-[#1d0b04] left-[92px] text-xl cursor-pointer font-semibold'}
                 >
-                    复制链接发送给好用
+                    复制链接发送给好友
                 </div>
                 <svg
                     onClick={() => {

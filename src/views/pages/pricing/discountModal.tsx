@@ -248,7 +248,7 @@ export function DiscountModal({
                                             )}
                                         </div>
                                     )}
-                                    {!currentSelect.experience && !value && (
+                                    {!value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
                                             <span className="text-[#868A91] mb-2">折扣券</span>
                                             <div>

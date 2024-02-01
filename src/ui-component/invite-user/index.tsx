@@ -30,11 +30,11 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                 <img
                     className="w-[365px]"
                     src={vipModal}
-                    onClick={() => {
-                        navigate('/subscribe');
-                    }}
+                    // onClick={() => {
+                    //     navigate('/subscribe');
+                    // }}
                 />
-                <div className="flex items-baseline text-[#f0d6a4] absolute top-[112px] left-[82px]">
+                {/* <div className="flex items-baseline text-[#f0d6a4] absolute top-[112px] left-[82px]">
                     <span>距离结束还剩</span>
                     {endTime && (
                         <Countdown
@@ -47,7 +47,7 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                             format="D天H时m分s秒"
                         />
                     )}
-                </div>
+                </div> */}
                 <div
                     style={{
                         bottom: '125px',
@@ -69,11 +69,25 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
 
                 <div
                     onClick={() => {
-                        navigate('/subscribe');
+                        copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '复制成功, 快去邀请吧~',
+                                variant: 'alert',
+                                zIndex: 9999,
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                transition: 'SlideDown',
+                                close: false
+                            })
+                        );
                     }}
-                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}
+                    className={'absolute  bottom-[38px] text-[#1d0b04] left-[92px] text-xl cursor-pointer font-semibold'}
                 >
-                    立即购买
+                    复制链接发送给好用
                 </div>
                 <svg
                     onClick={() => {

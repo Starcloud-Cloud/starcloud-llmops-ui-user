@@ -392,11 +392,8 @@ const MainLayout = () => {
         //};
         if (allDetail?.allDetail?.isNewUser) {
             handleShowNewUserVip();
-            return;
-        }
-        if (allDetail?.allDetail?.isInviteUser) {
+        } else {
             const dateTime = localStorage.getItem('inviteUserVipEndTime');
-            console.log('🚀 ~ useEffect ~ dateTime:', dateTime);
             if (dateTime) {
                 if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
                     setOpenInvite(true);
@@ -590,7 +587,7 @@ const MainLayout = () => {
                             {openInvite && (
                                 <InviteUser
                                     onClose={() => {
-                                        const inviteUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                                        const inviteUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                                         localStorage.setItem('inviteUserVipEndTime', inviteUserVipEndTime);
                                         setOpenInvite(false);
                                     }}

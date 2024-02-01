@@ -16,7 +16,7 @@ import {
     Typography,
     FormLabel
 } from '@mui/material';
-import { InputNumber, Radio } from 'antd';
+import { InputNumber, Radio, Row, Col } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import MainCard from 'ui-component/cards/MainCard';
@@ -56,6 +56,8 @@ import useUserStore from 'store/user';
 import CreateTable from './spliceCmponents/table';
 import CreateVariable from './spliceCmponents/variable';
 import CreateTab from './spliceCmponents/tab';
+import Goods from '../../batchSmallRedBooks/good';
+import { getContentPage } from 'api/redBook';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const { TextArea } = Input;
@@ -212,7 +214,6 @@ const AddModal = () => {
     ];
     //测试
     const [testOpen, setTestOpen] = useState(false);
-    const [testTableList, setTestTableList] = useState<any[]>([]);
     //测试图片上传
     const [imageOpen, setImageOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -702,6 +703,74 @@ const AddModal = () => {
 
         setValueList(newData);
     };
+
+    //测试生成
+    const timer: any = useRef([]);
+    const [total, setTotal] = useState(0);
+    const [planList, setPlanList] = useState<any[]>([]);
+    const plabListRef: any = useRef(null);
+    const [queryPage, setQueryPage] = useState({
+        pageNo: 1,
+        pageSize: 20
+    });
+    const getList = () => {
+        getContentPage({
+            ...queryPage,
+            isTest: true,
+            schemeUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            plabListRef.current = [...planList, ...res.list];
+            setPlanList(plabListRef.current);
+        });
+    };
+    const getLists = (pageNo: number) => {
+        getContentPage({
+            ...queryPage,
+            isTest: true,
+            pageNo,
+            schemeUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            const newList = _.cloneDeep(plabListRef.current);
+            newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
+            plabListRef.current = newList;
+            setPlanList(plabListRef.current);
+        });
+    };
+    const scrollRef: any = useRef(null);
+    const handleScroll = () => {
+        const { current } = scrollRef;
+        if (current) {
+            if (current.scrollHeight - current.scrollTop === current.clientHeight && queryPage.pageNo * queryPage.pageSize < total) {
+                setQueryPage({
+                    ...queryPage,
+                    pageNo: queryPage.pageNo + 1
+                });
+            }
+        }
+    };
+    useEffect(() => {
+        if (searchParams.get('uid')) {
+            getList();
+            timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                if (
+                    plabListRef.current
+                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        ?.every(
+                            (item: any) =>
+                                item?.pictureStatus !== 'executing' &&
+                                item?.pictureStatus !== 'init' &&
+                                item?.copyWritingStatus !== 'executing' &&
+                                item?.copyWritingStatus !== 'init'
+                        )
+                ) {
+                    clearInterval(timer.current[queryPage.pageNo - 1]);
+                }
+                getLists(queryPage.pageNo);
+            }, 3000);
+        }
+    }, [queryPage.pageNo]);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -1379,6 +1448,22 @@ const AddModal = () => {
                 </div>
                 <Button
                     onClick={() => {
+                        if (!testImageList || testImageList.length === 0) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '没有上传测试图片',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                            return false;
+                        }
                         if (searchParams.get('uid')) {
                             setTestOpen(true);
                             try {
@@ -1417,7 +1502,22 @@ const AddModal = () => {
                                 })
                                     .then((res) => {
                                         setTestOpen(false);
-                                        setTestTableList(res);
+                                        getList();
+                                        timer.current[0] = setInterval(() => {
+                                            if (
+                                                plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                    return (
+                                                        item?.pictureStatus !== 'executing' &&
+                                                        item?.pictureStatus !== 'init' &&
+                                                        item?.copyWritingStatus !== 'executing' &&
+                                                        item?.copyWritingStatus !== 'init'
+                                                    );
+                                                })
+                                            ) {
+                                                clearInterval(timer.current[0]);
+                                            }
+                                            getLists(1);
+                                        }, 3000);
                                     })
                                     .catch((err) => {
                                         setTestOpen(false);
@@ -1447,7 +1547,16 @@ const AddModal = () => {
                 >
                     测试生成
                 </Button>
-                {testTableList?.length > 0 && (
+                <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
+                    <Row gutter={20} className="h-[fit-content] w-full">
+                        {planList.map((item, index: number) => (
+                            <Col key={index} span={6} className="inline-block">
+                                <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+                {/* {testTableList?.length > 0 && (
                     <Table
                         className="mt-[20px]"
                         scroll={{ y: 500 }}
@@ -1456,7 +1565,7 @@ const AddModal = () => {
                         columns={testColumn}
                         dataSource={testTableList}
                     />
-                )}
+                )} */}
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">

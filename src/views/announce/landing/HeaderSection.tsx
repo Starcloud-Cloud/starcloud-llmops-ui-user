@@ -88,7 +88,7 @@ const HeaderSection = () => {
         window.scrollTo(0, window.innerHeight - 80);
     };
 
-    const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3rem', lg: '3rem' } };
+    const headerSX = { fontSize: { xs: '1rem', sm: '2rem', md: '2rem', lg: '2rem' } };
 
     const HeaderAnimationImagememo = useMemo(
         () => (
@@ -129,11 +129,14 @@ const HeaderSection = () => {
                                 <Stack spacing={2}>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
                                         {/* {t('homepage.title.slogan')} */}
-                                        多平台多账号内容 AI 创作运营工具
+                                        多平台多账号内容
                                     </Typography>
-                                    <Typography fontWeight={400} textAlign={{ xs: 'center', md: 'left' }} variant="h2">
+                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
+                                        AI内容创作运营工具
+                                    </Typography>
+                                    {/* <Typography fontWeight={400} textAlign={{ xs: 'center', md: 'left' }} variant="h2">
                                         免费下载使用
-                                    </Typography>
+                                    </Typography> */}
 
                                     {/* <Typography
                                         textAlign={{ xs: 'center', md: 'left' }}

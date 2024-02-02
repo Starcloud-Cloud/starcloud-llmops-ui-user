@@ -10,7 +10,7 @@ export const getTenant = () => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return ENUM_TENANT.ANNOUNCE;
     } else {
-        return ENUM_TENANT.AI;
+        return ENUM_TENANT.ANNOUNCE;
     }
 };
 
@@ -42,7 +42,7 @@ const list: IList = {
 
 const announceList: IList = {
     [ENUM_PERMISSION.APP_NAME]: '魔法矩阵',
-    [ENUM_PERMISSION.APP_DES]: 'AI创作运营工具',
+    [ENUM_PERMISSION.APP_DES]: 'AI内容创作运营工具',
     [ENUM_PERMISSION.App_DOWNLOAD]: '免费下载',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,
@@ -58,6 +58,6 @@ export const getPermission = (key: ENUM_PERMISSION) => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return announceList[key];
     } else {
-        return list[key];
+        return announceList[key];
     }
 };

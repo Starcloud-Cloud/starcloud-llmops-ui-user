@@ -51,182 +51,182 @@ const CardSection = () => {
         <Container>
             <Grid container justifyContent="center" spacing={{ xs: 3, sm: 5 }} sx={{ textAlign: 'center' }}>
                 <Grid item md={3} sm={6} xs={12}>
-                    <FadeInWhenVisible>
-                        <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Avatar
-                                    variant="rounded"
+                    {/* <FadeInWhenVisible> */}
+                    <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Avatar
+                                variant="rounded"
+                                sx={{
+                                    background: theme.palette.background.paper,
+                                    opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
+                                    color: theme.palette.warning.main,
+                                    height: 60,
+                                    width: 60,
+                                    borderRadius: '12px'
+                                }}
+                            >
+                                <GridViewIcon sx={{ fontSize: '2.25rem', transform: 'rotate(45deg)' }} />
+                            </Avatar>
+                            <Stack alignItems="flex-end">
+                                <Typography
+                                    variant="h1"
                                     sx={{
-                                        background: theme.palette.background.paper,
-                                        opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
-                                        color: theme.palette.warning.main,
-                                        height: 60,
-                                        width: 60,
-                                        borderRadius: '12px'
+                                        fontWeight: 800,
+                                        fontSize: '2.5rem',
+                                        zIndex: '99',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                     }}
                                 >
-                                    <GridViewIcon sx={{ fontSize: '2.25rem', transform: 'rotate(45deg)' }} />
-                                </Avatar>
-                                <Stack alignItems="flex-end">
-                                    <Typography
-                                        variant="h1"
-                                        sx={{
-                                            fontWeight: 800,
-                                            fontSize: '2.5rem',
-                                            zIndex: '99',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        300+
-                                    </Typography>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 500,
-                                            fontSize: '1.120rem',
-                                            textAlign: 'end',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        {t('homepage.cards.templates')}
-                                    </Typography>
-                                </Stack>
+                                    300+
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        fontWeight: 500,
+                                        fontSize: '1.120rem',
+                                        textAlign: 'end',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                    }}
+                                >
+                                    {t('homepage.cards.templates')}
+                                </Typography>
                             </Stack>
-                        </SubCard>
-                    </FadeInWhenVisible>
+                        </Stack>
+                    </SubCard>
+                    {/* </FadeInWhenVisible> */}
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
-                    <FadeInWhenVisible>
-                        <SubCard sx={{ bgcolor: theme.palette.primary[200], ...cardSX }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Avatar
-                                    variant="rounded"
+                    {/* <FadeInWhenVisible> */}
+                    <SubCard sx={{ bgcolor: theme.palette.primary[200], ...cardSX }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Avatar
+                                variant="rounded"
+                                sx={{
+                                    background: theme.palette.background.paper,
+                                    color: theme.palette.primary.main,
+                                    opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
+                                    height: 60,
+                                    width: 60,
+                                    borderRadius: '12px'
+                                }}
+                            >
+                                <WidgetsOutlinedIcon sx={{ fontSize: '2.25rem' }} />
+                            </Avatar>
+                            <Stack alignItems="flex-end">
+                                <Typography
+                                    variant="h1"
                                     sx={{
-                                        background: theme.palette.background.paper,
-                                        color: theme.palette.primary.main,
-                                        opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
-                                        height: 60,
-                                        width: 60,
-                                        borderRadius: '12px'
+                                        fontWeight: 800,
+                                        fontSize: '2.5rem',
+                                        zIndex: '99',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                     }}
                                 >
-                                    <WidgetsOutlinedIcon sx={{ fontSize: '2.25rem' }} />
-                                </Avatar>
-                                <Stack alignItems="flex-end">
-                                    <Typography
-                                        variant="h1"
-                                        sx={{
-                                            fontWeight: 800,
-                                            fontSize: '2.5rem',
-                                            zIndex: '99',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        10+
-                                    </Typography>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 500,
-                                            fontSize: '1.120rem',
-                                            textAlign: 'end',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        {t('homepage.cards.experts')}
-                                    </Typography>
-                                </Stack>
+                                    10+
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        fontWeight: 500,
+                                        fontSize: '1.120rem',
+                                        textAlign: 'end',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                    }}
+                                >
+                                    {t('homepage.cards.experts')}
+                                </Typography>
                             </Stack>
-                        </SubCard>
-                    </FadeInWhenVisible>
+                        </Stack>
+                    </SubCard>
+                    {/* </FadeInWhenVisible> */}
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
-                    <FadeInWhenVisible>
-                        <SubCard sx={{ bgcolor: theme.palette.secondary[200], ...cardSX }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Avatar
-                                    variant="rounded"
+                    {/* <FadeInWhenVisible> */}
+                    <SubCard sx={{ bgcolor: theme.palette.secondary[200], ...cardSX }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Avatar
+                                variant="rounded"
+                                sx={{
+                                    background: theme.palette.background.paper,
+                                    opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
+                                    color: theme.palette.secondary.main,
+                                    height: 60,
+                                    width: 60,
+                                    borderRadius: '12px'
+                                }}
+                            >
+                                <WebOutlinedIcon sx={{ fontSize: '2.25rem' }} />
+                            </Avatar>
+                            <Stack alignItems="flex-end">
+                                <Typography
+                                    variant="h1"
                                     sx={{
-                                        background: theme.palette.background.paper,
-                                        opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
-                                        color: theme.palette.secondary.main,
-                                        height: 60,
-                                        width: 60,
-                                        borderRadius: '12px'
+                                        fontSize: '2.5rem',
+                                        zIndex: '99',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                     }}
                                 >
-                                    <WebOutlinedIcon sx={{ fontSize: '2.25rem' }} />
-                                </Avatar>
-                                <Stack alignItems="flex-end">
-                                    <Typography
-                                        variant="h1"
-                                        sx={{
-                                            fontSize: '2.5rem',
-                                            zIndex: '99',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        99%
-                                    </Typography>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontSize: '1.120rem',
-                                            textAlign: 'end',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        {t('homepage.cards.savings')}
-                                    </Typography>
-                                </Stack>
+                                    99%
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        fontSize: '1.120rem',
+                                        textAlign: 'end',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                    }}
+                                >
+                                    {t('homepage.cards.savings')}
+                                </Typography>
                             </Stack>
-                        </SubCard>
-                    </FadeInWhenVisible>
+                        </Stack>
+                    </SubCard>
+                    {/* </FadeInWhenVisible> */}
                 </Grid>
                 <Grid item md={3} sm={6} xs={12}>
-                    <FadeInWhenVisible>
-                        <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Avatar
-                                    variant="rounded"
+                    {/* <FadeInWhenVisible> */}
+                    <SubCard sx={{ bgcolor: 'warning.main', ...cardSX }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Avatar
+                                variant="rounded"
+                                sx={{
+                                    background: theme.palette.background.paper,
+                                    opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
+                                    color: theme.palette.warning.main,
+                                    height: 60,
+                                    width: 60,
+                                    borderRadius: '12px'
+                                }}
+                            >
+                                <GridViewIcon sx={{ fontSize: '2.25rem', transform: 'rotate(45deg)' }} />
+                            </Avatar>
+                            <Stack alignItems="flex-end">
+                                <Typography
+                                    variant="h1"
                                     sx={{
-                                        background: theme.palette.background.paper,
-                                        opacity: theme.palette.mode === 'dark' ? 1 : 0.5,
-                                        color: theme.palette.warning.main,
-                                        height: 60,
-                                        width: 60,
-                                        borderRadius: '12px'
+                                        fontWeight: 800,
+                                        fontSize: '2.5rem',
+                                        zIndex: '99',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
                                     }}
                                 >
-                                    <GridViewIcon sx={{ fontSize: '2.25rem', transform: 'rotate(45deg)' }} />
-                                </Avatar>
-                                <Stack alignItems="flex-end">
-                                    <Typography
-                                        variant="h1"
-                                        sx={{
-                                            fontWeight: 800,
-                                            fontSize: '2.5rem',
-                                            zIndex: '99',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        10S
-                                    </Typography>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 500,
-                                            fontSize: '1.120rem',
-                                            textAlign: 'end',
-                                            color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
-                                        }}
-                                    >
-                                        {t('homepage.cards.creation')}
-                                    </Typography>
-                                </Stack>
+                                    10S
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        fontWeight: 500,
+                                        fontSize: '1.120rem',
+                                        textAlign: 'end',
+                                        color: theme.palette.mode === 'dark' ? theme.palette.dark[900] : theme.palette.grey[900]
+                                    }}
+                                >
+                                    {t('homepage.cards.creation')}
+                                </Typography>
                             </Stack>
-                        </SubCard>
-                    </FadeInWhenVisible>
+                        </Stack>
+                    </SubCard>
+                    {/* </FadeInWhenVisible> */}
                 </Grid>
             </Grid>
         </Container>

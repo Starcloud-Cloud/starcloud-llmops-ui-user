@@ -129,7 +129,7 @@ const HeaderSection = () => {
                                 <Stack spacing={2}>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
                                         {/* {t('homepage.title.slogan')} */}
-                                        多平台多账号内容
+                                        多平台多账号
                                     </Typography>
                                     <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
                                         AI内容创作运营工具

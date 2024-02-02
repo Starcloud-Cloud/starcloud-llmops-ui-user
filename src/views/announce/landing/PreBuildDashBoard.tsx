@@ -137,12 +137,12 @@ const Items = ({ title, caption, image, link, subTitle, description }: ItemProps
                     }}
                 />
                 <div className="w-[50%]">
-                    <h3 className="text-[32px] text-[#051d32] font-[500]">{subTitle}</h3>
+                    <div className="text-[32px] text-[#051d32] font-[500] leading-[50px]">{subTitle}</div>
                     <p className="text-[#76838f] text-[16px] mt-[24px] leading-[30px]">{description}</p>
                 </div>
             </div>
             <Stack spacing={1} sx={{ pt: 1 }}>
-                <Stack
+                {/* <Stack
                     direction="row"
                     spacing={1}
                     alignItems="center"
@@ -158,7 +158,7 @@ const Items = ({ title, caption, image, link, subTitle, description }: ItemProps
                     <IconButton size="small">
                         <IconLink aria-label="link button" size={18} color={theme.palette.text.primary} />
                     </IconButton>
-                </Stack>
+                </Stack> */}
                 <Typography variant="subtitle2" color="text.primary" sx={{ fontSize: { xs: '1rem', xl: '1.125rem' } }}>
                     {caption}
                 </Typography>
@@ -201,7 +201,7 @@ const PreBuildDashBoard = () => {
                             showThumbs={false}
                             showIndicators={false}
                             centerMode={matchUpSM ? false : true}
-                            centerSlidePercentage={70}
+                            centerSlidePercentage={60}
                             infiniteLoop={true}
                             autoFocus={true}
                             emulateTouch={true}

@@ -13,12 +13,14 @@ import { translateText } from 'api/picture/create';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
+import { verifyJSON } from '../components/validaForm';
 function Perform({
     detaData,
     config,
     changeSon,
     source,
     loadings,
+    isDisables,
     isallExecute,
     variableChange,
     promptChange,
@@ -66,18 +68,26 @@ function Perform({
         });
         return flag?.some((value: boolean) => value === true);
     };
-    //执行按钮是否全部禁用
+    //执行按钮是否禁用
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
-            if (el.isShow) {
-                return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
-            } else {
-                return el.defaultValue || el.defaultValue === false ? false : true;
-            }
+            // if (!el.isShow) {
+            return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
+            // } else {
+            //     return el.defaultValue || el.defaultValue === false ? false : true;
+            // }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
-                return el.value || el.value || el.defaultValue || el.defaultValue === false ? false : true;
+                if (el.style === 'JSON') {
+                    if (el.value) {
+                        return !verifyJSON(el.value);
+                    } else {
+                        return !verifyJSON(el.defaultValue);
+                    }
+                } else {
+                    return el.value || el.value || el.defaultValue || el.defaultValue === false ? false : true;
+                }
             } else {
                 return false;
             }
@@ -172,14 +182,14 @@ function Perform({
                                     ) : null}
                                     <Box sx={{ display: { xs: 'none', md: 'block' } }}></Box>
                                     <Box whiteSpace="nowrap">
-                                        <Tooltip title={t('market.stepTips')}>
+                                        <Tooltip placement="top" title={t('market.stepTips')}>
                                             <IconButton size="small">
                                                 <ErrorOutline />
                                             </IconButton>
                                         </Tooltip>
                                         <Button
                                             onClick={() => executeAPP(steps)}
-                                            disabled={disSteps(steps) || history}
+                                            disabled={disSteps(steps) || history || isDisables[steps]}
                                             color="secondary"
                                             size="small"
                                             startIcon={<NotStarted />}
@@ -193,7 +203,7 @@ function Perform({
                                     <Grid container spacing={1}>
                                         {item.variable?.variables?.map((el: any, i: number) =>
                                             el.isShow ? (
-                                                <Grid item key={i} md={el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
+                                                <Grid item key={i} md={el.style === 'JSON' ? 12 : el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
                                                     <FormExecute item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
                                                 </Grid>
                                             ) : null
@@ -377,6 +387,7 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
         JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
+        JSON.stringify(prevProps?.isDisables) === JSON.stringify(nextProps?.isDisables) &&
         JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)
     );
 };

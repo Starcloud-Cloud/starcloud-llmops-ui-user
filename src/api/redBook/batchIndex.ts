@@ -53,3 +53,7 @@ export const contentLike = (data: any) => {
 export const contentUnlike = (data: any) => {
     return request.post({ url: '/llm/xhs/content/unlike', data });
 };
+//失败重试
+export const failureRetry = (uid: any) => {
+    return request.get({ url: `/llm/xhs/content/failureRetry/${uid}` });
+};

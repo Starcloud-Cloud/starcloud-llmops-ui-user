@@ -63,6 +63,7 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
             sex: sex === 'man' ? 1 : 0
         });
         if (res) {
+            all_detail?.setPre(all_detail?.pre + 1);
             forceUpdate();
             all_detail?.setPre(all_detail?.pre + 1);
             dispatch(

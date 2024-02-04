@@ -16,7 +16,7 @@ import {
     Typography,
     FormLabel
 } from '@mui/material';
-import { InputNumber, Radio } from 'antd';
+import { InputNumber, Radio, Row, Col } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import MainCard from 'ui-component/cards/MainCard';
@@ -56,6 +56,8 @@ import useUserStore from 'store/user';
 import CreateTable from './spliceCmponents/table';
 import CreateVariable from './spliceCmponents/variable';
 import CreateTab from './spliceCmponents/tab';
+import Goods from '../../batchSmallRedBooks/good';
+import { getContentPage } from 'api/redBook';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = () => {
     const { TextArea } = Input;
@@ -66,7 +68,7 @@ const AddModal = () => {
     const searchParams = new URLSearchParams(location.search);
     // 1.模板名称
     const [params, setParams] = useState<any>({
-        mode: 'RANDOM_IMAGE_TEXT'
+        mode: 'CUSTOM_IMAGE_TEXT'
     });
     const [titleOpen, setTitleOpen] = useState(false);
     const [tagOpen, setTagOpen] = useState(false);
@@ -97,7 +99,8 @@ const AddModal = () => {
                 {
                     key: '1',
                     name: '首图',
-                    variables: []
+                    model: '',
+                    variableList: []
                 }
             ]
         }
@@ -112,6 +115,7 @@ const AddModal = () => {
     };
 
     //文案生成模板
+    const copyWritingTemplateRef: any = useRef({});
     const [copyWritingTemplate, setCopyWritingTemplate] = useState<any>({});
 
     useEffect(() => {
@@ -140,31 +144,32 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                        setRows(res.configuration?.copyWritingTemplate?.variables);
-                        setTableData(res.refers);
-                        setTestImageList(
-                            res.useImages?.map((item: any) => {
-                                return {
-                                    uid: uuidv4(),
-                                    thumbUrl: item,
-                                    response: {
-                                        data: {
-                                            url: item
-                                        }
-                                    }
-                                };
-                            })
-                        );
-                        setTestTableList(res.configuration.copyWritingTemplate.example);
-                        setCopyWritingTemplate(res.configuration.copyWritingTemplate);
-                        setImageStyleData(res.configuration.imageTemplate.styleList);
-                        setparagraphCount(res.configuration.paragraphCount);
-                    } else {
-                        setSplitValue(res.customConfiguration?.appUid);
-                        valueListRef.current = res.customConfiguration?.steps;
-                        setValueList(valueListRef.current);
-                    }
+                    // if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
+                    //     setRows(res.configuration?.copyWritingTemplate?.variableList);
+                    //     setTableData(res.refers);
+                    //     setTestImageList(
+                    //         res.useImages?.map((item: any) => {
+                    //             return {
+                    //                 uid: uuidv4(),
+                    //                 thumbUrl: item,
+                    //                 response: {
+                    //                     data: {
+                    //                         url: item
+                    //                     }
+                    //                 }
+                    //             };
+                    //         })
+                    //     );
+                    //     setTestTableList(res.configuration.copyWritingTemplate.example);
+                    //     copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
+                    //     setCopyWritingTemplate(copyWritingTemplateRef.current);
+                    //     setImageStyleData(res.configuration.imageTemplate.styleList);
+                    //     setparagraphCount(res.configuration.paragraphCount);
+                    // } else {
+                    setSplitValue(res.customConfiguration?.appUid);
+                    valueListRef.current = res.customConfiguration?.steps;
+                    setValueList(valueListRef.current);
+                    // }
                 }
             });
         } else {
@@ -200,7 +205,7 @@ const AddModal = () => {
             title: '图片内容',
             render: (_, row) => (
                 <div className="flex gap-2">
-                    {row?.images?.map((item: any) => (
+                    {row?.imageList?.map((item: any) => (
                         <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
                     ))}
                 </div>
@@ -209,7 +214,6 @@ const AddModal = () => {
     ];
     //测试
     const [testOpen, setTestOpen] = useState(false);
-    const [testTableList, setTestTableList] = useState<any[]>([]);
     //测试图片上传
     const [imageOpen, setImageOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -237,7 +241,37 @@ const AddModal = () => {
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-
+    //每一个内容校验
+    const verifyItem = (item: any) => {
+        let content = '';
+        let flag;
+        if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
+            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
+                flag = true;
+                content = '参考来源最少一个';
+            } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
+                flag = true;
+                content = '文案生成要求必填';
+            } else if (item.code === 'ParagraphActionHandler' && !item.paragraphCount) {
+                flag = true;
+                content = '文案段落数量必填';
+            } else {
+                flag = false;
+            }
+        } else if (item.code === 'AssembleActionHandler' && !item.requirement) {
+            flag = true;
+            content = '文案拼接配置必填';
+        } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
+            flag = true;
+            content = '风格必选';
+        } else {
+            flag = false;
+        }
+        return {
+            flag,
+            content
+        };
+    };
     //校验
     const verify = (flag?: boolean) => {
         if (!params.name) {
@@ -391,186 +425,189 @@ const AddModal = () => {
     };
     //保存
     const handleSave = () => {
-        if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
-            if (searchParams.get('uid')) {
-                schemeModify({
-                    uid: searchParams.get('uid'),
-                    ...params,
-                    type: params.type ? 'SYSTEM' : 'USER',
-                    refers: tableData,
-                    configuration: {
-                        copyWritingTemplate: {
-                            ...copyWritingTemplate,
-                            example: testTableList,
-                            variables: rows
-                        },
-                        imageTemplate: {
-                            styleList: imageStyleData
-                        },
-                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                    }
-                }).then((res) => {
-                    if (res) {
-                        navigate('/copywriting');
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: ' 编辑成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                transition: 'SlideDown',
-                                close: false
-                            })
-                        );
-                    }
-                });
-                return false;
-            }
-            schemeCreate({
-                ...params,
-                type: params.type ? 'SYSTEM' : 'USER',
-                refers: tableData,
-                configuration: {
-                    copyWritingTemplate: {
-                        ...copyWritingTemplate,
-                        example: testTableList,
-                        variables: rows
+        // if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
+        //     if (searchParams.get('uid')) {
+        //         schemeModify({
+        //             uid: searchParams.get('uid'),
+        //             ...params,
+        //             type: params.type ? 'SYSTEM' : 'USER',
+        //             refers: tableData,
+        //             configuration: {
+        //                 copyWritingTemplate: {
+        //                     ...copyWritingTemplate,
+        //                     example: testTableList,
+        //                     variableList: rows
+        //                 },
+        //                 imageTemplate: {
+        //                     styleList: imageStyleData
+        //                 },
+        //                 paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+        //             }
+        //         }).then((res) => {
+        //             if (res) {
+        //                 navigate('/copywriting');
+        //                 dispatch(
+        //                     openSnackbar({
+        //                         open: true,
+        //                         message: ' 编辑成功',
+        //                         variant: 'alert',
+        //                         alert: {
+        //                             color: 'success'
+        //                         },
+        //                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        //                         transition: 'SlideDown',
+        //                         close: false
+        //                     })
+        //                 );
+        //             }
+        //         });
+        //         return false;
+        //     }
+        //     schemeCreate({
+        //         ...params,
+        //         type: params.type ? 'SYSTEM' : 'USER',
+        //         refers: tableData,
+        //         configuration: {
+        //             copyWritingTemplate: {
+        //                 ...copyWritingTemplate,
+        //                 example: testTableList,
+        //                 variableList: rows
+        //             },
+        //             imageTemplate: {
+        //                 styleList: imageStyleData
+        //             },
+        //             paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+        //         }
+        //     }).then((res) => {
+        //         if (res) {
+        //             setTableList([]);
+        //             navigate('/copywriting');
+        //             dispatch(
+        //                 openSnackbar({
+        //                     open: true,
+        //                     message: ' 创建成功',
+        //                     variant: 'alert',
+        //                     alert: {
+        //                         color: 'success'
+        //                     },
+        //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        //                     transition: 'SlideDown',
+        //                     close: false
+        //                 })
+        //             );
+        //         }
+        //     });
+        // } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
+        if (!params.name) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '方案名称必填',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
                     },
-                    imageTemplate: {
-                        styleList: imageStyleData
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!params.category) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '类目必选',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
                     },
-                    paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-                }
-            }).then((res) => {
-                if (res) {
-                    setTableList([]);
-                    navigate('/copywriting');
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: ' 创建成功',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            transition: 'SlideDown',
-                            close: false
-                        })
-                    );
-                }
-            });
-        } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
-            if (!params.name) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '方案名称必填',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (!params.category) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '类目必选',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (!params.tags || params.tags?.length === 0) {
-                setTitleOpen(true);
-                setCategoryOpen(true);
-                setTagOpen(true);
-                setPre(pre + 1);
-                setSummaryOpen(true);
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '标签最少输入一个',
-                        variant: 'alert',
-                        alert: {
-                            color: 'error'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                return false;
-            }
-            if (searchParams.get('uid')) {
-                schemeModify({
-                    uid: searchParams.get('uid'),
-                    ...params,
-                    type: params.type ? 'SYSTEM' : 'USER',
-                    customConfiguration: {
-                        ...splitList.filter((item) => item.appUid === splitValue)[0],
-                        steps: valueList
-                    }
-                }).then((res) => {
-                    if (res) {
-                        navigate('/copywriting');
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: ' 编辑成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                transition: 'SlideDown',
-                                close: false
-                            })
-                        );
-                    }
-                });
-                return false;
-            }
-            schemeCreate({
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!params.tags || params.tags?.length === 0) {
+            setTitleOpen(true);
+            setCategoryOpen(true);
+            setTagOpen(true);
+            setPre(pre + 1);
+            setSummaryOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '标签最少输入一个',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (valueList?.some((item) => verifyItem(item).flag)) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '创作方式有未填项',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (searchParams.get('uid')) {
+            schemeModify({
+                uid: searchParams.get('uid'),
                 ...params,
                 type: params.type ? 'SYSTEM' : 'USER',
                 customConfiguration: {
                     ...splitList.filter((item) => item.appUid === splitValue)[0],
-                    steps: valueList
+                    steps: valueList?.map((item) => {
+                        if (item?.model === 'RANDOM') {
+                            return {
+                                ...item,
+                                variableList: [],
+                                requirement: ''
+                            };
+                        } else if (item?.model === 'AI_CUSTOM') {
+                            return {
+                                ...item,
+                                referList: []
+                            };
+                        } else {
+                            return item;
+                        }
+                    })
                 }
             }).then((res) => {
                 if (res) {
-                    setTableList([]);
                     navigate('/copywriting');
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: ' 创建成功',
+                            message: ' 编辑成功',
                             variant: 'alert',
                             alert: {
                                 color: 'success'
@@ -582,7 +619,50 @@ const AddModal = () => {
                     );
                 }
             });
+            return false;
         }
+        schemeCreate({
+            ...params,
+            type: params.type ? 'SYSTEM' : 'USER',
+            customConfiguration: {
+                ...splitList.filter((item) => item.appUid === splitValue)[0],
+                steps: valueList?.map((item) => {
+                    if (item?.model === 'RANDOM') {
+                        return {
+                            ...item,
+                            variableList: [],
+                            requirement: ''
+                        };
+                    } else if (item?.model === 'AI_CUSTOM') {
+                        return {
+                            ...item,
+                            referList: []
+                        };
+                    } else {
+                        return item;
+                    }
+                })
+            }
+        }).then((res) => {
+            if (res) {
+                setTableList([]);
+                navigate('/copywriting');
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: ' 创建成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        transition: 'SlideDown',
+                        close: false
+                    })
+                );
+            }
+        });
+        // }
     };
 
     //自定义内容拼接
@@ -596,6 +676,9 @@ const AddModal = () => {
     useEffect(() => {
         appList().then((res) => {
             setSplitList(res);
+            if (!searchParams.get('uid')) {
+                setSplitValue(res[0]?.appUid);
+            }
         });
     }, []);
     const [changeFalg, setChangeFalg] = useState(false);
@@ -620,6 +703,74 @@ const AddModal = () => {
 
         setValueList(newData);
     };
+
+    //测试生成
+    const timer: any = useRef([]);
+    const [total, setTotal] = useState(0);
+    const [planList, setPlanList] = useState<any[]>([]);
+    const plabListRef: any = useRef(null);
+    const [queryPage, setQueryPage] = useState({
+        pageNo: 1,
+        pageSize: 20
+    });
+    const getList = () => {
+        getContentPage({
+            ...queryPage,
+            isTest: true,
+            schemeUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            plabListRef.current = [...planList, ...res.list];
+            setPlanList(plabListRef.current);
+        });
+    };
+    const getLists = (pageNo: number) => {
+        getContentPage({
+            ...queryPage,
+            isTest: true,
+            pageNo,
+            schemeUid: searchParams.get('uid')
+        }).then((res) => {
+            setTotal(res.total);
+            const newList = _.cloneDeep(plabListRef.current);
+            newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
+            plabListRef.current = newList;
+            setPlanList(plabListRef.current);
+        });
+    };
+    const scrollRef: any = useRef(null);
+    const handleScroll = () => {
+        const { current } = scrollRef;
+        if (current) {
+            if (current.scrollHeight - current.scrollTop === current.clientHeight && queryPage.pageNo * queryPage.pageSize < total) {
+                setQueryPage({
+                    ...queryPage,
+                    pageNo: queryPage.pageNo + 1
+                });
+            }
+        }
+    };
+    useEffect(() => {
+        if (searchParams.get('uid')) {
+            getList();
+            timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                if (
+                    plabListRef.current
+                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        ?.every(
+                            (item: any) =>
+                                item?.pictureStatus !== 'executing' &&
+                                item?.pictureStatus !== 'init' &&
+                                item?.copyWritingStatus !== 'executing' &&
+                                item?.copyWritingStatus !== 'init'
+                        )
+                ) {
+                    clearInterval(timer.current[queryPage.pageNo - 1]);
+                }
+                getLists(queryPage.pageNo);
+            }, 3000);
+        }
+    }, [queryPage.pageNo]);
     return (
         // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
@@ -785,77 +936,33 @@ const AddModal = () => {
                 <Divider />
                 <div className="text-[18px] font-[600]">创作方式</div>
                 <div className="my-[20px] flex gap-2 flex-wrap">
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
-                            borderColor: params.mode === 'RANDOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'RANDOM_IMAGE_TEXT' });
-                                }
+                    {splitList?.map((item) => (
+                        <SubCard
+                            sx={{
+                                mb: 1,
+                                cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
+                                borderColor: splitValue === item.appUid ? '#673ab7' : 'rgba(230,230,231,1)'
                             }}
+                            contentSX={{ p: '10px !important', width: '200px' }}
                         >
-                            <Typography variant="h4" mb={1}>
-                                图文随机组合
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据参考文案，自动生成相似内容，并根据上传的图片自动替换风格模版中的图片'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            borderColor: params.mode === 'PRACTICAL_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'PRACTICAL_IMAGE_TEXT' });
-                                }
-                            }}
-                        >
-                            <Typography variant="h4" mb={1}>
-                                干货文生成
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
-                    <SubCard
-                        sx={{
-                            mb: 1,
-                            borderColor: params.mode === 'CUSTOM_IMAGE_TEXT' ? '#673ab7' : 'rgba(230,230,231,1)',
-                            cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer'
-                        }}
-                        contentSX={{ p: '10px !important', width: '200px' }}
-                    >
-                        <Box
-                            onClick={() => {
-                                if (!searchParams.get('uid')) {
-                                    setParams({ ...params, mode: 'CUSTOM_IMAGE_TEXT' });
-                                }
-                            }}
-                        >
-                            <Typography variant="h4" mb={1}>
-                                自定义内容拼接生成
-                            </Typography>
-                            <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                {'根据话题 和 参考文案，自动生成认知文，每个段落随机适配一张风格图片，会生成多个段落和多张图'}
-                            </Typography>
-                        </Box>
-                    </SubCard>
+                            <Box
+                                onClick={() => {
+                                    if (!searchParams.get('uid')) {
+                                        setSplitValue(item.appUid);
+                                    }
+                                }}
+                            >
+                                <Typography variant="h4" mb={1}>
+                                    {item.appName}
+                                </Typography>
+                                <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
+                                    {item?.description}
+                                </Typography>
+                            </Box>
+                        </SubCard>
+                    ))}
                 </div>
-                {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
+                {/* {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
                     <Collapse
                         bordered={false}
                         style={{ background: 'transparent' }}
@@ -981,10 +1088,11 @@ const AddModal = () => {
                                                     const reader = result.getReader();
                                                     const textDecoder = new TextDecoder();
                                                     valueRef.current = '';
-                                                    setCopyWritingTemplate({
-                                                        ...copyWritingTemplate,
+                                                    copyWritingTemplateRef.current = {
+                                                        ...copyWritingTemplateRef.current,
                                                         summary: ''
-                                                    });
+                                                    };
+                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                     let outerJoins: any;
                                                     while (1) {
                                                         let joins = outerJoins;
@@ -1029,10 +1137,11 @@ const AddModal = () => {
                                                             }
                                                             if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
                                                                 valueRef.current = valueRef.current + bufferObj.content;
-                                                                setCopyWritingTemplate({
-                                                                    ...copyWritingTemplate,
+                                                                copyWritingTemplateRef.current = {
+                                                                    ...copyWritingTemplateRef.current,
                                                                     summary: valueRef.current
-                                                                });
+                                                                };
+                                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                             } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
                                                                 dispatch(
                                                                     openSnackbar({
@@ -1081,10 +1190,11 @@ const AddModal = () => {
                                                 style={{ height: '300px' }}
                                                 value={copyWritingTemplate.summary}
                                                 onChange={(e) => {
-                                                    setCopyWritingTemplate({
-                                                        ...copyWritingTemplate,
+                                                    copyWritingTemplateRef.current = {
+                                                        ...copyWritingTemplateRef.current,
                                                         summary: e.target.value
-                                                    });
+                                                    };
+                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
                                                 }}
                                             />
                                             {summaryOpen && !copyWritingTemplate.summary && (
@@ -1103,10 +1213,11 @@ const AddModal = () => {
                                             pre={pre}
                                             value={copyWritingTemplate.demand}
                                             setValue={(data) => {
-                                                setCopyWritingTemplate({
-                                                    ...copyWritingTemplate,
+                                                copyWritingTemplateRef.current = {
+                                                    ...copyWritingTemplateRef.current,
                                                     demand: data
-                                                });
+                                                };
+                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
                                             }}
                                             rows={rows}
                                             setRows={setRows}
@@ -1167,124 +1278,159 @@ const AddModal = () => {
                             }
                         ]}
                     />
-                ) : (
-                    <div>
-                        <FormControl sx={{ mb: 2 }} fullWidth>
-                            <FormLabel>选择应用</FormLabel>
-                            <Select
-                                label="选择应用"
-                                name="source"
-                                value={splitValue}
-                                onChange={(e) => {
-                                    setChangeFalg(false);
-                                    setSplitValue(e.target.value);
-                                }}
-                            >
-                                {splitList.map((item) => (
-                                    <MenuItem key={item.appUid} value={item.appUid}>
-                                        {item.appName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Collapse
-                            bordered={false}
-                            style={{ background: 'transparent' }}
-                            items={valueList?.map((el: any, index: number) => {
-                                return {
-                                    key: index,
-                                    style: {
-                                        background: '#fafafa',
-                                        border: '1px solod #d9d9d9'
-                                    },
-                                    label: el?.name,
-                                    children: (
+                ) : ( */}
+                <Collapse
+                    bordered={false}
+                    style={{ background: 'transparent' }}
+                    items={valueList?.map((el: any, index: number) => {
+                        return {
+                            key: index,
+                            style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
+                            label: (
+                                <div className="relative">
+                                    <span className="text-[18px] font-[600]">
+                                        {index + 1 + '.'} {el?.name}
+                                    </span>
+                                    {verifyItem(el)?.flag && (
+                                        <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
+                                    )}
+                                </div>
+                            ),
+                            children: (
+                                <>
+                                    {(el.code === 'CustomActionHandler' ||
+                                        el.code === 'ParagraphActionHandler' ||
+                                        el.code === 'TitleActionHandler') && (
                                         <>
-                                            {(el.code === 'CustomActionHandler' ||
-                                                el.code === 'ParagraphActionHandler' ||
-                                                el.code === 'TitleActionHandler') && (
-                                                <>
-                                                    <div className="text-[14px] mb-[10px] font-[600]">1.参考文案</div>
-                                                    <CreateTable
-                                                        tableData={el?.referList}
-                                                        sourceList={sourceList}
-                                                        setTableData={(data) => setValues('referList', data, index)}
-                                                        params={params}
-                                                    />
-                                                    <div className="text-[14px] my-[10px] font-[600]">2. 生成模式</div>
-                                                    <Radio.Group
-                                                        value={el.model}
-                                                        onChange={(e) => {
-                                                            setValues('model', e.target.value, index);
-                                                        }}
-                                                    >
-                                                        {modeList?.map((item) => (
+                                            <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
+                                            <div>
+                                                <Radio.Group
+                                                    value={el.model}
+                                                    onChange={(e) => {
+                                                        setValues('model', e.target.value, index);
+                                                    }}
+                                                >
+                                                    {modeList?.map((item) =>
+                                                        el?.code === 'ParagraphActionHandler' ? (
+                                                            item.label !== '随机获取' && (
+                                                                <Radio key={item.value} value={item.value}>
+                                                                    {item.label}
+                                                                </Radio>
+                                                            )
+                                                        ) : (
                                                             <Radio key={item.value} value={item.value}>
                                                                 {item.label}
                                                             </Radio>
-                                                        ))}
-                                                    </Radio.Group>
+                                                        )
+                                                    )}
+                                                </Radio.Group>
+                                            </div>
+                                            <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                <span className="font-[600] text-[#673ab7]">Tips：</span>
+                                                {el.model === 'RANDOM'
+                                                    ? '从参考内容中随机获取一条内容使用'
+                                                    : el.model === 'AI_PARODY'
+                                                    ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                    : '直接让AI生成内容，要求越详细越好'}
+                                            </div>
+                                            {el.model !== 'AI_CUSTOM' && (
+                                                <>
+                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
+                                                    <CreateTable
+                                                        tableData={el?.referList}
+                                                        sourceList={sourceList}
+                                                        code={el?.code}
+                                                        setTableData={(data) => setValues('referList', data, index)}
+                                                        params={params}
+                                                    />
+                                                </>
+                                            )}
+                                            {el.model !== 'RANDOM' && (
+                                                <>
+                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
+                                                        {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                    </div>
                                                     <CreateVariable
                                                         pre={pre}
+                                                        model={el?.model}
                                                         value={el?.requirement}
                                                         setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variables}
-                                                        setRows={(data: any[]) => setValues('variables', data, index)}
+                                                        rows={el?.variableList}
+                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
                                                     />
-                                                    {el.code === 'ParagraphActionHandler' && (
-                                                        <div className="relative mt-[20px]">
-                                                            <InputNumber
-                                                                size="large"
-                                                                className="w-[300px] bg-[#f8fafc]"
-                                                                min={1}
-                                                                value={el?.paragraphCount}
-                                                                onChange={(data) => setValues('paragraphCount', data, index)}
-                                                            />
-                                                            <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                                文案段落数量
-                                                            </span>
-                                                        </div>
+                                                </>
+                                            )}
+                                            {el.code === 'ParagraphActionHandler' && (
+                                                <>
+                                                    <div className="relative mt-[20px]">
+                                                        <InputNumber
+                                                            status={!el?.paragraphCount ? 'error' : ''}
+                                                            size="large"
+                                                            className="w-[300px] bg-[#f8fafc]"
+                                                            min={1}
+                                                            value={el?.paragraphCount}
+                                                            onChange={(data) => setValues('paragraphCount', data, index)}
+                                                        />
+                                                        <span
+                                                            style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
+                                                            className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                        >
+                                                            文案段落数量
+                                                        </span>
+                                                    </div>
+                                                    {!el?.paragraphCount && (
+                                                        <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                            文案段落数量必填
+                                                        </span>
                                                     )}
                                                 </>
                                             )}
-                                            {el.code === 'AssembleActionHandler' && (
-                                                <>
-                                                    <div className="relative">
-                                                        <TextArea
-                                                            defaultValue={el?.requirement}
-                                                            onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                            rows={4}
-                                                        />
-                                                        <span className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                            文案拼接配置
-                                                        </span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {el.code === 'PosterActionHandler' && (
-                                                <>
-                                                    <CreateTab
-                                                        imageStyleData={el?.styleList}
-                                                        setImageStyleData={(data) => setValues('styleList', data, index)}
-                                                        focuActive={focuActive}
-                                                        setFocuActive={setFocuActive}
-                                                        digui={() => {
-                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                                            if (newData.every((i: any) => !i)) {
-                                                                return 1;
-                                                            }
-                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                                        }}
-                                                    />
-                                                </>
+                                        </>
+                                    )}
+                                    {el.code === 'AssembleActionHandler' && (
+                                        <>
+                                            <div className="relative">
+                                                <TextArea
+                                                    status={!el?.requirement ? 'error' : ''}
+                                                    defaultValue={el?.requirement}
+                                                    onBlur={(data) => setValues('requirement', data.target.value, index)}
+                                                    rows={10}
+                                                />
+                                                <span
+                                                    style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                    className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                >
+                                                    文案拼接配置
+                                                </span>
+                                            </div>
+                                            {!el?.requirement && (
+                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案拼接配置必填</span>
                                             )}
                                         </>
-                                    )
-                                };
-                            })}
-                        />
-                    </div>
-                )}
+                                    )}
+                                    {el.code === 'PosterActionHandler' && (
+                                        <>
+                                            <CreateTab
+                                                imageStyleData={el?.styleList}
+                                                setImageStyleData={(data) => setValues('styleList', data, index)}
+                                                focuActive={focuActive}
+                                                setFocuActive={setFocuActive}
+                                                digui={() => {
+                                                    const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                    if (newData.every((i: any) => !i)) {
+                                                        return 1;
+                                                    }
+                                                    return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                }}
+                                            />
+                                        </>
+                                    )}
+                                </>
+                            )
+                        };
+                    })}
+                />
+                {/*  )} */}
                 <Divider />
                 <div className="text-[18px] my-[20px] font-[600]">测试生成</div>
                 <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
@@ -1302,23 +1448,47 @@ const AddModal = () => {
                 </div>
                 <Button
                     onClick={() => {
-                        if (verify(true)) {
+                        if (!testImageList || testImageList.length === 0) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '没有上传测试图片',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                            return false;
+                        }
+                        if (searchParams.get('uid')) {
                             setTestOpen(true);
                             try {
                                 schemeExample({
+                                    uid: searchParams.get('uid'),
                                     ...params,
                                     type: params.type ? 'SYSTEM' : 'USER',
-                                    refers: tableData,
-                                    configuration: {
-                                        copyWritingTemplate: {
-                                            ...copyWritingTemplate,
-                                            example: testTableList,
-                                            variables: rows
-                                        },
-                                        imageTemplate: {
-                                            styleList: imageStyleData
-                                        },
-                                        paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
+                                    customConfiguration: {
+                                        ...splitList.filter((item) => item.appUid === splitValue)[0],
+                                        steps: valueList?.map((item) => {
+                                            if (item?.model === 'RANDOM') {
+                                                return {
+                                                    ...item,
+                                                    variableList: [],
+                                                    requirement: ''
+                                                };
+                                            } else if (item?.model === 'AI_CUSTOM') {
+                                                return {
+                                                    ...item,
+                                                    referList: []
+                                                };
+                                            } else {
+                                                return item;
+                                            }
+                                        })
                                     },
                                     useImages: testImageList
                                         ?.map((item: any, i: number) => {
@@ -1332,7 +1502,22 @@ const AddModal = () => {
                                 })
                                     .then((res) => {
                                         setTestOpen(false);
-                                        setTestTableList(res);
+                                        getList();
+                                        timer.current[0] = setInterval(() => {
+                                            if (
+                                                plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                    return (
+                                                        item?.pictureStatus !== 'executing' &&
+                                                        item?.pictureStatus !== 'init' &&
+                                                        item?.copyWritingStatus !== 'executing' &&
+                                                        item?.copyWritingStatus !== 'init'
+                                                    );
+                                                })
+                                            ) {
+                                                clearInterval(timer.current[0]);
+                                            }
+                                            getLists(1);
+                                        }, 3000);
                                     })
                                     .catch((err) => {
                                         setTestOpen(false);
@@ -1340,6 +1525,20 @@ const AddModal = () => {
                             } catch (err) {
                                 setTestOpen(false);
                             }
+                        } else {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '保存之后才能测试生成',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
                         }
                     }}
                     loading={testOpen}
@@ -1348,7 +1547,16 @@ const AddModal = () => {
                 >
                     测试生成
                 </Button>
-                {testTableList?.length > 0 && (
+                <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
+                    <Row gutter={20} className="h-[fit-content] w-full">
+                        {planList.map((item, index: number) => (
+                            <Col key={index} span={6} className="inline-block">
+                                <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+                {/* {testTableList?.length > 0 && (
                     <Table
                         className="mt-[20px]"
                         scroll={{ y: 500 }}
@@ -1357,7 +1565,7 @@ const AddModal = () => {
                         columns={testColumn}
                         dataSource={testTableList}
                     />
-                )}
+                )} */}
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">

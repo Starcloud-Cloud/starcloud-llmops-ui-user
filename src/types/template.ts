@@ -32,6 +32,7 @@ export interface Details {
     workflowConfig: { steps: any[] };
 }
 export interface Anyevent {
+    basisPre: number;
     initialValues: {
         name: string;
         description: string;
@@ -46,6 +47,7 @@ export interface Anyevent {
 }
 export type Rows = {
     field: string;
+    group: string;
     label: string;
     type: string;
     style: string;
@@ -75,4 +77,5 @@ export interface El {
     value: null | undefined | string | boolean;
     defaultValue: null | undefined | string | boolean;
     isShow: boolean;
+    style: string;
 }

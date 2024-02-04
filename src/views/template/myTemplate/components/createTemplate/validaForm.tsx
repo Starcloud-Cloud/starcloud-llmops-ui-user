@@ -133,8 +133,11 @@ const Valida = ({
             <form>
                 <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content1" id="panel1a-header1">
-                        {formik.values.prompt !== '' && <CheckCircleIcon fontSize="small" color="success" />}
-                        {formik.values.prompt === '' && <CancelIcon fontSize="small" color="error" />}
+                        {formik.values.prompt ? (
+                            <CheckCircleIcon fontSize="small" color="success" />
+                        ) : (
+                            <CancelIcon fontSize="small" color="error" />
+                        )}
                         <Typography ml={2} fontSize="16px">
                             {t('market.prompt')}
                         </Typography>
@@ -294,18 +297,24 @@ const Valida = ({
                                                     >
                                                         <SettingsIcon />
                                                     </IconButton>
-                                                    <Popconfirm
-                                                        title={t('myApp.del')}
-                                                        description={t('myApp.delDesc')}
-                                                        onConfirm={() => delModal(i, index)}
-                                                        onCancel={() => {}}
-                                                        okText={t('myApp.confirm')}
-                                                        cancelText={t('myApp.cancel')}
-                                                    >
-                                                        <IconButton color="error">
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                    </Popconfirm>
+                                                    {row?.group !== 'SYSTEM' ? (
+                                                        <>
+                                                            <Popconfirm
+                                                                title={t('myApp.del')}
+                                                                description={t('myApp.delDesc')}
+                                                                onConfirm={() => delModal(i, index)}
+                                                                onCancel={() => {}}
+                                                                okText={t('myApp.confirm')}
+                                                                cancelText={t('myApp.cancel')}
+                                                            >
+                                                                <IconButton color="error">
+                                                                    <DeleteIcon />
+                                                                </IconButton>
+                                                            </Popconfirm>
+                                                        </>
+                                                    ) : (
+                                                        '-'
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -317,20 +326,18 @@ const Valida = ({
                 </Accordion>
                 <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
-                        {Object.entries({ ...formik.values }).every((value) => {
-                            if (value[0] !== 'prompt') {
-                                return value[1] !== '';
+                        {variables.every((value) => {
+                            if (value.field !== 'prompt') {
+                                return value.value;
                             } else {
                                 return true;
                             }
-                        }) && <CheckCircleIcon fontSize="small" color="success" />}
-                        {Object.entries({ ...formik.values }).some((value) => {
-                            if (value[0] !== 'prompt') {
-                                return value[1] === '';
-                            } else {
-                                return false;
-                            }
-                        }) && <CancelIcon fontSize="small" color="error" />}
+                        }) ? (
+                            <CheckCircleIcon fontSize="small" color="success" />
+                        ) : (
+                            <CancelIcon fontSize="small" color="error" />
+                        )}
+
                         <Typography ml={2} fontSize="16px">
                             {t('market.model')}
                         </Typography>

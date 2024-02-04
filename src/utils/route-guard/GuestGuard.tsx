@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // project imports
 import useAuth from 'hooks/useAuth';
 import { DASHBOARD_PATH } from 'config';
+import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 import { GuardProps } from 'types';
 import { useEffect } from 'react';
 
@@ -19,7 +20,11 @@ const GuestGuard = ({ children }: GuardProps) => {
 
     useEffect(() => {
         if (isLoggedIn) {
-            navigate(DASHBOARD_PATH, { replace: true });
+            if (getPermission(ENUM_PERMISSION.APP_HOME)) {
+                navigate(DASHBOARD_PATH, { replace: true });
+            } else {
+                navigate('/', { replace: true });
+            }
         }
     }, [isLoggedIn, navigate]);
 

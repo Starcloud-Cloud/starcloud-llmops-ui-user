@@ -62,6 +62,7 @@ interface TableData {
     appMode: string;
     fromScene: string;
     appName: string;
+    imagePoints?: string;
     totalAnswerTokens: number;
     totalMessageTokens: number;
     totalElapsed: number;
@@ -141,7 +142,6 @@ function ApplicationAnalysis({
         }
     };
     const permissions = useUserStore((state) => state.permissions);
-    console.log(permissions);
     //获取标数据
     const getStatistic = async () => {
         let res: any;
@@ -499,7 +499,7 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
-                                <TableCell align="center">{row.costPoints}</TableCell>
+                                <TableCell align="center">{row?.appMode === 'IMAGE' ? row.imagePoints : row.costPoints}</TableCell>
                                 <TableCell align="center">{row.totalElapsed}</TableCell>
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
@@ -766,6 +766,7 @@ function ApplicationAnalysis({
                                             changeSon={() => {}}
                                             changeanswer={() => {}}
                                             loadings={[]}
+                                            isDisables={[]}
                                             isShows={[]}
                                             variableChange={() => {}}
                                             promptChange={() => {}}

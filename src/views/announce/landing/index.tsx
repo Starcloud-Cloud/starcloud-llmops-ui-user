@@ -72,9 +72,9 @@ const Landing = () => {
             {/* 4. Developer Experience section */}
 
             {/* 3. about section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <FeatureSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 4. Apps */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>

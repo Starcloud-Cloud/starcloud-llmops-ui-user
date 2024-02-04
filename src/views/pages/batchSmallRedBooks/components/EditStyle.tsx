@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField } from '@mui/material';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Image, Row, Col } from 'antd';
+import { Image, Row, Col, Switch, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
@@ -17,7 +17,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
         newData.id = temp.id;
-        newData.variables = temp.variables;
+        newData.variableList = temp.variableList;
         setData(newData);
         setOpen(false);
     };
@@ -59,8 +59,39 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 </FormControl>
                 {imageStyleData?.id && (
                     <div>
+                        {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
+                            imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
+                            <div className="flex items-center gap-4 min-h-[32px]">
+                                <span>图片标题生成</span>
+                                <Switch
+                                    checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
+                                    onChange={(e) => {
+                                        const newData = _.cloneDeep(imageStyleData);
+                                        if (e) {
+                                            newData.titleGenerateMode = 'AI';
+                                        } else {
+                                            newData.titleGenerateMode = 'DEFAULT';
+                                        }
+                                        setData(newData);
+                                    }}
+                                />
+                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}</span>
+                                {imageStyleData?.titleGenerateMode === 'AI' && (
+                                    <Input
+                                        className="w-[400px]"
+                                        value={imageStyleData?.titleGenerateRequirement}
+                                        onChange={(e) => {
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            newData.titleGenerateRequirement = e.target.value;
+                                            setData(newData);
+                                        }}
+                                        placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                    />
+                                )}
+                            </div>
+                        )}
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variables?.map(
+                            {imageStyleData?.variableList?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
                                         <Col key={index} sm={12} xs={24} md={6}>
@@ -69,7 +100,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 index={index}
                                                 changeValue={(data: any) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.variables[data.index].value = data.value;
+                                                    newData.variableList[data.index].value = data.value;
                                                     setData(newData);
                                                 }}
                                                 item={el}

@@ -54,136 +54,149 @@ function Deatail() {
     const aimodeRef = useRef('gpt-3.5-turbo-16k');
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
+    const loadingsRef: any = useRef([]);
+    //执行禁用
+    const isDisableRef: any = useRef([]);
+    const [isDisables, setIsDisables] = useState<any>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
     let isAllExecute = false;
     let conversationUid: undefined | string = undefined;
+    //数组方法封装
+    const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
+        const newData = _.cloneDeep(data);
+        newData[index] = flag;
+        setData(newData);
+    };
+    const allChangeArr = (stepLength: number, flag: boolean) => {
+        const value: any[] = [];
+        for (let i = 0; i < stepLength; i++) {
+            value[i] = flag;
+        }
+        isDisableRef.current = value;
+        loadingsRef.current = value;
+        setIsDisables(isDisableRef?.current);
+        setLoadings(loadingsRef?.current);
+    };
     //执行
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
-        const newValue = [...loadings];
-        newValue[index] = true;
         if (!isAllExecute) {
-            setLoadings(newValue);
+            changeArr(isDisableRef.current, setIsDisables, index, true);
+            changeArr(loadingsRef.current, setLoadings, index, true);
         } else {
-            const value: any[] = [];
-            for (let i = index; i < detailData.workflowConfig.steps.length; i++) {
-                value[i] = true;
-            }
-            setLoadings(value);
+            allChangeArr(detailData.workflowConfig.steps.length, true);
         }
         const fetchData = async () => {
-            let resp: any = await executeMarket({
-                appUid: detailRef.current?.uid,
-                stepId: stepId,
-                aiModel: aimodeRef.current,
-                appReqVO: detailRef.current,
-                conversationUid
-            });
-            const contentData = _.cloneDeep(detailRef.current);
-            contentData.workflowConfig.steps[index].flowStep.response.answer = '';
-            detailRef.current = contentData;
-            setDetailData(contentData);
-            const reader = resp.getReader();
-            const textDecoder = new TextDecoder();
-            let outerJoins: any;
-            while (1) {
-                let joins = outerJoins;
-                const { done, value } = await reader.read();
-
-                if (done) {
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
-                    const newShow = _.cloneDeep(isShows);
-                    newShow[index] = true;
-                    setIsShow(newShow);
-                    allDetail?.setPre(allDetail?.pre + 1);
-                    if (
-                        isAllExecute &&
-                        index < detailData.workflowConfig.steps.length - 1 &&
-                        detailData.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
-                    ) {
-                        changeData({
-                            index: index + 1,
-                            stepId: detailData.workflowConfig.steps[index + 1].field,
-                            steps: detailData.workflowConfig.steps[index + 1]
-                        });
+            try {
+                let resp: any = await executeMarket({
+                    appUid: detailRef.current?.uid,
+                    stepId: stepId,
+                    aiModel: aimodeRef.current,
+                    appReqVO: detailRef.current,
+                    conversationUid
+                });
+                const contentData = _.cloneDeep(detailRef.current);
+                contentData.workflowConfig.steps[index].flowStep.response.answer = '';
+                detailRef.current = contentData;
+                setDetailData(contentData);
+                const reader = resp.getReader();
+                const textDecoder = new TextDecoder();
+                let outerJoins: any;
+                while (1) {
+                    let joins = outerJoins;
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        changeArr(isDisableRef.current, setIsDisables, index, false);
+                        const newShow = _.cloneDeep(isShows);
+                        newShow[index] = true;
+                        setIsShow(newShow);
+                        allDetail?.setPre(allDetail?.pre + 1);
+                        if (
+                            isAllExecute &&
+                            index < detailData.workflowConfig.steps.length - 1 &&
+                            detailData.workflowConfig.steps[index + 1].flowStep.response.style !== 'BUTTON'
+                        ) {
+                            changeData({
+                                index: index + 1,
+                                stepId: detailData.workflowConfig.steps[index + 1].field,
+                                steps: detailData.workflowConfig.steps[index + 1]
+                            });
+                        }
+                        break;
                     }
-                    break;
-                }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((message, i: number) => {
-                    if (i === 0 && joins) {
-                        message = joins + message;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (message && message.indexOf('}') === -1) {
-                            joins = message;
+                    let str = textDecoder.decode(value);
+                    const lines = str.split('\n');
+                    lines.forEach((message, i: number) => {
+                        if (i === 0 && joins) {
+                            message = joins + message;
+                            joins = undefined;
+                        }
+                        if (i === lines.length - 1) {
+                            if (message && message.indexOf('}') === -1) {
+                                joins = message;
+                                return;
+                            }
+                        }
+                        let bufferObj;
+                        if (message?.startsWith('data:')) {
+                            bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                        }
+                        if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                            changeArr(loadingsRef.current, setLoadings, index, false);
+                            if (!conversationUid && index === 0 && isAllExecute) {
+                                conversationUid = bufferObj.conversationUid;
+                            }
+                            const contentData1 = _.cloneDeep(contentData);
+                            contentData1.workflowConfig.steps[index].flowStep.response.answer =
+                                detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
+                            detailRef.current = contentData1;
+                            setDetailData(contentData1);
+                        } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: bufferObj.content,
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                        } else if (bufferObj?.code === 2004008003) {
+                            setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
+                            setTokenOpen(true);
+                            return;
+                        } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: t('market.warning'),
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                            allChangeArr(detailData.workflowConfig.steps.length, false);
                             return;
                         }
-                    }
-                    let bufferObj;
-                    if (message?.startsWith('data:')) {
-                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                    }
-                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                        const newValue1 = _.cloneDeep(loadings);
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
-                        if (!conversationUid && index === 0 && isAllExecute) {
-                            conversationUid = bufferObj.conversationUid;
-                        }
-                        const contentData1 = _.cloneDeep(contentData);
-                        contentData1.workflowConfig.steps[index].flowStep.response.answer =
-                            detailRef.current.workflowConfig.steps[index].flowStep.response.answer + bufferObj.content;
-                        detailRef.current = contentData1;
-                        setDetailData(contentData1);
-                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: bufferObj.content,
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
-                    } else if (bufferObj?.code === 2004008003) {
-                        setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
-                        setTokenOpen(true);
-                        const newValue1 = [...loadings];
-                        newValue1.forEach((item) => {
-                            item = false;
-                        });
-                        setLoadings(newValue1);
-                        return;
-                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: t('market.warning'),
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                close: false
-                            })
-                        );
-                    }
-                });
-                outerJoins = joins;
+                    });
+                    outerJoins = joins;
+                }
+            } catch (err) {
+                allChangeArr(detailData.workflowConfig.steps.length, false);
             }
         };
         fetchData();
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
-        const newValue = _.cloneDeep(detailData);
+        const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[index].flowStep.response.answer = value;
         detailRef.current = newValue;
         setDetailData(newValue);
@@ -201,7 +214,7 @@ function Deatail() {
     };
     //更改变量的值
     const variableChange = ({ e, steps, i }: any) => {
-        const newValue = _.cloneDeep(detailData);
+        const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         detailRef.current = newValue;
         setDetailData(newValue);
@@ -209,15 +222,10 @@ function Deatail() {
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {
         detailRef.current = _.cloneDeep({
-            ...detailData,
+            ...detailRef.current,
             workflowConfig: data
         });
-        setDetailData(
-            _.cloneDeep({
-                ...detailData,
-                workflowConfig: data
-            })
-        );
+        setDetailData(detailRef.current);
     };
     const [active, setActive] = useState(false);
     useEffect(() => {
@@ -274,7 +282,7 @@ function Deatail() {
                 }
             };
             detailRef.current = result;
-            setDetailData(result);
+            setDetailData(detailRef.current);
         };
         metadata().then((res) => {
             setAppModel(res);
@@ -505,6 +513,7 @@ function Deatail() {
             <CarryOut
                 config={detailData}
                 isShows={isShows}
+                isDisables={isDisables}
                 changeConfigs={changeConfigs}
                 changeData={changeData}
                 variableChange={variableChange}

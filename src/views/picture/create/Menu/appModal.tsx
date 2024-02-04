@@ -89,12 +89,30 @@ const AppModal = ({
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
     const [loadings, setLoadings] = useState<any[]>([]);
+    const loadingsRef: any = useRef([]);
+    //执行禁用
+    const isDisableRef: any = useRef([]);
+    const [isDisables, setIsDisables] = useState<any>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
     //历史记录
     const [historyList, setHistoryList] = useState<any[]>([]);
     const [from, setFrom] = useState('');
-
+    const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
+        const newData = _.cloneDeep(data);
+        newData[index] = flag;
+        setData(newData);
+    };
+    const allChangeArr = (stepLength: number, flag: boolean) => {
+        const value: any[] = [];
+        for (let i = 0; i < stepLength; i++) {
+            value[i] = flag;
+        }
+        isDisableRef.current = value;
+        loadingsRef.current = value;
+        setIsDisables(isDisableRef?.current);
+        setLoadings(loadingsRef?.current);
+    };
     //点击历史记录填入数据
     const setPreForm = (row: { appInfo: any }) => {
         const res = _.cloneDeep(row.appInfo);
@@ -134,7 +152,7 @@ const AppModal = ({
             }
         });
         detailRef.current = newValue;
-        setDetail(newValue);
+        setDetail(detailRef.current);
         setPerform(perform + 1);
     };
     //更改answer
@@ -144,7 +162,7 @@ const AppModal = ({
             newValue.workflowConfig.steps[index].flowStep.response.answer = value;
         }
         detailRef.current = newValue;
-        setDetail(newValue);
+        setDetail(detailRef.current);
     };
     //设置执行的步骤的模型
     const exeChange = ({ e, steps, i }: any) => {
@@ -153,7 +171,7 @@ const AppModal = ({
             newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         }
         detailRef.current = _.cloneDeep(newValue);
-        setDetail(newValue);
+        setDetail(detailRef.current);
     };
     //设置执行步骤的参数
     const promptChange = async ({ e, steps, i, flag = false }: any) => {
@@ -164,7 +182,7 @@ const AppModal = ({
             newValue.workflowConfig.steps[steps].flowStep.variable.variables[i].value = e.value;
         }
         detailRef.current = _.cloneDeep(newValue);
-        setDetail(newValue);
+        setDetail(detailRef.current);
     };
     //是否全部执行
     let isAllExecute = false;
@@ -173,16 +191,15 @@ const AppModal = ({
     //执行
     const changeData = (data: Execute) => {
         const { stepId, index }: { stepId: string; index: number } = data;
-        const newValue = [...loadings];
-        newValue[index] = true;
         if (!isAllExecute) {
-            setLoadings(newValue);
+            changeArr(isDisableRef.current, setIsDisables, index, true);
+            changeArr(loadingsRef.current, setLoadings, index, true);
         } else {
             const value: any[] = [];
             for (let i = index; i < detail.workflowConfig.steps.length; i++) {
                 value[i] = true;
             }
-            setLoadings(value);
+            allChangeArr(detail.workflowConfig.steps.length, true);
         }
         const fetchData = async () => {
             let resp: any = await executeMarket({
@@ -205,9 +222,7 @@ const AppModal = ({
                 const { done, value } = await reader.read();
 
                 if (done) {
-                    const newValue1 = [...loadings];
-                    newValue1[index] = false;
-                    setLoadings(newValue1);
+                    changeArr(isDisableRef.current, setIsDisables, index, false);
                     const newShow = _.cloneDeep(isShows);
                     newShow[index] = true;
                     setIsShow(newShow);
@@ -243,9 +258,7 @@ const AppModal = ({
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                        const newValue1 = [...loadings];
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
+                        changeArr(loadingsRef.current, setLoadings, index, false);
                         if (!conversationUid && index === 0 && isAllExecute) {
                             conversationUid = bufferObj.conversationUid;
                         }
@@ -255,6 +268,8 @@ const AppModal = ({
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                        console.log(1);
+
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -263,17 +278,21 @@ const AppModal = ({
                                 alert: {
                                     color: 'success'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );
+                        allChangeArr(detail.workflowConfig.steps.length, false);
                     } else if (bufferObj?.code === 2004008003) {
+                        console.log(2);
+
                         setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
                         setTokenOpen(true);
-                        const newValue1 = [...loadings];
-                        newValue1[index] = false;
-                        setLoadings(newValue1);
+                        allChangeArr(detail.workflowConfig.steps.length, false);
                         return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                        console.log(3);
+
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -282,9 +301,11 @@ const AppModal = ({
                                 alert: {
                                     color: 'error'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );
+                        allChangeArr(detail.workflowConfig.steps.length, false);
                     }
                 });
                 outerJoins = joins;
@@ -295,15 +316,10 @@ const AppModal = ({
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {
         detailRef.current = _.cloneDeep({
-            ...detail,
+            ...detailRef.current,
             workflowConfig: data
         });
-        setDetail(
-            _.cloneDeep({
-                ...detail,
-                workflowConfig: data
-            })
-        );
+        setDetail(detailRef.current);
     };
     const leftRef: any = useRef(null);
     const [leftHeight, setLeftHeight] = useState(0);
@@ -369,11 +385,12 @@ const AppModal = ({
                                     </FormControl>
                                     {perform > 0 && (
                                         <Perform
-                                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                            config={detail?.workflowConfig}
                                             changeSon={changeData}
                                             changeConfigs={changeConfigs}
                                             changeanswer={changeanswer}
                                             loadings={loadings}
+                                            isDisables={isDisables}
                                             isShows={isShows}
                                             variableChange={exeChange}
                                             promptChange={promptChange}

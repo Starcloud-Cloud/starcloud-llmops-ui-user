@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Button, CardMedia, Container, Grid, Stack, Typography } from '@mui/material';
+import { Image, Divider } from 'antd';
 
 // third party
 import { motion } from 'framer-motion';
@@ -24,6 +25,11 @@ import img6 from 'assets/images/landing/6.png';
 import img7 from 'assets/images/landing/7.png';
 import img8 from 'assets/images/landing/8.png';
 import img9 from 'assets/images/landing/9.png';
+import vodeo from 'assets/images/landing/视频号.svg';
+import bili from 'assets/images/landing/哔哩哔哩.svg';
+import kuai from 'assets/images/landing/快手.svg';
+import iosFill from 'assets/images/landing/ios.svg';
+import windowsFill from 'assets/images/landing/windows-fill.svg';
 import downArrow from 'assets/images/landing/down-arrow.gif';
 // import TechLight from 'assets/images/landing/tech-light.svg';
 // import TechDark from 'assets/images/landing/tech-dark.svg';
@@ -82,7 +88,7 @@ const HeaderSection = () => {
         window.scrollTo(0, window.innerHeight - 80);
     };
 
-    const headerSX = { fontSize: { xs: '2rem', sm: '3rem', md: '3rem', lg: '3rem' } };
+    const headerSX = { fontSize: { xs: '1rem', sm: '2rem', md: '2rem', lg: '2rem' } };
 
     const HeaderAnimationImagememo = useMemo(
         () => (
@@ -121,11 +127,18 @@ const HeaderSection = () => {
                                 transition={{ type: 'spring', stiffness: 150, damping: 30 }}
                             >
                                 <Stack spacing={2}>
-                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
-                                        {t('homepage.title.slogan')}
+                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
+                                        {/* {t('homepage.title.slogan')} */}
+                                        多平台多账号
                                     </Typography>
+                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h2" sx={headerSX}>
+                                        AI内容创作运营工具
+                                    </Typography>
+                                    {/* <Typography fontWeight={400} textAlign={{ xs: 'center', md: 'left' }} variant="h2">
+                                        免费下载使用
+                                    </Typography> */}
 
-                                    <Typography
+                                    {/* <Typography
                                         textAlign={{ xs: 'center', md: 'left' }}
                                         variant="h2"
                                         color="primary"
@@ -173,7 +186,7 @@ const HeaderSection = () => {
                                                 </Typography>
                                             </div>
                                         </Slider>
-                                    </Typography>
+                                    </Typography> */}
                                 </Stack>
                             </motion.div>
                         </Grid>
@@ -189,7 +202,8 @@ const HeaderSection = () => {
                                     variant="body1"
                                     sx={{ fontSize: { xs: '1rem', md: '1.125rem' } }}
                                 >
-                                    {t('homepage.title.spread')}
+                                    {/* {t('homepage.title.spread')} */}
+                                    主流内容创作平台多账号登录，多模态 AI 生成，作品一键分发，数据综合分析
                                 </Typography>
                             </motion.div>
                         </Grid>
@@ -200,9 +214,9 @@ const HeaderSection = () => {
                                 transition={{ type: 'spring', stiffness: 150, damping: 30, delay: 0.4 }}
                             >
                                 <Grid container spacing={2} sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                                    <Grid item>
-                                        <AnimateButton>
-                                            <Button
+                                    <Grid item className="flex gap-4">
+                                        {/* <AnimateButton> */}
+                                        {/* <Button
                                                 onClick={() => {
                                                     navigate(DASHBOARD_PATH);
                                                     setRoutesIndex(0);
@@ -213,10 +227,34 @@ const HeaderSection = () => {
                                                 startIcon={<StarIcon />}
                                             >
                                                 开始免费创作
-                                            </Button>
-                                        </AnimateButton>
+                                            </Button> */}
+                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                            <Image width={20} src={windowsFill} preview={false} />
+                                            <div className="ml-[5px] mt-[4px]">Windows 下载</div>
+                                        </div>
+                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                            <Image width={20} src={iosFill} preview={false} />
+                                            <div className="ml-[5px] mt-[4px]">MacOS 下载</div>
+                                        </div>
+                                        {/* <Button
+                                                onClick={() => {
+                                                    navigate(DASHBOARD_PATH);
+                                                    setRoutesIndex(0);
+                                                }}
+                                                variant="contained"
+                                                color="secondary"
+                                                startIcon={<StarIcon />}
+                                            >
+                                                Windows 下载
+                                            </Button> */}
+                                        {/* </AnimateButton> */}
                                     </Grid>
                                 </Grid>
+                                <div className="text-[14px] text-[#000]/50 mt-[20px]">
+                                    版本：1.0.8
+                                    <Divider type="vertical" /> 更新：2023-6-27 <Divider type="vertical" />
+                                    适应系统：Win7以上 / Mac
+                                </div>
                             </motion.div>
                         </Grid>
                         <Grid item xs={12}>
@@ -227,14 +265,17 @@ const HeaderSection = () => {
                             >
                                 <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }}>
                                     <CardMedia component="img" image={img1} alt="img1" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img2} alt="img2" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    {/* <CardMedia component="img" image={img2} alt="img2" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} /> */}
                                     <CardMedia component="img" image={img3} alt="img3" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img4} alt="img4" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={vodeo} alt="img4" sx={{ width: { xs: '7%', sm: '7%', md: '10%' } }} />
+                                    <CardMedia component="img" image={bili} alt="bili" sx={{ width: { xs: '6%', sm: '6%', md: '9%' } }} />
+                                    <CardMedia component="img" image={kuai} alt="kuai" sx={{ width: { xs: '6%', sm: '6%', md: '9%' } }} />
+                                    {/* <CardMedia component="img" image={img4} alt="img4" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img5} alt="img5" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img6} alt="img6" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img7} alt="img7" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
                                     <CardMedia component="img" image={img8} alt="img8" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
-                                    <CardMedia component="img" image={img9} alt="img9" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} />
+                                    <CardMedia component="img" image={img9} alt="img9" sx={{ width: { xs: '8%', sm: '8%', md: '11%' } }} /> */}
                                 </Stack>
                             </motion.div>
                         </Grid>

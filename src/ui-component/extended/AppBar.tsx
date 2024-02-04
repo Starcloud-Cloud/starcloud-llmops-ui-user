@@ -1,5 +1,6 @@
 import { cloneElement, useState, ReactElement } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 
 // material-ui
 import {
@@ -75,14 +76,17 @@ const AppBar = ({ ...others }) => {
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button
                                 onClick={() => {
-                                    navigate(DASHBOARD_PATH);
-                                    setRoutesIndex(0);
+                                    if (getPermission(ENUM_PERMISSION.App_DOWNLOAD) === '免费使用') {
+                                        navigate(DASHBOARD_PATH);
+                                        setRoutesIndex(0);
+                                    } else {
+                                    }
                                 }}
                                 disableElevation
                                 variant="contained"
                                 color="secondary"
                             >
-                                免费使用
+                                {getPermission(ENUM_PERMISSION.App_DOWNLOAD)}
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'none', sm: 'none' } }}>

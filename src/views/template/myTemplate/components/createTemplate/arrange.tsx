@@ -39,6 +39,9 @@ import { useState, useEffect, memo } from 'react';
 import { useFormik } from 'formik';
 import _ from 'lodash-es';
 import * as yup from 'yup';
+import { verifyJSON, changeJSONValue } from 'views/template/components/validaForm';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 interface Option {
     label: string;
     value: string;
@@ -89,23 +92,46 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         },
         validationSchema,
         onSubmit: (values) => {
-            const oldValue = _.cloneDeep(config);
-            if (title === t('myApp.add')) {
-                if (!oldValue.steps[modal].variable) {
-                    oldValue.steps[modal].variable = { variables: [] };
+            if (values.style === 'JSON' && values.defaultValue) {
+                if (!verifyJSON(values.defaultValue)) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '默认值必须是 JSON 格式',
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            close: false,
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            transition: 'SlideLeft'
+                        })
+                    );
+                } else {
+                    changevariable(values);
                 }
-                oldValue.steps[modal].variable.variables.push({ ...values, options });
             } else {
-                oldValue.steps[modal].variable.variables[stepIndex] = {
-                    ...oldValue.steps[modal].variable.variables[stepIndex],
-                    ...values,
-                    options
-                };
+                changevariable(values);
             }
-            changeConfigs(oldValue);
-            handleClose();
         }
     });
+    const changevariable = (values: any) => {
+        const oldValue = _.cloneDeep(config);
+        if (title === t('myApp.add')) {
+            if (!oldValue.steps[modal].variable) {
+                oldValue.steps[modal].variable = { variables: [] };
+            }
+            oldValue.steps[modal].variable.variables.push({ ...values, options });
+        } else {
+            oldValue.steps[modal].variable.variables[stepIndex] = {
+                ...oldValue.steps[modal].variable.variables[stepIndex],
+                ...values,
+                options
+            };
+        }
+        changeConfigs(oldValue);
+        handleClose();
+    };
     const [modal, setModal] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState<number>(0);
     const [options, setOptions] = useState<Option[]>([]);
@@ -115,6 +141,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     const typeList = [
         { label: t('myApp.input'), value: 'INPUT' },
         { label: t('myApp.textarea'), value: 'TEXTAREA' },
+        { label: t('myApp.json_textarea'), value: 'JSON' },
         { label: t('myApp.select'), value: 'SELECT' }
     ];
     //关闭弹窗
@@ -127,6 +154,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     const addVariable = () => {
         setOptions([..._.cloneDeep(options), { label: 'label', value: 'value' }]);
     };
+    const [row, setRow] = useState<any>(null);
     //编辑变量
     const editModal = (row: any, i: number, index: number) => {
         for (let key in formik.values) {
@@ -134,6 +162,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
         if (row.options) setOptions(row.options);
         setTitle(t('myApp.edit'));
+        setRow(row);
         setModal(index);
         setStepIndex(i);
         setOpen(true);
@@ -231,9 +260,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     useEffect(() => {
         setallvalidas(
             config?.steps.map((item: any) => {
-                return item.flowStep.variable?.variables?.some((el: { defaultValue: string | null }) => {
-                    return el.defaultValue === '';
-                });
+                return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
             })
         );
     }, [expanded]);
@@ -580,8 +607,13 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             name="defaultValue"
                             sx={{ mt: 2 }}
                             label={t('myApp.value')}
+                            multiline={formik.values.style === 'JSON' ? true : false}
+                            minRows={4}
                             value={formik.values.defaultValue}
                             onChange={formik.handleChange}
+                            onBlur={(e) => {
+                                formik.setFieldValue('defaultValue', changeJSONValue(e.target.value));
+                            }}
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
@@ -645,6 +677,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                 </DialogContent>
                 <DialogActions>
                     <Button
+                        disabled={row?.group === 'SYSTEM'}
                         autoFocus
                         onClick={() => {
                             formik.handleSubmit();

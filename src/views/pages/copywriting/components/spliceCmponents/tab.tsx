@@ -1,10 +1,10 @@
-import { Button, Tabs, Popover } from 'antd';
+import { Button, Tabs, Popover, Input } from 'antd';
 import { TextField, IconButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 interface Tabs {
     imageStyleData: any;
     setImageStyleData: (data: any) => void;
@@ -13,6 +13,7 @@ interface Tabs {
     digui: () => number;
 }
 const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
+    const { TextArea } = Input;
     return (
         <div>
             <div className="flex items-end mb-[20px]">
@@ -27,7 +28,9 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                 {
                                     key: '1',
                                     name: '首图',
-                                    variables: []
+                                    model: '',
+                                    titleGenerateMode: 'DEFAULT',
+                                    variableList: []
                                 }
                             ]
                         });

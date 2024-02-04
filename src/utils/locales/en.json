@@ -777,7 +777,9 @@
     "stepStyle": "Style Configuration",
     "exeLabel": "Execute Button Name",
     "categoryVaid": "Categories Is Required",
-    "delApp": "Delete App"
+    "delApp": "Delete App",
+    "json_textarea": " JSON_Textarea",
+    "json": " JSON_Textarea"
   },
   "voiceStyles": {
     "affectionate": "affectionate",

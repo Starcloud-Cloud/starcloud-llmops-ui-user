@@ -141,7 +141,11 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             if (!res?.data) {
                 return;
             }
-            jsCookie.set('token', res.data.accessToken);
+            const expires = (res.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
+            console.log(res, 'res');
+            jsCookie.set('token', res.data.accessToken, {
+                expires
+            });
             authUtil.setToken(res?.data);
             await login();
             setIsLoggedIn(true);
@@ -223,7 +227,11 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 if (!res) {
                                     return;
                                 }
-                                jsCookie.set('token', res.accessToken);
+                                console.log(res);
+                                const expires = (res.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
+                                jsCookie.set('token', res.accessToken, {
+                                    expires
+                                });
                                 setLoginData((prevState) => ({
                                     ...prevState,
                                     loginForm: updatedLoginForm

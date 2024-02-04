@@ -9,10 +9,12 @@ import infoStore from 'store/entitlementAction';
 import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { useAllDetail } from '../../contexts/JWTContext';
 const { Countdown } = Statistic;
 
 export const InviteUser = ({ onClose }: { onClose: any }) => {
     const { use } = infoStore();
+    const allDetail = useAllDetail();
     const navigate = useNavigate();
     const [endTime, setEndTime] = useState('');
 
@@ -30,11 +32,11 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                 <img
                     className="w-[365px]"
                     src={vipModal}
-                    onClick={() => {
-                        navigate('/subscribe');
-                    }}
+                    // onClick={() => {
+                    //     navigate('/subscribe');
+                    // }}
                 />
-                <div className="flex items-baseline text-[#f0d6a4] absolute top-[112px] left-[82px]">
+                {/* <div className="flex items-baseline text-[#f0d6a4] absolute top-[112px] left-[82px]">
                     <span>距离结束还剩</span>
                     {endTime && (
                         <Countdown
@@ -47,7 +49,7 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                             format="D天H时m分s秒"
                         />
                     )}
-                </div>
+                </div> */}
                 <div
                     style={{
                         bottom: '125px',
@@ -57,24 +59,62 @@ export const InviteUser = ({ onClose }: { onClose: any }) => {
                 >
                     每邀请3名好友注册即可以9.9元享周体验包
                 </div>
-                <div
-                    style={{
-                        bottom: '105px',
-                        left: '45px'
-                    }}
-                    className={'absolute bottom-[104px] text-[#d4c399] left-[35px] '}
-                >
-                    {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
-                </div>
 
-                <div
-                    onClick={() => {
-                        navigate('/subscribe');
-                    }}
-                    className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}
-                >
-                    立即购买
-                </div>
+                {allDetail?.allDetail?.isInviteUser ? (
+                    <div
+                        style={{
+                            bottom: '105px',
+                            left: '40px'
+                        }}
+                        className={'absolute bottom-[104px] text-base text-[#d4c399] left-[35px] '}
+                    >
+                        您已邀请3名好友即可以9.9元享周体验包
+                    </div>
+                ) : (
+                    <div
+                        style={{
+                            bottom: '105px',
+                            left: '45px'
+                        }}
+                        className={'absolute bottom-[104px] text-[#d4c399] left-[35px] '}
+                    >
+                        {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
+                    </div>
+                )}
+
+                {!allDetail?.allDetail?.isInviteUser ? (
+                    <div
+                        onClick={() => {
+                            copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '复制成功, 快去邀请吧~',
+                                    variant: 'alert',
+                                    zIndex: 9999,
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        }}
+                        className={'absolute  bottom-[38px] text-[#1d0b04] left-[92px] text-xl cursor-pointer font-semibold'}
+                    >
+                        复制链接发送给好友
+                    </div>
+                ) : (
+                    <div
+                        onClick={() => {
+                            navigate('/subscribe');
+                        }}
+                        className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}
+                    >
+                        立即购买
+                    </div>
+                )}
                 <svg
                     onClick={() => {
                         onClose();

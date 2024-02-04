@@ -39,6 +39,7 @@ import * as authUtil from 'utils/auth';
 // import { TrendingUp } from '@mui/icons-material';
 import { Divider, Stack, useMediaQuery } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
+import jsCookie from 'js-cookie';
 
 // ===============================|| JWT LOGIN ||=============================== //
 
@@ -140,6 +141,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             if (!res?.data) {
                 return;
             }
+            jsCookie.set('token', res.data.accessToken);
             authUtil.setToken(res?.data);
             await login();
             setIsLoggedIn(true);
@@ -221,6 +223,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 if (!res) {
                                     return;
                                 }
+                                jsCookie.set('token', res.accessToken);
                                 setLoginData((prevState) => ({
                                     ...prevState,
                                     loginForm: updatedLoginForm

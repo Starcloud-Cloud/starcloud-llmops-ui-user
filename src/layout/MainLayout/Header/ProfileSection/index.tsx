@@ -3,6 +3,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import copy from 'clipboard-copy';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAllDetail } from 'contexts/JWTContext';
 // material-ui
 import {
     Avatar,
@@ -54,13 +55,12 @@ import {
     // IconUser
 } from '@tabler/icons';
 import useConfig from 'hooks/useConfig';
-import { useAllDetail } from 'contexts/JWTContext';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
-    const data = useUserStore();
     const all_detail = useAllDetail();
+    const data = useUserStore();
     const theme = useTheme();
     const { borderRadius } = useConfig();
     const navigate = useNavigate();

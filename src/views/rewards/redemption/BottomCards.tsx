@@ -90,7 +90,7 @@ const BottomCards: React.FC = () => {
             description: '注册一位获取一个权益包，无上限，发送链接邀请注册。每邀请三个获取额外权益包（联系客服）',
             buttonText: '复制链接',
             Icon: PersonAddIcon,
-            endText: '送10魔法豆/2点作图',
+            endText: '送5魔法豆/2点作图',
             onClick: handleInvite
         },
         {

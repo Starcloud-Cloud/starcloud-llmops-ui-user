@@ -76,8 +76,11 @@ const AppBar = ({ ...others }) => {
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button
                                 onClick={() => {
-                                    navigate(DASHBOARD_PATH);
-                                    setRoutesIndex(0);
+                                    if (getPermission(ENUM_PERMISSION.App_DOWNLOAD) === '免费使用') {
+                                        navigate(DASHBOARD_PATH);
+                                        setRoutesIndex(0);
+                                    } else {
+                                    }
                                 }}
                                 disableElevation
                                 variant="contained"

@@ -19,6 +19,7 @@ type IList = {
 };
 
 export const enum ENUM_PERMISSION {
+    APP_HOME = 'app_home',
     APP_NAME = 'app_nme', // 应用名称
     APP_DES = 'app_des', // 应用描述
     App_DOWNLOAD = 'app_downLoad', //首页免费使用或者免费下载
@@ -30,6 +31,7 @@ export const enum ENUM_PERMISSION {
 }
 
 const list: IList = {
+    [ENUM_PERMISSION.APP_HOME]: true,
     [ENUM_PERMISSION.APP_NAME]: '魔法AI',
     [ENUM_PERMISSION.APP_DES]: '跨境营销创意大师',
     [ENUM_PERMISSION.App_DOWNLOAD]: '免费使用',
@@ -41,8 +43,9 @@ const list: IList = {
 };
 
 const announceList: IList = {
+    [ENUM_PERMISSION.APP_HOME]: false,
     [ENUM_PERMISSION.APP_NAME]: '魔法矩阵',
-    [ENUM_PERMISSION.APP_DES]: 'AI创作运营工具',
+    [ENUM_PERMISSION.APP_DES]: 'AI内容创作运营工具',
     [ENUM_PERMISSION.App_DOWNLOAD]: '免费下载',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,

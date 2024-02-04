@@ -14,6 +14,7 @@ import { getTenant } from 'utils/permission';
 
 // import { resetRouter } from "router";
 // import { useCache } from "hooks/web/useCache";
+import jsCookie from 'js-cookie';
 
 const tenantEnable = process.env.REACT_APP_TENANT_ENABLE;
 const { result_code, base_url, request_timeout } = config;
@@ -139,6 +140,8 @@ service.interceptors.response.use(
                 // 2. 进行刷新访问令牌
                 try {
                     const refreshTokenRes = await refreshToken();
+                    jsCookie.set('token', refreshTokenRes.data.data.accessToken);
+
                     // 2.1 刷新成功，则回放队列的请求 + 当前请求
                     setToken((await refreshTokenRes).data.data);
                     config.headers!.Authorization = 'Bearer ' + getAccessToken();

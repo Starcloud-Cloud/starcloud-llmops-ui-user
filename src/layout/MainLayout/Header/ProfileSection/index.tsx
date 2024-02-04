@@ -55,14 +55,12 @@ import {
     // IconUser
 } from '@tabler/icons';
 import useConfig from 'hooks/useConfig';
-import { useAllDetail } from 'contexts/JWTContext';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
     const all_detail = useAllDetail();
     const data = useUserStore();
-    const all_detail = useAllDetail();
     const theme = useTheme();
     const { borderRadius } = useConfig();
     const navigate = useNavigate();

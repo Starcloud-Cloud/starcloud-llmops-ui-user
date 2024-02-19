@@ -587,7 +587,8 @@ const MainLayout = () => {
                             {openInvite && (
                                 <InviteUser
                                     onClose={() => {
-                                        const inviteUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
+                                        // 由3天改成不展示
+                                        const inviteUserVipEndTime = dayjs().add(999, 'y').format('YYYY-MM-DD HH:mm:ss');
                                         localStorage.setItem('inviteUserVipEndTime', inviteUserVipEndTime);
                                         setOpenInvite(false);
                                     }}

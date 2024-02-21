@@ -13,6 +13,8 @@ const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
 const PagesPrice = Loadable(lazy(() => import('views/announce/pricing/member')));
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord')));
+const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
+const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -23,6 +25,8 @@ export default function ThemeRoutes() {
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/web-view/orderRecord', element: <OrderRecord /> },
         { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
+        { path: '/web-view/copywriting', element: <Copywriting /> },
+        { path: '/web-view/redBookTaskList', element: <RedBookTaskList /> },
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
         LoginRoutes,

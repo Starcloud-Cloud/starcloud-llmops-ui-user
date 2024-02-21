@@ -390,18 +390,20 @@ const MainLayout = () => {
         // () => {
         //     clearInterval(userVip);
         //};
-        if (allDetail?.allDetail?.isNewUser) {
-            handleShowNewUserVip();
-        } else {
-            const dateTime = localStorage.getItem('inviteUserVipEndTime');
-            if (dateTime) {
-                if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                    setOpenInvite(true);
-                } else {
-                    setOpenInvite(false);
-                }
+        if (allDetail?.allDetail) {
+            if (allDetail?.allDetail?.isNewUser) {
+                handleShowNewUserVip();
             } else {
-                setOpenInvite(true);
+                const dateTime = localStorage.getItem('inviteUserVipEndTime');
+                if (dateTime) {
+                    if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                        setOpenInvite(true);
+                    } else {
+                        setOpenInvite(false);
+                    }
+                } else {
+                    setOpenInvite(true);
+                }
             }
         }
     }, [location.pathname, allDetail]);

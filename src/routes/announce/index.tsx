@@ -7,6 +7,7 @@ import MainRoutes from './MainRoutes';
 import useRouteStore from 'store/router';
 import Loadable from 'ui-component/Loadable';
 import AuthenticationRoutes from './AuthenticationRoutes';
+import { webviewRoutes } from './webviewRoutes';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
@@ -25,20 +26,21 @@ export default function ThemeRoutes() {
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
-        { path: '/subscribe', element: <PagesPrice /> },
-        { path: '/web-view/orderRecord', element: <OrderRecord /> },
-        { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
-        //AI媒体分发嵌入
-        { path: '/copywriting', element: <Copywriting /> },
-        { path: '/redBookTaskList', element: <RedBookTaskList /> },
-        { path: '/copywritingModal', element: <CopywritingModal /> },
-        { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
-        { path: '/redBookContentList', element: <RedBookContentList /> },
+        // { path: '/subscribe', element: <PagesPrice /> },
+        // { path: '/web-view/orderRecord', element: <OrderRecord /> },
+        // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
+        // //AI媒体分发嵌入
+        // { path: '/copywriting', element: <Copywriting /> },
+        // { path: '/redBookTaskList', element: <RedBookTaskList /> },
+        // { path: '/copywritingModal', element: <CopywritingModal /> },
+        // { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
+        // { path: '/redBookContentList', element: <RedBookContentList /> },
         //
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
         LoginRoutes,
         MainRoutes,
+        webviewRoutes,
         AuthenticationRoutes,
         { path: '*', element: <PageNotFound /> }
     ]);

@@ -16,7 +16,7 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 
 // ==============================|| ROUTING RENDER ||============================== //
 
-export const webviewRoutes = {
+const WebviewRoutes = {
     path: '/',
     element: (
         <AuthGuard>
@@ -35,3 +35,5 @@ export const webviewRoutes = {
         { path: '/redBookContentList', element: <RedBookContentList /> }
     ]
 };
+
+export default WebviewRoutes;

@@ -7,7 +7,7 @@ import MainRoutes from './MainRoutes';
 import useRouteStore from 'store/router';
 import Loadable from 'ui-component/Loadable';
 import AuthenticationRoutes from './AuthenticationRoutes';
-import { webviewRoutes } from './webviewRoutes';
+import WebviewRoutes from './webviewRoutes';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
@@ -38,9 +38,9 @@ export default function ThemeRoutes() {
         //
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
+        WebviewRoutes,
         LoginRoutes,
         MainRoutes,
-        webviewRoutes,
         AuthenticationRoutes,
         { path: '*', element: <PageNotFound /> }
     ]);

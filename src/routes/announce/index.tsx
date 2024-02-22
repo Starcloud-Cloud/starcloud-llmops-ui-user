@@ -15,6 +15,9 @@ const AppUserAccountProfile = Loadable(lazy(() => import('views/application/user
 const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord')));
 const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
 const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
+const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
+const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
+const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -25,8 +28,13 @@ export default function ThemeRoutes() {
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/web-view/orderRecord', element: <OrderRecord /> },
         { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
-        { path: '/web-view/copywriting', element: <Copywriting /> },
-        { path: '/web-view/redBookTaskList', element: <RedBookTaskList /> },
+        //AI媒体分发嵌入
+        { path: '/copywriting', element: <Copywriting /> },
+        { path: '/redBookTaskList', element: <RedBookTaskList /> },
+        { path: '/copywritingModal', element: <CopywritingModal /> },
+        { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
+        { path: '/redBookContentList', element: <RedBookContentList /> },
+        //
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
         LoginRoutes,

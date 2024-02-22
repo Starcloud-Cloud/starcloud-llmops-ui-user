@@ -1,6 +1,8 @@
 import request from 'utils/axios';
 import { getRefreshToken } from 'utils/auth';
 import type { UserLoginVO } from './types';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
+import { getQueryVariable } from 'utils/getQueryVariable';
 
 export interface SmsCodeVO {
     mobile: string;
@@ -14,7 +16,16 @@ export interface SmsLoginVO {
 
 // 登录 | Login
 export const login = (data: UserLoginVO) => {
-    return request.post({ url: '/system/auth/login', data });
+    return request.post({
+        url: '/system/auth/login',
+        data,
+        headers:
+            getTenant() === ENUM_TENANT.ANNOUNCE
+                ? {
+                      'client-type': getQueryVariable('client-type') || 1
+                  }
+                : {}
+    });
 };
 
 // 刷新访问令牌 | Refresh access token
@@ -86,7 +97,16 @@ export const oriregister = (data: any) => {
 
 // 二维码登陆 | QRcodeLogin
 export const qRcodeLogin = (data: any) => {
-    return request.postOriginal({ url: 'llm/wechat/qr/login', data });
+    return request.postOriginal({
+        url: 'llm/wechat/qr/login',
+        data,
+        headers:
+            getTenant() === ENUM_TENANT.ANNOUNCE
+                ? {
+                      'client-type': getQueryVariable('client-type') || 1
+                  }
+                : {}
+    });
 };
 
 //获取验证码

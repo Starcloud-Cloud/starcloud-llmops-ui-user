@@ -23,7 +23,7 @@ const GuestGuard = ({ children }: GuardProps) => {
             if (getPermission(ENUM_PERMISSION.APP_HOME)) {
                 navigate(DASHBOARD_PATH, { replace: true });
             } else {
-                navigate('/', { replace: true });
+                // navigate('/', { replace: true });
             }
         }
     }, [isLoggedIn, navigate]);

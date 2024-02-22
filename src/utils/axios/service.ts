@@ -140,8 +140,10 @@ service.interceptors.response.use(
                 // 2. 进行刷新访问令牌
                 try {
                     const refreshTokenRes = await refreshToken();
-                    jsCookie.set('token', refreshTokenRes.data.data.accessToken);
-
+                    const expires = (refreshTokenRes.data.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
+                    jsCookie.set('token', refreshTokenRes.data.data.accessToken, {
+                        expires
+                    });
                     // 2.1 刷新成功，则回放队列的请求 + 当前请求
                     setToken((await refreshTokenRes).data.data);
                     config.headers!.Authorization = 'Bearer ' + getAccessToken();

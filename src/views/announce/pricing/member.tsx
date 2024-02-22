@@ -753,10 +753,10 @@ const Price1 = () => {
 
     return (
         <div>
-            <HeaderWrapper id="vip">
+            {/* <HeaderWrapper id="vip">
                 <VipBar />
-            </HeaderWrapper>
-            <div className="flex w-full bg-[#f4f6f8] mt-[100px] pt-10 pb-10 justify-center">
+            </HeaderWrapper> */}
+            <div className="flex w-full bg-[#f4f6f8] pt-14 pb-10 justify-center">
                 <div className="w-[94%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">

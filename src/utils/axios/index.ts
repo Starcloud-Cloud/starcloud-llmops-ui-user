@@ -5,7 +5,7 @@ import { config } from './config';
 const { default_headers, request_timeout } = config;
 
 const request = (option: any) => {
-    const { baseUrl, url, method, params, data, headersType, responseType, timeout } = option;
+    const { baseUrl, url, method, params, data, headersType, responseType, timeout, headers = {} } = option;
     return service({
         baseURL: baseUrl,
         url: url,
@@ -15,7 +15,8 @@ const request = (option: any) => {
         timeout: timeout || request_timeout,
         responseType: responseType,
         headers: {
-            'Content-Type': headersType || default_headers
+            'Content-Type': headersType || default_headers,
+            ...headers
         }
     });
 };

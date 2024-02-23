@@ -199,14 +199,7 @@ const plansDefault = (value: number) => [
                 </Tag> */}
             </div>
         ),
-        btnTextNew: (
-            <div>
-                新用户一周体验包
-                <Tag className="ml-1" color="#f50">
-                    <span className="text-base">9.9元</span>
-                </Tag>
-            </div>
-        ),
+        btnTextNew: true,
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
@@ -378,7 +371,6 @@ const planListDefault = (value: number) => [
     ],
     [
         <div className="flex items-center">
-            <span>25000魔法豆</span>
             <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
             <Tooltip title={'执行应用或聊天消耗一点'}>
                 <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
@@ -442,10 +434,14 @@ const Price1 = () => {
     const [order, setOrder] = useState<any>({});
 
     const [discountOpen, setDiscountOpen] = useState(false);
+    const [beanTypeId, setBeanTypeId] = useState('');
 
     const [newUserProductId, setNewUserProductId] = useState<any>();
+    const [beanProducts, setBeanProducts] = useState<any[]>([]);
+    const [newUserProducts, setNewUserProducts] = useState<any[]>([]);
 
     const { width } = useWindowSize();
+    const myRef = React.useRef<any>(null);
 
     const navigate = useNavigate();
 
@@ -473,9 +469,23 @@ const Price1 = () => {
 
     useEffect(() => {
         getPayType().then((res) => {
-            const result = res.filter((item: any) => item.parentId === 0) || [];
+            const result = res.filter((item: any) => item.parentId === 0 && item.name !== '专享特惠') || [];
             setValue(result?.[0]?.id);
             setTabs(result);
+
+            // 加油包
+            const data = res.filter((v: any) => v.name === '加油包' && v.parentId === 0);
+            setBeanTypeId(data?.[0]?.id);
+            getPayList(data?.[0]?.id).then((payRes) => {
+                setBeanProducts(payRes.list);
+            });
+
+            // 新人特惠
+            const newUserData = res.filter((v: any) => v.name === '专享特惠' && v.parentId === 0);
+            getPayList(newUserData?.[0]?.id).then((payRes) => {
+                const current = payRes?.list?.length ? [payRes.list[0]] : [];
+                setNewUserProducts(current);
+            });
         });
     }, []);
 
@@ -559,7 +569,11 @@ const Price1 = () => {
     }, []);
 
     const onChange = (e: RadioChangeEvent) => {
-        setValue(e.target.value);
+        if (e.target.value === beanTypeId) {
+            handleClickRef();
+        } else {
+            setValue(e.target.value);
+        }
     };
 
     const onRefresh = async () => {
@@ -751,12 +765,17 @@ const Price1 = () => {
         }
     };
 
+    const handleClickRef = () => {
+        if (myRef?.current) {
+            myRef?.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
     return (
         <div>
             {/* <HeaderWrapper id="vip">
                 <VipBar />
             </HeaderWrapper> */}
-            <div className="flex w-full bg-[#f4f6f8] pt-14 pb-10 justify-center">
+            <div className="flex w-full bg-[#f4f6f8]  pt-16 pb-10 justify-center">
                 <div className="w-[94%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
@@ -769,6 +788,9 @@ const Price1 = () => {
                                 );
                             })}
                         </Radio.Group>
+                        {/* <span className="flex items-end ml-1 cursor-pointer text-blue-500" onClick={handleClickRef}>
+                            加油包购买
+                        </span> */}
                     </div>
                     <Grid container spacing={gridSpacing} columns={20}>
                         {plans.map((plan, index) => {
@@ -876,31 +898,43 @@ const Price1 = () => {
                                                         }}
                                                         color="secondary"
                                                     >
-                                                        {plan.btnText}
+                                                        <div className="flex flex-col">
+                                                            <div> {plan.btnText}</div>
+                                                            {plan?.isSubscribe && (
+                                                                <div>
+                                                                    <Tag className="ml-1" color="#f50">
+                                                                        订阅优惠10元
+                                                                    </Tag>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </Button>
                                                 )}
                                             </Grid>
-                                            {plan.btnTextNew && showTrial && (
-                                                <Grid item xs={12}>
-                                                    <Button
-                                                        className={'w-4/5'}
-                                                        variant={plan.active ? 'contained' : 'outlined'}
-                                                        onClick={() => {
-                                                            setCurrentSelect({
-                                                                title: '体验版',
-                                                                select: value,
-                                                                payId: newUserProductId,
-                                                                experience: true,
-                                                                isSubscribe: false
-                                                            });
-                                                            handleClick(index, newUserProductId);
-                                                        }}
-                                                        color="secondary"
-                                                    >
-                                                        {plan.btnTextNew}
-                                                    </Button>
-                                                </Grid>
-                                            )}
+
+                                            {plan.btnTextNew &&
+                                                newUserProducts?.map((item, index) => (
+                                                    <Grid item xs={12} key={index}>
+                                                        <Button
+                                                            className={'w-4/5'}
+                                                            variant={plan.active ? 'contained' : 'outlined'}
+                                                            onClick={() => {
+                                                                setCurrentSelect({
+                                                                    title: item.name,
+                                                                    select: value,
+                                                                    payId: item?.skus?.[0]?.id,
+                                                                    experience: true,
+                                                                    unitName: item.unitName,
+                                                                    isSubscribe: false
+                                                                });
+                                                                handleClick(3, item?.skus?.[0]?.id);
+                                                            }}
+                                                            color="secondary"
+                                                        >
+                                                            {item.name}
+                                                        </Button>
+                                                    </Grid>
+                                                ))}
                                             <Grid item xs={12}>
                                                 <List
                                                     sx={{
@@ -940,8 +974,106 @@ const Price1 = () => {
                             );
                         })}
                     </Grid>
-                    <div className="flex justify-center mt-10">注：如之前已购买权益并在有效期内的，将自动升级到新权益</div>
-                    <>
+                    <div className="flex justify-center mt-10" ref={myRef}>
+                        注：如之前已购买权益并在有效期内的，将自动升级到新权益
+                    </div>
+
+                    <div className="flex justify-center">
+                        <Divider className="py-3 w-[70%]" />
+                    </div>
+                    <div className="flex w-full mt-[40px]  pb-10 justify-center flex-col items-center">
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <div className="flex justify-center mt-3 mb-5 xs:text-2xl md:text-5xl">加油包</div>
+                            <div className="flex justify-center mt-5 mb-7">购买后立即生效，有效期7天</div>
+                        </div>
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <Grid container spacing={gridSpacing} columns={20} className="flex justify-center">
+                                {beanProducts.map((plan, index) => (
+                                    <Grid item xs={20} sm={10} md={10} key={index} className="max-w-[320px] ">
+                                        <MainCard
+                                            boxShadow
+                                            sx={{
+                                                pt: 1.75,
+                                                border: '1px solid',
+                                                borderColor: 'secondary.main'
+                                            }}
+                                        >
+                                            <Grid container textAlign="center" spacing={gridSpacing}>
+                                                <Grid item xs={12}>
+                                                    <Typography
+                                                        variant="h6"
+                                                        sx={{
+                                                            fontSize: '1.5625rem',
+                                                            fontWeight: 500,
+                                                            position: 'relative',
+                                                            mb: 1.875,
+                                                            '&:after': {
+                                                                content: '""',
+                                                                position: 'absolute',
+                                                                bottom: -15,
+                                                                left: 'calc(50% - 25px)',
+                                                                width: 50,
+                                                                height: 4,
+                                                                background: theme.palette.primary.main,
+                                                                borderRadius: '3px'
+                                                            }
+                                                        }}
+                                                    >
+                                                        {plan.name}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography variant="body2">{`${plan?.giveRights?.giveMagicBean}魔法豆, ${plan?.giveRights?.giveImage}点作图`}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
+                                                        ￥{plan?.marketPrice / 100}/{plan?.unitName}
+                                                    </div> */}
+                                                    <Typography
+                                                        component="div"
+                                                        variant="body2"
+                                                        sx={{
+                                                            fontSize: '2.1875rem',
+                                                            fontWeight: 700,
+                                                            lineHeight: '1.2em',
+                                                            '& > span': {
+                                                                fontSize: '1.25rem',
+                                                                fontWeight: 500
+                                                            }
+                                                        }}
+                                                    >
+                                                        <span>￥</span>
+                                                        {plan.price / 100}
+                                                    </Typography>
+                                                    <div className="text-[#aaa] text-sm text-center">{'七天加油包'}</div>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Button
+                                                        className={'w-4/5'}
+                                                        variant={plan.active ? 'contained' : 'outlined'}
+                                                        onClick={() => {
+                                                            setCurrentSelect({
+                                                                isDataPlus: true,
+                                                                payPrice: plan.price
+                                                            });
+                                                            handleCreateOrder(plan?.skus?.[0]?.id);
+                                                        }}
+                                                        color="secondary"
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <div>购买加油包</div>
+                                                        </div>
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </MainCard>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </div>
+                    </div>
+
+                    {/* <>
                         <div className="flex justify-center">
                             <Divider className="py-3 w-[70%]" />
                         </div>
@@ -999,7 +1131,7 @@ const Price1 = () => {
                                 </Swiper>
                             </div>
                         </div>
-                    </>
+                    </> */}
                 </div>
             </div>
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
@@ -1012,6 +1144,7 @@ const Price1 = () => {
                 isTimeout={isTimeout}
                 onRefresh={onRefresh}
                 payPrice={currentSelect?.payPrice / 100 || 0}
+                isDataPlus={currentSelect?.isDataPlus}
             />
             <SignModal
                 open={openSign}

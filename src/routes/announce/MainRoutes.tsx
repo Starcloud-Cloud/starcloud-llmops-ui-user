@@ -192,26 +192,26 @@ const MainRoutes = {
             path: '/smallRedBook',
             element: <SmallRedBook />
         },
-        {
-            path: '/batchSmallRedBook',
-            element: <BatchSmallRedBook />
-        },
-        {
-            path: '/redBookTaskList',
-            element: <RedBookTaskList />
-        },
-        {
-            path: '/redBookContentList',
-            element: <RedBookContentList />
-        },
-        {
-            path: '/copywriting',
-            element: <Copywriting />
-        },
-        {
-            path: '/copywritingModal',
-            element: <CopywritingModal />
-        },
+        // {
+        //     path: '/batchSmallRedBook',
+        //     element: <BatchSmallRedBook />
+        // },
+        // {
+        //     path: '/redBookTaskList',
+        //     element: <RedBookTaskList />
+        // },
+        // {
+        //     path: '/redBookContentList',
+        //     element: <RedBookContentList />
+        // },
+        // {
+        //     path: '/copywriting',
+        //     element: <Copywriting />
+        // },
+        // {
+        //     path: '/copywritingModal',
+        //     element: <CopywritingModal />
+        // },
         {
             path: '/taskCenter',
             element: <TaskCenter />

@@ -7,6 +7,7 @@ import MainRoutes from './MainRoutes';
 import useRouteStore from 'store/router';
 import Loadable from 'ui-component/Loadable';
 import AuthenticationRoutes from './AuthenticationRoutes';
+import WebviewRoutes from './webviewRoutes';
 
 const PageNotFound = Loadable(lazy(() => import('views/pages/maintenance/Error')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
@@ -15,6 +16,9 @@ const AppUserAccountProfile = Loadable(lazy(() => import('views/application/user
 const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord')));
 const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
 const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
+const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
+const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
+const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -22,13 +26,19 @@ export default function ThemeRoutes() {
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
-        { path: '/subscribe', element: <PagesPrice /> },
-        { path: '/web-view/orderRecord', element: <OrderRecord /> },
-        { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
-        { path: '/web-view/copywriting', element: <Copywriting /> },
-        { path: '/web-view/redBookTaskList', element: <RedBookTaskList /> },
+        // { path: '/subscribe', element: <PagesPrice /> },
+        // { path: '/web-view/orderRecord', element: <OrderRecord /> },
+        // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
+        // //AI媒体分发嵌入
+        // { path: '/copywriting', element: <Copywriting /> },
+        // { path: '/redBookTaskList', element: <RedBookTaskList /> },
+        // { path: '/copywritingModal', element: <CopywritingModal /> },
+        // { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
+        // { path: '/redBookContentList', element: <RedBookContentList /> },
+        //
         { path: '/admin-api/*', element: null },
         { path: '/app-api/*', element: null },
+        WebviewRoutes,
         LoginRoutes,
         MainRoutes,
         AuthenticationRoutes,

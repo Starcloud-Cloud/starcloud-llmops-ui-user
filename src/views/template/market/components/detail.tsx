@@ -50,8 +50,8 @@ function Deatail() {
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo-16k');
-    const aimodeRef = useRef('gpt-3.5-turbo-16k');
+    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo-1106');
+    const aimodeRef = useRef('gpt-3.5-turbo-1106');
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     const loadingsRef: any = useRef([]);

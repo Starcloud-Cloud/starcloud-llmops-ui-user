@@ -298,6 +298,13 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             </Tooltip>
                                         </CopyToClipboard>
                                     )}
+                                    <div className="flex gap-4 flex-wrap text-lg">
+                                        {data?.tags?.map((item: string) => (
+                                            <span key={item} className="text-[#13386c] cursor-pointer">
+                                                #{item}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         }

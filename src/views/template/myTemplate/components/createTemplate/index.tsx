@@ -88,7 +88,7 @@ function CreateDetail() {
     const [from, setFrom] = useState('');
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModel, setAiModel] = useState('gpt-3.5-turbo-16k');
+    const [aiModel, setAiModel] = useState('gpt-3.5-turbo-1106');
     //数组方法封装
     const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
         const newData = _.cloneDeep(data);

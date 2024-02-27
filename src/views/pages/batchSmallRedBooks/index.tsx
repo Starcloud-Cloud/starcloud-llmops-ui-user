@@ -1,6 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TextField, IconButton, FormControl, OutlinedInput, InputLabel, Select, MenuItem, Box, Chip, FormHelperText } from '@mui/material';
+import {
+    TextField,
+    IconButton,
+    FormControl,
+    OutlinedInput,
+    InputLabel,
+    Select,
+    MenuItem,
+    Box,
+    Chip,
+    FormHelperText,
+    Autocomplete
+} from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
 import type { RadioChangeEvent } from 'antd';
@@ -53,12 +65,15 @@ const BatcSmallRedBooks = () => {
     //2.文案模板
     const [mockData, setMockData] = useState<any[]>([]);
     const [targetKeys, setTargetKeys] = useState<any[]>([]);
+    const [tags, setTags] = useState<any>([]);
+    const [tagOpen, setTagOpen] = useState(false);
     const uidRef = useRef('');
     const [preform, setPerform] = useState(1);
     useEffect(() => {
-        if (targetKeys && targetKeys.length > 0) {
+        if (targetKeys && targetKeys?.length > 0) {
             if (preform > 1) {
                 if (mockData.filter((value) => value.uid === targetKeys[0])[0]?.mode === 'CUSTOM_IMAGE_TEXT') {
+                    setTags(mockData.filter((value) => value.uid === targetKeys[0])[0]?.tags);
                     schemeRef.current = mockData.filter((value) => value.uid === targetKeys[0])[0]?.steps;
                     setSchemeList(schemeRef.current);
                 } else {
@@ -72,7 +87,8 @@ const BatcSmallRedBooks = () => {
             } else {
                 setPerform(preform + 1);
             }
-        } else if (targetKeys && targetKeys.length === 0) {
+        } else if (targetKeys && targetKeys?.length === 0) {
+            setTags([]);
             variableRef.current = {};
             setVariables(variableRef.current);
         }
@@ -81,6 +97,7 @@ const BatcSmallRedBooks = () => {
         const res = _.cloneDeep(result);
         setTargetKeys(res.config?.schemeUidList);
         setValue(res.name);
+        setTags(res?.tags ? res?.tags : []);
         setDetailData({
             ...res.config,
             total: res.total,
@@ -147,6 +164,7 @@ const BatcSmallRedBooks = () => {
         randomType: 'RANDOM',
         total: 5
     });
+    const [exedisabled, setExeDisabled] = useState(false);
     const handleSave = async (flag?: boolean) => {
         if (!value) {
             setValueOpen(true);
@@ -181,12 +199,29 @@ const BatcSmallRedBooks = () => {
         //     );
         //     return false;
         // }
-        if (!targetKeys || targetKeys.length === 0) {
+        if (!targetKeys || targetKeys?.length === 0) {
             settargetKeysOpen(true);
             dispatch(
                 openSnackbar({
                     open: true,
                     message: '没有选择生成方案',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    transition: 'SlideDown',
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (targetKeys && targetKeys.length > 0 && (!tags || tags?.length === 0)) {
+            setTagOpen(true);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '标签必填',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -241,6 +276,7 @@ const BatcSmallRedBooks = () => {
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUidList = targetKeys;
         if (flag) {
+            setExeDisabled(true);
             plabListRef.current = [];
             setPlanList(plabListRef.current);
         }
@@ -249,6 +285,7 @@ const BatcSmallRedBooks = () => {
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
+                tags,
                 config: {
                     ...newData,
                     total: undefined,
@@ -312,6 +349,7 @@ const BatcSmallRedBooks = () => {
                 name: value,
                 randomType: newData.randomType,
                 total: newData.total,
+                tags,
                 config: {
                     ...newData,
                     total: undefined,
@@ -476,6 +514,7 @@ const BatcSmallRedBooks = () => {
     };
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
+    const [selectOpen, setSelectOpen] = useState(false);
     return (
         <div className="h-full">
             <SubCard
@@ -487,7 +526,7 @@ const BatcSmallRedBooks = () => {
                         <KeyboardBackspace fontSize="small" />
                     </IconButton>
                     <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
-                    <span className="text-[#673ab7] font-[500]">- {searchParams.get('uid') ? '新建创作计划' : '编辑创作计划'}</span>
+                    <span className="text-[#673ab7] font-[500]">- {!searchParams.get('uid') ? '新建创作计划' : '编辑创作计划'}</span>
                 </div>
                 <div></div>
             </SubCard>
@@ -540,7 +579,7 @@ const BatcSmallRedBooks = () => {
                         </div>
                         <div className="text-[18px] font-[600] my-[20px]">2. 选择创作方案</div>
                         <FormControl
-                            error={targetKeysOpen && (!targetKeys || targetKeys.length === 0)}
+                            error={targetKeysOpen && (!targetKeys || targetKeys?.length === 0)}
                             color="secondary"
                             size="small"
                             fullWidth
@@ -550,6 +589,8 @@ const BatcSmallRedBooks = () => {
                                 labelId="example"
                                 value={targetKeys}
                                 label="选择文案模版"
+                                open={selectOpen}
+                                onOpen={() => setSelectOpen(true)}
                                 multiple
                                 onChange={(e: any) => {
                                     setPerform(preform + 1);
@@ -559,6 +600,7 @@ const BatcSmallRedBooks = () => {
                                     } else {
                                         setTargetKeys(e.target.value);
                                     }
+                                    setSelectOpen(false);
                                 }}
                                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                                 renderValue={(selected) => (
@@ -580,12 +622,62 @@ const BatcSmallRedBooks = () => {
                                 ))}
                             </Select>
                             <FormHelperText>
-                                {targetKeysOpen && (!targetKeys || targetKeys.length === 0) ? '请选择文案模板' : ''}
+                                {targetKeysOpen && (!targetKeys || targetKeys?.length === 0) ? '请选择文案模板' : ''}
                             </FormHelperText>
                         </FormControl>
-                        {targetKeys && targetKeys.length > 0 && (
+                        <div className="text-[18px] font-[600] mt-[20px]">3. 标签</div>
+                        {targetKeys && targetKeys?.length > 0 && (
+                            <FormControl
+                                key={tags}
+                                error={(!tags || tags?.length === 0) && tagOpen}
+                                color="secondary"
+                                size="small"
+                                fullWidth
+                            >
+                                <Autocomplete
+                                    sx={{ mt: 2 }}
+                                    multiple
+                                    size="small"
+                                    id="tags-filled"
+                                    color="secondary"
+                                    options={[]}
+                                    defaultValue={tags}
+                                    freeSolo
+                                    renderTags={(value: readonly string[], getTagProps) =>
+                                        value.map((option: string, index: number) => (
+                                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                        ))
+                                    }
+                                    onChange={(e: any, newValue) => {
+                                        setTagOpen(true);
+                                        setTags(newValue);
+                                    }}
+                                    renderInput={(param) => (
+                                        <TextField
+                                            onBlur={(e: any) => {
+                                                if (e.target.value) {
+                                                    let newValue = tags;
+                                                    if (!newValue) {
+                                                        newValue = [];
+                                                    }
+                                                    newValue.push(e.target.value);
+                                                    setTags(newValue);
+                                                }
+                                            }}
+                                            error={(!tags || tags?.length === 0) && tagOpen}
+                                            color="secondary"
+                                            {...param}
+                                            label="标签"
+                                            placeholder="请输入标签然后回车"
+                                        />
+                                    )}
+                                />
+                                <FormHelperText>{(!tags || tags?.length === 0) && tagOpen ? '标签最少输入一个' : ''}</FormHelperText>
+                            </FormControl>
+                        )}
+                        {targetKeys && targetKeys?.length > 0 && (
                             <div>
-                                <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
+                                <div className="text-[18px] font-[600] mt-[20px]">4. 方案参数</div>
                                 {mockData.filter((value) => value.uid === targetKeys[0])[0]?.mode === 'CUSTOM_IMAGE_TEXT' ? (
                                     <>
                                         <div className="text-[14px] font-[600] mt-[10px]">
@@ -661,7 +753,7 @@ const BatcSmallRedBooks = () => {
                                 )}
                             </div>
                         )}
-                        <div className="text-[18px] font-[600] my-[20px]">4. 批量生成参数</div>
+                        <div className="text-[18px] font-[600] my-[20px]">5. 批量生成参数</div>
                         <div>
                             <Radio.Group
                                 value={detailData?.randomType}
@@ -692,7 +784,7 @@ const BatcSmallRedBooks = () => {
                     <div className="z-100 absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
                         <Button
                             className="w-full"
-                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
+                            disabled={exedisabled || (detailData.status && detailData.status !== 'PENDING' ? true : false)}
                             icon={<SaveOutlined rev={undefined} />}
                             onClick={() => handleSave(false)}
                             type="primary"
@@ -700,7 +792,7 @@ const BatcSmallRedBooks = () => {
                             保存配置
                         </Button>
                         <Button
-                            disabled={detailData.status && detailData.status !== 'PENDING' ? true : false}
+                            disabled={exedisabled || (detailData.status && detailData.status !== 'PENDING' ? true : false)}
                             className="w-full"
                             type="primary"
                             onClick={() => handleSave(true)}

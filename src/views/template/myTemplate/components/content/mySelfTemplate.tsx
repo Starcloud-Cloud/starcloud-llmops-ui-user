@@ -44,7 +44,7 @@ function MyselfTemplate({ appList }: { appList: Item[] }) {
                                         #{useCategory(categoryTrees, data?.category)?.name}
                                     </Link>
                                 </Box>
-                                <Box fontSize={14} mt={0.5}>
+                                <Box height={'19px'} fontSize={14} mt={0.5}>
                                     {data?.tags.map((el) => (
                                         <Chip
                                             sx={{ mr: 0.5, fontSize: '12px', height: '16px' }}

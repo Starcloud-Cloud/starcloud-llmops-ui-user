@@ -472,31 +472,35 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                                             }
                                             setLinkLoading(true);
                                             try {
-                                                noteDetail({ noteUrl: accoutQuery.link }).then((res) => {
-                                                    setLinkLoading(false);
-                                                    if (res) {
-                                                        if (!code) {
-                                                            setAccoutQuery({
-                                                                ...accoutQuery,
-                                                                content: res.desc,
-                                                                title: res.title,
-                                                                tagList: res.tagList?.map((item: any) => item.name)
-                                                            });
-                                                        } else {
-                                                            if (code === 'TitleActionHandler') {
+                                                noteDetail({ noteUrl: accoutQuery.link })
+                                                    .then((res) => {
+                                                        setLinkLoading(false);
+                                                        if (res) {
+                                                            if (!code) {
                                                                 setAccoutQuery({
                                                                     ...accoutQuery,
-                                                                    title: res.title
+                                                                    content: res.desc,
+                                                                    title: res.title,
+                                                                    tagList: res.tagList?.map((item: any) => item.name)
                                                                 });
                                                             } else {
-                                                                setAccoutQuery({
-                                                                    ...accoutQuery,
-                                                                    content: res.desc
-                                                                });
+                                                                if (code === 'TitleActionHandler') {
+                                                                    setAccoutQuery({
+                                                                        ...accoutQuery,
+                                                                        title: res.title
+                                                                    });
+                                                                } else {
+                                                                    setAccoutQuery({
+                                                                        ...accoutQuery,
+                                                                        content: res.desc
+                                                                    });
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                });
+                                                    })
+                                                    .catch((err) => {
+                                                        setLinkLoading(false);
+                                                    });
                                             } catch (err) {
                                                 setLinkLoading(false);
                                             }

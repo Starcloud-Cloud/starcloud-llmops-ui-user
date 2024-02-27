@@ -1,5 +1,5 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
@@ -42,6 +42,8 @@ import { t } from 'hooks/web/useI18n';
 import Slider from 'react-slick';
 import useRouteStore from 'store/router';
 import { DASHBOARD_PATH } from 'config';
+import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -83,6 +85,9 @@ const HeaderSection = () => {
         autoplay: true,
         autoplaySpeed: 2000
     };
+    const [version, setVersion] = useState('');
+    const [macDownload, setMacDownload] = useState('');
+    const [releaseDate, setReleaseDate] = useState('');
 
     const handleScroll = () => {
         window.scrollTo(0, window.innerHeight - 80);
@@ -109,6 +114,32 @@ const HeaderSection = () => {
         ),
         [rtlLayout, theme]
     );
+
+    useEffect(() => {
+        (async () => {
+            const response = await fetch('https://mofaai-juzhen.oss-cn-hangzhou.aliyuncs.com/client/latest-mac.yml');
+            const text = await response.text();
+            let match = text.match(/url: (https?:\/\/[^\s]+)/g);
+            let secondUrl = match && match[0].replace('url: ', '');
+            if (secondUrl) {
+                setMacDownload(secondUrl);
+            }
+            let matchVersion = text.match(/version: ([^\s]+)/);
+            let version = matchVersion && matchVersion[1];
+            if (version) {
+                setVersion(version);
+            }
+            let matchReleaseDate = text.match(/releaseDate: "([^"]+)/);
+            let releaseDate = matchReleaseDate && matchReleaseDate[1];
+            if (releaseDate) {
+                setReleaseDate(releaseDate);
+            }
+        })();
+    }, []);
+
+    const macClientDownload = async () => {
+        window.open(macDownload);
+    };
 
     return (
         <Container sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
@@ -232,7 +263,10 @@ const HeaderSection = () => {
                                             <Image width={20} src={windowsFill} preview={false} />
                                             <div className="ml-[5px] mt-[4px]">Windows 下载</div>
                                         </div>
-                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                        <div
+                                            className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center cursor-pointer"
+                                            onClick={() => macClientDownload()}
+                                        >
                                             <Image width={20} src={iosFill} preview={false} />
                                             <div className="ml-[5px] mt-[4px]">MacOS 下载</div>
                                         </div>
@@ -251,8 +285,9 @@ const HeaderSection = () => {
                                     </Grid>
                                 </Grid>
                                 <div className="text-[14px] text-[#000]/50 mt-[20px]">
-                                    版本：1.0.8
-                                    <Divider type="vertical" /> 更新：2023-6-27 <Divider type="vertical" />
+                                    版本：{version}
+                                    <Divider type="vertical" /> 更新：{dayjs(releaseDate).format('YYYY-MM-DD')}
+                                    <Divider type="vertical" />
                                     适应系统：Win7以上 / Mac
                                 </div>
                             </motion.div>

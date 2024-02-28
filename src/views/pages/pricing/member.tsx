@@ -439,6 +439,7 @@ const Price1 = () => {
     const [newUserProductId, setNewUserProductId] = useState<any>();
     const [beanProducts, setBeanProducts] = useState<any[]>([]);
     const [newUserProducts, setNewUserProducts] = useState<any[]>([]);
+    const [activeProduct, setActiveProduct] = useState<any[]>([]);
 
     const { width } = useWindowSize();
     const myRef = React.useRef<any>(null);
@@ -456,22 +457,32 @@ const Price1 = () => {
         }
     };
 
-    useEffect(() => {
-        discountNewUser().then((res) => {
-            if (res.isNewUser) {
-                setShowTrial(true);
-                getNewUserProduct().then((res) => {
-                    setNewUserProductId(res?.skus?.[0]?.id);
-                });
-            }
-        });
-    }, []);
+    // useEffect(() => {
+    //     discountNewUser().then((res) => {
+    //         if (res.isNewUser) {
+    //             setShowTrial(true);
+    //             getNewUserProduct().then((res) => {
+    //                 setNewUserProductId(res?.skus?.[0]?.id);
+    //             });
+    //         }
+    //     });
+    // }, []);
 
     useEffect(() => {
         getPayType().then((res) => {
             const result = res.filter((item: any) => item.parentId === 0 && item.name !== '专享特惠') || [];
             setValue(result?.[0]?.id);
-            setTabs(result);
+            setTabs([
+                {
+                    id: result?.[0]?.id,
+                    name: '月付'
+                },
+                {
+                    id: `${result?.[0]?.id}-month`,
+                    name: '年付'
+                },
+                ...result.filter((item: any) => item.name === '加油包')
+            ]);
 
             // 加油包
             const data = res.filter((v: any) => v.name === '加油包' && v.parentId === 0);
@@ -492,7 +503,16 @@ const Price1 = () => {
     useEffect(() => {
         const monthId = tabs?.find((v) => v.name === '月付')?.id;
         if (value) {
-            getPayList(value).then((res) => {
+            const categoryId = value.toString()?.includes('-') ? value?.split('-')[0] : value;
+            getPayList(categoryId).then((res: any) => {
+                // 获取活动sku
+                const list = res?.list
+                    ?.find((item: any) => item.keyword === 'basic')
+                    .skus?.filter(
+                        (item: any) => item.properties?.[0]?.remark === 'NEW_USER' || item.properties?.[0]?.remark === 'USER_INVITE'
+                    );
+                setActiveProduct(list);
+
                 let newList: any[] = [];
                 res.list.forEach((item: any, index: number) => {
                     // 是月付
@@ -505,13 +525,15 @@ const Price1 = () => {
                                 } else if (index === 4) {
                                     newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
                                 } else {
+                                    const sku: any = item?.skus?.find((item: any) => item?.properties?.[0]?.remark === 'MONTH');
                                     newList.push({
                                         ...v,
-                                        id: item?.skus?.[0]?.id,
-                                        payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100,
+                                        id: sku?.id,
+                                        payPrice: sku.price / 100,
+                                        marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig?.isSubscribe
+                                        isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'MONTH')
                                     });
                                 }
                             }
@@ -527,13 +549,15 @@ const Price1 = () => {
                                 } else if (index === 4) {
                                     newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
                                 } else {
+                                    const sku: any = item?.skus?.find((item: any) => item?.properties?.[0]?.remark === 'YEAR');
                                     newList.push({
                                         ...v,
-                                        id: item?.skus?.[0]?.id,
-                                        payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100,
+                                        id: sku?.id,
+                                        payPrice: sku.price / 100,
+                                        marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig?.isSubscribe
+                                        isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'YEAR')
                                     });
                                 }
                             }
@@ -770,6 +794,7 @@ const Price1 = () => {
             myRef?.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
+
     return (
         <div>
             <HeaderWrapper id="vip">
@@ -892,7 +917,8 @@ const Price1 = () => {
                                                                 title: plan.title,
                                                                 select: value,
                                                                 payId: plan.id,
-                                                                isSubscribe: plan?.isSubscribe
+                                                                isSubscribe: plan?.isSubscribe,
+                                                                skus: plan.skus
                                                             });
                                                             handleClick(index, plan.id);
                                                         }}
@@ -913,25 +939,26 @@ const Price1 = () => {
                                             </Grid>
 
                                             {plan.btnTextNew &&
-                                                newUserProducts?.map((item, index) => (
+                                                activeProduct?.map((item, index) => (
                                                     <Grid item xs={12} key={index}>
                                                         <Button
                                                             className={'w-4/5'}
                                                             variant={plan.active ? 'contained' : 'outlined'}
                                                             onClick={() => {
                                                                 setCurrentSelect({
-                                                                    title: item.name,
+                                                                    title: item.properties[0].valueName,
                                                                     select: value,
-                                                                    payId: item?.skus?.[0]?.id,
+                                                                    payId: item?.id,
                                                                     experience: true,
-                                                                    unitName: item.unitName,
-                                                                    isSubscribe: false
+                                                                    unitName: plan.unitName,
+                                                                    isSubscribe: false,
+                                                                    buyTime: item.rightsConfig.levelBasicDTO.timesRange.range
                                                                 });
-                                                                handleClick(3, item?.skus?.[0]?.id);
+                                                                handleClick(3, item?.id);
                                                             }}
                                                             color="secondary"
                                                         >
-                                                            {item.name}
+                                                            {item.properties[0].valueName}
                                                         </Button>
                                                     </Grid>
                                                 ))}
@@ -1023,7 +1050,7 @@ const Price1 = () => {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
-                                                    <Typography variant="body2">{`${plan?.giveRights?.giveMagicBean}魔法豆, ${plan?.giveRights?.giveImage}点作图`}</Typography>
+                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicBean}魔法豆, ${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicImage}点作图`}</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
@@ -1163,7 +1190,7 @@ const Price1 = () => {
                     currentSelect={currentSelect}
                     handleCreateOrder={handleCreateOrder}
                     handleCreateSignPay={handleCreateSignPay}
-                    categoryId={value}
+                    categoryId={value.toString()?.includes('-') ? Number(value?.split('-')[0]) : value}
                 />
             )}
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}

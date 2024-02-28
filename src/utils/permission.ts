@@ -10,7 +10,7 @@ export const getTenant = () => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return ENUM_TENANT.ANNOUNCE;
     } else {
-        return ENUM_TENANT.ANNOUNCE;
+        return ENUM_TENANT.AI;
     }
 };
 
@@ -61,6 +61,6 @@ export const getPermission = (key: ENUM_PERMISSION) => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return announceList[key];
     } else {
-        return announceList[key];
+        return list[key];
     }
 };

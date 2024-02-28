@@ -65,7 +65,8 @@ const Body = React.forwardRef(
                                         <span className="text-[#f50] text-lg ml-1 font-semibold ">￥{payPrice?.toFixed(2)}</span>
                                     </div>
                                     <div className="text-base mb-2 ">请扫描下方二维码完成签约</div>
-                                    <img src={`data:image/jpeg;base64,${url}`} className="w-[240px] h-[240px]" />
+                                    <iframe className={'h-[410px] overflow-hidden'} title={'支付码'} src={url} frameBorder={0} />
+                                    {/* <img src={`data:image/jpeg;base64,${url}`} className="w-[240px] h-[240px]" /> */}
                                     <div className="text-sm mt-2">二维码将在5分钟内失效</div>
                                 </div>
                             </Grid>

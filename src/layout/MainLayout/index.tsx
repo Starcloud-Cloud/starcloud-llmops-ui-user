@@ -391,10 +391,10 @@ const MainLayout = () => {
         // () => {
         //     clearInterval(userVip);
         //};
-        if (allDetail?.allDetail?.isNewUser) {
-            handleShowNewUserVip();
-        } else {
-            if (allDetail?.allDetail?.id) {
+        if (allDetail?.allDetail) {
+            if (allDetail?.allDetail?.isNewUser) {
+                handleShowNewUserVip();
+            } else {
                 const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
                 if (dateTime) {
                     if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
@@ -590,7 +590,8 @@ const MainLayout = () => {
                             {openInvite && (
                                 <InviteUser
                                     onClose={() => {
-                                        const inviteUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
+                                        // 由3天改成不展示
+                                        const inviteUserVipEndTime = dayjs().add(999, 'y').format('YYYY-MM-DD HH:mm:ss');
                                         localStorage.setItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`, inviteUserVipEndTime);
                                         setOpenInvite(false);
                                     }}

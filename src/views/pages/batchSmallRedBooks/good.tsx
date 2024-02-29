@@ -67,9 +67,9 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                             className="!w-[100%] !h-[100%]"
                             active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
                         />
-                        {item.copyWritingStatus === 'executing' && (
+                        {(item.copyWritingStatus === 'executing' || item.copyWritingStatus === 'execute_error') && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
-                                <Progress type="circle" percent={Math.floor(item?.currentStepIndex / item?.totalStep) * 100} />
+                                <Progress type="circle" percent={Math.floor((item?.currentStepIndex / item?.totalStep) * 100 ) } />
                                 <Popover content={'执行到第几步/总步数'}>
                                     <div className="font-[500] cursor-pointer">
                                         {item?.currentStepIndex}/{item?.totalStep}

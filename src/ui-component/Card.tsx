@@ -131,7 +131,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                             <BorderLinearProgress
                                 level={vipSwitch(info?.allDetail?.levels[0]?.levelId)}
                                 variant="determinate"
-                                value={(item?.remaining / item?.totalNum) * 100}
+                                value={item?.totalNum ? (item?.remaining / item?.totalNum) * 100 : 0}
                                 theme={theme}
                             />
                         </Tooltip>

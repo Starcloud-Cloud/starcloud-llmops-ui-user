@@ -132,10 +132,12 @@ export function DiscountModal({
     }, [discountList]);
 
     const handleRadio = async (e: RadioChangeEvent) => {
+        const isSubscribe = currentSelect?.skus.find((item: any) => item.id === e.target.value).subscribeConfig.isSubscribe;
         setCurrentSelect((pre: any) => {
             return {
                 ...pre,
-                payId: e.target.value
+                payId: e.target.value,
+                isSubscribe
             };
         });
         await handleFetchPay(e.target.value, discountCode);
@@ -231,7 +233,7 @@ export function DiscountModal({
                                     {currentSelect.experience ? (
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
-                                            <span className="text-sm text-[#868A91]">1{currentSelect?.unitName}</span>
+                                            <span className="text-sm text-[#868A91]">{currentSelect?.buyTime}天</span>
                                         </div>
                                     ) : (
                                         <div className="flex justify-between items-center w-full mb-3">
@@ -239,8 +241,9 @@ export function DiscountModal({
                                             {!value ? (
                                                 <span>
                                                     <Radio.Group onChange={handleRadio} value={selectCode}>
-                                                        <Radio value={timeList?.[0]}>月</Radio>
-                                                        <Radio value={timeList?.[1]}>年</Radio>
+                                                        {currentSelect.skus.map((v: any, index: number) => (
+                                                            <Radio value={v.id}>{v.properties[0].valueName}</Radio>
+                                                        ))}
                                                     </Radio.Group>
                                                 </span>
                                             ) : (

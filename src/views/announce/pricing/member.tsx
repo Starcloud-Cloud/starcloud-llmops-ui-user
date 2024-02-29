@@ -1007,66 +1007,6 @@ const Price1 = () => {
                             </Grid>
                         </div>
                     </div>
-
-                    <>
-                        <div className="flex justify-center">
-                            <Divider className="py-3 w-[70%]" />
-                        </div>
-                        <div>
-                            <div className="text-3xl font-semibold w-full text-center my-[20px]">
-                                跨境人都选择
-                                <span className="text-violet-500">“魔法AI”</span>
-                            </div>
-                            <div className="flex justify-center">
-                                <AntButton
-                                    icon={<KeyboardBackspaceIcon className="text-white" />}
-                                    type="primary"
-                                    shape="circle"
-                                    onClick={() => {
-                                        swiperRef?.slidePrev();
-                                    }}
-                                />
-                                <AntButton
-                                    style={{ marginLeft: '10px' }}
-                                    icon={<ArrowForwardIcon className="text-white" />}
-                                    type="primary"
-                                    shape="circle"
-                                    onClick={() => {
-                                        swiperRef?.slideNext();
-                                    }}
-                                />
-                            </div>
-                            <div className="mt-[20px]">
-                                <Swiper
-                                    onSwiper={(swiper) => setSwiperRef(swiper)}
-                                    slidesPerView={onCol()}
-                                    spaceBetween={30}
-                                    centeredSlides={false}
-                                    loop
-                                    modules={[]}
-                                    className="mySwiper"
-                                    autoplay={{
-                                        delay: 2500,
-                                        disableOnInteraction: false
-                                    }}
-                                >
-                                    {recommendList.map((item, index) => (
-                                        <SwiperSlide>
-                                            <div className="!bg-white rounded-2xl p-5 space-y-2.5 border border-neutral-100">
-                                                <div className="flex items-center gap-2">
-                                                    <div>
-                                                        <img src={item.avatar} className="rounded-full w-9 h-9" />
-                                                    </div>
-                                                    <div className="text-xs font-semibold">{item.title}</div>
-                                                </div>
-                                                <div className="font-semibold leading-7">“{item.content}”</div>
-                                            </div>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                            </div>
-                        </div>
-                    </>
                 </div>
             </div>
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>

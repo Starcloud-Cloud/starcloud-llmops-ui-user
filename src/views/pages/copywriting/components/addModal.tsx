@@ -30,6 +30,7 @@ import '../index.scss';
 import useUserStore from 'store/user';
 import CreateTable from './spliceCmponents/table';
 import CreateVariable from './spliceCmponents/variable';
+import CreateVariables from './spliceCmponents/variables';
 import CreateTab from './spliceCmponents/tab';
 import Goods from '../../batchSmallRedBooks/good';
 import { getContentPage } from 'api/redBook';
@@ -61,23 +62,6 @@ const AddModal = () => {
     const [tableData, setTableData] = useState<any[]>([]);
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
-    const [imageStyleData, setImageStyleData] = useState<any[]>([
-        {
-            name: '风格 1',
-            key: '1',
-            id: '1',
-            templateList: [
-                {
-                    key: '1',
-                    name: '首图',
-                    model: '',
-                    variableList: []
-                }
-            ]
-        }
-    ]);
-
-    //文案生成模板
 
     useEffect(() => {
         // imageTemplates().then((res) => {
@@ -105,32 +89,9 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    // if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                    //     setRows(res.configuration?.copyWritingTemplate?.variableList);
-                    //     setTableData(res.refers);
-                    //     setTestImageList(
-                    //         res.useImages?.map((item: any) => {
-                    //             return {
-                    //                 uid: uuidv4(),
-                    //                 thumbUrl: item,
-                    //                 response: {
-                    //                     data: {
-                    //                         url: item
-                    //                     }
-                    //                 }
-                    //             };
-                    //         })
-                    //     );
-                    //     setTestTableList(res.configuration.copyWritingTemplate.example);
-                    //     copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
-                    //     setCopyWritingTemplate(copyWritingTemplateRef.current);
-                    //     setImageStyleData(res.configuration.imageTemplate.styleList);
-                    //     setparagraphCount(res.configuration.paragraphCount);
-                    // } else {
-                    setSplitValue(res.customConfiguration?.appUid);
-                    valueListRef.current = res.customConfiguration?.steps;
+                    setSplitValue(res.configuration?.appUid);
+                    valueListRef.current = res.configuration?.steps;
                     setValueList(valueListRef.current);
-                    // }
                 }
             });
         } else {
@@ -288,7 +249,7 @@ const AddModal = () => {
                 uid: searchParams.get('uid'),
                 ...params,
                 type: params.type ? 'SYSTEM' : 'USER',
-                customConfiguration: {
+                configuration: {
                     ...splitList.filter((item) => item.appUid === splitValue)[0],
                     steps: valueList?.map((item) => {
                         if (item?.model === 'RANDOM') {
@@ -330,7 +291,7 @@ const AddModal = () => {
         schemeCreate({
             ...params,
             type: params.type ? 'SYSTEM' : 'USER',
-            customConfiguration: {
+            configuration: {
                 ...splitList.filter((item) => item.appUid === splitValue)[0],
                 steps: valueList?.map((item) => {
                     if (item?.model === 'RANDOM') {
@@ -405,8 +366,7 @@ const AddModal = () => {
             [key]: data
         };
         valueListRef.current = newData;
-
-        setValueList(newData);
+        setValueList(valueListRef.current);
     };
 
     //测试生成
@@ -478,6 +438,7 @@ const AddModal = () => {
     }, [queryPage.pageNo]);
 
     const [current, setCurrent] = useState(0);
+    const [variableLists, setvariableLists] = useState<any[]>([]);
     return (
         <MainCard content={false}>
             <CardContent>
@@ -644,6 +605,7 @@ const AddModal = () => {
                 <div className="my-[20px] flex gap-2 flex-wrap">
                     {splitList?.map((item) => (
                         <SubCard
+                            key={item?.appUid}
                             sx={{
                                 mb: 1,
                                 cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
@@ -682,157 +644,215 @@ const AddModal = () => {
                         ]}
                     />
                 </div>
+                {current === 1 && (
+                    <CreateVariable
+                        rows={valueList?.filter((item) => item.code === 'VariableActionHandler')[0]?.variableList}
+                        setRows={(data: any[]) =>
+                            setValues(
+                                'variableList',
+                                data,
+                                valueList?.findIndex((item) => item.code === 'VariableActionHandler')
+                            )
+                        }
+                    />
+                )}
                 {current === 2 && (
                     <Collapse
                         bordered={false}
                         style={{ background: 'transparent' }}
-                        items={valueList?.map((el: any, index: number) => {
-                            return {
-                                key: index,
-                                style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
-                                label: (
-                                    <div className="relative">
-                                        <span className="text-[18px] font-[600]">
-                                            {index + 1 + '.'} {el?.name}
-                                        </span>
-                                        {verifyItem(el)?.flag && (
-                                            <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
-                                        )}
-                                    </div>
-                                ),
-                                children: (
-                                    <>
-                                        {(el.code === 'CustomActionHandler' ||
-                                            el.code === 'ParagraphActionHandler' ||
-                                            el.code === 'TitleActionHandler') && (
-                                            <>
-                                                <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
-                                                <div>
-                                                    <Radio.Group
-                                                        value={el.model}
-                                                        onChange={(e) => {
-                                                            setValues('model', e.target.value, index);
-                                                        }}
-                                                    >
-                                                        {modeList?.map((item) =>
-                                                            el?.code === 'ParagraphActionHandler' ? (
-                                                                item.label !== '随机获取' && (
+                        items={valueList
+                            ?.filter((item) => item.code !== 'VariableActionHandler')
+                            ?.map((el: any, index: number) => {
+                                return {
+                                    key: index,
+                                    style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
+                                    label: (
+                                        <div className="relative">
+                                            <span className="text-[18px] font-[600]">
+                                                {index + 1 + '.'} {el?.name}
+                                            </span>
+                                            {verifyItem(el)?.flag && (
+                                                <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
+                                            )}
+                                        </div>
+                                    ),
+                                    children: (
+                                        <>
+                                            {(el.code === 'CustomActionHandler' ||
+                                                el.code === 'ParagraphActionHandler' ||
+                                                el.code === 'TitleActionHandler') && (
+                                                <>
+                                                    <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
+                                                    <div>
+                                                        <Radio.Group
+                                                            value={el.model}
+                                                            onChange={(e) => {
+                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                    setValues('model', e.target.value, index + 1);
+                                                                } else {
+                                                                    setValues('model', e.target.value, index);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {modeList?.map((item) =>
+                                                                el?.code === 'ParagraphActionHandler' ? (
+                                                                    item.label !== '随机获取' && (
+                                                                        <Radio key={item.value} value={item.value}>
+                                                                            {item.label}
+                                                                        </Radio>
+                                                                    )
+                                                                ) : (
                                                                     <Radio key={item.value} value={item.value}>
                                                                         {item.label}
                                                                     </Radio>
                                                                 )
-                                                            ) : (
-                                                                <Radio key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                </Radio>
-                                                            )
-                                                        )}
-                                                    </Radio.Group>
-                                                </div>
-                                                <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
-                                                    <span className="font-[600] text-[#673ab7]">Tips：</span>
-                                                    {el.model === 'RANDOM'
-                                                        ? '从参考内容中随机获取一条内容使用'
-                                                        : el.model === 'AI_PARODY'
-                                                        ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
-                                                        : '直接让AI生成内容，要求越详细越好'}
-                                                </div>
-                                                {el.model !== 'AI_CUSTOM' && (
-                                                    <>
-                                                        <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
-                                                        <CreateTable
-                                                            tableData={el?.referList}
-                                                            sourceList={sourceList}
-                                                            code={el?.code}
-                                                            setTableData={(data) => setValues('referList', data, index)}
-                                                            params={params}
-                                                        />
-                                                    </>
-                                                )}
-                                                {el.model !== 'RANDOM' && (
-                                                    <>
-                                                        <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
-                                                            {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
-                                                        </div>
-                                                        <CreateVariable
-                                                            pre={pre}
-                                                            model={el?.model}
-                                                            value={el?.requirement}
-                                                            setValue={(data: string) => setValues('requirement', data, index)}
-                                                            rows={el?.variableList}
-                                                            setRows={(data: any[]) => setValues('variableList', data, index)}
-                                                        />
-                                                    </>
-                                                )}
-                                                {el.code === 'ParagraphActionHandler' && (
-                                                    <>
-                                                        <div className="relative mt-[20px]">
-                                                            <InputNumber
-                                                                status={!el?.paragraphCount ? 'error' : ''}
-                                                                size="large"
-                                                                className="w-[300px] bg-[#f8fafc]"
-                                                                min={1}
-                                                                value={el?.paragraphCount}
-                                                                onChange={(data) => setValues('paragraphCount', data, index)}
+                                                            )}
+                                                        </Radio.Group>
+                                                    </div>
+                                                    <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                        <span className="font-[600] text-[#673ab7]">Tips：</span>
+                                                        {el.model === 'RANDOM'
+                                                            ? '从参考内容中随机获取一条内容使用'
+                                                            : el.model === 'AI_PARODY'
+                                                            ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                            : '直接让AI生成内容，要求越详细越好'}
+                                                    </div>
+                                                    {el.model !== 'AI_CUSTOM' && (
+                                                        <>
+                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
+                                                            <CreateTable
+                                                                tableData={el?.referList}
+                                                                sourceList={sourceList}
+                                                                code={el?.code}
+                                                                setTableData={(data) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('referList', data, index + 1);
+                                                                    } else {
+                                                                        setValues('referList', data, index);
+                                                                    }
+                                                                }}
+                                                                params={params}
                                                             />
-                                                            <span
-                                                                style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
-                                                                className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
-                                                            >
-                                                                文案段落数量
-                                                            </span>
-                                                        </div>
-                                                        {!el?.paragraphCount && (
-                                                            <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
-                                                                文案段落数量必填
-                                                            </span>
-                                                        )}
-                                                    </>
-                                                )}
-                                            </>
-                                        )}
-                                        {el.code === 'AssembleActionHandler' && (
-                                            <>
-                                                <div className="relative">
-                                                    <TextArea
-                                                        status={!el?.requirement ? 'error' : ''}
-                                                        defaultValue={el?.requirement}
-                                                        onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                        rows={10}
+                                                        </>
+                                                    )}
+                                                    {el.model !== 'RANDOM' && (
+                                                        <>
+                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
+                                                                {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                            </div>
+                                                            <CreateVariables
+                                                                pre={pre}
+                                                                model={el?.model}
+                                                                value={el?.requirement}
+                                                                setValue={(data: string) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('requirement', data, index + 1);
+                                                                    } else {
+                                                                        setValues('requirement', data, index);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </>
+                                                    )}
+                                                    {el.code === 'ParagraphActionHandler' && (
+                                                        <>
+                                                            <div className="relative mt-[20px]">
+                                                                <InputNumber
+                                                                    status={!el?.paragraphCount ? 'error' : ''}
+                                                                    size="large"
+                                                                    className="w-[300px] bg-[#f8fafc]"
+                                                                    min={1}
+                                                                    value={el?.paragraphCount}
+                                                                    onChange={(data) => {
+                                                                        if (
+                                                                            valueList.find((item) => item.code === 'VariableActionHandler')
+                                                                        ) {
+                                                                            setValues('paragraphCount', data, index + 1);
+                                                                        } else {
+                                                                            setValues('paragraphCount', data, index);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <span
+                                                                    style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
+                                                                    className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                                >
+                                                                    文案段落数量
+                                                                </span>
+                                                            </div>
+                                                            {!el?.paragraphCount && (
+                                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                                    文案段落数量必填
+                                                                </span>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </>
+                                            )}
+                                            {el.code === 'AssembleActionHandler' && (
+                                                <>
+                                                    <div className="relative">
+                                                        <TextArea
+                                                            status={!el?.requirement ? 'error' : ''}
+                                                            defaultValue={el?.requirement}
+                                                            onBlur={(data) => {
+                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                    setValues('requirement', data.target.value, index + 1);
+                                                                } else {
+                                                                    setValues('requirement', data.target.value, index);
+                                                                }
+                                                            }}
+                                                            rows={10}
+                                                        />
+                                                        <span
+                                                            style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                            className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                        >
+                                                            文案拼接配置
+                                                        </span>
+                                                    </div>
+                                                    {!el?.requirement && (
+                                                        <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                            文案拼接配置必填
+                                                        </span>
+                                                    )}
+                                                </>
+                                            )}
+                                            {el.code === 'PosterActionHandler' && (
+                                                <>
+                                                    <CreateTab
+                                                        mode={el?.mode}
+                                                        setModel={(data) => {
+                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                setValues('mode', data, index + 1);
+                                                            } else {
+                                                                setValues('mode', data, index);
+                                                            }
+                                                        }}
+                                                        imageStyleData={el?.styleList}
+                                                        setImageStyleData={(data) => {
+                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                setValues('styleList', data, index + 1);
+                                                            } else {
+                                                                setValues('styleList', data, index);
+                                                            }
+                                                        }}
+                                                        focuActive={focuActive}
+                                                        setFocuActive={setFocuActive}
+                                                        digui={() => {
+                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                            if (!newData || newData?.every((i: any) => !i)) {
+                                                                return 1;
+                                                            }
+                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                        }}
                                                     />
-                                                    <span
-                                                        style={{ color: !el?.requirement ? '#f44336' : '#000' }}
-                                                        className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
-                                                    >
-                                                        文案拼接配置
-                                                    </span>
-                                                </div>
-                                                {!el?.requirement && (
-                                                    <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案拼接配置必填</span>
-                                                )}
-                                            </>
-                                        )}
-                                        {el.code === 'PosterActionHandler' && (
-                                            <>
-                                                <CreateTab
-                                                    imageStyleData={el?.styleList}
-                                                    setImageStyleData={(data) => setValues('styleList', data, index)}
-                                                    focuActive={focuActive}
-                                                    setFocuActive={setFocuActive}
-                                                    digui={() => {
-                                                        const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                                        if (newData.every((i: any) => !i)) {
-                                                            return 1;
-                                                        }
-                                                        return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                                    }}
-                                                />
-                                            </>
-                                        )}
-                                    </>
-                                )
-                            };
-                        })}
+                                                </>
+                                            )}
+                                        </>
+                                    )
+                                };
+                            })}
                     />
                 )}
                 {current === 3 && (
@@ -875,7 +895,7 @@ const AddModal = () => {
                                             uid: searchParams.get('uid'),
                                             ...params,
                                             type: params.type ? 'SYSTEM' : 'USER',
-                                            customConfiguration: {
+                                            configuration: {
                                                 ...splitList.filter((item) => item.appUid === splitValue)[0],
                                                 steps: valueList?.map((item) => {
                                                     if (item?.model === 'RANDOM') {
@@ -973,7 +993,7 @@ const AddModal = () => {
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button type="primary" onClick={handleSave}>
+                        <Button className="w-[100px]" size="large" type="primary" onClick={handleSave}>
                             保存
                         </Button>
                     </Grid>

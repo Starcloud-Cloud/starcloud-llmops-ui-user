@@ -173,11 +173,11 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
-        description: '每天签到获取魔法豆/图片使用数',
+        description: '10矩阵豆',
         monthPrice: '免费',
         yearPrice: '免费',
-        des: '适用于新用户体验，打卡获得魔法豆',
-        permission: [0, 1, 2, 5, 6, 7, 8, 9, 10],
+        des: '适用于新用户体验',
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         btnText: '免费使用'
     },
     {
@@ -185,20 +185,13 @@ const plansDefault = (value: number) => [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: value === 1 ? '3000魔法豆，300点作图' : '36000魔法豆，3600点作图',
+        description: value === 1 ? '300矩阵豆' : '3600矩阵豆',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
         des: '适用于普通用户',
-        permission: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12],
-        btnText: (
-            <div>
-                立即购买
-                {/* <Tag className="ml-1" color="#f50">
-                    {'订阅立减10元'}
-                </Tag> */}
-            </div>
-        ),
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        btnText: <div>立即购买</div>,
         btnTextNew: true,
         monthCode: 'basic_month',
         yearCode: 'basic_year'
@@ -208,12 +201,12 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
+        description: value === 1 ? '1000矩阵豆' : '12000矩阵豆',
         monthPrice: 199,
         yearPrice: 1999,
         preMonthPrice: 166.58,
         des: '适用于专业卖家',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         btnText: '立即购买',
         monthCode: 'plus_month',
         yearCode: 'plus_year'
@@ -223,12 +216,12 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: value === 1 ? '6个账号，25000魔法豆，2000点作图' : '6个账号，300000魔法豆，24000点作图',
+        description: value === 1 ? '6个账号，2500矩阵豆' : '6个账号，30000矩阵豆',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
         des: '适用于公司团队',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
@@ -248,160 +241,73 @@ const plansDefault = (value: number) => [
 ];
 
 const planListDefault = (value: number) => [
-    [
-        '签到可免费获得2魔法豆', // 0
-        '签到可免费获取图片1张', // 1
-        'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
-        '个人空间',
-        '1个自定义应用', // 4
-        '1个自定义机器人', // 4
-        '1个微信群机器人', // 4
-        '多渠道发布机器人客服', // 4
-        '上传信息库/文档问答', // 4
-        '每个机器人1个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '3000魔法豆' : '36000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 300 : 3600}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        <div className="flex items-center">
-            <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔法豆'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '个人空间',
-        <div className="flex items-center">
-            <span>5个自定义应用</span>
-            <Tooltip title={'可自定义提示词应用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>5个自定义机器人</span>
-            <Tooltip title={'可自定义自己的问答机器人'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>1个微信群机器人</span>
-            <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>多渠道发布机器人客服</span>
-            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>上传信息库/文档问答</span>
-            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-
-        '每个机器人5个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '1个机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '10000魔法豆' : '120000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 1000 : 12000}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        <div className="flex items-center">
-            <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔法豆'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>个人空间</span>
-            <Tooltip title={'可邀请3名好友在空间创作'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>20个自定义应用</span>
-            <Tooltip title={'可自定义提示词应用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>20个自定义机器人</span>
-            <Tooltip title={'可自定义自己的问答机器人'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>10个微信群机器人</span>
-            <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>多渠道发布机器人客服</span>
-            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>上传信息库/文档问答</span>
-            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '每个机器人20个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '3个机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 2000 : 24000}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
-        <div className="flex items-center">
-            <span>个人空间</span>
-            <Tooltip title={'可邀请6名好友在空间创作'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '无限自定义应用', // 4
-        '无限自定义机器人', // 4
-        '无限个微信群机器人', // 4
-        '多渠道发布机器人客服', // 4
-        '上传信息库/文档问答', // 4
-        '无限文档上传', // 4
-        'Google/Amazon联网查询', // 4
-        '10个机器人插件扩展' // 5
-    ],
-    [
-        '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
-        '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
-        '私有的企业知识库存储空间', // 2
-        '按需提供企业所需的数据接入和发布方式', // 3
-        '定制化的联网查询/企业数据查询', // 4
-        '个性化域名' // 6
-    ]
+    {
+        keyword: 'free',
+        value: [
+            '账号管理数量：3个', // 0
+            '账号分组数量：0', // 1
+            '账号云同步：无', // 2
+            '一键检查账号状态：有', // 3
+            '一键发布次数/天：6次/天',
+            '每次发布账号数上限：3', // 4
+            '定时发布：有', // 4
+            '数据中心（数据聚合）：无', // 4
+            '评论管理：无' // 4
+        ]
+    },
+    {
+        keyword: 'basic',
+        value: [
+            '账号管理数量：10',
+            '账号分组数量：3',
+            '账号云同步：有',
+            '一键检查账号状态：有',
+            '一键发布次数/天：20次/天',
+            '每次发布账号数上限：10',
+            '定时发布：有',
+            '数据中心（数据聚合）：有',
+            '评论管理：有'
+        ]
+    },
+    {
+        keyword: 'plus',
+        value: [
+            '账号管理数量：10',
+            '账号分组数量：3',
+            '账号云同步：有',
+            '一键检查账号状态：有',
+            '一键发布次数/天：20次/天',
+            '每次发布账号数上限：10',
+            '定时发布：有',
+            '数据中心（数据聚合）：有',
+            '评论管理：有'
+        ]
+    },
+    {
+        keyword: 'pro',
+        value: [
+            '账号管理数量：10',
+            '账号分组数量：3',
+            '账号云同步：有',
+            '一键检查账号状态：有',
+            '一键发布次数/天：20次/天',
+            '每次发布账号数上限：10',
+            '定时发布：有',
+            '数据中心（数据聚合）：有',
+            '评论管理：有'
+        ]
+    },
+    {
+        keyword: 'business',
+        value: [
+            '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
+            '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
+            '私有的企业知识库存储空间', // 2
+            '按需提供企业所需的数据接入和发布方式', // 3
+            '定制化的联网查询/企业数据查询', // 4
+            '个性化域名' // 6
+        ]
+    }
 ];
 
 // ===============================|| PRICING - PRICE 1 ||=============================== //
@@ -410,7 +316,7 @@ let interval: any;
 
 const Price1 = () => {
     const [planList, setPlanList] = useState<any[]>(planListDefault(1));
-    const [plans, setPlans] = useState<any[]>(plansDefault(1));
+    const [plans, setPlans] = useState<any[]>([]);
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
@@ -439,6 +345,7 @@ const Price1 = () => {
     const [newUserProductId, setNewUserProductId] = useState<any>();
     const [beanProducts, setBeanProducts] = useState<any[]>([]);
     const [newUserProducts, setNewUserProducts] = useState<any[]>([]);
+    const [activeProduct, setActiveProduct] = useState<any[]>([]);
 
     const { width } = useWindowSize();
     const myRef = React.useRef<any>(null);
@@ -456,22 +363,32 @@ const Price1 = () => {
         }
     };
 
-    useEffect(() => {
-        discountNewUser().then((res) => {
-            if (res.isNewUser) {
-                setShowTrial(true);
-                getNewUserProduct().then((res) => {
-                    setNewUserProductId(res?.skus?.[0]?.id);
-                });
-            }
-        });
-    }, []);
+    // useEffect(() => {
+    //     discountNewUser().then((res) => {
+    //         if (res.isNewUser) {
+    //             setShowTrial(true);
+    //             getNewUserProduct().then((res) => {
+    //                 setNewUserProductId(res?.skus?.[0]?.id);
+    //             });
+    //         }
+    //     });
+    // }, []);
 
     useEffect(() => {
         getPayType().then((res) => {
             const result = res.filter((item: any) => item.parentId === 0 && item.name !== '专享特惠') || [];
             setValue(result?.[0]?.id);
-            setTabs(result);
+            setTabs([
+                {
+                    id: result?.[0]?.id,
+                    name: '月付'
+                },
+                {
+                    id: `${result?.[0]?.id}-month`,
+                    name: '年付'
+                },
+                ...result.filter((item: any) => item.name === '加油包')
+            ]);
 
             // 加油包
             const data = res.filter((v: any) => v.name === '加油包' && v.parentId === 0);
@@ -492,7 +409,16 @@ const Price1 = () => {
     useEffect(() => {
         const monthId = tabs?.find((v) => v.name === '月付')?.id;
         if (value) {
-            getPayList(value).then((res) => {
+            const categoryId = value.toString()?.includes('-') ? value?.split('-')[0] : value;
+            getPayList(categoryId).then((res: any) => {
+                // 获取活动sku
+                const list = res?.list
+                    ?.find((item: any) => item.keyword === 'basic')
+                    .skus?.filter(
+                        (item: any) => item.properties?.[0]?.remark === 'NEW_USER' || item.properties?.[0]?.remark === 'USER_INVITE'
+                    );
+                setActiveProduct(list);
+
                 let newList: any[] = [];
                 res.list.forEach((item: any, index: number) => {
                     // 是月付
@@ -505,13 +431,15 @@ const Price1 = () => {
                                 } else if (index === 4) {
                                     newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
                                 } else {
+                                    const sku: any = item?.skus?.find((item: any) => item?.properties?.[0]?.remark === 'MONTH');
                                     newList.push({
                                         ...v,
-                                        id: item?.skus?.[0]?.id,
-                                        payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100,
+                                        id: sku?.id,
+                                        payPrice: sku.price / 100,
+                                        marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig?.isSubscribe
+                                        isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'MONTH')
                                     });
                                 }
                             }
@@ -527,13 +455,15 @@ const Price1 = () => {
                                 } else if (index === 4) {
                                     newList.push({ ...v, payPrice: '专属顾问', id: item?.skus?.[0]?.id });
                                 } else {
+                                    const sku: any = item?.skus?.find((item: any) => item?.properties?.[0]?.remark === 'YEAR');
                                     newList.push({
                                         ...v,
-                                        id: item?.skus?.[0]?.id,
-                                        payPrice: item.price / 100,
-                                        marketPrice: item.marketPrice / 100,
+                                        id: sku?.id,
+                                        payPrice: sku.price / 100,
+                                        marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
-                                        isSubscribe: item.subscribeConfig?.isSubscribe
+                                        isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'YEAR')
                                     });
                                 }
                             }
@@ -770,12 +700,13 @@ const Price1 = () => {
             myRef?.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
+
     return (
         <div>
             {/* <HeaderWrapper id="vip">
                 <VipBar />
             </HeaderWrapper> */}
-            <div className="flex w-full bg-[#f4f6f8]  pt-16 pb-10 justify-center">
+            <div className="flex w-full bg-[#f4f6f8]  pt-20 pb-10 justify-center">
                 <div className="w-[94%]">
                     <div className="flex justify-center mb-10 xs:text-2xl md:text-5xl">立即订阅，创作无限可能！</div>
                     <div className="flex justify-center mb-10">
@@ -792,7 +723,7 @@ const Price1 = () => {
                             加油包购买
                         </span> */}
                     </div>
-                    <Grid container spacing={gridSpacing} columns={20}>
+                    <Grid container spacing={gridSpacing} columns={20} className="flex justify-center min-h-[1000px]">
                         {plans.map((plan, index) => {
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
@@ -892,7 +823,8 @@ const Price1 = () => {
                                                                 title: plan.title,
                                                                 select: value,
                                                                 payId: plan.id,
-                                                                isSubscribe: plan?.isSubscribe
+                                                                isSubscribe: plan?.isSubscribe,
+                                                                skus: plan.skus
                                                             });
                                                             handleClick(index, plan.id);
                                                         }}
@@ -913,25 +845,26 @@ const Price1 = () => {
                                             </Grid>
 
                                             {plan.btnTextNew &&
-                                                newUserProducts?.map((item, index) => (
+                                                activeProduct?.map((item, index) => (
                                                     <Grid item xs={12} key={index}>
                                                         <Button
                                                             className={'w-4/5'}
                                                             variant={plan.active ? 'contained' : 'outlined'}
                                                             onClick={() => {
                                                                 setCurrentSelect({
-                                                                    title: item.name,
+                                                                    title: item.properties[0].valueName,
                                                                     select: value,
-                                                                    payId: item?.skus?.[0]?.id,
+                                                                    payId: item?.id,
                                                                     experience: true,
-                                                                    unitName: item.unitName,
-                                                                    isSubscribe: false
+                                                                    unitName: plan.unitName,
+                                                                    isSubscribe: false,
+                                                                    buyTime: item.rightsConfig.levelBasicDTO.timesRange.range
                                                                 });
-                                                                handleClick(3, item?.skus?.[0]?.id);
+                                                                handleClick(3, item?.id);
                                                             }}
                                                             color="secondary"
                                                         >
-                                                            {item.name}
+                                                            {item.properties[0].valueName}
                                                         </Button>
                                                     </Grid>
                                                 ))}
@@ -950,22 +883,24 @@ const Price1 = () => {
                                                     }}
                                                     component="ul"
                                                 >
-                                                    {planList?.[index]?.map((list: any, i: number) => (
-                                                        <React.Fragment key={i}>
-                                                            <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
-                                                                <ListItemIcon>
-                                                                    <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                                                </ListItemIcon>
-                                                                <ListItemText
-                                                                    sx={{
-                                                                        '& .tips': { fill: '#000' }
-                                                                    }}
-                                                                    primary={list}
-                                                                />
-                                                            </ListItem>
-                                                            <Divider />
-                                                        </React.Fragment>
-                                                    ))}
+                                                    {planList
+                                                        ?.find((item) => item.keyword === plan.keyword)
+                                                        .value?.map((list: any, i: number) => (
+                                                            <React.Fragment key={i}>
+                                                                <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
+                                                                    <ListItemIcon>
+                                                                        <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                                                    </ListItemIcon>
+                                                                    <ListItemText
+                                                                        sx={{
+                                                                            '& .tips': { fill: '#000' }
+                                                                        }}
+                                                                        primary={list}
+                                                                    />
+                                                                </ListItem>
+                                                                <Divider />
+                                                            </React.Fragment>
+                                                        ))}
                                                 </List>
                                             </Grid>
                                         </Grid>
@@ -1023,7 +958,7 @@ const Price1 = () => {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
-                                                    <Typography variant="body2">{`${plan?.giveRights?.giveMagicBean}魔法豆, ${plan?.giveRights?.giveImage}点作图`}</Typography>
+                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicBean}魔法豆, ${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicImage}点作图`}</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
@@ -1073,7 +1008,7 @@ const Price1 = () => {
                         </div>
                     </div>
 
-                    {/* <>
+                    <>
                         <div className="flex justify-center">
                             <Divider className="py-3 w-[70%]" />
                         </div>
@@ -1131,12 +1066,12 @@ const Price1 = () => {
                                 </Swiper>
                             </div>
                         </div>
-                    </> */}
+                    </>
                 </div>
             </div>
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
                 <FooterSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
             <PayModal
                 open={open}
                 handleClose={() => handleClose()}
@@ -1163,7 +1098,7 @@ const Price1 = () => {
                     currentSelect={currentSelect}
                     handleCreateOrder={handleCreateOrder}
                     handleCreateSignPay={handleCreateSignPay}
-                    categoryId={value}
+                    categoryId={value.toString()?.includes('-') ? Number(value?.split('-')[0]) : value}
                 />
             )}
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}

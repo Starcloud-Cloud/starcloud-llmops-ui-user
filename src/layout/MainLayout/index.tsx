@@ -308,6 +308,7 @@ const MainLayout = () => {
     const storage = new StorageCache();
     const navigation = getMenuItems();
     const allDetail = useAllDetail();
+    console.log('🚀 ~ MainLayout ~ allDetail:', allDetail);
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -371,7 +372,7 @@ const MainLayout = () => {
     // }, [matchDownMd]);
 
     const handleShowNewUserVip = () => {
-        const dateTime = localStorage.getItem('newUserVipEndTime');
+        const dateTime = localStorage.getItem(`newUserVipEndTime-${allDetail?.allDetail.id}`);
         if (dateTime) {
             if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
                 setNewUserVipOpen(true);
@@ -393,15 +394,17 @@ const MainLayout = () => {
         if (allDetail?.allDetail?.isNewUser) {
             handleShowNewUserVip();
         } else {
-            const dateTime = localStorage.getItem('inviteUserVipEndTime');
-            if (dateTime) {
-                if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                    setOpenInvite(true);
+            if (allDetail?.allDetail?.id) {
+                const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
+                if (dateTime) {
+                    if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                        setOpenInvite(true);
+                    } else {
+                        setOpenInvite(false);
+                    }
                 } else {
-                    setOpenInvite(false);
+                    setOpenInvite(true);
                 }
-            } else {
-                setOpenInvite(true);
             }
         }
     }, [location.pathname, allDetail]);
@@ -579,7 +582,7 @@ const MainLayout = () => {
                                 <NewUserVip
                                     onClose={() => {
                                         const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
-                                        localStorage.setItem('newUserVipEndTime', newUserVipEndTime);
+                                        localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
                                         setNewUserVipOpen(false);
                                     }}
                                 />
@@ -588,7 +591,7 @@ const MainLayout = () => {
                                 <InviteUser
                                     onClose={() => {
                                         const inviteUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
-                                        localStorage.setItem('inviteUserVipEndTime', inviteUserVipEndTime);
+                                        localStorage.setItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`, inviteUserVipEndTime);
                                         setOpenInvite(false);
                                     }}
                                 />

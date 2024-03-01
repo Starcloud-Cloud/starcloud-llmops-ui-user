@@ -644,6 +644,14 @@ const AddModal = () => {
                         ]}
                     />
                 </div>
+                {current === 0 && (
+                    <div className="flex justify-center items-center">
+                        <div className="w-[200px] rounded-lg border border-solid border-black/30 shadow-sm p-4">
+                            <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
+                            <div className="text-xs mt-[10px]">{splitList?.find((item) => item.appUid === splitValue)?.description}</div>
+                        </div>
+                    </div>
+                )}
                 {current === 1 && (
                     <CreateVariable
                         rows={valueList?.filter((item) => item.code === 'VariableActionHandler')[0]?.variableList}

@@ -1,25 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-    TextField,
-    IconButton,
-    FormControl,
-    OutlinedInput,
-    InputLabel,
-    Select,
-    MenuItem,
-    Box,
-    Chip,
-    FormHelperText,
-    Autocomplete
-} from '@mui/material';
+import { TextField, IconButton, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Popover, Skeleton, Tag } from 'antd';
+import { Button, Upload, UploadProps, Image, Radio, Modal, Row, Col, InputNumber, Collapse, Spin } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import { getContentPage } from 'api/redBook';
-import { planCreate, planGet, planModify, schemeList, planExecute } from 'api/redBook/batchIndex';
+import { planCreate, planGet, planModify, schemeList, planExecute, batchPages } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -29,6 +17,7 @@ import Form from '../smallRedBook/components/form';
 import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
 import Goods from './good';
+import dayjs from 'dayjs';
 const BatcSmallRedBooks = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -37,6 +26,9 @@ const BatcSmallRedBooks = () => {
     const [value, setValue] = useState('');
     const [valueOpen, setValueOpen] = useState(false);
     const [targetKeysOpen, settargetKeysOpen] = useState(false);
+    //2.文案模板
+    const [mockData, setMockData] = useState<any[]>([]);
+    const [targetKeys, setTargetKeys] = useState<''>('');
     //1.批量上传图片素材
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -50,6 +42,7 @@ const BatcSmallRedBooks = () => {
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },
+        disabled: targetKeys ? false : true,
         maxCount: 500,
         onChange(info) {
             setImageList(info.fileList);
@@ -62,9 +55,6 @@ const BatcSmallRedBooks = () => {
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-    //2.文案模板
-    const [mockData, setMockData] = useState<any[]>([]);
-    const [targetKeys, setTargetKeys] = useState<''>('');
     const [tags, setTags] = useState<any>([]);
     const [tagOpen, setTagOpen] = useState(false);
     const uidRef = useRef('');
@@ -109,29 +99,23 @@ const BatcSmallRedBooks = () => {
             })
         );
     };
+
+    //批次分页
+    const [batchTotal, setBathTotal] = useState(0);
+    const [batchPage, setBatchPage] = useState({ page: 1, pageSize: 10 });
+    const [batchUid, setBatchUid] = useState('');
+    const [bathList, setBathList] = useState<any[]>([]);
+    const [batchOpen, setbatchOpen] = useState(false);
+    //编辑获取值
     useEffect(() => {
         if (searchParams.get('uid')) {
             planGet(searchParams.get('uid')).then((result) => {
                 if (result) {
                     setDetail(result);
-                    if (result.status !== 'PENDING') {
-                        getList();
-                        timer.current[0] = setInterval(() => {
-                            if (
-                                plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                    return (
-                                        item?.pictureStatus !== 'executing' &&
-                                        item?.pictureStatus !== 'init' &&
-                                        item?.copyWritingStatus !== 'executing' &&
-                                        item?.copyWritingStatus !== 'init'
-                                    );
-                                })
-                            ) {
-                                clearInterval(timer.current[0]);
-                            }
-                            getLists(1);
-                        }, 3000);
-                    }
+                    batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                        setBathTotal(res.total);
+                        setBathList(res.list);
+                    });
                 }
             });
         }
@@ -229,23 +213,23 @@ const BatcSmallRedBooks = () => {
             setPlanList(plabListRef.current);
         }
         if (searchParams.get('uid')) {
-            const res = await planModify({
-                name: value,
-                randomType: newData.randomType,
-                total: newData.total,
-                tags,
-                configuration: {
-                    ...newData,
-                    total: undefined,
-                    randomType: undefined,
-                    imageStyleList: undefined,
-                    variableList: schemesList
-                },
-                type: 'XHS',
+            try {
+                const res = await planModify({
+                    name: value,
+                    randomType: newData.randomType,
+                    total: newData.total,
+                    tags,
+                    configuration: {
+                        ...newData,
+                        total: undefined,
+                        randomType: undefined,
+                        imageStyleList: undefined,
+                        variableList: schemesList
+                    },
+                    type: 'XHS',
 
-                uid: searchParams.get('uid')
-            });
-            if (res) {
+                    uid: searchParams.get('uid')
+                });
                 uidRef.current = res;
                 dispatch(
                     openSnackbar({
@@ -261,44 +245,38 @@ const BatcSmallRedBooks = () => {
                     })
                 );
                 if (flag) {
-                    planExecute({ uid: searchParams.get('uid') }).then((res) => {
-                        if (res) {
-                            getList();
-                            timer.current[0] = setInterval(() => {
-                                if (
-                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                        return (
-                                            item?.pictureStatus !== 'executing' &&
-                                            item?.pictureStatus !== 'init' &&
-                                            item?.copyWritingStatus !== 'executing' &&
-                                            item?.copyWritingStatus !== 'init'
-                                        );
-                                    })
-                                ) {
-                                    clearInterval(timer.current[0]);
-                                }
-                                getLists(1);
-                            }, 3000);
-                        }
-                    });
+                    planExecute({ uid: searchParams.get('uid') })
+                        .then((res) => {
+                            if (res) {
+                                batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                                    setBathTotal(res.total);
+                                    setBathList(res.list);
+                                });
+                            }
+                        })
+                        .catch((err) => {
+                            setExeDisabled(false);
+                        });
                 }
+            } catch (err) {
+                setExeDisabled(false);
             }
         } else {
-            const res = await planCreate({
-                name: value,
-                randomType: newData.randomType,
-                total: newData.total,
-                tags,
-                configuration: {
-                    ...newData,
-                    total: undefined,
-                    randomType: undefined,
-                    imageStyleList: undefined,
-                    variableList: schemesList
-                },
-                type: 'XHS'
-            });
-            if (res) {
+            try {
+                const res = await planCreate({
+                    name: value,
+                    randomType: newData.randomType,
+                    total: newData.total,
+                    tags,
+                    configuration: {
+                        ...newData,
+                        total: undefined,
+                        randomType: undefined,
+                        imageStyleList: undefined,
+                        variableList: schemesList
+                    },
+                    type: 'XHS'
+                });
                 uidRef.current = res;
                 dispatch(
                     openSnackbar({
@@ -313,30 +291,19 @@ const BatcSmallRedBooks = () => {
                         close: false
                     })
                 );
-
                 navigate('/batchSmallRedBook?uid=' + res);
                 if (flag) {
                     planExecute({ uid: res }).then((result) => {
                         if (result) {
-                            getList();
-                            timer.current[0] = setInterval(() => {
-                                if (
-                                    plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                        return (
-                                            item?.pictureStatus !== 'executing' &&
-                                            item?.pictureStatus !== 'init' &&
-                                            item?.copyWritingStatus !== 'executing' &&
-                                            item?.copyWritingStatus !== 'init'
-                                        );
-                                    })
-                                ) {
-                                    clearInterval(timer.current[0]);
-                                }
-                                getLists(1);
-                            }, 3000);
+                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                                setBathTotal(res.total);
+                                setBathList(res.list);
+                            });
                         }
                     });
                 }
+            } catch (err) {
+                setExeDisabled(false);
             }
         }
     };
@@ -351,63 +318,72 @@ const BatcSmallRedBooks = () => {
         pageNo: 1,
         pageSize: 20
     });
+    const queryRef: any = useRef({ pageNo: 1, pageSize: 20 });
     const handleScroll = () => {
         const { current } = scrollRef;
         if (current) {
-            if (current.scrollHeight - current.scrollTop === current.clientHeight && queryPage.pageNo * queryPage.pageSize < total) {
-                setQueryPage({
-                    ...queryPage,
-                    pageNo: queryPage.pageNo + 1
-                });
+            if (
+                current.scrollHeight - current.scrollTop === current.clientHeight &&
+                queryRef.current.pageNo * queryRef.current.pageSize < total
+            ) {
+                queryRef.current = {
+                    pageNo: queryRef.current.pageNo + 1,
+                    pageSize: queryRef.current.pageSize
+                };
+                setQueryPage(queryRef.current);
             }
         }
     };
-    const getList = () => {
+    const getList = (batch?: string) => {
         getContentPage({
-            ...queryPage,
+            ...queryRef.current,
+            batch: batch || batchUid,
             planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
             setSuccessCount(res.successCount);
             setErrorCount(res.errorCount);
-            plabListRef.current = [...planList, ...res.list];
+            plabListRef.current = [...plabListRef.current, ...res.list];
             setPlanList(plabListRef.current);
+            setbatchOpen(false);
         });
     };
     const getLists = (pageNo: number) => {
         getContentPage({
-            ...queryPage,
+            ...queryRef.current,
             pageNo,
+            batch: batchUid,
             planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
             setSuccessCount(res.successCount);
             setErrorCount(res.errorCount);
             const newList = _.cloneDeep(plabListRef.current);
-            newList.splice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageSize, ...res.list);
+            newList.splice((queryRef.current.pageNo - 1) * queryRef.current.pageSize, queryRef.current.pageSize, ...res.list);
             plabListRef.current = newList;
             setPlanList(plabListRef.current);
+            setbatchOpen(false);
         });
     };
     useEffect(() => {
         if (queryPage.pageNo > 1) {
             getList();
-            timer.current[queryPage.pageNo - 1] = setInterval(() => {
-                if (
-                    plabListRef.current
-                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                        ?.every(
-                            (item: any) =>
-                                item?.pictureStatus !== 'executing' &&
-                                item?.pictureStatus !== 'init' &&
-                                item?.copyWritingStatus !== 'executing' &&
-                                item?.copyWritingStatus !== 'init'
-                        )
-                ) {
-                    clearInterval(timer.current[queryPage.pageNo - 1]);
-                }
-                getLists(queryPage.pageNo);
-            }, 3000);
+            if (
+                plabListRef.current
+                    .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                    ?.every(
+                        (item: any) =>
+                            item?.pictureStatus !== 'executing' &&
+                            item?.pictureStatus !== 'init' &&
+                            item?.copyWritingStatus !== 'executing' &&
+                            item?.copyWritingStatus !== 'init'
+                    )
+            ) {
+                timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                    getLists(queryPage.pageNo);
+                }, 3000);
+                clearInterval(timer.current[queryPage.pageNo - 1]);
+            }
         }
     }, [queryPage.pageNo]);
     //变量
@@ -448,37 +424,7 @@ const BatcSmallRedBooks = () => {
                                 setValue(e.target.value);
                             }}
                         />
-                        <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">1. 批量上传素材图片</div>
-                        <div className="text-[12px] font-[500] flex items-center justify-between">
-                            <div>图片总量：{imageList?.length}</div>
-                            {imageList?.length > 0 && (
-                                <Button
-                                    danger
-                                    onClick={() => {
-                                        setImageList([]);
-                                    }}
-                                    size="small"
-                                    type="text"
-                                >
-                                    全部清除
-                                </Button>
-                            )}
-                        </div>
-                        <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
-                                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
-                            </Modal>
-
-                            <div>
-                                <Upload {...props}>
-                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                        <PlusOutlined rev={undefined} />
-                                        <div style={{ marginTop: 8 }}>Upload</div>
-                                    </div>
-                                </Upload>
-                            </div>
-                        </div>
-                        <div className="text-[18px] font-[600] my-[20px]">2. 选择创作方案</div>
+                        <div className="text-[18px] font-[600] my-[20px]">1. 选择创作方案</div>
                         <FormControl error={targetKeysOpen && !targetKeys} color="secondary" size="small" fullWidth>
                             <InputLabel id="example">选择文案模版</InputLabel>
                             <Select
@@ -499,10 +445,68 @@ const BatcSmallRedBooks = () => {
                             </Select>
                             <FormHelperText>{targetKeysOpen && !targetKeys ? '请选择文案模板' : ''}</FormHelperText>
                         </FormControl>
-
                         {targetKeys && (
                             <>
-                                <div className="text-[18px] font-[600] mt-[20px]">3. 标签</div>
+                                <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">2. 批量上传素材图片</div>
+                                <div className="text-[12px] font-[500] flex items-center justify-between">
+                                    <div>图片总量：{imageList?.length}</div>
+                                    {imageList?.length > 0 && (
+                                        <Button
+                                            danger
+                                            onClick={() => {
+                                                setImageList([]);
+                                            }}
+                                            size="small"
+                                            type="text"
+                                        >
+                                            全部清除
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                                    <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
+                                        <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                                    </Modal>
+                                    <div>
+                                        <Upload {...props}>
+                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                <PlusOutlined rev={undefined} />
+                                                <div style={{ marginTop: 8 }}>Upload</div>
+                                            </div>
+                                        </Upload>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
+                                    <div className="text-[14px] font-[600] mt-[10px]">
+                                        {mockData.filter((value) => value.uid === targetKeys)[0]?.name}
+                                        <span
+                                            onClick={() => {
+                                                navigate(
+                                                    `/copywritingModal?uid=${mockData?.filter((val) => val?.uid === targetKeys)[0]?.uid}`
+                                                );
+                                            }}
+                                            className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
+                                        >
+                                            查看方案
+                                        </span>
+                                    </div>
+                                    {schemesList?.map((item, de) => (
+                                        <Form
+                                            key={item?.field}
+                                            item={item}
+                                            index={de}
+                                            changeValue={(data: any) => {
+                                                const newData = _.cloneDeep(schemeRef.current);
+                                                newData[de].value = data.value;
+                                                schemeRef.current = newData;
+                                                setSchemeList(schemeRef.current);
+                                            }}
+                                            flag={false}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="text-[18px] font-[600] mt-[20px]">4. 标签</div>
                                 <FormControl
                                     key={tags}
                                     error={(!tags || tags?.length === 0) && tagOpen}
@@ -550,78 +554,43 @@ const BatcSmallRedBooks = () => {
                                     />
                                     <FormHelperText>{(!tags || tags?.length === 0) && tagOpen ? '标签最少输入一个' : ''}</FormHelperText>
                                 </FormControl>
+
+                                <div className="text-[18px] font-[600] my-[20px]">5. 批量生成参数</div>
+                                <div>
+                                    <Radio.Group
+                                        value={detailData?.randomType}
+                                        onChange={(e: RadioChangeEvent) => {
+                                            const newData = _.cloneDeep(detailData);
+                                            newData.randomType = e.target.value;
+                                            setDetailData(newData);
+                                        }}
+                                    >
+                                        <Radio value="RANDOM">全部随机</Radio>
+                                        {/* <Radio value="SEQUENCE">按顺序</Radio> */}
+                                    </Radio.Group>
+                                </div>
+                                <div className="mt-[20px]">生成数量：</div>
+                                <InputNumber
+                                    size="large"
+                                    value={detailData?.total}
+                                    onChange={(e: any) => {
+                                        const newData = _.cloneDeep(detailData);
+                                        newData.total = e;
+                                        setDetailData(newData);
+                                    }}
+                                    min={1}
+                                    max={100}
+                                    className="w-full"
+                                />
                             </>
                         )}
-                        {targetKeys && (
-                            <div>
-                                <div className="text-[18px] font-[600] mt-[20px]">4. 方案参数</div>
-                                <div className="text-[14px] font-[600] mt-[10px]">
-                                    {mockData.filter((value) => value.uid === targetKeys)[0]?.name}
-                                    <span
-                                        onClick={() => {
-                                            navigate(`/copywritingModal?uid=${mockData?.filter((val) => val?.uid === targetKeys)[0]?.uid}`);
-                                        }}
-                                        className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
-                                    >
-                                        查看方案
-                                    </span>
-                                </div>
-                                {schemesList?.map((item, de) => (
-                                    <Form
-                                        key={item?.field}
-                                        item={item}
-                                        index={de}
-                                        changeValue={(data: any) => {
-                                            const newData = _.cloneDeep(schemeRef.current);
-                                            newData[de].value = data.value;
-                                            schemeRef.current = newData;
-                                            setSchemeList(schemeRef.current);
-                                        }}
-                                        flag={false}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                        <div className="text-[18px] font-[600] my-[20px]">5. 批量生成参数</div>
-                        <div>
-                            <Radio.Group
-                                value={detailData?.randomType}
-                                onChange={(e: RadioChangeEvent) => {
-                                    const newData = _.cloneDeep(detailData);
-                                    newData.randomType = e.target.value;
-                                    setDetailData(newData);
-                                }}
-                            >
-                                <Radio value="RANDOM">全部随机</Radio>
-                                {/* <Radio value="SEQUENCE">按顺序</Radio> */}
-                            </Radio.Group>
-                        </div>
-                        <div className="mt-[20px]">生成数量：</div>
-                        <InputNumber
-                            size="large"
-                            value={detailData?.total}
-                            onChange={(e: any) => {
-                                const newData = _.cloneDeep(detailData);
-                                newData.total = e;
-                                setDetailData(newData);
-                            }}
-                            min={1}
-                            max={100}
-                            className="w-full"
-                        />
                     </div>
                     <div className="z-100 absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] w-[100%]">
-                        <Button
-                            className="w-full"
-                            disabled={exedisabled || (detailData.status && detailData.status !== 'PENDING' ? true : false)}
-                            icon={<SaveOutlined rev={undefined} />}
-                            onClick={() => handleSave(false)}
-                            type="primary"
-                        >
+                        <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSave(false)} type="primary">
                             保存配置
                         </Button>
                         <Button
-                            disabled={exedisabled || (detailData.status && detailData.status !== 'PENDING' ? true : false)}
+                            disabled={exedisabled || (detailData.status && detailData.status === 'RUNNING' ? true : false)}
                             className="w-full"
                             type="primary"
                             onClick={() => handleSave(true)}
@@ -631,7 +600,7 @@ const BatcSmallRedBooks = () => {
                     </div>
                 </Col>
                 <Col span={18} className="overflow-hidden">
-                    {planList?.length === 0 ? (
+                    {/* {planList?.length === 0 ? (
                         <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                             <div className="text-center">
                                 <img
@@ -643,64 +612,89 @@ const BatcSmallRedBooks = () => {
                                 <div>在左侧输入你的创意吧</div>
                             </div>
                         </div>
-                    ) : (
-                        <>
-                            <SubCard contentSX={{ p: '10px !important' }}>
-                                {/* <Tag
-                                    className="mr-[10px]"
-                                    color={
-                                        detailData.status === 'PENDING'
-                                            ? 'default'
-                                            : detailData.status === 'RUNNING'
-                                            ? 'green'
-                                            : detailData.status === 'PAUSE'
-                                            ? 'warning'
-                                            : detailData.status === 'CANCELED'
-                                            ? 'warning'
-                                            : detailData.status === 'COMPLETE'
-                                            ? 'blue'
-                                            : detailData.status === 'FAILURE'
-                                            ? 'error'
-                                            : 'default'
+                    ) : ( */}
+                    <>
+                        <Collapse
+                            onChange={(e: any) => {
+                                plabListRef.current = [];
+                                setPlanList([]);
+                                if (e.length > 0) {
+                                    setbatchOpen(true);
+                                    queryRef.current = {
+                                        pageNo: 1,
+                                        pageSize: 20
+                                    };
+                                    setQueryPage(queryRef.current);
+                                    setBatchUid(e[0]);
+                                    if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
+                                        getList(e[0]);
+                                    } else {
+                                        getList(e[0]);
+                                        timer.current[0] = setInterval(() => {
+                                            if (
+                                                plabListRef.current?.length === 0 ||
+                                                plabListRef.current.slice(0, 1)?.every((item: any) => {
+                                                    return (
+                                                        item?.pictureStatus !== 'executing' &&
+                                                        item?.pictureStatus !== 'init' &&
+                                                        item?.copyWritingStatus !== 'executing' &&
+                                                        item?.copyWritingStatus !== 'init'
+                                                    );
+                                                })
+                                            ) {
+                                                clearInterval(timer.current[0]);
+                                            }
+                                            getLists(1);
+                                        }, 3000);
                                     }
-                                >
-                                    {detailData.status === 'PENDING'
-                                        ? '待执行'
-                                        : detailData.status === 'RUNNING'
-                                        ? '执行中'
-                                        : detailData.status === 'PAUSE'
-                                        ? '已暂停'
-                                        : detailData.status === 'CANCELED'
-                                        ? '已取消'
-                                        : detailData.status === 'COMPLETE'
-                                        ? '已完成'
-                                        : detailData.status === 'FAILURE'
-                                        ? '已失败'
-                                        : ''}
-                                </Tag> */}
-                                <span className="font-[600]">生成成功数：</span>
-                                {successCount}&nbsp;&nbsp;
-                                <span className="font-[600]">生成失败数：</span>
-                                {errorCount}&nbsp;&nbsp;
-                                <span className="font-[600]">生成总数：</span>
-                                {total}
-                            </SubCard>
-                            <div
-                                className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
-                                ref={scrollRef}
-                                onScroll={handleScroll}
-                                style={{ height: 'calc(100vh - 270px)' }}
-                            >
-                                <Row gutter={20} className="h-[fit-content] w-full">
-                                    {planList.map((item, index: number) => (
-                                        <Col key={index} span={6} className="inline-block">
-                                            <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} />
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </div>
-                        </>
-                    )}
+                                }
+                            }}
+                            items={bathList?.map((item) => {
+                                return {
+                                    key: item.batch,
+                                    label: (
+                                        <div className="w-full flex justify-between items-center text-sm pr-[20px]">
+                                            <div className="">
+                                                <span className="font-[600]">生成时间：</span>
+                                                {dayjs(item?.endTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                            </div>
+                                            <div>
+                                                <span className="font-[600]">生成成功数：</span>
+                                                {item?.successCount}&nbsp;&nbsp;
+                                                <span className="font-[600]">生成失败数：</span>
+                                                {item?.failureCount}&nbsp;&nbsp;
+                                                <span className="font-[600]">生成总数：</span>
+                                                {item?.totalCount}
+                                            </div>
+                                        </div>
+                                    ),
+                                    children: (
+                                        <Spin spinning={batchOpen}>
+                                            <div
+                                                className="h-[200px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                                ref={scrollRef}
+                                                onScroll={handleScroll}
+                                            >
+                                                <Row gutter={20} className="h-[fit-content] w-full">
+                                                    {planList.map((item1, index: number) => (
+                                                        <Col key={index} xs={12} md={12} xl={8} xxl={6} className="inline-block">
+                                                            <Goods
+                                                                item={item}
+                                                                setBusinessUid={setBusinessUid}
+                                                                setDetailOpen={setDetailOpen}
+                                                            />
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                            </div>
+                                        </Spin>
+                                    )
+                                };
+                            })}
+                            accordion
+                        />
+                    </>
+                    {/* )} */}
                 </Col>
             </Row>
             {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}

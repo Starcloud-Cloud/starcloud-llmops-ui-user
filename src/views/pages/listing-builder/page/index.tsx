@@ -25,6 +25,7 @@ import { config } from 'utils/axios/config';
 import axios from 'axios';
 import { getAccessToken } from 'utils/auth';
 import StorageCache from 'web-storage-cache';
+import { useAllDetail } from '../../../../contexts/JWTContext';
 const { base_url } = config;
 
 export interface DraftConfig {}
@@ -146,8 +147,10 @@ const ListingBuilderPage: React.FC = () => {
 
     const storage = new StorageCache();
     const [videoOpne, setVideoOpen] = useState(false);
+    const all_detail = useAllDetail();
+
     useEffect(() => {
-        if (!storage.get('video')) {
+        if (!storage.get(`video-${all_detail?.allDetail.id}`)) {
             setVideoOpen(true);
         }
     }, []);
@@ -611,7 +614,7 @@ const ListingBuilderPage: React.FC = () => {
                 >
                     <IconButton
                         onClick={() => {
-                            storage.set('video', 1);
+                            storage.set(`video-${all_detail?.allDetail.id}`, 1);
                             setVideoOpen(false);
                         }}
                         size="large"

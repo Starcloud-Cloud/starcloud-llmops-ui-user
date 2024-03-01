@@ -248,160 +248,175 @@ const plansDefault = (value: number) => [
 ];
 
 const planListDefault = (value: number) => [
-    [
-        '签到可免费获得2魔法豆', // 0
-        '签到可免费获取图片1张', // 1
-        'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
-        '个人空间',
-        '1个自定义应用', // 4
-        '1个自定义机器人', // 4
-        '1个微信群机器人', // 4
-        '多渠道发布机器人客服', // 4
-        '上传信息库/文档问答', // 4
-        '每个机器人1个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '3000魔法豆' : '36000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 300 : 3600}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        <div className="flex items-center">
-            <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔法豆'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '个人空间',
-        <div className="flex items-center">
-            <span>5个自定义应用</span>
-            <Tooltip title={'可自定义提示词应用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>5个自定义机器人</span>
-            <Tooltip title={'可自定义自己的问答机器人'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>1个微信群机器人</span>
-            <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>多渠道发布机器人客服</span>
-            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>上传信息库/文档问答</span>
-            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
+    {
+        keyword: 'free',
+        value: [
+            '签到可免费获得2魔法豆', // 0
+            '签到可免费获取图片1张', // 1
+            'GPT-3.5/开源模型', // 2
+            'GPT-4', // 3
+            '个人空间',
+            '1个自定义应用', // 4
+            '1个自定义机器人', // 4
+            '1个微信群机器人', // 4
+            '多渠道发布机器人客服', // 4
+            '上传信息库/文档问答', // 4
+            '每个机器人1个文档上传', // 4
+            'Google/Amazon联网查询', // 5
+            '机器人插件扩展' // 6
+        ]
+    },
+    {
+        keyword: 'basic',
+        value: [
+            <div className="flex items-center">
+                <span>{value === 1 ? '3000魔法豆' : '36000魔法豆'}</span>
+                <Tooltip title={'执行应用或聊天消耗一点'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>, // 0
+            `生成图片${value === 1 ? 300 : 3600}张`, // 1
+            'GPT-3.5/开源模型', // 2
+            <div className="flex items-center">
+                <span>GPT-4</span>
+                <Tooltip title={'消耗30点魔法豆'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            '个人空间',
+            <div className="flex items-center">
+                <span>5个自定义应用</span>
+                <Tooltip title={'可自定义提示词应用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>5个自定义机器人</span>
+                <Tooltip title={'可自定义自己的问答机器人'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>1个微信群机器人</span>
+                <Tooltip title={'机器人可发布到微信群使用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>多渠道发布机器人客服</span>
+                <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>上传信息库/文档问答</span>
+                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
 
-        '每个机器人5个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '1个机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '10000魔法豆' : '120000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 1000 : 12000}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        <div className="flex items-center">
-            <span>GPT-4</span>
-            <Tooltip title={'消耗30点魔法豆'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>个人空间</span>
-            <Tooltip title={'可邀请3名好友在空间创作'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>20个自定义应用</span>
-            <Tooltip title={'可自定义提示词应用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>20个自定义机器人</span>
-            <Tooltip title={'可自定义自己的问答机器人'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>10个微信群机器人</span>
-            <Tooltip title={'机器人可发布到微信群使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>多渠道发布机器人客服</span>
-            <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        <div className="flex items-center">
-            <span>上传信息库/文档问答</span>
-            <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '每个机器人20个文档上传', // 4
-        'Google/Amazon联网查询', // 5
-        '3个机器人插件扩展' // 6
-    ],
-    [
-        <div className="flex items-center">
-            <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
-            <Tooltip title={'执行应用或聊天消耗一点'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>, // 0
-        `生成图片${value === 1 ? 2000 : 24000}张`, // 1
-        'GPT-3.5/开源模型', // 2
-        'GPT-4', // 3
-        <div className="flex items-center">
-            <span>个人空间</span>
-            <Tooltip title={'可邀请6名好友在空间创作'}>
-                <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-            </Tooltip>
-        </div>,
-        '无限自定义应用', // 4
-        '无限自定义机器人', // 4
-        '无限个微信群机器人', // 4
-        '多渠道发布机器人客服', // 4
-        '上传信息库/文档问答', // 4
-        '无限文档上传', // 4
-        'Google/Amazon联网查询', // 4
-        '10个机器人插件扩展' // 5
-    ],
-    [
-        '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
-        '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
-        '私有的企业知识库存储空间', // 2
-        '按需提供企业所需的数据接入和发布方式', // 3
-        '定制化的联网查询/企业数据查询', // 4
-        '个性化域名' // 6
-    ]
+            '每个机器人5个文档上传', // 4
+            'Google/Amazon联网查询', // 5
+            '1个机器人插件扩展' // 6
+        ]
+    },
+    {
+        keyword: 'plus',
+        value: [
+            <div className="flex items-center">
+                <span>{value === 1 ? '10000魔法豆' : '120000魔法豆'}</span>
+                <Tooltip title={'执行应用或聊天消耗一点'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>, // 0
+            `生成图片${value === 1 ? 1000 : 12000}张`, // 1
+            'GPT-3.5/开源模型', // 2
+            <div className="flex items-center">
+                <span>GPT-4</span>
+                <Tooltip title={'消耗30点魔法豆'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>个人空间</span>
+                <Tooltip title={'可邀请3名好友在空间创作'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>20个自定义应用</span>
+                <Tooltip title={'可自定义提示词应用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>20个自定义机器人</span>
+                <Tooltip title={'可自定义自己的问答机器人'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>10个微信群机器人</span>
+                <Tooltip title={'机器人可发布到微信群使用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>多渠道发布机器人客服</span>
+                <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            <div className="flex items-center">
+                <span>上传信息库/文档问答</span>
+                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            '每个机器人20个文档上传', // 4
+            'Google/Amazon联网查询', // 5
+            '3个机器人插件扩展' // 6
+        ]
+    },
+    {
+        keyword: 'pro',
+        value: [
+            <div className="flex items-center">
+                <span>{value === 1 ? '25000魔法豆' : '300000魔法豆'}</span>
+                <Tooltip title={'执行应用或聊天消耗一点'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>, // 0
+            `生成图片${value === 1 ? 2000 : 24000}张`, // 1
+            'GPT-3.5/开源模型', // 2
+            'GPT-4', // 3
+            <div className="flex items-center">
+                <span>个人空间</span>
+                <Tooltip title={'可邀请6名好友在空间创作'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            '无限自定义应用', // 4
+            '无限自定义机器人', // 4
+            '无限个微信群机器人', // 4
+            '多渠道发布机器人客服', // 4
+            '上传信息库/文档问答', // 4
+            '无限文档上传', // 4
+            'Google/Amazon联网查询', // 4
+            '10个机器人插件扩展' // 5
+        ]
+    },
+    {
+        keyword: 'business',
+        value: [
+            '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
+            '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
+            '私有的企业知识库存储空间', // 2
+            '按需提供企业所需的数据接入和发布方式', // 3
+            '定制化的联网查询/企业数据查询', // 4
+            '个性化域名' // 6
+        ]
+    }
 ];
 
 // ===============================|| PRICING - PRICE 1 ||=============================== //
@@ -410,7 +425,7 @@ let interval: any;
 
 const Price1 = () => {
     const [planList, setPlanList] = useState<any[]>(planListDefault(1));
-    const [plans, setPlans] = useState<any[]>(plansDefault(1));
+    const [plans, setPlans] = useState<any[]>([]);
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
@@ -795,6 +810,7 @@ const Price1 = () => {
         }
     };
 
+    console.log('plans', plans);
     return (
         <div>
             <HeaderWrapper id="vip">
@@ -817,7 +833,7 @@ const Price1 = () => {
                             加油包购买
                         </span> */}
                     </div>
-                    <Grid container spacing={gridSpacing} columns={20}>
+                    <Grid container spacing={gridSpacing} columns={20} className="flex justify-center min-h-[1000px]">
                         {plans.map((plan, index) => {
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
@@ -977,22 +993,24 @@ const Price1 = () => {
                                                     }}
                                                     component="ul"
                                                 >
-                                                    {planList?.[index]?.map((list: any, i: number) => (
-                                                        <React.Fragment key={i}>
-                                                            <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
-                                                                <ListItemIcon>
-                                                                    <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                                                </ListItemIcon>
-                                                                <ListItemText
-                                                                    sx={{
-                                                                        '& .tips': { fill: '#000' }
-                                                                    }}
-                                                                    primary={list}
-                                                                />
-                                                            </ListItem>
-                                                            <Divider />
-                                                        </React.Fragment>
-                                                    ))}
+                                                    {planList
+                                                        ?.find((item) => item.keyword === plan.keyword)
+                                                        .value?.map((list: any, i: number) => (
+                                                            <React.Fragment key={i}>
+                                                                <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
+                                                                    <ListItemIcon>
+                                                                        <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                                                    </ListItemIcon>
+                                                                    <ListItemText
+                                                                        sx={{
+                                                                            '& .tips': { fill: '#000' }
+                                                                        }}
+                                                                        primary={list}
+                                                                    />
+                                                                </ListItem>
+                                                                <Divider />
+                                                            </React.Fragment>
+                                                        ))}
                                                 </List>
                                             </Grid>
                                         </Grid>

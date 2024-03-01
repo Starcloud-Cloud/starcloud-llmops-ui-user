@@ -26,6 +26,7 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
                     className="w-[365px]"
                     src={vipModal}
                     onClick={() => {
+                        onClose();
                         navigate('/subscribe');
                     }}
                 />
@@ -73,6 +74,7 @@ export const NewUserVip = ({ onClose }: { onClose: any }) => {
 
                 <div
                     onClick={() => {
+                        onClose();
                         navigate('/subscribe');
                     }}
                     className={'absolute  bottom-[40px] text-[#1d0b04] left-[143px] text-xl cursor-pointer font-semibold'}

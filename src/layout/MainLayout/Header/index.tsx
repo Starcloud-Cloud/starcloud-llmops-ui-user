@@ -36,6 +36,7 @@ import { isMobile } from 'react-device-detect';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { useAllDetail } from '../../../contexts/JWTContext';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -59,6 +60,7 @@ const Header = () => {
 
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const { layout } = useConfig();
+    const allDetail = useAllDetail();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -79,17 +81,19 @@ const Header = () => {
     };
 
     useEffect(() => {
-        const dateTime = localStorage.getItem('tipsEndTime');
-        if (dateTime) {
-            if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                setLogoPopoverOpen(true);
+        if (allDetail?.allDetail?.id) {
+            const dateTime = localStorage.getItem(`tipsEndTime-${allDetail?.allDetail?.id}`);
+            if (dateTime) {
+                if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                    setLogoPopoverOpen(true);
+                } else {
+                    setLogoPopoverOpen(false);
+                }
             } else {
-                setLogoPopoverOpen(false);
+                setLogoPopoverOpen(true);
             }
-        } else {
-            setLogoPopoverOpen(true);
         }
-    }, []);
+    }, [allDetail]);
 
     useEffect(() => {
         const tabIndex = Number(localStorage.getItem('routesIndex') || '0');
@@ -120,7 +124,7 @@ const Header = () => {
                             <span
                                 onClick={() => {
                                     const tipsEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
-                                    localStorage.setItem('tipsEndTime', tipsEndTime);
+                                    localStorage.setItem(`tipsEndTime-${allDetail?.allDetail?.id}`, tipsEndTime);
                                     setLogoPopoverOpen(false);
                                 }}
                             >

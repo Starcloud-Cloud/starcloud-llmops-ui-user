@@ -624,7 +624,7 @@
       "signupwithemail": "邮箱注册",
       "emailrequired": "邮箱为必填项",
       "passwordrequired": "密码为必填项",
-      "successful": "激活链接已发送至邮箱,请前往激活",
+      "successful": "激活链接已发送至邮箱,请前往激活。",
       "tologin": "立即登录！",
       "checkTreaty": "请同意下方协议&条款"
     },

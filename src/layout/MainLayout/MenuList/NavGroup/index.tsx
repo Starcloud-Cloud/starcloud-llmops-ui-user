@@ -206,6 +206,15 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                                                             fill="#f82307"
                                                         ></path>
                                                     </svg>
+
+                                                    <span
+                                                        onClick={() => {
+                                                            window.open('https://mp.weixin.qq.com/s/3ZbMV0WQmyV58kIuwn748A');
+                                                        }}
+                                                        className={'cursor-pointer font-[10px] text-[#1d4ed8] ml-1'}
+                                                    >
+                                                        使用教程
+                                                    </span>
                                                 </div>
                                             ) : (
                                                 currentItem.title

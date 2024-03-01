@@ -1,25 +1,45 @@
-import { Button, Tabs, Popover, Input } from 'antd';
+import { Button, Tabs, Popover, Switch } from 'antd';
 import { TextField, IconButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 interface Tabs {
+    mode: string;
+    setModel: (data: any) => void;
     imageStyleData: any;
     setImageStyleData: (data: any) => void;
     focuActive: any[];
     setFocuActive: (data: any) => void;
     digui: () => number;
 }
-const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
-    const { TextArea } = Input;
+const CreateTab = ({ mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
     return (
         <div>
+            <div className="flex items-center gap-4 min-h-[32px]">
+                <span>海报生成模式</span>
+                <Switch
+                    checked={mode === 'SEQUENCE' ? true : false}
+                    onChange={(e) => {
+                        let newData = _.cloneDeep(mode);
+                        if (e) {
+                            newData = 'SEQUENCE';
+                        } else {
+                            newData = 'RANDOM';
+                        }
+                        setModel(newData);
+                    }}
+                />
+                <span className="text-[#673ab7]">{mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}</span>
+            </div>
             <div className="flex items-end mb-[20px]">
                 <Button
                     onClick={() => {
-                        const newData = _.cloneDeep(imageStyleData);
+                        let newData = _.cloneDeep(imageStyleData);
+                        if (!newData) {
+                            newData = [];
+                        }
                         newData.push({
                             name: `风格 ${digui()}`,
                             key: digui().toString(),
@@ -30,6 +50,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                     name: '首图',
                                     model: '',
                                     titleGenerateMode: 'DEFAULT',
+                                    mode: 'SEQUENCE',
                                     variableList: []
                                 }
                             ]
@@ -52,7 +73,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
             </div>
             <Tabs
                 tabPosition="left"
-                items={imageStyleData.map((item: any, i: number) => {
+                items={imageStyleData?.map((item: any, i: number) => {
                     return {
                         label: (
                             <div>
@@ -94,7 +115,6 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
                                             variant="standard"
                                         />
                                     )}
-
                                     <div>
                                         <Popover
                                             zIndex={9999}
@@ -139,6 +159,7 @@ const CreateTab = ({ imageStyleData, setImageStyleData, focuActive, setFocuActiv
 };
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.mode) === JSON.stringify(nextProps?.mode) &&
         JSON.stringify(prevProps?.imageStyleData) === JSON.stringify(nextProps?.imageStyleData) &&
         JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive)
     );

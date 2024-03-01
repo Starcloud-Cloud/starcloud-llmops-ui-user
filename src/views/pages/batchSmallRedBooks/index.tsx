@@ -616,6 +616,10 @@ const BatcSmallRedBooks = () => {
                     <>
                         <Collapse
                             onChange={(e: any) => {
+                                timer.current?.map((item: any) => {
+                                    clearInterval(item);
+                                });
+                                timer.current = [];
                                 plabListRef.current = [];
                                 setPlanList([]);
                                 if (e.length > 0) {
@@ -656,7 +660,7 @@ const BatcSmallRedBooks = () => {
                                         <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                             <div className="">
                                                 <span className="font-[600]">生成时间：</span>
-                                                {dayjs(item?.endTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                                {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
                                             </div>
                                             <div>
                                                 <span className="font-[600]">生成成功数：</span>

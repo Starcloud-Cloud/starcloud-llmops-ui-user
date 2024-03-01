@@ -14,8 +14,6 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
     const [tempList, setTempList] = React.useState<any>([]);
     const [imageTypeList, setImageTypeList] = React.useState<any[]>([]);
     const handleOk = (temp: any) => {
-        console.log(temp);
-
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
         newData.id = temp.id;

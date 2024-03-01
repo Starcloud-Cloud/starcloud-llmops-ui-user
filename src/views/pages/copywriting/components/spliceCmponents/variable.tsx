@@ -25,14 +25,21 @@ interface Variable {
 }
 
 const CreateVariable = ({ rows, setRows }: Variable) => {
+    console.log(rows);
+
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
     const [itemData, setItemData] = useState<any>({});
     const saveContent = (data: any) => {
         if (title === '增加变量') {
-            setRows([...rows, data]);
-            setVariableOpen(false);
+            if (rows) {
+                setRows([...rows, data]);
+                setVariableOpen(false);
+            } else {
+                setRows([data]);
+                setVariableOpen(false);
+            }
         } else {
             const newList = _.cloneDeep(rows);
             newList[varIndex] = data;

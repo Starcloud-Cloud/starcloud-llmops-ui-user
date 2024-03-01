@@ -34,6 +34,7 @@ import CreateVariables from './spliceCmponents/variables';
 import CreateTab from './spliceCmponents/tab';
 import Goods from '../../batchSmallRedBooks/good';
 import { getContentPage } from 'api/redBook';
+import Form from '../../smallRedBook/components/form';
 const AddModal = () => {
     const { TextArea } = Input;
     const permissions = useUserStore((state) => state.permissions);
@@ -650,19 +651,41 @@ const AddModal = () => {
                             <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
                             <div className="text-xs mt-[10px]">{splitList?.find((item) => item.appUid === splitValue)?.description}</div>
                         </div>
+                        <div></div>
                     </div>
                 )}
                 {current === 1 && (
-                    <CreateVariable
-                        rows={valueList?.filter((item) => item.code === 'VariableActionHandler')[0]?.variableList}
-                        setRows={(data: any[]) =>
-                            setValues(
-                                'variableList',
-                                data,
-                                valueList?.findIndex((item) => item.code === 'VariableActionHandler')
-                            )
-                        }
-                    />
+                    <>
+                        <Row gutter={20}>
+                            {valueList
+                                ?.find((el) => el.code === 'VariableActionHandler')
+                                ?.variableList?.map((item: any, de: number) => (
+                                    <Col key={item?.field} xs={24} sm={12} lg={6}>
+                                        <Form
+                                            item={item}
+                                            index={de}
+                                            changeValue={(data: any) => {
+                                                const newList = _.cloneDeep(valueList);
+                                                const num = valueList?.findIndex((item) => item.code === 'VariableActionHandler');
+                                                newList[num].variableList[data?.index].value = data.value;
+                                                setValueList(newList);
+                                            }}
+                                            flag={false}
+                                        />
+                                    </Col>
+                                ))}
+                        </Row>
+                        <CreateVariable
+                            rows={valueList?.find((item) => item.code === 'VariableActionHandler')?.variableList}
+                            setRows={(data: any[]) =>
+                                setValues(
+                                    'variableList',
+                                    data,
+                                    valueList?.findIndex((item) => item.code === 'VariableActionHandler')
+                                )
+                            }
+                        />
+                    </>
                 )}
                 {current === 2 && (
                     <Collapse

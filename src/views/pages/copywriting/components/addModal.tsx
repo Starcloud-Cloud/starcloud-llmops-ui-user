@@ -3,9 +3,6 @@ import {
     CardContent,
     TextField,
     FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     FormHelperText,
     CardActions,
     Grid,
@@ -13,52 +10,31 @@ import {
     Autocomplete,
     Chip,
     Box,
-    Typography,
-    FormLabel
+    Typography
 } from '@mui/material';
 import { InputNumber, Radio, Row, Col } from 'antd';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-    UploadProps,
-    Upload,
-    Table,
-    Button,
-    Divider,
-    Tabs,
-    Popover,
-    Image,
-    TreeSelect,
-    Input,
-    Popconfirm,
-    Spin,
-    Modal,
-    Collapse,
-    Tag
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { PlusOutlined, DeleteOutlined, LeftOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { UploadProps, Upload, Button, Divider, Image, TreeSelect, Input, Modal, Collapse, Steps } from 'antd';
+import { PlusOutlined, HomeOutlined, ContainerOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeDemand, schemeExample, appList } from 'api/redBook/copywriting';
-import StyleTabs from './styleTabs';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeExample, appList } from 'api/redBook/copywriting';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import copywriting from 'store/copywriting';
 import '../index.scss';
-import { t } from 'hooks/web/useI18n';
 import useUserStore from 'store/user';
 import CreateTable from './spliceCmponents/table';
 import CreateVariable from './spliceCmponents/variable';
+import CreateVariables from './spliceCmponents/variables';
 import CreateTab from './spliceCmponents/tab';
 import Goods from '../../batchSmallRedBooks/good';
 import { getContentPage } from 'api/redBook';
-type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
+import Form from '../../smallRedBook/components/form';
 const AddModal = () => {
     const { TextArea } = Input;
     const permissions = useUserStore((state) => state.permissions);
@@ -79,9 +55,6 @@ const AddModal = () => {
             [data.name]: data.value
         });
     };
-    const [paragraphCount, setparagraphCount] = useState<null | number>(1);
-    //风格类型
-    const [typeList, setTypeList] = useState<any[]>([]);
     //类目列表
     const [categoryList, setCategoryList] = useState<any[]>([]);
     //参考来源列表
@@ -90,33 +63,6 @@ const AddModal = () => {
     const [tableData, setTableData] = useState<any[]>([]);
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
-    const [imageStyleData, setImageStyleData] = useState<any[]>([
-        {
-            name: '风格 1',
-            key: '1',
-            id: '1',
-            templateList: [
-                {
-                    key: '1',
-                    name: '首图',
-                    model: '',
-                    variableList: []
-                }
-            ]
-        }
-    ]);
-
-    const digui = () => {
-        const newData = imageStyleData.map((item) => item.name.split(' ')[1]);
-        if (newData.every((item) => !item)) {
-            return 1;
-        }
-        return newData?.sort((a, b) => b - a)[0] * 1 + 1;
-    };
-
-    //文案生成模板
-    const copyWritingTemplateRef: any = useRef({});
-    const [copyWritingTemplate, setCopyWritingTemplate] = useState<any>({});
 
     useEffect(() => {
         // imageTemplates().then((res) => {
@@ -144,32 +90,9 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    // if (res.mode !== 'CUSTOM_IMAGE_TEXT') {
-                    //     setRows(res.configuration?.copyWritingTemplate?.variableList);
-                    //     setTableData(res.refers);
-                    //     setTestImageList(
-                    //         res.useImages?.map((item: any) => {
-                    //             return {
-                    //                 uid: uuidv4(),
-                    //                 thumbUrl: item,
-                    //                 response: {
-                    //                     data: {
-                    //                         url: item
-                    //                     }
-                    //                 }
-                    //             };
-                    //         })
-                    //     );
-                    //     setTestTableList(res.configuration.copyWritingTemplate.example);
-                    //     copyWritingTemplateRef.current = res.configuration.copyWritingTemplate;
-                    //     setCopyWritingTemplate(copyWritingTemplateRef.current);
-                    //     setImageStyleData(res.configuration.imageTemplate.styleList);
-                    //     setparagraphCount(res.configuration.paragraphCount);
-                    // } else {
-                    setSplitValue(res.customConfiguration?.appUid);
-                    valueListRef.current = res.customConfiguration?.steps;
+                    setSplitValue(res.configuration?.appUid);
+                    valueListRef.current = res.configuration?.steps;
                     setValueList(valueListRef.current);
-                    // }
                 }
             });
         } else {
@@ -181,37 +104,6 @@ const AddModal = () => {
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [pre, setPre] = useState(1);
 
-    const valueRef: any = useRef('');
-    const [valueLoading, setValueLoading] = useState(false);
-    const [buttonLoading, setButtonLoading] = useState(false);
-    const testColumn: ColumnsType<any> = [
-        {
-            title: '标题',
-            render: (_, row, index) => <span>{row?.copyWriting?.title}</span>
-        },
-        {
-            title: '内容',
-            render: (_, row) => <span>{row?.copyWriting?.content}</span>
-        },
-        {
-            title: '图片标题',
-            render: (_, row) => <span>{row?.copyWriting?.imgTitle}</span>
-        },
-        {
-            title: '图片副标题',
-            render: (_, row) => <span>{row?.copyWriting?.imgSubTitle}</span>
-        },
-        {
-            title: '图片内容',
-            render: (_, row) => (
-                <div className="flex gap-2">
-                    {row?.imageList?.map((item: any) => (
-                        <Image width={50} height={50} key={item?.url} src={item?.url} preview={false} />
-                    ))}
-                </div>
-            )
-        }
-    ];
     //测试
     const [testOpen, setTestOpen] = useState(false);
     //测试图片上传
@@ -272,232 +164,8 @@ const AddModal = () => {
             content
         };
     };
-    //校验
-    const verify = (flag?: boolean) => {
-        if (!params.name) {
-            setTitleOpen(true);
-            setCategoryOpen(true);
-            setTagOpen(true);
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '方案名称必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!params.category) {
-            setTitleOpen(true);
-            setCategoryOpen(true);
-            setTagOpen(true);
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '类目必选',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!params.tags || params.tags?.length === 0) {
-            setTitleOpen(true);
-            setCategoryOpen(true);
-            setTagOpen(true);
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '标签最少输入一个',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!copyWritingTemplate.summary) {
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '参考文案分析必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!copyWritingTemplate.demand) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '文案生成要求必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            return false;
-        }
-        if (imageStyleData?.length === 0) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '图片生成模板中最少添加一个风格',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (imageStyleData?.map((i) => i?.templateList?.some((item: any) => !item.id))?.some((el) => el)) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '图片生成模板风格必选',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (flag && (!testImageList || testImageList.length === 0)) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '没有上传测试图片',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        return true;
-    };
     //保存
     const handleSave = () => {
-        // if (params.mode !== 'CUSTOM_IMAGE_TEXT' && verify()) {
-        //     if (searchParams.get('uid')) {
-        //         schemeModify({
-        //             uid: searchParams.get('uid'),
-        //             ...params,
-        //             type: params.type ? 'SYSTEM' : 'USER',
-        //             refers: tableData,
-        //             configuration: {
-        //                 copyWritingTemplate: {
-        //                     ...copyWritingTemplate,
-        //                     example: testTableList,
-        //                     variableList: rows
-        //                 },
-        //                 imageTemplate: {
-        //                     styleList: imageStyleData
-        //                 },
-        //                 paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-        //             }
-        //         }).then((res) => {
-        //             if (res) {
-        //                 navigate('/copywriting');
-        //                 dispatch(
-        //                     openSnackbar({
-        //                         open: true,
-        //                         message: ' 编辑成功',
-        //                         variant: 'alert',
-        //                         alert: {
-        //                             color: 'success'
-        //                         },
-        //                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
-        //                         transition: 'SlideDown',
-        //                         close: false
-        //                     })
-        //                 );
-        //             }
-        //         });
-        //         return false;
-        //     }
-        //     schemeCreate({
-        //         ...params,
-        //         type: params.type ? 'SYSTEM' : 'USER',
-        //         refers: tableData,
-        //         configuration: {
-        //             copyWritingTemplate: {
-        //                 ...copyWritingTemplate,
-        //                 example: testTableList,
-        //                 variableList: rows
-        //             },
-        //             imageTemplate: {
-        //                 styleList: imageStyleData
-        //             },
-        //             paragraphCount: params.mode === 'PRACTICAL_IMAGE_TEXT' ? paragraphCount : null
-        //         }
-        //     }).then((res) => {
-        //         if (res) {
-        //             setTableList([]);
-        //             navigate('/copywriting');
-        //             dispatch(
-        //                 openSnackbar({
-        //                     open: true,
-        //                     message: ' 创建成功',
-        //                     variant: 'alert',
-        //                     alert: {
-        //                         color: 'success'
-        //                     },
-        //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
-        //                     transition: 'SlideDown',
-        //                     close: false
-        //                 })
-        //             );
-        //         }
-        //     });
-        // } else if (params.mode === 'CUSTOM_IMAGE_TEXT') {
         if (!params.name) {
             setTitleOpen(true);
             setCategoryOpen(true);
@@ -582,7 +250,7 @@ const AddModal = () => {
                 uid: searchParams.get('uid'),
                 ...params,
                 type: params.type ? 'SYSTEM' : 'USER',
-                customConfiguration: {
+                configuration: {
                     ...splitList.filter((item) => item.appUid === splitValue)[0],
                     steps: valueList?.map((item) => {
                         if (item?.model === 'RANDOM') {
@@ -624,7 +292,7 @@ const AddModal = () => {
         schemeCreate({
             ...params,
             type: params.type ? 'SYSTEM' : 'USER',
-            customConfiguration: {
+            configuration: {
                 ...splitList.filter((item) => item.appUid === splitValue)[0],
                 steps: valueList?.map((item) => {
                     if (item?.model === 'RANDOM') {
@@ -662,7 +330,6 @@ const AddModal = () => {
                 );
             }
         });
-        // }
     };
 
     //自定义内容拼接
@@ -700,8 +367,7 @@ const AddModal = () => {
             [key]: data
         };
         valueListRef.current = newData;
-
-        setValueList(newData);
+        setValueList(valueListRef.current);
     };
 
     //测试生成
@@ -771,8 +437,10 @@ const AddModal = () => {
             }, 3000);
         }
     }, [queryPage.pageNo]);
+
+    const [current, setCurrent] = useState(0);
+    const [variableLists, setvariableLists] = useState<any[]>([]);
     return (
-        // <Modals open={detailOpen} aria-labelledby="modal-title" aria-describedby="modal-description">
         <MainCard content={false}>
             <CardContent>
                 <SubCard
@@ -938,6 +606,7 @@ const AddModal = () => {
                 <div className="my-[20px] flex gap-2 flex-wrap">
                     {splitList?.map((item) => (
                         <SubCard
+                            key={item?.appUid}
                             sx={{
                                 mb: 1,
                                 cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
@@ -962,621 +631,406 @@ const AddModal = () => {
                         </SubCard>
                     ))}
                 </div>
-                {/* {params.mode !== 'CUSTOM_IMAGE_TEXT' ? (
+                <div className="p-4 border border-solid border-black/30 rounded-lg mb-[20px]">
+                    <Steps
+                        current={current}
+                        items={[
+                            {
+                                icon: <HomeOutlined rev={undefined} />,
+                                title: '应用说明'
+                            },
+                            { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
+                            { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
+                            { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
+                        ]}
+                    />
+                </div>
+                {current === 0 && (
+                    <div className="flex justify-center items-center">
+                        <div className="w-[200px] rounded-lg border border-solid border-black/30 shadow-sm p-4">
+                            <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
+                            <div className="text-xs mt-[10px]">{splitList?.find((item) => item.appUid === splitValue)?.description}</div>
+                        </div>
+                        <div></div>
+                    </div>
+                )}
+                {current === 1 && (
+                    <>
+                        <Row gutter={20}>
+                            {valueList
+                                ?.find((el) => el.code === 'VariableActionHandler')
+                                ?.variableList?.map((item: any, de: number) => (
+                                    <Col key={item?.field} xs={24} sm={12} lg={6}>
+                                        <Form
+                                            item={item}
+                                            index={de}
+                                            changeValue={(data: any) => {
+                                                const newList = _.cloneDeep(valueList);
+                                                const num = valueList?.findIndex((item) => item.code === 'VariableActionHandler');
+                                                newList[num].variableList[data?.index].value = data.value;
+                                                setValueList(newList);
+                                            }}
+                                            flag={false}
+                                        />
+                                    </Col>
+                                ))}
+                        </Row>
+                        <CreateVariable
+                            rows={valueList?.find((item) => item.code === 'VariableActionHandler')?.variableList}
+                            setRows={(data: any[]) =>
+                                setValues(
+                                    'variableList',
+                                    data,
+                                    valueList?.findIndex((item) => item.code === 'VariableActionHandler')
+                                )
+                            }
+                        />
+                    </>
+                )}
+                {current === 2 && (
                     <Collapse
                         bordered={false}
                         style={{ background: 'transparent' }}
-                        items={[
-                            {
-                                key: '1',
-                                style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
-                                label: (
-                                    <div className="relative">
-                                        1.参考内容
-                                        {oneLoading && tableData?.length === 0 && (
-                                            <span className="text-[#ff4d4f] ml-[10px]">（参考内容最少添加一个）</span>
-                                        )}
-                                        {oneLoading && tableData?.length === 0 && (
-                                            <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
-                                        )}
-                                    </div>
-                                ),
-                                children: (
-                                    <>
-                                        <CreateTable
-                                            tableData={tableData}
-                                            sourceList={sourceList}
-                                            setTableData={setTableData}
-                                            params={params}
-                                        />
-                                    </>
-                                )
-                            },
-                            {
-                                key: '2',
-                                style: {
-                                    marginBottom: 20,
-                                    background: '#fafafa',
-                                    border: '1px solod #d9d9d9'
-                                },
-                                label: (
-                                    <div className="relative">
-                                        2.文案生成模板
-                                        {oneLoading && !copyWritingTemplate.summary && (
-                                            <span className="text-[#ff4d4f] ml-[10px]">（参考文案分析必填）</span>
-                                        )}
-                                        {oneLoading && !copyWritingTemplate.demand && (
-                                            <span className="text-[#ff4d4f] ml-[10px]">（文案生成要求必填）</span>
-                                        )}
-                                        {oneLoading && (!copyWritingTemplate.summary || !copyWritingTemplate.demand) && (
-                                            <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
-                                        )}
-                                    </div>
-                                ),
-                                children: (
-                                    <div>
-                                        <div className="flex justify-between items-end mb-[10px]">
-                                            <div className="text-[16px] font-[600]">参考文案分析</div>
-                                            <Button
-                                                disabled={buttonLoading}
-                                                onClick={async () => {
-                                                    setSummaryOpen(false);
-                                                    if (!params.name) {
-                                                        setTitleOpen(true);
-                                                        setCategoryOpen(true);
-                                                        setTagOpen(true);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '方案名称必填',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideDown',
-                                                                close: false
-                                                            })
-                                                        );
-                                                        return false;
-                                                    }
-                                                    if (!params.category) {
-                                                        setTitleOpen(true);
-                                                        setCategoryOpen(true);
-                                                        setTagOpen(true);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '类目必选',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideDown',
-                                                                close: false
-                                                            })
-                                                        );
-                                                        return false;
-                                                    }
-                                                    if (!params.tags || params.tags?.length === 0) {
-                                                        setTitleOpen(true);
-                                                        setCategoryOpen(true);
-                                                        setTagOpen(true);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '标签最少输入一个',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideDown',
-                                                                close: false
-                                                            })
-                                                        );
-                                                        return false;
-                                                    }
-                                                    setButtonLoading(true);
-                                                    setValueLoading(true);
-                                                    const result: any = await schemeDemand({
-                                                        ...params,
-                                                        type: params.type ? 'SYSTEM' : 'USER',
-                                                        refers: tableData
-                                                    });
-                                                    const reader = result.getReader();
-                                                    const textDecoder = new TextDecoder();
-                                                    valueRef.current = '';
-                                                    copyWritingTemplateRef.current = {
-                                                        ...copyWritingTemplateRef.current,
-                                                        summary: ''
-                                                    };
-                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
-                                                    let outerJoins: any;
-                                                    while (1) {
-                                                        let joins = outerJoins;
-                                                        const { done, value } = await reader.read();
-                                                        setValueLoading(false);
-                                                        if (done) {
-                                                            setButtonLoading(false);
-                                                            break;
-                                                        }
-                                                        let str = textDecoder.decode(value);
-                                                        const lines = str.split('\n');
-                                                        lines.forEach((message, i: number) => {
-                                                            if (i === 0 && joins) {
-                                                                message = joins + message;
-                                                                joins = undefined;
-                                                            }
-                                                            if (i === lines.length - 1) {
-                                                                if (message && message.indexOf('}') === -1) {
-                                                                    joins = message;
-                                                                    return;
-                                                                }
-                                                            }
-                                                            if (message.indexOf('"code":400') !== -1) {
-                                                                setButtonLoading(false);
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: JSON.parse(message)?.msg,
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'error'
-                                                                        },
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                        transition: 'SlideDown',
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            }
-                                                            let bufferObj;
-                                                            if (message?.startsWith('data:')) {
-                                                                bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                                                            }
-                                                            if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                                                                valueRef.current = valueRef.current + bufferObj.content;
-                                                                copyWritingTemplateRef.current = {
-                                                                    ...copyWritingTemplateRef.current,
-                                                                    summary: valueRef.current
-                                                                };
-                                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
-                                                            } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: bufferObj.content,
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                        transition: 'SlideDown',
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            } else if (
-                                                                bufferObj &&
-                                                                bufferObj.code !== 200 &&
-                                                                bufferObj.code !== 300900000
-                                                            ) {
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: t('market.warning'),
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'error'
-                                                                        },
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                        transition: 'SlideDown',
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            }
-                                                        });
-                                                        outerJoins = joins;
-                                                    }
-                                                }}
-                                                type="primary"
-                                            >
-                                                AI分析参考文案
-                                            </Button>
-                                        </div>
+                        items={valueList
+                            ?.filter((item) => item.code !== 'VariableActionHandler')
+                            ?.map((el: any, index: number) => {
+                                return {
+                                    key: index,
+                                    style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
+                                    label: (
                                         <div className="relative">
-                                            <TextArea
-                                                status={summaryOpen && !copyWritingTemplate.summary ? 'error' : ''}
-                                                style={{ height: '300px' }}
-                                                value={copyWritingTemplate.summary}
-                                                onChange={(e) => {
-                                                    copyWritingTemplateRef.current = {
-                                                        ...copyWritingTemplateRef.current,
-                                                        summary: e.target.value
-                                                    };
-                                                    setCopyWritingTemplate(copyWritingTemplateRef.current);
-                                                }}
-                                            />
-                                            {summaryOpen && !copyWritingTemplate.summary && (
-                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">参考文案分析必填</span>
-                                            )}
-                                            {valueLoading && (
-                                                <div className="w-full h-full absolute flex justify-center items-center top-0 bg-[#000]/40">
-                                                    <Spin
-                                                        spinning={valueLoading}
-                                                        indicator={<LoadingOutlined rev={undefined} style={{ fontSize: 30 }} spin />}
-                                                    />
-                                                </div>
+                                            <span className="text-[18px] font-[600]">
+                                                {index + 1 + '.'} {el?.name}
+                                            </span>
+                                            {verifyItem(el)?.flag && (
+                                                <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
                                             )}
                                         </div>
-                                        <CreateVariable
-                                            pre={pre}
-                                            value={copyWritingTemplate.demand}
-                                            setValue={(data) => {
-                                                copyWritingTemplateRef.current = {
-                                                    ...copyWritingTemplateRef.current,
-                                                    demand: data
-                                                };
-                                                setCopyWritingTemplate(copyWritingTemplateRef.current);
-                                            }}
-                                            rows={rows}
-                                            setRows={setRows}
-                                        />
-                                        {params.mode === 'PRACTICAL_IMAGE_TEXT' && (
-                                            <div className="relative mt-[20px]">
-                                                <InputNumber
-                                                    size="large"
-                                                    className="w-[300px] bg-[#f8fafc]"
-                                                    min={1}
-                                                    value={paragraphCount}
-                                                    onChange={(value: number | null) => {
-                                                        setparagraphCount(value);
-                                                    }}
-                                                />
-                                                <span className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                                    文案段落数量
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )
-                            },
-                            {
-                                key: '3',
-                                style: {
-                                    background: '#fafafa',
-                                    border: '1px solod #d9d9d9'
-                                },
-                                label: (
-                                    <div className="relative">
-                                        3.图片生成模板
-                                        {oneLoading && imageStyleData?.length === 0 && (
-                                            <span className="text-[#ff4d4f] ml-[10px]">（最少添加一个风格）</span>
-                                        )}
-                                        {oneLoading &&
-                                            imageStyleData
-                                                ?.map((i) => i?.templateList?.some((item: any) => !item.id))
-                                                ?.some((el) => el) && <span className="text-[#ff4d4f] ml-[10px]">（图片风格必选）</span>}
-                                        {oneLoading &&
-                                            (imageStyleData?.length === 0 ||
-                                                imageStyleData
-                                                    ?.map((i) => i?.templateList?.some((item: any) => !item.id))
-                                                    ?.some((el) => el)) && (
-                                                <div className="absolute h-[46px] w-[7px] bg-[#ff4d4f] left-[-40px] top-[-12px] rounded-sm"></div>
-                                            )}
-                                    </div>
-                                ),
-                                children: (
-                                    <CreateTab
-                                        imageStyleData={imageStyleData}
-                                        setImageStyleData={setImageStyleData}
-                                        focuActive={focuActive}
-                                        setFocuActive={setFocuActive}
-                                        digui={digui}
-                                    />
-                                )
-                            }
-                        ]}
-                    />
-                ) : ( */}
-                <Collapse
-                    bordered={false}
-                    style={{ background: 'transparent' }}
-                    items={valueList?.map((el: any, index: number) => {
-                        return {
-                            key: index,
-                            style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
-                            label: (
-                                <div className="relative">
-                                    <span className="text-[18px] font-[600]">
-                                        {index + 1 + '.'} {el?.name}
-                                    </span>
-                                    {verifyItem(el)?.flag && (
-                                        <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
-                                    )}
-                                </div>
-                            ),
-                            children: (
-                                <>
-                                    {(el.code === 'CustomActionHandler' ||
-                                        el.code === 'ParagraphActionHandler' ||
-                                        el.code === 'TitleActionHandler') && (
+                                    ),
+                                    children: (
                                         <>
-                                            <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
-                                            <div>
-                                                <Radio.Group
-                                                    value={el.model}
-                                                    onChange={(e) => {
-                                                        setValues('model', e.target.value, index);
-                                                    }}
-                                                >
-                                                    {modeList?.map((item) =>
-                                                        el?.code === 'ParagraphActionHandler' ? (
-                                                            item.label !== '随机获取' && (
-                                                                <Radio key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                </Radio>
-                                                            )
-                                                        ) : (
-                                                            <Radio key={item.value} value={item.value}>
-                                                                {item.label}
-                                                            </Radio>
-                                                        )
-                                                    )}
-                                                </Radio.Group>
-                                            </div>
-                                            <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
-                                                <span className="font-[600] text-[#673ab7]">Tips：</span>
-                                                {el.model === 'RANDOM'
-                                                    ? '从参考内容中随机获取一条内容使用'
-                                                    : el.model === 'AI_PARODY'
-                                                    ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
-                                                    : '直接让AI生成内容，要求越详细越好'}
-                                            </div>
-                                            {el.model !== 'AI_CUSTOM' && (
+                                            {(el.code === 'CustomActionHandler' ||
+                                                el.code === 'ParagraphActionHandler' ||
+                                                el.code === 'TitleActionHandler') && (
                                                 <>
-                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
-                                                    <CreateTable
-                                                        tableData={el?.referList}
-                                                        sourceList={sourceList}
-                                                        code={el?.code}
-                                                        setTableData={(data) => setValues('referList', data, index)}
-                                                        params={params}
-                                                    />
-                                                </>
-                                            )}
-                                            {el.model !== 'RANDOM' && (
-                                                <>
-                                                    <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
-                                                        {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                    <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
+                                                    <div>
+                                                        <Radio.Group
+                                                            value={el.model}
+                                                            onChange={(e) => {
+                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                    setValues('model', e.target.value, index + 1);
+                                                                } else {
+                                                                    setValues('model', e.target.value, index);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {modeList?.map((item) =>
+                                                                el?.code === 'ParagraphActionHandler' ? (
+                                                                    item.label !== '随机获取' && (
+                                                                        <Radio key={item.value} value={item.value}>
+                                                                            {item.label}
+                                                                        </Radio>
+                                                                    )
+                                                                ) : (
+                                                                    <Radio key={item.value} value={item.value}>
+                                                                        {item.label}
+                                                                    </Radio>
+                                                                )
+                                                            )}
+                                                        </Radio.Group>
                                                     </div>
-                                                    <CreateVariable
-                                                        pre={pre}
-                                                        model={el?.model}
-                                                        value={el?.requirement}
-                                                        setValue={(data: string) => setValues('requirement', data, index)}
-                                                        rows={el?.variableList}
-                                                        setRows={(data: any[]) => setValues('variableList', data, index)}
-                                                    />
+                                                    <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                        <span className="font-[600] text-[#673ab7]">Tips：</span>
+                                                        {el.model === 'RANDOM'
+                                                            ? '从参考内容中随机获取一条内容使用'
+                                                            : el.model === 'AI_PARODY'
+                                                            ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                            : '直接让AI生成内容，要求越详细越好'}
+                                                    </div>
+                                                    {el.model !== 'AI_CUSTOM' && (
+                                                        <>
+                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
+                                                            <CreateTable
+                                                                tableData={el?.referList}
+                                                                sourceList={sourceList}
+                                                                code={el?.code}
+                                                                setTableData={(data) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('referList', data, index + 1);
+                                                                    } else {
+                                                                        setValues('referList', data, index);
+                                                                    }
+                                                                }}
+                                                                params={params}
+                                                            />
+                                                        </>
+                                                    )}
+                                                    {el.model !== 'RANDOM' && (
+                                                        <>
+                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
+                                                                {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                            </div>
+                                                            <CreateVariables
+                                                                pre={pre}
+                                                                model={el?.model}
+                                                                value={el?.requirement}
+                                                                setValue={(data: string) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('requirement', data, index + 1);
+                                                                    } else {
+                                                                        setValues('requirement', data, index);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </>
+                                                    )}
+                                                    {el.code === 'ParagraphActionHandler' && (
+                                                        <>
+                                                            <div className="relative mt-[20px]">
+                                                                <InputNumber
+                                                                    status={!el?.paragraphCount ? 'error' : ''}
+                                                                    size="large"
+                                                                    className="w-[300px] bg-[#f8fafc]"
+                                                                    min={1}
+                                                                    value={el?.paragraphCount}
+                                                                    onChange={(data) => {
+                                                                        if (
+                                                                            valueList.find((item) => item.code === 'VariableActionHandler')
+                                                                        ) {
+                                                                            setValues('paragraphCount', data, index + 1);
+                                                                        } else {
+                                                                            setValues('paragraphCount', data, index);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <span
+                                                                    style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
+                                                                    className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                                >
+                                                                    文案段落数量
+                                                                </span>
+                                                            </div>
+                                                            {!el?.paragraphCount && (
+                                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                                    文案段落数量必填
+                                                                </span>
+                                                            )}
+                                                        </>
+                                                    )}
                                                 </>
                                             )}
-                                            {el.code === 'ParagraphActionHandler' && (
+                                            {el.code === 'AssembleActionHandler' && (
                                                 <>
-                                                    <div className="relative mt-[20px]">
-                                                        <InputNumber
-                                                            status={!el?.paragraphCount ? 'error' : ''}
-                                                            size="large"
-                                                            className="w-[300px] bg-[#f8fafc]"
-                                                            min={1}
-                                                            value={el?.paragraphCount}
-                                                            onChange={(data) => setValues('paragraphCount', data, index)}
+                                                    <div className="relative">
+                                                        <TextArea
+                                                            status={!el?.requirement ? 'error' : ''}
+                                                            defaultValue={el?.requirement}
+                                                            onBlur={(data) => {
+                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                    setValues('requirement', data.target.value, index + 1);
+                                                                } else {
+                                                                    setValues('requirement', data.target.value, index);
+                                                                }
+                                                            }}
+                                                            rows={10}
                                                         />
                                                         <span
-                                                            style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
-                                                            className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                            style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                            className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
                                                         >
-                                                            文案段落数量
+                                                            文案拼接配置
                                                         </span>
                                                     </div>
-                                                    {!el?.paragraphCount && (
+                                                    {!el?.requirement && (
                                                         <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
-                                                            文案段落数量必填
+                                                            文案拼接配置必填
                                                         </span>
                                                     )}
                                                 </>
                                             )}
-                                        </>
-                                    )}
-                                    {el.code === 'AssembleActionHandler' && (
-                                        <>
-                                            <div className="relative">
-                                                <TextArea
-                                                    status={!el?.requirement ? 'error' : ''}
-                                                    defaultValue={el?.requirement}
-                                                    onBlur={(data) => setValues('requirement', data.target.value, index)}
-                                                    rows={10}
-                                                />
-                                                <span
-                                                    style={{ color: !el?.requirement ? '#f44336' : '#000' }}
-                                                    className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
-                                                >
-                                                    文案拼接配置
-                                                </span>
-                                            </div>
-                                            {!el?.requirement && (
-                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案拼接配置必填</span>
+                                            {el.code === 'PosterActionHandler' && (
+                                                <>
+                                                    <CreateTab
+                                                        mode={el?.mode}
+                                                        setModel={(data) => {
+                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                setValues('mode', data, index + 1);
+                                                            } else {
+                                                                setValues('mode', data, index);
+                                                            }
+                                                        }}
+                                                        imageStyleData={el?.styleList}
+                                                        setImageStyleData={(data) => {
+                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                setValues('styleList', data, index + 1);
+                                                            } else {
+                                                                setValues('styleList', data, index);
+                                                            }
+                                                        }}
+                                                        focuActive={focuActive}
+                                                        setFocuActive={setFocuActive}
+                                                        digui={() => {
+                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                            if (!newData || newData?.every((i: any) => !i)) {
+                                                                return 1;
+                                                            }
+                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                        }}
+                                                    />
+                                                </>
                                             )}
                                         </>
-                                    )}
-                                    {el.code === 'PosterActionHandler' && (
-                                        <>
-                                            <CreateTab
-                                                imageStyleData={el?.styleList}
-                                                setImageStyleData={(data) => setValues('styleList', data, index)}
-                                                focuActive={focuActive}
-                                                setFocuActive={setFocuActive}
-                                                digui={() => {
-                                                    const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                                    if (newData.every((i: any) => !i)) {
-                                                        return 1;
-                                                    }
-                                                    return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                                }}
-                                            />
-                                        </>
-                                    )}
-                                </>
-                            )
-                        };
-                    })}
-                />
-                {/*  )} */}
-                <Divider />
-                <div className="text-[18px] my-[20px] font-[600]">测试生成</div>
-                <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
-                    <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
-                        <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
-                    </Modal>
-                    <div>
-                        <Upload {...testProps}>
-                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                <PlusOutlined rev={undefined} />
-                                <div style={{ marginTop: 8 }}>Upload</div>
-                            </div>
-                        </Upload>
-                    </div>
-                </div>
-                <Button
-                    onClick={() => {
-                        if (!testImageList || testImageList.length === 0) {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: '没有上传测试图片',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                    transition: 'SlideDown',
-                                    close: false
-                                })
-                            );
-                            return false;
-                        }
-                        if (searchParams.get('uid')) {
-                            setTestOpen(true);
-                            try {
-                                schemeExample({
-                                    uid: searchParams.get('uid'),
-                                    ...params,
-                                    type: params.type ? 'SYSTEM' : 'USER',
-                                    customConfiguration: {
-                                        ...splitList.filter((item) => item.appUid === splitValue)[0],
-                                        steps: valueList?.map((item) => {
-                                            if (item?.model === 'RANDOM') {
-                                                return {
-                                                    ...item,
-                                                    variableList: [],
-                                                    requirement: ''
-                                                };
-                                            } else if (item?.model === 'AI_CUSTOM') {
-                                                return {
-                                                    ...item,
-                                                    referList: []
-                                                };
-                                            } else {
-                                                return item;
-                                            }
-                                        })
-                                    },
-                                    useImages: testImageList
-                                        ?.map((item: any, i: number) => {
-                                            if (item?.response?.data?.url) {
-                                                return item?.response?.data?.url;
-                                            } else {
-                                                return undefined;
-                                            }
-                                        })
-                                        ?.filter((item) => item)
-                                })
-                                    .then((res) => {
-                                        setTestOpen(false);
-                                        getList();
-                                        timer.current[0] = setInterval(() => {
-                                            if (
-                                                plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                                    return (
-                                                        item?.pictureStatus !== 'executing' &&
-                                                        item?.pictureStatus !== 'init' &&
-                                                        item?.copyWritingStatus !== 'executing' &&
-                                                        item?.copyWritingStatus !== 'init'
-                                                    );
-                                                })
-                                            ) {
-                                                clearInterval(timer.current[0]);
-                                            }
-                                            getLists(1);
-                                        }, 3000);
-                                    })
-                                    .catch((err) => {
-                                        setTestOpen(false);
-                                    });
-                            } catch (err) {
-                                setTestOpen(false);
-                            }
-                        } else {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: '保存之后才能测试生成',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                    transition: 'SlideDown',
-                                    close: false
-                                })
-                            );
-                        }
-                    }}
-                    loading={testOpen}
-                    className="mt-[20px]"
-                    type="primary"
-                >
-                    测试生成
-                </Button>
-                <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
-                    <Row gutter={20} className="h-[fit-content] w-full">
-                        {planList.map((item, index: number) => (
-                            <Col key={index} span={6} className="inline-block">
-                                <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
-                            </Col>
-                        ))}
-                    </Row>
-                </div>
-                {/* {testTableList?.length > 0 && (
-                    <Table
-                        className="mt-[20px]"
-                        scroll={{ y: 500 }}
-                        rowKey={'title'}
-                        size="small"
-                        columns={testColumn}
-                        dataSource={testTableList}
+                                    )
+                                };
+                            })}
                     />
-                )} */}
+                )}
+                {current === 3 && (
+                    <>
+                        <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
+                            <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
+                                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                            </Modal>
+                            <div>
+                                <Upload {...testProps}>
+                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                        <PlusOutlined rev={undefined} />
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => {
+                                if (!testImageList || testImageList.length === 0) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '没有上传测试图片',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            transition: 'SlideDown',
+                                            close: false
+                                        })
+                                    );
+                                    return false;
+                                }
+                                if (searchParams.get('uid')) {
+                                    setTestOpen(true);
+                                    try {
+                                        schemeExample({
+                                            uid: searchParams.get('uid'),
+                                            ...params,
+                                            type: params.type ? 'SYSTEM' : 'USER',
+                                            configuration: {
+                                                ...splitList.filter((item) => item.appUid === splitValue)[0],
+                                                steps: valueList?.map((item) => {
+                                                    if (item?.model === 'RANDOM') {
+                                                        return {
+                                                            ...item,
+                                                            variableList: [],
+                                                            requirement: ''
+                                                        };
+                                                    } else if (item?.model === 'AI_CUSTOM') {
+                                                        return {
+                                                            ...item,
+                                                            referList: []
+                                                        };
+                                                    } else {
+                                                        return item;
+                                                    }
+                                                })
+                                            },
+                                            useImages: testImageList
+                                                ?.map((item: any, i: number) => {
+                                                    if (item?.response?.data?.url) {
+                                                        return item?.response?.data?.url;
+                                                    } else {
+                                                        return undefined;
+                                                    }
+                                                })
+                                                ?.filter((item) => item)
+                                        })
+                                            .then((res) => {
+                                                setTestOpen(false);
+                                                getList();
+                                                timer.current[0] = setInterval(() => {
+                                                    if (
+                                                        plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                            return (
+                                                                item?.pictureStatus !== 'executing' &&
+                                                                item?.pictureStatus !== 'init' &&
+                                                                item?.copyWritingStatus !== 'executing' &&
+                                                                item?.copyWritingStatus !== 'init'
+                                                            );
+                                                        })
+                                                    ) {
+                                                        clearInterval(timer.current[0]);
+                                                    }
+                                                    getLists(1);
+                                                }, 3000);
+                                            })
+                                            .catch((err) => {
+                                                setTestOpen(false);
+                                            });
+                                    } catch (err) {
+                                        setTestOpen(false);
+                                    }
+                                } else {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '保存之后才能测试生成',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            transition: 'SlideDown',
+                                            close: false
+                                        })
+                                    );
+                                }
+                            }}
+                            loading={testOpen}
+                            className="mt-[20px]"
+                            type="primary"
+                        >
+                            测试生成
+                        </Button>
+                        <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
+                            <Row gutter={20} className="h-[fit-content] w-full">
+                                {planList.map((item, index: number) => (
+                                    <Col key={index} span={6} className="inline-block">
+                                        <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </div>
+                    </>
+                )}
+                <div className="my-[20px] flex justify-center gap-2">
+                    <Button type="primary" onClick={() => setCurrent(current - 1)} disabled={current === 0}>
+                        上一步
+                    </Button>
+                    <Button type="primary" onClick={() => setCurrent(current + 1)} disabled={current === 3}>
+                        下一步
+                    </Button>
+                </div>
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">
-                        <Button type="primary" onClick={handleSave}>
+                        <Button className="w-[100px]" size="large" type="primary" onClick={handleSave}>
                             保存
                         </Button>
                     </Grid>
                 </CardActions>
             </CardContent>
         </MainCard>
-        // </Modals>
     );
 };
 export default AddModal;

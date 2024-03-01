@@ -177,7 +177,7 @@ const plansDefault = (value: number) => [
         monthPrice: '免费',
         yearPrice: '免费',
         des: '适用于新用户体验',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        permission: [0, 1, 3, 4, 5, 6],
         btnText: '免费使用'
     },
     {
@@ -272,12 +272,12 @@ const planListDefault = (value: number) => [
     {
         keyword: 'plus',
         value: [
-            '账号管理数量：10',
-            '账号分组数量：3',
+            '账号管理数量：30',
+            '账号分组数量：10',
             '账号云同步：有',
             '一键检查账号状态：有',
-            '一键发布次数/天：20次/天',
-            '每次发布账号数上限：10',
+            '一键发布次数/天：不限',
+            '每次发布账号数上限：30',
             '定时发布：有',
             '数据中心（数据聚合）：有',
             '评论管理：有'
@@ -286,12 +286,12 @@ const planListDefault = (value: number) => [
     {
         keyword: 'pro',
         value: [
-            '账号管理数量：10',
-            '账号分组数量：3',
+            '账号管理数量：80',
+            '账号分组数量：30',
             '账号云同步：有',
             '一键检查账号状态：有',
-            '一键发布次数/天：20次/天',
-            '每次发布账号数上限：10',
+            '一键发布次数/天：不限',
+            '每次发布账号数上限：50',
             '定时发布：有',
             '数据中心（数据聚合）：有',
             '评论管理：有'
@@ -958,7 +958,7 @@ const Price1 = () => {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
-                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicBean}魔法豆, ${plan?.skus?.[0].rightsConfig.rightsBasicDTO.magicImage}点作图`}</Typography>
+                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.matrixBean}矩阵豆`}</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     {/* <div className="text-sm text-center text-[#d7d7d7] line-through">

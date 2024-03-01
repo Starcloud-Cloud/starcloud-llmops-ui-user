@@ -61,34 +61,54 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                     <div>
                         {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
                             imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
-                            <div className="flex items-center gap-4 min-h-[32px]">
-                                <span>图片标题生成</span>
-                                <Switch
-                                    checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
-                                    onChange={(e) => {
-                                        const newData = _.cloneDeep(imageStyleData);
-                                        if (e) {
-                                            newData.titleGenerateMode = 'AI';
-                                        } else {
-                                            newData.titleGenerateMode = 'DEFAULT';
-                                        }
-                                        setData(newData);
-                                    }}
-                                />
-                                <span className="text-[#673ab7]">{imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}</span>
-                                {imageStyleData?.titleGenerateMode === 'AI' && (
-                                    <Input
-                                        className="w-[400px]"
-                                        value={imageStyleData?.titleGenerateRequirement}
+                            <>
+                                <div className="flex items-center gap-4 min-h-[32px]">
+                                    <span className="w-[112px]">图片标题生成</span>
+                                    <Switch
+                                        checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                         onChange={(e) => {
                                             const newData = _.cloneDeep(imageStyleData);
-                                            newData.titleGenerateRequirement = e.target.value;
+                                            if (e) {
+                                                newData.titleGenerateMode = 'AI';
+                                            } else {
+                                                newData.titleGenerateMode = 'DEFAULT';
+                                            }
                                             setData(newData);
                                         }}
-                                        placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
                                     />
-                                )}
-                            </div>
+                                    <span className="text-[#673ab7]">
+                                        {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
+                                    </span>
+                                    {imageStyleData?.titleGenerateMode === 'AI' && (
+                                        <Input
+                                            className="w-[400px]"
+                                            value={imageStyleData?.titleGenerateRequirement}
+                                            onChange={(e) => {
+                                                const newData = _.cloneDeep(imageStyleData);
+                                                newData.titleGenerateRequirement = e.target.value;
+                                                setData(newData);
+                                            }}
+                                            placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                        />
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-4 min-h-[32px]">
+                                    <span>图片生成模式</span>
+                                    <Switch
+                                        checked={imageStyleData?.mode === 'SEQUENCE' ? true : false}
+                                        onChange={(e) => {
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            if (e) {
+                                                newData.mode = 'SEQUENCE';
+                                            } else {
+                                                newData.mode = 'RANDOM';
+                                            }
+                                            setData(newData);
+                                        }}
+                                    />
+                                    <span className="text-[#673ab7]">{imageStyleData?.mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}</span>
+                                </div>
+                            </>
                         )}
                         <Row className="items-center mt-[20px]" gutter={20}>
                             {imageStyleData?.variableList?.map(

@@ -15,14 +15,14 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                         size="small"
                         sx={mt}
                         label={item.label}
-                        value={item.value}
+                        defaultValue={item.value}
                         id={item.field}
                         required
                         name={item.field}
                         InputLabelProps={{ shrink: true }}
                         error={!item.value && open && !flag}
                         helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
-                        onChange={(e) => {
+                        onBlur={(e) => {
                             setOpen(true);
                             changeValue({ index, value: e.target.value });
                         }}
@@ -35,7 +35,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     size="small"
                     sx={mt}
                     label={item.label}
-                    value={item.value}
+                    defaultValue={item.value}
                     id={item.field}
                     required
                     name={item.field}
@@ -45,7 +45,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     InputLabelProps={{ shrink: true }}
                     error={!item.value && open && !flag}
                     helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
-                    onChange={(e) => {
+                    onBlur={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
                     }}
@@ -56,7 +56,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     sx={mt}
                     size="small"
                     color="secondary"
-                    value={item.value}
+                    defaultValue={item.value}
                     InputLabelProps={{ shrink: true }}
                     select
                     required
@@ -65,7 +65,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     label={item.label}
                     error={!item.value && open && !flag}
                     helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
-                    onChange={(e) => {
+                    onBlur={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
                     }}

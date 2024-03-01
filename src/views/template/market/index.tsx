@@ -351,11 +351,13 @@ function TemplateMarket() {
     const allDetail = useAllDetail();
 
     useEffect(() => {
-        const result = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
-        if (!result) {
-            setOpenMarketVideo(true);
+        if (allDetail?.allDetail?.id) {
+            const result = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
+            if (!result) {
+                setOpenMarketVideo(true);
+            }
         }
-    }, []);
+    }, [allDetail]);
 
     return (
         // <Box

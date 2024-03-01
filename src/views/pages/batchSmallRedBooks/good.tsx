@@ -147,7 +147,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         }}
                     >
                         <div className="flex justify-between items-start">
-                            <div className="line-clamp-2 h-[37px] text-[14px] font-bold">{item.copyWritingTitle}</div>
+                            <div className="line-clamp-2 h-[40px] text-[14px] font-bold">{item.copyWritingTitle}</div>
                             {likeOpen ? (
                                 <GradeIcon
                                     onClick={async (e: any) => {
@@ -212,7 +212,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                                 </div>
                             }
                         >
-                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[75px]">{item.copyWritingContent}</div>
+                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[85px]">{item.copyWritingContent}</div>
                         </Popover>
                         <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
                             <div>

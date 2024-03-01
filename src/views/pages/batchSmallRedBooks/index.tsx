@@ -671,12 +671,12 @@ const BatcSmallRedBooks = () => {
                                     children: (
                                         <Spin spinning={batchOpen}>
                                             <div
-                                                className="h-[200px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                                className="h-[1000px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
                                                 ref={scrollRef}
                                                 onScroll={handleScroll}
                                             >
                                                 <Row gutter={20} className="h-[fit-content] w-full">
-                                                    {planList.map((item1, index: number) => (
+                                                    {planList.map((item, index: number) => (
                                                         <Col key={index} xs={12} md={12} xl={8} xxl={6} className="inline-block">
                                                             <Goods
                                                                 item={item}

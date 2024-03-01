@@ -26,6 +26,9 @@ import { favoriteList } from 'api/template/collect';
 import _ from 'lodash-es';
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
+import { useAllDetail } from '../../../contexts/JWTContext';
+import market from 'assets/images/landing/pre-apps/market.jpg';
+import { MarketVideoModel } from './MarketVideoModel';
 interface MarketList {
     name: string;
     tags: string[];
@@ -336,12 +339,24 @@ function TemplateMarket() {
     };
     const [value, setValue] = useState(0);
     const [collectList, setCollectList] = useState<any[]>([]);
+    const [openMarketVideo, setOpenMarketVideo] = useState(false);
+
     useEffect(() => {
         favoriteList({}).then((res) => {
             setCollectList(res);
         });
     }, [value]);
     const scrollRef: any = useRef(null);
+
+    const allDetail = useAllDetail();
+
+    useEffect(() => {
+        const result = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
+        if (!result) {
+            setOpenMarketVideo(true);
+        }
+    }, []);
+
     return (
         // <Box
         //     sx={{
@@ -408,7 +423,6 @@ function TemplateMarket() {
                     </Box>
                 ))}
             </ScrollMenu>
-
             {newList?.map((item, index) => (
                 <div key={index}>
                     {item.appList?.length > 0 && (
@@ -471,6 +485,12 @@ function TemplateMarket() {
                                         }
                                         {...a11yProps(1)}
                                     />
+                                    <div
+                                        className="cursor-pointer text-[#6839b7] ml-1 flex justify-center items-center"
+                                        onClick={() => setOpenMarketVideo(true)}
+                                    >
+                                        应用市场使用视频
+                                    </div>
                                 </Tabs>
                             )}
                         </>
@@ -533,6 +553,13 @@ function TemplateMarket() {
                         ))}
                 </div>
             ))}
+            <MarketVideoModel
+                open={openMarketVideo}
+                handleClose={() => {
+                    setOpenMarketVideo(false);
+                    localStorage.setItem(`marketVideo-${allDetail?.allDetail?.id}`, 'true');
+                }}
+            />
         </Box>
         // </Box>
     );

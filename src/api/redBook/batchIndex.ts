@@ -57,3 +57,7 @@ export const contentUnlike = (data: any) => {
 export const failureRetry = (uid: any) => {
     return request.get({ url: `/llm/xhs/content/failureRetry/${uid}` });
 };
+//失败重试
+export const batchPages = (data: any) => {
+    return request.get({ url: `/llm/creative/batch/page`, params: data });
+};

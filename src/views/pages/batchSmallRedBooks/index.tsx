@@ -348,11 +348,11 @@ const BatcSmallRedBooks = () => {
             setbatchOpen(false);
         });
     };
-    const getLists = (pageNo: number) => {
+    const getLists = (pageNo: number, batch?: string) => {
         getContentPage({
             ...queryRef.current,
             pageNo,
-            batch: batchUid,
+            batch: batch || batchUid,
             planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
@@ -368,22 +368,17 @@ const BatcSmallRedBooks = () => {
     useEffect(() => {
         if (queryPage.pageNo > 1) {
             getList();
-            if (
-                plabListRef.current
-                    .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                    ?.every(
-                        (item: any) =>
-                            item?.pictureStatus !== 'executing' &&
-                            item?.pictureStatus !== 'init' &&
-                            item?.copyWritingStatus !== 'executing' &&
-                            item?.copyWritingStatus !== 'init'
-                    )
-            ) {
-                timer.current[queryPage.pageNo - 1] = setInterval(() => {
-                    getLists(queryPage.pageNo);
-                }, 3000);
-                clearInterval(timer.current[queryPage.pageNo - 1]);
-            }
+            timer.current[queryPage.pageNo - 1] = setInterval(() => {
+                if (
+                    plabListRef.current
+                        .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init')
+                ) {
+                    clearInterval(timer.current[queryPage.pageNo - 1]);
+                    return;
+                }
+                getLists(queryPage.pageNo);
+            }, 3000);
         }
     }, [queryPage.pageNo]);
     //变量
@@ -638,17 +633,13 @@ const BatcSmallRedBooks = () => {
                                             if (
                                                 plabListRef.current?.length === 0 ||
                                                 plabListRef.current.slice(0, 1)?.every((item: any) => {
-                                                    return (
-                                                        item?.pictureStatus !== 'executing' &&
-                                                        item?.pictureStatus !== 'init' &&
-                                                        item?.copyWritingStatus !== 'executing' &&
-                                                        item?.copyWritingStatus !== 'init'
-                                                    );
+                                                    return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
                                                 })
                                             ) {
                                                 clearInterval(timer.current[0]);
+                                                return;
                                             }
-                                            getLists(1);
+                                            getLists(1, e[0]);
                                         }, 3000);
                                     }
                                 }
